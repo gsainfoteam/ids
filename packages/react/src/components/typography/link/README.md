@@ -28,11 +28,11 @@ import { Link } from '@gsainfoteam/ids-react';
 <Link colorScheme="primary" />    // 기본. 브랜드 글자색(text-primary)
 <Link colorScheme="secondary" />  // text-secondary, 테마에 없으면 primary 에서 만든 색
 <Link colorScheme="tertiary" />   // text-tertiary, 테마에 없으면 primary 에서 만든 색
-<Link colorScheme="neutral" />    // 둘레 글자색을 따르고, 가리키면 text-neutral-bold
+<Link colorScheme="neutral" />    // 둘레 글자색을 따르고, 가리키면 text-neutral-strong
 <Link colorScheme="neutral" aria-current="page" />  // 지금 페이지는 text-primary
 ```
 
-- 브랜드 색은 채우기(`bg-primary`)가 아니라 글자 역할(`text-primary`)을 씁니다. 모든 테마에서 바탕과 APCA Lc 60 을 넘습니다.
+- 브랜드 색은 채우기(`bg-primary-solid`)가 아니라 글자 역할(`text-primary`)을 씁니다. 모든 테마에서 바탕과 APCA Lc 60 을 넘습니다.
 - 예전 `accent` 는 `primary` 로 바뀌었습니다.
 - `neutral` 은 `Card.Description` 처럼 흐린 글자 안에 두면 그 색을 따릅니다.
 - `neutral` 링크에 `aria-current="page"` 가 붙으면 `text-primary` 가 되고, 가리켜도 그대로입니다. 상단 바나 바닥글의 지금 페이지 표시입니다. 라우터 링크(`NavLink`, TanStack Router 의 `Link`)는 `aria-current` 를 스스로 붙이므로 따로 적을 것이 없습니다.

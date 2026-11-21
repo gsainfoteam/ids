@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const examples = fileURLToPath(new URL('../examples/', import.meta.url));
 
 const serverRenderedIds = [
-  ['IdsProvider theme', '--ids-theme-light-bg-primary:#155dfc'],
+  ['IdsProvider theme', '--ids-theme-light-bg-primary-solid:#155dfc'],
   ['glossy Button', 'data-variant="glossy"'],
   ['Dialog.Trigger', 'aria-haspopup="dialog"'],
   ['Select', 'data-select=""'],
@@ -15,7 +15,7 @@ const serverRenderedIds = [
   ['Menu.Trigger', 'aria-haspopup="menu"'],
 ];
 
-const utilityOnlyIdsUses = '.bg-neutral-subtlest';
+const utilityOnlyIdsUses = '.bg-base';
 
 const idsFonts = ['Pretendard GOV Variable', 'Geist Mono Variable'];
 

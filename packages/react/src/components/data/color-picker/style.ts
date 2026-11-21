@@ -12,7 +12,7 @@ const dimOnceAtRoot = {
 
 export const colorPickerStyle = tv({
   slots: {
-    root: 'grid w-full min-w-0 gap-3 text-neutral-bold data-disabled:opacity-50',
+    root: 'grid w-full min-w-0 gap-3 text-neutral-strong data-disabled:opacity-50',
     area: [
       sliderSurface.edge,
       'relative w-full cursor-crosshair touch-none rounded-standard select-none',
@@ -32,8 +32,8 @@ export const colorPickerStyle = tv({
     tool: '',
     swatches: 'gap-2',
     swatch: [
-      'rounded-standard shadow-none inset-ring-(--ids-color-text-neutral-bold)/10',
-      'data-[state=checked]:ring-2 data-[state=checked]:ring-scheme',
+      'rounded-standard shadow-none inset-ring-(--ids-color-text-neutral-strong)/10',
+      'data-[state=checked]:ring-2 data-[state=checked]:ring-scheme-strong',
       'data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-(--ids-bg-current)',
     ],
   },

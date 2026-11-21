@@ -363,7 +363,7 @@ test('underline draws the selected label and its line in primary', async () => {
     .poll(() => getComputedStyle(selected).color)
     .toBe(colorOf('--ids-color-text-primary'));
   expect(getComputedStyle(selected, '::after').backgroundColor).toBe(
-    colorOf('--ids-color-border-primary'),
+    colorOf('--ids-color-border-primary-strong'),
   );
   expect(getComputedStyle(tab('a').element()).color).not.toBe(colorOf('--ids-color-text-primary'));
 });
@@ -390,9 +390,9 @@ test('pill fills the selected tab with the primary subtle pair', async () => {
 
   await expect
     .poll(() => getComputedStyle(tab('b').element()).backgroundColor)
-    .toBe(colorOf('--ids-color-bg-primary-subtle'));
+    .toBe(colorOf('--ids-color-bg-primary-soft'));
   expect(getComputedStyle(tab('b').element()).color).toBe(
-    colorOf('--ids-color-text-on-primary-subtle'),
+    colorOf('--ids-color-text-on-primary-soft'),
   );
   expect(getComputedStyle(tab('a').element()).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 });
@@ -460,8 +460,8 @@ test('segmented in dark lifts the selected tab one neutral step above the track'
   const root = document.querySelector('[data-mode="dark"]')!;
   await expect
     .poll(() => getComputedStyle(tab('a').element()).backgroundColor)
-    .toBe(colorOf('--ids-color-bg-neutral', root));
+    .toBe(colorOf('--ids-color-border-neutral-strong', root));
   expect(getComputedStyle(screen.getByRole('tablist').element()).backgroundColor).toBe(
-    colorOf('--ids-color-bg-neutral-subtle', root),
+    colorOf('--ids-color-bg-neutral-soft', root),
   );
 });

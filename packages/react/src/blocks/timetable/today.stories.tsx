@@ -49,7 +49,7 @@ export const PC: Story = {
           <Progress value={68} aria-label="다음 수업까지 남은 시간" />
           <p>{CLASSES[NOW_INDEX].room}</p>
         </Card.Content>
-        <Card.Footer className="border-t">
+        <Card.Footer>
           <Button variant="outline" className="w-full">
             <MapPinIcon />
             강의실 가는 길

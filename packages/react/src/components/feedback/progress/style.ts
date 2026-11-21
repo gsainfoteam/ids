@@ -7,17 +7,17 @@ export const progressStyle = tv({
   slots: {
     root: '',
     header: 'flex items-baseline gap-2',
-    track: 'relative w-full overflow-hidden rounded-full bg-neutral-subtle',
-    indicator: 'h-full rounded-full bg-scheme',
+    track: 'relative w-full overflow-hidden rounded-full bg-neutral-soft',
+    indicator: 'h-full rounded-full bg-scheme-solid',
     circle: 'relative inline-flex shrink-0 items-center justify-center',
     svg: 'size-full',
-    trackCircle: 'text-(--ids-color-bg-neutral-subtle)',
+    trackCircle: 'text-(--ids-color-bg-neutral-soft)',
     indicatorCircle: [
-      'origin-center -rotate-90 text-(--ids-color-bg-scheme)',
+      'origin-center -rotate-90 text-(--ids-color-bg-scheme-solid)',
       'transition-[stroke-dashoffset] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
     ],
     center: 'absolute inset-0 flex items-center justify-center [&_svg]:size-[40%]',
-    label: 'min-w-0 truncate text-neutral-bold',
+    label: 'min-w-0 truncate text-neutral-strong',
     value: 'shrink-0 text-neutral tabular-nums',
   },
   variants: {

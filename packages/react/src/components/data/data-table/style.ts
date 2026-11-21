@@ -11,7 +11,7 @@ export const dataTableStyle = tv({
     head: 'group/head relative',
     sortButton: [
       'group/sort -mx-2 max-w-full gap-1 px-2 text-inherit',
-      'data-hovered:text-neutral-bold data-active:text-neutral-bold',
+      'data-hovered:text-neutral-strong data-active:text-neutral-strong',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
@@ -33,7 +33,7 @@ export const dataTableStyle = tv({
     message: 'h-24 text-center text-neutral',
     overlay: [
       'absolute inset-0 z-20 flex items-center justify-center rounded-container',
-      'bg-neutral-subtlest/60',
+      'bg-base/60',
     ],
     spinner: 'size-6 text-neutral',
     footer: 'flex flex-wrap items-center justify-between gap-3',

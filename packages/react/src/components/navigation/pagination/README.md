@@ -134,7 +134,7 @@ import { Link } from '@tanstack/react-router';
 <Pagination pageCount={20} disabled />           {/* 모든 버튼을 끈다 */}
 ```
 
-- 현재 페이지는 기본으로 `bg-primary-subtle` 과 `text-on-primary-subtle` 입니다. DataTable 의 선택한 행과 같은 색입니다.
+- 현재 페이지는 기본으로 `bg-primary-soft` 과 `text-on-primary-soft` 입니다. DataTable 의 선택한 행과 같은 색입니다.
 - `variant` 는 현재 페이지에만 입힙니다. `ghost` 는 채우지 않고 press 층(`state-press`)에 글자를 `text-primary` 로 바꿉니다.
 
 ## 키보드

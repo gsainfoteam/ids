@@ -1,8 +1,8 @@
 import { COMPARED_STEP, RED_GREEN_PAIRS, alikeUnderRedGreenCvd, tooClose } from './color-distance';
-import { chromaOf, hueOf, paletteFromSteps, rotatedPalette, signedHueDelta } from './palette-seed';
+import { chromaOf, hueOf, rampFromSteps, rotatedRamp, signedHueDelta } from './palette-seed';
 import { STATUS_PALETTES } from '../../../tokens/palette-model';
 
-import type { IdsPalette, IdsStatusFamily } from './theme';
+import type { IdsRamp, IdsStatusFamily } from './theme';
 
 export const STATUS_PALETTE_NAMES = {
   success: 'green',
@@ -41,11 +41,11 @@ export function harmonizedRotation(family: IdsStatusFamily, hue: number, primary
 }
 
 export const fixedStatusPalette = (family: IdsStatusFamily) =>
-  paletteFromSteps(STATUS_PALETTES[STATUS_PALETTE_NAMES[family]]);
+  rampFromSteps(STATUS_PALETTES[STATUS_PALETTE_NAMES[family]]);
 
 const HALVINGS_BEFORE_GIVING_UP = 6;
 
-type StatusPalettes = { [family in IdsStatusFamily]: IdsPalette };
+type StatusPalettes = { [family in IdsStatusFamily]: IdsRamp };
 
 const statusFamilies = Object.keys(STATUS_PALETTE_NAMES) as IdsStatusFamily[];
 
@@ -75,7 +75,7 @@ function familiesLosingDistinction(
   return losing;
 }
 
-export function harmonizedStatusPalettes(primary: IdsPalette): StatusPalettes {
+export function harmonizedStatusPalettes(primary: IdsRamp): StatusPalettes {
   const fixed = fixedPalettes();
   if (chromaOf(primary) < ACHROMATIC) return fixed;
 
@@ -90,7 +90,7 @@ export function harmonizedStatusPalettes(primary: IdsPalette): StatusPalettes {
     Object.fromEntries(
       statusFamilies.map((family) => [
         family,
-        rotations[family] === 0 ? fixed[family] : rotatedPalette(fixed[family], rotations[family]),
+        rotations[family] === 0 ? fixed[family] : rotatedRamp(fixed[family], rotations[family]),
       ]),
     ) as StatusPalettes;
 

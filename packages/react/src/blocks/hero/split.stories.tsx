@@ -129,7 +129,7 @@ export const PC: Story = {
                 </Table>
               </Card.Content>
             )}
-            <Card.Footer className="border-t">출처 · {current.source}</Card.Footer>
+            <Card.Footer>출처 · {current.source}</Card.Footer>
           </Card>
         </Card>
       </main>

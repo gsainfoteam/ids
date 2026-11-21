@@ -47,7 +47,7 @@ function ContainingBlock({
       dir={dir}
       aria-label={label}
       data-frame=""
-      className="rounded-standard border-neutral bg-neutral-subtler relative h-64 w-full max-w-sm transform-[translateZ(0)] overflow-hidden border"
+      className="rounded-standard border-neutral bg-block relative h-64 w-full max-w-sm transform-[translateZ(0)] overflow-hidden border"
     >
       {children}
     </div>

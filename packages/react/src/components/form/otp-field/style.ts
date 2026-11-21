@@ -29,8 +29,7 @@ export const otpFieldStyle = tv({
     maskDot: 'size-2 rounded-full bg-current',
     separator: 'flex items-center text-neutral [&_svg]:size-4',
     caret: 'pointer-events-none absolute inset-0 flex items-center justify-center',
-    caretLine:
-      'h-1/2 w-px animate-caret-blink bg-neutral-bold motion-reduce:animate-none',
+    caretLine: 'h-1/2 w-px animate-caret-blink bg-neutral-solid motion-reduce:animate-none',
   },
   variants: {
     variant: {

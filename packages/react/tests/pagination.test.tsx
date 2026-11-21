@@ -321,9 +321,9 @@ test('the current page is primary subtle by default; ghost marks it with primary
   await expect.element(button('Soft', 2)).toHaveAttribute('data-variant', 'soft');
   await expect
     .poll(() => getComputedStyle(button('Soft', 2)).backgroundColor)
-    .toBe(colorOf('--ids-color-bg-primary-subtle'));
+    .toBe(colorOf('--ids-color-bg-primary-soft'));
   expect(getComputedStyle(button('Soft', 2)).color).toBe(
-    colorOf('--ids-color-text-on-primary-subtle'),
+    colorOf('--ids-color-text-on-primary-soft'),
   );
   expect(getComputedStyle(button('Soft', 1)).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 

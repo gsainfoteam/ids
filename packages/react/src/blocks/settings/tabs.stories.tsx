@@ -214,7 +214,7 @@ export const PC: Story = {
                       </Select>
                     </Field>
                   </Card.Content>
-                  <Card.Footer className="justify-end border-t">
+                  <Card.Footer className="justify-end">
                     <Button type="submit">저장</Button>
                   </Card.Footer>
                 </form>
@@ -283,7 +283,7 @@ export const PC: Story = {
                       </div>
                     )}
                   </Card.Content>
-                  <Card.Footer className="justify-end border-t">
+                  <Card.Footer className="justify-end">
                     <Button type="submit">저장</Button>
                   </Card.Footer>
                 </form>
@@ -407,7 +407,7 @@ export const PC: Story = {
                       </Item.Actions>
                     </Item>
                   </Card.Content>
-                  <Card.Footer className="justify-end border-t">
+                  <Card.Footer className="justify-end">
                     <Button type="submit">비밀번호 바꾸기</Button>
                   </Card.Footer>
                 </form>

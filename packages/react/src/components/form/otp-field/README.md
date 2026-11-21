@@ -92,7 +92,7 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 ```tsx
 <OTPField.Slot
   index={0}
-  className={(slot) => (slot.isFilled ? 'bg-primary text-on-primary' : undefined)}
+  className={(slot) => (slot.isFilled ? 'bg-primary-solid text-on-primary-solid' : undefined)}
 >
   {(slot) => (slot.isFilled ? '✓' : slot.hasFakeCaret && <OTPField.Caret />)}
 </OTPField.Slot>

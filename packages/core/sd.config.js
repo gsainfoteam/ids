@@ -43,15 +43,7 @@ const resolveRef = (value, palette) => {
   return m ? (palette[m[1]] ?? value) : value;
 };
 
-const readColorEntriesWithoutCollision = (color, mode, palette) => {
-  const json = JSON.parse(
-    readFileSync(`./tokens/semantic/${color}.${mode}.json`, "utf8"),
-  );
-  return Object.entries(json.color ?? {}).map(([name, token]) => ({
-    name,
-    value: resolveRef(token.$value ?? token.value, palette),
-  }));
-};
+const NEUTRAL_ROLE_STEPS = JSON.parse(readFileSync("./neutral-roles.json", "utf8"));
 
 const isTypographyToken = (node) =>
   node &&
@@ -297,7 +289,7 @@ const buildColorBridgeCSS = () =>
 const schemeLayer = (family) =>
   SCHEME_LAYER_IN_TEXT_COLOR.includes(family)
     ? ["currentColor", "var(--ids-state-hover)", "var(--ids-state-press)"]
-    : [`var(${colorVar(`bg-${family}`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
+    : [`var(${colorVar(`bg-${family}-solid`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
 
 const buildSchemeCSS = () =>
   COLOR_FAMILIES.map((family) => {
@@ -350,7 +342,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-skeleton-pulse {
   50% {
-    background-color: var(--ids-color-bg-neutral-subtler);
+    background-color: var(--ids-color-bg-block);
   }
 }
 
@@ -419,26 +411,26 @@ const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:wh
 }
 `;
 
-const focusRingUtility = (name, family) => `@utility ${name} {
+const focusRingUtility = (name, line) => `@utility ${name} {
   outline: none;
 
   ${focusRingTriggers("  ")} {
-    @apply ring-[3px] ring-${family}/40 inset-ring-${family};
+    @apply ring-[3px] ring-${line}/40 inset-ring-${line};
   }
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-danger;
+    @apply inset-ring-danger-strong;
 
     ${focusRingTriggers("    ")} {
-      @apply ring-danger/40 inset-ring-danger;
+      @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
 }
 `;
 
-const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary")}
-${focusRingUtility("focus-ring-scheme", "scheme")}
+const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary-strong")}
+${focusRingUtility("focus-ring-scheme", "scheme-strong")}
 ${focusRingUtility("focus-ring-current", "current")}
 
 @utility state-layer {
@@ -476,7 +468,7 @@ ${focusRingUtility("focus-ring-current", "current")}
   background-image: linear-gradient(
     90deg,
     currentColor calc(50% - var(--ids-shimmer-spread, 3em)),
-    var(--ids-shimmer-color, var(--ids-color-text-neutral-bold)) 50%,
+    var(--ids-shimmer-color, var(--ids-color-text-neutral-strong)) 50%,
     currentColor calc(50% + var(--ids-shimmer-spread, 3em))
   );
   background-size: calc(200% + 2 * var(--ids-shimmer-spread, 3em)) 100%;
@@ -593,12 +585,12 @@ const buildTypographyCSS = (dictionary) => {
   });
 };
 
-const neutralFallbacks = (dictionary, mode) =>
-  Object.fromEntries(
-    readColorEntriesWithoutCollision("neutral", mode, buildPalette(dictionary)).map(
-      ({ name, value }) => [name, value],
-    ),
+const neutralFallbacks = (dictionary, mode) => {
+  const scale = neutralScale(dictionary, mode);
+  return Object.fromEntries(
+    Object.entries(NEUTRAL_ROLE_STEPS).map(([slot, step]) => [slot, scale[step - 1]]),
   );
+};
 
 const providerValue = (mode, slot, fallbacks) => {
   if (slot in fallbacks) return `var(${themeVar(mode, slot)}, ${fallbacks[slot]})`;
@@ -644,16 +636,16 @@ const T_CSS_CORNER_SHAPE = `@layer base {
 
 const T_CSS_BACKGROUND_UNDERNEATH = `@layer base {
   [data-mode]:not([data-mode] [data-mode]),
-  [data-mode].bg-neutral-subtlest {
-    --ids-bg-current: var(--ids-color-bg-neutral-subtlest);
+  [data-mode].bg-base {
+    --ids-bg-current: var(--ids-color-bg-base);
   }
 
-  .bg-panel {
-    --ids-bg-current: var(--ids-color-bg-panel);
+  .bg-surface {
+    --ids-bg-current: var(--ids-color-bg-surface);
   }
 
-  .bg-band {
-    --ids-bg-current: var(--ids-color-bg-band);
+  .bg-block {
+    --ids-bg-current: var(--ids-color-bg-block);
   }
 }
 `;
@@ -764,14 +756,6 @@ const tsTypesFormatter = ({ dictionary }) => {
   });
 };
 
-const stepOf = (reference) => Number(reference.match(/^\{neutral\.(\d+)\}$/)[1]);
-
-const neutralSteps = (mode) => {
-  const json = JSON.parse(readFileSync(`./tokens/semantic/neutral.${mode}.json`, "utf8"));
-  return Object.fromEntries(
-    Object.entries(json.color).map(([slot, token]) => [slot, stepOf(token.$value)]),
-  );
-};
 
 const tsList = (values) => `[${values.map((v) => `'${v}'`).join(", ")}]`;
 
@@ -780,10 +764,11 @@ const tsRecord = (entries, indent) =>
     .map(([key, value]) => `${indent}  '${key}': ${value},`)
     .join("\n")}\n${indent}}`;
 
-const neutralPalette = (dictionary) =>
-  Object.fromEntries(
-    byPath(dictionary, "neutral").map((t) => [t.path[1], `'${val(t)}'`]),
-  );
+const neutralScale = (dictionary, mode) =>
+  byPath(dictionary, "neutral")
+    .filter((t) => t.path[1] === mode)
+    .sort((a, b) => Number(a.path[2]) - Number(b.path[2]))
+    .map(val);
 
 const stateTokens = (dictionary, type) =>
   byCategory(dictionary, "state").filter((t) => (t.$type ?? t.type) === type);
@@ -805,10 +790,10 @@ const tsColorRolesFormatter = ({ dictionary }) =>
       `export const IDS_NEUTRAL_ONLY_SLOTS = ${tsList(NEUTRAL_ONLY_SLOTS)} as const;`,
       `export const IDS_STATE_OPACITY = ${tsRecord(stateOpacity(dictionary), "")} as const;`,
       `export const IDS_STATE_FILL_COLOR = '${stateFillColor(dictionary)}';`,
-      `export const IDS_NEUTRAL_PALETTE = ${tsRecord(neutralPalette(dictionary), "")} as const;`,
-      `export const IDS_NEUTRAL_STEPS = {\n${["light", "dark"]
-        .map((mode) => `  ${mode}: ${tsRecord(neutralSteps(mode), "  ")},`)
-        .join("\n")}\n} as const;`,
+      `export const IDS_NEUTRAL_SCALES = {\n${MODES.map(
+        (mode) => `  ${mode}: ${tsList(neutralScale(dictionary, mode))},`,
+      ).join("\n")}\n} as const;`,
+      `export const IDS_NEUTRAL_STEPS = ${tsRecord(NEUTRAL_ROLE_STEPS, "")} as const;`,
     ].join("\n\n"),
   });
 
@@ -846,11 +831,11 @@ import 'ids_enums.dart';
 abstract final class IdsColorRoles {
 {{LISTS}}
 
-  static const neutralPalette = <int, Color>{
-{{NEUTRAL_PALETTE}}
+  static const neutralScales = <IdsMode, List<Color>>{
+{{NEUTRAL_SCALES}}
   };
 
-  static const neutralSteps = <IdsMode, Map<String, int>>{
+  static const neutralSteps = <String, int>{
 {{NEUTRAL_STEPS}}
   };
 
@@ -913,18 +898,18 @@ const dartColorRolesFormatter = ({ dictionary }) => {
     `  static const neutralOnlySlots = ${dartList(NEUTRAL_ONLY_SLOTS)};`,
     `  static const all = ${dartList(allSlots)};`,
   ];
-  const neutral = Object.entries(neutralPalette(dictionary)).map(
-    ([step, hex]) => `    ${step}: ${hexToFlutterColor(hex.replaceAll("'", "")).replace(/^const /, "")},`,
-  );
-  const steps = ["light", "dark"].map(
+  const scales = MODES.map(
     (mode) =>
-      `    IdsMode.${mode}: {\n${Object.entries(neutralSteps(mode))
-        .map(([slot, step]) => `      '${slot}': ${step},`)
-        .join("\n")}\n    },`,
+      `    IdsMode.${mode}: [\n${neutralScale(dictionary, mode)
+        .map((hex) => `      ${hexToFlutterColor(hex).replace(/^const /, "")},`)
+        .join("\n")}\n    ],`,
+  );
+  const steps = Object.entries(NEUTRAL_ROLE_STEPS).map(
+    ([slot, step]) => `    '${slot}': ${step},`,
   );
   return render(T_DART_COLOR_ROLES, {
     LISTS: lists.join("\n"),
-    NEUTRAL_PALETTE: neutral.join("\n"),
+    NEUTRAL_SCALES: scales.join("\n"),
     NEUTRAL_STEPS: steps.join("\n"),
     STATE_FILL_COLOR: `0xFF${stateFillColor(dictionary).slice(1).toUpperCase()}`,
     STATE_OPACITY: Object.entries(stateOpacity(dictionary))

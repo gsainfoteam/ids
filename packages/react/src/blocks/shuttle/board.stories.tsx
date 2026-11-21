@@ -167,7 +167,7 @@ export const PC: Story = {
                       />
                     </Card.Content>
                   )}
-                  <Card.Footer className="border-t">
+                  <Card.Footer>
                     <Label>
                       <Switch
                         onCheckedChange={(checked) => {

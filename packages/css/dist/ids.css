@@ -1,149 +1,175 @@
 @theme inline {
-  --background-color-neutral-subtlest: var(--ids-color-bg-neutral-subtlest);
-  --background-color-neutral-subtler: var(--ids-color-bg-neutral-subtler);
-  --background-color-neutral-subtle: var(--ids-color-bg-neutral-subtle);
-  --background-color-neutral: var(--ids-color-bg-neutral);
-  --background-color-neutral-bold: var(--ids-color-bg-neutral-bold);
-  --text-color-on-neutral-subtlest: var(--ids-color-text-on-neutral-subtlest);
-  --fill-on-neutral-subtlest: var(--ids-color-text-on-neutral-subtlest);
-  --text-color-on-neutral-subtler: var(--ids-color-text-on-neutral-subtler);
-  --fill-on-neutral-subtler: var(--ids-color-text-on-neutral-subtler);
-  --text-color-on-neutral-subtle: var(--ids-color-text-on-neutral-subtle);
-  --fill-on-neutral-subtle: var(--ids-color-text-on-neutral-subtle);
-  --text-color-on-neutral: var(--ids-color-text-on-neutral);
-  --fill-on-neutral: var(--ids-color-text-on-neutral);
-  --text-color-on-neutral-bold: var(--ids-color-text-on-neutral-bold);
-  --fill-on-neutral-bold: var(--ids-color-text-on-neutral-bold);
+  --background-color-base: var(--ids-color-bg-base);
+  --background-color-surface: var(--ids-color-bg-surface);
+  --background-color-block: var(--ids-color-bg-block);
+  --background-color-neutral-soft: var(--ids-color-bg-neutral-soft);
+  --background-color-neutral-solid: var(--ids-color-bg-neutral-solid);
+  --text-color-on-base: var(--ids-color-text-on-base);
+  --fill-on-base: var(--ids-color-text-on-base);
+  --text-color-on-surface: var(--ids-color-text-on-surface);
+  --fill-on-surface: var(--ids-color-text-on-surface);
+  --text-color-on-block: var(--ids-color-text-on-block);
+  --fill-on-block: var(--ids-color-text-on-block);
+  --text-color-on-neutral-soft: var(--ids-color-text-on-neutral-soft);
+  --fill-on-neutral-soft: var(--ids-color-text-on-neutral-soft);
+  --text-color-on-neutral-solid: var(--ids-color-text-on-neutral-solid);
+  --fill-on-neutral-solid: var(--ids-color-text-on-neutral-solid);
   --text-color-neutral: var(--ids-color-text-neutral);
   --fill-neutral: var(--ids-color-text-neutral);
-  --text-color-neutral-bold: var(--ids-color-text-neutral-bold);
-  --fill-neutral-bold: var(--ids-color-text-neutral-bold);
+  --text-color-neutral-strong: var(--ids-color-text-neutral-strong);
+  --fill-neutral-strong: var(--ids-color-text-neutral-strong);
   --border-color-neutral: var(--ids-color-border-neutral);
   --ring-color-neutral: var(--ids-color-border-neutral);
   --outline-color-neutral: var(--ids-color-border-neutral);
   --stroke-neutral: var(--ids-color-border-neutral);
-  --background-color-primary-subtler: var(--ids-color-bg-primary-subtler);
-  --background-color-primary-subtle: var(--ids-color-bg-primary-subtle);
-  --background-color-primary: var(--ids-color-bg-primary);
-  --text-color-on-primary-subtler: var(--ids-color-text-on-primary-subtler);
-  --fill-on-primary-subtler: var(--ids-color-text-on-primary-subtler);
-  --text-color-on-primary-subtle: var(--ids-color-text-on-primary-subtle);
-  --fill-on-primary-subtle: var(--ids-color-text-on-primary-subtle);
-  --text-color-on-primary: var(--ids-color-text-on-primary);
-  --fill-on-primary: var(--ids-color-text-on-primary);
+  --border-color-neutral-strong: var(--ids-color-border-neutral-strong);
+  --ring-color-neutral-strong: var(--ids-color-border-neutral-strong);
+  --outline-color-neutral-strong: var(--ids-color-border-neutral-strong);
+  --stroke-neutral-strong: var(--ids-color-border-neutral-strong);
+  --background-color-primary-soft: var(--ids-color-bg-primary-soft);
+  --background-color-primary-solid: var(--ids-color-bg-primary-solid);
+  --text-color-on-primary-soft: var(--ids-color-text-on-primary-soft);
+  --fill-on-primary-soft: var(--ids-color-text-on-primary-soft);
+  --text-color-on-primary-solid: var(--ids-color-text-on-primary-solid);
+  --fill-on-primary-solid: var(--ids-color-text-on-primary-solid);
   --text-color-primary: var(--ids-color-text-primary);
   --fill-primary: var(--ids-color-text-primary);
+  --text-color-primary-strong: var(--ids-color-text-primary-strong);
+  --fill-primary-strong: var(--ids-color-text-primary-strong);
   --border-color-primary: var(--ids-color-border-primary);
   --ring-color-primary: var(--ids-color-border-primary);
   --outline-color-primary: var(--ids-color-border-primary);
   --stroke-primary: var(--ids-color-border-primary);
-  --background-color-secondary-subtler: var(--ids-color-bg-secondary-subtler);
-  --background-color-secondary-subtle: var(--ids-color-bg-secondary-subtle);
-  --background-color-secondary: var(--ids-color-bg-secondary);
-  --text-color-on-secondary-subtler: var(--ids-color-text-on-secondary-subtler);
-  --fill-on-secondary-subtler: var(--ids-color-text-on-secondary-subtler);
-  --text-color-on-secondary-subtle: var(--ids-color-text-on-secondary-subtle);
-  --fill-on-secondary-subtle: var(--ids-color-text-on-secondary-subtle);
-  --text-color-on-secondary: var(--ids-color-text-on-secondary);
-  --fill-on-secondary: var(--ids-color-text-on-secondary);
+  --border-color-primary-strong: var(--ids-color-border-primary-strong);
+  --ring-color-primary-strong: var(--ids-color-border-primary-strong);
+  --outline-color-primary-strong: var(--ids-color-border-primary-strong);
+  --stroke-primary-strong: var(--ids-color-border-primary-strong);
+  --background-color-secondary-soft: var(--ids-color-bg-secondary-soft);
+  --background-color-secondary-solid: var(--ids-color-bg-secondary-solid);
+  --text-color-on-secondary-soft: var(--ids-color-text-on-secondary-soft);
+  --fill-on-secondary-soft: var(--ids-color-text-on-secondary-soft);
+  --text-color-on-secondary-solid: var(--ids-color-text-on-secondary-solid);
+  --fill-on-secondary-solid: var(--ids-color-text-on-secondary-solid);
   --text-color-secondary: var(--ids-color-text-secondary);
   --fill-secondary: var(--ids-color-text-secondary);
+  --text-color-secondary-strong: var(--ids-color-text-secondary-strong);
+  --fill-secondary-strong: var(--ids-color-text-secondary-strong);
   --border-color-secondary: var(--ids-color-border-secondary);
   --ring-color-secondary: var(--ids-color-border-secondary);
   --outline-color-secondary: var(--ids-color-border-secondary);
   --stroke-secondary: var(--ids-color-border-secondary);
-  --background-color-tertiary-subtler: var(--ids-color-bg-tertiary-subtler);
-  --background-color-tertiary-subtle: var(--ids-color-bg-tertiary-subtle);
-  --background-color-tertiary: var(--ids-color-bg-tertiary);
-  --text-color-on-tertiary-subtler: var(--ids-color-text-on-tertiary-subtler);
-  --fill-on-tertiary-subtler: var(--ids-color-text-on-tertiary-subtler);
-  --text-color-on-tertiary-subtle: var(--ids-color-text-on-tertiary-subtle);
-  --fill-on-tertiary-subtle: var(--ids-color-text-on-tertiary-subtle);
-  --text-color-on-tertiary: var(--ids-color-text-on-tertiary);
-  --fill-on-tertiary: var(--ids-color-text-on-tertiary);
+  --border-color-secondary-strong: var(--ids-color-border-secondary-strong);
+  --ring-color-secondary-strong: var(--ids-color-border-secondary-strong);
+  --outline-color-secondary-strong: var(--ids-color-border-secondary-strong);
+  --stroke-secondary-strong: var(--ids-color-border-secondary-strong);
+  --background-color-tertiary-soft: var(--ids-color-bg-tertiary-soft);
+  --background-color-tertiary-solid: var(--ids-color-bg-tertiary-solid);
+  --text-color-on-tertiary-soft: var(--ids-color-text-on-tertiary-soft);
+  --fill-on-tertiary-soft: var(--ids-color-text-on-tertiary-soft);
+  --text-color-on-tertiary-solid: var(--ids-color-text-on-tertiary-solid);
+  --fill-on-tertiary-solid: var(--ids-color-text-on-tertiary-solid);
   --text-color-tertiary: var(--ids-color-text-tertiary);
   --fill-tertiary: var(--ids-color-text-tertiary);
+  --text-color-tertiary-strong: var(--ids-color-text-tertiary-strong);
+  --fill-tertiary-strong: var(--ids-color-text-tertiary-strong);
   --border-color-tertiary: var(--ids-color-border-tertiary);
   --ring-color-tertiary: var(--ids-color-border-tertiary);
   --outline-color-tertiary: var(--ids-color-border-tertiary);
   --stroke-tertiary: var(--ids-color-border-tertiary);
-  --background-color-success-subtler: var(--ids-color-bg-success-subtler);
-  --background-color-success-subtle: var(--ids-color-bg-success-subtle);
-  --background-color-success: var(--ids-color-bg-success);
-  --text-color-on-success-subtler: var(--ids-color-text-on-success-subtler);
-  --fill-on-success-subtler: var(--ids-color-text-on-success-subtler);
-  --text-color-on-success-subtle: var(--ids-color-text-on-success-subtle);
-  --fill-on-success-subtle: var(--ids-color-text-on-success-subtle);
-  --text-color-on-success: var(--ids-color-text-on-success);
-  --fill-on-success: var(--ids-color-text-on-success);
+  --border-color-tertiary-strong: var(--ids-color-border-tertiary-strong);
+  --ring-color-tertiary-strong: var(--ids-color-border-tertiary-strong);
+  --outline-color-tertiary-strong: var(--ids-color-border-tertiary-strong);
+  --stroke-tertiary-strong: var(--ids-color-border-tertiary-strong);
+  --background-color-success-soft: var(--ids-color-bg-success-soft);
+  --background-color-success-solid: var(--ids-color-bg-success-solid);
+  --text-color-on-success-soft: var(--ids-color-text-on-success-soft);
+  --fill-on-success-soft: var(--ids-color-text-on-success-soft);
+  --text-color-on-success-solid: var(--ids-color-text-on-success-solid);
+  --fill-on-success-solid: var(--ids-color-text-on-success-solid);
   --text-color-success: var(--ids-color-text-success);
   --fill-success: var(--ids-color-text-success);
+  --text-color-success-strong: var(--ids-color-text-success-strong);
+  --fill-success-strong: var(--ids-color-text-success-strong);
   --border-color-success: var(--ids-color-border-success);
   --ring-color-success: var(--ids-color-border-success);
   --outline-color-success: var(--ids-color-border-success);
   --stroke-success: var(--ids-color-border-success);
-  --background-color-warning-subtler: var(--ids-color-bg-warning-subtler);
-  --background-color-warning-subtle: var(--ids-color-bg-warning-subtle);
-  --background-color-warning: var(--ids-color-bg-warning);
-  --text-color-on-warning-subtler: var(--ids-color-text-on-warning-subtler);
-  --fill-on-warning-subtler: var(--ids-color-text-on-warning-subtler);
-  --text-color-on-warning-subtle: var(--ids-color-text-on-warning-subtle);
-  --fill-on-warning-subtle: var(--ids-color-text-on-warning-subtle);
-  --text-color-on-warning: var(--ids-color-text-on-warning);
-  --fill-on-warning: var(--ids-color-text-on-warning);
+  --border-color-success-strong: var(--ids-color-border-success-strong);
+  --ring-color-success-strong: var(--ids-color-border-success-strong);
+  --outline-color-success-strong: var(--ids-color-border-success-strong);
+  --stroke-success-strong: var(--ids-color-border-success-strong);
+  --background-color-warning-soft: var(--ids-color-bg-warning-soft);
+  --background-color-warning-solid: var(--ids-color-bg-warning-solid);
+  --text-color-on-warning-soft: var(--ids-color-text-on-warning-soft);
+  --fill-on-warning-soft: var(--ids-color-text-on-warning-soft);
+  --text-color-on-warning-solid: var(--ids-color-text-on-warning-solid);
+  --fill-on-warning-solid: var(--ids-color-text-on-warning-solid);
   --text-color-warning: var(--ids-color-text-warning);
   --fill-warning: var(--ids-color-text-warning);
+  --text-color-warning-strong: var(--ids-color-text-warning-strong);
+  --fill-warning-strong: var(--ids-color-text-warning-strong);
   --border-color-warning: var(--ids-color-border-warning);
   --ring-color-warning: var(--ids-color-border-warning);
   --outline-color-warning: var(--ids-color-border-warning);
   --stroke-warning: var(--ids-color-border-warning);
-  --background-color-danger-subtler: var(--ids-color-bg-danger-subtler);
-  --background-color-danger-subtle: var(--ids-color-bg-danger-subtle);
-  --background-color-danger: var(--ids-color-bg-danger);
-  --text-color-on-danger-subtler: var(--ids-color-text-on-danger-subtler);
-  --fill-on-danger-subtler: var(--ids-color-text-on-danger-subtler);
-  --text-color-on-danger-subtle: var(--ids-color-text-on-danger-subtle);
-  --fill-on-danger-subtle: var(--ids-color-text-on-danger-subtle);
-  --text-color-on-danger: var(--ids-color-text-on-danger);
-  --fill-on-danger: var(--ids-color-text-on-danger);
+  --border-color-warning-strong: var(--ids-color-border-warning-strong);
+  --ring-color-warning-strong: var(--ids-color-border-warning-strong);
+  --outline-color-warning-strong: var(--ids-color-border-warning-strong);
+  --stroke-warning-strong: var(--ids-color-border-warning-strong);
+  --background-color-danger-soft: var(--ids-color-bg-danger-soft);
+  --background-color-danger-solid: var(--ids-color-bg-danger-solid);
+  --text-color-on-danger-soft: var(--ids-color-text-on-danger-soft);
+  --fill-on-danger-soft: var(--ids-color-text-on-danger-soft);
+  --text-color-on-danger-solid: var(--ids-color-text-on-danger-solid);
+  --fill-on-danger-solid: var(--ids-color-text-on-danger-solid);
   --text-color-danger: var(--ids-color-text-danger);
   --fill-danger: var(--ids-color-text-danger);
+  --text-color-danger-strong: var(--ids-color-text-danger-strong);
+  --fill-danger-strong: var(--ids-color-text-danger-strong);
   --border-color-danger: var(--ids-color-border-danger);
   --ring-color-danger: var(--ids-color-border-danger);
   --outline-color-danger: var(--ids-color-border-danger);
   --stroke-danger: var(--ids-color-border-danger);
-  --background-color-info-subtler: var(--ids-color-bg-info-subtler);
-  --background-color-info-subtle: var(--ids-color-bg-info-subtle);
-  --background-color-info: var(--ids-color-bg-info);
-  --text-color-on-info-subtler: var(--ids-color-text-on-info-subtler);
-  --fill-on-info-subtler: var(--ids-color-text-on-info-subtler);
-  --text-color-on-info-subtle: var(--ids-color-text-on-info-subtle);
-  --fill-on-info-subtle: var(--ids-color-text-on-info-subtle);
-  --text-color-on-info: var(--ids-color-text-on-info);
-  --fill-on-info: var(--ids-color-text-on-info);
+  --border-color-danger-strong: var(--ids-color-border-danger-strong);
+  --ring-color-danger-strong: var(--ids-color-border-danger-strong);
+  --outline-color-danger-strong: var(--ids-color-border-danger-strong);
+  --stroke-danger-strong: var(--ids-color-border-danger-strong);
+  --background-color-info-soft: var(--ids-color-bg-info-soft);
+  --background-color-info-solid: var(--ids-color-bg-info-solid);
+  --text-color-on-info-soft: var(--ids-color-text-on-info-soft);
+  --fill-on-info-soft: var(--ids-color-text-on-info-soft);
+  --text-color-on-info-solid: var(--ids-color-text-on-info-solid);
+  --fill-on-info-solid: var(--ids-color-text-on-info-solid);
   --text-color-info: var(--ids-color-text-info);
   --fill-info: var(--ids-color-text-info);
+  --text-color-info-strong: var(--ids-color-text-info-strong);
+  --fill-info-strong: var(--ids-color-text-info-strong);
   --border-color-info: var(--ids-color-border-info);
   --ring-color-info: var(--ids-color-border-info);
   --outline-color-info: var(--ids-color-border-info);
   --stroke-info: var(--ids-color-border-info);
-  --background-color-scheme-subtler: var(--ids-color-bg-scheme-subtler);
-  --background-color-scheme-subtle: var(--ids-color-bg-scheme-subtle);
-  --background-color-scheme: var(--ids-color-bg-scheme);
-  --text-color-on-scheme-subtler: var(--ids-color-text-on-scheme-subtler);
-  --fill-on-scheme-subtler: var(--ids-color-text-on-scheme-subtler);
-  --text-color-on-scheme-subtle: var(--ids-color-text-on-scheme-subtle);
-  --fill-on-scheme-subtle: var(--ids-color-text-on-scheme-subtle);
-  --text-color-on-scheme: var(--ids-color-text-on-scheme);
-  --fill-on-scheme: var(--ids-color-text-on-scheme);
+  --border-color-info-strong: var(--ids-color-border-info-strong);
+  --ring-color-info-strong: var(--ids-color-border-info-strong);
+  --outline-color-info-strong: var(--ids-color-border-info-strong);
+  --stroke-info-strong: var(--ids-color-border-info-strong);
+  --background-color-scheme-soft: var(--ids-color-bg-scheme-soft);
+  --background-color-scheme-solid: var(--ids-color-bg-scheme-solid);
+  --text-color-on-scheme-soft: var(--ids-color-text-on-scheme-soft);
+  --fill-on-scheme-soft: var(--ids-color-text-on-scheme-soft);
+  --text-color-on-scheme-solid: var(--ids-color-text-on-scheme-solid);
+  --fill-on-scheme-solid: var(--ids-color-text-on-scheme-solid);
   --text-color-scheme: var(--ids-color-text-scheme);
   --fill-scheme: var(--ids-color-text-scheme);
+  --text-color-scheme-strong: var(--ids-color-text-scheme-strong);
+  --fill-scheme-strong: var(--ids-color-text-scheme-strong);
   --border-color-scheme: var(--ids-color-border-scheme);
   --ring-color-scheme: var(--ids-color-border-scheme);
   --outline-color-scheme: var(--ids-color-border-scheme);
   --stroke-scheme: var(--ids-color-border-scheme);
-  --background-color-panel: var(--ids-color-bg-panel);
-  --background-color-band: var(--ids-color-bg-band);
+  --border-color-scheme-strong: var(--ids-color-border-scheme-strong);
+  --ring-color-scheme-strong: var(--ids-color-border-scheme-strong);
+  --outline-color-scheme-strong: var(--ids-color-border-scheme-strong);
+  --stroke-scheme-strong: var(--ids-color-border-scheme-strong);
   --background-color-control-outline: var(--ids-color-bg-control-outline);
   --border-color-control-outline: var(--ids-color-border-control-outline);
   --ring-color-control-outline: var(--ids-color-border-control-outline);
@@ -167,7 +193,7 @@
   --background-color-qr-code-inverse: var(--ids-color-bg-qr-code-inverse);
   --text-color-qr-code-inverse: var(--ids-color-text-qr-code-inverse);
   --fill-qr-code-inverse: var(--ids-color-text-qr-code-inverse);
-  --shadow-panel: var(--ids-shadow-panel);
+  --shadow-surface: var(--ids-shadow-surface);
 }
 
 :root {
@@ -224,7 +250,7 @@
 
 @keyframes ids-skeleton-pulse {
   50% {
-    background-color: var(--ids-color-bg-neutral-subtler);
+    background-color: var(--ids-color-bg-block);
   }
 }
 
@@ -284,19 +310,19 @@
   &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
   &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
-    @apply ring-[3px] ring-primary/40 inset-ring-primary;
+    @apply ring-[3px] ring-primary-strong/40 inset-ring-primary-strong;
   }
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-danger;
+    @apply inset-ring-danger-strong;
 
     &:focus-visible,
     &[data-focus-visible],
     &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
     &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
-      @apply ring-danger/40 inset-ring-danger;
+      @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
 }
@@ -309,19 +335,19 @@
   &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
   &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
-    @apply ring-[3px] ring-scheme/40 inset-ring-scheme;
+    @apply ring-[3px] ring-scheme-strong/40 inset-ring-scheme-strong;
   }
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-danger;
+    @apply inset-ring-danger-strong;
 
     &:focus-visible,
     &[data-focus-visible],
     &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
     &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
-      @apply ring-danger/40 inset-ring-danger;
+      @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
 }
@@ -339,14 +365,14 @@
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-danger;
+    @apply inset-ring-danger-strong;
 
     &:focus-visible,
     &[data-focus-visible],
     &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
     &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
-      @apply ring-danger/40 inset-ring-danger;
+      @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
 }
@@ -387,7 +413,7 @@
   background-image: linear-gradient(
     90deg,
     currentColor calc(50% - var(--ids-shimmer-spread, 3em)),
-    var(--ids-shimmer-color, var(--ids-color-text-neutral-bold)) 50%,
+    var(--ids-shimmer-color, var(--ids-color-text-neutral-strong)) 50%,
     currentColor calc(50% + var(--ids-shimmer-spread, 3em))
   );
   background-size: calc(200% + 2 * var(--ids-shimmer-spread, 3em)) 100%;
@@ -408,113 +434,113 @@
 }
 
 @utility scheme-neutral {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-neutral-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-neutral-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-neutral-bold);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-neutral-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-neutral-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-neutral-bold);
-  --ids-color-text-scheme: var(--ids-color-text-neutral-bold);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-neutral-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-neutral-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-neutral-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-neutral-solid);
+  --ids-color-text-scheme: var(--ids-color-text-neutral-strong);
+  --ids-color-text-scheme-strong: var(--ids-color-text-neutral-strong);
   --ids-color-border-scheme: var(--ids-color-border-neutral);
+  --ids-color-border-scheme-strong: var(--ids-color-border-neutral-strong);
   --ids-state-layer-scheme: currentColor;
   --ids-state-layer-scheme-hover: var(--ids-state-hover);
   --ids-state-layer-scheme-press: var(--ids-state-press);
 }
 
 @utility scheme-primary {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-primary-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-primary-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-primary);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-primary-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-primary-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-primary);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-primary-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-primary-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-primary-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-primary-solid);
   --ids-color-text-scheme: var(--ids-color-text-primary);
+  --ids-color-text-scheme-strong: var(--ids-color-text-primary-strong);
   --ids-color-border-scheme: var(--ids-color-border-primary);
-  --ids-state-layer-scheme: var(--ids-color-bg-primary);
+  --ids-color-border-scheme-strong: var(--ids-color-border-primary-strong);
+  --ids-state-layer-scheme: var(--ids-color-bg-primary-solid);
   --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
   --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
 
 @utility scheme-secondary {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-secondary-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-secondary-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-secondary);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-secondary-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-secondary-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-secondary);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-secondary-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-secondary-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-secondary-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-secondary-solid);
   --ids-color-text-scheme: var(--ids-color-text-secondary);
+  --ids-color-text-scheme-strong: var(--ids-color-text-secondary-strong);
   --ids-color-border-scheme: var(--ids-color-border-secondary);
-  --ids-state-layer-scheme: var(--ids-color-bg-secondary);
+  --ids-color-border-scheme-strong: var(--ids-color-border-secondary-strong);
+  --ids-state-layer-scheme: var(--ids-color-bg-secondary-solid);
   --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
   --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
 
 @utility scheme-tertiary {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-tertiary-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-tertiary-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-tertiary);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-tertiary-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-tertiary-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-tertiary);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-tertiary-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-tertiary-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-tertiary-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-tertiary-solid);
   --ids-color-text-scheme: var(--ids-color-text-tertiary);
+  --ids-color-text-scheme-strong: var(--ids-color-text-tertiary-strong);
   --ids-color-border-scheme: var(--ids-color-border-tertiary);
-  --ids-state-layer-scheme: var(--ids-color-bg-tertiary);
+  --ids-color-border-scheme-strong: var(--ids-color-border-tertiary-strong);
+  --ids-state-layer-scheme: var(--ids-color-bg-tertiary-solid);
   --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
   --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
 
 @utility scheme-success {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-success-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-success-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-success);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-success-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-success-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-success);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-success-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-success-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-success-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-success-solid);
   --ids-color-text-scheme: var(--ids-color-text-success);
+  --ids-color-text-scheme-strong: var(--ids-color-text-success-strong);
   --ids-color-border-scheme: var(--ids-color-border-success);
-  --ids-state-layer-scheme: var(--ids-color-bg-success);
+  --ids-color-border-scheme-strong: var(--ids-color-border-success-strong);
+  --ids-state-layer-scheme: var(--ids-color-bg-success-solid);
   --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
   --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
 
 @utility scheme-warning {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-warning-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-warning-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-warning);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-warning-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-warning-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-warning);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-warning-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-warning-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-warning-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-warning-solid);
   --ids-color-text-scheme: var(--ids-color-text-warning);
+  --ids-color-text-scheme-strong: var(--ids-color-text-warning-strong);
   --ids-color-border-scheme: var(--ids-color-border-warning);
-  --ids-state-layer-scheme: var(--ids-color-bg-warning);
+  --ids-color-border-scheme-strong: var(--ids-color-border-warning-strong);
+  --ids-state-layer-scheme: var(--ids-color-bg-warning-solid);
   --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
   --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
 
 @utility scheme-danger {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-danger-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-danger-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-danger);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-danger-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-danger-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-danger);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-danger-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-danger-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-danger-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-danger-solid);
   --ids-color-text-scheme: var(--ids-color-text-danger);
+  --ids-color-text-scheme-strong: var(--ids-color-text-danger-strong);
   --ids-color-border-scheme: var(--ids-color-border-danger);
-  --ids-state-layer-scheme: var(--ids-color-bg-danger);
+  --ids-color-border-scheme-strong: var(--ids-color-border-danger-strong);
+  --ids-state-layer-scheme: var(--ids-color-bg-danger-solid);
   --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
   --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
 
 @utility scheme-info {
-  --ids-color-bg-scheme-subtler: var(--ids-color-bg-info-subtler);
-  --ids-color-bg-scheme-subtle: var(--ids-color-bg-info-subtle);
-  --ids-color-bg-scheme: var(--ids-color-bg-info);
-  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-info-subtler);
-  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-info-subtle);
-  --ids-color-text-on-scheme: var(--ids-color-text-on-info);
+  --ids-color-bg-scheme-soft: var(--ids-color-bg-info-soft);
+  --ids-color-bg-scheme-solid: var(--ids-color-bg-info-solid);
+  --ids-color-text-on-scheme-soft: var(--ids-color-text-on-info-soft);
+  --ids-color-text-on-scheme-solid: var(--ids-color-text-on-info-solid);
   --ids-color-text-scheme: var(--ids-color-text-info);
+  --ids-color-text-scheme-strong: var(--ids-color-text-info-strong);
   --ids-color-border-scheme: var(--ids-color-border-info);
-  --ids-state-layer-scheme: var(--ids-color-bg-info);
+  --ids-color-border-scheme-strong: var(--ids-color-border-info-strong);
+  --ids-state-layer-scheme: var(--ids-color-bg-info-solid);
   --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
   --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
@@ -1605,16 +1631,16 @@
 
 @layer base {
   [data-mode]:not([data-mode] [data-mode]),
-  [data-mode].bg-neutral-subtlest {
-    --ids-bg-current: var(--ids-color-bg-neutral-subtlest);
+  [data-mode].bg-base {
+    --ids-bg-current: var(--ids-color-bg-base);
   }
 
-  .bg-panel {
-    --ids-bg-current: var(--ids-color-bg-panel);
+  .bg-surface {
+    --ids-bg-current: var(--ids-color-bg-surface);
   }
 
-  .bg-band {
-    --ids-bg-current: var(--ids-color-bg-band);
+  .bg-block {
+    --ids-bg-current: var(--ids-color-bg-block);
   }
 }
 
@@ -1719,175 +1745,173 @@
 }
 
 [data-mode="light"] {
-  --ids-color-bg-neutral-subtlest: var(--ids-theme-light-bg-neutral-subtlest, #ffffff);
-  --ids-color-bg-neutral-subtler: var(--ids-theme-light-bg-neutral-subtler, #fafafa);
-  --ids-color-bg-neutral-subtle: var(--ids-theme-light-bg-neutral-subtle, #f5f5f5);
-  --ids-color-bg-neutral: var(--ids-theme-light-bg-neutral, #d4d4d4);
-  --ids-color-bg-neutral-bold: var(--ids-theme-light-bg-neutral-bold, #171717);
-  --ids-color-text-on-neutral-subtlest: var(--ids-theme-light-text-on-neutral-subtlest, #171717);
-  --ids-color-text-on-neutral-subtler: var(--ids-theme-light-text-on-neutral-subtler, #171717);
-  --ids-color-text-on-neutral-subtle: var(--ids-theme-light-text-on-neutral-subtle, #171717);
-  --ids-color-text-on-neutral: var(--ids-theme-light-text-on-neutral, #0a0a0a);
-  --ids-color-text-on-neutral-bold: var(--ids-theme-light-text-on-neutral-bold, #ffffff);
+  --ids-color-bg-base: var(--ids-theme-light-bg-base, #ffffff);
+  --ids-color-bg-surface: var(--ids-theme-light-bg-surface, #ffffff);
+  --ids-color-bg-block: var(--ids-theme-light-bg-block, #fafafa);
+  --ids-color-bg-neutral-soft: var(--ids-theme-light-bg-neutral-soft, #f5f5f5);
+  --ids-color-bg-neutral-solid: var(--ids-theme-light-bg-neutral-solid, #0a0a0a);
+  --ids-color-text-on-base: var(--ids-theme-light-text-on-base);
+  --ids-color-text-on-surface: var(--ids-theme-light-text-on-surface);
+  --ids-color-text-on-block: var(--ids-theme-light-text-on-block);
+  --ids-color-text-on-neutral-soft: var(--ids-theme-light-text-on-neutral-soft);
+  --ids-color-text-on-neutral-solid: var(--ids-theme-light-text-on-neutral-solid);
   --ids-color-text-neutral: var(--ids-theme-light-text-neutral, #525252);
-  --ids-color-text-neutral-bold: var(--ids-theme-light-text-neutral-bold, #171717);
+  --ids-color-text-neutral-strong: var(--ids-theme-light-text-neutral-strong, #0a0a0a);
   --ids-color-border-neutral: var(--ids-theme-light-border-neutral, #e5e5e5);
-  --ids-color-bg-primary-subtler: var(--ids-theme-light-bg-primary-subtler);
-  --ids-color-bg-primary-subtle: var(--ids-theme-light-bg-primary-subtle);
-  --ids-color-bg-primary: var(--ids-theme-light-bg-primary);
-  --ids-color-text-on-primary-subtler: var(--ids-theme-light-text-on-primary-subtler);
-  --ids-color-text-on-primary-subtle: var(--ids-theme-light-text-on-primary-subtle);
-  --ids-color-text-on-primary: var(--ids-theme-light-text-on-primary);
+  --ids-color-border-neutral-strong: var(--ids-theme-light-border-neutral-strong, #d4d4d4);
+  --ids-color-bg-primary-soft: var(--ids-theme-light-bg-primary-soft);
+  --ids-color-bg-primary-solid: var(--ids-theme-light-bg-primary-solid);
+  --ids-color-text-on-primary-soft: var(--ids-theme-light-text-on-primary-soft);
+  --ids-color-text-on-primary-solid: var(--ids-theme-light-text-on-primary-solid);
   --ids-color-text-primary: var(--ids-theme-light-text-primary);
+  --ids-color-text-primary-strong: var(--ids-theme-light-text-primary-strong);
   --ids-color-border-primary: var(--ids-theme-light-border-primary);
-  --ids-color-bg-secondary-subtler: var(--ids-theme-light-bg-secondary-subtler);
-  --ids-color-bg-secondary-subtle: var(--ids-theme-light-bg-secondary-subtle);
-  --ids-color-bg-secondary: var(--ids-theme-light-bg-secondary);
-  --ids-color-text-on-secondary-subtler: var(--ids-theme-light-text-on-secondary-subtler);
-  --ids-color-text-on-secondary-subtle: var(--ids-theme-light-text-on-secondary-subtle);
-  --ids-color-text-on-secondary: var(--ids-theme-light-text-on-secondary);
+  --ids-color-border-primary-strong: var(--ids-theme-light-border-primary-strong);
+  --ids-color-bg-secondary-soft: var(--ids-theme-light-bg-secondary-soft);
+  --ids-color-bg-secondary-solid: var(--ids-theme-light-bg-secondary-solid);
+  --ids-color-text-on-secondary-soft: var(--ids-theme-light-text-on-secondary-soft);
+  --ids-color-text-on-secondary-solid: var(--ids-theme-light-text-on-secondary-solid);
   --ids-color-text-secondary: var(--ids-theme-light-text-secondary);
+  --ids-color-text-secondary-strong: var(--ids-theme-light-text-secondary-strong);
   --ids-color-border-secondary: var(--ids-theme-light-border-secondary);
-  --ids-color-bg-tertiary-subtler: var(--ids-theme-light-bg-tertiary-subtler);
-  --ids-color-bg-tertiary-subtle: var(--ids-theme-light-bg-tertiary-subtle);
-  --ids-color-bg-tertiary: var(--ids-theme-light-bg-tertiary);
-  --ids-color-text-on-tertiary-subtler: var(--ids-theme-light-text-on-tertiary-subtler);
-  --ids-color-text-on-tertiary-subtle: var(--ids-theme-light-text-on-tertiary-subtle);
-  --ids-color-text-on-tertiary: var(--ids-theme-light-text-on-tertiary);
+  --ids-color-border-secondary-strong: var(--ids-theme-light-border-secondary-strong);
+  --ids-color-bg-tertiary-soft: var(--ids-theme-light-bg-tertiary-soft);
+  --ids-color-bg-tertiary-solid: var(--ids-theme-light-bg-tertiary-solid);
+  --ids-color-text-on-tertiary-soft: var(--ids-theme-light-text-on-tertiary-soft);
+  --ids-color-text-on-tertiary-solid: var(--ids-theme-light-text-on-tertiary-solid);
   --ids-color-text-tertiary: var(--ids-theme-light-text-tertiary);
+  --ids-color-text-tertiary-strong: var(--ids-theme-light-text-tertiary-strong);
   --ids-color-border-tertiary: var(--ids-theme-light-border-tertiary);
-  --ids-color-bg-success-subtler: var(--ids-theme-light-bg-success-subtler);
-  --ids-color-bg-success-subtle: var(--ids-theme-light-bg-success-subtle);
-  --ids-color-bg-success: var(--ids-theme-light-bg-success);
-  --ids-color-text-on-success-subtler: var(--ids-theme-light-text-on-success-subtler);
-  --ids-color-text-on-success-subtle: var(--ids-theme-light-text-on-success-subtle);
-  --ids-color-text-on-success: var(--ids-theme-light-text-on-success);
+  --ids-color-border-tertiary-strong: var(--ids-theme-light-border-tertiary-strong);
+  --ids-color-bg-success-soft: var(--ids-theme-light-bg-success-soft);
+  --ids-color-bg-success-solid: var(--ids-theme-light-bg-success-solid);
+  --ids-color-text-on-success-soft: var(--ids-theme-light-text-on-success-soft);
+  --ids-color-text-on-success-solid: var(--ids-theme-light-text-on-success-solid);
   --ids-color-text-success: var(--ids-theme-light-text-success);
+  --ids-color-text-success-strong: var(--ids-theme-light-text-success-strong);
   --ids-color-border-success: var(--ids-theme-light-border-success);
-  --ids-color-bg-warning-subtler: var(--ids-theme-light-bg-warning-subtler);
-  --ids-color-bg-warning-subtle: var(--ids-theme-light-bg-warning-subtle);
-  --ids-color-bg-warning: var(--ids-theme-light-bg-warning);
-  --ids-color-text-on-warning-subtler: var(--ids-theme-light-text-on-warning-subtler);
-  --ids-color-text-on-warning-subtle: var(--ids-theme-light-text-on-warning-subtle);
-  --ids-color-text-on-warning: var(--ids-theme-light-text-on-warning);
+  --ids-color-border-success-strong: var(--ids-theme-light-border-success-strong);
+  --ids-color-bg-warning-soft: var(--ids-theme-light-bg-warning-soft);
+  --ids-color-bg-warning-solid: var(--ids-theme-light-bg-warning-solid);
+  --ids-color-text-on-warning-soft: var(--ids-theme-light-text-on-warning-soft);
+  --ids-color-text-on-warning-solid: var(--ids-theme-light-text-on-warning-solid);
   --ids-color-text-warning: var(--ids-theme-light-text-warning);
+  --ids-color-text-warning-strong: var(--ids-theme-light-text-warning-strong);
   --ids-color-border-warning: var(--ids-theme-light-border-warning);
-  --ids-color-bg-danger-subtler: var(--ids-theme-light-bg-danger-subtler);
-  --ids-color-bg-danger-subtle: var(--ids-theme-light-bg-danger-subtle);
-  --ids-color-bg-danger: var(--ids-theme-light-bg-danger);
-  --ids-color-text-on-danger-subtler: var(--ids-theme-light-text-on-danger-subtler);
-  --ids-color-text-on-danger-subtle: var(--ids-theme-light-text-on-danger-subtle);
-  --ids-color-text-on-danger: var(--ids-theme-light-text-on-danger);
+  --ids-color-border-warning-strong: var(--ids-theme-light-border-warning-strong);
+  --ids-color-bg-danger-soft: var(--ids-theme-light-bg-danger-soft);
+  --ids-color-bg-danger-solid: var(--ids-theme-light-bg-danger-solid);
+  --ids-color-text-on-danger-soft: var(--ids-theme-light-text-on-danger-soft);
+  --ids-color-text-on-danger-solid: var(--ids-theme-light-text-on-danger-solid);
   --ids-color-text-danger: var(--ids-theme-light-text-danger);
+  --ids-color-text-danger-strong: var(--ids-theme-light-text-danger-strong);
   --ids-color-border-danger: var(--ids-theme-light-border-danger);
-  --ids-color-bg-info-subtler: var(--ids-theme-light-bg-info-subtler);
-  --ids-color-bg-info-subtle: var(--ids-theme-light-bg-info-subtle);
-  --ids-color-bg-info: var(--ids-theme-light-bg-info);
-  --ids-color-text-on-info-subtler: var(--ids-theme-light-text-on-info-subtler);
-  --ids-color-text-on-info-subtle: var(--ids-theme-light-text-on-info-subtle);
-  --ids-color-text-on-info: var(--ids-theme-light-text-on-info);
+  --ids-color-border-danger-strong: var(--ids-theme-light-border-danger-strong);
+  --ids-color-bg-info-soft: var(--ids-theme-light-bg-info-soft);
+  --ids-color-bg-info-solid: var(--ids-theme-light-bg-info-solid);
+  --ids-color-text-on-info-soft: var(--ids-theme-light-text-on-info-soft);
+  --ids-color-text-on-info-solid: var(--ids-theme-light-text-on-info-solid);
   --ids-color-text-info: var(--ids-theme-light-text-info);
+  --ids-color-text-info-strong: var(--ids-theme-light-text-info-strong);
   --ids-color-border-info: var(--ids-theme-light-border-info);
-  --ids-color-bg-panel: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-bg-band: var(--ids-color-bg-neutral-subtler);
-  --ids-color-bg-control-outline: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-border-info-strong: var(--ids-theme-light-border-info-strong);
+  --ids-color-bg-control-outline: var(--ids-color-bg-base);
   --ids-color-border-control-outline: var(--ids-color-border-neutral);
-  --ids-color-bg-field-outline: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-field-outline: var(--ids-color-bg-base);
   --ids-color-border-field-outline: var(--ids-color-border-neutral);
   --ids-color-border-field-bar: var(--ids-color-border-neutral);
-  --ids-color-bg-field-code-outline: var(--ids-color-bg-neutral-subtle);
-  --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-bg-segment: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-bg-qr-code: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-text-qr-code: var(--ids-color-text-neutral-bold);
-  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-bold);
-  --ids-color-text-qr-code-inverse: var(--ids-color-text-on-neutral-bold);
-  --ids-shadow-panel: var(--ids-shadow-1);
+  --ids-color-bg-field-code-outline: var(--ids-color-bg-neutral-soft);
+  --ids-color-bg-switch-thumb: var(--ids-color-bg-base);
+  --ids-color-bg-segment: var(--ids-color-bg-base);
+  --ids-color-bg-qr-code: var(--ids-color-bg-base);
+  --ids-color-text-qr-code: var(--ids-color-text-neutral-strong);
+  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-solid);
+  --ids-color-text-qr-code-inverse: var(--ids-color-text-on-neutral-solid);
+  --ids-shadow-surface: var(--ids-shadow-1);
 }
 
 [data-mode="dark"] {
-  --ids-color-bg-neutral-subtlest: var(--ids-theme-dark-bg-neutral-subtlest, #0a0a0a);
-  --ids-color-bg-neutral-subtler: var(--ids-theme-dark-bg-neutral-subtler, #171717);
-  --ids-color-bg-neutral-subtle: var(--ids-theme-dark-bg-neutral-subtle, #262626);
-  --ids-color-bg-neutral: var(--ids-theme-dark-bg-neutral, #404040);
-  --ids-color-bg-neutral-bold: var(--ids-theme-dark-bg-neutral-bold, #fafafa);
-  --ids-color-text-on-neutral-subtlest: var(--ids-theme-dark-text-on-neutral-subtlest, #fafafa);
-  --ids-color-text-on-neutral-subtler: var(--ids-theme-dark-text-on-neutral-subtler, #fafafa);
-  --ids-color-text-on-neutral-subtle: var(--ids-theme-dark-text-on-neutral-subtle, #fafafa);
-  --ids-color-text-on-neutral: var(--ids-theme-dark-text-on-neutral, #fafafa);
-  --ids-color-text-on-neutral-bold: var(--ids-theme-dark-text-on-neutral-bold, #0a0a0a);
+  --ids-color-bg-base: var(--ids-theme-dark-bg-base, #0a0a0a);
+  --ids-color-bg-surface: var(--ids-theme-dark-bg-surface, #171717);
+  --ids-color-bg-block: var(--ids-theme-dark-bg-block, #1e1e1e);
+  --ids-color-bg-neutral-soft: var(--ids-theme-dark-bg-neutral-soft, #262626);
+  --ids-color-bg-neutral-solid: var(--ids-theme-dark-bg-neutral-solid, #fafafa);
+  --ids-color-text-on-base: var(--ids-theme-dark-text-on-base);
+  --ids-color-text-on-surface: var(--ids-theme-dark-text-on-surface);
+  --ids-color-text-on-block: var(--ids-theme-dark-text-on-block);
+  --ids-color-text-on-neutral-soft: var(--ids-theme-dark-text-on-neutral-soft);
+  --ids-color-text-on-neutral-solid: var(--ids-theme-dark-text-on-neutral-solid);
   --ids-color-text-neutral: var(--ids-theme-dark-text-neutral, #d4d4d4);
-  --ids-color-text-neutral-bold: var(--ids-theme-dark-text-neutral-bold, #fafafa);
-  --ids-color-border-neutral: var(--ids-theme-dark-border-neutral, #262626);
-  --ids-color-bg-primary-subtler: var(--ids-theme-dark-bg-primary-subtler);
-  --ids-color-bg-primary-subtle: var(--ids-theme-dark-bg-primary-subtle);
-  --ids-color-bg-primary: var(--ids-theme-dark-bg-primary);
-  --ids-color-text-on-primary-subtler: var(--ids-theme-dark-text-on-primary-subtler);
-  --ids-color-text-on-primary-subtle: var(--ids-theme-dark-text-on-primary-subtle);
-  --ids-color-text-on-primary: var(--ids-theme-dark-text-on-primary);
+  --ids-color-text-neutral-strong: var(--ids-theme-dark-text-neutral-strong, #fafafa);
+  --ids-color-border-neutral: var(--ids-theme-dark-border-neutral, #2e2e2e);
+  --ids-color-border-neutral-strong: var(--ids-theme-dark-border-neutral-strong, #3a3a3a);
+  --ids-color-bg-primary-soft: var(--ids-theme-dark-bg-primary-soft);
+  --ids-color-bg-primary-solid: var(--ids-theme-dark-bg-primary-solid);
+  --ids-color-text-on-primary-soft: var(--ids-theme-dark-text-on-primary-soft);
+  --ids-color-text-on-primary-solid: var(--ids-theme-dark-text-on-primary-solid);
   --ids-color-text-primary: var(--ids-theme-dark-text-primary);
+  --ids-color-text-primary-strong: var(--ids-theme-dark-text-primary-strong);
   --ids-color-border-primary: var(--ids-theme-dark-border-primary);
-  --ids-color-bg-secondary-subtler: var(--ids-theme-dark-bg-secondary-subtler);
-  --ids-color-bg-secondary-subtle: var(--ids-theme-dark-bg-secondary-subtle);
-  --ids-color-bg-secondary: var(--ids-theme-dark-bg-secondary);
-  --ids-color-text-on-secondary-subtler: var(--ids-theme-dark-text-on-secondary-subtler);
-  --ids-color-text-on-secondary-subtle: var(--ids-theme-dark-text-on-secondary-subtle);
-  --ids-color-text-on-secondary: var(--ids-theme-dark-text-on-secondary);
+  --ids-color-border-primary-strong: var(--ids-theme-dark-border-primary-strong);
+  --ids-color-bg-secondary-soft: var(--ids-theme-dark-bg-secondary-soft);
+  --ids-color-bg-secondary-solid: var(--ids-theme-dark-bg-secondary-solid);
+  --ids-color-text-on-secondary-soft: var(--ids-theme-dark-text-on-secondary-soft);
+  --ids-color-text-on-secondary-solid: var(--ids-theme-dark-text-on-secondary-solid);
   --ids-color-text-secondary: var(--ids-theme-dark-text-secondary);
+  --ids-color-text-secondary-strong: var(--ids-theme-dark-text-secondary-strong);
   --ids-color-border-secondary: var(--ids-theme-dark-border-secondary);
-  --ids-color-bg-tertiary-subtler: var(--ids-theme-dark-bg-tertiary-subtler);
-  --ids-color-bg-tertiary-subtle: var(--ids-theme-dark-bg-tertiary-subtle);
-  --ids-color-bg-tertiary: var(--ids-theme-dark-bg-tertiary);
-  --ids-color-text-on-tertiary-subtler: var(--ids-theme-dark-text-on-tertiary-subtler);
-  --ids-color-text-on-tertiary-subtle: var(--ids-theme-dark-text-on-tertiary-subtle);
-  --ids-color-text-on-tertiary: var(--ids-theme-dark-text-on-tertiary);
+  --ids-color-border-secondary-strong: var(--ids-theme-dark-border-secondary-strong);
+  --ids-color-bg-tertiary-soft: var(--ids-theme-dark-bg-tertiary-soft);
+  --ids-color-bg-tertiary-solid: var(--ids-theme-dark-bg-tertiary-solid);
+  --ids-color-text-on-tertiary-soft: var(--ids-theme-dark-text-on-tertiary-soft);
+  --ids-color-text-on-tertiary-solid: var(--ids-theme-dark-text-on-tertiary-solid);
   --ids-color-text-tertiary: var(--ids-theme-dark-text-tertiary);
+  --ids-color-text-tertiary-strong: var(--ids-theme-dark-text-tertiary-strong);
   --ids-color-border-tertiary: var(--ids-theme-dark-border-tertiary);
-  --ids-color-bg-success-subtler: var(--ids-theme-dark-bg-success-subtler);
-  --ids-color-bg-success-subtle: var(--ids-theme-dark-bg-success-subtle);
-  --ids-color-bg-success: var(--ids-theme-dark-bg-success);
-  --ids-color-text-on-success-subtler: var(--ids-theme-dark-text-on-success-subtler);
-  --ids-color-text-on-success-subtle: var(--ids-theme-dark-text-on-success-subtle);
-  --ids-color-text-on-success: var(--ids-theme-dark-text-on-success);
+  --ids-color-border-tertiary-strong: var(--ids-theme-dark-border-tertiary-strong);
+  --ids-color-bg-success-soft: var(--ids-theme-dark-bg-success-soft);
+  --ids-color-bg-success-solid: var(--ids-theme-dark-bg-success-solid);
+  --ids-color-text-on-success-soft: var(--ids-theme-dark-text-on-success-soft);
+  --ids-color-text-on-success-solid: var(--ids-theme-dark-text-on-success-solid);
   --ids-color-text-success: var(--ids-theme-dark-text-success);
+  --ids-color-text-success-strong: var(--ids-theme-dark-text-success-strong);
   --ids-color-border-success: var(--ids-theme-dark-border-success);
-  --ids-color-bg-warning-subtler: var(--ids-theme-dark-bg-warning-subtler);
-  --ids-color-bg-warning-subtle: var(--ids-theme-dark-bg-warning-subtle);
-  --ids-color-bg-warning: var(--ids-theme-dark-bg-warning);
-  --ids-color-text-on-warning-subtler: var(--ids-theme-dark-text-on-warning-subtler);
-  --ids-color-text-on-warning-subtle: var(--ids-theme-dark-text-on-warning-subtle);
-  --ids-color-text-on-warning: var(--ids-theme-dark-text-on-warning);
+  --ids-color-border-success-strong: var(--ids-theme-dark-border-success-strong);
+  --ids-color-bg-warning-soft: var(--ids-theme-dark-bg-warning-soft);
+  --ids-color-bg-warning-solid: var(--ids-theme-dark-bg-warning-solid);
+  --ids-color-text-on-warning-soft: var(--ids-theme-dark-text-on-warning-soft);
+  --ids-color-text-on-warning-solid: var(--ids-theme-dark-text-on-warning-solid);
   --ids-color-text-warning: var(--ids-theme-dark-text-warning);
+  --ids-color-text-warning-strong: var(--ids-theme-dark-text-warning-strong);
   --ids-color-border-warning: var(--ids-theme-dark-border-warning);
-  --ids-color-bg-danger-subtler: var(--ids-theme-dark-bg-danger-subtler);
-  --ids-color-bg-danger-subtle: var(--ids-theme-dark-bg-danger-subtle);
-  --ids-color-bg-danger: var(--ids-theme-dark-bg-danger);
-  --ids-color-text-on-danger-subtler: var(--ids-theme-dark-text-on-danger-subtler);
-  --ids-color-text-on-danger-subtle: var(--ids-theme-dark-text-on-danger-subtle);
-  --ids-color-text-on-danger: var(--ids-theme-dark-text-on-danger);
+  --ids-color-border-warning-strong: var(--ids-theme-dark-border-warning-strong);
+  --ids-color-bg-danger-soft: var(--ids-theme-dark-bg-danger-soft);
+  --ids-color-bg-danger-solid: var(--ids-theme-dark-bg-danger-solid);
+  --ids-color-text-on-danger-soft: var(--ids-theme-dark-text-on-danger-soft);
+  --ids-color-text-on-danger-solid: var(--ids-theme-dark-text-on-danger-solid);
   --ids-color-text-danger: var(--ids-theme-dark-text-danger);
+  --ids-color-text-danger-strong: var(--ids-theme-dark-text-danger-strong);
   --ids-color-border-danger: var(--ids-theme-dark-border-danger);
-  --ids-color-bg-info-subtler: var(--ids-theme-dark-bg-info-subtler);
-  --ids-color-bg-info-subtle: var(--ids-theme-dark-bg-info-subtle);
-  --ids-color-bg-info: var(--ids-theme-dark-bg-info);
-  --ids-color-text-on-info-subtler: var(--ids-theme-dark-text-on-info-subtler);
-  --ids-color-text-on-info-subtle: var(--ids-theme-dark-text-on-info-subtle);
-  --ids-color-text-on-info: var(--ids-theme-dark-text-on-info);
+  --ids-color-border-danger-strong: var(--ids-theme-dark-border-danger-strong);
+  --ids-color-bg-info-soft: var(--ids-theme-dark-bg-info-soft);
+  --ids-color-bg-info-solid: var(--ids-theme-dark-bg-info-solid);
+  --ids-color-text-on-info-soft: var(--ids-theme-dark-text-on-info-soft);
+  --ids-color-text-on-info-solid: var(--ids-theme-dark-text-on-info-solid);
   --ids-color-text-info: var(--ids-theme-dark-text-info);
+  --ids-color-text-info-strong: var(--ids-theme-dark-text-info-strong);
   --ids-color-border-info: var(--ids-theme-dark-border-info);
-  --ids-color-bg-panel: var(--ids-color-bg-neutral-subtler);
-  --ids-color-bg-band: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-bg-control-outline: var(--ids-color-bg-neutral-subtle);
-  --ids-color-border-control-outline: var(--ids-color-bg-neutral);
-  --ids-color-bg-field-outline: var(--ids-color-bg-neutral-subtle);
-  --ids-color-border-field-outline: var(--ids-color-bg-neutral);
-  --ids-color-border-field-bar: var(--ids-color-bg-neutral);
-  --ids-color-bg-field-code-outline: var(--ids-color-bg-neutral-subtler);
-  --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-bold);
-  --ids-color-bg-segment: var(--ids-color-bg-neutral);
-  --ids-color-bg-qr-code: var(--ids-color-bg-neutral-bold);
-  --ids-color-text-qr-code: var(--ids-color-text-on-neutral-bold);
-  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-text-qr-code-inverse: var(--ids-color-text-neutral-bold);
-  --ids-shadow-panel: var(--ids-shadow-0);
+  --ids-color-border-info-strong: var(--ids-theme-dark-border-info-strong);
+  --ids-color-bg-control-outline: var(--ids-color-bg-block);
+  --ids-color-border-control-outline: var(--ids-color-border-neutral-strong);
+  --ids-color-bg-field-outline: var(--ids-color-bg-block);
+  --ids-color-border-field-outline: var(--ids-color-border-neutral-strong);
+  --ids-color-border-field-bar: var(--ids-color-border-neutral-strong);
+  --ids-color-bg-field-code-outline: var(--ids-color-bg-surface);
+  --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-solid);
+  --ids-color-bg-segment: var(--ids-color-border-neutral-strong);
+  --ids-color-bg-qr-code: var(--ids-color-bg-neutral-solid);
+  --ids-color-text-qr-code: var(--ids-color-text-on-neutral-solid);
+  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-base);
+  --ids-color-text-qr-code-inverse: var(--ids-color-text-neutral-strong);
+  --ids-shadow-surface: var(--ids-shadow-0);
 }

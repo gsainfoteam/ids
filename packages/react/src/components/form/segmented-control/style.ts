@@ -9,7 +9,7 @@ export const segmentedControlStyle = tv({
     root: [
       'm-0 flex min-w-0 border-0 outline-none',
       segmentSurface.track,
-      'data-invalid:inset-ring-1 data-invalid:inset-ring-danger',
+      'data-invalid:inset-ring-1 data-invalid:inset-ring-danger-strong',
     ],
     item: [
       'relative inline-flex min-w-0 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap select-none',

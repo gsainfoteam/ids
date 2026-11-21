@@ -3,9 +3,9 @@ import { cn } from '../../utils/cn';
 import type { IdsSize } from '../../tokens/types';
 
 export const segmentSurface = {
-  track: cn('concentric-p-1 gap-0.5 bg-neutral-subtle'),
+  track: cn('concentric-p-1 gap-0.5 bg-neutral-soft'),
   segment: cn(
-    'rounded-standard text-neutral data-selected:text-neutral-bold',
+    'rounded-standard text-neutral data-selected:text-neutral-strong',
     'data-selected:bg-segment data-selected:shadow-xs',
     'state-layer not-data-selected:data-hovered:state-hover',
     'not-data-selected:data-active:state-press',

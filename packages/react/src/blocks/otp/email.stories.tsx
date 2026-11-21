@@ -79,7 +79,7 @@ export const PC: Story = {
             </form>
           </Card.Content>
 
-          <Card.Footer className="justify-center border-t">
+          <Card.Footer className="justify-center">
             메일이 오지 않았나요?
             <Button
               variant="soft"

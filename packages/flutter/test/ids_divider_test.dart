@@ -43,7 +43,7 @@ void main() {
     );
     expect(
       tester.widget<ColoredBox>(find.byType(ColoredBox)).color,
-      const Color(0xFF262626),
+      const Color(0xFF2E2E2E),
     );
   });
 

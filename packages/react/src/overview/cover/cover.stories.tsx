@@ -94,12 +94,12 @@ const column = cn('flex shrink-0 flex-col gap-4');
 
 const tile = cn(
   'shrink-0 shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)]',
-  'dark:bg-neutral-subtle dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
+  'dark:bg-neutral-soft dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
 );
 
 const frame = cn(
-  'shrink-0 overflow-hidden rounded-container bg-neutral-subtlest inset-ring-1 inset-ring-neutral',
-  'shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)] dark:bg-neutral-subtle dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
+  'shrink-0 overflow-hidden rounded-container bg-base inset-ring-1 inset-ring-neutral',
+  'shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)] dark:bg-neutral-soft dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
 );
 
 const row = cn('flex items-center justify-between gap-3 text-body-b3-medium');
@@ -121,7 +121,7 @@ export const Cover: Story = {
           inert
           aria-hidden
           className={cn(
-            'bg-neutral-subtle text-neutral-bold dark:bg-neutral-subtlest absolute inset-0 overflow-hidden',
+            'bg-neutral-soft text-neutral-strong dark:bg-base absolute inset-0 overflow-hidden',
             halves[mode],
           )}
         >
@@ -635,9 +635,9 @@ export const Cover: Story = {
 
               <IdsProvider.Scope
                 theme={{ primary: palettes.cyan }}
-                className="bg-neutral-subtlest h-[600px] shrink-0 overflow-hidden rounded-[48px] border-[10px] border-(--ids-color-bg-neutral-bold) p-5 shadow-[0_32px_64px_-24px_rgb(15_23_42/0.4)] dark:border-(--ids-color-bg-neutral)"
+                className="bg-base h-[600px] shrink-0 overflow-hidden rounded-[48px] border-[10px] border-(--ids-color-bg-neutral-solid) p-5 shadow-[0_32px_64px_-24px_rgb(15_23_42/0.4)] dark:border-(--ids-color-border-neutral-strong)"
               >
-                <div className="dark:bg-neutral mx-auto mb-4 h-6 w-24 rounded-full bg-neutral-bold" />
+                <div className="bg-neutral-solid mx-auto mb-4 h-6 w-24 rounded-full dark:bg-(--ids-color-border-neutral-strong)" />
                 <p className="text-caption-c1-medium text-neutral">gistory</p>
                 <p className="text-headline-h5-bold mb-4">최근 활동</p>
                 <Stepper progress={false} orientation="vertical" size="tiny" aria-label="최근 활동">
@@ -1075,13 +1075,13 @@ export const Cover: Story = {
                         <IdsProvider.Scope
                           key={color}
                           theme={{ primary: palettes[color] }}
-                          className="bg-primary aspect-square rounded-full"
+                          className="bg-primary-solid aspect-square rounded-full"
                         />
                       ))}
                     </div>
                   </Card>
 
-                  <p className="-me-[0.1em] bg-linear-to-b from-(--ids-color-text-neutral-bold) to-(--ids-color-text-neutral) bg-clip-text pe-[0.1em] font-[system-ui] text-[200px] leading-none font-black tracking-[-0.06em] text-transparent">
+                  <p className="-me-[0.1em] bg-linear-to-b from-(--ids-color-text-neutral-strong) to-(--ids-color-text-neutral) bg-clip-text pe-[0.1em] font-[system-ui] text-[200px] leading-none font-black tracking-[-0.06em] text-transparent">
                     IDS
                   </p>
 
@@ -1500,9 +1500,9 @@ export const Cover: Story = {
 
               <IdsProvider.Scope theme={{ primary: palettes.orange }} className={frame}>
                 <div className="border-neutral flex items-center gap-1.5 border-b px-4 py-3">
-                  <span className="bg-danger size-3 rounded-full" />
-                  <span className="bg-warning size-3 rounded-full" />
-                  <span className="bg-success size-3 rounded-full" />
+                  <span className="bg-danger-solid size-3 rounded-full" />
+                  <span className="bg-warning-solid size-3 rounded-full" />
+                  <span className="bg-success-solid size-3 rounded-full" />
                   <span className="text-caption-c1-medium text-neutral ms-3">gistory.me</span>
                 </div>
                 <Splitter className="h-56">

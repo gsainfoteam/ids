@@ -3,7 +3,7 @@
 ---
 
 Tabs keeps `underline`, `pill` and `enclosed` as fixed appearances and drops the `variant`
-prop. `pill` always fills the selected tab with `bg-primary-subtle` and `text-on-primary-subtle`
+prop. `pill` always fills the selected tab with `bg-primary-soft` and `text-on-primary-soft`
 (the `colorScheme`'s subtle pair); a different fill goes on `Tabs.Trigger`'s `className`.
 `underline` and `enclosed` draw the selected label in `text-primary` (the `colorScheme`'s
 `text-X`). `enclosed` paints the selected tab with `--ids-bg-current`, so it covers the list line
