@@ -28,20 +28,6 @@ const weekRange = (from: CalendarDate, to: CalendarDate, locale = 'ko-KR') =>
   }).formatRange(from.toDate(WALL_CLOCK), to.toDate(WALL_CLOCK));
 
 const EVENTS: Scheduler.EventData[] = [
-  { id: 'standup', title: '팀 회의', start: at(16, 9), end: at(16, 9, 30) },
-  { id: 'algo', title: '알고리즘', start: at(17, 9), end: at(17, 10, 30) },
-  {
-    id: 'room',
-    title: '스터디룸 B',
-    start: at(17, 10),
-    end: at(17, 12),
-    colorScheme: 'secondary',
-  },
-  { id: 'lunch', title: '점심', start: at(17, 12), end: at(17, 13), colorScheme: 'neutral' },
-  { id: 'os', title: '운영체제', start: at(18, 13), end: at(18, 14, 30), colorScheme: 'tertiary' },
-  { id: 'review', title: '코드 리뷰', start: at(18, 13, 30), end: at(18, 14), colorScheme: 'info' },
-  { id: 'deadline', title: '과제 제출', start: at(19, 23), end: at(20, 1), colorScheme: 'danger' },
-  { id: 'lab', title: '물리 실험', start: at(20, 14), end: at(20, 17), colorScheme: 'success' },
   {
     id: 'festival',
     title: '지스트 축제',
@@ -50,6 +36,165 @@ const EVENTS: Scheduler.EventData[] = [
     allDay: true,
     colorScheme: 'warning',
   },
+  {
+    id: 'no-class',
+    title: '휴강',
+    start: on(18),
+    end: on(18),
+    allDay: true,
+    colorScheme: 'neutral',
+  },
+  {
+    id: 'grades',
+    title: '중간고사 성적 공개',
+    start: on(20),
+    end: on(20),
+    allDay: true,
+    colorScheme: 'info',
+  },
+  {
+    id: 'hackathon',
+    title: 'GIST 해커톤',
+    start: on(21),
+    end: on(22),
+    allDay: true,
+    colorScheme: 'secondary',
+  },
+  {
+    id: 'finals',
+    title: '기말고사',
+    start: new CalendarDate(2026, 12, 14),
+    end: new CalendarDate(2026, 12, 18),
+    allDay: true,
+    colorScheme: 'danger',
+  },
+
+  { id: 'brunch', title: '브런치', start: at(15, 11), end: at(15, 12, 30), colorScheme: 'neutral' },
+  { id: 'laundry', title: '빨래', start: at(15, 15), end: at(15, 15, 30), colorScheme: 'tertiary' },
+  { id: 'retro', title: '주간 회고', start: at(15, 21), end: at(15, 22), colorScheme: 'tertiary' },
+
+  {
+    id: 'run',
+    title: '아침 러닝',
+    start: at(16, 7, 30),
+    end: at(16, 8, 30),
+    colorScheme: 'success',
+  },
+  { id: 'mon-lunch', title: '점심', start: at(16, 12), end: at(16, 13), colorScheme: 'neutral' },
+  { id: 'graph-mon', title: '그래프 이론', start: at(16, 13), end: at(16, 14, 15) },
+  { id: 'office-hour', title: '조교 면담', start: at(16, 14, 30), end: at(16, 15) },
+  {
+    id: 'compiler-mon',
+    title: '프로그래밍 언어 및 컴파일러',
+    start: at(16, 16),
+    end: at(16, 17, 15),
+  },
+  {
+    id: 'team-mon',
+    title: '행복의 조건 조모임',
+    start: at(16, 18),
+    end: at(16, 21),
+    colorScheme: 'secondary',
+  },
+  {
+    id: 'ids-review',
+    title: 'IDS 리뷰',
+    start: at(16, 19),
+    end: at(16, 19, 30),
+    colorScheme: 'info',
+  },
+
+  { id: 'algo', title: '알고리즘 스터디', start: at(17, 9), end: at(17, 10, 30) },
+  {
+    id: 'room',
+    title: '스터디룸 B',
+    start: at(17, 10),
+    end: at(17, 12),
+    colorScheme: 'secondary',
+  },
+  { id: 'lunch', title: '점심', start: at(17, 12), end: at(17, 13), colorScheme: 'neutral' },
+  { id: 'hair', title: '미용실', start: at(17, 14), end: at(17, 15, 40), colorScheme: 'tertiary' },
+  {
+    id: 'design',
+    title: 'IDS 디자인 리뷰',
+    start: at(17, 16),
+    end: at(17, 17),
+    colorScheme: 'info',
+  },
+  {
+    id: 'pairing',
+    title: 'Scheduler 페어링',
+    start: at(17, 16, 30),
+    end: at(17, 17, 30),
+    colorScheme: 'info',
+  },
+  {
+    id: 'one-on-one',
+    title: '1:1',
+    start: at(17, 16, 45),
+    end: at(17, 17, 15),
+    colorScheme: 'info',
+  },
+  {
+    id: 'team-tue',
+    title: '행복의 조건 조모임',
+    start: at(17, 18),
+    end: at(17, 21, 30),
+    colorScheme: 'secondary',
+  },
+
+  { id: 'attendance', title: '출석 체크', start: at(18, 9), end: at(18, 9, 15) },
+  {
+    id: 'compiler-hw',
+    title: '컴파일러 과제',
+    start: at(18, 10),
+    end: at(18, 12),
+    colorScheme: 'tertiary',
+  },
+  { id: 'graph-wed', title: '그래프 이론', start: at(18, 13), end: at(18, 14, 15) },
+  {
+    id: 'compiler-wed',
+    title: '프로그래밍 언어 및 컴파일러',
+    start: at(18, 16),
+    end: at(18, 17, 15),
+  },
+  {
+    id: 'club',
+    title: '동아리 세션',
+    start: at(18, 20),
+    end: at(18, 22),
+    colorScheme: 'secondary',
+  },
+
+  { id: 'happiness', title: '행복의 조건', start: at(19, 10, 30), end: at(19, 11, 45) },
+  { id: 'network', title: '컴퓨터네트워킹', start: at(19, 13), end: at(19, 14, 15) },
+  { id: 'linear', title: '선형대수학과 응용', start: at(19, 14, 30), end: at(19, 15, 45) },
+  { id: 'colloquium', title: 'GIST대학 콜로퀴움', start: at(19, 16), end: at(19, 17, 15) },
+  {
+    id: 'exam-check',
+    title: '선대 중간고사 시험지 확인',
+    start: at(19, 17),
+    end: at(19, 18),
+    colorScheme: 'warning',
+  },
+  { id: 'deadline', title: '과제 제출', start: at(19, 23), end: at(20, 1), colorScheme: 'danger' },
+
+  { id: 'lab-meeting', title: '랩 미팅', start: at(20, 10), end: at(20, 11, 30) },
+  {
+    id: 'fri-lunch',
+    title: '점심 약속',
+    start: at(20, 12),
+    end: at(20, 13),
+    colorScheme: 'neutral',
+  },
+  {
+    id: 'network-hw',
+    title: '네트워킹 과제',
+    start: at(20, 14),
+    end: at(20, 17),
+    colorScheme: 'tertiary',
+  },
+  { id: 'movie', title: '영화', start: at(20, 19, 30), end: at(20, 22), colorScheme: 'success' },
 ];
 
 const SCHEMES = [
@@ -316,19 +461,18 @@ export const ClickableEvents: Story = {
     const titles = [...canvasElement.querySelectorAll('[data-scheduler-event] button')].map(
       (button) => button.textContent,
     );
-    await expect(titles).toEqual([
+    await expect(titles.slice(0, 9)).toEqual([
+      '휴강',
       '지스트 축제',
       '지스트 축제',
-      '팀 회의',
-      '알고리즘',
-      '스터디룸 B',
-      '점심',
-      '운영체제',
-      '코드 리뷰',
-      '과제 제출',
-      '과제 제출',
-      '물리 실험',
+      '중간고사 성적 공개',
+      'GIST 해커톤',
+      '브런치',
+      '빨래',
+      '주간 회고',
+      '아침 러닝',
     ]);
+    await expect(titles.filter((title) => title === '과제 제출')).toHaveLength(2);
     await userEvent.click(canvas.getByRole('button', { name: '스터디룸 B' }));
     await expect(canvas.getByTestId('opened')).toHaveTextContent('스터디룸 B');
   },
