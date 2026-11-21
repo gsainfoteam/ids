@@ -1,5 +1,6 @@
 import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { minBy } from 'es-toolkit';
 
 import type { BlockHoverStore, HoveredBlock } from './store';
@@ -7,7 +8,7 @@ import type { EditorView } from '@tiptap/pm/view';
 
 const blockHandleKey = new PluginKey('idsBlockHandle');
 
-function topLevelBlocks(view: EditorView) {
+export function topLevelBlocks(view: EditorView) {
   const blocks: HoveredBlock[] = [];
   view.state.doc.forEach((_, pos) => {
     const dom = view.nodeDOM(pos);
@@ -42,6 +43,12 @@ function blockUnderThePointer(view: EditorView, event: MouseEvent): HoveredBlock
   return dom instanceof HTMLElement ? { pos, dom } : null;
 }
 
+type DraggedBlock = number | null;
+
+export function markTheDraggedBlock(view: EditorView, pos: DraggedBlock) {
+  view.dispatch(view.state.tr.setMeta(blockHandleKey, pos));
+}
+
 export const BlockHandle = Extension.create<{ store: BlockHoverStore | null }>({
   name: 'idsBlockHandle',
 
@@ -54,9 +61,25 @@ export const BlockHandle = Extension.create<{ store: BlockHoverStore | null }>({
     if (!store) return [];
 
     return [
-      new Plugin({
+      new Plugin<DraggedBlock>({
         key: blockHandleKey,
+        state: {
+          init: () => null,
+          apply: (tr, dragged) => {
+            const meta = tr.getMeta(blockHandleKey) as DraggedBlock | undefined;
+            if (meta !== undefined) return meta;
+            return dragged === null || !tr.docChanged ? dragged : null;
+          },
+        },
         props: {
+          decorations: (state) => {
+            const dragged = blockHandleKey.getState(state) as DraggedBlock;
+            const node = dragged === null ? null : state.doc.nodeAt(dragged);
+            if (dragged === null || !node) return DecorationSet.empty;
+            return DecorationSet.create(state.doc, [
+              Decoration.node(dragged, dragged + node.nodeSize, { 'data-block-dragging': '' }),
+            ]);
+          },
           handleDOMEvents: {
             mousemove: (view, event) => {
               if (!view.editable) {

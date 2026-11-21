@@ -1,5 +1,6 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
+import { EditorBlockHandlePart, type EditorBlockHandleProps } from './block-handle';
 import { EditorBlockType, type EditorBlockTypeProps, type EditorHeadingLevel } from './block-type';
 import {
   EditorBlockquote,
@@ -98,6 +99,7 @@ export namespace Editor {
   export type DetailsProps = EditorDetailsProps;
   export type SeparatorProps = EditorSeparatorProps;
   export type BubbleMenuProps = EditorBubbleMenuProps;
+  export type BlockHandleProps = EditorBlockHandleProps;
   export type CountProps = EditorCountProps;
 
   export const Content = EditorContentPart;
@@ -122,6 +124,7 @@ export namespace Editor {
   export const Details = EditorDetails;
   export const Separator = EditorSeparator;
   export const BubbleMenu = EditorBubbleMenu;
+  export const BlockHandle = EditorBlockHandlePart;
   export const Count = EditorCount;
 
   export const Style = editorStyle;

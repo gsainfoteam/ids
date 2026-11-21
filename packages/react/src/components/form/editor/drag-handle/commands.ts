@@ -55,20 +55,14 @@ export function selectBlock(editor: TiptapEditor, pos: number) {
   editor.commands.setNodeSelection(pos);
 }
 
-export function startDraggingBlock(editor: TiptapEditor, pos: number, event: DragEvent) {
-  const { view } = editor;
-  const selection = NodeSelection.create(view.state.doc, pos);
-  view.dispatch(view.state.tr.setSelection(selection));
+export function moveBlock(editor: TiptapEditor, from: number, to: number) {
+  const { state } = editor.view;
+  const node = state.doc.nodeAt(from);
+  if (!node || to === from || to === after(from, node)) return;
 
-  const slice = selection.content();
-  const { dom, text } = view.serializeForClipboard(slice);
-  const block = view.nodeDOM(pos);
-
-  event.dataTransfer?.clearData();
-  event.dataTransfer?.setData('text/html', dom.innerHTML);
-  event.dataTransfer?.setData('text/plain', text);
-  if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copyMove';
-  if (block instanceof HTMLElement) event.dataTransfer?.setDragImage(block, 0, 0);
-
-  view.dragging = { slice, move: true };
+  const tr = state.tr.delete(from, after(from, node));
+  const at = tr.mapping.map(to);
+  tr.insert(at, node);
+  tr.setSelection(NodeSelection.create(tr.doc, at));
+  editor.view.dispatch(tr.scrollIntoView());
 }

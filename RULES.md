@@ -625,7 +625,7 @@ layer, soft and accent text under the text-color layer and the family-fill layer
 - Translucent layers over a background IDS does not know stay as they are: Image's hover scrim,
   Chip lines, the ScrollArea track, the DataTable loading veil, disabled opacity and backdrops,
   the hairline round an image, a color swatch or a slider track (`inset-ring-(--ids-color-text-neutral-strong)/N`),
-  with the focus halo and text selection. They are the only opacity modifiers on an IDS color;
+  with the focus halo and text and block selection. They are the only opacity modifiers on an IDS color;
   `tests/color-rules.test.ts` lists them and fails on any other, on `dark:`, on `color-mix` and on
   an `--ids-*` variable `ids.css` does not have.
 

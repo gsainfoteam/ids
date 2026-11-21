@@ -1,4 +1,5 @@
-import { tv } from '../../../utils';
+import { dragSurface } from '../../../internal/drag-surface';
+import { cn, tv } from '../../../utils';
 
 export type SidebarVariant = 'sidebar' | 'floating' | 'inset';
 export type SidebarCollapsibleMode = 'icon' | 'offcanvas';
@@ -56,11 +57,8 @@ export const sidebarStyle = tv({
       'data-[drop=inside]:[&>[data-sidebar-item]]:bg-primary-soft data-[drop=inside]:[&>[data-sidebar-item]]:text-on-primary-soft',
     ],
     dropLayer: 'relative',
-    dropLine: [
-      'pointer-events-none absolute z-10 h-0.5 -translate-y-1/2 rounded-full bg-primary-solid',
-      'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-primary-strong before:bg-(--ids-bg-current)',
-    ],
-    dragPreview: 'w-full cursor-grabbing bg-base opacity-75 shadow-lg',
+    dropLine: dragSurface.dropLine,
+    dragPreview: cn('w-full', dragSurface.preview),
     inset: 'flex min-w-0 flex-1 flex-col',
     provider: 'group/sidebar-provider flex min-h-dvh w-full',
   },

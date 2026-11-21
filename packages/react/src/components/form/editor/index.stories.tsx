@@ -169,6 +169,7 @@ export const Gallery: Story = {
             <Editor.HorizontalRule />
             <Editor.Table />
             <Editor.Content />
+            <Editor.BlockHandle />
           </Editor>
         </Showcase.Row>
         <Showcase.Row label="default with upload">
@@ -677,7 +678,7 @@ export const BlockHandle: Story = {
     docs: {
       description: {
         story:
-          '편집할 수 있는 Editor 는 블록 위에 올린 포인터 옆, 본문 왼쪽 여백에 손잡이를 보여 줍니다. 손잡이를 끌면 블록이 옮겨지고, 누르면 메뉴가 열립니다. 메뉴로 아래에 블록을 넣거나(블록 메뉴가 바로 열립니다), 글이 담긴 블록을 다른 종류로 바꾸거나, 복제하거나, 지울 수 있습니다. 손잡이는 Tab 순서에 들지 않습니다. 같은 일은 키보드로도 할 수 있어서(/ 메뉴, 잘라 내기와 붙여 넣기, 실행 취소), 손잡이는 포인터를 위한 지름길입니다.',
+          'Editor.BlockHandle 을 넣으면 편집할 수 있는 Editor 가 포인터를 올린 블록의 첫 줄 옆, 상자 바깥 왼쪽에 손잡이를 보여 줍니다. 상자 안쪽 여백은 늘지 않고, 넣지 않은 Editor 에는 손잡이가 없습니다. 손잡이를 끌면 Sidebar 처럼 블록의 복사본이 따라오고 놓을 자리에 primary 선이 그어지며, 놓은 블록은 옅은 틴트로 골라집니다. 누르면 메뉴가 열립니다. 메뉴로 아래에 블록을 넣거나(블록 메뉴가 바로 열립니다), 글이 담긴 블록을 다른 종류로 바꾸거나, 복제하거나, 지울 수 있습니다. 손잡이는 Tab 순서에 들지 않습니다. 같은 일은 키보드로도 할 수 있어서(/ 메뉴, 잘라 내기와 붙여 넣기, 실행 취소), 손잡이는 포인터를 위한 지름길입니다.',
       },
     },
   },
@@ -687,6 +688,16 @@ export const BlockHandle: Story = {
     const handle = await canvas.findByRole('button', { name: '블록 메뉴' });
     await userEvent.click(handle);
     await expect(await canvas.findByRole('menuitem', { name: '복제' })).toBeVisible();
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.BlockType />
+      <Editor.Separator />
+      <Editor.Bold />
+      <Editor.Italic />
+      <Editor.Content />
+      <Editor.BlockHandle />
+    </Editor>
+  ),
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
   },

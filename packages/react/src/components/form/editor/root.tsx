@@ -16,6 +16,7 @@ import {
 import { isEqual } from 'es-toolkit';
 
 import { EditorBar } from './bar';
+import { EditorBlockHandlePart } from './block-handle';
 import { EditorBlockType } from './block-type';
 import {
   EditorBlockquote,
@@ -133,12 +134,17 @@ const DEFAULT_TOOLBAR_WITH_IMAGE = defaultToolbar({ withImage: true });
 const isOfType = (type: unknown) => (node: ReactNode) =>
   isValidElement(node) && elementTypeOf(node) === type;
 
+const isFloating = (node: ReactNode) =>
+  isOfType(EditorBubbleMenu)(node) || isOfType(EditorBlockHandlePart)(node);
+
+const BLOCK_HANDLE = new Set<unknown>([EditorBlockHandlePart]);
+
 const isTool = (node: ReactNode) => isValidElement(node) && TOOLS.has(elementTypeOf(node));
 
 function splitByContent(children: ReactNode) {
   const items = flattenFragments(children);
   const bubbles = items.filter(isOfType(EditorBubbleMenu));
-  const laidOut = items.filter((item) => !isOfType(EditorBubbleMenu)(item));
+  const laidOut = items.filter((item) => !isFloating(item));
   const indexes = laidOut.flatMap((item, index) =>
     isOfType(EditorContentPart)(item) ? [index] : [],
   );
@@ -252,6 +258,7 @@ export function EditorRoot(props: Editor.Props) {
   const insertable = onImageUpload !== undefined;
   const shown =
     children === undefined ? (insertable ? DEFAULT_TOOLBAR_WITH_IMAGE : DEFAULT_TOOLBAR) : children;
+  const withHandle = containsElementOfType(children, BLOCK_HANDLE) === true;
   const { bubbles, top, content, bottom, items } = splitByContent(shown);
   const features = featuresIn(shown, {
     imageUpload: insertable,
@@ -338,15 +345,18 @@ export function EditorRoot(props: Editor.Props) {
         taskLabel: callIntoTheLatestRender.taskLabel,
         t: callIntoTheLatestRender.t,
         findMentions: callIntoTheLatestRender.findMentions,
+        withHandle,
       }),
-    [loaded, size, maxLength, uploaded, callIntoTheLatestRender],
+    [loaded, size, maxLength, uploaded, callIntoTheLatestRender, withHandle],
   );
   const mention = loaded?.features.mention;
   const floating = (
     <>
       {bubbles}
       {loaded && setup && <loaded.engine.EditorSlashMenu store={setup.slashMenu} />}
-      {loaded && setup && <loaded.engine.EditorBlockHandle store={setup.blockHandle} />}
+      {loaded && setup?.blockHandle && (
+        <loaded.engine.EditorBlockHandle store={setup.blockHandle} />
+      )}
       {mention && setup?.mentionMenu && <mention.EditorMentionMenu store={setup.mentionMenu} />}
     </>
   );

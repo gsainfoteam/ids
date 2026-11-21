@@ -43,6 +43,7 @@ import {
   type SidebarTreeItem,
   type SidebarTreeMove,
 } from './tree';
+import { swallowTheClickThatEndsADrag } from '../../../internal/drag-surface';
 import { keyHandler } from '../../../internal/keys';
 import { useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
@@ -80,15 +81,6 @@ const rowAtThePointerHeight: CollisionDetection = ({
 
 const sameDrop = (a: SidebarDrop | null, b: SidebarDrop | null) =>
   a?.key === b?.key && a?.position === b?.position;
-
-function swallowTheClickThatEndsADrag() {
-  const swallow = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  window.addEventListener('click', swallow, { capture: true, once: true });
-  setTimeout(() => window.removeEventListener('click', swallow, { capture: true }));
-}
 
 function swallowTheSpaceKeyupThatWouldPressTheRow() {
   const swallow = (event: KeyboardEvent) => {

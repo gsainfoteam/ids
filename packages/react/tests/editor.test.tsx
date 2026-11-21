@@ -68,43 +68,17 @@ const centerOf = (element: Element): Point => {
   return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
 };
 
-async function dragNatively(source: Element, target: Point) {
-  const session = cdp();
-  await session.send('Input.setInterceptDrags', { enabled: true });
-  const from = inTheTopPage(centerOf(source));
-  const to = inTheTopPage(target);
-  const dropped = new Promise<void>((resolve) => {
-    session.on('Input.dragIntercepted', async ({ data }) => {
-      for (const type of ['dragEnter', 'dragOver', 'drop'] as const)
-        await session.send('Input.dispatchDragEvent', { type, ...to, data });
-      resolve();
-    });
-  });
-  const held = { button: 'left', buttons: 1 } as const;
-
-  await session.send('Input.dispatchMouseEvent', {
-    type: 'mousePressed',
-    ...from,
-    ...held,
-    clickCount: 1,
-  });
-  const pastTheDragThreshold = { x: from.x + 8, y: from.y - 8 };
-  await session.send('Input.dispatchMouseEvent', {
-    type: 'mouseMoved',
-    ...pastTheDragThreshold,
-    ...held,
-  });
-  await session.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...to, ...held });
-  await dropped;
-  await session.send('Input.dispatchMouseEvent', {
-    type: 'mouseReleased',
-    ...to,
+async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', point: Point) {
+  await cdp().send('Input.dispatchMouseEvent', {
+    type,
+    ...inTheTopPage(point),
     button: 'left',
-    buttons: 0,
+    buttons: type === 'mouseReleased' ? 0 : 1,
     clickCount: 1,
   });
-  await session.send('Input.setInterceptDrags', { enabled: false });
 }
+
+const dropLine = () => document.querySelector('[data-editor-drop-line]');
 
 async function editable(name: string) {
   const content = page.getByRole('textbox', { name });
@@ -1324,7 +1298,10 @@ test('hovering a block shows its handle, whose menu turns, duplicates and delete
       aria-label="본문"
       defaultValue={'첫 줄\n\n둘째 줄'}
       onValueChange={onValueChange}
-    />,
+    >
+      <Editor.Content />
+      <Editor.BlockHandle />
+    </Editor>,
   );
   const content = await editable('본문');
   const handle = page.getByRole('button', { name: '블록 메뉴' });
@@ -1357,7 +1334,10 @@ test('Add a block below opens the block menu on a new line under the block', asy
       aria-label="본문"
       defaultValue={'위\n\n아래'}
       onValueChange={onValueChange}
-    />,
+    >
+      <Editor.Content />
+      <Editor.BlockHandle />
+    </Editor>,
   );
   const content = await editable('본문');
   await userEvent.hover(content.getByText('위'));
@@ -1378,7 +1358,10 @@ test('dragging a block by its handle moves it', async (context) => {
       aria-label="본문"
       defaultValue={'하나\n\n둘\n\n- 셋'}
       onValueChange={onValueChange}
-    />,
+    >
+      <Editor.Content />
+      <Editor.BlockHandle />
+    </Editor>,
   );
   const content = await editable('본문');
   await userEvent.hover(content.getByText('셋'));
@@ -1386,13 +1369,59 @@ test('dragging a block by its handle moves it', async (context) => {
   await expect.element(handle).toBeVisible();
 
   const first = content.getByText('하나').element().getBoundingClientRect();
-  await dragNatively(handle.element(), { x: first.left + 4, y: first.top + 2 });
+  const grip = centerOf(handle.element());
+  await mouse('mousePressed', grip);
+  for (let step = 1; step <= 8; step++)
+    await mouse('mouseMoved', {
+      x: grip.x + ((first.left + 4 - grip.x) * step) / 8,
+      y: grip.y + ((first.top + 2 - grip.y) * step) / 8,
+    });
+  await expect.poll(dropLine).not.toBeNull();
+  await expect
+    .poll(() => content.element().querySelector('[data-block-dragging]')?.textContent)
+    .toBe('셋');
+  await mouse('mouseReleased', { x: first.left + 4, y: first.top + 2 });
 
   await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('- 셋\n\n하나\n\n둘');
+  expect(content.element().querySelector('[data-block-dragging]')).toBeNull();
+  expect(dropLine()).toBeNull();
+});
+
+test('the block handle hangs outside the box, and an Editor without Editor.BlockHandle has none', async () => {
+  render(
+    <div className="flex flex-col gap-4 ps-10">
+      <Editor aria-label="손잡이 없음" defaultValue="<p>글</p>" />
+      <Editor aria-label="손잡이 있음" defaultValue="<p>글</p>">
+        <Editor.Content />
+        <Editor.BlockHandle />
+      </Editor>
+    </div>,
+  );
+  const without = await editable('손잡이 없음');
+  const withHandle = await editable('손잡이 있음');
+  const inlineStart = (element: Element) => getComputedStyle(element).paddingInlineStart;
+  expect(inlineStart(withHandle.element())).toBe(inlineStart(without.element()));
+
+  await userEvent.hover(without.getByText('글'));
+  expect(page.getByRole('button', { name: '블록 메뉴' }).query()).toBeNull();
+
+  await userEvent.hover(withHandle.getByText('글'));
+  const handle = page.getByRole('button', { name: '블록 메뉴' });
+  await expect.element(handle).toBeVisible();
+  const box = withHandle.element().closest('[data-editor]')!.getBoundingClientRect();
+  expect(handle.element().getBoundingClientRect().right).toBeLessThanOrEqual(box.left + 1);
+
+  await userEvent.hover(handle);
+  await expect.element(handle).toBeVisible();
 });
 
 test('a read-only Editor has no block handle', async () => {
-  render(<Editor readOnly aria-label="본문" defaultValue="<p>읽기만</p>" />);
+  render(
+    <Editor readOnly aria-label="본문" defaultValue="<p>읽기만</p>">
+      <Editor.Content />
+      <Editor.BlockHandle />
+    </Editor>,
+  );
   const content = page.getByRole('textbox', { name: '본문' });
   await expect.element(content).toHaveAttribute('contenteditable', 'false');
   await userEvent.hover(content.getByText('읽기만'));

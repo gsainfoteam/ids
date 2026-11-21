@@ -1,3 +1,4 @@
+import { dragSurface } from '../../../internal/drag-surface';
 import { fieldSurface } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
 import { documentText } from '../../typography/rich-text/style';
@@ -18,14 +19,19 @@ const proseMirrorBaseline = cn(
   '[&_[contenteditable=false]]:whitespace-normal',
   '[&_img.ProseMirror-separator]:m-0! [&_img.ProseMirror-separator]:inline! [&_img.ProseMirror-separator]:size-0! [&_img.ProseMirror-separator]:border-0!',
   '[&.ProseMirror-hideselection]:caret-transparent',
-  '[&_.ProseMirror-selectednode:not(:has(>[data-image]))]:outline-2 [&_.ProseMirror-selectednode:not(:has(>[data-image]))]:outline-primary-strong',
+  '[&_.ProseMirror-selectednode:not(:has(>[data-node-view-wrapper]))]:relative',
+  '[&_.ProseMirror-selectednode:not(:has(>[data-node-view-wrapper]))]:after:pointer-events-none [&_.ProseMirror-selectednode:not(:has(>[data-node-view-wrapper]))]:after:absolute [&_.ProseMirror-selectednode:not(:has(>[data-node-view-wrapper]))]:after:-inset-x-1.5 [&_.ProseMirror-selectednode:not(:has(>[data-node-view-wrapper]))]:after:-inset-y-0.5 [&_.ProseMirror-selectednode:not(:has(>[data-node-view-wrapper]))]:after:rounded-standard [&_.ProseMirror-selectednode:not(:has(>[data-node-view-wrapper]))]:after:bg-primary-solid/15',
+  '[&_.ProseMirror-selectednode>[data-node-view-wrapper]:not([data-image])]:relative',
+  '[&_.ProseMirror-selectednode>[data-node-view-wrapper]:not([data-image])]:after:pointer-events-none [&_.ProseMirror-selectednode>[data-node-view-wrapper]:not([data-image])]:after:absolute [&_.ProseMirror-selectednode>[data-node-view-wrapper]:not([data-image])]:after:inset-0 [&_.ProseMirror-selectednode>[data-node-view-wrapper]:not([data-image])]:after:rounded-[inherit] [&_.ProseMirror-selectednode>[data-node-view-wrapper]:not([data-image])]:after:bg-primary-solid/15',
+  '[&_.ProseMirror-selectednode>[data-mention]]:after:rounded-full',
+  '[&_[data-block-dragging]]:opacity-40',
 );
 
 const editorBlocks = cn(
   '[&_.suggestion]:text-primary',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr:not([data-divider])]:my-3 [&_hr:not([data-divider])]:border-neutral',
-  '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode:not(:has(>[data-image]))]:outline-offset-2',
+  '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard',
   '[&_table]:w-full! [&_:is(td,th)]:break-words [&_.selectedCell]:bg-primary-soft',
 );
 
@@ -68,11 +74,11 @@ export const editorStyle = tv({
       '[&_[data-resizable-handle]]:transition-opacity [&_[data-resizable-handle]]:duration-(--ids-motion-fast)',
       '[&:not(:hover,:focus-within,[data-selected])_[data-resizable-handle]]:opacity-0',
     ],
-    imageResizable: [
-      'w-fit max-w-full rounded-standard',
-      'in-data-selected:outline-2 in-data-selected:outline-offset-2 in-data-selected:outline-primary-strong',
+    imageResizable: 'w-fit max-w-full rounded-standard',
+    resizedImage: [
+      'block h-auto w-full rounded-standard',
+      'in-data-selected:outline-2 in-data-selected:-outline-offset-2 in-data-selected:outline-primary-strong',
     ],
-    resizedImage: 'block h-auto w-full rounded-standard',
     uploadPlaceholder: 'inline-block h-24 w-40 max-w-full align-middle before:hidden',
     taskBox: 'mt-[calc((1lh_-_1rem)/2)]',
     textAlign: 'flex items-center gap-0.5',
@@ -90,15 +96,22 @@ export const editorStyle = tv({
       '[&_svg]:transition-transform [&_svg]:duration-(--ids-motion-normal) motion-reduce:[&_svg]:transition-none',
       'data-open:[&_svg]:rotate-180',
     ],
-    suggestion: 'w-64 concentric-p-1 p-0',
+    suggestion: 'w-64 concentric-p-1 p-0 [&>[data-scroll-area]>[data-scroll-area-viewport]]:p-0',
     suggestionScroll: 'max-h-72 rounded-[inherit]',
     suggestionList: 'flex flex-col p-1 outline-none',
     suggestionOption: 'pe-2.5 [&_svg]:size-(--ids-size-icon-standard)',
     mentionText: 'flex min-w-0 flex-col',
     mentionLabel: 'truncate',
     mentionDescription: 'truncate text-caption-c1-regular text-neutral',
-    blockHandle:
-      'absolute start-1.5 z-10 m-0 cursor-grab text-neutral active:cursor-grabbing [&_svg]:size-4 data-hidden:pointer-events-none data-hidden:invisible',
+    blockHandle: [
+      'fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent',
+      'cursor-grab text-neutral active:cursor-grabbing [&_svg]:size-4',
+      'transition-[opacity,visibility,--ids-state-opacity] transition-discrete duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'data-hidden:pointer-events-none data-hidden:invisible data-hidden:opacity-0',
+    ],
+    dropLine: dragSurface.dropLine,
+    dropCursor: cn(dragSurface.dropLine, 'translate-y-0'),
+    dragPreview: cn('pointer-events-none concentric-p-2', dragSurface.preview),
     imageUrlError: 'text-caption-c1-regular text-danger',
     tableSizePicker: 'flex flex-col gap-2',
     tableSizeGrid: 'grid grid-cols-10 gap-1',
@@ -152,10 +165,6 @@ export const editorStyle = tv({
       false: { content: 'cursor-default' },
     },
   },
-  compoundVariants: [
-    { editable: true, size: 'standard', class: { content: 'ps-9' } },
-    { editable: true, size: 'tiny', class: { content: 'ps-8' } },
-  ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',

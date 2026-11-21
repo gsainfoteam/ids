@@ -13,6 +13,7 @@ import { LeaveEscapeToTheLayers } from './escape-to-layers';
 import { EditorImageNode } from './image/node';
 import { CleanPastedHtml } from './paste/extension';
 import { SlashMenu } from './slash/extension';
+import { editorStyle } from './style';
 import { slashMenuKey, mentionMenuKey } from './suggestion/keys';
 import { createSuggestionStore, type SuggestionStore } from './suggestion/store';
 import { documentStarterKit } from '../../typography/rich-text/schema/starter-kit';
@@ -31,12 +32,14 @@ export type EngineSetup = {
   extensions: Extensions;
   slashMenu: SuggestionStore<EditorBlock>;
   mentionMenu: SuggestionStore<EditorMention> | null;
-  blockHandle: BlockHoverStore;
+  blockHandle: BlockHoverStore | null;
 };
 export type ImageSetup = {
   uploaded: ReadonlySet<string>;
   start: (editor: TiptapEditor, files: File[], at: number) => void;
 };
+
+const { dropCursor } = editorStyle();
 
 const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
   editor.view.dom.getAttribute('aria-placeholder') ?? '';
@@ -50,6 +53,7 @@ export function extensionsFor({
   taskLabel,
   t,
   findMentions,
+  withHandle,
 }: {
   size: IdsSize;
   maxLength: number | undefined;
@@ -59,16 +63,17 @@ export function extensionsFor({
   taskLabel: (text: string) => string;
   t: Translate;
   findMentions: FindMentions;
+  withHandle: boolean;
 }): EngineSetup {
   const slashMenu = createSuggestionStore<EditorBlock>(slashMenuKey);
   const mentionMenu = features.mention
     ? createSuggestionStore<EditorMention>(mentionMenuKey)
     : null;
 
-  const blockHandle = createBlockHoverStore();
+  const blockHandle = withHandle ? createBlockHoverStore() : null;
 
   const extensions = [
-    documentStarterKit([1, 2, 3, 4], { codeBlock: false }),
+    documentStarterKit([1, 2, 3, 4], { codeBlock: false, dropCursorClass: dropCursor() }),
     EditorCodeBlockNode,
     Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
     CharacterCount.configure({ limit: maxLength }),
@@ -96,7 +101,7 @@ export function extensionsFor({
       blocks: (editor, query) =>
         blocksAvailableIn(editor).filter((block) => blockMatches(block, query, t)),
     }),
-    BlockHandle.configure({ store: blockHandle }),
+    ...(blockHandle ? [BlockHandle.configure({ store: blockHandle })] : []),
     ...(markdown ? [markdown] : []),
   ];
 

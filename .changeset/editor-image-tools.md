@@ -17,12 +17,15 @@ components RichText renders: code blocks as `CodeBlock` (with its copy button an
 Select), callouts as `Alert`, toggle blocks as `Accordion` and tables as `Table`. Each of these loads its Tiptap extension with `import()` only when
 its part is in the Editor, and image uploading only with `onImageUpload`.
 
-An editable Editor opens a block menu on `/` and shows a handle beside the hovered block, which
-drags it or opens a menu to insert, turn into, duplicate or delete it. `mentions(query, signal)`
-turns on `@` mentions, saved as `[@ id="" label=""]` in markdown. Lists and blank paragraphs
+An editable Editor opens a block menu on `/`. `Editor.BlockHandle` adds a handle outside the
+Editor's left edge beside the hovered block, with no gutter inside the box. It drags the block the
+way Sidebar drags an item (a copy follows the pointer, a primary line marks the drop) or opens a
+menu to insert, turn into, duplicate or delete it. A selected block takes a light primary tint
+instead of an outline. `mentions(query, signal)` turns on `@` mentions, drawn as an avatar and a
+name and saved as `[@ id="" label="" avatar=""]` in markdown. Lists and blank paragraphs
 pasted from Word and Google Docs are cleaned up.
 
 Add `RichText` from the new `@gsainfoteam/ids-react/rich-text` entry. It draws saved markdown or
-Editor JSON with IDS components (CodeBlock, Alert, Accordion, Table, Image, Checkbox, Chip, Link)
+Editor JSON with IDS components (CodeBlock, Alert, Accordion, Table, Image, Checkbox, Avatar, Link)
 and has no hooks, so a Server Component renders a post without sending Tiptap to the browser. It
 shares the Editor's schema and text styles.
