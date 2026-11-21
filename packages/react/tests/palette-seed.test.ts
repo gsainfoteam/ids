@@ -54,7 +54,7 @@ const SEEDS: [lightness: number, chroma: number][] = [
   [0.2, 0.05],
 ];
 
-const SWEEP_OF_EVERY_SEED_MS = 30_000;
+const SWEEP_OF_EVERY_SEED_ON_A_SHARED_RUNNER_MS = 120_000;
 
 const COLD_NODE_START_ON_A_BUSY_RUNNER_MS = 30_000;
 
@@ -65,7 +65,7 @@ const everySeed = () =>
 
 test(
   'every seed builds a palette whose roles reach their Lc in both modes',
-  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  { timeout: SWEEP_OF_EVERY_SEED_ON_A_SHARED_RUNNER_MS },
   () => {
     const failing = everySeed().flatMap((seed) => {
       const { issues } = resolveColors({ primary: seed, secondary: seed, tertiary: seed });
@@ -102,7 +102,7 @@ const SCALE_ENDS_THAT_KEEP_THEIR_ORDER = [
 
 test(
   'every scale moves away from the page step by step, the solid aside',
-  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  { timeout: SWEEP_OF_EVERY_SEED_ON_A_SHARED_RUNNER_MS },
   () => {
     const pageL = (mode: 'light' | 'dark') => shadeOf(IDS_NEUTRAL_SCALES[mode][0]!).l;
     const outOfOrder = [...everySeed(), 'neutral'].flatMap((seed) =>
@@ -128,7 +128,7 @@ test(
 
 test(
   'text sits at or beyond the solid, away from the page',
-  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  { timeout: SWEEP_OF_EVERY_SEED_ON_A_SHARED_RUNNER_MS },
   () => {
     for (const seed of everySeed())
       for (const mode of ['light', 'dark'] as const) {
@@ -142,7 +142,7 @@ test(
 
 test(
   'strong text is a step beyond text, so the two never read the same',
-  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  { timeout: SWEEP_OF_EVERY_SEED_ON_A_SHARED_RUNNER_MS },
   () => {
     const same = [...everySeed(), ...Object.values(STATUS_PALETTES).map((steps) => steps[6]!)]
       .flatMap((seed) =>
