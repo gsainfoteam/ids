@@ -8,7 +8,7 @@ import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Scheduler } from '../src';
 import { testTheme } from './theme';
-import { timedSegmentsOn } from '../src/components/data/scheduler/layout';
+import { allDayBarsIn, timedSegmentsOn } from '../src/components/data/scheduler/layout';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -91,8 +91,17 @@ test('SSR: a labelled group, one named section per day and the events as list it
   expect(now.closest('section')!.getAttribute('data-scheduler-column')).toBe('2026-11-17');
 
   const festival = doc.querySelectorAll('[data-scheduler-event="fest"]');
-  expect(festival).toHaveLength(2);
-  expect(nameOf(doc, festival[0].closest('ul')!)).toBe('2026년 11월 19일 목요일 종일');
+  expect(festival).toHaveLength(1);
+  expect(nameOf(doc, festival[0].closest('ul')!)).toBe('종일');
+  expect(festival[0].querySelector('[data-item-description]')!.textContent).toBe(
+    new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+      timeZone: WALL_CLOCK,
+    }).formatRange(on(19).toDate(WALL_CLOCK), on(20).toDate(WALL_CLOCK)),
+  );
   expect(doc.querySelectorAll('[data-scheduler-event="late"]')).toHaveLength(2);
 });
 
@@ -140,12 +149,25 @@ test('a server on another date marks no day as today, and hydration marks the cl
   logged.mockRestore();
 });
 
-test('overlapping events split the column into lanes, and the lanes end with the overlap', () => {
-  const segments = timedSegmentsOn(EVENTS, on(17));
-  expect(segments.map(({ event, lane, lanes }) => [event.id, lane, lanes])).toEqual([
-    ['algo', 0, 2],
-    ['room', 1, 2],
+test('a later overlapping event stacks indented over the earlier one, and near starts sit side by side', () => {
+  const place = (segments: ReturnType<typeof timedSegmentsOn>) =>
+    segments.map(({ event, left, width }) => [event.id, left, width]);
+
+  expect(place(timedSegmentsOn(EVENTS, on(17)))).toEqual([
+    ['algo', 0, 1],
+    ['room', 0.15, 0.85],
     ['lunch', 0, 1],
+  ]);
+
+  const together = [
+    { id: 'a', title: 'A', start: at(18, 13), end: at(18, 14) },
+    { id: 'b', title: 'B', start: at(18, 13, 15), end: at(18, 14) },
+    { id: 'c', title: 'C', start: at(18, 13, 45), end: at(18, 15) },
+  ];
+  expect(place(timedSegmentsOn(together, on(18)))).toEqual([
+    ['a', 0, 0.5],
+    ['b', 0.5, 0.5],
+    ['c', 0.15, 0.85],
   ]);
 
   const thursday = timedSegmentsOn(EVENTS, on(19))[0];
@@ -184,7 +206,6 @@ test('keyboard: Tab walks the toolbar and the event buttons in day and time orde
     '주',
     ...gridStop,
     'Festival',
-    'Festival',
     'Algorithms',
     'Study room',
     'Lunch',
@@ -201,7 +222,7 @@ test('keyboard: Tab walks the toolbar and the event buttons in day and time orde
   await userEvent.keyboard('{Enter}');
   expect(opened).toHaveBeenLastCalledWith('late');
 
-  await userEvent.keyboard(`{Shift>}${'{Tab}'.repeat(8 + gridStop.length)}{/Shift}`);
+  await userEvent.keyboard(`{Shift>}${'{Tab}'.repeat(7 + gridStop.length)}{/Shift}`);
   await expect.element(screen.getByRole('button', { name: '다음 주' })).toHaveFocus();
   await userEvent.keyboard('{Enter}');
   await expect
@@ -281,11 +302,28 @@ test('at 414px the week scrolls inside its board, and the page itself does not s
   expect(viewport.scrollWidth).toBeLessThanOrEqual(viewport.clientWidth);
 });
 
-test('the grid opens scrolled to the first event of the range, or to 08:00 when that comes first', async () => {
+test('the grid opens a quarter hour above the first event of the range, or above 08:00 when that comes first', async () => {
   await render(inProvider({ events: [EVENTS[3]] }));
   const viewport = document.querySelector<HTMLElement>('[data-scroll-area-viewport]')!;
   const hour = document.querySelector('section')!.getBoundingClientRect().height / 24;
-  await expect.poll(() => Math.round(viewport.scrollTop)).toBe(Math.round(hour * 8));
+  await expect.poll(() => Math.round(viewport.scrollTop)).toBe(Math.round(hour * 7.75));
+});
+
+test('all-day events become one bar across their days, clipped to the range and packed into rows', () => {
+  const bars = allDayBarsIn(
+    [
+      ...EVENTS,
+      { id: 'trip', title: 'Trip', start: on(12), end: on(16), allDay: true },
+      { id: 'exam', title: 'Exam', start: on(20), end: on(25), allDay: true },
+      { id: 'later', title: 'Later', start: on(23), end: on(23), allDay: true },
+    ],
+    [15, 16, 17, 18, 19, 20, 21].map(on),
+  );
+  expect(bars.map(({ event, column, span, row }) => [event.id, column, span, row])).toEqual([
+    ['trip', 0, 2, 0],
+    ['fest', 4, 2, 0],
+    ['exam', 5, 2, 1],
+  ]);
 });
 
 test('locale names the days and times, and picks the first weekday', () => {

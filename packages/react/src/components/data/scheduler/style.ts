@@ -32,11 +32,19 @@ export const schedulerStyle = tv({
     hidden: 'sr-only',
     allDay: 'border-b border-neutral bg-(--ids-bg-current)',
     allDayLabel: [
-      'sticky start-0 z-10 flex items-start justify-end border-e border-neutral bg-(--ids-bg-current) pe-2 pt-2',
+      'sticky start-0 z-10 col-start-1 row-start-1 flex items-start justify-end border-e border-neutral bg-(--ids-bg-current) pe-2 pt-2',
       'text-caption-c1-regular whitespace-nowrap text-neutral',
     ],
-    allDayCell: 'min-w-0 border-e border-neutral p-1 last:border-e-0',
-    allDayList: 'gap-1',
+    allDayCell:
+      'col-start-(--scheduler-cell-column) row-start-1 min-w-0 border-e border-neutral last-of-type:border-e-0',
+    allDayList: [
+      'col-start-2 -col-end-1 row-start-1 grid gap-y-1 py-1',
+      'grid-cols-[repeat(var(--scheduler-days),minmax(0,1fr))]',
+    ],
+    allDayBar: [
+      'flex min-w-0 px-1',
+      'col-start-(--scheduler-bar-column) col-span-(--scheduler-bar-span) row-start-(--scheduler-bar-row)',
+    ],
     body: 'relative',
     gutter: 'sticky start-0 z-10 flex flex-col border-e border-neutral bg-(--ids-bg-current)',
     hour: [
@@ -52,13 +60,15 @@ export const schedulerStyle = tv({
       'absolute flex p-px',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-event-start))]',
       'h-[calc(var(--scheduler-hour)*var(--scheduler-event-hours))]',
-      'start-[calc(100%*var(--scheduler-event-lane)/var(--scheduler-event-lanes))]',
-      'w-[calc(100%/var(--scheduler-event-lanes))]',
+      'start-[calc(100%*var(--scheduler-event-left))] w-[calc(100%*var(--scheduler-event-width))]',
     ],
     event: [
-      'min-h-0 overflow-hidden rounded-standard px-1.5 py-1',
+      'min-h-0 overflow-hidden rounded-standard px-1.5 py-0.5 outline-1 outline-(--ids-bg-current)',
       'bg-scheme-soft text-on-scheme-soft state-scheme [&_[data-item-description]]:text-on-scheme-soft',
     ],
+    eventContent: '',
+    eventTitle: '',
+    eventTime: '',
     now: [
       'pointer-events-none absolute inset-x-0 z-1 h-0.5 bg-danger-solid',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-now)-1px)]',
@@ -75,8 +85,21 @@ export const schedulerStyle = tv({
       day: { root: '[--scheduler-day-min:0px]' },
     } satisfies Record<SchedulerView, object>,
     allDay: {
-      true: { event: 'w-full py-0.5' },
-      false: { event: 'h-full items-start' },
+      true: { event: 'w-full', eventTime: 'sr-only' },
+      false: {
+        event: 'h-full items-start [container-type:size]',
+        eventContent: [
+          '[--scheduler-title-lines:1]',
+          '[@container(min-height:3.45rem)]:[--scheduler-title-lines:2]',
+          '[@container(min-height:4.45rem)]:[--scheduler-title-lines:3]',
+          '[@container(min-height:5.45rem)]:[--scheduler-title-lines:4]',
+        ],
+        eventTitle: [
+          'block max-w-full break-keep wrap-anywhere line-clamp-(--scheduler-title-lines)',
+          '[&>[data-surface-trigger]]:line-clamp-(--scheduler-title-lines)',
+        ],
+        eventTime: 'hidden truncate [@container(min-height:2.4rem)]:block',
+      },
     },
     colorScheme: {
       neutral: { event: 'scheme-neutral' },

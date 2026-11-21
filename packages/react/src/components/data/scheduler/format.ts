@@ -40,6 +40,8 @@ export const schedulerFormat = memoize((locale: string) => {
     weekday: (day: CalendarDate) => weekday.format(onTheWall(day)),
     dayNumber: (day: CalendarDate) => digits.format(day.day),
     fullDate: (day: CalendarDate) => fullDate.format(onTheWall(day)),
+    dates: (from: CalendarDate, to: CalendarDate) =>
+      fullDate.formatRange(onTheWall(from), onTheWall(to)),
     time: (value: CalendarDateTime) => time.format(onTheWall(value)),
     hour: (value: number) => hour.format(new Date(Date.UTC(SAMPLE_YEAR, 0, 1, value))),
     range: (view: SchedulerView, days: CalendarDate[]) =>

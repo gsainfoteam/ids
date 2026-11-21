@@ -11,7 +11,7 @@ import { range } from 'es-toolkit';
 
 import { SchedulerEventContext, type SchedulerContextValue } from './context';
 import {
-  allDayEventsOn,
+  allDayBarsIn,
   dateOf,
   firstHourOf,
   hourOfDay,
@@ -58,8 +58,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   const allDayLabelId = `${baseId}-all-day`;
   const viewportRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const allDayByDay = days.map((day) => allDayEventsOn(events, day));
-  const hasAllDay = allDayByDay.some((list) => list.length > 0);
+  const allDayBars = allDayBarsIn(events, days);
   const firstHour = Math.min(firstHourOf(events, days) ?? WORKDAY_START_HOUR, WORKDAY_START_HOUR);
 
   useFirstHourScroll(viewportRef, bodyRef, firstHour);
@@ -95,28 +94,42 @@ export function SchedulerGrid<E extends SchedulerEventData>({
               })}
             </div>
 
-            {hasAllDay && (
+            {allDayBars.length > 0 && (
               <div className={styles.columns({ className: styles.allDay() })}>
                 <div id={allDayLabelId} className={styles.allDayLabel()}>
                   {t('scheduler.allDay')}
                 </div>
                 {days.map((day, index) => (
-                  <div key={day.toString()} className={styles.allDayCell()}>
-                    {allDayByDay[index].length > 0 && (
-                      <ItemGroup
-                        variant="ghost"
-                        aria-labelledby={`${headId(day)} ${allDayLabelId}`}
-                        className={styles.allDayList()}
-                      >
-                        {allDayByDay[index].map((event) => (
-                          <SchedulerEventContext key={event.id} value={allDayContext(event)}>
-                            {renderEvent(event)}
-                          </SchedulerEventContext>
-                        ))}
-                      </ItemGroup>
-                    )}
-                  </div>
+                  <div
+                    key={day.toString()}
+                    aria-hidden="true"
+                    className={styles.allDayCell()}
+                    style={{ '--scheduler-cell-column': index + 2 } as CSSProperties}
+                  />
                 ))}
+                <ItemGroup
+                  variant="ghost"
+                  aria-labelledby={allDayLabelId}
+                  className={styles.allDayList()}
+                >
+                  {allDayBars.map((bar) => (
+                    <li
+                      key={bar.event.id}
+                      className={styles.allDayBar()}
+                      style={
+                        {
+                          '--scheduler-bar-column': bar.column + 1,
+                          '--scheduler-bar-span': bar.span,
+                          '--scheduler-bar-row': bar.row + 1,
+                        } as CSSProperties
+                      }
+                    >
+                      <SchedulerEventContext value={allDayContext(bar.event)}>
+                        {renderEvent(bar.event)}
+                      </SchedulerEventContext>
+                    </li>
+                  ))}
+                </ItemGroup>
               </div>
             )}
           </div>
@@ -157,8 +170,8 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                             {
                               '--scheduler-event-start': segment.startHour,
                               '--scheduler-event-hours': segment.hours,
-                              '--scheduler-event-lane': segment.lane,
-                              '--scheduler-event-lanes': segment.lanes,
+                              '--scheduler-event-left': segment.left,
+                              '--scheduler-event-width': segment.width,
                             } as CSSProperties
                           }
                         >

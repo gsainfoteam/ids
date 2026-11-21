@@ -37,14 +37,24 @@ export type SchedulerSegment<E extends SchedulerEventData = SchedulerEventData> 
   end: CalendarDateTime;
   startHour: number;
   hours: number;
-  lane: number;
-  lanes: number;
+  left: number;
+  width: number;
+};
+
+export type SchedulerAllDayBar<E extends SchedulerEventData = SchedulerEventData> = {
+  event: E;
+  column: number;
+  span: number;
+  row: number;
 };
 
 const DAYS_IN_WEEK = 7;
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;
 const SHORTEST_SHOWN_HOURS = 0.5;
+const SIDE_BY_SIDE_WITHIN_HOURS = 0.5;
+const STACK_INDENT = 0.15;
+const DEEPEST_STACK_INDENT = 0.45;
 
 const wallTime = (value: DateValue) => {
   const time = toCalendarDateTime(value);
@@ -68,22 +78,43 @@ export const stepOf = (view: SchedulerView) => (view === 'week' ? { weeks: 1 } :
 
 export const hourOfDay = (time: CalendarDateTime) => time.hour + time.minute / MINUTES_IN_HOUR;
 
-export function allDayEventsOn<E extends SchedulerEventData>(
+export function allDayBarsIn<E extends SchedulerEventData>(
   events: readonly E[],
-  day: CalendarDate,
-) {
-  return events.filter(
-    (event) =>
-      isAllDay(event) &&
-      compareDays(dateOf(event.start), day) <= 0 &&
-      compareDays(day, dateOf(event.end)) <= 0,
-  );
+  days: CalendarDate[],
+): SchedulerAllDayBar<E>[] {
+  const first = days[0];
+  const last = days[days.length - 1];
+  const columnOf = (day: CalendarDate) =>
+    Math.min(Math.max(compareDays(day, first), 0), days.length - 1);
+
+  const bars = events
+    .filter(
+      (event) =>
+        isAllDay(event) &&
+        compareDays(dateOf(event.start), last) <= 0 &&
+        compareDays(dateOf(event.end), first) >= 0,
+    )
+    .map((event) => {
+      const column = columnOf(dateOf(event.start));
+      return { event, column, span: columnOf(dateOf(event.end)) - column + 1, row: 0 };
+    })
+    .sort((a, b) => a.column - b.column || b.span - a.span);
+
+  const rowEnds: number[] = [];
+  for (const bar of bars) {
+    const freeRow = rowEnds.findIndex((rowEnd) => rowEnd < bar.column);
+    bar.row = freeRow === -1 ? rowEnds.length : freeRow;
+    rowEnds[bar.row] = bar.column + bar.span - 1;
+  }
+  return bars;
 }
+
+type UnplacedSegment<E extends SchedulerEventData> = Omit<SchedulerSegment<E>, 'left' | 'width'>;
 
 function segmentOn<E extends SchedulerEventData>(
   event: E,
   day: CalendarDate,
-): Omit<SchedulerSegment<E>, 'lane' | 'lanes'> | null {
+): UnplacedSegment<E> | null {
   const dayStart = toCalendarDateTime(day);
   const dayEnd = dayStart.add({ days: 1 });
   const start = wallTime(event.start);
@@ -105,10 +136,18 @@ function segmentOn<E extends SchedulerEventData>(
   return { event, start, end, startHour, hours };
 }
 
+type SideBySide<E extends SchedulerEventData> = {
+  indent: number;
+  members: UnplacedSegment<E>[];
+};
+
 const byStartThenLongest = (
-  a: Omit<SchedulerSegment, 'lane' | 'lanes'>,
-  b: Omit<SchedulerSegment, 'lane' | 'lanes'>,
+  a: UnplacedSegment<SchedulerEventData>,
+  b: UnplacedSegment<SchedulerEventData>,
 ) => a.startHour - b.startHour || b.hours - a.hours;
+
+const overlap = (a: UnplacedSegment<SchedulerEventData>, b: UnplacedSegment<SchedulerEventData>) =>
+  a.startHour < b.startHour + b.hours && b.startHour < a.startHour + a.hours;
 
 export function timedSegmentsOn<E extends SchedulerEventData>(
   events: readonly E[],
@@ -119,36 +158,32 @@ export function timedSegmentsOn<E extends SchedulerEventData>(
     .flatMap((event) => segmentOn(event, day) ?? [])
     .sort(byStartThenLongest);
 
-  const placed: SchedulerSegment<E>[] = [];
-  let cluster: SchedulerSegment<E>[] = [];
-  let laneEnds: number[] = [];
-  let clusterEnd = -Infinity;
-
-  const closeCluster = () => {
-    for (const segment of cluster) segment.lanes = laneEnds.length;
-    cluster = [];
-    laneEnds = [];
-  };
-
+  const sideBySideOf = new Map<UnplacedSegment<E>, SideBySide<E>>();
   for (const segment of segments) {
-    const overlapsNothingBefore = segment.startHour >= clusterEnd;
-    if (overlapsNothingBefore) {
-      closeCluster();
-      clusterEnd = -Infinity;
+    const earlier = [...sideBySideOf.keys()].filter((placed) => overlap(placed, segment));
+    const startsWith = earlier
+      .filter((placed) => segment.startHour - placed.startHour < SIDE_BY_SIDE_WITHIN_HOURS)
+      .at(-1);
+    if (startsWith) {
+      const sideBySide = sideBySideOf.get(startsWith)!;
+      sideBySide.members.push(segment);
+      sideBySideOf.set(segment, sideBySide);
+      continue;
     }
 
-    const segmentEnd = segment.startHour + segment.hours;
-    const freeLane = laneEnds.findIndex((laneEnd) => laneEnd <= segment.startHour);
-    const lane = freeLane === -1 ? laneEnds.length : freeLane;
-    laneEnds[lane] = segmentEnd;
-    clusterEnd = Math.max(clusterEnd, segmentEnd);
-    const laid = { ...segment, lane, lanes: 1 };
-    cluster.push(laid);
-    placed.push(laid);
+    const coveredIndent = Math.max(
+      -1,
+      ...earlier.map((placed) => sideBySideOf.get(placed)!.indent),
+    );
+    sideBySideOf.set(segment, { indent: coveredIndent + 1, members: [segment] });
   }
-  closeCluster();
 
-  return placed;
+  return segments.map((segment) => {
+    const { indent, members } = sideBySideOf.get(segment)!;
+    const inset = Math.min(indent * STACK_INDENT, DEEPEST_STACK_INDENT);
+    const width = (1 - inset) / members.length;
+    return { ...segment, left: inset + members.indexOf(segment) * width, width };
+  });
 }
 
 export function firstHourOf(events: readonly SchedulerEventData[], days: CalendarDate[]) {

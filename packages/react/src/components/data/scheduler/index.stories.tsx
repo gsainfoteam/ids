@@ -461,9 +461,8 @@ export const ClickableEvents: Story = {
     const titles = [...canvasElement.querySelectorAll('[data-scheduler-event] button')].map(
       (button) => button.textContent,
     );
-    await expect(titles.slice(0, 9)).toEqual([
+    await expect(titles.slice(0, 8)).toEqual([
       '휴강',
-      '지스트 축제',
       '지스트 축제',
       '중간고사 성적 공개',
       'GIST 해커톤',
@@ -509,7 +508,7 @@ export const Overlap: Story = {
     docs: {
       description: {
         story:
-          '겹치는 일정은 칸을 나눠 나란히 섭니다. 겹침이 끝나면 다음 일정은 다시 칸 폭 전체를 씁니다. 자정을 넘는 일정은 두 날에 나눠 그립니다.',
+          '30분 안에 함께 시작하는 일정은 칸을 나눠 나란히 섭니다. 더 늦게 시작하는 일정은 앞 일정 위에 들여 겹쳐 그려서, 긴 일정이 칸 폭을 지킵니다. 여러 날 종일 일정은 막대 하나로 잇고, 자정을 넘는 일정은 두 날에 나눠 그립니다.',
       },
     },
   },
@@ -517,9 +516,18 @@ export const Overlap: Story = {
     const algo = eventBox(canvasElement, 'algo');
     const room = eventBox(canvasElement, 'room');
     const lunch = eventBox(canvasElement, 'lunch');
-    await expect(Math.abs(algo.width - room.width)).toBeLessThan(1);
+    await expect(Math.abs(algo.width - lunch.width)).toBeLessThan(1);
     await expect(room.left).toBeGreaterThan(algo.left);
-    await expect(lunch.width).toBeGreaterThan(algo.width * 1.5);
+    await expect(Math.abs(room.right - algo.right)).toBeLessThan(1);
+
+    const pairing = eventBox(canvasElement, 'pairing');
+    const oneOnOne = eventBox(canvasElement, 'one-on-one');
+    await expect(Math.abs(pairing.width - oneOnOne.width)).toBeLessThan(1);
+    await expect(oneOnOne.left).toBeGreaterThanOrEqual(pairing.right - 1);
+
+    const festival = canvasElement.querySelectorAll('[data-scheduler-event="festival"]');
+    await expect(festival).toHaveLength(1);
+    await expect(festival[0].getBoundingClientRect().width).toBeGreaterThan(algo.width * 1.5);
     await expect(canvasElement.querySelectorAll('[data-scheduler-event="deadline"]')).toHaveLength(
       2,
     );

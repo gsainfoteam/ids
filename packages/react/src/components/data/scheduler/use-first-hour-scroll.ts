@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type RefObject } from 'react';
 
 const HOURS_IN_DAY = 24;
+const HOUR_LABEL_HEADROOM = 0.25;
 
 export function useFirstHourScroll(
   viewportRef: RefObject<HTMLElement | null>,
@@ -20,7 +21,8 @@ export function useFirstHourScroll(
       const laidOut = body.offsetHeight > 0 && viewport.clientHeight > 0;
       if (scrolledOnce.current || !laidOut) return;
       scrolledOnce.current = true;
-      viewport.scrollTop = (body.offsetHeight / HOURS_IN_DAY) * firstHour;
+      viewport.scrollTop =
+        (body.offsetHeight / HOURS_IN_DAY) * Math.max(firstHour - HOUR_LABEL_HEADROOM, 0);
     };
 
     scrollOnceLaidOut();

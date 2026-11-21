@@ -2,6 +2,8 @@
 
 import { type ReactNode } from 'react';
 
+import { toCalendarDate } from '@internationalized/date';
+
 import { useSchedulerEventContext } from './context';
 import { Item } from '../item';
 
@@ -38,15 +40,21 @@ export function SchedulerEvent({
       }
     >
       {children ?? (
-        <Item.Content>
-          <Item.Title truncate>{event.title}</Item.Title>
-          {!allDay && (
-            <Item.Description>
-              <time dateTime={start.toString()}>{format.time(start)}</time>
-              {' – '}
-              <time dateTime={end.toString()}>{format.time(end)}</time>
-            </Item.Description>
-          )}
+        <Item.Content className={styles.eventContent({ allDay })}>
+          <Item.Title truncate={allDay} className={styles.eventTitle({ allDay })}>
+            {event.title}
+          </Item.Title>
+          <Item.Description className={styles.eventTime({ allDay })}>
+            {allDay ? (
+              format.dates(toCalendarDate(start), toCalendarDate(end))
+            ) : (
+              <>
+                <time dateTime={start.toString()}>{format.time(start)}</time>
+                {' – '}
+                <time dateTime={end.toString()}>{format.time(end)}</time>
+              </>
+            )}
+          </Item.Description>
         </Item.Content>
       )}
     </Item>
