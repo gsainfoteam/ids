@@ -15,6 +15,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Bubble } from '../../components/data/bubble';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 import { toast } from '../../components/feedback/toast';
 import { PromptInput } from '../../components/form/prompt-input';
@@ -136,7 +137,7 @@ export const PC: Story = {
               {assistant}
               <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-3">
                 <p>학생회관 정류장에 곧 오는 셔틀이에요.</p>
-                <Item.Group variant="separated" size="tiny" aria-label="곧 오는 셔틀">
+                <ItemGroup variant="separated" size="tiny" aria-label="곧 오는 셔틀">
                   {SHUTTLES.map((shuttle) => (
                     <Item key={shuttle.id}>
                       <Item.Content>
@@ -149,7 +150,7 @@ export const PC: Story = {
                       </Item.Actions>
                     </Item>
                   ))}
-                </Item.Group>
+                </ItemGroup>
                 <Button
                   variant="soft"
                   size="tiny"

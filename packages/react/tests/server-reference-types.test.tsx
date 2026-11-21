@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Dialog, Field, IdsProvider, Image, Select, TextField } from '../src';
+import { Dialog, Field, IdsProvider, Image, ImageGroup, Select, TextField } from '../src';
 import { testTheme } from './theme';
 import { ImageViewer } from '../src/components/data/image/viewer';
 
@@ -56,17 +56,17 @@ test('Dialog lifts a lazily referenced Dialog.Overlay out of its children', asyn
   await expect.element(page.getByTestId('overlay')).toHaveAttribute('data-dialog-backdrop');
 });
 
-test('Image.Group finds a viewer handed over already rendered to its client root', async () => {
+test('ImageGroup finds a viewer handed over already rendered to its client root', async () => {
   const Viewer = asServerComponentHandsItOver(ImageViewer);
   const lake = `data:image/svg+xml;base64,${btoa(
     '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="30"><rect width="40" height="30"/></svg>',
   )}`;
   render(
     <IdsProvider theme={testTheme}>
-      <Image.Group aria-label="Photos">
+      <ImageGroup aria-label="Photos">
         <Image src={lake} alt="Lake" />
         <Viewer aria-label="Photo viewer" />
-      </Image.Group>
+      </ImageGroup>
     </IdsProvider>,
   );
 

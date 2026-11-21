@@ -101,6 +101,7 @@ const [zoom, setZoom] = useState('100');
 </Menu.RadioGroup>
 ```
 
+- 켜진 항목은 배경 없이 끝의 체크와 점만 `text-primary` 입니다. 가리키면 다른 항목처럼 hover state layer 가 깔립니다.
 - 상태는 늘 제어해서 넘깁니다. 메뉴는 닫히면 사라지므로 안에 둔 상태가 남지 않습니다. 그래서 `defaultChecked`, `defaultValue` 는 없습니다.
 - 고르면 메뉴가 닫힙니다. 여러 개를 이어서 바꾸게 하려면 `onSelect={(event) => event.preventDefault()}` 를 줍니다.
 

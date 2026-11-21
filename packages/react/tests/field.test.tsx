@@ -17,6 +17,7 @@ import { z } from 'zod';
 import {
   CheckboxGroup,
   Field,
+  FieldGroup,
   Input,
   NumberField,
   PasswordField,
@@ -700,9 +701,9 @@ test('orientation lays the label beside the control; variant stays as an alias',
   await expect.element(root()).toHaveAttribute('data-orientation', 'horizontal');
 });
 
-test('a horizontal Field.Group lines up its horizontal Fields and leaves a vertical one stacked', async () => {
+test('a horizontal FieldGroup lines up its horizontal Fields and leaves a vertical one stacked', async () => {
   const screen = await render(
-    <Field.Group orientation="horizontal" className="w-96">
+    <FieldGroup orientation="horizontal" className="w-96">
       <Field>
         <Field.Label>Name</Field.Label>
         <TextField />
@@ -715,7 +716,7 @@ test('a horizontal Field.Group lines up its horizontal Fields and leaves a verti
         <Field.Label>Bio</Field.Label>
         <TextArea />
       </Field>
-    </Field.Group>,
+    </FieldGroup>,
   );
   const box = (name: string) =>
     screen.getByRole('textbox', { name }).element().getBoundingClientRect();
