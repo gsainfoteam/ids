@@ -1,7 +1,6 @@
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details';
 import { Highlight } from '@tiptap/extension-highlight';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
-import { Mention } from '@tiptap/extension-mention';
 import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table';
 import { TextAlign } from '@tiptap/extension-text-align';
 import { MarkdownManager } from '@tiptap/markdown';
@@ -9,6 +8,7 @@ import { Marked, type marked } from 'marked';
 
 import { Callout } from './callout';
 import { DocumentImage } from './image';
+import { DocumentMention } from './mention';
 import { documentStarterKit } from './starter-kit';
 
 import type { Extensions } from '@tiptap/core';
@@ -37,7 +37,7 @@ export const documentExtensions = (): Extensions => [
   alignedBlocks,
   ...documentTable,
   ...detailsExtensions,
-  Mention,
+  DocumentMention,
   Callout,
 ];
 

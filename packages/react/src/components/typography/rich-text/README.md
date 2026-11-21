@@ -4,7 +4,7 @@
 
 - **서버에서 그립니다.** `RichText` 는 hook 이 없는 함수라 Server Component 에서 그대로 부를 수 있습니다. 이때 마크다운 해석과 Tiptap 은 서버에서만 돌고, 브라우저로는 IDS 컴포넌트만 갑니다.
 - **Editor 와 같은 문서입니다.** Editor 와 같은 Tiptap 스키마와 글자 스타일을 씁니다. Editor 로 쓴 글을 RichText 로 그리면 제목, 목록, 간격이 같습니다.
-- **블록은 IDS 컴포넌트입니다.** 코드 블록은 `CodeBlock`, 콜아웃은 `Alert`, 접는 블록은 `Accordion`, 표는 `Table`, 그림은 `Image`, 할 일은 `Checkbox`, 멘션은 `Chip`, 구분선은 `Divider`, 링크는 `Link` 로 그립니다.
+- **블록은 IDS 컴포넌트입니다.** 코드 블록은 `CodeBlock`, 콜아웃은 `Alert`, 접는 블록은 `Accordion`, 표는 `Table`, 그림은 `Image`, 할 일은 `Checkbox`, 멘션은 `Avatar` 와 이름을 담은 알약 모양, 구분선은 `Divider`, 링크는 `Link` 로 그립니다.
 
 ```tsx
 import { RichText } from '@gsainfoteam/ids-react/rich-text';

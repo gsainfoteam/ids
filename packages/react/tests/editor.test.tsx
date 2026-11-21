@@ -1273,7 +1273,7 @@ test('typing @ asks mentions for people, and the chosen one is written as a ment
   const onValueChange = vi.fn();
   const people = [
     { id: 'u1', label: '김지스트', description: '디자인' },
-    { id: 'u2', label: '이인포', description: '프론트엔드' },
+    { id: 'u2', label: '이인포', description: '프론트엔드', avatar: '/faces/u2.png' },
   ];
   const mentions = vi.fn(async (query: string) =>
     people.filter((person) => person.label.includes(query)),
@@ -1299,8 +1299,10 @@ test('typing @ asks mentions for people, and the chosen one is written as a ment
 
   await expect
     .poll(() => onValueChange.mock.lastCall?.[0])
-    .toBe('검토: [@ id="u2" label="이인포"] 님 확인');
-  await expect.element(content.getByText('@이인포')).toBeVisible();
+    .toBe('검토: [@ id="u2" label="이인포" avatar="/faces/u2.png"] 님 확인');
+  const mention = () => content.element().querySelector('[data-mention]');
+  await expect.poll(() => mention()?.textContent).toContain('이인포');
+  expect(mention()?.querySelector('[data-avatar]')).not.toBeNull();
 });
 
 test('without mentions, @ is plain text', async () => {

@@ -169,7 +169,7 @@ export const BlogPost: Story = {
     await expect(canvas.getByRole('note')).toHaveTextContent(/중요/);
     await expect(canvas.getByRole('table')).toBeVisible();
     await expect(canvas.getByRole('checkbox', { name: '졸업 요건 점검표 제출' })).toBeChecked();
-    await expect(canvas.getByRole('link', { name: '@학사팀' })).toHaveAttribute(
+    await expect(canvas.getByRole('link', { name: '학사팀' })).toHaveAttribute(
       'href',
       '#people/registrar',
     );

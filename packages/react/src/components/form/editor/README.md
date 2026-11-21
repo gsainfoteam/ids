@@ -133,7 +133,9 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 - `mentions` 를 주면 `@` 로 사람을 찾는 목록이 열립니다. 주지 않으면 `@` 는 그냥 글자입니다.
 - 함수는 친 글자를 받고, 배열이나 배열의 Promise 를 돌려줍니다. 글자가 바뀌면 앞 요청의 `signal` 을 끊습니다.
 - 목록은 Avatar, 이름, 설명으로 그립니다. 찾는 동안과 결과가 없을 때 그 상태를 목록 안에 보여 줍니다.
-- 멘션은 Chip 모양으로 들어가고, 마크다운에는 `[@ id="u2" label="이인포"]` 로 남습니다. RichText 는 이것을 Chip 이나 링크로 그립니다.
+- 멘션은 Avatar 와 이름을 담은 primary soft 알약 모양으로 들어갑니다. `avatar` 가 없으면 Avatar 가 이름의 첫 글자를 그립니다.
+- 마크다운에는 `[@ id="u2" label="이인포" avatar="/faces/u2.png"]` 로 남습니다. RichText 도 같은 모양으로 그리고, `mentionHref` 를 주면 링크로 그립니다.
+- `avatar` 도 그림 주소와 같은 검사를 거칩니다. `javascript:` 같은 주소는 버립니다.
 
 ## 코드 블록, 콜아웃, 접는 블록
 

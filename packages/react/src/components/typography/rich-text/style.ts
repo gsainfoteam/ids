@@ -1,5 +1,4 @@
 import { cn, tv } from '../../../utils';
-import { chipStyle } from '../../data/chip/style';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -19,8 +18,15 @@ export const documentText = cn(
   '[&_ul[data-type=taskList]>li[data-checked=true]>div>p]:text-neutral [&_ul[data-type=taskList]>li[data-checked=true]>div>p]:line-through',
 );
 
-export const mentionChip = chipStyle({ variant: 'soft', size: 'tiny' }).root({
-  className: 'align-baseline',
+export const mentionStyle = tv({
+  slots: {
+    root: [
+      'scheme-primary inline rounded-full bg-scheme-soft py-0.5 ps-0.5 pe-1.5 font-medium text-on-scheme-soft',
+      'whitespace-nowrap box-decoration-clone',
+    ],
+    avatar: 'me-1 size-[1.3em]',
+    link: 'no-underline state-layer hover:state-hover',
+  },
 });
 
 export const richTextStyle = tv({
@@ -30,7 +36,6 @@ export const richTextStyle = tv({
     figure: 'flex flex-col gap-1',
     caption: 'text-neutral',
     image: 'max-w-full',
-    mention: 'align-baseline',
   },
   variants: {
     size: {

@@ -76,10 +76,14 @@ test('task items are read-only checkboxes named by their text', () => {
   expect(html).toContain('남은 일');
 });
 
-test('a mention is a Chip, or a Link when mentionHref is given', () => {
-  const markdown = '안녕 [@ id="u1" label="하늘"]';
+test('a mention shows its avatar and name, or links when mentionHref is given', () => {
+  const markdown = '안녕 [@ id="u1" label="하늘" avatar="/faces/u1.png"]';
 
-  expect(render(markdown)).toContain('@하늘');
+  expect(render(markdown)).toContain('하늘');
+  expect(render(markdown)).toContain('src="/faces/u1.png"');
+  expect(render('[@ id="u1" label="하늘" avatar="javascript:alert(1)"]')).not.toContain(
+    'javascript:',
+  );
   expect(
     renderToString(<RichText value={markdown} mentionHref={(id) => `/users/${id}`} />),
   ).toContain('href="/users/u1"');
