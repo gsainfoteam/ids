@@ -9,7 +9,7 @@ import { Link } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const colorSchemes = ['primary', 'secondary', 'tertiary', 'neutral'] as const;
-const underlines = ['always', 'hover'] as const;
+const underlines = ['always', 'hover', 'none'] as const;
 
 const meta = {
   title: 'Typography/Link',
@@ -57,6 +57,31 @@ export const Gallery: Story = {
           <Link href="https://www.gist.ac.kr" target="_blank" colorScheme="neutral">
             GIST 누리집
           </Link>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Current page"
+        description="neutral 링크에 aria-current='page' 가 붙으면 primary 글자색이 됩니다."
+      >
+        <Showcase.Row label="neutral · none">
+          <ul className="text-body-b3-medium flex gap-6">
+            <li>
+              <Link href="#notices" colorScheme="neutral" underline="none">
+                공지
+              </Link>
+            </li>
+            <li>
+              <Link href="#groups" colorScheme="neutral" underline="none" aria-current="page">
+                그룹
+              </Link>
+            </li>
+            <li>
+              <Link href="#shuttle" colorScheme="neutral" underline="none">
+                셔틀
+              </Link>
+            </li>
+          </ul>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -222,5 +247,39 @@ export const LinkList: Story = {
       await expect(link).toHaveAttribute('data-underline', 'hover');
       await expect(getComputedStyle(link).textDecorationLine).toBe('none');
     }
+  },
+};
+
+export const CurrentPage: Story = {
+  render: () => (
+    <nav aria-label="주 메뉴">
+      <ul className="text-body-b3-medium flex gap-6">
+        <li>
+          <Link href="#notices" colorScheme="neutral" underline="none">
+            공지
+          </Link>
+        </li>
+        <li>
+          <Link href="#groups" colorScheme="neutral" underline="none" aria-current="page">
+            그룹
+          </Link>
+        </li>
+      </ul>
+    </nav>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '상단 바처럼 링크만 모인 메뉴는 neutral 과 none 으로 둘레 글자색을 따르고, 지금 페이지 링크(aria-current="page")만 primary 글자색으로 표시합니다. React Router 의 NavLink 와 TanStack Router 의 Link 는 aria-current 를 스스로 붙이고, Next.js 의 Link 는 앱이 usePathname() 으로 적습니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const current = canvas.getByRole('link', { name: '그룹' });
+    const other = canvas.getByRole('link', { name: '공지' });
+    await expect(current).toHaveAttribute('aria-current', 'page');
+    await expect(getComputedStyle(current).color).not.toBe(getComputedStyle(other).color);
+    await expect(getComputedStyle(current).textDecorationLine).toBe('none');
   },
 };

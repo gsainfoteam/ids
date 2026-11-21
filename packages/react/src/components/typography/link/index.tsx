@@ -9,7 +9,7 @@ export function Link(props: Link.Props) {
 
 export namespace Link {
   export type ColorScheme = 'primary' | 'secondary' | 'tertiary' | 'neutral';
-  export type Underline = 'always' | 'hover';
+  export type Underline = 'always' | 'hover' | 'none';
 
   export type Props = ComponentProps<'a'> & {
     colorScheme?: ColorScheme;
