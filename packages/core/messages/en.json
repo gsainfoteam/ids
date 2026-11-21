@@ -289,6 +289,20 @@
     "value": "{value}px",
     "width": "Width"
   },
+  "scheduler": {
+    "allDay": "All day",
+    "day": "Day",
+    "goToDate": "Go to date",
+    "label": "Schedule",
+    "navigation": "Navigate dates",
+    "nextDay": "Next day",
+    "nextWeek": "Next week",
+    "previousDay": "Previous day",
+    "previousWeek": "Previous week",
+    "today": "Today",
+    "view": "View",
+    "week": "Week"
+  },
   "select": {
     "clear": "Clear selection",
     "empty": "No results found.",
