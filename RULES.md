@@ -630,6 +630,9 @@ Every other prop is an option. The rules for options:
   from a `useX()` hook exported beside it. The hook takes one object per feature, on when the
   object is given, with the feature's state inside as a trio, and the root takes the result as one
   prop. The same result reaches parts the app renders outside the root.
+- **Existing props that break this rule are debt, not precedent.** Some components still carry
+  them (Drawer's `scaleBackground`, Table's `striped`, Dialog's `hideClose`), and other sections
+  of this file may still describe them. A new prop follows this rule, never their example.
 
 ```tsx
 const table = useDataTable({
