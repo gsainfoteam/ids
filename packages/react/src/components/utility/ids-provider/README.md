@@ -47,7 +47,7 @@ import { theme } from './ids-theme';
 ```
 
 - `defineIdsTheme` 과 `checkIdsTheme` 은 순수 함수라 Server Component 에서 만들어 넘겨도 됩니다.
-- 테마 객체는 모듈에 한 번 만들어 둡니다. 렌더마다 새 객체를 만들면 역할 색을 다시 계산합니다.
+- 역할 색은 색 설정(`primary`, `secondary`, `tertiary`, `neutral`, `status`)마다 한 번 계산하고, 최근 64개를 기억합니다. 렌더마다 같은 색으로 새 테마 객체를 만들거나 같은 팔레트의 `IdsProvider.Scope` 를 여러 개 두어도 다시 계산하지 않습니다.
 
 ## 테마
 
