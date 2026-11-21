@@ -607,6 +607,14 @@ take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks
 keys and that no Korean literal sits in component code; `tests/translate.test.tsx` renders every
 story in English.
 
+**Variants are the looks an app cannot build from IDS parts.** A `variant` or `appearance` value is
+a component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
+and `ghost`, Tabs' `underline`, `pill`, `enclosed` and `segmented`. A look an app can compose from
+IDS components and props (a Card holding a Tabs, a Field around a SegmentedControl) stays a
+composition and never becomes a prop value. Two components that read alike share an internal
+surface (`internal/surfaces/segment-surface.ts` for SegmentedControl and segmented Tabs) instead of
+one copying the other's classes.
+
 **Callbacks.** A value callback is `onValueChange(value)`; other state callbacks are
 `onCheckedChange`, `onPressedChange`, `onOpenChange` and so on. `onChange` keeps the native event
 signature and only exists where a real input does. react-hook-form's `field.onChange` and TanStack
