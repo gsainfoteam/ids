@@ -60,9 +60,10 @@
 
 ### 색
 
-- 색 역할 이름이 문법(`{bg|text|border}-{계열}[-{세기}]`, `text-on-{계열}[-{세기}]`)을 따르지 않는 경우. `surface`, `soft`, `accent`, `muted`, `-strong` 같은 쓰임새 이름이나 옛 이름은 `ids.css` 에 없어 Tailwind 가 조용히 클래스를 만들지 않습니다
-- 배경 `bg-X[-세기]` 위 글자가 짝인 `text-on-X[-세기]` 가 아닌 경우. neutral 바탕의 본문은 `text-neutral-strong`, 보조 글자는 `text-neutral` 입니다
-- 채움 없이 페이지 위에 놓인 계열 글자나 아이콘에 `bg-X` 의 색이나 `primary/10` 같은 투명도를 쓴 경우. `text-X` 와 `bg-X-subtle` 을 씁니다
+- 색 역할 이름이 문법을 따르지 않는 경우. 배경은 쓰임새(`bg-base`, `bg-surface`, `bg-block`, `bg-X-soft`, `bg-X-solid`), 선과 글자는 세기(`border-X[-strong]`, `text-X[-strong]`), 배경 위 글자는 `text-on-{배경}` 입니다. `accent`, `muted`, `subtle`, `bold` 같은 이름이나 옛 이름(`bg-panel`, `bg-band`, 단독 `bg-X`)은 `ids.css` 에 없어 Tailwind 가 조용히 클래스를 만들지 않습니다
+- 배경 위 글자가 그 배경의 짝(`bg-X-solid` 위 `text-on-X-solid`, `bg-X-soft` 위 `text-on-X-soft`)이 아닌 경우. neutral 바탕의 본문은 `text-neutral-strong`, 보조 글자는 `text-neutral` 입니다
+- 채움 없이 페이지 위에 놓인 계열 글자나 아이콘에 `bg-X-solid` 의 색이나 `primary/10` 같은 투명도를 쓴 경우. 글자는 `text-X`, 옅은 채움은 `bg-X-soft` 를 씁니다
+- 브랜드나 상태 색 선에 `border-X` 를 쓴 경우. `border-X` 는 옅은 장식 선이고, 읽혀야 하는 색 선은 `border-X-strong` 입니다
 - hover, press 를 색(`hover:bg-neutral-soft`, `-hover`, `-active`)이나 `/90` 같은 투명도로 만든 경우. `state-layer` 와 `state-hover`, `state-press` 를 쓰고, 채움은 `state-fill` 을 더합니다
 - 색 있는 soft 면, 상태 색의 outline, ghost 가 글자색 층을 쓰는 경우. control-surface 의 `drawsSoftLayer`, `drawsQuietLayer` 처럼 계열 채움 층을 씁니다
 - 구조선(필드 테두리, 카드 모서리, Divider, group 경계)에 theme 색을 쓴 경우. `border-neutral` 이 기본입니다

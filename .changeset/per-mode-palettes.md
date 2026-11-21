@@ -1,7 +1,7 @@
 ---
-'@gsainfoteam/ids-css': minor
-'@gsainfoteam/ids-react': minor
-'ids_flutter': minor
+'@gsainfoteam/ids-css': major
+'@gsainfoteam/ids-react': major
+'ids_flutter': major
 ---
 
 Every palette is now a light and a dark scale of nine steps, numbered outward from the page: 1
