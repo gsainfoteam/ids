@@ -850,9 +850,7 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
 `IDS_BROWSERS=firefox,webkit` picks engines by hand.
 
 CI splits the tests over runners with `vitest run --shard`: Chromium runs every project on two
-runners, Firefox runs the browser project on five and WebKit on seven. WebKit keeps every finished
-file's frame until its runner ends, so a runner's memory is the sum of its files; with five, a
-runner's page crashed out of memory, and seven lower each sum by about a third. `tests/balanced-sequencer.ts`
+runners, Firefox and WebKit run the browser project on five each. `tests/balanced-sequencer.ts`
 deals the files out by the seconds `tests/durations.json` gives each (WebKit times from a CI run,
 the median for a file not listed), so every runner gets about the same time; Vitest's own shard
 splits by path hash and leaves one runner twice as long as another. When a file grows much slower
@@ -862,7 +860,7 @@ libraries: `playwright install --with-deps` on the plain runner took from 20 sec
 waiting on apt. The required checks are small jobs that
 pass only when every runner behind them passed: `JS (lint / typecheck / build / test)` waits for
 the lint, typecheck and build job and both Chromium runners, `Browser tests (firefox)` and
-`Browser tests (webkit)` for their five and seven. WebKit on Linux retries a failed test once (`--retry 1`
+`Browser tests (webkit)` for their five. WebKit on Linux retries a failed test once (`--retry 1`
 on its runners only): about one run in three, one test there
 stops typing or firing a timer for seconds and runs out of time, a different typing or timer
 story each time (TextArea `CharacterCount`, TelField). The same story passes alone and with its
