@@ -1,6 +1,6 @@
 import { Chip } from '../../../data/chip';
 import { Link } from '../../link';
-import { isAllowedLinkHref } from '../schema/image-source';
+import { isAllowedLinkHref } from '../schema/url-rules';
 import { richTextStyle } from '../style';
 
 import type { DocumentNodeProps } from './types';

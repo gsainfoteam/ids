@@ -159,7 +159,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 ```
 
 - `onImageUpload` 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor 는 파일을 서버로 보내지 않습니다.
-- `Editor.Image` 를 누르면 그림 주소를 넣거나 파일을 고르는 Popover 가 열립니다. 주소는 `http:` 와 `https:` 만 받고, 다른 주소에는 입력란 아래에 오류를 보입니다.
+- `Editor.Image` 를 누르면 그림 주소를 넣거나 파일을 고르는 Popover 가 열립니다. 주소에 스킴이 없으면 `https://` 를 붙입니다. `http:` 와 `https:` 주소만 받고, 다른 주소나 상대 주소에는 입력란 아래에 오류를 보입니다.
 - `Editor.Image` 로 고른 파일, 붙여 넣은 파일, 끌어 놓은 파일이 모두 이 함수로 갑니다. PNG, JPEG, GIF, WebP, AVIF 만 받습니다. 형식은 FileField 의 `accept` 규칙으로 가리고, 다른 파일은 FileField 와 같은 "허용되지 않는 파일 형식입니다." 를 toast 로 알립니다.
 - 올리는 동안 본문의 그 자리에 Skeleton 모양의 자리표시가 서고, `Editor.Image` 는 Spinner 와 `aria-busy` 를 보입니다. 화면 읽기 프로그램에는 "그림을 올리는 중입니다" 를 알립니다.
 - 올리기에 실패하면(Promise 가 거부되거나 주소가 아니면) 자리표시를 지우고 toast 로 알립니다. 오류는 앱이 Field 오류로 다시 그릴 값의 문제가 아니라 한 번의 작업 결과라서 toast 입니다. IdsProvider 가 기본 Toaster 를 둡니다.

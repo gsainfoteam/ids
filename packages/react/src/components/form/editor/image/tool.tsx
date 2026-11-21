@@ -13,8 +13,9 @@ import { Button } from '../../../action/button';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Spinner } from '../../../feedback/spinner';
 import { Popover } from '../../../overlay/popover';
-import { isAllowedImageSource } from '../../../typography/rich-text/schema/image-source';
+import { isWebAddress } from '../../../typography/rich-text/schema/url-rules';
 import { TextField } from '../../text-field';
+import { isPlainEnter, withProtocol } from '../popover-form';
 import { useEditorToolProps, useToolState, type EditorToolProps } from '../tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
@@ -25,16 +26,6 @@ const IMAGE = {
   isActive: (editor: TiptapEditor) => editor.isActive('image'),
   can: () => true,
 };
-
-const NO_UPLOADS: ReadonlySet<string> = new Set();
-
-const isPlainEnter = (event: KeyboardEvent) =>
-  event.key === 'Enter' &&
-  !event.nativeEvent.isComposing &&
-  !event.shiftKey &&
-  !event.altKey &&
-  !event.ctrlKey &&
-  !event.metaKey;
 
 let warnedWithoutUpload = false;
 
@@ -73,8 +64,8 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
   };
 
   const insertUrl = () => {
-    const src = url.trim();
-    if (!isAllowedImageSource(src, NO_UPLOADS)) {
+    const src = withProtocol(url.trim());
+    if (!isWebAddress(src)) {
       setUrlRejected(true);
       return;
     }

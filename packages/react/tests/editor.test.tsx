@@ -570,7 +570,10 @@ test('a pasted or dropped image file goes through the upload, and other files do
   const content = await editable('본문');
   await userEvent.click(content);
 
-  const pasted = pasteEvent([png('pasted.png')], '<img src="https://elsewhere.example/pasted.png">');
+  const pasted = pasteEvent(
+    [png('pasted.png')],
+    '<img src="https://elsewhere.example/pasted.png">',
+  );
   content.element().dispatchEvent(pasted);
   expect(pasted.defaultPrevented).toBe(true);
   await expect
@@ -621,9 +624,9 @@ test('without onImageUpload there is no Image tool, files are not pasted and pas
   expect(file.defaultPrevented).toBe(false);
   await expect.element(content).toHaveFocus();
 
-  content.element().dispatchEvent(
-    pasteEvent([], '<p>붙인 글</p><img src="https://elsewhere.example/a.png">'),
-  );
+  content
+    .element()
+    .dispatchEvent(pasteEvent([], '<p>붙인 글</p><img src="https://elsewhere.example/a.png">'));
   await expect.element(content).toMatchTextContent('붙인 글');
   expect(content.element().querySelectorAll('img')).toHaveLength(1);
 });
@@ -667,7 +670,9 @@ test('a paste from Google Docs keeps its bold and lists, without blank paragraph
 
   await expect
     .poll(() => onValueChange.mock.lastCall?.[0])
-    .toBe('<p><strong>굵게</strong> 보통</p><ul><li><p>하나</p><ul><li><p>안쪽</p></li></ul></li></ul>');
+    .toBe(
+      '<p><strong>굵게</strong> 보통</p><ul><li><p>하나</p><ul><li><p>안쪽</p></li></ul></li></ul>',
+    );
 });
 
 test('javascript: and data: addresses never become images, in HTML, markdown or JSON', async () => {
@@ -1391,7 +1396,7 @@ test('a read-only Editor has no block handle', async () => {
   expect(page.getByRole('button', { name: '블록 메뉴' }).query()).toBeNull();
 });
 
-test('Image inserts a picture from an address and turns away a script address', async () => {
+test('Image inserts a picture from an address, adding https:// when it has no scheme, and turns away a script address', async () => {
   const onValueChange = vi.fn();
   render(
     <Editor
@@ -1417,7 +1422,7 @@ test('Image inserts a picture from an address and turns away a script address', 
     .toHaveAccessibleDescription('http 나 https 로 시작하는 주소를 넣어 주세요');
   expect(content.element().querySelector('img')).toBeNull();
 
-  await userEvent.fill(address, 'https://gistory.me/map.png');
+  await userEvent.fill(address, 'gistory.me/map.png');
   await userEvent.click(page.getByRole('button', { name: '넣기' }));
   await expect
     .poll(() => onValueChange.mock.lastCall?.[0])

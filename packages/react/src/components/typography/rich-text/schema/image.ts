@@ -1,6 +1,6 @@
 import { Image, type ImageOptions } from '@tiptap/extension-image';
 
-import { isAllowedImageSource } from './image-source';
+import { isAllowedImageSource } from './url-rules';
 
 export type DocumentImageOptions = ImageOptions & { uploaded: ReadonlySet<string> };
 

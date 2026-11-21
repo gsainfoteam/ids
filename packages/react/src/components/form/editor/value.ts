@@ -1,4 +1,4 @@
-import { keepAllowedImages } from '../../typography/rich-text/schema/image-source';
+import { keepAllowedImages } from '../../typography/rich-text/schema/url-rules';
 
 import type { Editor as TiptapEditor, JSONContent } from '@tiptap/core';
 

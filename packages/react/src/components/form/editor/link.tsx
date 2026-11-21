@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, type KeyboardEvent } from 'react';
+import { useState } from 'react';
 
 import { LinkIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useEditorContext } from './context';
+import { isPlainEnter, withProtocol } from './popover-form';
 import { useEditorToolProps, useToolState, type EditorToolProps } from './tool';
 import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
@@ -17,25 +18,10 @@ import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorLinkProps = EditorToolProps;
 
-const HAS_SCHEME = /^[a-z][a-z\d+.-]*:/i;
-const STAYS_ON_THIS_SITE = /^[/#?]/;
-
-export function withProtocol(url: string) {
-  return HAS_SCHEME.test(url) || STAYS_ON_THIS_SITE.test(url) ? url : `https://${url}`;
-}
-
 const LINK = {
   isActive: (editor: TiptapEditor) => editor.isActive('link'),
   can: (editor: TiptapEditor) => !editor.isActive('codeBlock') && !editor.isActive('code'),
 };
-
-const isPlainEnter = (event: KeyboardEvent) =>
-  event.key === 'Enter' &&
-  !event.nativeEvent.isComposing &&
-  !event.shiftKey &&
-  !event.altKey &&
-  !event.ctrlKey &&
-  !event.metaKey;
 
 export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorLinkProps) {
   const t = useTranslate();

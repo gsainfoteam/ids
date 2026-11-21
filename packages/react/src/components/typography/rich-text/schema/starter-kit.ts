@@ -1,6 +1,6 @@
 import { StarterKit } from '@tiptap/starter-kit';
 
-import { isAllowedLinkHref } from './image-source';
+import { isAllowedLinkHref } from './url-rules';
 
 type Level = 1 | 2 | 3 | 4 | 5 | 6;
 

@@ -9,7 +9,7 @@ import { mentionNode } from './nodes/mention';
 import { TableCellNode, TableHeaderNode, TableNode, TableRowNode } from './nodes/table';
 import { TaskItemNode } from './nodes/task-item';
 import { documentExtensions, documentMarkdown } from './schema/document';
-import { keepAllowedImages } from './schema/image-source';
+import { keepAllowedImages } from './schema/url-rules';
 import { Divider } from '../../layout/divider';
 
 import type { JSONContent } from '@tiptap/core';

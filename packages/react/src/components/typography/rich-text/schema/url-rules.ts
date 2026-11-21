@@ -14,6 +14,8 @@ export function isAllowedImageSource(src: unknown, uploaded: ReadonlySet<string>
   return !HAS_SCHEME.test(read) || WEB_SCHEME.test(read);
 }
 
+export const isWebAddress = (url: string) => WEB_SCHEME.test(asTheBrowserReadsIt(url));
+
 export function isAllowedLinkHref(href: unknown) {
   if (typeof href !== 'string' || href === '') return false;
   const read = asTheBrowserReadsIt(href);

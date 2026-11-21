@@ -1,5 +1,5 @@
 import { Link } from '../../link';
-import { isAllowedLinkHref } from '../schema/image-source';
+import { isAllowedLinkHref } from '../schema/url-rules';
 
 import type { DocumentMarkProps } from './types';
 
