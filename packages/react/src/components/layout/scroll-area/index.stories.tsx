@@ -14,7 +14,7 @@ const meta = {
   component: ScrollArea,
   tags: ['autodocs'],
   argTypes: {
-    variant: { control: 'radio', options: ['hover', 'auto', 'always'] },
+    variant: { control: 'radio', options: ['hover', 'auto', 'always', 'none'] },
     size: { control: 'radio', options: ['standard', 'tiny'] },
     orientation: { control: 'radio', options: ['vertical', 'horizontal', 'both'] },
     fade: { control: 'radio', options: [false, true, 'y', 'x'] },
@@ -25,11 +25,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const variants = ['hover', 'auto', 'always'] as const;
+const variants = ['hover', 'auto', 'always', 'none'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const frame = cn('h-40 w-56 rounded-standard border border-neutral text-body-b3-regular');
-const panel = cn('h-56 w-64 concentric-p-1 p-0 border border-neutral bg-surface shadow-md');
+const panel = cn('h-56 w-64 concentric-p-1 p-0 border border-neutral bg-base shadow-md');
 
 const paragraphs = [
   '스크롤 영역은 브라우저의 스크롤을 그대로 씁니다. 휠, 트랙패드, 터치, 키보드가 평소처럼 움직입니다.',
@@ -115,7 +115,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Variant × Size"
-        description="hover 는 포인터를 올리거나 스크롤할 때, auto 는 넘칠 때, always 는 늘 트랙과 함께 보입니다."
+        description="hover 는 포인터를 올리거나 스크롤할 때, auto 는 넘칠 때, always 는 늘 트랙과 함께 보입니다. none 은 막대를 그리지 않습니다."
       >
         <Showcase.Matrix
           rows={sizes}
@@ -234,6 +234,13 @@ export const Gallery: Story = {
             </ScrollArea.Viewport>
           </ScrollArea>
         </Showcase.Row>
+        <Showcase.Row label="none">
+          <ScrollArea fade="x" variant="none" orientation="horizontal" className="w-72">
+            <ScrollArea.Viewport ref={startClearOfBothEdges}>
+              <Wide />
+            </ScrollArea.Viewport>
+          </ScrollArea>
+        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Dark mode" description="막대 색은 scrollbar-* 토큰을 따릅니다.">
@@ -242,7 +249,7 @@ export const Gallery: Story = {
             <IdsProvider.Scope
               key={mode}
               mode={mode}
-              className="rounded-standard bg-surface text-on-surface p-4"
+              className="rounded-standard bg-base text-neutral-strong p-4"
             >
               <ScrollArea variant="always" className={frame}>
                 <Text />
@@ -444,7 +451,7 @@ export const CustomThumb: Story = {
     <ScrollArea variant="auto" className={frame}>
       <Text />
       <ScrollArea.Scrollbar>
-        <ScrollArea.Thumb className="bg-primary hover:bg-primary" />
+        <ScrollArea.Thumb className="bg-primary-solid hover:bg-primary-solid" />
       </ScrollArea.Scrollbar>
     </ScrollArea>
   ),
@@ -458,6 +465,6 @@ export const CustomThumb: Story = {
   play: async ({ canvasElement }) => {
     const thumb = canvasElement.querySelector<HTMLElement>('[data-scroll-area-thumb]')!;
     await waitFor(() => expect(thumb).toBeVisible());
-    await expect(thumb.className).toMatch(/(^| )bg-primary( |$)/);
+    await expect(thumb.className).toMatch(/(^| )bg-primary-solid( |$)/);
   },
 };

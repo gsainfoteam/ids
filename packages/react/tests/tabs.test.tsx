@@ -5,7 +5,8 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Tabs } from '../src';
+import { IdsProvider, SegmentedControl, Tabs } from '../src';
+import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -273,7 +274,7 @@ test('render children hand over the parts', async () => {
 
 test('state props: selected, disabled and interaction reach className and children', async () => {
   await render(
-    tabs({ defaultValue: 'a', appearance: 'pill', variant: 'solid' }, ['a', 'b'], {
+    tabs({ defaultValue: 'a', appearance: 'enclosed' }, ['a', 'b'], {
       a: { className: ({ selected }) => (selected ? 'is-selected' : 'not-selected') },
       b: { children: ({ selected }) => (selected ? 'b (on)' : 'b (off)') },
     }),
@@ -282,8 +283,7 @@ test('state props: selected, disabled and interaction reach className and childr
   await expect.element(tab('b (off)')).toBeInTheDocument();
   await expect.element(tab('a')).toHaveAttribute('data-selected', '');
   const root = document.querySelector('[data-appearance]')!;
-  expect(root.getAttribute('data-appearance')).toBe('pill');
-  expect(root.getAttribute('data-variant')).toBe('solid');
+  expect(root.getAttribute('data-appearance')).toBe('enclosed');
 });
 
 test('nested tabs keep their own roving focus', async () => {
@@ -343,4 +343,125 @@ test('a stretched list shares its width between horizontal tabs', async () => {
     .map((tab) => tab.getBoundingClientRect().width);
   expect(widths[0]).toBeCloseTo(widths[1]!, 0);
   expect(widths[0]! + widths[1]!).toBeCloseTo(list.width, 0);
+});
+
+function colorOf(variable: string, root = document.querySelector('[data-mode]')!) {
+  const probe = document.createElement('div');
+  probe.style.backgroundColor = `var(${variable})`;
+  root.append(probe);
+  const color = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return color;
+}
+
+test('underline draws the selected label and its line in primary', async () => {
+  await render(<IdsProvider theme={testTheme}>{tabs({ defaultValue: 'b' })}</IdsProvider>);
+  await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
+
+  const selected = tab('b').element();
+  await expect
+    .poll(() => getComputedStyle(selected).color)
+    .toBe(colorOf('--ids-color-text-primary'));
+  expect(getComputedStyle(selected, '::after').backgroundColor).toBe(
+    colorOf('--ids-color-border-primary-strong'),
+  );
+  expect(getComputedStyle(tab('a').element()).color).not.toBe(colorOf('--ids-color-text-primary'));
+});
+
+test('enclosed draws the selected label in primary', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>
+      {tabs({ defaultValue: 'b', appearance: 'enclosed' })}
+    </IdsProvider>,
+  );
+  await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
+
+  await expect
+    .poll(() => getComputedStyle(tab('b').element()).color)
+    .toBe(colorOf('--ids-color-text-primary'));
+  expect(getComputedStyle(tab('a').element()).color).not.toBe(colorOf('--ids-color-text-primary'));
+});
+
+test('pill fills the selected tab with the primary subtle pair', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>{tabs({ defaultValue: 'b', appearance: 'pill' })}</IdsProvider>,
+  );
+  await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
+
+  await expect
+    .poll(() => getComputedStyle(tab('b').element()).backgroundColor)
+    .toBe(colorOf('--ids-color-bg-primary-soft'));
+  expect(getComputedStyle(tab('b').element()).color).toBe(
+    colorOf('--ids-color-text-on-primary-soft'),
+  );
+  expect(getComputedStyle(tab('a').element()).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+});
+
+test('segmented draws the same track and segment as SegmentedControl', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <div>
+        {tabs({ defaultValue: 'b', appearance: 'segmented' })}
+        <SegmentedControl aria-label="Period" defaultValue="b">
+          <SegmentedControl.Item value="a">a</SegmentedControl.Item>
+          <SegmentedControl.Item value="b">b</SegmentedControl.Item>
+          <SegmentedControl.Item value="c">c</SegmentedControl.Item>
+        </SegmentedControl>
+      </div>
+    </IdsProvider>,
+  );
+  await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
+
+  const list = screen.getByRole('tablist').element();
+  const group = screen.getByRole('radiogroup').element();
+  const segmentOf = (value: string) =>
+    screen.getByRole('radio', { name: value }).element().closest('label')!;
+  const pairs = [
+    [list, group],
+    [tab('b').element(), segmentOf('b')],
+    [tab('a').element(), segmentOf('a')],
+  ] as const;
+
+  await expect
+    .poll(() => getComputedStyle(tab('b').element()).backgroundColor)
+    .toBe(colorOf('--ids-color-bg-segment'));
+  for (const [tabPart, segmentPart] of pairs) {
+    const a = getComputedStyle(tabPart);
+    const b = getComputedStyle(segmentPart);
+    for (const property of [
+      'backgroundColor',
+      'color',
+      'boxShadow',
+      'borderTopLeftRadius',
+      'paddingTop',
+      'height',
+    ] as const) {
+      expect(a[property], property).toBe(b[property]);
+    }
+  }
+  expect(list.getBoundingClientRect().width).toBeLessThan(
+    list.parentElement!.getBoundingClientRect().width,
+  );
+
+  await userEvent.hover(tab('a'));
+  await expect.element(tab('a')).toHaveAttribute('data-hovered');
+  expect(getComputedStyle(tab('a').element()).color, 'hover adds a layer, not a color').toBe(
+    colorOf('--ids-color-text-neutral'),
+  );
+  await userEvent.unhover(tab('a'));
+});
+
+test('segmented in dark lifts the selected tab one neutral step above the track', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme} mode="dark">
+      {tabs({ defaultValue: 'a', appearance: 'segmented', size: 'tiny' })}
+    </IdsProvider>,
+  );
+  const root = document.querySelector('[data-mode="dark"]')!;
+  await expect
+    .poll(() => getComputedStyle(tab('a').element()).backgroundColor)
+    .toBe(colorOf('--ids-color-border-neutral-strong', root));
+  expect(getComputedStyle(screen.getByRole('tablist').element()).backgroundColor).toBe(
+    colorOf('--ids-color-bg-neutral-soft', root),
+  );
 });

@@ -7,12 +7,12 @@ export const promptInputStyle = tv({
     root: 'group/prompt-input grid w-full min-w-0 gap-2',
     textArea: [
       'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'group-data-dragging/prompt-input:inset-ring-primary',
+      'group-data-dragging/prompt-input:inset-ring-primary-strong',
     ],
     attachments: 'w-full py-0.5',
     submit: 'ms-auto!',
     tool: [
-      'data-pressed:bg-(--control-soft) data-pressed:text-(--control-on-soft)',
+      'data-pressed:bg-scheme-soft data-pressed:text-on-scheme-soft',
       'data-pressed:inset-ring-transparent data-pressed:shadow-none',
     ],
   },

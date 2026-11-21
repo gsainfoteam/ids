@@ -415,10 +415,10 @@ export const RechartsTooltip: Story = {
         <Tooltip
           cursor={false}
           contentStyle={{
-            background: 'var(--ids-color-surface)',
+            background: 'var(--ids-color-bg-base)',
             borderColor: 'var(--ids-color-border-neutral)',
           }}
-          itemStyle={{ color: 'var(--ids-color-on-surface)' }}
+          itemStyle={{ color: 'var(--ids-color-text-neutral-strong)' }}
         />
       </BarChart>
     </Chart>
@@ -475,7 +475,7 @@ export const SeriesColors: Story = {
   play: async ({ canvasElement }) => {
     const figure = canvasElement.querySelector<HTMLElement>('[data-chart]')!;
     await expect(figure.style.getPropertyValue('--chart-income')).toBe(
-      'var(--ids-color-bg-success)',
+      'var(--ids-color-bg-success-solid)',
     );
     await waitFor(() =>
       expect(

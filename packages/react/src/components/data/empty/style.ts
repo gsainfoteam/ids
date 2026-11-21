@@ -5,7 +5,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const emptyStyle = tv({
   slots: {
-    root: 'flex w-full min-w-0 flex-col text-on-surface',
+    root: 'flex w-full min-w-0 flex-col text-neutral-strong',
     media: [
       'flex shrink-0 items-center justify-center overflow-hidden text-neutral',
       '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&>img]:max-w-full',
@@ -14,20 +14,20 @@ export const emptyStyle = tv({
     description: [
       'max-w-sm text-pretty text-neutral',
       '[&_a:not([data-link])]:underline [&_a:not([data-link])]:underline-offset-4',
-      '[&_a:not([data-link]):hover]:text-on-surface',
+      '[&_a:not([data-link]):hover]:text-neutral-strong',
     ],
     actions: 'flex flex-wrap items-center gap-2',
   },
   variants: {
     variant: {
       ghost: {},
-      soft: { root: 'bg-neutral-soft' },
+      soft: { root: 'bg-block' },
       outline: { root: 'border border-dashed border-neutral' },
     } satisfies Record<EmptyVariant, object>,
     media: {
-      soft: { media: 'rounded-standard bg-neutral-soft text-on-surface' },
+      soft: { media: 'rounded-standard bg-neutral-soft text-neutral-strong' },
       outline: {
-        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-on-surface',
+        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-neutral-strong',
       },
       ghost: {},
     } satisfies Record<EmptyMediaVariant, object>,
@@ -61,7 +61,7 @@ export const emptyStyle = tv({
       class: { media: "[&_svg:not([class*='size-'])]:size-12" },
     },
     { media: 'ghost', size: 'tiny', class: { media: "[&_svg:not([class*='size-'])]:size-10" } },
-    { media: 'soft', variant: 'soft', class: { media: 'bg-surface' } },
+    { media: 'soft', variant: 'soft', class: { media: 'bg-base' } },
     { media: ['soft', 'outline'], class: { media: '[&>img]:size-full [&>img]:object-cover' } },
   ],
   defaultVariants: { variant: 'outline', media: 'soft', size: 'standard', align: 'center' },

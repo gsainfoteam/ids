@@ -1,16 +1,14 @@
 import { tv } from '../../../utils';
 
-import type { ItemGroupVariant, ItemVariant } from '.';
+import type { ItemVariant } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
 export const itemStyle = tv({
   slots: {
     root: [
-      'group/item relative isolate flex w-full min-w-0 items-center text-start text-on-surface',
-      'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]',
-      'before:bg-(--ids-color-on-surface) before:opacity-0',
-      'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
-      'data-selected:before:opacity-6',
+      'group/item relative isolate flex w-full min-w-0 items-center text-start text-neutral-strong',
+      'state-layer data-selected:state-press',
+      'transition-[--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
     media: [
       'flex shrink-0 items-center justify-center gap-2 text-neutral',
@@ -24,27 +22,18 @@ export const itemStyle = tv({
       'ms-auto flex shrink-0 items-center gap-2',
       "[&>svg]:pointer-events-none [&>svg:not([class*='text-'])]:text-neutral [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ],
-    group: 'flex min-w-0 flex-col',
-    groupItem: 'flex',
   },
   variants: {
-    groupVariant: {
-      bordered: {
-        group: 'divide-y divide-neutral [&>li>[data-item]]:rounded-none',
-      },
-      separated: { group: 'gap-2' },
-      ghost: {},
-    } satisfies Record<ItemGroupVariant, object>,
     variant: {
       ghost: {},
       outline: { root: 'inset-ring-1 inset-ring-neutral' },
-      soft: { root: 'bg-neutral-soft' },
+      soft: { root: 'bg-block' },
     } satisfies Record<ItemVariant, object>,
     media: {
       ghost: {},
-      soft: { media: 'rounded-standard bg-neutral-soft text-on-surface' },
+      soft: { media: 'rounded-standard bg-neutral-soft text-neutral-strong' },
       outline: {
-        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-on-surface',
+        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-neutral-strong',
       },
     } satisfies Record<ItemVariant, object>,
     size: {
@@ -74,8 +63,7 @@ export const itemStyle = tv({
       true: {
         root: [
           'cursor-pointer select-none focus-ring',
-          'data-hovered:before:opacity-4 data-active:before:opacity-8',
-          'data-selected:data-hovered:before:opacity-10',
+          'not-data-selected:data-hovered:state-hover data-active:state-press',
           'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         ],
       },
@@ -98,7 +86,6 @@ export const itemStyle = tv({
     },
   ],
   defaultVariants: {
-    groupVariant: 'ghost',
     variant: 'ghost',
     media: 'ghost',
     size: 'standard',

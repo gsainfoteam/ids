@@ -48,8 +48,8 @@ test('colors soft marks with the primary soft pair and solid marks with the prim
 
   expect(getComputedStyle(soft).backgroundColor).toBe(color('bg-primary-soft'));
   expect(getComputedStyle(soft).color).toBe(color('text-on-primary-soft'));
-  expect(getComputedStyle(solid).backgroundColor).toBe(color('bg-primary'));
-  expect(getComputedStyle(solid).color).toBe(color('text-on-primary'));
+  expect(getComputedStyle(solid).backgroundColor).toBe(color('bg-primary-solid'));
+  expect(getComputedStyle(solid).color).toBe(color('text-on-primary-solid'));
 });
 
 test('takes the props of a Highlight.Mark child for every match', async () => {

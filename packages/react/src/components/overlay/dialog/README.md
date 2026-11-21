@@ -8,6 +8,7 @@
 - **어디서든 엽니다.** `overlay.open` 으로 컴포넌트 밖에서 열고, 닫을 때 넘긴 값을 `await` 으로 받습니다.
 - **겹쳐 열 수 있습니다.** 안에서 연 대화상자는 위에 쌓이고, 아래 대화상자는 조금 작아지며 뒤로 물러납니다.
 - **한글 입력.** 조합 중에 누른 Escape 는 조합만 취소하고 대화상자는 그대로 둡니다.
+- **버튼 줄은 띠.** `Dialog.Footer` 는 위쪽 선과 옅은 배경을 깐 띠로 대화상자 바닥에 붙고, 본문이 길어 스크롤해도 그 자리에 있습니다.
 
 ```tsx
 import { Dialog } from '@gsainfoteam/ids-react';
@@ -41,12 +42,13 @@ import { Dialog } from '@gsainfoteam/ids-react';
 | `Dialog.Header`      | 제목과 설명을 묶는다                                                        |
 | `Dialog.Title`       | 대화상자의 이름(`aria-labelledby`)                                          |
 | `Dialog.Description` | 대화상자의 설명(`aria-describedby`)                                         |
-| `Dialog.Footer`      | 버튼 줄. 좁은 화면에서는 세로로, 주 버튼이 위에 온다                        |
+| `Dialog.Footer`      | 바닥의 버튼 띠. 좁은 화면에서는 세로로, 주 버튼이 위에 온다                 |
 | `Dialog.Close`       | 닫는 버튼. 글자만 주면 outline 버튼, `asChild` 면 자식 버튼에 닫기를 붙인다 |
 | `Dialog.Overlay`     | 뒤 배경. `className`, `style` 을 바꿀 때만 적는다                           |
 
 - 모든 파트는 생략할 수 있습니다. `Dialog.Title` 이 없으면 `Dialog.Content` 에 `aria-label` 을 줍니다. 둘 다 없으면 개발 모드에서 경고합니다.
 - 모서리의 닫기 버튼(X)은 늘 붙습니다. 빼려면 `hideClose` 를 줍니다.
+- 닫기 버튼은 대화상자 오른쪽 위에 고정되어 본문이 스크롤돼도 그 자리에 있고, Tab 순서는 Footer 다음 마지막입니다. `Dialog.Header` 만 버튼 자리(`pe-8`)를 비켜 주므로, 긴 본문은 스크롤할 때 버튼 아래로 지나갑니다.
 
 ## 크기
 
@@ -56,7 +58,25 @@ import { Dialog } from '@gsainfoteam/ids-react';
 ```
 
 - 크기 prop 은 없습니다. 본문이 화면보다 길면 대화상자 안에서 스크롤합니다. 막대는 OS 막대가 아니라 [ScrollArea](../../layout/scroll-area/README.md) 의 `hover` 막대라 둥근 모서리 안쪽에 섭니다.
-- `Dialog.Content` 가 ScrollArea root 이고 padding 과 `gap` 은 안쪽 viewport 가 가집니다. `className` 의 `p-*`, `gap-*` 는 root 에 붙으므로, 여백을 바꾸려면 안쪽에 요소를 두고 거기에 줍니다.
+- 본문(`data-dialog-body`)이 ScrollArea root 이고 padding 과 `gap` 은 안쪽 viewport 가 가집니다. `className` 은 `Dialog.Content` 에 붙으므로, 본문 여백을 바꾸려면 안쪽에 요소를 두고 거기에 줍니다.
+
+## 버튼 띠
+
+```tsx
+<Dialog.Content>
+  <Dialog.Header>...</Dialog.Header>
+  ...                                   {/* 본문. 길면 여기만 스크롤 */}
+  <Dialog.Footer>                       {/* 위쪽 선과 옅은 배경의 띠. 스크롤 밖 */}
+    <Dialog.Close>취소</Dialog.Close>
+    <Dialog.Close asChild>
+      <Button>저장</Button>
+    </Dialog.Close>
+  </Dialog.Footer>
+</Dialog.Content>
+```
+
+- 마지막에 오는 `Dialog.Footer` 는 스크롤하는 본문 밖, 대화상자 바닥에 놓입니다. 배경은 `bg-block` 로, 대화상자 면(`bg-surface`)보다 한 단계 들어가 보입니다. 위쪽에 `border-neutral` 선이 있습니다.
+- `Dialog.Footer` 를 `form` 안에 두면 본문 안에 남아 함께 스크롤합니다. 바닥에 두려면 폼은 본문에 두고 Footer 는 폼 밖에 둔 뒤, 제출 버튼을 `form` 속성으로 잇습니다: `<Button type="submit" form="profile">`.
 
 ## 열고 닫기
 
@@ -97,7 +117,7 @@ const discard = await overlay.open<boolean>(({ close }) => (
 ## 겹쳐 열기
 
 - 대화상자 안에서 연 대화상자, 안에 든 Select, 메뉴는 위에 쌓입니다. Escape 와 바깥 클릭은 맨 위부터 하나씩 닫습니다.
-- 가장 아래 대화상자만 배경을 어둡게 합니다. 위의 대화상자 뒤에서는 아래 대화상자가 조금 작아집니다(`data-nested-open`).
+- 가장 아래 대화상자만 배경을 어둡고 흐리게 합니다. 위의 대화상자 뒤에서는 아래 대화상자가 조금 작아집니다(`data-nested-open`).
 - 대화상자를 세 개 이상 겹치면 개발 모드에서 경고합니다.
 
 ## 상태

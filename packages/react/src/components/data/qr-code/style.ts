@@ -6,16 +6,13 @@ export type QRCodeTone = 'theme' | 'dark-on-light' | 'light-on-dark';
 
 export const qrCodeStyle = tv({
   slots: {
-    root: [
-      'relative inline-block shrink-0 overflow-hidden rounded-standard align-middle',
-      '[--qr-code-foreground:var(--ids-color-on-surface)] [--qr-code-background:var(--ids-color-surface)]',
-    ],
+    root: 'relative inline-block shrink-0 overflow-hidden rounded-standard align-middle',
     svg: 'block size-full',
-    background: 'fill-(--qr-code-background)',
-    modules: 'fill-(--qr-code-foreground)',
-    finders: 'fill-(--qr-code-foreground)',
+    background: '',
+    modules: 'fill-current',
+    finders: 'fill-current',
     logo: [
-      'absolute flex items-center justify-center overflow-hidden text-(--qr-code-foreground)',
+      'absolute flex items-center justify-center overflow-hidden',
       '[&>img]:size-full [&>img]:object-contain [&>svg]:size-full',
     ],
   },
@@ -25,15 +22,17 @@ export const qrCodeStyle = tv({
       tiny: { root: 'size-24' },
     } satisfies Record<IdsSize, object>,
     tone: {
-      theme: {},
+      theme: {
+        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-neutral-strong))]',
+        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-base))]',
+      },
       'dark-on-light': {
-        root: 'dark:[--qr-code-foreground:var(--ids-color-surface)] dark:[--qr-code-background:var(--ids-color-on-surface)]',
+        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code))]',
+        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code))]',
       },
       'light-on-dark': {
-        root: [
-          '[--qr-code-foreground:var(--ids-color-surface)] [--qr-code-background:var(--ids-color-on-surface)]',
-          'dark:[--qr-code-foreground:var(--ids-color-on-surface)] dark:[--qr-code-background:var(--ids-color-surface)]',
-        ],
+        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code-inverse))]',
+        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code-inverse))]',
       },
     } satisfies Record<QRCodeTone, object>,
     flush: {

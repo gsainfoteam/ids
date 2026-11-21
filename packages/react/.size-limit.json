@@ -193,5 +193,38 @@
     ],
     "limit": "57 kB",
     "gzip": true
+  },
+  {
+    "name": "import { Editor } from editor",
+    "path": "dist/editor.js",
+    "import": "{ Editor }",
+    "entry": ["index"],
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "97 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Editor } from editor, its engine loaded",
+    "path": "dist/editor.js",
+    "import": "{ Editor }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "260 kB",
+    "gzip": true
   }
 ]

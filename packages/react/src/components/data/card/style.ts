@@ -1,3 +1,4 @@
+import { footerBand } from '../../../internal/surfaces/footer-band';
 import { tv } from '../../../utils';
 
 import type { CardVariant } from '.';
@@ -6,7 +7,7 @@ import type { IdsSize } from '../../../tokens/types';
 export const cardStyle = tv({
   slots: {
     root: [
-      'relative isolate flex flex-col text-on-surface',
+      'relative isolate flex flex-col text-neutral-strong',
       '[--card-pad:var(--ids-concentric-pad)]',
     ],
     header: [
@@ -19,8 +20,10 @@ export const cardStyle = tv({
     action: 'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
     content: 'flex-1 border-neutral',
     footer: [
-      'flex items-center gap-2 border-neutral',
-      '[.border-t]:-mx-(--card-pad) [.border-t]:px-(--card-pad) [.border-t]:pt-(--card-gap)',
+      'flex items-center gap-2',
+      footerBand,
+      '-mx-[calc(var(--card-pad)_-_var(--card-ring))] px-[calc(var(--card-pad)_-_var(--card-ring))]',
+      'last:-mb-[calc(var(--card-pad)_-_var(--card-ring))] last:rounded-b-[inherit]',
     ],
     media: [
       'relative -mx-[calc(var(--card-pad)_-_var(--card-ring))] overflow-hidden',
@@ -32,32 +35,31 @@ export const cardStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-surface shadow-xs inset-ring-1 inset-ring-neutral [--card-ring:1px]',
+        root: 'bg-surface shadow-surface inset-ring-1 inset-ring-neutral [--card-ring:1px]',
       },
-      soft: { root: 'bg-neutral-soft [--card-ring:0px]' },
-      ghost: { root: 'bg-transparent [--card-ring:0px]' },
+      soft: { root: 'bg-block [--card-ring:0px]' },
+      ghost: { root: 'bg-transparent [--card-ring:0px]', footer: 'bg-transparent' },
     } satisfies Record<CardVariant, object>,
     size: {
       standard: {
         root: 'gap-4 concentric-p-4 text-body-b3-regular [--card-gap:--spacing(4)]',
         title: 'text-subtitle-s2-semibold',
         description: 'text-body-b3-regular',
+        footer: 'py-3',
       },
       tiny: {
         root: 'gap-3 concentric-p-3 text-caption-c1-regular [--card-gap:--spacing(3)]',
         title: 'text-body-b3-semibold',
         description: 'text-caption-c1-regular',
+        footer: 'py-2',
       },
     } satisfies Record<IdsSize, object>,
     interactive: {
       true: {
         root: [
           'cursor-pointer select-none focus-ring',
-          'transition-[box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-          'before:pointer-events-none before:absolute before:inset-0 before:-z-10',
-          'before:rounded-[inherit] before:bg-(--ids-color-on-surface) before:opacity-0',
-          'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
-          'data-hovered:before:opacity-4 data-active:before:opacity-8',
+          'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+          'state-layer data-hovered:state-hover data-active:state-press',
           'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         ],
       },

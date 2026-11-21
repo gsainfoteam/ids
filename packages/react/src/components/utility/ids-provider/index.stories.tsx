@@ -84,7 +84,11 @@ function Readout() {
     <dl className="text-caption-c1-regular text-neutral grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono">
       <dt>primary</dt>
       <dd data-testid="palette">
-        {typeof theme.primary === 'string' ? theme.primary : theme.primary?.[600]}
+        {typeof theme.primary === 'string'
+          ? theme.primary
+          : theme.primary !== undefined && 'light' in theme.primary
+            ? theme.primary.light[6]
+            : theme.primary?.[600]}
       </dd>
       <dt>scale</dt>
       <dd data-testid="scale">{scale ?? 1}</dd>
@@ -193,7 +197,7 @@ export const Gallery: Story = {
                     key={`${neutral}:${mode}`}
                     theme={{ primary: palettes[hue], neutral }}
                     mode={mode}
-                    className="bg-surface text-on-surface"
+                    className="bg-base text-neutral-strong"
                   >
                     <Card className="w-56">
                       <Card.Header>
@@ -459,8 +463,8 @@ export const Scope: Story = {
     await expect(dark).toHaveAttribute('data-mode', 'dark');
     await expect(within(orange).getByTestId('palette')).toHaveTextContent(palettes.orange[600]);
     await expect(orange).toHaveAttribute('data-mode', 'light');
-    await expect(dark.className).toContain('bg-surface');
-    await expect(orange.className).not.toContain('bg-surface');
+    await expect(dark.className).toContain('bg-base');
+    await expect(orange.className).not.toContain('bg-base');
     await userEvent.click(within(orange).getByRole('button', { name: 'dark' }));
     await expect(outer).toHaveAttribute('data-mode', 'dark');
     await expect(orange).toHaveAttribute('data-mode', 'dark');
@@ -493,7 +497,7 @@ export const AsChild: Story = {
     const section = canvas.getByRole('region', { name: '녹색 영역' });
     await expect(section).toHaveAttribute('data-mode', 'dark');
     await expect(Object.values(palettes.green)).toContain(
-      section.style.getPropertyValue('--ids-theme-dark-bg-primary'),
+      section.style.getPropertyValue('--ids-theme-dark-bg-primary-solid'),
     );
     await expect(section.parentElement).not.toBe(null);
   },

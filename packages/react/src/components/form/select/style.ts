@@ -1,5 +1,5 @@
-import { fieldAction, fieldTrigger } from '../../../internal/field-surface';
 import { listStyles } from '../../../internal/list-styles';
+import { fieldAction, fieldTrigger } from '../../../internal/surfaces/field-surface';
 import { tv } from '../../../utils';
 
 import type { SelectVariant } from '.';

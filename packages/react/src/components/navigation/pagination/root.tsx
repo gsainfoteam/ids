@@ -17,7 +17,7 @@ export function PaginationRoot({
   siblingCount = 1,
   boundaryCount = 1,
   size = 'standard',
-  variant = 'solid',
+  variant = 'soft',
   disabled = false,
   getHref,
   ref,

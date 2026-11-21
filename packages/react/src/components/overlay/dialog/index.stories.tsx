@@ -67,7 +67,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Anatomy"
-        description="Header 에 Title 과 Description, 아래에 Footer 를 둡니다. 모서리의 닫기 버튼은 hideClose 로 뺍니다."
+        description="Header 에 Title 과 Description, 아래에 Footer 를 둡니다. Footer 는 위쪽 선과 옅은 배경을 깐 띠로 바닥에 붙습니다. 모서리의 닫기 버튼은 hideClose 로 뺍니다."
       >
         <Showcase.Row label="기본">
           <Dialog>
@@ -133,7 +133,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Size"
-        description="크기 prop 은 없습니다. 기본은 max-w-sm(384px) 이고, 폭과 높이는 className 으로 바꿉니다. 화면보다 긴 본문은 대화상자 안에서 스크롤합니다."
+        description="크기 prop 은 없습니다. 기본은 max-w-sm(384px) 이고, 폭과 높이는 className 으로 바꿉니다. 화면보다 긴 본문은 대화상자 안에서 스크롤하고, Footer 띠는 바닥에 남습니다."
       >
         <Showcase.Row label="className">
           <Dialog>

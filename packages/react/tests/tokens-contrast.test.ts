@@ -7,21 +7,26 @@ import { paletteHues, palettes } from '../.storybook/palettes';
 import { lightnessContrast } from '../src/components/utility/ids-provider/contrast';
 import {
   ACCENT_TEXT_LC,
+  FILL_LAYER,
   MARK_LC,
   TEXT_LC,
   MODES,
   neutralRoles,
   resolveColors,
+  slotsOf,
+  contentLayer,
+  tintLayer,
+  underStateLayers,
+  type StateLayer,
 } from '../src/components/utility/ids-provider/theme-roles';
 import {
-  IDS_BASE_SLOTS,
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,
-  IDS_FAMILY_SLOTS,
-  IDS_NEUTRAL_PALETTE,
+  IDS_NEUTRAL_SCALES,
   IDS_NEUTRAL_STEPS,
   IDS_STATUS_FAMILIES,
 } from '../src/tokens/color-roles';
+import { IDS_COMPONENT_COLORS } from '../src/tokens/component-tokens';
 
 import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provider/theme';
 import type { IdsMode } from '../src/tokens/types';
@@ -33,73 +38,103 @@ const css = readFileSync(resolveCss('@gsainfoteam/ids-css/no-fonts.css'), 'utf8'
 const modeBlock = (mode: IdsMode) =>
   css.match(new RegExp(`\\[data-mode="${mode}"\\] \\{([^}]*)\\}`))?.[1] ?? '';
 
-const mappedSlots = (mode: IdsMode) =>
-  Object.fromEntries(
-    [...modeBlock(mode).matchAll(/--ids-color-([\w-]+): var\((.+)\);/g)].map(([, slot, value]) => [
-      slot!,
-      value!,
-    ]),
+const isComponentToken = (slot: string) => slot in IDS_COMPONENT_COLORS;
+
+const mappedVariables = (mode: IdsMode) =>
+  [...modeBlock(mode).matchAll(/--ids-color-([\w-]+): var\((.+)\);/g)].map(
+    ([, slot, value]) => [slot!, value!] as const,
   );
 
-const slotsOf = (family: string) =>
-  IDS_FAMILY_SLOTS.map((template) => template.replace('{family}', family));
+const mappedSlots = (mode: IdsMode) =>
+  Object.fromEntries(mappedVariables(mode).filter(([slot]) => !isComponentToken(slot)));
+
+const mappedComponentTokens = (mode: IdsMode) =>
+  Object.fromEntries(mappedVariables(mode).filter(([slot]) => isComponentToken(slot)));
 
 const themeVar = (mode: IdsMode, slot: string) => `--ids-theme-${mode}-${slot}`;
 
-const atLeast = (foreground: string, backgrounds: string[], lc: number) =>
-  Math.min(...backgrounds.map((background) => lightnessContrast(foreground, background))) >= lc;
+type Roles = { [slot: string]: string };
 
-const pairsFor = (family: string) => {
-  const [bg, bgHover, bgActive, soft, softHover, softActive, onFill, onSoft, text, border] =
-    slotsOf(family) as [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
+type LayersOf = (roles: Roles, text: string) => StateLayer[];
+
+type Pair = { foreground: string; backgrounds: string[]; lc: number; layers: LayersOf };
+
+const noLayer: LayersOf = () => [];
+
+const fillLayer: LayersOf = () => [FILL_LAYER];
+
+const textLayer: LayersOf = (_, text) => [contentLayer(text)];
+
+const textAndFamilyLayers =
+  (family: string): LayersOf =>
+  (roles, text) => [contentLayer(text), tintLayer(roles[`bg-${family}-solid`]!)];
+
+const pair = (foreground: string, backgrounds: string[], lc: number, layers: LayersOf): Pair => ({
+  foreground,
+  backgrounds,
+  lc,
+  layers,
+});
+
+const CONTAINERS = ['bg-base', 'bg-surface', 'bg-block'];
+
+const pairsFor = (family: string): Pair[] => {
+  if (family === 'neutral')
+    return [
+      pair('text-on-base', ['bg-base'], TEXT_LC, textLayer),
+      pair('text-on-surface', ['bg-surface'], TEXT_LC, textLayer),
+      pair('text-on-block', ['bg-block'], TEXT_LC, textLayer),
+      pair('text-on-neutral-soft', ['bg-neutral-soft'], TEXT_LC, textLayer),
+      pair('text-on-neutral-solid', ['bg-neutral-solid'], TEXT_LC, fillLayer),
+      pair('text-neutral-strong', [...CONTAINERS, 'bg-neutral-soft'], TEXT_LC, textLayer),
+      pair('text-neutral', [...CONTAINERS, 'bg-neutral-soft'], TEXT_LC, noLayer),
     ];
 
-  return {
-    text: [
-      [onFill, family === 'neutral' ? [bg] : [bg, bgHover, bgActive]],
-      [onSoft, [soft, softHover, softActive]],
-      ...(family === 'neutral' ? [[text, ['surface', soft]]] : []),
-    ] as [string, string[]][],
-    accent: family === 'neutral' ? [] : ([[text, ['surface', soft]]] as [string, string[]][]),
-    mark: family === 'neutral' ? [] : ([[border, ['surface']]] as [string, string[]][]),
-  };
+  const familyLayers = textAndFamilyLayers(family);
+  const surfaces = [...CONTAINERS, `bg-${family}-soft`];
+
+  return [
+    pair(`text-on-${family}-solid`, [`bg-${family}-solid`], TEXT_LC, fillLayer),
+    pair(`text-on-${family}-soft`, [`bg-${family}-soft`], TEXT_LC, familyLayers),
+    pair(`text-${family}`, surfaces, ACCENT_TEXT_LC, familyLayers),
+    pair(`text-${family}-strong`, surfaces, TEXT_LC, familyLayers),
+    pair(`border-${family}-strong`, surfaces, MARK_LC, noLayer),
+  ];
 };
 
-const failingPairs = (roles: { [slot: string]: string }) => {
-  const failures: string[] = [];
-  const check = (foreground: string, backgrounds: string[], lc: number) => {
-    const values = backgrounds.map((background) => roles[background]!);
-    if (!atLeast(roles[foreground]!, values, lc))
-      failures.push(`${foreground} on ${backgrounds.join(' / ')} below Lc ${lc}`);
-  };
-
-  check('on-surface', ['surface'], TEXT_LC);
-  for (const family of IDS_COLOR_FAMILIES) {
-    const { text, accent, mark } = pairsFor(family);
-    for (const [foreground, backgrounds] of text) check(foreground, backgrounds, TEXT_LC);
-    for (const [foreground, backgrounds] of accent) check(foreground, backgrounds, ACCENT_TEXT_LC);
-    for (const [foreground, backgrounds] of mark) check(foreground, backgrounds, MARK_LC);
-  }
-
-  return failures;
+const lowestContrast = (roles: Roles, { foreground, backgrounds, layers }: Pair) => {
+  const text = roles[foreground]!;
+  const states = backgrounds.flatMap((background) =>
+    underStateLayers(roles[background]!, layers(roles, text)),
+  );
+  return Math.min(...states.map((state) => lightnessContrast(text, state)));
 };
+
+const failingPairs = (roles: Roles) =>
+  IDS_COLOR_FAMILIES.flatMap(pairsFor)
+    .filter((checked) => lowestContrast(roles, checked) < checked.lc)
+    .map(
+      (checked) =>
+        `${checked.foreground} on ${checked.backgrounds.join(' / ')} below Lc ${checked.lc}: ${lowestContrast(roles, checked).toFixed(1)}`,
+    );
 
 test.each(MODES)('ids.css maps every %s slot from the provider variables', (mode) => {
   const mapped = mappedSlots(mode);
-  const expected = [...IDS_BASE_SLOTS, ...IDS_COLOR_FAMILIES.flatMap(slotsOf)];
+  const expected = IDS_COLOR_FAMILIES.flatMap(slotsOf);
 
   expect(Object.keys(mapped).sort()).toEqual([...expected].sort());
   for (const slot of expected) expect(mapped[slot]!.startsWith(themeVar(mode, slot))).toBe(true);
+});
+
+test.each(MODES)('ids.css points every %s component token at one semantic role', (mode) => {
+  expect(mappedComponentTokens(mode)).toEqual(
+    Object.fromEntries(
+      Object.entries(IDS_COMPONENT_COLORS).map(([token, roles]) => [
+        token,
+        `--ids-color-${roles[mode]}`,
+      ]),
+    ),
+  );
 });
 
 test.each(MODES)(
@@ -115,30 +150,20 @@ test.each(MODES)(
 test.each(MODES)('ids.css falls back to the pure %s neutral without a provider value', (mode) => {
   const mapped = mappedSlots(mode);
 
-  for (const [slot, step] of Object.entries(IDS_NEUTRAL_STEPS[mode]))
-    expect(mapped[slot]).toBe(
-      `${themeVar(mode, slot)}, ${IDS_NEUTRAL_PALETTE[String(step) as keyof typeof IDS_NEUTRAL_PALETTE]}`,
-    );
+  for (const [slot, step] of Object.entries(IDS_NEUTRAL_STEPS))
+    expect(mapped[slot]).toBe(`${themeVar(mode, slot)}, ${IDS_NEUTRAL_SCALES[mode][step - 1]}`);
 });
 
 test.each(MODES)('the pure %s neutral fallback reaches its Lc', (mode) => {
-  const roles = neutralRoles({ ...IDS_NEUTRAL_PALETTE }, mode);
-  const { text } = pairsFor('neutral');
+  const roles = neutralRoles(IDS_NEUTRAL_SCALES[mode], mode);
 
-  expect(atLeast(roles['on-surface']!, [roles['surface']!], TEXT_LC)).toBe(true);
-  for (const [foreground, backgrounds] of text)
-    expect(
-      atLeast(
-        roles[foreground]!,
-        backgrounds.map((background) => roles[background]!),
-        TEXT_LC,
-      ),
-      foreground,
-    ).toBe(true);
+  for (const checked of pairsFor('neutral'))
+    expect(lowestContrast(roles, checked), checked.foreground).toBeGreaterThanOrEqual(checked.lc);
 });
 
 test('ids.css emits no shared color namespace and no chart colors', () => {
   expect(css).not.toMatch(/--color-(primary|secondary|danger|neutral|surface)\b/);
+  expect(css).not.toMatch(/--ids-color-[\w-]*-(hover|active)\b/);
   expect(css).not.toMatch(/--ids-color-chart-/);
   expect(css).not.toMatch(/data-color/);
 });
@@ -150,7 +175,9 @@ test('every utility namespace reads a family role', () => {
       `--text-color-on-${family}-soft: var(--ids-color-text-on-${family}-soft);`,
     );
     expect(css).toContain(`--border-color-${family}: var(--ids-color-border-${family});`);
-    expect(css).toContain(`--ring-color-${family}: var(--ids-color-border-${family});`);
+    expect(css).toContain(
+      `--ring-color-${family}-strong: var(--ids-color-border-${family}-strong);`,
+    );
   }
 });
 
@@ -177,28 +204,16 @@ test('the default entry loads the fonts, and no-fonts.css is the tokens alone', 
 
 const neutrals: IdsNeutral[] = ['pure', 'tinted'];
 
-test.each(MODES)(
-  'every family × slot reaches its Lc with all three brands given in %s',
-  (mode) => {
-    for (const hue of paletteHues) {
-      const { colors, issues } = resolveColors({
-        primary: palettes[hue],
-        secondary: palettes[paletteHues[(paletteHues.indexOf(hue) + 4) % paletteHues.length]!],
-        tertiary: palettes[paletteHues[(paletteHues.indexOf(hue) + 8) % paletteHues.length]!],
-      });
-
-      expect(issues, hue).toEqual([]);
-      expect(failingPairs(colors!.roles[mode]), hue).toEqual([]);
-    }
-  },
-);
-
-test.each(MODES)('a %s line is the color of the text beside it', (mode) => {
+test.each(MODES)('every family × slot reaches its Lc with all three brands given in %s', (mode) => {
   for (const hue of paletteHues) {
-    const roles = resolveColors({ primary: palettes[hue] }).colors!.roles[mode];
+    const { colors, issues } = resolveColors({
+      primary: palettes[hue],
+      secondary: palettes[paletteHues[(paletteHues.indexOf(hue) + 4) % paletteHues.length]!],
+      tertiary: palettes[paletteHues[(paletteHues.indexOf(hue) + 8) % paletteHues.length]!],
+    });
 
-    for (const family of [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES])
-      expect(roles[`border-${family}`], `${hue} ${family}`).toBe(roles[`text-${family}`]);
+    expect(issues, hue).toEqual([]);
+    expect(failingPairs(colors!.roles[mode]), hue).toEqual([]);
   }
 });
 

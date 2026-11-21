@@ -7,7 +7,7 @@ export const avatarGroupStyle = tv({
   slots: {
     root: 'm-0 inline-flex list-none items-center p-0 [--ag-gap:2px]',
     item: 'flex',
-    overflow: 'text-on-surface tabular-nums',
+    overflow: 'text-neutral-strong tabular-nums',
   },
   variants: {
     digits: {

@@ -21,6 +21,7 @@ async function renderInTheme(control: ReactElement) {
       <p>Elsewhere</p>
     </IdsProvider>,
   );
+  await userEvent.hover(screen.getByText('Elsewhere'));
   const token = (name: string) => {
     const probe = document.createElement('div');
     probe.style.color = `var(${name})`;
@@ -100,7 +101,7 @@ test('a transparent Button in a brand scheme rests in the ghost foreground and s
   const button = screen.getByRole('button', { name: '취소' });
   await expect.element(button).toHaveAttribute('data-variant', 'transparent');
   expect(paint(button.element())).toMatchObject({
-    color: token('--ids-color-on-surface'),
+    color: token('--ids-color-text-neutral-strong'),
     opacity: '1',
   });
 
@@ -108,7 +109,7 @@ test('a transparent Button in a brand scheme rests in the ghost foreground and s
   await expect.element(button).toHaveAttribute('data-hovered');
   expect(paint(button.element())).toMatchObject({
     background: NO_BACKGROUND,
-    color: token('--ids-color-on-surface'),
+    color: token('--ids-color-text-neutral-strong'),
     opacity: HOVER_OPACITY,
   });
   await userEvent.hover(screen.getByText('Elsewhere'));
@@ -132,7 +133,7 @@ test('a transparent IconToggle turns on by coloring only its glyph', async () =>
   expect(paint(element)).toMatchObject({
     background: NO_BACKGROUND,
     shadow: 'none',
-    color: token('--ids-color-on-surface'),
+    color: token('--ids-color-text-neutral-strong'),
   });
 
   await userEvent.hover(toggle);

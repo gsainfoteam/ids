@@ -103,7 +103,7 @@ import { Checkbox, Label } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Checkbox className={(state) => (state.checked ? 'shadow-md' : undefined)} />
-<Checkbox className="data-[state=checked]:[--checkbox-accent:var(--ids-color-bg-success)]" />
+<Checkbox className="data-[state=checked]:scheme-success" />
 ```
 
 | 상태            | `data-*`                     | 뜻                                |
@@ -120,7 +120,7 @@ import { Checkbox, Label } from '@gsainfoteam/ids-react';
 | `focused`       | `data-focused`               | 포커스                            |
 | `focusVisible`  | `data-focus-visible`         | 키보드 포커스. 포커스 링이 보인다 |
 
-- 체크 색은 `--checkbox-accent`, 체크 표시 색은 `--checkbox-on-accent` 입니다. 기본은 primary, 오류면 danger입니다.
+- 체크 색은 scheme 의 `bg-scheme-solid`, 체크 표시 색은 `text-on-scheme-solid` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다. 다른 계열은 `scheme-*` 클래스로 바꿉니다.
 - `Checkbox.Indicator` 에도 `data-state` 가 붙습니다.
 
 ## 폼

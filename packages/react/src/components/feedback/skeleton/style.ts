@@ -20,7 +20,7 @@ export const skeletonStyle = tv({
       pulse: { paint: 'animate-skeleton-pulse motion-reduce:animate-none' },
       wave: {
         paint: [
-          'bg-linear-to-r from-transparent via-neutral-soft-hover to-transparent',
+          'bg-linear-to-r from-transparent via-(--ids-color-bg-block) to-transparent',
           'bg-[length:50%_100%] bg-no-repeat',
           'animate-skeleton-wave rtl:[animation-direction:reverse]',
           'motion-reduce:animate-none motion-reduce:bg-none',

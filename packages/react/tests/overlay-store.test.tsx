@@ -144,7 +144,7 @@ test('only the first outermost provider hosts, and items take the theme they wer
   const first = screen.getByTestId('first').element();
   expect(first.contains(global.element())).toBe(true);
   const primaryOf = (element: Element | null) =>
-    getComputedStyle(element!).getPropertyValue('--ids-color-bg-primary');
+    getComputedStyle(element!).getPropertyValue('--ids-color-bg-primary-solid');
   expect(primaryOf(global.element().closest('[data-overlay-item]'))).toBe(palettes.blue[600]);
   expect(global.element().closest('[data-overlay-item]')).not.toHaveAttribute('data-scale');
 

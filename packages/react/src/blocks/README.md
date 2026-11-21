@@ -62,7 +62,7 @@ login/
   - 배치: `flex`, `grid`, 간격, 여백, 너비와 높이, 정렬, `hidden md:flex` 같은 폭별 표시.
   - 글자: 제목과 문단의 IDS 글자 크기(`text-headline-h3-bold`, `text-body-b2-regular`), `text-center`, `break-keep`.
   - 색, 테두리, 배경, 모서리, 그림자, `style` 은 쓰지 않습니다. 선은 `Divider`, 면은 `Card` 와 `Item`, 흐린 글자는 각 컴포넌트의 `Description` 파트가 그립니다.
-  - IDS 컴포넌트가 문서로 받는 className 은 씁니다: `Card.Header` 와 `Card.Footer` 의 `border-b`, `border-t`.
+  - IDS 컴포넌트가 문서로 받는 className 은 씁니다: `Card.Header` 의 `border-b`. `Card.Footer` 는 띠가 선을 그리므로 `border-t` 를 붙이지 않습니다.
 - **ghost 는 쓰지 않습니다.** 버튼은 `solid`, `outline`, `soft` 입니다.
 - **링크.**
   - 글 속 링크와 "비밀번호 찾기", "회원가입" 같은 안내 링크는 `Link` 입니다.

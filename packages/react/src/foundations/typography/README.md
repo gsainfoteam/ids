@@ -3,11 +3,11 @@
 글자 스타일은 컴포넌트가 아니라 `@gsainfoteam/ids-css` 가 Tailwind `@theme` 으로 내보내는 텍스트 유틸리티입니다. import 없이 className으로 씁니다.
 
 - **한 클래스에 한 스타일.** 크기, 굵기, 행간, 자간이 한 클래스에 묶여 있어 섞어 쓸 일이 없습니다.
-- **글자색은 따로.** 색은 `text-on-surface` 같은 색 토큰으로 지정합니다.
+- **글자색은 따로.** 색은 `text-neutral-strong` 같은 색 토큰으로 지정합니다.
 
 ```tsx
 <h1 className="text-headline-h3-bold">공지사항</h1>
-<p className="text-body-b2-regular text-on-surface">본문입니다.</p>
+<p className="text-body-b2-regular text-neutral-strong">본문입니다.</p>
 <span className="text-caption-c1-medium text-neutral">2026-09-10</span>
 ```
 

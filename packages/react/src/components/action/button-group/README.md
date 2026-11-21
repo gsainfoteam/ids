@@ -42,6 +42,7 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 
 - `solid`, `soft` 처럼 테두리가 없는 버튼 사이를 나눌 때 씁니다. `outline` 은 테두리가 이미 선 역할을 합니다.
 - 선은 이웃과 1px 씩 겹쳐서 outline 버튼 옆에 두어도 두 줄이 되지 않습니다.
+- `attached={false}` 로 띄운 그룹에서는 버튼보다 짧은 선(standard 20px, tiny 16px)이 가운데에 섭니다.
 - 스크린 리더에는 `role="separator"` 로 읽힙니다.
 
 ## 합성
@@ -78,6 +79,23 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
   <Button>읽지 않음</Button>
 </ButtonGroup>
 ```
+
+## 툴바
+
+```tsx
+<Card className="w-fit flex-row gap-0 concentric-p-1">  {/* 막대는 Card 로 그린다 */}
+  <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+    <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+    <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+    <ButtonGroup.Separator className="mx-1" />  {/* 띄운 그룹의 선은 짧다 */}
+    <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+  </ButtonGroup>
+</Card>
+```
+
+- 테두리 막대 안에 버튼이 떠 있는 툴바는 `Card` 로 막대를 그리고, 그 안에 띄운 그룹을 넣습니다.
+- 막대가 면을 그리므로 안의 버튼은 `ghost` 로 둡니다.
+- 버튼 묶음끼리 띄우려면 그룹 안에 그룹을 넣습니다. [합성](#합성)을 봅니다.
 
 ## 속성
 

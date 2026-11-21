@@ -58,8 +58,8 @@ test('the server HTML holds the caption and an empty box of the ratio, with no s
   expect(figure.querySelector('figcaption')?.textContent).toBe('방문');
   expect(frame.getAttribute('style')).toMatch(/aspect-ratio:\s*2/);
   expect(frame.querySelector('svg')).toBeNull();
-  expect(figure.style.getPropertyValue('--chart-web')).toBe('var(--ids-color-bg-primary)');
-  expect(figure.style.getPropertyValue('--chart-app')).toBe('var(--ids-color-bg-secondary)');
+  expect(figure.style.getPropertyValue('--chart-web')).toBe('var(--ids-color-bg-primary-solid)');
+  expect(figure.style.getPropertyValue('--chart-app')).toBe('var(--ids-color-bg-secondary-solid)');
 });
 
 test('the graph fills the measured box and takes the title as its name', async () => {
@@ -121,10 +121,10 @@ test('series take the default order, skip a series with its own color, and an ow
   );
   const figure = document.querySelector<HTMLElement>('[data-chart]')!;
 
-  expect(figure.style.getPropertyValue('--chart-b')).toBe('var(--ids-color-bg-danger)');
-  expect(figure.style.getPropertyValue('--chart-a')).toBe('var(--ids-color-bg-primary)');
-  expect(figure.style.getPropertyValue('--chart-c')).toBe('var(--ids-color-bg-secondary)');
-  expect(figure.style.getPropertyValue('--chart-d')).toBe('var(--ids-color-bg-tertiary)');
+  expect(figure.style.getPropertyValue('--chart-b')).toBe('var(--ids-color-bg-danger-solid)');
+  expect(figure.style.getPropertyValue('--chart-a')).toBe('var(--ids-color-bg-primary-solid)');
+  expect(figure.style.getPropertyValue('--chart-c')).toBe('var(--ids-color-bg-secondary-solid)');
+  expect(figure.style.getPropertyValue('--chart-d')).toBe('var(--ids-color-bg-tertiary-solid)');
   await expect
     .poll(() =>
       [...document.querySelectorAll('.recharts-bar-rectangle path')].map((bar) =>
@@ -179,8 +179,8 @@ test('the series follow a dark Scope and a Scope that adds a brand family', asyn
   const { roles } = resolveColors(secondary).colors!;
   const computed = (key: string) => getComputedStyle(figure).getPropertyValue(key).trim();
 
-  await expect.poll(() => computed('--chart-web')).toBe(roles.dark['bg-primary']);
-  expect(computed('--chart-app')).toBe(roles.dark['bg-secondary']);
+  await expect.poll(() => computed('--chart-web')).toBe(roles.dark['bg-primary-solid']);
+  expect(computed('--chart-app')).toBe(roles.dark['bg-secondary-solid']);
 });
 
 test('lines are stroked with their series variable', async () => {

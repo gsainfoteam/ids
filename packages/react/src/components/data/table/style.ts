@@ -7,11 +7,11 @@ export const tableStyle = tv({
   slots: {
     root: 'w-full max-w-full',
     viewport: 'isolate',
-    table: 'w-full border-separate border-spacing-0 text-on-surface',
+    table: 'w-full border-separate border-spacing-0 text-neutral-strong',
     caption: 'caption-bottom text-start text-neutral',
     header: '',
     body: '',
-    footer: 'bg-neutral-soft',
+    footer: 'bg-block',
     row: 'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     head: 'border-b border-neutral align-middle whitespace-nowrap',
     cell: 'border-b border-neutral align-middle',
@@ -20,9 +20,9 @@ export const tableStyle = tv({
     variant: {
       outline: {
         root: 'rounded-container border border-neutral',
-        header: 'bg-neutral-soft',
+        header: 'bg-block',
       },
-      ghost: { header: 'bg-surface' },
+      ghost: { header: 'bg-(--ids-bg-current)' },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {
@@ -48,16 +48,12 @@ export const tableStyle = tv({
     section: {
       header: { head: 'text-neutral' },
       body: {
-        row: [
-          'data-selected:bg-neutral-soft-hover',
-          'data-selected:hover:bg-neutral-soft-active',
-          'last:*:border-b-0',
-        ],
+        row: ['state-layer data-selected:state-press', 'last:*:border-b-0'],
       },
       footer: { head: 'border-t border-b-0', cell: 'border-t border-b-0' },
     } satisfies Record<TableSection, object>,
     hoverable: {
-      true: { row: 'hover:bg-neutral-soft' },
+      true: { row: 'not-data-selected:hover:state-hover' },
       false: {},
     },
     clickable: {
@@ -70,15 +66,7 @@ export const tableStyle = tv({
       end: { head: 'text-end', cell: 'text-end' },
     } satisfies Record<TableAlign, object>,
   },
-  compoundVariants: [
-    { striped: true, section: 'body', class: { row: 'even:bg-neutral-soft' } },
-    {
-      striped: true,
-      section: 'body',
-      hoverable: true,
-      class: { row: 'even:hover:bg-neutral-soft-hover' },
-    },
-  ],
+  compoundVariants: [{ striped: true, section: 'body', class: { row: 'even:bg-block' } }],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',

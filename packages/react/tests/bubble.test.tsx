@@ -157,10 +157,10 @@ test('variants: soft is the muted fill, solid the brand fill, outline the neutra
   };
 
   expect(getComputedStyle(soft!).backgroundColor).toBe(token('--ids-color-bg-neutral-soft'));
-  expect(getComputedStyle(soft!).color).toBe(token('--ids-color-on-surface'));
-  expect(getComputedStyle(solid!).backgroundColor).toBe(token('--ids-color-bg-primary'));
-  expect(getComputedStyle(solid!).color).toBe(token('--ids-color-text-on-primary'));
-  expect(getComputedStyle(outline!).backgroundColor).toBe(token('--ids-color-surface'));
+  expect(getComputedStyle(soft!).color).toBe(token('--ids-color-text-neutral-strong'));
+  expect(getComputedStyle(solid!).backgroundColor).toBe(token('--ids-color-bg-primary-solid'));
+  expect(getComputedStyle(solid!).color).toBe(token('--ids-color-text-on-primary-solid'));
+  expect(getComputedStyle(outline!).backgroundColor).toBe(token('--ids-color-bg-base'));
   expect(getComputedStyle(outline!).boxShadow).toContain(token('--ids-color-border-neutral'));
 });
 

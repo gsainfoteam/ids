@@ -43,7 +43,7 @@ export const NodeLocal: Story = {
           </Button>
         </Showcase.Row>
         <Showcase.Row label="data-* 스타일">
-          <Button variant="outline" className="data-hovered:inset-ring-primary">
+          <Button variant="outline" className="data-hovered:inset-ring-primary-strong">
             data-hovered로 테두리
           </Button>
         </Showcase.Row>

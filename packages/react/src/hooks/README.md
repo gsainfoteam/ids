@@ -7,7 +7,7 @@
 
 | 파일                                                     | 내용                                                 | 쓰는 곳                                                              |
 | -------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- |
-| [`use-clipboard-support.ts`](#use-clipboard-supportts)   | `navigator.clipboard.writeText` 가 있는지            | ColorPicker, CodeBlock 의 복사 버튼                                  |
+| [`use-clipboard-support.ts`](#use-clipboard-supportts)   | `navigator.clipboard.writeText` 가 있는지            | ColorPicker, CodeBlock 과 Message 의 복사 버튼                      |
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
 | [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/surface.ts` |
@@ -152,8 +152,8 @@ const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
 - 상태의 주인은 컴포넌트입니다. `onInteractionChange` 는 부모에게 상태의 사본을 알리는 콜백이고, 제어 prop 이 아닙니다.
 - hover 는 `pointerType === 'mouse'` 일 때만 켭니다. 터치에서는 켜지지 않습니다.
 - `focusVisible` 은 focus 때 요소가 `:focus-visible` 인지 읽어 정합니다. Enter 와 Space 의 keydown 은 active 를 켜고 keyup 은 끕니다.
-- 누르는 도중이나 pointer 아래에서 disabled 가 된 컨트롤은 pointerleave, pointerup 을 받지 못합니다(native disabled button 은 pointer 이벤트를 아예 받지 않습니다). 그대로 두면 반응하지 않는 컨트롤에 hover 배경이 남으므로, `disabled` 가 켜지는 렌더에서 바로 끕니다(`disabledBefore`, `stuckWithoutPointerEvents`).
-- `interactiveDataProps` 는 DOM 에 pressed, active, hovered 중 하나만 이 순서의 우선순위로 붙입니다(`pressedOverActiveOverHovered`). 같은 속성(배경 등)을 두고 클래스끼리 다투지 않게 하기 위해서입니다. render prop 이 받는 `state` 는 원래 값을 그대로 둡니다.
+- 누르는 도중이나 pointer 아래에서 disabled 가 된 컨트롤은 pointerleave, pointerup 을 받지 못합니다(native disabled button 은 pointer 이벤트를 아예 받지 않습니다). 그대로 두면 반응하지 않는 컨트롤에 hover 층(`state-hover`)이 남으므로, `disabled` 가 켜지는 렌더에서 바로 끕니다(`disabledBefore`, `stuckWithoutPointerEvents`).
+- `interactiveDataProps` 는 DOM 에 pressed, active, hovered 중 하나만 이 순서의 우선순위로 붙입니다(`pressedOverActiveOverHovered`). 같은 속성(state 층의 불투명도, 배경 등)을 두고 클래스끼리 다투지 않게 하기 위해서입니다. render prop 이 받는 `state` 는 원래 값을 그대로 둡니다.
 - `WithInteractiveValues<P>` 는 prop 을 `T | ((state) => T)` 로 넓힙니다. 이벤트 핸들러, 이미 함수인 prop, `ref`, `disabled`, `key`, `formAction`, `pressed`, `defaultPressed`, `onPressedChange`, `value` 는 넓히지 않습니다.
 - `resolveInteractiveProps` 는 함수인 prop 을 state 로 풉니다. `CALLBACK_PROPS`(`on*`, `formAction`, `ref`)는 state 를 받는 함수가 아니라 콜백이므로 그대로 둡니다.
 - `useInteractiveProps` 는 props 에서 옵션을 골라 `useInteractive` 에 넘기고, 나머지를 풀고, 핸들러 키(`INTERACTIVE_HANDLER_KEYS`)와 DOM 에 없는 키(`pressed`, `defaultPressed`, `onPressedChange`, `onInteractionChange`)를 뺍니다.

@@ -14,6 +14,7 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Tabs } from '../../components/navigation/tabs';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -181,7 +182,7 @@ export const PC: Story = {
                         {day}
                       </h2>
                       <Card size="tiny">
-                        <Item.Group aria-label={`${day} 알림`}>
+                        <ItemGroup aria-label={`${day} 알림`}>
                           {ofTheDay.map((notification) => (
                             <Item key={notification.id} onClick={() => markRead(notification.id)}>
                               <Item.Media variant={notification.icon ? 'soft' : undefined}>
@@ -204,7 +205,7 @@ export const PC: Story = {
                               )}
                             </Item>
                           ))}
-                        </Item.Group>
+                        </ItemGroup>
                       </Card>
                     </section>
                   );

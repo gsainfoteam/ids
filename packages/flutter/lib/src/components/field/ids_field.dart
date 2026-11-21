@@ -45,7 +45,7 @@ class IdsField extends StatelessWidget {
       child: Opacity(
         opacity: disabled ? 0.5 : 1,
         child: DefaultTextStyle(
-          style: ids.textStyle(style, color: ids.colors.onSurface),
+          style: ids.textStyle(style, color: ids.colors.textNeutralStrong),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: ids.dimension(_gaps[size]!),

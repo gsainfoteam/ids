@@ -15,7 +15,7 @@ import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { TextArea } from '.';
-import type { FieldSurfaceVariant } from '../../../internal/field-surface';
+import type { FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
 
 export type TextAreaVariant = FieldSurfaceVariant;
 export type TextAreaState = TextControlState;

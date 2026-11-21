@@ -7,8 +7,8 @@ export const telFieldStyle = tv({
   extend: textControlStyle,
   slots: {
     country: [
-      'w-auto shrink-0 rounded-standard text-on-surface',
-      'hover:bg-neutral-soft active:bg-neutral-soft-hover ring-0! inset-ring-transparent!',
+      'w-auto shrink-0 rounded-standard text-neutral-strong',
+      'state-layer hover:state-hover active:state-press ring-0! inset-ring-transparent!',
     ],
     countryTrigger: 'gap-1',
     countryValue: 'tabular-nums',

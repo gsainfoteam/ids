@@ -60,7 +60,7 @@ export const Durations: Story = {
                   <div className="bg-neutral-soft relative h-4 w-full max-w-80 rounded-full">
                     <span
                       data-dot=""
-                      className="bg-primary absolute inset-y-0 left-0 size-4 rounded-full transition-[left] ease-out data-moved:left-[calc(100%-1rem)] motion-reduce:transition-none"
+                      className="bg-primary-solid absolute inset-y-0 left-0 size-4 rounded-full transition-[left] ease-out data-moved:left-[calc(100%-1rem)] motion-reduce:transition-none"
                       data-moved={moved ? '' : undefined}
                       style={{ transitionDuration: `var(--ids-motion-${name})` }}
                     />

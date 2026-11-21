@@ -128,10 +128,14 @@ import { Link } from '@tanstack/react-router';
 ## 모양
 
 ```tsx
-<Pagination pageCount={20} variant="outline" />  {/* 현재 페이지만. 나머지는 ghost */}
+<Pagination pageCount={20} />                   {/* 현재 페이지는 primary soft */}
+<Pagination pageCount={20} variant="solid" />    {/* 현재 페이지만. 나머지는 ghost */}
 <Pagination pageCount={20} size="tiny" />
 <Pagination pageCount={20} disabled />           {/* 모든 버튼을 끈다 */}
 ```
+
+- 현재 페이지는 기본으로 `bg-primary-soft` 과 `text-on-primary-soft` 입니다. DataTable 의 선택한 행과 같은 색입니다.
+- `variant` 는 현재 페이지에만 입힙니다. `ghost` 는 채우지 않고 press 층(`state-press`)에 글자를 `text-primary` 로 바꿉니다.
 
 ## 키보드
 
@@ -157,7 +161,7 @@ import { Link } from '@tanstack/react-router';
 | `boundaryCount`         | `1`. 양 끝에 보일 수                                          |
 | `getHref`               | `(page) => string`. 주면 링크 모드                            |
 | `size`                  | `standard`(기본) / `tiny`                                     |
-| `variant`               | 현재 페이지의 Button variant. `solid`(기본)                   |
+| `variant`               | 현재 페이지의 Button variant. `soft`(기본)                    |
 | `disabled`              | 모든 버튼과 링크를 끈다                                       |
 | `Pagination.Link`       | `page` 필수. `asChild`, 자식이 없으면 번호                    |
 | `Pagination.Previous`   | `icon`, `asChild`. 이름은 "이전 페이지"                       |

@@ -198,7 +198,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 
 - `autoResize` 와 `resize` 를 함께 주면 에러가 납니다. `resize="none"` 은 허용합니다.
 - `minRows` 가 `maxRows` 보다 크거나 양의 정수가 아니면 에러가 납니다.
-- `autoResize={false}` 에서 세로 패딩을 바꾸려면 `--ids-text-area-pad-y` 를 씁니다. `maxRows` 높이 계산에 이 값이 들어갑니다.
+- `autoResize={false}` 에서 세로 패딩을 바꾸려면 `--text-area-pad-y` 를 씁니다. `maxRows` 높이 계산에 이 값이 들어갑니다.
 - 손잡이로 바꾼 크기는 컴포넌트 안에만 있습니다. 새로 마운트하면(`key` 가 바뀌거나 `autoResize` 를 켜고 끄면) 처음 크기로 돌아갑니다.
 - 손잡이의 누를 영역은 필드 밖 22px 까지입니다. 그 안에 둔 요소는 손잡이가 받습니다. `Field` 의 설명과 오류는 필드 8px 아래라서 첫 줄의 위쪽이 여기에 듭니다.
 - `overflow: hidden` 인 부모 안에 두면 손잡이의 바깥 부분(선의 2px 과 누를 영역)이 잘립니다.

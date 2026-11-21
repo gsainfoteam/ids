@@ -7,6 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Table } from '../src';
 import { testTheme } from './theme';
+import { IDS_STATE_OPACITY } from '../src/tokens/color-roles';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -103,7 +104,7 @@ test('a row with onClick presses anywhere and hovers; selection stays a data att
   expect(header.hasAttribute('data-hoverable')).toBe(false);
 });
 
-test('the neutral ladder: stripe muted, hover a step up, selected the press step', async () => {
+test('the stripe is a block row, and hover and selection lay the state layer over it', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <p>Outside</p>
@@ -113,18 +114,24 @@ test('the neutral ladder: stripe muted, hover a step up, selected the press step
   await userEvent.hover(screen.getByText('Outside'));
   const row = (name: string) => screen.getByRole('row', { name: new RegExp(name) });
   const background = (name: string) => getComputedStyle(row(name).element()).backgroundColor;
+  const layer = (name: string) =>
+    getComputedStyle(row(name).element()).getPropertyValue('--ids-state-opacity');
+  const hover = `${IDS_STATE_OPACITY.hover * 100}%`;
+  const press = `${IDS_STATE_OPACITY.press * 100}%`;
 
   await expect.element(row('Ada')).toBeInTheDocument();
   expect(background('Ada')).toBe('rgba(0, 0, 0, 0)');
-  expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft'));
-  expect(background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-block'));
+  expect(layer('Ada')).toBe('0%');
+  expect(layer('Linus')).toBe(press);
 
   await userEvent.hover(row('Ada'));
-  await expect.poll(() => background('Ada')).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect.poll(() => layer('Ada')).toBe(hover);
   await userEvent.hover(row('Grace'));
-  await expect.poll(() => background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
+  await expect.poll(() => layer('Grace')).toBe(hover);
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-block'));
   await userEvent.hover(row('Linus'));
-  await expect.poll(() => background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-active'));
+  await expect.poll(() => layer('Linus')).toBe(press);
 });
 
 test('stickyHeader keeps the header row in view while the body scrolls', async () => {

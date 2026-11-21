@@ -47,10 +47,10 @@
 - 실행 중에 조립한 클래스 이름(템플릿 리터럴, 접두사를 붙이는 함수). Tailwind가 생성하지 않아 조용히 동작하지 않습니다
 - `cn()`, `tv()`, JSX `className` 밖에 놓인 클래스 문자열(객체 값, 상수, 배열, 스토리 `args`)
 - 한 컴포넌트의 부품을 `tv()` 여러 개로 나누거나, 같은 컴포넌트의 부품을 `cn('...')`으로 따로 꾸민 경우. 부품은 하나의 `tv({ slots })` 안의 slot입니다
-- 여러 부품에 퍼지는 색을 부품과 scheme 조합마다 클래스로 쓴 경우. CSS custom property(`[--chip-accent:...]`) 하나로 넘깁니다
+- 여러 부품에 퍼지는 색을 부품과 scheme 조합마다 클래스로 쓴 경우. 루트에 `scheme-X`를 쓰고 부품은 `bg-scheme-solid`, `text-on-scheme-solid`, `text-scheme`을 씁니다. 역할을 가리키는 자체 변수(`[--x:var(--ids-color-…)]`)는 쓰지 않습니다
 - `text-*` 앞에 `leading-*`를 둔 경우. `cn`이 앞의 `leading-*`를 버립니다
 - `font-family`를 직접 쓰거나 `font-mono`에 `text-[0.9em]`을 더한 경우
-- `dark:` 대신 `prefers-color-scheme`이나 다른 방법으로 다크 모드를 판단한 경우
+- 컴포넌트 코드의 `dark:`, `prefers-color-scheme`, `color-mix`. 모드마다 다른 색은 컴포넌트 토큰(`bg-surface`, `bg-control-outline`)으로 고릅니다
 
 ### 모서리와 여백
 
@@ -60,13 +60,15 @@
 
 ### 색
 
-- 텍스트나 아이콘에 `primary`를 쓰거나, 옅은 brand 배경에 `primary/10`을 쓴 경우. 순서대로 `accent`, `secondary`를 씁니다
-- brand fill 위 글자가 `on-primary`가 아닌 경우, `secondary` 위 글자가 `on-secondary`가 아닌 경우
-- solid brand fill의 hover와 press를 `/90` 같은 투명도로 만든 경우. `--control-fill-hover`, `--control-fill-press`를 씁니다
-- 구조선(필드 테두리, 카드 모서리, Divider, group 경계)에 theme 색을 쓴 경우. `--ids-color-border`가 기본입니다
-- `outline`이나 `ghost` 버튼이 theme 색을 가진 경우
-- 중립 상태가 한 단계씩 오르지 않는 경우: 투명 control은 rest, `muted`, `muted-hover`이고, 채워진 control은 `muted`, `muted-hover`, `muted-active`입니다
-- status 색 글자에 `-strong`이 아닌 색을 쓴 경우
+- 색 역할 이름이 문법을 따르지 않는 경우. 배경은 쓰임새(`bg-base`, `bg-surface`, `bg-block`, `bg-X-soft`, `bg-X-solid`), 선과 글자는 세기(`border-X[-strong]`, `text-X[-strong]`), 배경 위 글자는 `text-on-{배경}` 입니다. `accent`, `muted`, `subtle`, `bold` 같은 이름이나 옛 이름(`bg-panel`, `bg-band`, 단독 `bg-X`)은 `ids.css` 에 없어 Tailwind 가 조용히 클래스를 만들지 않습니다
+- 배경 위 글자가 그 배경의 짝(`bg-X-solid` 위 `text-on-X-solid`, `bg-X-soft` 위 `text-on-X-soft`)이 아닌 경우. neutral 바탕의 본문은 `text-neutral-strong`, 보조 글자는 `text-neutral` 입니다
+- 채움 없이 페이지 위에 놓인 계열 글자나 아이콘에 `bg-X-solid` 의 색이나 `primary/10` 같은 투명도를 쓴 경우. 글자는 `text-X`, 옅은 채움은 `bg-X-soft` 를 씁니다
+- 브랜드나 상태 색 선에 `border-X` 를 쓴 경우. `border-X` 는 옅은 장식 선이고, 읽혀야 하는 색 선은 `border-X-strong` 입니다
+- hover, press 를 색(`hover:bg-neutral-soft`, `-hover`, `-active`)이나 `/90` 같은 투명도로 만든 경우. `state-layer` 와 `state-hover`, `state-press` 를 쓰고, 채움은 `state-fill` 을 더합니다
+- 색 있는 soft 면, 상태 색의 outline, ghost 가 글자색 층을 쓰는 경우. control-surface 의 `drawsSoftLayer`, `drawsQuietLayer` 처럼 계열 채움 층을 씁니다
+- 구조선(필드 테두리, 카드 모서리, Divider, group 경계)에 theme 색을 쓴 경우. `border-neutral` 이 기본입니다
+- `outline` 이나 `ghost` 버튼이 brand 색을 가진 경우. brand 는 `solid`, `soft` 만 색을 갖습니다
+- 두 토큰을 `color-mix` 로 섞어 새 색을 만든 경우
 
 ### Focus와 테두리
 
@@ -85,7 +87,7 @@
 
 - IDS 부품이 있는데 손으로 그린 경우: 선은 `Divider`, 면은 `Card`나 `Item`, 아이콘 버튼은 `IconButton`, 흐린 글자는 `Description` 부품, 라벨은 `Label`입니다
 - 다른 컴포넌트 안에 있는지 감지해서 동작을 바꾸는 경우. prop으로 고르게 합니다
-- 예제, 패턴, block에서 `ghost` variant를 쓴 경우
+- 예제, 패턴, block에서 `ghost` variant를 쓴 경우. 툴바 막대처럼 이미 면을 그린 컨테이너 안의 버튼은 예외입니다.
 
 ### 패키지
 

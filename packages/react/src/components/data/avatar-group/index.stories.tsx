@@ -132,7 +132,7 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="primary">
-          <div className="rounded-standard bg-primary p-3">
+          <div className="rounded-standard bg-primary-solid p-3">
             <AvatarGroup max={4} aria-label="primary">
               {MEMBERS.map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />
@@ -168,7 +168,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="custom">
           <AvatarGroup max={2} aria-label="custom overflow">
-            <AvatarGroup.Overflow className="bg-primary text-on-primary">
+            <AvatarGroup.Overflow className="bg-primary-solid text-on-primary-solid">
               {({ count }) => `${count}+`}
             </AvatarGroup.Overflow>
             {MEMBERS.map((member) => (

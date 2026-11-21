@@ -239,10 +239,7 @@ export const MatchValidity: Story = {
 
 export const FieldState: Story = {
   render: () => (
-    <Field
-      className="rounded-standard data-focused:bg-neutral-soft/60 w-80 p-3 transition-colors"
-      required
-    >
+    <Field className="rounded-standard data-focused:bg-block w-80 p-3 transition-colors" required>
       <Field.Label>닉네임</Field.Label>
       <TextField placeholder="닉네임" />
       <Field.Description>
@@ -297,39 +294,6 @@ export const Horizontal: Story = {
       </Field>
     </div>
   ),
-};
-
-export const Group: Story = {
-  render: () => (
-    <Field.Group orientation="horizontal" className="w-96">
-      <Field>
-        <Field.Label>이름</Field.Label>
-        <TextField defaultValue="김지수" />
-      </Field>
-      <Field>
-        <Field.Label>GIST 메일</Field.Label>
-        <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
-      </Field>
-      <Field>
-        <Field.Label>학번</Field.Label>
-        <TextField defaultValue="20250001" />
-      </Field>
-    </Field.Group>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '`Field.Group orientation="horizontal"` 안의 Field 는 라벨 열 하나를 나눠 씁니다. 라벨 길이가 달라도 입력칸이 같은 자리에서 시작합니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    const starts = canvas
-      .getAllByRole('textbox')
-      .map((input) => Math.round(input.getBoundingClientRect().left));
-    await expect(new Set(starts).size).toBe(1);
-  },
 };
 
 export const CustomLabel: Story = {

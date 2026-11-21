@@ -11,7 +11,7 @@ export const dataTableStyle = tv({
     head: 'group/head relative',
     sortButton: [
       'group/sort -mx-2 max-w-full gap-1 px-2 text-inherit',
-      'data-hovered:text-on-surface data-active:text-on-surface',
+      'data-hovered:text-neutral-strong data-active:text-neutral-strong',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
@@ -26,14 +26,14 @@ export const dataTableStyle = tv({
       'absolute inset-y-0 end-0 z-10 flex w-3 translate-x-1/2 cursor-col-resize justify-center rounded-full rtl:-translate-x-1/2',
       'before:h-full before:w-0.5 before:rounded-full before:bg-transparent',
       'before:transition-colors before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
-      'hover:before:bg-neutral-hover focus-visible:before:bg-neutral-active',
-      'data-resizing:before:bg-neutral-active',
+      'hover:before:bg-(--ids-color-text-neutral) focus-visible:before:bg-(--ids-color-text-neutral)',
+      'data-resizing:before:bg-(--ids-color-text-neutral)',
     ],
     selectCell: 'w-0 whitespace-nowrap',
     message: 'h-24 text-center text-neutral',
     overlay: [
       'absolute inset-0 z-20 flex items-center justify-center rounded-container',
-      'bg-surface/60',
+      'bg-base/60',
     ],
     spinner: 'size-6 text-neutral',
     footer: 'flex flex-wrap items-center justify-between gap-3',
@@ -43,10 +43,7 @@ export const dataTableStyle = tv({
   },
   variants: {
     variant: {
-      outline: {
-        sortButton:
-          '[--control-hover:var(--ids-color-bg-neutral-soft-hover)] [--control-press:var(--ids-color-bg-neutral-soft-active)]',
-      },
+      outline: {},
       ghost: {},
     } satisfies Record<TableVariant, object>,
     size: {

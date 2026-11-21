@@ -96,7 +96,7 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section title="Color" description="색은 currentColor입니다.">
-        <Showcase.Row label="on-surface">
+        <Showcase.Row label="text-neutral-strong">
           <Spinner size="standard" />
         </Showcase.Row>
         <Showcase.Row label="primary">

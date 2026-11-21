@@ -41,7 +41,7 @@ function Tag({
 
 export const Playground: Story = {
   render: () => (
-    <Slot className="rounded-standard bg-primary text-on-primary px-4 py-2">
+    <Slot className="rounded-standard bg-primary-solid text-on-primary-solid px-4 py-2">
       <a href="#slot">Slot이 감싼 링크</a>
     </Slot>
   ),

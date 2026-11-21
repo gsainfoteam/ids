@@ -17,7 +17,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const surface = cn('bg-neutral-soft/60 inset-ring-1 inset-ring-neutral');
+const surface = cn('bg-block inset-ring-1 inset-ring-neutral');
 
 const radii: { [token: string]: string } = Object.fromEntries(
   Object.entries(tokens.radius).map(([token, { $value }]) => [token, $value]),
@@ -29,7 +29,10 @@ function Measured({ token, className }: { token: string; className: string }) {
     <div data-radius-token={token} className="flex flex-col items-center gap-2">
       <div
         data-box=""
-        className={cn(className, 'bg-primary-soft inset-ring-primary/40 size-16 inset-ring-1')}
+        className={cn(
+          className,
+          'bg-primary-soft inset-ring-primary-strong/40 size-16 inset-ring-1',
+        )}
       />
       <span className="text-caption-c1-medium text-neutral">
         {token} · {value}

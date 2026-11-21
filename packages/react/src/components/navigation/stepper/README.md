@@ -167,7 +167,7 @@ const [step, setStep] = useState(0);
     <Stepper.Indicator>{(step) => (step.status === 'completed' ? '✓' : step.index + 1)}</Stepper.Indicator>
     <Stepper.Title>결제</Stepper.Title>
   </Stepper.Trigger>
-  <Stepper.Separator className="bg-(--ids-color-border-primary)" />
+  <Stepper.Separator className="bg-(--ids-color-border-primary-strong)" />
 </Stepper.Item>
 
 <Stepper.Indicator className="size-2.5">{null}</Stepper.Indicator>  {/* 빈 점 */}

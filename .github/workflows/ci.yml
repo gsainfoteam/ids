@@ -1,8 +1,9 @@
 name: CI
 
 on:
+  # No base branch filter: the Claude review job lives in this workflow, so a filter
+  # would leave PRs stacked on another branch without CI and without a review.
   pull_request:
-    branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
 

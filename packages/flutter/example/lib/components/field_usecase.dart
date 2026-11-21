@@ -37,9 +37,9 @@ class _EmailInput extends StatelessWidget {
       height: tiny ? 32 : 44,
       padding: EdgeInsetsDirectional.only(start: tiny ? 10 : 12, end: 4),
       decoration: BoxDecoration(
-        color: colors.surface,
+        color: colors.bgBase,
         border: Border.all(
-          color: field.invalid ? colors.borderDanger : colors.borderNeutral,
+          color: field.invalid ? colors.borderDangerStrong : colors.borderNeutral,
         ),
         borderRadius: BorderRadius.circular(ids.radius.standard),
       ),

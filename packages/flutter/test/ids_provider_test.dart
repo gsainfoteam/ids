@@ -39,11 +39,11 @@ void main() {
       ),
     );
     final colors = scope.colors;
-    expect(colors.surface, const Color(0xFFFFFFFF));
-    expect(colors.onSurface, const Color(0xFF171717));
+    expect(colors.bgBase, const Color(0xFFFFFFFF));
+    expect(colors.textNeutralStrong, const Color(0xFF0A0A0A));
     expect(colors.borderNeutral, const Color(0xFFE5E5E5));
     expect(colors.textNeutral, const Color(0xFF525252));
-    expect(colors.bgPrimary, const Color(0xFF155DFC));
+    expect(colors.bgPrimarySolid, const Color(0xFF155DFC));
     expect(colors['bg-primary-soft'], colors.bgPrimarySoft);
     expect(colors['text-on-primary-soft'], colors.textOnPrimarySoft);
     expect(colors.roles.keys, IdsColorRoles.all);
@@ -67,21 +67,21 @@ void main() {
                         'Sans',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.onSurface,
+                          color: ids.colors.textNeutralStrong,
                         ),
                       ),
                       Text(
                         'Mono',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.onSurface,
+                          color: ids.colors.textNeutralStrong,
                           mono: true,
                         ),
                       ),
                       TextField(
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.onSurface,
+                          color: ids.colors.textNeutralStrong,
                           mono: true,
                         ),
                       ),
@@ -115,7 +115,7 @@ void main() {
         expect(style.fontFamilyFallback, fallback);
         expect(style.fontSize, IdsTypography.bodyB3Regular.fontSize);
         expect(style.fontWeight, IdsTypography.bodyB3Regular.fontWeight);
-        expect(style.color, const Color(0xff171717));
+        expect(style.color, const Color(0xff0a0a0a));
       }
     },
   );
@@ -293,8 +293,8 @@ void main() {
         ),
       ),
     );
-    expect(scope.colors.bgPrimary, isNot(root.colors.bgPrimary));
-    expect(scope.colors.surface, root.colors.surface);
+    expect(scope.colors.bgPrimarySolid, isNot(root.colors.bgPrimarySolid));
+    expect(scope.colors.bgBase, root.colors.bgBase);
     expect(scope.colors.borderNeutral, isNot(root.colors.borderNeutral));
     expect(root.colors, colorsOf(testTheme, IdsMode.light));
   });

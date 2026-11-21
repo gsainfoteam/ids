@@ -8,7 +8,7 @@ import {
 } from './root';
 import { groupStyle } from './style';
 
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Group(props: Group.Props) {

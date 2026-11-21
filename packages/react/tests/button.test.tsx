@@ -23,7 +23,7 @@ test('SSR: a native button that never submits by accident and names its variant 
   expect(button.type).toBe('button');
   expect(button.dataset.variant).toBe('solid');
   expect(button.dataset.size).toBe('tiny');
-  expect(button.className).toMatch(/\[--control-fill:var\(--ids-color-bg-danger\)\]/);
+  expect(button.className).toMatch(/(^| )scheme-danger( |$)/);
   expect(button.textContent).toBe('삭제');
 });
 
@@ -342,7 +342,7 @@ const statusSchemes = ['danger', 'success', 'warning', 'info'] as const;
 const FORTY_TWO_HOVERS = 45_000;
 
 test(
-  'hovering a solid fill moves it away from its text, keeping Lc 75 in every color and mode',
+  'hovering a solid fill lays the state layer over it and keeps Lc 75 in every color and mode',
   { timeout: FORTY_TWO_HOVERS },
   async () => {
     const cases = (['light', 'dark'] as const).flatMap((mode) => [
@@ -357,7 +357,7 @@ test(
             theme={{ primary: palettes[entry.color] }}
             key={name(entry)}
             mode={entry.mode}
-            className="bg-surface"
+            className="bg-base"
           >
             <Button colorScheme={entry.scheme}>{name(entry)}</Button>
           </IdsProvider>
@@ -372,7 +372,9 @@ test(
       await expect.element(button).toHaveAttribute('data-hovered');
       const style = getComputedStyle(button.element());
       const page = getComputedStyle(button.element().parentElement!).backgroundColor;
-      const shown = blend([page, style.backgroundColor], 'normal', 'rgb');
+      const layer = style.backgroundImage.match(/linear-gradient\(((?:color|rgba?)\([^)]*\))/)?.[1];
+      expect(layer, name(entry)).toBeDefined();
+      const shown = blend([page, style.backgroundColor, layer!], 'normal', 'rgb');
       const lc = lightnessContrast(style.color, formatHex(shown));
       if (lc < TEXT_LC) failing.push(`${name(entry)}: Lc ${lc.toFixed(1)}`);
     }

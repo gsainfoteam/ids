@@ -78,7 +78,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ```tsx
 <Resizable direction="horizontal">
   내용
-  <Resizable.Handle className="inset-y-3 w-1 bg-primary before:hidden" />
+  <Resizable.Handle className="inset-y-3 w-1 bg-primary-solid before:hidden" />
 </Resizable>
 
 <Resizable>
@@ -102,7 +102,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ```
 
 - `Resizable.Handle` 을 적으면 기본 손잡이를 그리지 않습니다. 손잡이의 종류는 `direction` 이 정합니다.
-- 모서리 손잡이의 호는 글자색(`currentColor`)으로 그립니다. `text-*` 로 쉬는 때의 색을 바꾸고, 올렸을 때와 끄는 동안은 손잡이 단계를 따릅니다.
+- 모서리 손잡이의 호는 글자색(`currentColor`)으로 그립니다. `text-*` 로 쉬는 때의 색을 바꾸고, 올렸을 때와 끄는 동안은 손잡이 색(`text-neutral`)을 따릅니다.
 - 모서리 손잡이에 `children` 이나 `asChild` 를 주면 호 대신 그 표시를 모서리 안쪽 16px 상자에 그리고, 누를 영역은 그 상자 둘레 24px 입니다.
 - 가장자리 손잡이의 보이는 막대는 `before:` 로 그립니다. 막대를 지우려면 `before:hidden` 입니다.
 - `asChild` 로 합칠 때 겹치는 클래스(위치, 크기)는 손잡이 쪽이 이깁니다. 위치와 크기는 `Resizable.Handle` 의 `className` 으로 바꿉니다.
@@ -162,11 +162,10 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 ## 색
 
-| 토큰                        | 쓰임                          |
-| --------------------------- | ----------------------------- |
-| `--ids-color-bg-neutral`        | 가장자리 막대와 모서리의 호   |
-| `--ids-color-bg-neutral-hover`  | 손잡이에 올렸을 때            |
-| `--ids-color-bg-neutral-active` | 끄는 동안                     |
+| 토큰                       | 쓰임                               |
+| -------------------------- | ---------------------------------- |
+| `--ids-color-border-neutral-strong`   | 가장자리 막대와 모서리의 호        |
+| `--ids-color-text-neutral` | 손잡이에 올렸을 때와 끄는 동안     |
 
 ## 속성
 

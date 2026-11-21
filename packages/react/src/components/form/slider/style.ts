@@ -1,4 +1,4 @@
-import { sliderSurface } from '../../../internal/slider-surface';
+import { sliderSurface } from '../../../internal/surfaces/slider-surface';
 import { tv } from '../../../utils';
 
 import type { SliderOrientation } from '.';
@@ -13,17 +13,17 @@ export const sliderStyle = tv({
     track: [sliderSurface.edge, 'relative rounded-full bg-neutral-soft'],
     range: [
       sliderSurface.edge,
-      'absolute rounded-full bg-primary group-data-invalid/slider:bg-danger',
+      'absolute rounded-full bg-primary-solid group-data-invalid/slider:bg-danger-solid',
     ],
     thumb: [
       sliderSurface.thumb,
       'group/thumb absolute block size-(--slider-thumb)',
-      'bg-primary group-data-invalid/slider:bg-danger',
+      'bg-primary-solid group-data-invalid/slider:bg-danger-solid',
       'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none focus-ring',
     ],
     valueLabel: [
       'pointer-events-none absolute rounded-indicator px-1.5 py-0.5 whitespace-nowrap',
-      'bg-(--ids-color-on-surface) text-caption-c1-medium text-(--ids-color-surface) tabular-nums',
+      'bg-neutral-solid text-caption-c1-medium text-on-neutral-solid tabular-nums',
       'opacity-0 transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
       'group-focus-visible/thumb:opacity-100 group-data-dragging/thumb:opacity-100 data-visible:opacity-100',
     ],

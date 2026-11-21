@@ -16,19 +16,18 @@ export const resizeHandle = {
     corner: cn('cursor-nwse-resize rtl:cursor-nesw-resize'),
   },
   focus: cn('focus-ring'),
-  focusWithin: cn('has-focus-visible:ring-[3px] has-focus-visible:ring-primary/40'),
+  focusWithin: cn('has-focus-visible:ring-[3px] has-focus-visible:ring-primary-strong/40'),
   ladder: {
     ink: cn(
-      'text-(--ids-color-bg-neutral) hover:text-(--ids-color-bg-neutral-hover)',
-      'data-dragging:text-(--ids-color-bg-neutral-active)',
+      'text-(--ids-color-border-neutral-strong) hover:text-neutral data-dragging:text-neutral',
     ),
     pill: cn(
-      'before:bg-neutral hover:before:bg-neutral-hover',
-      'data-dragging:before:bg-neutral-active',
+      'before:bg-(--ids-color-border-neutral-strong) hover:before:bg-(--ids-color-text-neutral)',
+      'data-dragging:before:bg-(--ids-color-text-neutral)',
     ),
     line: cn(
-      'bg-(--ids-color-border-neutral) hover:bg-neutral-hover',
-      'data-dragging:bg-neutral-active',
+      'bg-(--ids-color-border-neutral) hover:bg-(--ids-color-text-neutral)',
+      'data-dragging:bg-(--ids-color-text-neutral)',
     ),
   },
   motion: cn(
@@ -73,8 +72,8 @@ export const resizeGripStyle = tv({
       'group/grip absolute end-0 bottom-0 z-10 data-disabled:opacity-50',
     ],
     drawing: 'pointer-events-none absolute overflow-visible rtl:-scale-x-100',
-    halo: ['stroke-primary/40 opacity-0', 'group-has-focus-visible/grip:opacity-100'],
-    arc: ['stroke-current', 'group-has-focus-visible/grip:stroke-primary'],
+    halo: ['stroke-primary-strong/40 opacity-0', 'group-has-focus-visible/grip:opacity-100'],
+    arc: ['stroke-current', 'group-has-focus-visible/grip:stroke-primary-strong'],
     target: [resizeHandle.cursor.corner, 'group-data-disabled/grip:pointer-events-none'],
     separator: 'sr-only',
   },

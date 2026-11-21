@@ -153,6 +153,44 @@ mixin IdsMessages {
 
   String? get drawerHandle => null;
 
+  String? get editorBlockType => null;
+
+  String? get editorBlockquote => null;
+
+  String? get editorBold => null;
+
+  String? get editorBubbleMenu => null;
+
+  String? get editorBulletList => null;
+
+  String? get editorCode => null;
+
+  String? get editorCodeBlock => null;
+
+  String? get editorContent => null;
+
+  String? editorHeading({required Object level}) => null;
+
+  String? get editorItalic => null;
+
+  String? get editorLink => null;
+
+  String? get editorLinkApply => null;
+
+  String? get editorLinkRemove => null;
+
+  String? get editorLinkUrl => null;
+
+  String? get editorOrderedList => null;
+
+  String? get editorParagraph => null;
+
+  String? get editorStrike => null;
+
+  String? get editorToolbar => null;
+
+  String? get editorUnderline => null;
+
   String? get fileFieldClear => null;
 
   String? fileFieldCount({required Object count}) => null;
@@ -211,7 +249,11 @@ mixin IdsMessages {
 
   String? get imageZoomIn => null;
 
+  String? imageZoomLevel({required Object percent}) => null;
+
   String? get imageZoomOut => null;
+
+  String? imageZoomReset({required Object percent}) => null;
 
   String? get inputClearSearch => null;
 
@@ -281,6 +323,22 @@ mixin IdsMessages {
 
   String? menuSubmenu({required Object label}) => null;
 
+  String? get messageActions => null;
+
+  String? get messageCopied => null;
+
+  String? get messageCopy => null;
+
+  String? get messageError => null;
+
+  String? get messagePending => null;
+
+  String? get messageRetry => null;
+
+  String? get messageUnread => null;
+
+  String? messageUnreadBy({required Object count}) => null;
+
   String? get messageScrollerJump => null;
 
   String? messageScrollerJumpUnseen({required Object count}) => null;
@@ -336,6 +394,24 @@ mixin IdsMessages {
   String? get promptInputStop => null;
 
   String? get qrCodeLabel => null;
+
+  String? get questionnaireNavigation => null;
+
+  String? get questionnaireNext => null;
+
+  String? get questionnaireOther => null;
+
+  String? get questionnaireOtherPlaceholder => null;
+
+  String? get questionnairePrevious => null;
+
+  String? get questionnaireProgress => null;
+
+  String? get questionnaireSkip => null;
+
+  String? questionnaireStep({required Object current, required Object total}) => null;
+
+  String? get questionnaireSubmit => null;
 
   String? get ratingLabel => null;
 
@@ -716,6 +792,63 @@ final class IdsKoreanMessages with IdsMessages {
   String get drawerHandle => '끌어서 크기 조절';
 
   @override
+  String get editorBlockType => '문단 모양';
+
+  @override
+  String get editorBlockquote => '인용';
+
+  @override
+  String get editorBold => '굵게';
+
+  @override
+  String get editorBubbleMenu => '선택한 글 서식';
+
+  @override
+  String get editorBulletList => '글머리 기호 목록';
+
+  @override
+  String get editorCode => '코드';
+
+  @override
+  String get editorCodeBlock => '코드 블록';
+
+  @override
+  String get editorContent => '본문';
+
+  @override
+  String editorHeading({required Object level}) => '제목 ${_format(level)}';
+
+  @override
+  String get editorItalic => '기울임';
+
+  @override
+  String get editorLink => '링크';
+
+  @override
+  String get editorLinkApply => '적용';
+
+  @override
+  String get editorLinkRemove => '링크 지우기';
+
+  @override
+  String get editorLinkUrl => '링크 주소';
+
+  @override
+  String get editorOrderedList => '번호 목록';
+
+  @override
+  String get editorParagraph => '문단';
+
+  @override
+  String get editorStrike => '취소선';
+
+  @override
+  String get editorToolbar => '서식';
+
+  @override
+  String get editorUnderline => '밑줄';
+
+  @override
   String get fileFieldClear => '파일 모두 지우기';
 
   @override
@@ -803,7 +936,13 @@ final class IdsKoreanMessages with IdsMessages {
   String get imageZoomIn => '확대';
 
   @override
+  String imageZoomLevel({required Object percent}) => '${_format(percent)}%';
+
+  @override
   String get imageZoomOut => '축소';
+
+  @override
+  String imageZoomReset({required Object percent}) => '${_format(percent)}%, 화면에 맞추기';
 
   @override
   String get inputClearSearch => '검색어 지우기';
@@ -908,6 +1047,30 @@ final class IdsKoreanMessages with IdsMessages {
   String menuSubmenu({required Object label}) => '${_format(label)} 하위 메뉴';
 
   @override
+  String get messageActions => '메시지 동작';
+
+  @override
+  String get messageCopied => '복사했습니다';
+
+  @override
+  String get messageCopy => '메시지 복사';
+
+  @override
+  String get messageError => '보내지 못했어요';
+
+  @override
+  String get messagePending => '보내는 중';
+
+  @override
+  String get messageRetry => '다시 보내기';
+
+  @override
+  String get messageUnread => '안 읽음';
+
+  @override
+  String messageUnreadBy({required Object count}) => '${_format(count)}명 안 읽음';
+
+  @override
   String get messageScrollerJump => '맨 아래로';
 
   @override
@@ -990,6 +1153,33 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get qrCodeLabel => 'QR 코드';
+
+  @override
+  String get questionnaireNavigation => '질문 이동';
+
+  @override
+  String get questionnaireNext => '다음';
+
+  @override
+  String get questionnaireOther => '직접 입력';
+
+  @override
+  String get questionnaireOtherPlaceholder => '다른 답을 적어 주세요';
+
+  @override
+  String get questionnairePrevious => '이전';
+
+  @override
+  String get questionnaireProgress => '질문 진행';
+
+  @override
+  String get questionnaireSkip => '건너뛰기';
+
+  @override
+  String questionnaireStep({required Object current, required Object total}) => '질문 ${_format(current)} / ${_format(total)}';
+
+  @override
+  String get questionnaireSubmit => '보내기';
 
   @override
   String get ratingLabel => '평점';

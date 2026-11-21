@@ -52,6 +52,31 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 
 - 값은 `string[]` 이고 누른 순서가 아니라 항목 순서로 정렬됩니다.
 
+## 묶기
+
+```tsx
+<ButtonGroup aria-label="서식">                              {/* 선택이 다른 묶음은 ButtonGroup 안에 나란히 */}
+  <ToggleGroup selectionMode="multiple" aria-label="강조">...</ToggleGroup>
+  <ToggleGroup aria-label="정렬">...</ToggleGroup>
+</ButtonGroup>
+
+<ToggleGroup aria-label="기간" defaultValue="day">           {/* 하나의 선택을 보기 좋게 나눈다 */}
+  <ButtonGroup>
+    <Toggle value="day">일</Toggle>
+    <Toggle value="week">주</Toggle>
+  </ButtonGroup>
+  <ButtonGroup>
+    <Toggle value="month">월</Toggle>
+    <Toggle value="year">년</Toggle>
+  </ButtonGroup>
+</ToggleGroup>
+```
+
+- 그룹 안의 그룹은 8px 떨어지고, 각 묶음 안의 토글은 붙은 채로 남습니다.
+- ButtonGroup 안에 나란히 둔 ToggleGroup 은 값, 이름, 키보드가 각자입니다. 화살표는 제 묶음 안에서만 돌고 `Tab` 이 다음 묶음으로 넘어갑니다.
+- ToggleGroup 안에 ButtonGroup 을 두면 토글은 모두 바깥 그룹의 항목입니다. 화살표가 묶음을 건너갑니다.
+- ToggleGroup 안에 ToggleGroup 을 넣지 않습니다. 바깥 그룹이 고를 항목 없는 라디오 그룹이 되고, 바깥의 `value` 와 `onValueChange` 가 동작하지 않습니다.
+
 ## 키보드
 
 | 키              | 하나만 고르기 (라디오)          | 여러 개 고르기 (툴바)                       |
@@ -95,8 +120,8 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 ```tsx
 <ToggleGroup aria-label="정렬" variant="outline" size="tiny">  {/* 안의 토글이 따른다 */}
 <ToggleGroup aria-label="보기" orientation="vertical">         {/* 세로. 화살표도 위아래 */}
-<ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 토글이 폭을 나눠 가진다 */}
-<ToggleGroup aria-label="태그" attached={false}>               {/* 붙이지 않고 간격만 둔다 */}
+<ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 붙인 토글이 폭을 나눠 가진다 */}
+<ToggleGroup aria-label="시간" attached={false} className="flex-wrap">  {/* 띄운 토글은 제 너비로 줄을 넘긴다 */}
 ```
 
 ## 속성

@@ -185,7 +185,7 @@ export const PC: Story = {
                       ))}
                     </ul>
                   </Card.Content>
-                  <Card.Footer className="border-t">
+                  <Card.Footer>
                     <Button variant="outline" size="tiny" className="flex-1">
                       메시지
                     </Button>

@@ -38,7 +38,7 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 ```
 
 - 흔한 조합은 보낸 말 `align="end" variant="solid"`, 받은 말 `align="start"` 의 기본 `soft` 입니다.
-- 글자는 바탕과 짝인 색을 씁니다. `solid` 는 `on-primary`, `soft` 와 `outline` 은 `on-surface` 입니다. 링크와 아이콘은 이 색을 이어받습니다.
+- 글자는 바탕과 짝인 색을 씁니다. `solid` 는 `text-on-primary-solid`, `soft` 와 `outline` 은 `text-neutral-strong` 입니다. 링크와 아이콘은 이 색을 이어받습니다.
 - 안쪽 여백은 12px(`concentric-p-3`), 모서리는 16px, 꼬리 쪽 모서리는 4px 입니다.
 
 ## 줄 배치

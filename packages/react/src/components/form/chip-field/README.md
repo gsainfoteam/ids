@@ -5,6 +5,7 @@
 - **칩 사이를 키보드로.** 입력 맨 앞에서 `←` 를 누르면 마지막 칩으로 가고, 칩 사이는 방향키로 오갑니다. `Backspace` 와 `Delete` 는 칩을 지운 뒤 옆 칩에 포커스를 둡니다. `Tab` 은 칩을 거치지 않고 필드를 떠납니다.
 - **붙여넣기.** 쉼표, 탭, 줄바꿈이 섞인 글을 붙여넣으면 칩 여러 개가 됩니다. 이미 있는 값은 건너뛰고, 칩으로 만들 수 없는 글자는 입력에 남겨 둡니다.
 - **새 값 만들기.** `creatable` 이면 목록에 없는 값도 칩이 됩니다. `validate` 로 거를 수 있고, 쉼표나 `Enter` 로 확정합니다.
+- **고른 옵션.** 목록에 남아 `text-primary` 체크로 보입니다. 다시 고르면 칩이 빠집니다.
 - **중복 없음.** 대소문자, 전각, 악센트만 다른 값은 같은 값으로 봅니다.
 - **개수 제한.** `maxCount` 에 닿으면 나머지 옵션이 비활성이 되고 목록 위에 안내가 나옵니다.
 - **폼.** 칩마다 hidden input 하나가 제출되고, `required` 는 브라우저 검증이 막습니다. 입력 중인 검색어는 제출되지 않습니다.
@@ -148,10 +149,12 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 | ------ | --------------------------------------------------------------------------------------------------------- |
 | 루트   | `data-open`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-full`, `data-empty` |
 | 칩     | `data-chip-field-chip`, 지울 수 없는 옵션이면 `data-disabled`, 방향키가 가리키면 `data-focus-visible`     |
+| 값 줄  | `data-chip-field-values`. 칩과 입력을 담고 이 안에서만 줄을 바꾼다                                        |
 | Item   | `data-selected`, `data-highlighted`, `data-disabled`                                                      |
 | Create | `data-highlighted`, 거부된 값이면 `data-invalid`                                                          |
 
 - 루트의 `className` 은 `ChipField.State` 를 받는 함수도 됩니다.
+- 칩이 줄을 넘으면 값 줄만 아래로 늘어나고, 꾸밈과 화살표는 오른쪽 열에서 세로 가운데에 남습니다. 줄 간격은 4px 입니다.
 - 칩은 `Chip` 이고 지우기 버튼은 `Chip.Close` 입니다. `data-chip`, `data-size` 같은 Chip 의 속성도 붙습니다.
 - 지우기 버튼에 포커스가 있으면 필드 테두리에 링이 그려지고 칩은 테마 색으로 칠해집니다. 버튼 자체에는 링을 그리지 않습니다.
 
@@ -241,7 +244,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `name` / `form`                         | 칩마다 hidden input                                        |
 | `required`                              | 브라우저 검증                                              |
 | `className` / `style`                   | 루트                                                       |
-| `ref`, 그 외 native 속성                | 검색 input. 기본 `placeholder="항목 추가…"`                |
+| `ref`, 그 외 native 속성                | 검색 input. 기본 `placeholder="항목 추가…"`(칩이 없을 때만)            |
 
 ## 알아둘 것
 
@@ -249,3 +252,5 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 - `ChipField.Input` 의 `onChange` 는 검색어 입력 이벤트입니다. 고른 값은 루트의 `onValueChange` 로 받습니다.
 - 목록에 아직 없는 값의 칩은 값 그대로 보입니다. 새로 만든 값의 저장이나 ID 변환은 앱이 맡습니다.
 - 컨테이너의 빈 곳을 클릭하면 입력에 포커스하고 목록을 엽니다.
+- 칩이 하나라도 있으면 입력의 `placeholder` 는 앱이 준 것까지 숨깁니다. 모바일 시트의 검색창은 placeholder 를 계속 보입니다.
+- 입력은 친 글자만큼만 폭을 차지합니다. 비어 있으면 칩 줄 끝에 붙어 있고, 친 글자가 그 줄에 들어가지 않을 때만 다음 줄로 내려갑니다. `data-chip-field-sizer` 가 입력과 같은 글자를 숨긴 채 겹쳐 그려 폭을 정하므로 JS 로 재지 않습니다.

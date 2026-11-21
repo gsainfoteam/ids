@@ -7,6 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { Button, Dialog, IdsProvider, Select, overlay } from '../src';
 import { testTheme } from './theme';
+import { IDS_STATE_OPACITY } from '../src/tokens/color-roles';
 
 const finishAnimations = (element: Element) => {
   for (const animation of element.getAnimations()) animation.finish();
@@ -106,6 +107,26 @@ test('Escape closes a Select inside first, then the dialog', async () => {
   await expect.element(select).toHaveFocus();
   await userEvent.keyboard('{Escape}');
   await expect.element(screen.getByRole('dialog', { name: 'Settings' })).not.toBeInTheDocument();
+});
+
+test('a Select sheet opened over a dialog marks its backdrop stacked, so it does not blur the dialog', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Settings defaultOpen>
+        <Select aria-label="Theme" mobileVariant="drawer">
+          <Select.Item value="light">Light</Select.Item>
+          <Select.Item value="dark">Dark</Select.Item>
+        </Select>
+      </Settings>
+    </IdsProvider>,
+  );
+  await userEvent.click(screen.getByRole('combobox', { name: 'Theme' }));
+  await expect
+    .element(screen.getByRole('dialog', { name: 'Theme' }))
+    .toHaveAttribute('data-presentation', 'drawer');
+  const sheet = document.querySelector<HTMLElement>('[data-field-popup-backdrop]')!;
+  await expect.poll(() => sheet.hasAttribute('data-stacked')).toBe(true);
+  expect(getComputedStyle(sheet).backdropFilter).toBe('none');
 });
 
 test('a dialog that cannot be dismissed ignores Escape and the backdrop', async () => {
@@ -210,4 +231,76 @@ test('a dialog opened from a dialog stays usable and the one under it steps back
   await expect.element(screen.getByText('answer yes')).toBeInTheDocument();
   await expect.poll(() => outer.hasAttribute('data-nested-open')).toBe(false);
   await expect.element(screen.getByRole('button', { name: 'Ask' })).toHaveFocus();
+});
+
+function colorOf(variable: string, inside: Element) {
+  const probe = document.createElement('div');
+  probe.style.backgroundColor = `var(${variable})`;
+  inside.closest('[data-mode]')!.append(probe);
+  const color = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return color;
+}
+
+function textColorOf(variable: string, inside: Element) {
+  const probe = document.createElement('div');
+  probe.style.color = `var(${variable})`;
+  inside.closest('[data-mode]')!.append(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+
+const hoverLayer = `${IDS_STATE_OPACITY.hover * 100}%`;
+const layerOf = (element: Element) =>
+  getComputedStyle(element).getPropertyValue('--ids-state-opacity');
+
+test('the footer is a band below the body that scrolls', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Dialog defaultOpen>
+        <Dialog.Content className="max-h-60">
+          <Dialog.Title>Terms</Dialog.Title>
+          <p className="h-96 shrink-0">Long terms</p>
+          <Dialog.Footer>
+            <Dialog.Close>Decline</Dialog.Close>
+            <Button>Accept</Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
+    </IdsProvider>,
+  );
+  const dialog = screen.getByRole('dialog', { name: 'Terms' });
+  await expect.element(dialog).toBeVisible();
+  const content = dialog.element();
+  finishAnimations(content);
+  const body = content.querySelector<HTMLElement>(':scope > [data-dialog-body]')!;
+  const footer = content.querySelector<HTMLElement>(':scope > [data-dialog-footer]')!;
+
+  expect(body.contains(footer)).toBe(false);
+  expect(getComputedStyle(content).backgroundColor).toBe(
+    colorOf('--ids-color-bg-surface', content),
+  );
+  expect(getComputedStyle(footer).backgroundColor).toBe(colorOf('--ids-color-bg-block', content));
+  expect(getComputedStyle(footer).color).toBe(
+    textColorOf('--ids-color-text-neutral-strong', content),
+  );
+  expect(getComputedStyle(footer).borderTopColor).toBe(
+    colorOf('--ids-color-border-neutral', content),
+  );
+  expect(
+    content.getBoundingClientRect().bottom - footer.getBoundingClientRect().bottom,
+  ).toBeCloseTo(1, 0);
+
+  const viewport = body.querySelector<HTMLElement>('[data-scroll-area-viewport]')!;
+  expect(viewport.scrollHeight).toBeGreaterThan(viewport.clientHeight);
+  expect(getComputedStyle(body).borderTopLeftRadius).toBe(
+    getComputedStyle(content).borderTopLeftRadius,
+  );
+  expect(getComputedStyle(body).borderBottomLeftRadius).toBe('0px');
+
+  const decline = () => screen.getByRole('button', { name: 'Decline' }).element();
+  expect(layerOf(decline())).toBe('0%');
+  await userEvent.hover(screen.getByRole('button', { name: 'Decline' }));
+  await expect.poll(() => layerOf(decline())).toBe(hoverLayer);
 });

@@ -36,8 +36,8 @@ class ProviderPreview extends StatelessWidget {
           TextStyle body(Color color) =>
               ids.textStyle(IdsTypography.bodyB3Regular, color: color);
           return Material(
-            color: colors.surface,
-            textStyle: body(colors.onSurface),
+            color: colors.bgBase,
+            textStyle: body(colors.textNeutralStrong),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Center(
@@ -61,7 +61,7 @@ class ProviderPreview extends StatelessWidget {
                         'IDS mono: Aa Wi 0123',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: colors.onSurface,
+                          color: colors.textNeutralStrong,
                           mono: true,
                         ),
                       ),
@@ -116,12 +116,12 @@ class _FamilySwatch extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: ShapeDecoration(
-              color: role('bg-$family'),
+              color: role('bg-$family-solid'),
               shape: ids.shape(),
             ),
             child: Text(
-              '$family ${hexOf(role('bg-$family'))}',
-              style: on('text-on-$family'),
+              '$family ${hexOf(role('bg-$family-solid'))}',
+              style: on('text-on-$family-solid'),
             ),
           ),
         ),
@@ -204,8 +204,8 @@ class ScopePreview extends StatelessWidget {
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: colors.bgPrimary,
-              foregroundColor: colors.textOnPrimary,
+              backgroundColor: colors.bgPrimarySolid,
+              foregroundColor: colors.textOnPrimarySolid,
             ),
             onPressed: ids.toggleMode,
             child: Text('Toggle $name mode'),

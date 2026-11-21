@@ -77,7 +77,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Open"
-        description="고른 옵션에는 체크가 붙습니다. 찾는 옵션이 없으면 새 값을 만드는 행이 나옵니다."
+        description="고른 옵션에는 primary 체크가 붙습니다. 찾는 옵션이 없으면 새 값을 만드는 행이 나옵니다."
       >
         <Showcase.Row label="creatable" className="h-72 items-start">
           <div className="w-80">
@@ -148,10 +148,32 @@ export const Gallery: Story = {
             </ChipField>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="wrapping">
-          <div className="w-80">
+        <Showcase.Row label="wrapping standard">
+          <div className="w-64">
             <ChipField
-              aria-label="여러 줄"
+              aria-label="여러 줄 standard"
+              defaultValue={['react', 'vue', 'svelte', 'flutter', 'swift']}
+            >
+              <ChipField.Group heading="프론트엔드">
+                <ChipField.Item value="react">React</ChipField.Item>
+                <ChipField.Item value="vue">Vue</ChipField.Item>
+                <ChipField.Item value="svelte">Svelte</ChipField.Item>
+              </ChipField.Group>
+              <ChipField.Group heading="모바일">
+                <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                <ChipField.Item value="swift">Swift</ChipField.Item>
+                <ChipField.Item value="kotlin" disabled>
+                  Kotlin (준비 중)
+                </ChipField.Item>
+              </ChipField.Group>
+            </ChipField>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="wrapping tiny">
+          <div className="w-48">
+            <ChipField
+              aria-label="여러 줄 tiny"
+              size="tiny"
               defaultValue={['react', 'vue', 'svelte', 'flutter', 'swift']}
             >
               <ChipField.Group heading="프론트엔드">

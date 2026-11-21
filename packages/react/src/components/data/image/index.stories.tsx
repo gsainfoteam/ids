@@ -6,6 +6,7 @@ import { Showcase } from '~story-kit';
 
 import { overlay } from '../../../internal/overlay';
 import { Button } from '../../action/button';
+import { ImageGroup } from '../image-group';
 
 import { Image } from '.';
 
@@ -110,45 +111,6 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
       </Showcase.Section>
-
-      <Showcase.Section
-        title="Group layout"
-        description="Image.Group 은 사진을 가로, 세로, 격자로 늘어놓고, 누르면 그 장부터 크게 봅니다."
-      >
-        <Showcase.Row label="row">
-          <div className="w-full max-w-md">
-            <Image.Group layout="row" aria-label="풍경 사진">
-              {PHOTOS.slice(0, 3).map((photo) => (
-                <Image key={photo.id} src={photo.src} alt={photo.alt} ratio={1} />
-              ))}
-            </Image.Group>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="column">
-          <div className="w-40">
-            <Image.Group layout="column" aria-label="풍경 사진">
-              {PHOTOS.slice(3, 5).map((photo) => (
-                <Image key={photo.id} src={photo.src} alt={photo.alt} ratio={16 / 9} />
-              ))}
-            </Image.Group>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="grid">
-          <div className="w-full max-w-md">
-            <Image.Group layout="grid" columns={3} aria-label="풍경 사진">
-              {PHOTOS.map((photo) => (
-                <Image
-                  key={photo.id}
-                  src={photo.src}
-                  alt={photo.alt}
-                  caption={photo.caption}
-                  ratio={1}
-                />
-              ))}
-            </Image.Group>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
     </Showcase>
   ),
 };
@@ -164,7 +126,9 @@ export const Status: Story = {
           src={src}
           alt="호수 위로 뜬 해"
           ratio={4 / 3}
-          className={(state) => (state.status === 'loaded' ? 'ring-success ring-2' : undefined)}
+          className={(state) =>
+            state.status === 'loaded' ? 'ring-success-strong ring-2' : undefined
+          }
           onStatusChange={(status) => setLog((previous) => [...previous, status])}
         />
         <div className="flex gap-2">
@@ -238,80 +202,21 @@ export const Fallback: Story = {
   },
 };
 
-export const Group: Story = {
-  render: function Render() {
-    const [index, setIndex] = useState(0);
-    const [open, setOpen] = useState(false);
-
-    return (
-      <div className="flex max-w-md flex-col gap-3">
-        <Image.Group
-          layout="grid"
-          columns={3}
-          value={index}
-          onValueChange={setIndex}
-          open={open}
-          onOpenChange={setOpen}
-          aria-label="풍경 사진"
-        >
-          {PHOTOS.map((photo) => (
-            <Image
-              key={photo.id}
-              src={photo.src}
-              alt={photo.alt}
-              caption={photo.caption}
-              ratio={1}
-            />
-          ))}
-        </Image.Group>
-        <output aria-label="뷰어 상태" className="text-body-b3-regular font-mono">
-          {open ? `${index + 1}번째 장을 연다` : '닫힘'}
-        </output>
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '사진을 누르거나 Tab 으로 가서 Enter, Space 를 누르면 그 장부터 뷰어가 열립니다. 지금 보는 장은 `value` / `onValueChange`, 열림은 `open` / `onOpenChange` 로 제어합니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const third = () => canvas.getByLabelText('노을 진 산등성이 크게 보기');
-    const status = () => canvas.getByLabelText('뷰어 상태');
-
-    await expect(canvas.getByRole('list', { name: '풍경 사진' })).toBeInTheDocument();
-    await expect(canvas.getAllByRole('listitem')).toHaveLength(PHOTOS.length);
-    await expect(third()).toHaveAttribute('aria-haspopup', 'dialog');
-    await userEvent.click(third());
-    await canvas.findByRole('dialog', { name: VIEWER });
-    await expect(status()).toHaveTextContent('3번째 장을 연다');
-    await waitFor(() => expect(third()).toHaveAttribute('aria-expanded', 'true'));
-    await userEvent.keyboard('{ArrowRight}');
-    await waitFor(() => expect(status()).toHaveTextContent('4번째 장을 연다'));
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(status()).toHaveTextContent('닫힘'));
-    await waitFor(() => expect(third()).toHaveFocus());
-  },
-};
-
 export const Viewer: Story = {
   render: () => (
     <div className="max-w-md">
-      <Image.Group layout="grid" columns={3} aria-label="풍경 사진">
+      <ImageGroup layout="grid" columns={3} aria-label="풍경 사진">
         {PHOTOS.map((photo) => (
           <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
         ))}
-      </Image.Group>
+      </ImageGroup>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '뷰어는 화면을 덮는 모달입니다. ←/→ 로 넘기고(오른쪽에서 왼쪽으로 쓰는 문서에서는 반대), Home/End 로 처음과 끝, `+` `-` `0` 으로 확대, 축소, 원래 크기, Escape 로 닫습니다. 확대한 사진에서는 ←/→ 가 사진을 옮깁니다. 휠과 두 손가락으로 확대하고, 두 번 누르면 확대와 원래 크기를 오갑니다. 원래 크기에서 아래로 쓸어내리면 닫힙니다. 닫으면 누른 사진으로 포커스가 돌아갑니다.',
+          '뷰어는 화면을 덮는 어두운 모달입니다. 설명은 위 왼쪽에, 도구 막대는 아래 가운데에 있습니다. 막대의 백분율은 지금 배율이고, 누르면 화면에 맞춥니다. ←/→ 로 넘기고(오른쪽에서 왼쪽으로 쓰는 문서에서는 반대), Home/End 로 처음과 끝, `+` `-` `0` 으로 확대, 축소, 원래 크기, Escape 로 닫습니다. 확대한 사진에서는 ←/→ 가 사진을 옮깁니다. 휠과 두 손가락으로 확대하고, 두 번 누르면 확대와 원래 크기를 오갑니다. 원래 크기에서 아래로 쓸어내리면 닫힙니다. 닫으면 누른 사진으로 포커스가 돌아갑니다.',
       },
     },
   },
@@ -340,6 +245,53 @@ export const Viewer: Story = {
       expect(canvas.getByRole('button', { name: '축소' })).not.toHaveAttribute('aria-disabled'),
     );
     await userEvent.keyboard('0');
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: '축소' })).toHaveAttribute('aria-disabled', 'true'),
+    );
+    await expect(canvas.queryByRole('group', { name: '사진 목록' })).toBeNull();
+  },
+};
+
+export const ComposedViewer: Story = {
+  render: () => (
+    <div className="max-w-md">
+      <ImageGroup layout="grid" columns={3} loop aria-label="풍경 사진">
+        {PHOTOS.map((photo) => (
+          <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
+        ))}
+        <Image.Viewer aria-label="풍경 사진 보기">
+          <Image.Viewer.Caption />
+          <Image.Viewer.Toolbar>
+            <Image.Viewer.Prev />
+            <Image.Viewer.Counter />
+            <Image.Viewer.Next />
+            <Image.Viewer.Separator />
+            <Image.Viewer.Share />
+            <Image.Viewer.Download />
+            <Image.Viewer.Close />
+          </Image.Viewer.Toolbar>
+          <Image.Viewer.Thumbnails />
+        </Image.Viewer>
+      </ImageGroup>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'ImageGroup 안에 Image.Viewer 를 두고 그 부품(Image.Viewer.Caption, Image.Viewer.Toolbar 등)을 고르면 그 부품만 그립니다. 도구 막대는 Image.Viewer.Toolbar 안에 Prev, Counter, Next, ZoomOut, ZoomReset, ZoomIn, Download, Share, Close 와 칸을 나누는 Separator 를 원하는 순서로 담습니다. Image.Viewer.Thumbnails 를 넣으면 도구 막대 아래에 썸네일 줄이 생깁니다. Share 는 브라우저가 공유를 지원할 때만 보입니다. `loop` 을 주면 끝에서 처음으로 넘어갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '호수 위로 뜬 해 크게 보기' }));
+    await canvas.findByRole('dialog', { name: '풍경 사진 보기' });
+    await expect(canvas.queryByRole('button', { name: '확대' })).toBeNull();
+    await expect(canvas.getByRole('link', { name: '내려받기' })).toHaveAttribute('download');
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await waitFor(() => expect(canvas.getByText('6 / 6')).toBeInTheDocument());
+    await expect(canvas.getByText('숲')).toBeVisible();
 
     const thumbnails = canvas.getByRole('group', { name: '사진 목록' });
     await userEvent.click(within(thumbnails).getByRole('button', { name: '노을 진 산등성이' }));
@@ -349,48 +301,6 @@ export const Viewer: Story = {
         name: '노을 진 산등성이',
       }),
     ).toHaveAttribute('aria-current', 'true');
-  },
-};
-
-export const ComposedViewer: Story = {
-  render: () => (
-    <div className="max-w-md">
-      <Image.Group layout="grid" columns={3} loop aria-label="풍경 사진">
-        {PHOTOS.map((photo) => (
-          <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
-        ))}
-        <Image.Viewer aria-label="풍경 사진 보기">
-          <Image.Viewer.Toolbar>
-            <Image.Viewer.Counter />
-            <Image.Viewer.Share />
-            <Image.Viewer.Download />
-            <Image.Viewer.Close />
-          </Image.Viewer.Toolbar>
-          <Image.Viewer.Prev />
-          <Image.Viewer.Next />
-          <Image.Viewer.Caption />
-        </Image.Viewer>
-      </Image.Group>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Image.Group 안에 Image.Viewer 를 두고 그 부품(Image.Viewer.Toolbar, Image.Viewer.Prev 등)을 고르면 그 부품만 그립니다. 도구 막대는 Image.Viewer.Toolbar 안에 Counter, ZoomIn, ZoomOut, Download, Share, Close 를 원하는 순서로 담습니다. Share 는 브라우저가 공유를 지원할 때만 보입니다. `loop` 을 주면 끝에서 처음으로 넘어갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '호수 위로 뜬 해 크게 보기' }));
-    await canvas.findByRole('dialog', { name: '풍경 사진 보기' });
-    await expect(canvas.queryByRole('group', { name: '사진 목록' })).toBeNull();
-    await expect(canvas.queryByRole('button', { name: '확대' })).toBeNull();
-    await expect(canvas.getByRole('link', { name: '내려받기' })).toHaveAttribute('download');
-
-    await userEvent.keyboard('{ArrowLeft}');
-    await waitFor(() => expect(canvas.getByText('6 / 6')).toBeInTheDocument());
-    await expect(canvas.getByText('숲')).toBeVisible();
   },
 };
 
@@ -411,7 +321,7 @@ export const Standalone: Story = {
     docs: {
       description: {
         story:
-          '썸네일 없이 뷰어만 쓸 때는 `items` 에 `src`, `alt`, `caption`, `thumbnail` 을 넘깁니다. `open`, `value`, `loop`, `zoom` 은 Image.Group 과 같습니다. 닫으면 뷰어를 연 버튼으로 포커스가 돌아갑니다.',
+          '썸네일 없이 뷰어만 쓸 때는 `items` 에 `src`, `alt`, `caption`, `thumbnail` 을 넘깁니다. `open`, `value`, `loop`, `zoom` 은 ImageGroup 과 같습니다. 닫으면 뷰어를 연 버튼으로 포커스가 돌아갑니다.',
       },
     },
   },
@@ -462,7 +372,7 @@ export const OnePhoto: Story = {
     docs: {
       description: {
         story:
-          'Image.Group 밖의 사진도 `preview` 를 주면 누를 수 있고, 그 한 장만 담은 뷰어가 열립니다. 넘기기 버튼, 번호, 썸네일은 그리지 않습니다.',
+          'ImageGroup 밖의 사진도 `preview` 를 주면 누를 수 있고, 그 한 장만 담은 뷰어가 열립니다. 넘기기 버튼, 번호, 썸네일은 그리지 않습니다.',
       },
     },
   },
