@@ -307,13 +307,24 @@ export const Formats: Story = {
     const [markdown, setMarkdown] = useState(
       '## 회의록\n\n- **안건**: 축제 부스\n- 결정: 다음 주에',
     );
+    const [html, setHtml] = useState('<p><strong>HTML</strong> 로 저장합니다</p>');
     const [json, setJson] = useState<Editor.Json>({
       type: 'doc',
       content: [{ type: 'paragraph', content: [{ type: 'text', text: 'JSON 으로 저장합니다' }] }],
     });
 
     return (
-      <div className="grid w-full max-w-3xl gap-6 md:grid-cols-2">
+      <div className="grid w-full max-w-5xl gap-6 md:grid-cols-3">
+        <div className="flex flex-col gap-2">
+          <Editor format="html" aria-label="HTML" value={html} onValueChange={setHtml}>
+            <Editor.Bold />
+            <Editor.Italic />
+            <Editor.Content />
+          </Editor>
+          <pre data-testid="html" className="text-caption-c1-regular font-mono whitespace-pre-wrap">
+            {html}
+          </pre>
+        </div>
         <div className="flex flex-col gap-2">
           <Editor
             format="markdown"
@@ -350,6 +361,9 @@ export const Formats: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
+    const html = await editableContent(canvas, 'HTML');
+    await expect(html.querySelector('strong')).toHaveTextContent('HTML');
+
     const markdown = await editableContent(canvas, '마크다운');
     await expect(markdown.querySelector('h2')).toHaveTextContent('회의록');
     await expect(markdown.querySelector('strong')).toHaveTextContent('안건');
@@ -674,6 +688,16 @@ export const BlockHandle: Story = {
     defaultValue: '## 준비물\n\n이름표와 노트북을 챙기세요.\n\n- 9시 집합\n- 10시 발표',
     'aria-label': '블록 본문',
   },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.BlockType />
+      <Editor.Separator />
+      <Editor.Bold />
+      <Editor.Italic />
+      <Editor.Content />
+      <Editor.BlockHandle />
+    </Editor>
+  ),
   parameters: {
     docs: {
       description: {
@@ -688,16 +712,6 @@ export const BlockHandle: Story = {
     const handle = await canvas.findByRole('button', { name: '블록 메뉴' });
     await userEvent.click(handle);
     await expect(await canvas.findByRole('menuitem', { name: '복제' })).toBeVisible();
-  render: (args) => (
-    <Editor {...args}>
-      <Editor.BlockType />
-      <Editor.Separator />
-      <Editor.Bold />
-      <Editor.Italic />
-      <Editor.Content />
-      <Editor.BlockHandle />
-    </Editor>
-  ),
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
   },
@@ -734,5 +748,66 @@ export const TextAlign: Story = {
       'aria-pressed',
       'true',
     );
+  },
+};
+
+export const FullDocument: Story = {
+  args: {
+    'aria-label': '문서 본문',
+    defaultValue: [
+      '<h1>가을 축제 부스 안내</h1>',
+      '<p>올해 부스는 <strong>학생회관 앞</strong>에 섭니다. <mark>신청은 금요일까지</mark>입니다.</p>',
+      '<div data-type="callout" data-kind="tip"><p>신청서는 동아리 대표가 냅니다.</p></div>',
+      '<h2>준비물</h2>',
+      '<ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>이름표</p></li><li data-type="taskItem" data-checked="false"><p>노트북</p></li></ul>',
+      '<pre><code class="language-tsx">export const booth = { place: "학생회관", day: "금" };</code></pre>',
+      '<table><tbody><tr><th><p>시간</p></th><th><p>할 일</p></th></tr><tr><td><p>9시</p></td><td><p>집합</p></td></tr><tr><td><p>10시</p></td><td><p>발표</p></td></tr></tbody></table>',
+      '<details open><summary>자주 묻는 질문</summary><div data-type="detailsContent"><p>부스는 두 곳까지 신청할 수 있습니다.</p></div></details>',
+      '<p></p>',
+    ].join(''),
+  },
+  render: (args) => (
+    <Editor
+      {...args}
+      className="w-[48rem]"
+      onImageUpload={async () => PICTURE}
+      mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
+    >
+      <Editor.BlockType />
+      <Editor.Separator />
+      <Editor.Bold />
+      <Editor.Italic />
+      <Editor.Underline />
+      <Editor.Strike />
+      <Editor.Code />
+      <Editor.Highlight />
+      <Editor.Link />
+      <Editor.Separator />
+      <Editor.BulletList />
+      <Editor.OrderedList />
+      <Editor.TaskList />
+      <Editor.Blockquote />
+      <Editor.CodeBlock />
+      <Editor.Separator />
+      <Editor.TextAlign />
+      <Editor.Separator />
+      <Editor.Image />
+      <Editor.Table />
+      <Editor.Callout />
+      <Editor.Details />
+      <Editor.HorizontalRule />
+      <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+      <Editor.BubbleMenu />
+      <Editor.BlockHandle />
+      <Editor.Count />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '모든 부품을 한 Editor 에 넣은 문서입니다. 툴바, / 메뉴, @ 멘션, 블록 손잡이, 글자를 고르면 뜨는 BubbleMenu, 그림 올리기와 크기 조절, 표, 콜아웃, 접는 블록, 코드 블록을 함께 써 볼 수 있습니다.',
+      },
+    },
   },
 };
