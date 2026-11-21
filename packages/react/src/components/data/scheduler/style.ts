@@ -47,7 +47,7 @@ export const schedulerStyle = tv({
       'relative h-[calc(var(--scheduler-hour)*24)] min-w-0 border-e border-neutral last:border-e-0',
       'bg-[linear-gradient(to_bottom,var(--ids-color-border-neutral)_1px,transparent_1px)] bg-size-[100%_var(--scheduler-hour)]',
     ],
-    dayEvents: 'absolute inset-y-0 start-0 end-2',
+    dayEvents: 'absolute inset-0',
     slot: [
       'absolute flex p-px',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-event-start))]',
