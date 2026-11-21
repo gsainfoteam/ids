@@ -35,7 +35,7 @@ import { Link } from '@gsainfoteam/ids-react';
 - 브랜드 색은 채우기(`bg-primary-solid`)가 아니라 글자 역할(`text-primary`)을 씁니다. 모든 테마에서 바탕과 APCA Lc 60 을 넘습니다.
 - 예전 `accent` 는 `primary` 로 바뀌었습니다.
 - `neutral` 은 `Card.Description` 처럼 흐린 글자 안에 두면 그 색을 따릅니다.
-- `neutral` 링크에 `aria-current="page"` 가 붙으면 `text-primary` 가 되고, 가리켜도 그대로입니다. 상단 바나 바닥글의 지금 페이지 표시입니다. 라우터 링크(`NavLink`, TanStack Router 의 `Link`)는 `aria-current` 를 스스로 붙이므로 따로 적을 것이 없습니다.
+- `neutral` 링크에 `aria-current="page"` 가 붙으면 `text-primary` 가 되고, 가리켜도 그대로입니다. 상단 바나 바닥글의 지금 페이지 표시입니다. React Router 의 `NavLink` 와 TanStack Router 의 `Link` 는 `aria-current` 를 스스로 붙이므로 따로 적을 것이 없습니다. Next.js 의 `Link` 는 붙이지 않으므로 `usePathname()` 과 비교해 적습니다.
 - 지금 페이지는 Pagination, Tabs 처럼 둘레가 neutral 이어도 primary 로 표시합니다. `primary`, `secondary`, `tertiary` 링크는 이미 그 색이라 바뀌지 않습니다.
 
 ## 밑줄

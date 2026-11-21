@@ -122,9 +122,9 @@ export const PC: Story = {
           </Badge>
           <Menu>
             <Menu.Trigger asChild>
-              <Button variant="outline" size="tiny" aria-label="내 계정">
+              <Button variant="outline" size="tiny">
                 <Avatar name="김지수" size="tiny" />
-                <span className="max-sm:hidden">김지수</span>
+                <span className="max-sm:sr-only">김지수</span>
                 <ChevronDownIcon />
               </Button>
             </Menu.Trigger>

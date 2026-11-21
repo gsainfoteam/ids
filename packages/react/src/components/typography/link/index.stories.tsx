@@ -271,7 +271,7 @@ export const CurrentPage: Story = {
     docs: {
       description: {
         story:
-          '상단 바처럼 링크만 모인 메뉴는 neutral 과 none 으로 둘레 글자색을 따르고, 지금 페이지 링크(aria-current="page")만 primary 글자색으로 표시합니다. 라우터 링크는 aria-current 를 스스로 붙입니다.',
+          '상단 바처럼 링크만 모인 메뉴는 neutral 과 none 으로 둘레 글자색을 따르고, 지금 페이지 링크(aria-current="page")만 primary 글자색으로 표시합니다. React Router 의 NavLink 와 TanStack Router 의 Link 는 aria-current 를 스스로 붙이고, Next.js 의 Link 는 앱이 usePathname() 으로 적습니다.',
       },
     },
   },
