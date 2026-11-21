@@ -63,6 +63,7 @@ const playwrightIn = (browsers: BrowserName[], viewport?: { width: number; heigh
 
 export default defineConfig({
   plugins: [tsconfigPaths({ projects: ['./tsconfig.json'] }), tailwindcss(), react()],
+  publicDir: '.storybook/public',
   optimizeDeps: { include: ['@floating-ui/react'] },
   test: {
     sequence: { sequencer: BalancedSequencer },

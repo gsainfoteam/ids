@@ -242,15 +242,45 @@ const renderChartFromAServerComponent = renderEntryFromAServerComponent({
 const renderEditorFromAServerComponent = renderEntryFromAServerComponent({
   entry: 'editor',
   component: 'Editor',
-  parts: ['Content', 'BlockType', 'Bold', 'Link', 'Separator', 'BubbleMenu', 'Count', 'Style'],
+  parts: [
+    'Content',
+    'BlockType',
+    'Bold',
+    'Highlight',
+    'Link',
+    'Image',
+    'TaskList',
+    'HorizontalRule',
+    'Table',
+    'TextAlign',
+    'Separator',
+    'BubbleMenu',
+    'Count',
+    'Style',
+  ],
   page: `h(
     Editor,
     { name: 'body', defaultValue: '<p>Hello</p>' },
     h(Editor.Bold),
+    h(Editor.Highlight),
     h(Editor.Link),
+    h(Editor.TaskList),
+    h(Editor.HorizontalRule),
+    h(Editor.Table),
+    h(Editor.TextAlign),
     h(Editor.Content),
     h(Editor.Count),
   )`,
+});
+
+const renderRichTextFromAServerComponent = renderEntryFromAServerComponent({
+  entry: 'rich-text',
+  component: 'RichText',
+  parts: ['Style'],
+  page: `h(RichText, {
+    value: '# 공지\\n\\n> [!NOTE]\\n> 참고하세요\\n\\n\\u0060\\u0060\\u0060ts\\nconst a = 1;\\n\\u0060\\u0060\\u0060',
+    mentionHref: (id) => '/users/' + id,
+  })`,
 });
 
 test(
@@ -275,10 +305,30 @@ test(
       'EditorRoot',
       'EditorBold',
       'EditorLink',
+      'EditorHighlight',
+      'EditorTaskList',
+      'EditorHorizontalRule',
+      'EditorTable',
+      'EditorTextAlign',
       'EditorContentPart',
       'EditorCount',
     ])
       expect(rendered.stdout).toContain(`"${reference}"`);
+  },
+  coldNodeStartOnABusyRunner,
+);
+
+test(
+  'a Server Component renders RichText from the rich-text entry without shipping Tiptap',
+  () => {
+    const rendered = runNode(['react-server'], renderRichTextFromAServerComponent);
+    expect(rendered.status, rendered.stderr).toBe(0);
+
+    expect(rendered.stdout).toContain('공지');
+    expect(rendered.stdout).toContain('"h1"');
+    for (const reference of ['AlertRoot', 'CodeBlockRoot', 'RichTextCalloutTitle'])
+      expect(rendered.stdout).toContain(`"${reference}"`);
+    expect(rendered.stdout).not.toMatch(/@tiptap/);
   },
   coldNodeStartOnABusyRunner,
 );

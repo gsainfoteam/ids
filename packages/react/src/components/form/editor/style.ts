@@ -1,5 +1,6 @@
 import { fieldSurface } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
+import { documentText } from '../../typography/rich-text/style';
 
 import type { EditorVariant } from './root';
 import type { IdsSize } from '../../../tokens/types';
@@ -17,19 +18,15 @@ const proseMirrorBaseline = cn(
   '[&_[contenteditable=false]]:whitespace-normal',
   '[&_img.ProseMirror-separator]:m-0! [&_img.ProseMirror-separator]:inline! [&_img.ProseMirror-separator]:size-0! [&_img.ProseMirror-separator]:border-0!',
   '[&.ProseMirror-hideselection]:caret-transparent',
-  '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary-strong',
+  '[&_.ProseMirror-selectednode:not(:has(>[data-image]))]:outline-2 [&_.ProseMirror-selectednode:not(:has(>[data-image]))]:outline-primary-strong',
 );
 
-const documentBlocks = cn(
-  '[&>*+*]:mt-2',
-  '[&_h1]:text-headline-h4-bold [&_h2]:text-headline-h5-bold [&_h3]:text-headline-h6-bold [&_h4]:text-body-b1-bold',
-  '[&_:is(h1,h2,h3,h4)+*]:mt-1',
-  '[&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-6 [&_li>*+*]:mt-1 [&_li+li]:mt-1',
-  '[&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
-  '[&_pre]:rounded-standard [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
-  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
+const editorBlocks = cn(
+  '[&_.suggestion]:text-primary',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
-  '[&_hr]:my-3 [&_hr]:border-neutral',
+  '[&_hr:not([data-divider])]:my-3 [&_hr:not([data-divider])]:border-neutral',
+  '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode:not(:has(>[data-image]))]:outline-offset-2',
+  '[&_table]:w-full! [&_:is(td,th)]:break-words [&_.selectedCell]:bg-primary-soft',
 );
 
 export const editorStyle = tv({
@@ -55,7 +52,8 @@ export const editorStyle = tv({
       'min-h-24 outline-none text-neutral-strong',
       'selection:bg-primary-solid/30 selection:text-neutral-strong',
       proseMirrorBaseline,
-      documentBlocks,
+      documentText,
+      editorBlocks,
       placeholder,
     ],
     count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-strong'],
@@ -64,18 +62,65 @@ export const editorStyle = tv({
     bubbleAnchor: 'pointer-events-none absolute',
     linkForm: 'flex flex-col gap-2',
     linkActions: 'flex justify-end gap-2',
+    imageInput: 'hidden',
+    imageFrame: [
+      'block w-full',
+      '[&_[data-resizable-handle]]:transition-opacity [&_[data-resizable-handle]]:duration-(--ids-motion-fast)',
+      '[&:not(:hover,:focus-within,[data-selected])_[data-resizable-handle]]:opacity-0',
+    ],
+    imageResizable: [
+      'w-fit max-w-full rounded-standard',
+      'in-data-selected:outline-2 in-data-selected:outline-offset-2 in-data-selected:outline-primary-strong',
+    ],
+    resizedImage: 'block h-auto w-full rounded-standard',
+    uploadPlaceholder: 'inline-block h-24 w-40 max-w-full align-middle before:hidden',
+    taskBox: 'mt-[calc((1lh_-_1rem)/2)]',
+    textAlign: 'flex items-center gap-0.5',
+    codeLanguage: '-ms-2.5 w-auto shrink-0 font-mono text-neutral',
+    codePre: 'px-4',
+    glyphButton: [
+      '-m-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard p-1',
+      'focus-ring state-layer data-hovered:state-hover data-active:state-press',
+      'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'disabled:cursor-default',
+    ],
+    details: ['relative', '[&:not([data-open])_[data-type=detailsContent]]:hidden'],
+    detailsToggle: [
+      'absolute end-1 m-0 size-6 text-neutral [&_svg]:size-4',
+      '[&_svg]:transition-transform [&_svg]:duration-(--ids-motion-normal) motion-reduce:[&_svg]:transition-none',
+      'data-open:[&_svg]:rotate-180',
+    ],
+    suggestion: 'w-64 concentric-p-1 p-0',
+    suggestionScroll: 'max-h-72 rounded-[inherit]',
+    suggestionList: 'flex flex-col p-1 outline-none',
+    suggestionOption: 'pe-2.5 [&_svg]:size-(--ids-size-icon-standard)',
+    mentionText: 'flex min-w-0 flex-col',
+    mentionLabel: 'truncate',
+    mentionDescription: 'truncate text-caption-c1-regular text-neutral',
+    blockHandle:
+      'absolute start-1.5 z-10 m-0 cursor-grab text-neutral active:cursor-grabbing [&_svg]:size-4 data-hidden:pointer-events-none data-hidden:invisible',
+    imageUrlError: 'text-caption-c1-regular text-danger',
+    tableSizePicker: 'flex flex-col gap-2',
+    tableSizeGrid: 'grid grid-cols-10 gap-1',
+    tableSizeCell: [
+      'size-4 cursor-pointer rounded-indicator bg-field-outline inset-ring-1 inset-ring-neutral',
+      'focus-ring focus-ring-visible:z-10',
+      'data-covered:bg-primary-soft data-covered:inset-ring-primary-strong',
+    ],
+    tableSizeLabel: 'text-center text-caption-c1-regular text-neutral tabular-nums',
+    detailsPlaceholder: 'pointer-events-none absolute start-0 text-neutral',
   },
   variants: {
     variant: {
       outline: {
         root: fieldSurface.variant.outline,
         bar: 'border-field-bar',
-        content: '[&_pre]:bg-field-code-outline [&_:not(pre)>code]:bg-field-code-outline',
+        content: '[&_:not(pre)>code]:bg-field-code-outline',
       },
       soft: {
         root: fieldSurface.variant.soft,
         bar: 'border-field-bar',
-        content: '[&_pre]:bg-block [&_:not(pre)>code]:bg-block',
+        content: '[&_:not(pre)>code]:bg-block',
       },
     } satisfies Record<EditorVariant, object>,
     size: {
@@ -83,12 +128,18 @@ export const editorStyle = tv({
         root: 'text-body-b3-regular',
         barItems: 'p-1',
         content: 'px-3 py-2',
+        blockHandle: 'size-6',
+        detailsToggle: 'top-[calc(--spacing(4)+(1lh-var(--spacing)*6)/2)]',
+        detailsPlaceholder: 'top-4 text-body-b3-medium',
         count: 'px-2 text-caption-c1-regular',
       },
       tiny: {
         root: 'text-caption-c1-regular',
         barItems: 'p-0.5',
         content: 'px-2 py-1.5',
+        blockHandle: 'size-5 rounded-indicator p-0.5',
+        detailsToggle: 'top-[calc(--spacing(3)+(1lh-var(--spacing)*6)/2)]',
+        detailsPlaceholder: 'top-3 text-caption-c1-medium',
         count: 'px-1.5 text-caption-c2-regular',
       },
     } satisfies Record<IdsSize, object>,
@@ -101,6 +152,10 @@ export const editorStyle = tv({
       false: { content: 'cursor-default' },
     },
   },
+  compoundVariants: [
+    { editable: true, size: 'standard', class: { content: 'ps-9' } },
+    { editable: true, size: 'tiny', class: { content: 'ps-8' } },
+  ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',

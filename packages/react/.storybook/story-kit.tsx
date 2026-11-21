@@ -83,12 +83,12 @@ export namespace Showcase {
   }
 }
 
-export function holdTheNextCall(spy: unknown) {
+export function holdTheNextCall<T = void>(spy: unknown, resolvesTo?: T) {
   let release = () => {};
   (spy as Mock).mockImplementationOnce(
     () =>
-      new Promise<void>((resolve) => {
-        release = resolve;
+      new Promise<T | undefined>((resolve) => {
+        release = () => resolve(resolvesTo);
       }),
   );
   return () => release();

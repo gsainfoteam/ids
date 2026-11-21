@@ -17,21 +17,48 @@ import { isEqual } from 'es-toolkit';
 
 import { EditorBar } from './bar';
 import { EditorBlockType } from './block-type';
-import { EditorBlockquote, EditorBulletList, EditorCodeBlock, EditorOrderedList } from './blocks';
+import {
+  EditorBlockquote,
+  EditorBulletList,
+  EditorCodeBlock,
+  EditorOrderedList,
+  EditorTaskList,
+} from './blocks';
 import { EditorBubbleMenu } from './bubble-menu';
+import { EditorCallout } from './callout/tool';
 import { EditorContentPart, type EditorContentProps } from './content';
-import { EditorContext } from './context';
+import { EditorContext, type EditorImages } from './context';
 import { EditorCount } from './count';
+import { EditorDetails } from './details/tool';
+import { EditorHorizontalRule } from './horizontal-rule';
+import { EditorImage } from './image/tool';
+import { isImageFile, type ImageUpload } from './image/types';
 import { EditorLink } from './link';
-import { loadEngine, type LoadedEngine } from './load-engine';
-import { EditorBold, EditorCode, EditorItalic, EditorStrike, EditorUnderline } from './marks';
+import {
+  EDITOR_FEATURES,
+  engineKey,
+  loadEngine,
+  type EditorFeature,
+  type LoadedEngine,
+} from './load-engine';
+import {
+  EditorBold,
+  EditorCode,
+  EditorHighlight,
+  EditorItalic,
+  EditorStrike,
+  EditorUnderline,
+} from './marks';
 import { EditorSeparator } from './separator';
 import { editorStyle } from './style';
+import { EditorTable } from './table/tool';
+import { EditorTextAlign } from './text-align';
 import { useEditorSelector } from './use-editor-selector';
 import {
   formText,
   isEmptyValue,
   readValue,
+  writable,
   writeValue,
   type EditorFormat,
   type EditorValue,
@@ -39,11 +66,13 @@ import {
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { FormValue } from '../../../internal/form-value';
-import { useTranslate } from '../../../internal/translate';
-import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { useTranslate, type Translate } from '../../../internal/translate';
+import { containsElementOfType, elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { toast } from '../../feedback/toast/toast-store';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
 import type { Editor } from '.';
+import type { FindMentions } from './mention/node';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorVariant = 'outline' | 'soft';
@@ -63,29 +92,43 @@ const TOOLS = new Set<unknown>([
   EditorUnderline,
   EditorStrike,
   EditorCode,
+  EditorHighlight,
   EditorLink,
+  EditorImage,
   EditorBulletList,
   EditorOrderedList,
+  EditorTaskList,
   EditorBlockquote,
   EditorCodeBlock,
+  EditorHorizontalRule,
+  EditorTable,
+  EditorTextAlign,
+  EditorCallout,
+  EditorDetails,
 ]);
 
-const DEFAULT_TOOLBAR = (
-  <>
-    <EditorBlockType />
-    <EditorSeparator />
-    <EditorBold />
-    <EditorItalic />
-    <EditorStrike />
-    <EditorCode />
-    <EditorLink />
-    <EditorSeparator />
-    <EditorBulletList />
-    <EditorOrderedList />
-    <EditorBlockquote />
-    <EditorCodeBlock />
-  </>
-);
+function defaultToolbar({ withImage }: { withImage: boolean }) {
+  return (
+    <>
+      <EditorBlockType />
+      <EditorSeparator />
+      <EditorBold />
+      <EditorItalic />
+      <EditorStrike />
+      <EditorCode />
+      <EditorLink />
+      {withImage && <EditorImage />}
+      <EditorSeparator />
+      <EditorBulletList />
+      <EditorOrderedList />
+      <EditorBlockquote />
+      <EditorCodeBlock />
+    </>
+  );
+}
+
+const DEFAULT_TOOLBAR = defaultToolbar({ withImage: false });
+const DEFAULT_TOOLBAR_WITH_IMAGE = defaultToolbar({ withImage: true });
 
 const isOfType = (type: unknown) => (node: ReactNode) =>
   isValidElement(node) && elementTypeOf(node) === type;
@@ -93,7 +136,7 @@ const isOfType = (type: unknown) => (node: ReactNode) =>
 const isTool = (node: ReactNode) => isValidElement(node) && TOOLS.has(elementTypeOf(node));
 
 function splitByContent(children: ReactNode) {
-  const items = flattenFragments(children === undefined ? DEFAULT_TOOLBAR : children);
+  const items = flattenFragments(children);
   const bubbles = items.filter(isOfType(EditorBubbleMenu));
   const laidOut = items.filter((item) => !isOfType(EditorBubbleMenu)(item));
   const indexes = laidOut.flatMap((item, index) =>
@@ -123,25 +166,59 @@ function definedOnly(record: Record<string, string | undefined>) {
   );
 }
 
-function useLoadedEngine(format: EditorFormat) {
+type ToolFeature = Exclude<EditorFeature, 'imageUpload' | 'mention'>;
+
+const FEATURE_TOOLS: Record<ToolFeature, unknown> = {
+  highlight: EditorHighlight,
+  taskList: EditorTaskList,
+  textAlign: EditorTextAlign,
+  table: EditorTable,
+  callout: EditorCallout,
+  details: EditorDetails,
+};
+
+function featuresIn(
+  source: ReactNode,
+  props: Record<'imageUpload' | 'mention', boolean>,
+): EditorFeature[] {
+  return EDITOR_FEATURES.filter((feature) =>
+    feature === 'imageUpload' || feature === 'mention'
+      ? props[feature]
+      : containsElementOfType(source, new Set([FEATURE_TOOLS[feature]])),
+  );
+}
+
+function useLoadedEngine(format: EditorFormat, features: readonly EditorFeature[]) {
+  const key = engineKey(format, features);
   const [loaded, setLoaded] = useState<LoadedEngine | null>(null);
+  const requested = useRef({ format, features });
+  useLayoutEffect(() => {
+    requested.current = { format, features };
+  });
 
   useEffect(() => {
     let mounted = true;
-    void loadEngine(format).then((next) => {
+    void loadEngine(requested.current.format, requested.current.features).then((next) => {
       if (mounted) setLoaded(next);
     });
     return () => {
       mounted = false;
     };
-  }, [format]);
+  }, [key]);
 
-  return loaded?.format === format ? loaded : null;
+  return loaded?.key === key ? loaded : null;
+}
+
+function taskLabelIn(t: Translate) {
+  return (text: string) =>
+    text === '' ? t('editor.taskItemEmpty') : t('editor.taskItem', { text });
 }
 
 export function EditorRoot(props: Editor.Props) {
   const {
     format = 'html',
+    onImageUpload,
+    mentions,
     value,
     defaultValue,
     onValueChange,
@@ -172,7 +249,14 @@ export function EditorRoot(props: Editor.Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLElement | null>(null);
   const notifyField = use(FieldNotifyContext);
-  const { bubbles, top, content, bottom, items } = splitByContent(children);
+  const insertable = onImageUpload !== undefined;
+  const shown =
+    children === undefined ? (insertable ? DEFAULT_TOOLBAR_WITH_IMAGE : DEFAULT_TOOLBAR) : children;
+  const { bubbles, top, content, bottom, items } = splitByContent(shown);
+  const features = featuresIn(shown, {
+    imageUpload: insertable,
+    mention: mentions !== undefined,
+  });
   const hasCount = items.some(isOfType(EditorCount));
   const editable = !disabled && !readOnly;
   const invalid = Boolean(
@@ -185,10 +269,34 @@ export function EditorRoot(props: Editor.Props) {
     onValueChange: onValueChange as ((next: EditorValue | undefined) => void) | undefined,
   });
   const [focused, setFocused] = useState(false);
+  const loaded = useLoadedEngine(format, features);
+  const [uploaded] = useState(() => new Set<string>());
+  const [pendingUploads, setPendingUploads] = useState(0);
 
-  const latest = useRef({ format, setCurrent });
+  const startUploads = (instance: TiptapEditor, files: readonly File[], at: number) => {
+    const upload = latest.current.onImageUpload;
+    const uploadImage = loaded?.features.imageUpload?.uploadImage;
+    if (!upload || !uploadImage) return;
+    const accepted = files.filter(isImageFile);
+    for (const file of files.filter((candidate) => !isImageFile(candidate)))
+      toast.error(file.name, { description: t('fileField.rejectType') });
+    setPendingUploads((count) => count + accepted.length);
+    for (const file of accepted)
+      void uploadImage(instance, file, at, { upload, uploaded })
+        .catch(() => toast.error(t('editor.imageUploadFailed'), { description: file.name }))
+        .finally(() => setPendingUploads((count) => count - 1));
+  };
+
+  const latest = useRef<{
+    format: EditorFormat;
+    setCurrent: typeof setCurrent;
+    onImageUpload: ImageUpload | undefined;
+    mentions: FindMentions | undefined;
+    startUploads: typeof startUploads;
+    t: Translate;
+  }>({ format, setCurrent, onImageUpload, mentions, startUploads, t });
   useLayoutEffect(() => {
-    latest.current = { format, setCurrent };
+    latest.current = { format, setCurrent, onImageUpload, mentions, startUploads, t };
   });
   const reportedSinceTheLastRender = useRef<EditorValue[]>([]);
 
@@ -210,20 +318,47 @@ export function EditorRoot(props: Editor.Props) {
     class: styles.content({ className: content.props.className }),
   });
 
-  const loaded = useLoadedEngine(format);
-  const extensions = useMemo(
-    () => loaded?.engine.extensionsFor({ maxLength, markdown: loaded.markdown }),
-    [loaded, maxLength],
+  const [callIntoTheLatestRender] = useState(() => ({
+    startUploads: (instance: TiptapEditor, files: File[], at: number) =>
+      latest.current.startUploads(instance, files, at),
+    taskLabel: (text: string) => taskLabelIn(latest.current.t)(text),
+    t: ((key, values) => latest.current.t(key, values)) satisfies Translate,
+    findMentions: ((query, signal) =>
+      latest.current.mentions?.(query, signal) ?? []) satisfies FindMentions,
+  }));
+
+  const setup = useMemo(
+    () =>
+      loaded?.engine.extensionsFor({
+        size,
+        maxLength,
+        markdown: loaded.markdown,
+        features: loaded.features,
+        images: { uploaded, start: callIntoTheLatestRender.startUploads },
+        taskLabel: callIntoTheLatestRender.taskLabel,
+        t: callIntoTheLatestRender.t,
+        findMentions: callIntoTheLatestRender.findMentions,
+      }),
+    [loaded, size, maxLength, uploaded, callIntoTheLatestRender],
+  );
+  const mention = loaded?.features.mention;
+  const floating = (
+    <>
+      {bubbles}
+      {loaded && setup && <loaded.engine.EditorSlashMenu store={setup.slashMenu} />}
+      {loaded && setup && <loaded.engine.EditorBlockHandle store={setup.blockHandle} />}
+      {mention && setup?.mentionMenu && <mention.EditorMentionMenu store={setup.mentionMenu} />}
+    </>
   );
   const [editor, setEditor] = useState<TiptapEditor | null>(null);
 
-  const engineOptions = extensions && {
+  const engineOptions = setup && {
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
     injectCSS: false,
     editable,
-    extensions,
-    content: current ?? '',
+    extensions: setup.extensions,
+    content: writable(current ?? '', format, uploaded),
     contentType: format,
     editorProps: { attributes: contentAttributes },
   };
@@ -272,13 +407,13 @@ export function EditorRoot(props: Editor.Props) {
     }
     reportedSinceTheLastRender.current = [];
     if (isEqual(readValue(editor, format), value)) return;
-    writeValue(editor, value, format);
-  }, [editor, value, format]);
+    writeValue(editor, value, format, uploaded);
+  }, [editor, value, format, uploaded]);
 
   useFormReset(rootRef, () => {
     if (!editor || value !== undefined) return;
     setCurrent(defaultValue, { silent: true });
-    writeValue(editor, defaultValue, format);
+    writeValue(editor, defaultValue, format, uploaded);
   });
 
   const empty = useEditorSelector(editor, (instance) => instance.isEmpty, isEmptyValue(current));
@@ -290,10 +425,20 @@ export function EditorRoot(props: Editor.Props) {
 
   const state: EditorState = { disabled, readOnly, invalid, focused, filled: !empty };
 
+  const images: EditorImages | null = insertable
+    ? {
+        pending: pendingUploads,
+        upload: (files, at) => {
+          if (editor) startUploads(editor, files, at);
+        },
+      }
+    : null;
+
   return (
     <EditorContext
       value={{
         editor,
+        format,
         editable,
         disabled,
         readOnly,
@@ -302,7 +447,8 @@ export function EditorRoot(props: Editor.Props) {
         countId,
         maxLength,
         contentAttributes,
-        bubbles,
+        floating,
+        images,
         styles,
         EngineContent: loaded?.engine.EditorContent ?? null,
       }}
@@ -339,6 +485,11 @@ export function EditorRoot(props: Editor.Props) {
           >
             {bottom}
           </EditorBar>
+        )}
+        {insertable && (
+          <span role="status" className="sr-only">
+            {pendingUploads > 0 ? t('editor.imageUploading') : ''}
+          </span>
         )}
         <FormValue
           name={name}
