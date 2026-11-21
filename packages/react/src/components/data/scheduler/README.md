@@ -120,6 +120,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 
 - 오늘 칸에 지금 시각의 선을 긋습니다. 장식이라 화면 읽기는 읽지 않습니다.
 - `now` 가 없으면 hydration 뒤에 클라이언트 시계를 읽어 긋습니다. 서버 HTML 에는 선이 없어서 서버와 클라이언트 시각이 달라도 어긋나지 않습니다.
+- 오늘 칸(`aria-current="date"`)도 같은 시계를 따릅니다. 서버 HTML 에는 오늘 칸이 없고, hydration 뒤에 클라이언트의 오늘을 표시합니다.
 - `now` 를 주면 그 시각에 고정하고, 오늘도 그 날짜입니다. 스토리와 테스트가 씁니다.
 
 ## 스크롤

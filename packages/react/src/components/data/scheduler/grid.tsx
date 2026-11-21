@@ -31,7 +31,7 @@ const WORKDAY_START_HOUR = 8;
 type SchedulerGridProps<E extends SchedulerEventData> = SchedulerContextValue & {
   days: CalendarDate[];
   events: readonly E[];
-  today: CalendarDate;
+  today: CalendarDate | undefined;
   now: CalendarDateTime | undefined;
   renderEvent: (event: E) => ReactNode;
 };
@@ -74,7 +74,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
             <div className={styles.columns({ className: styles.header() })}>
               <div aria-hidden="true" className={styles.corner()} />
               {days.map((day) => {
-                const isToday = sameDay(day, today);
+                const isToday = today !== undefined && sameDay(day, today);
                 return (
                   <div
                     key={day.toString()}

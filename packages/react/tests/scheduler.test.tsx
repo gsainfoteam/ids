@@ -1,5 +1,6 @@
 import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import axe from 'axe-core';
+import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, expect, test, vi } from 'vitest';
 import { page, server, userEvent } from 'vitest/browser';
@@ -110,6 +111,33 @@ test('the client clock draws the time line after hydration', async () => {
   const line = document.querySelector<HTMLElement>('[data-scheduler-now]')!;
   expect(line.closest('section')!.getAttribute('data-scheduler-column')).toBe('2026-11-17');
   expect(line.style.getPropertyValue('--scheduler-now')).toBe('14.25');
+});
+
+test('a server on another date marks no day as today, and hydration marks the client day', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date(2026, 10, 17, 23, 30));
+  const tree = inProvider({ now: undefined });
+  const container = document.createElement('div');
+  container.innerHTML = renderToString(tree);
+  document.body.append(container);
+  expect(container.querySelector('[aria-current="date"]')).toBeNull();
+
+  vi.setSystemTime(new Date(2026, 10, 18, 8, 30));
+  const recovered = vi.fn();
+  const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+  const root = hydrateRoot(container, tree, { onRecoverableError: recovered });
+
+  await expect
+    .poll(() =>
+      container.querySelector('[aria-current="date"]')?.getAttribute('data-scheduler-day'),
+    )
+    .toBe('2026-11-18');
+  expect(recovered).not.toHaveBeenCalled();
+  expect(logged).not.toHaveBeenCalled();
+
+  root.unmount();
+  container.remove();
+  logged.mockRestore();
 });
 
 test('overlapping events split the column into lanes, and the lanes end with the overlap', () => {

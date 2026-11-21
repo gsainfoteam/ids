@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
+import { getLocalTimeZone, today as todayIn } from '@internationalized/date';
 
 import { stepOf, type SchedulerView } from './layout';
 import { useTranslate } from '../../../internal/translate';
@@ -26,7 +27,7 @@ type SchedulerToolbarProps = SchedulerContextValue & {
   date: CalendarDate;
   onDateChange: (date: CalendarDate) => void;
   days: CalendarDate[];
-  today: CalendarDate;
+  today: CalendarDate | undefined;
   locale: string;
   weekStartsOn: WeekDay;
 };
@@ -56,7 +57,9 @@ export function SchedulerToolbar({
           aria-label={t(view === 'week' ? 'scheduler.previousWeek' : 'scheduler.previousDay')}
           onClick={() => onDateChange(date.subtract(step))}
         />
-        <Button onClick={() => onDateChange(today)}>{t('scheduler.today')}</Button>
+        <Button onClick={() => onDateChange(today ?? todayIn(getLocalTimeZone()))}>
+          {t('scheduler.today')}
+        </Button>
         <IconButton
           icon={<ChevronRightIcon aria-hidden="true" className="rtl:-scale-x-100" />}
           aria-label={t(view === 'week' ? 'scheduler.nextWeek' : 'scheduler.nextDay')}

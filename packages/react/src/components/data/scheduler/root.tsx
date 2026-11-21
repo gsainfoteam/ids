@@ -64,8 +64,8 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   const resolvedLocale = resolveLocale(locale ?? providerLocale);
   const weekStart = weekStartsOn ?? weekStartOf(resolvedLocale);
   const now = useNow(nowProp);
-  const [mountedToday] = useState(() => todayIn(getLocalTimeZone()));
-  const today = nowProp ? dateOf(nowProp) : mountedToday;
+  const [firstShownDate] = useState(() => defaultDate ?? todayIn(getLocalTimeZone()));
+  const today = now && dateOf(now);
 
   const [view, setView] = useControllableState({
     value: viewProp,
@@ -74,7 +74,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   });
   const [date, setDate] = useControllableState({
     value: dateProp,
-    defaultValue: defaultDate ?? today,
+    defaultValue: firstShownDate,
     onValueChange: onDateChange,
   });
 
