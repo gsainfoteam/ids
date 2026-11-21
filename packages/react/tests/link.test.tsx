@@ -183,6 +183,27 @@ test('neutral follows the surrounding text color', async () => {
   expect(getComputedStyle(link).color).toBe('rgb(1, 2, 3)');
 });
 
+test('a neutral link to the current page takes the primary color, and keeps it on hover', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <p style={{ color: 'rgb(1, 2, 3)' }}>
+        <Link href="#a" data-testid="primary">
+          Primary
+        </Link>
+        <Link href="#b" colorScheme="neutral" underline="none" aria-current="page">
+          Current
+        </Link>
+      </p>
+    </IdsProvider>,
+  );
+  const primary = getComputedStyle(screen.getByTestId('primary').element()).color;
+  const current = screen.getByRole('link', { name: 'Current' });
+
+  expect(getComputedStyle(current.element()).color).toBe(primary);
+  await userEvent.hover(current);
+  expect(getComputedStyle(current.element()).color).toBe(primary);
+});
+
 test('inside Empty.Description a Link keeps its own underline offset', async () => {
   const screen = await render(
     <div>

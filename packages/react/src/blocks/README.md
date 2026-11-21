@@ -19,6 +19,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Profile](profile/README.md) | Members, Page |
 | [Search](search/README.md) | Command, Results |
 | [Sidebar](sidebar/README.md) | Collapsible, Inset, Simple |
+| [TopBar](top-bar/README.md) | Account, Simple |
 | [Mail](mail/README.md) | Compose, Inbox |
 | [Chat](chat/README.md) | Channel |
 | [Chatbot](chatbot/README.md) | Research, Simple, Thread, Welcome, Widget |
@@ -67,6 +68,7 @@ login/
 - **링크.**
   - 글 속 링크와 "비밀번호 찾기", "회원가입" 같은 안내 링크는 `Link` 입니다.
   - 표 칸과 바닥글 목록의 링크는 `Link colorScheme="neutral" underline="hover"` 입니다. 목록 안이라 밑줄 없이도 구별됩니다.
+  - 상단 바의 메뉴 링크는 `Link colorScheme="neutral" underline="none"` 이고, 지금 페이지에 `aria-current="page"` 를 줍니다.
   - 눈에 띄어야 할 행동은 `<a>` 를 감싼 `solid`, `outline`, `soft` 버튼(`Button asChild`)입니다.
   - 행과 카드 전체가 링크면 `Item asChild`, `Card asChild` 입니다.
   - 맨 `<a>` 는 `Button`, `IconButton`, `Item`, `Card`, `Link` 의 `asChild` 자식으로만 씁니다.
