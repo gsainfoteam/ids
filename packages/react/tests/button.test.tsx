@@ -357,7 +357,7 @@ test(
             theme={{ primary: palettes[entry.color] }}
             key={name(entry)}
             mode={entry.mode}
-            className="bg-neutral-subtlest"
+            className="bg-base"
           >
             <Button colorScheme={entry.scheme}>{name(entry)}</Button>
           </IdsProvider>

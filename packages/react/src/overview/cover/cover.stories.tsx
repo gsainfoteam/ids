@@ -40,6 +40,7 @@ import { Chip } from '../../components/data/chip';
 import { ColorPicker } from '../../components/data/color-picker';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { QRCode } from '../../components/data/qr-code';
 import { Table } from '../../components/data/table';
 import { TimePicker } from '../../components/data/time-picker';
@@ -93,12 +94,12 @@ const column = cn('flex shrink-0 flex-col gap-4');
 
 const tile = cn(
   'shrink-0 shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)]',
-  'dark:bg-neutral-subtle dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
+  'dark:bg-neutral-soft dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
 );
 
 const frame = cn(
-  'shrink-0 overflow-hidden rounded-container bg-neutral-subtlest inset-ring-1 inset-ring-neutral',
-  'shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)] dark:bg-neutral-subtle dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
+  'shrink-0 overflow-hidden rounded-container bg-base inset-ring-1 inset-ring-neutral',
+  'shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)] dark:bg-neutral-soft dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
 );
 
 const row = cn('flex items-center justify-between gap-3 text-body-b3-medium');
@@ -120,7 +121,7 @@ export const Cover: Story = {
           inert
           aria-hidden
           className={cn(
-            'bg-neutral-subtle text-neutral-bold dark:bg-neutral-subtlest absolute inset-0 overflow-hidden',
+            'bg-neutral-soft text-neutral-strong dark:bg-base absolute inset-0 overflow-hidden',
             halves[mode],
           )}
         >
@@ -408,7 +409,7 @@ export const Cover: Story = {
 
               <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                 <Card size="tiny" className={tile}>
-                  <Item.Group variant="separated" aria-label="파일" size="tiny">
+                  <ItemGroup variant="separated" aria-label="파일" size="tiny">
                     <Item>
                       <Item.Media variant="soft">
                         <DocumentTextIcon />
@@ -436,7 +437,7 @@ export const Cover: Story = {
                         <Item.Description>파일 12개</Item.Description>
                       </Item.Content>
                     </Item>
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
               </IdsProvider.Scope>
 
@@ -465,7 +466,7 @@ export const Cover: Story = {
                       <Badge content={3} aria-label="새 알림 3개" colorScheme="danger" />
                     </Card.Action>
                   </Card.Header>
-                  <Item.Group aria-label="알림" size="tiny">
+                  <ItemGroup aria-label="알림" size="tiny">
                     <Item>
                       <Item.Media>
                         <Avatar name="박서연" size="tiny" />
@@ -484,7 +485,7 @@ export const Cover: Story = {
                         <Item.Description>1시간 전</Item.Description>
                       </Item.Content>
                     </Item>
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
               </IdsProvider.Scope>
 
@@ -634,9 +635,9 @@ export const Cover: Story = {
 
               <IdsProvider.Scope
                 theme={{ primary: palettes.cyan }}
-                className="bg-neutral-subtlest h-[600px] shrink-0 overflow-hidden rounded-[48px] border-[10px] border-(--ids-color-bg-neutral-bold) p-5 shadow-[0_32px_64px_-24px_rgb(15_23_42/0.4)] dark:border-(--ids-color-bg-neutral)"
+                className="bg-base h-[600px] shrink-0 overflow-hidden rounded-[48px] border-[10px] border-(--ids-color-bg-neutral-solid) p-5 shadow-[0_32px_64px_-24px_rgb(15_23_42/0.4)] dark:border-(--ids-color-border-neutral-strong)"
               >
-                <div className="dark:bg-neutral mx-auto mb-4 h-6 w-24 rounded-full bg-neutral-bold" />
+                <div className="bg-neutral-solid mx-auto mb-4 h-6 w-24 rounded-full dark:bg-(--ids-color-border-neutral-strong)" />
                 <p className="text-caption-c1-medium text-neutral">gistory</p>
                 <p className="text-headline-h5-bold mb-4">최근 활동</p>
                 <Stepper progress={false} orientation="vertical" size="tiny" aria-label="최근 활동">
@@ -710,7 +711,7 @@ export const Cover: Story = {
                   <Card.Header>
                     <Card.Title>대출 중인 책</Card.Title>
                   </Card.Header>
-                  <Item.Group aria-label="대출 중인 책" size="tiny">
+                  <ItemGroup aria-label="대출 중인 책" size="tiny">
                     <Item>
                       <Item.Content>
                         <Item.Title>클린 코드</Item.Title>
@@ -731,7 +732,7 @@ export const Cover: Story = {
                         </Button>
                       </Item.Actions>
                     </Item>
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
               </IdsProvider.Scope>
 
@@ -806,7 +807,7 @@ export const Cover: Story = {
                         </Tabs.List>
                         <Tabs.Content value="all">전체 글</Tabs.Content>
                         <Tabs.Content value="notice">
-                          <Item.Group aria-label="공지" size="tiny">
+                          <ItemGroup aria-label="공지" size="tiny">
                             <Item>
                               <Item.Content>
                                 <Item.Title>기숙사 점호 안내</Item.Title>
@@ -822,7 +823,7 @@ export const Cover: Story = {
                                 <Item.Description>총학생회</Item.Description>
                               </Item.Content>
                             </Item>
-                          </Item.Group>
+                          </ItemGroup>
                         </Tabs.Content>
                         <Tabs.Content value="event">행사 글</Tabs.Content>
                       </Tabs>
@@ -840,7 +841,7 @@ export const Cover: Story = {
                           </Badge>
                         </Card.Action>
                       </Card.Header>
-                      <Item.Group aria-label="식당" size="tiny">
+                      <ItemGroup aria-label="식당" size="tiny">
                         <Item>
                           <Item.Media variant="soft">
                             <BuildingStorefrontIcon />
@@ -861,7 +862,7 @@ export const Cover: Story = {
                           </Item.Content>
                           <Item.Actions>4,500원</Item.Actions>
                         </Item>
-                      </Item.Group>
+                      </ItemGroup>
                     </Card>
                   </IdsProvider.Scope>
                 </div>
@@ -1074,13 +1075,13 @@ export const Cover: Story = {
                         <IdsProvider.Scope
                           key={color}
                           theme={{ primary: palettes[color] }}
-                          className="bg-primary aspect-square rounded-full"
+                          className="bg-primary-solid aspect-square rounded-full"
                         />
                       ))}
                     </div>
                   </Card>
 
-                  <p className="-me-[0.1em] bg-linear-to-b from-(--ids-color-text-neutral-bold) to-(--ids-color-text-neutral) bg-clip-text pe-[0.1em] font-[system-ui] text-[200px] leading-none font-black tracking-[-0.06em] text-transparent">
+                  <p className="-me-[0.1em] bg-linear-to-b from-(--ids-color-text-neutral-strong) to-(--ids-color-text-neutral) bg-clip-text pe-[0.1em] font-[system-ui] text-[200px] leading-none font-black tracking-[-0.06em] text-transparent">
                     IDS
                   </p>
 
@@ -1194,7 +1195,7 @@ export const Cover: Story = {
                   <IdsProvider.Scope theme={{ primary: palettes.purple }} asChild>
                     <Card size="tiny" className={cn(tile, 'gap-2')}>
                       <TextField aria-label="명령" placeholder="명령 찾기" variant="soft" />
-                      <Item.Group aria-label="명령" size="tiny">
+                      <ItemGroup aria-label="명령" size="tiny">
                         <Item>
                           <Item.Content>
                             <Item.Title>새 공지 작성</Item.Title>
@@ -1219,7 +1220,7 @@ export const Cover: Story = {
                             <Kbd keys="Mod+Shift+L" />
                           </Item.Actions>
                         </Item>
-                      </Item.Group>
+                      </ItemGroup>
                     </Card>
                   </IdsProvider.Scope>
 
@@ -1399,7 +1400,7 @@ export const Cover: Story = {
                       <Tabs.Trigger value="closed">마감</Tabs.Trigger>
                     </Tabs.List>
                     <Tabs.Content value="open">
-                      <Item.Group aria-label="모집 중인 스터디" size="tiny">
+                      <ItemGroup aria-label="모집 중인 스터디" size="tiny">
                         <Item>
                           <Item.Content>
                             <Item.Title>알고리즘 스터디</Item.Title>
@@ -1422,7 +1423,7 @@ export const Cover: Story = {
                             </Button>
                           </Item.Actions>
                         </Item>
-                      </Item.Group>
+                      </ItemGroup>
                     </Tabs.Content>
                     <Tabs.Content value="closed">마감된 스터디</Tabs.Content>
                   </Tabs>
@@ -1499,14 +1500,14 @@ export const Cover: Story = {
 
               <IdsProvider.Scope theme={{ primary: palettes.orange }} className={frame}>
                 <div className="border-neutral flex items-center gap-1.5 border-b px-4 py-3">
-                  <span className="bg-danger size-3 rounded-full" />
-                  <span className="bg-warning size-3 rounded-full" />
-                  <span className="bg-success size-3 rounded-full" />
+                  <span className="bg-danger-solid size-3 rounded-full" />
+                  <span className="bg-warning-solid size-3 rounded-full" />
+                  <span className="bg-success-solid size-3 rounded-full" />
                   <span className="text-caption-c1-medium text-neutral ms-3">gistory.me</span>
                 </div>
                 <Splitter className="h-56">
                   <Splitter.Panel defaultSize={40}>
-                    <Item.Group aria-label="폴더" size="tiny" className="p-2">
+                    <ItemGroup aria-label="폴더" size="tiny" className="p-2">
                       <Item selected>
                         <Item.Content>
                           <Item.Title>공지</Item.Title>
@@ -1522,7 +1523,7 @@ export const Cover: Story = {
                           <Item.Title>동아리</Item.Title>
                         </Item.Content>
                       </Item>
-                    </Item.Group>
+                    </ItemGroup>
                   </Splitter.Panel>
                   <Splitter.Panel>
                     <div className="flex flex-col gap-3 p-4">
@@ -1654,7 +1655,7 @@ export const Cover: Story = {
                   <Card.Header>
                     <Card.Title>함께 편집</Card.Title>
                   </Card.Header>
-                  <Item.Group aria-label="편집자" size="tiny">
+                  <ItemGroup aria-label="편집자" size="tiny">
                     <Item>
                       <Item.Media>
                         <Avatar name="김지수" size="tiny" />
@@ -1677,7 +1678,7 @@ export const Cover: Story = {
                         <span className={hint}>편집 가능</span>
                       </Item.Actions>
                     </Item>
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
               </IdsProvider.Scope>
 
@@ -1870,7 +1871,7 @@ export const Cover: Story = {
               <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                 <Card size="tiny" className={cn(tile, 'gap-2')}>
                   <TextField aria-label="사람 찾기" placeholder="사람 찾기" variant="soft" />
-                  <Item.Group aria-label="사람" size="tiny">
+                  <ItemGroup aria-label="사람" size="tiny">
                     <Item selected>
                       <Item.Media>
                         <Avatar name="최하준" size="tiny" />
@@ -1887,7 +1888,7 @@ export const Cover: Story = {
                         <Item.Title>정예린</Item.Title>
                       </Item.Content>
                     </Item>
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
               </IdsProvider.Scope>
 

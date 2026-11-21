@@ -12,10 +12,10 @@ export const bubbleStyle = tv({
   },
   variants: {
     variant: {
-      soft: { root: 'bg-neutral-subtle text-neutral-bold' },
-      solid: { root: 'bg-primary text-on-primary' },
+      soft: { root: 'bg-neutral-soft text-neutral-strong' },
+      solid: { root: 'bg-primary-solid text-on-primary-solid' },
       outline: {
-        root: 'bg-neutral-subtlest text-neutral-bold inset-ring-1 inset-ring-neutral',
+        root: 'bg-base text-neutral-strong inset-ring-1 inset-ring-neutral',
       },
     } satisfies Record<BubbleVariant, object>,
     align: {

@@ -17,6 +17,7 @@
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`surfaces/field-surface.ts`](#surfacesfield-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
+| [`surfaces/footer-band.ts`](#surfacesfooter-bandts)             | 카드와 대화상자 바닥의 버튼 띠 클래스 조각                                          | Card, Dialog                                                                                                                                                                                                          |
 | [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수                         | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                                                                                                                            |
 | [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                                       |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
@@ -31,6 +32,7 @@
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
 | [`resize-handle/`](./resize-handle/README.md)    | 크기 조절 손잡이의 키 표, separator ARIA, 포인터 끌기, 클래스 조각, 가장자리와 모서리 손잡이 | DataTable, Resizable, Splitter, TextArea                                                                                                                                                                                                   |
 | [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
+| [`surfaces/segment-surface.ts`](#surfacessegment-surfacets)       | 트랙 위에 고른 칸을 띄우는 모양과 칸 높이                                             | SegmentedControl, Tabs(`segmented`) |
 | [`surfaces/slider-surface.ts`](#surfacesslider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                                 | Slider, ColorPicker                                                                                                                                                                                                   |
 | [`slides/`](#slides)                             | Embla Carousel 을 감싼 슬라이드 엔진, 장마다의 ARIA, 키, 넘김 알림                    | Carousel, Image |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Image, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                 |
@@ -135,20 +137,20 @@ export const iconToggleStyle = tv({
 
 ### 왜 이렇게
 
-- `colorScheme` 은 `scheme-{계열}` 클래스 하나만 붙입니다. variant 는 계열 자리에 `scheme` 을 쓴 utility(`bg-scheme`, `text-on-scheme`, `bg-scheme-subtle`, `text-scheme`)만 읽습니다. 그래서 variant 와 scheme 의 조합마다 클래스를 따로 쓰지 않습니다.
+- `colorScheme` 은 `scheme-{계열}` 클래스 하나만 붙입니다. variant 는 계열 자리에 `scheme` 을 쓴 utility(`bg-scheme-solid`, `text-on-scheme-solid`, `bg-scheme-soft`, `text-scheme`)만 읽습니다. 그래서 variant 와 scheme 의 조합마다 클래스를 따로 쓰지 않습니다.
 
 | variant | 클래스 |
 | --- | --- |
-| solid | `bg-scheme text-on-scheme`, `state-fill` |
-| soft | `bg-scheme-subtle text-on-scheme-subtle`, `state-scheme` |
-| outline | `bg-control-outline text-neutral-bold inset-ring-control-outline` |
-| ghost | `bg-transparent text-neutral-bold` |
-| glossy | `bg-scheme text-on-scheme`, 광택, `inset-ring-black/20` |
-| transparent | `bg-transparent text-neutral-bold`, 불투명도 |
+| solid | `bg-scheme-solid text-on-scheme-solid`, `state-fill` |
+| soft | `bg-scheme-soft text-on-scheme-soft`, `state-scheme` |
+| outline | `bg-control-outline text-neutral-strong inset-ring-control-outline` |
+| ghost | `bg-transparent text-neutral-strong` |
+| glossy | `bg-scheme-solid text-on-scheme-solid`, 광택, `inset-ring-black/20` |
+| transparent | `bg-transparent text-neutral-strong`, 불투명도 |
 
 - prop 조합이 고르는 것은 `compoundVariants` 에 있습니다. 토큰으로 만들지 않습니다.
-  - `colorScheme: 'neutral'` 은 `focus-ring`(primary ring) 입니다. 나머지는 `base` 의 `focus-ring-scheme`(`border-scheme` ring) 입니다. `.scheme-neutral` 의 `border-scheme` 은 `border-neutral` 이라 ring 이 보이지 않기 때문입니다.
-  - 상태 계열(danger, success, warning, info)의 outline, ghost 는 `quietInStatusColor`(`text-scheme state-scheme`), transparent 는 `text-scheme` 입니다. 브랜드와 neutral 의 outline, ghost 는 `text-neutral-bold` 그대로입니다.
+  - `colorScheme: 'neutral'` 은 `focus-ring`(primary ring) 입니다. 나머지는 `base` 의 `focus-ring-scheme`(`border-scheme-strong` ring) 입니다. `.scheme-neutral` 의 `border-scheme-strong` 은 `border-neutral` 이라 ring 이 보이지 않기 때문입니다.
+  - 상태 계열(danger, success, warning, info)의 outline, ghost 는 `quietInStatusColor`(`text-scheme state-scheme`), transparent 는 `text-scheme` 입니다. 브랜드와 neutral 의 outline, ghost 는 `text-neutral-strong` 그대로입니다.
 - hover 와 press 색 변수는 없습니다. 모두 `pressStates`(`state-layer data-hovered:state-hover data-active:state-press`)를 씁니다.
   - solid 는 `state-fill` 을 더합니다. 층이 검정 hover 10%, press 18% 라 채움이 같은 색의 진한 쪽으로 갑니다.
   - `state-scheme` 은 scheme 클래스가 정한 층(`--ids-state-layer-scheme`, `-hover`, `-press`)을 그립니다. 브랜드와 상태 계열은 계열 채움 8% / 12%, neutral 은 글자색 6% / 10% 입니다.
@@ -162,7 +164,7 @@ export const iconToggleStyle = tv({
   - 계열 채움 층은 빨간 버튼이 hover 때 거뭇해지지 않고 더 붉어지게 합니다.
   - IdsProvider 가 이 층들 아래에서도 글자 대비를 지키는 단계를 고릅니다(`theme-roles.ts` 의 `underStateLayers`). `tests/tokens-contrast.test.ts` 가 확인합니다.
   - `base` 의 `transition-[…]` 에 `--ids-state-opacity` 가 있어 층이 다른 색과 함께 바뀝니다.
-- outline 은 컴포넌트 토큰 `bg-control-outline` 과 `inset-ring-control-outline` 입니다. 라이트는 페이지 색에 `border-neutral` 테두리, 다크는 800 면에 700 테두리라 `bg-panel`(900) 위에서도 면보다 밝고 테두리가 보입니다. `dark:` 클래스는 쓰지 않습니다.
+- outline 은 컴포넌트 토큰 `bg-control-outline` 과 `inset-ring-control-outline` 입니다. 라이트는 `bg-base` 면에 `border-neutral` 테두리, 다크는 `bg-block` 면에 `border-neutral-strong` 테두리라 `bg-surface` 위에서도 면보다 밝고 테두리가 보입니다. `dark:` 클래스는 쓰지 않습니다.
 - scheme 은 상속하지 않습니다. 기본값이라도 `tv` 의 `defaultVariants` 가 자기 클래스를 붙이므로, danger Alert 안의 Button 도 자기 primary 로 그립니다.
 - `glossy` 는 state layer 를 쓰지 않습니다. `state-layer` 가 `background-image` 를 차지하는데 glossy 의 광택도 `background-image` 입니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택, 안쪽 위 1px 하이라이트(`inset-shadow`), 채움 위에 검정 20% 를 얹은 가장자리(`inset-ring-black/20`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다.
 - `transparent` 는 어느 상태에서도 배경을 칠하지 않습니다. hover 는 `opacity-70`, press 는 `opacity-40` 입니다. 그래서 `transition` 에 `opacity` 를 더합니다.
@@ -349,8 +351,8 @@ size: {
 
 ### 왜 이렇게
 
-- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 컴포넌트 토큰 `bg-field-outline` 배경과 `inset-ring-field-outline` 테두리(다크는 800 배경에 700 테두리), `soft` 는 `bg-neutral-subtle` 배경, `ghost` 는 배경과 테두리가 없습니다.
-- 글자는 `text-neutral-bold` 입니다. 상자 안 버튼(`fieldAction`)은 `text-neutral` 에서 hover, press, 켜짐에 `text-neutral-bold` 로 바뀝니다.
+- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 컴포넌트 토큰 `bg-field-outline` 배경과 `inset-ring-field-outline` 테두리(다크는 850 배경에 700 테두리), `soft` 는 `bg-neutral-soft` 배경, `ghost` 는 배경과 테두리가 없습니다.
+- 글자는 `text-neutral-strong` 입니다. 상자 안 버튼(`fieldAction`)은 `text-neutral` 에서 hover, press, 켜짐에 `text-neutral-strong` 로 바뀝니다.
 - focus 와 invalid 색은 여기서 정하지 않습니다. `focus-ring` 이 이 파일이 그린 `inset-ring` 테두리의 색을 바꾸므로 그 상태를 되풀이해 적지 않습니다.
 - `soft` 와 `ghost` 도 투명한 `inset-ring-1` 을 그립니다. `focus-ring` 은 inset ring 의 색만 바꾸므로, 폭이 있는 inset ring 이 있어야 focus 와 invalid 테두리가 보입니다.
 - `fieldAction` 은 상자 안의 버튼(Clear, 보기 버튼, stepper, 달력 버튼)입니다. standard 는 36px 상자에 28px(`size-7`), tiny 는 32px 상자에 24px(`size-6`)라서 위아래로 4px 씩 남습니다. 양 끝의 버튼도 테두리에서 4px 떨어지도록 geometry 가 두 가지입니다.
@@ -371,6 +373,34 @@ size: {
 - `size-7`, `size-6` 과 음수 margin 은 control 높이 토큰(36px, 32px)과 상자 padding 에 맞춘 값입니다. 둘 중 하나를 바꾸면 이 값도 다시 계산합니다.
 - disabled 필드는 루트에서 이미 흐려집니다(`data-disabled:opacity-50`). ColorField 와 FileField 는 disabled Clear 가 한 번 더 흐려지지 않도록 `alreadyDimmedByField`(`data-disabled:opacity-100`)를 더합니다.
 - `FieldSurfaceVariant` 에 값을 더하면 가져가는 컴포넌트의 `variants` 에도 각각 더해야 적용됩니다. Select, ChipField, ColorField 는 variant 타입이 `FieldTriggerVariant` 라서, 빠뜨리면 `satisfies Record<..., object>` 가 타입 오류를 냅니다. FileField 는 자기 `FileFieldVariant` 와 `compoundVariants` 를 따로 고칩니다.
+
+## surfaces/footer-band.ts
+
+Card 와 Dialog 의 Footer 를 바닥 띠로 그리는 클래스 조각입니다. 위쪽 `border-neutral` 선과 `bg-block` 배경을 담습니다. 글자는 루트의 `text-neutral-strong` 를 그대로 씁니다.
+
+### 쓰는 곳
+
+- Card: `Card.Footer`. 좌우 가장자리까지 나가는 음수 margin 과 마지막 자식일 때의 아래 margin, 둥근 모서리는 Card 의 `style.ts` 가 더합니다.
+- Dialog: `Dialog.Footer`. 스크롤하는 본문 밖, `Dialog.Content` 바닥에 놓입니다. 모서리는 `Dialog.Content` 의 `overflow-hidden` 이 깎습니다.
+
+### 쓰는 법
+
+```ts
+footer: [
+  'flex items-center gap-2',
+  footerBand,
+  '-mx-[calc(var(--card-pad)_-_var(--card-ring))] px-[calc(var(--card-pad)_-_var(--card-ring))]',
+],
+```
+
+### 알아둘 것
+
+- 배경은 component 토큰 `bg-block` 입니다. light 에서는 흰 `bg-surface` 아래 `neutral-50`, dark 에서는 `neutral-900` 인 `bg-surface` 아래 `neutral-850` 입니다. dark 에서는 위에 놓인 면일수록 밝으므로 띠도 면보다 반 단계 밝습니다. 850 은 이 반 단계를 위해 neutral 팔레트에 둔 단계이고, `bg-neutral-soft` 이 dark 에서 가리킵니다.
+- dark 에서 띠는 outline 버튼의 채움(`bg-control-outline`)과 같은 850 입니다. 띠 위 outline 버튼은 `border-control-outline`(700) 테두리로 구분되고, light 에서 흰 면 위의 흰 outline 버튼과 같은 모양입니다.
+- 글자색은 따로 두지 않습니다. `text-neutral-strong` 는 모든 neutral 배경에서 읽히는 본문 색입니다.
+- 띠 위 버튼은 따로 맞추지 않습니다. hover 와 press 는 글자색을 덮는 state layer 라 띠 위에서도 보입니다.
+- Card `ghost` 는 배경을 `bg-transparent` 로 덮어 선만 남깁니다.
+- Card 의 띠는 outline 테두리(`--card-ring`) 1px 안쪽에서 멈춥니다. 테두리는 루트의 `inset-ring` 이라 자식 배경이 그 위를 덮기 때문입니다.
 
 ## form-bridge.ts
 
@@ -680,7 +710,7 @@ slots: {
 
 ### 왜 이렇게
 
-- 옵션 강조(`data-highlighted`)는 hover state layer(`state-layer data-highlighted:state-hover`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
+- 고른 옵션(`data-selected`, Menu 는 `data-checked`)은 배경 없이 끝의 체크나 점만 `text-primary` 입니다(shadcn/ui 방식). 목록에서 배경은 가리킨 옵션 하나에만 깔립니다. 고른 옵션에도 primary 배경을 깔면 여러 개를 고른 목록이 primary 로 덮여, 가리킨 옵션보다 고른 옵션이 더 크게 보입니다.
 - 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)도 `state-hover` 라, 포인터가 하위 메뉴로 옮겨 가도 강조가 남습니다(`overlay/menu/style.ts`).
 - 층은 글자색으로 덮으므로 팝업 배경이 무엇이든 같은 세기로 보입니다.
 - 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
@@ -877,6 +907,33 @@ searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
 - 비교를 바꾸면 Select, ChipField, Menu 의 거르기, ChipField 의 중복 판정, Highlight 의 칠하기가 함께 바뀝니다. `tests/search-text.test.ts` 는 `matchRanges` 가 `matchesSearch` 와 같은 판정을 내는지 봅니다.
 - `searchChunks` 의 조각을 이어 붙이면 언제나 받은 글과 같습니다. 서버와 클라이언트가 같은 HTML 을 내려면 이 함수는 순수해야 합니다.
 
+## surfaces/segment-surface.ts
+
+`bg-neutral-soft` 트랙 위에 고른 칸을 `bg-segment` 카드로 띄우는 클래스 조각입니다. 값을 고르는 SegmentedControl 과 패널을 오가는 segmented Tabs 가 함께 읽어서 두 컴포넌트가 늘 같은 모양입니다.
+
+### 쓰는 곳
+
+- SegmentedControl: 루트(`<fieldset>`)에 `track`, 칸(`<label>`)에 `segment` 와 `height`
+- Tabs: `appearance="segmented"` 일 때 `Tabs.List` 에 `track`, `Tabs.Trigger` 에 `segment` 와 `height`
+
+### 쓰는 법
+
+```tsx
+// components/navigation/tabs/style.ts
+segmented: {
+  list: segmentSurface.track,
+  trigger: [segmentSurface.segment, 'not-aria-selected:data-hovered:text-neutral'],
+},
+{ appearance: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
+```
+
+### 왜 이렇게
+
+- 고른 칸은 `data-selected` 로 찾습니다. SegmentedControl Item 과 Tabs Trigger 가 둘 다 고른 칸에 `data-selected` 를 붙이므로 `aria-selected` 와 `data-state=checked` 를 따로 쓰지 않아도 됩니다.
+- 칸은 컨트롤 높이에서 8px 낮고, 트랙의 `concentric-p-1` 이 4px 씩 둘러 트랙이 다른 컨트롤과 같은 높이가 됩니다. 칸 높이나 트랙 padding 한쪽만 바꾸면 Field 안에서 옆 컨트롤과 높이가 어긋납니다.
+- 고르지 않은 칸의 hover 와 press 는 state layer 만 얹고 글자색은 그대로입니다. Tabs 의 기본 trigger 는 hover 에 글자를 진하게 하므로 segmented 가 `text-neutral` 로 되돌립니다.
+- `bg-segment` 는 밝은 모드에서 페이지색, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다. 어두운 모드에서 페이지색이면 칸이 트랙보다 어두워져 눌린 홈처럼 보입니다.
+
 ## surfaces/slider-surface.ts
 
 슬라이더 트랙의 가장자리와 thumb 모양을 정하는 클래스 조각입니다. ColorPicker 의 색 영역은 두 방향으로 움직이는 슬라이더라서 같은 모양을 씁니다.
@@ -890,11 +947,11 @@ searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
 
 ```tsx
 // components/form/slider/style.ts
-track: [sliderSurface.edge, 'relative rounded-full bg-neutral-subtle'],
+track: [sliderSurface.edge, 'relative rounded-full bg-neutral-soft'],
 thumb: [
   sliderSurface.thumb,
   'group/thumb absolute block size-(--slider-thumb)',
-  'bg-primary group-data-invalid/slider:bg-danger',
+  'bg-primary-solid group-data-invalid/slider:bg-danger-solid',
 ],
 ```
 
@@ -1159,16 +1216,16 @@ export const toggleStyle = tv({
 
 | variant            | 켜짐(`data-pressed`)                                                     |
 | ------------------ | ------------------------------------------------------------------------ |
-| `ghost`, `outline` | press state layer(`data-pressed:state-press`). 글자는 그대로 `text-neutral-bold`, 상태 계열은 `text-scheme` |
-| `soft`             | `bg-scheme-subtle` 배경과 `text-on-scheme-subtle` 글자, `state-scheme`   |
-| `solid`            | `bg-scheme` 배경과 `text-on-scheme` 글자, `shadow-xs`                    |
-| `glossy`           | `bg-scheme` 배경과 `text-on-scheme` 글자, 광택, 진한 가장자리, `shadow-sm` |
+| `ghost`, `outline` | press state layer(`data-pressed:state-press`). 글자는 그대로 `text-neutral-strong`, 상태 계열은 `text-scheme` |
+| `soft`             | `bg-scheme-soft` 배경과 `text-on-scheme-soft` 글자, `state-scheme`   |
+| `solid`            | `bg-scheme-solid` 배경과 `text-on-scheme-solid` 글자, `shadow-xs`                    |
+| `glossy`           | `bg-scheme-solid` 배경과 `text-on-scheme-solid` 글자, 광택, 진한 가장자리, `shadow-sm` |
 | `transparent`      | 배경 없이 아이콘만 `text-scheme`. IconToggle 만                          |
 
 - 색은 [surfaces/control-surface.ts](#surfacescontrol-surfacets) 와 같은 scheme utility 에서 옵니다. `compoundVariants` 가 neutral 의 primary ring 과 상태 계열의 `quietInStatusColor` 를 더합니다.
 - 꺼진 동안의 hover 와 press 는 모든 variant 가 state layer(`state-hover`, `state-press`)입니다. 켜진 동안에는 `data-hovered`, `data-active` 가 붙지 않으므로 층이 켜진 모양을 바꾸지 않습니다.
 - `transparent` 는 `glyphVariant` 에만 있습니다. 글자 Toggle 이 배경 없이 색만 바꾸면 켜짐을 색으로만 알리게 됩니다. IconToggle 은 `icon` 함수로 채운 아이콘을 바꿀 수 있습니다.
-- 꺼진 `transparent` 는 scheme 과 상관없이 `text-neutral-bold` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
+- 꺼진 `transparent` 는 scheme 과 상관없이 `text-neutral-strong` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
 - 켜진 `ghost`, `outline` 은 색 있는 배경을 칠하지 않고 press 층만 남깁니다. 층은 상태 scheme 에서 `state-scheme` 의 계열 채움 12%, 나머지는 글자색 10% 이고, `text-X` 는 그 층 아래에서도 Lc 60 을 지킵니다(IdsProvider 가 확인). 켜진 soft 는 soft 층, 켜진 solid 는 `state-fill` 입니다.
 - 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.

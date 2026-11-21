@@ -9,7 +9,6 @@ export const kbdStyle = tv({
       'rounded-indicator bg-current/10 font-sans text-current select-none',
     ],
     face: 'inline-flex items-center gap-0.5',
-    group: 'inline-flex items-center gap-1',
     glyph: 'shrink-0',
     separator: 'text-current/60 select-none',
   },
@@ -18,14 +17,12 @@ export const kbdStyle = tv({
       standard: {
         root: 'h-5 min-w-5 px-1 align-[calc(0.5cap-var(--spacing)*2.5)]',
         face: 'text-caption-c1-medium',
-        group: 'align-[calc(0.5cap-var(--spacing)*2.5)]',
         glyph: 'size-3!',
         separator: 'text-caption-c1-regular',
       },
       tiny: {
         root: 'h-4 min-w-4 px-0.5 align-[calc(0.5cap-var(--spacing)*2)]',
         face: 'text-caption-c2-medium',
-        group: 'align-[calc(0.5cap-var(--spacing)*2)]',
         glyph: 'size-2.5!',
         separator: 'text-caption-c2-regular',
       },

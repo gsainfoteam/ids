@@ -83,16 +83,16 @@ export const controlSurface = {
     ),
   } satisfies Record<IdsSize, string>,
   variant: {
-    solid: cn('bg-scheme text-on-scheme shadow-xs', pressStates, 'state-fill'),
-    soft: cn('bg-scheme-subtle text-on-scheme-subtle', pressStates, 'state-scheme'),
+    solid: cn('bg-scheme-solid text-on-scheme-solid shadow-xs', pressStates, 'state-fill'),
+    soft: cn('bg-scheme-soft text-on-scheme-soft', pressStates, 'state-scheme'),
     outline: cn(
-      'bg-control-outline text-neutral-bold shadow-xs',
+      'bg-control-outline text-neutral-strong shadow-xs',
       'inset-ring-1 inset-ring-control-outline',
       pressStates,
     ),
-    ghost: cn('bg-transparent text-neutral-bold', pressStates),
+    ghost: cn('bg-transparent text-neutral-strong', pressStates),
     glossy: cn(
-      'bg-scheme text-on-scheme shadow-sm',
+      'bg-scheme-solid text-on-scheme-solid shadow-sm',
       'bg-linear-to-b from-white/20 to-transparent',
       'inset-shadow-[0_1px_0_rgb(255_255_255/0.35)]',
       'inset-ring-1 inset-ring-black/20',
@@ -100,7 +100,7 @@ export const controlSurface = {
       'data-active:from-transparent data-active:shadow-none data-active:inset-shadow-[0_1px_2px_rgb(0_0_0/0.2)]',
     ),
     transparent: cn(
-      'bg-transparent text-neutral-bold',
+      'bg-transparent text-neutral-strong',
       'transition-[color,background-color,border-color,box-shadow,opacity]',
       'data-hovered:opacity-70 data-active:opacity-40',
     ),

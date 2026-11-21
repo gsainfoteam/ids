@@ -83,23 +83,30 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 
 ## 색 역할 이름 변경
 
-React와 같은 문법(`{bg|text|border}-{계열}[-{세기}]`, 세기 `subtlest` < `subtler` < `subtle` < (없음) < `bold`)으로 바뀌었다. `IdsColors` 필드는 `lib/tokens/ids_color_roles.dart`가 `packages/core/color-roles.json`에서 만든다.
+React와 같은 문법으로 바뀌었다. 배경은 쓰임새(`bgBase`, `bgSurface`, `bgBlock`, `bgXSoft`, `bgXSolid`), 선과 글자는 세기(`borderX`, `borderXStrong`, `textX`, `textXStrong`), 배경 위 글자는 `textOn{배경}`이다. `IdsColors` 필드는 `lib/tokens/ids_color_roles.dart`가 `packages/core/color-roles.json`에서 만든다.
 
 | 예전 | 지금 |
 | --- | --- |
-| `colors.surface` | `colors.bgNeutralSubtlest` |
-| `colors.onSurface` | `colors.textNeutralBold` |
-| `bgXSoft` (`bgPrimarySoft`, `bgNeutralSoft` …) | `bgXSubtle` |
-| `textOnXSoft` | `textOnXSubtle` |
-| `bgXHover`, `bgXActive` | 없음. `IdsStateOpacity`로 state layer |
-| `bgXSoftHover`, `bgXSoftActive` | 없음. 위와 같다 |
+| `colors.surface` | `colors.bgBase` |
+| `colors.onSurface` | `colors.textNeutralStrong` |
+| `bgX` / `textOnX` (`bgPrimary` …) | `bgXSolid` / `textOnXSolid` |
+| `bgXSubtle` / `textOnXSubtle` | `bgXSoft` / `textOnXSoft` |
+| `bgXSubtler` | 없음. `bgXSoft` |
+| `bgNeutralSubtlest` / `textOnNeutralSubtlest` | `bgBase` / `textOnBase` |
+| `bgNeutralSubtler`, `IdsComponentColors.bgBand` | `bgBlock` |
+| `IdsComponentColors.bgPanel`, `IdsComponentShadows.shadowPanel` | `bgSurface`, `shadowSurface` |
+| `bgNeutralBold` / `textOnNeutralBold` | `bgNeutralSolid` / `textOnNeutralSolid` |
+| `textNeutralBold` | `textNeutralStrong` |
+| 색 선 `borderX` (브랜드, 상태) | `borderXStrong`. `borderX` 는 옅은 선 |
+| `bgXHover`, `bgXActive`, `bgXSoftHover`, `bgXSoftActive` | 없음. `IdsStateOpacity`로 state layer |
 | `IdsColorRoles.baseSlots` | 없음. `IdsColorRoles.neutralOnlySlots` |
+| 50~950 `IdsPalette` | `IdsRamp`. `IdsPalette(light:, dark:)` 는 모드마다 9색 |
 
 새로 생긴 것:
 
-- 모든 계열: `bgXSubtler`. light 는 팔레트 50, dark 는 950 을 `bgNeutralSubtlest` 쪽으로 절반(OKLab) 섞은 색
-- neutral만: `bgNeutralSubtlest`, `bgNeutralBold`, `textOnNeutralBold`, `textNeutralBold`
-- `IdsStateOpacity.hover` (0.06), `IdsStateOpacity.press` (0.1)
+- 모든 계열: `textXStrong`, `borderXStrong`
+- neutral만: `bgBase`, `bgSurface`, `bgBlock`과 `textOnBase`, `textOnSurface`, `textOnBlock`
+- `IdsStateOpacity.hover`·`.press` (0.06 / 0.1), `.tintHover`·`.tintPress` (0.08 / 0.12), `.fillHover`·`.fillPress` (0.1 / 0.18), `IdsStateLayer.fillColor`
 - `IdsColorRoles.slotsOf(family)`: neutral 이 아니면 `neutralOnlySlots`를 뺀다
 
 ## 옮겨야 할 규약
@@ -150,20 +157,20 @@ focusVisible = focused
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/internal/surfaces/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySubtle`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
+[control-surface.ts](../react/src/internal/surfaces/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimarySolid` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
 
-| `colorScheme`                       | fill / on-fill                         | soft / on-soft                         | quiet             | ring            |
-| ----------------------------------- | -------------------------------------- | -------------------------------------- | ----------------- | --------------- |
-| `primary` `secondary` `tertiary`    | `bgX` / `textOnX`                      | `bgXSubtle` / `textOnXSubtle`          | `textNeutralBold` | `borderX`       |
-| `neutral`                           | `bgNeutralBold` / `textOnNeutralBold`  | `bgNeutralSubtle` / `textOnNeutralSubtle` | `textNeutralBold` | `borderPrimary` |
-| `danger` `success` `warning` `info` | `bgX` / `textOnX`                      | `bgXSubtle` / `textOnXSubtle`          | `textX`           | `borderX`       |
+| `colorScheme`                       | fill / on-fill                          | soft / on-soft                        | quiet               | ring                  |
+| ----------------------------------- | --------------------------------------- | ------------------------------------- | ------------------- | --------------------- |
+| `primary` `secondary` `tertiary`    | `bgXSolid` / `textOnXSolid`             | `bgXSoft` / `textOnXSoft`             | `textNeutralStrong` | `borderXStrong`       |
+| `neutral`                           | `bgNeutralSolid` / `textOnNeutralSolid` | `bgNeutralSoft` / `textOnNeutralSoft` | `textNeutralStrong` | `borderNeutralStrong` |
+| `danger` `success` `warning` `info` | `bgXSolid` / `textOnXSolid`             | `bgXSoft` / `textOnXSoft`             | `textX`             | `borderXStrong`       |
 
-|           | 배경 default                                    | hover / active               | 전경    | 테두리·그림자                         |
-| --------- | ----------------------------------------------- | ---------------------------- | ------- | ------------------------------------- |
-| `solid`   | fill                                            | state layer 0.06 / 0.1       | on-fill | 그림자 `shadow-xs`                    |
-| `soft`    | soft                                            | state layer 0.06 / 0.1       | on-soft | 없음                                  |
-| `outline` | `bgNeutralSubtlest` (dark: `bgNeutralSubtler`)  | state layer 0.06 / 0.1       | quiet   | 안쪽 1px `borderNeutral`, `shadow-xs` |
-| `ghost`   | 투명                                            | state layer 0.06 / 0.1       | quiet   | 없음                                  |
+|           | 배경 default                              | hover / active                                   | 전경    | 테두리·그림자                                                  |
+| --------- | ----------------------------------------- | ------------------------------------------------ | ------- | -------------------------------------------------------------- |
+| `solid`   | fill                                      | 검정 층 `fillHover` / `fillPress` (0.1 / 0.18)    | on-fill | 그림자 `shadow-xs`                                             |
+| `soft`    | soft                                      | 색 계열은 fill 층 0.08 / 0.12, neutral 은 0.06 / 0.1 | on-soft | 없음                                                           |
+| `outline` | `IdsComponentColors.bgControlOutline`     | 상태 계열은 fill 층 0.08 / 0.12, 그 밖은 0.06 / 0.1 | quiet   | 안쪽 1px `IdsComponentColors.borderControlOutline`, `shadow-xs` |
+| `ghost`   | 투명                                      | outline 과 같다                                  | quiet   | 없음                                                           |
 
 - state layer: 배경 위에 전경색을 `IdsStateOpacity.hover`·`.press` 알파로 한 겹 더 칠한다(`Color.lerp(background, foreground, IdsStateOpacity.hover)`, `theme_roles.dart` 의 `withStateLayer`와 같은 계산). 어두운 글자 아래에서는 어두워지고 밝은 글자 아래에서는 밝아진다. 테마가 이 두 층 아래의 글자 대비까지 지키도록 역할을 고른다(`theme_roles.dart`)
 - 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`)이다

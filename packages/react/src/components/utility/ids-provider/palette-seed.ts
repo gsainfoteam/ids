@@ -13,7 +13,7 @@ import {
 } from 'culori/fn';
 import { clamp, minBy, range } from 'es-toolkit';
 
-import { PALETTE_STEPS, type IdsPalette } from './theme';
+import { RAMP_STEPS, type IdsRamp } from './theme';
 import { PALETTE_MODEL } from '../../../tokens/palette-model';
 
 type Shade = { l: number; c: number; h: number };
@@ -60,7 +60,7 @@ const gamutChroma = (l: number, h: number) =>
   clampChroma({ mode: 'oklch', l, c: BEYOND_SRGB_CHROMA, h }, 'oklch').c;
 
 function modelAt(hue: number): ModelShade[] {
-  return PALETTE_STEPS.map((_, index) => ({
+  return RAMP_STEPS.map((_, index) => ({
     l: seriesAt(PALETTE_MODEL.lightness[index]!, hue),
     gamutShare: clamp(seriesAt(PALETTE_MODEL.chroma[index]!, hue), 0, 1),
     h: hue + seriesAt(PALETTE_MODEL.hueShift[index]!, hue),
@@ -100,11 +100,11 @@ const shadesOf = (model: ModelShade[], chromaRatio: number): Shade[] =>
 const inSrgb = (shade: Shade) =>
   formatHex(clampChroma({ mode: 'oklch', l: shade.l, c: shade.c, h: shade.h }, 'oklch'));
 
-function paletteOf(steps: Shade[]): IdsPalette {
-  return paletteFromSteps(steps.map(inSrgb));
+function rampOf(steps: Shade[]): IdsRamp {
+  return rampFromSteps(steps.map(inSrgb));
 }
 
-export function createIdsPalette(seed: string): IdsPalette | undefined {
+export function createIdsRamp(seed: string): IdsRamp | undefined {
   if (parse(seed) === undefined) return undefined;
 
   const shade = shadeOf(seed);
@@ -112,32 +112,32 @@ export function createIdsPalette(seed: string): IdsPalette | undefined {
   const steps = shadesOf(model, chromaRatioAgainst(model, shade));
   steps[nearestStepIndex(model, shade.l)] = shade;
 
-  return paletteOf(steps);
+  return rampOf(steps);
 }
 
-export const hueOf = (palette: IdsPalette) => shadeOf(palette[500]).h;
+export const hueOf = (palette: IdsRamp) => shadeOf(palette[500]).h;
 
-export function chromaRatioOf(palette: IdsPalette) {
+export function chromaRatioOf(palette: IdsRamp) {
   const shade = shadeOf(palette[500]);
   return chromaRatioAgainst(modelAt(shade.h), shade);
 }
 
-export const paletteAtHue = (hue: number, chromaRatio: number): IdsPalette =>
-  paletteOf(shadesOf(modelAt(hue), chromaRatio));
+export const rampAtHue = (hue: number, chromaRatio: number): IdsRamp =>
+  rampOf(shadesOf(modelAt(hue), chromaRatio));
 
-export const chromaOf = (palette: IdsPalette) => shadeOf(palette[500]).c;
+export const chromaOf = (palette: IdsRamp) => shadeOf(palette[500]).c;
 
-export function rotatedPalette(palette: IdsPalette, degrees: number): IdsPalette {
-  return paletteOf(
-    PALETTE_STEPS.map((step) => {
+export function rotatedRamp(palette: IdsRamp, degrees: number): IdsRamp {
+  return rampOf(
+    RAMP_STEPS.map((step) => {
       const shade = shadeOf(palette[step]);
       return { ...shade, h: shade.h + degrees };
     }),
   );
 }
 
-export function paletteFromSteps(steps: readonly string[]): IdsPalette {
+export function rampFromSteps(steps: readonly string[]): IdsRamp {
   return Object.fromEntries(
-    PALETTE_STEPS.map((step, index) => [step, steps[index]!]),
-  ) as unknown as IdsPalette;
+    RAMP_STEPS.map((step, index) => [step, steps[index]!]),
+  ) as unknown as IdsRamp;
 }

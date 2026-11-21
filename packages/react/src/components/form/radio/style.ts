@@ -26,7 +26,7 @@ export const radioStyle = tv({
       outline: {
         root: 'bg-control-outline shadow-xs inset-ring-1 inset-ring-control-outline',
       },
-      soft: { root: 'bg-neutral-subtle inset-ring-1 inset-ring-transparent' },
+      soft: { root: 'bg-neutral-soft inset-ring-1 inset-ring-transparent' },
     } satisfies Record<RadioVariant, object>,
     size: {
       standard: { root: 'size-4', indicator: 'size-2' },

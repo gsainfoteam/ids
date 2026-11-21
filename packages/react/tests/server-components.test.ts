@@ -98,7 +98,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     (name) => /^[A-Z][a-z]/.test(name) && ids[name].$$typeof === clientReference,
   );
 
-  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, defineIdsTheme, checkIdsTheme } = ids;
+  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, ImageGroup, defineIdsTheme, checkIdsTheme } = ids;
   const palette = { 50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff', 600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456' };
   const theme = defineIdsTheme({ primary: palette, radius: 12 });
   if (checkIdsTheme(theme).length) {
@@ -133,7 +133,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     ),
     h(TextField, { name: 'note' }, h(TextField.Clear)),
     h(
-      Image.Group,
+      ImageGroup,
       { 'aria-label': 'Photos' },
       h(Image, { src: '/lake.png', alt: 'Lake' }),
       h(
@@ -352,7 +352,7 @@ test(
 
     expect(clientComponents).toEqual(['ThemeContext', 'TooltipDelayGroup']);
     expect(namespaced.Image).toEqual(
-      expect.arrayContaining(['Group', 'Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
+      expect.arrayContaining(['Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
     );
     expect(payload).toContain('"600":"#155dfc"');
     for (const reference of [
@@ -366,7 +366,7 @@ test(
       'SelectRoot',
       'SelectItem',
       'FieldLabel',
-      'ImageGroup',
+      'ImageGroupRoot',
       'ImageViewer',
       'ImageViewerToolbar',
       'ImageViewerClose',

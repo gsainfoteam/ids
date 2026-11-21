@@ -19,7 +19,7 @@ const proseMirrorBaseline = cn(
   '[&_[contenteditable=false]]:whitespace-normal',
   '[&_img.ProseMirror-separator]:m-0! [&_img.ProseMirror-separator]:inline! [&_img.ProseMirror-separator]:size-0! [&_img.ProseMirror-separator]:border-0!',
   '[&.ProseMirror-hideselection]:caret-transparent',
-  '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary',
+  '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary-strong',
 );
 
 const editorBlocks = cn(
@@ -30,10 +30,10 @@ const editorBlocks = cn(
   '[&_[data-resize-container]]:w-fit [&_[data-resize-container]]:max-w-full [&_[data-resize-container]]:rounded-standard [&_[data-resize-wrapper]_img]:h-auto!',
   '[&_[data-resize-handle]]:z-10 [&_[data-resize-handle]]:flex [&_[data-resize-handle]]:w-3 [&_[data-resize-handle]]:cursor-ew-resize [&_[data-resize-handle]]:items-center [&_[data-resize-handle]]:justify-center',
   '[&_[data-resize-handle]]:opacity-0 [&_[data-resize-handle]]:transition-opacity [&_[data-resize-wrapper]:hover_[data-resize-handle]]:opacity-100 [&_.ProseMirror-selectednode_[data-resize-handle]]:opacity-100',
-  '[&_[data-resize-handle]]:after:h-10 [&_[data-resize-handle]]:after:max-h-[50%] [&_[data-resize-handle]]:after:w-1 [&_[data-resize-handle]]:after:rounded-full [&_[data-resize-handle]]:after:bg-neutral-bold [&_[data-resize-handle]]:after:shadow-panel',
+  '[&_[data-resize-handle]]:after:h-10 [&_[data-resize-handle]]:after:max-h-[50%] [&_[data-resize-handle]]:after:w-1 [&_[data-resize-handle]]:after:rounded-full [&_[data-resize-handle]]:after:bg-neutral-solid [&_[data-resize-handle]]:after:shadow-md',
   '[&_table]:my-2 [&_table]:w-full! [&_table]:table-fixed [&_table]:border-collapse',
   '[&_:is(td,th)]:border [&_:is(td,th)]:border-neutral [&_:is(td,th)]:px-2 [&_:is(td,th)]:py-1 [&_:is(td,th)]:align-top [&_:is(td,th)]:break-words',
-  '[&_th]:text-start [&_th]:font-semibold [&_.selectedCell]:bg-primary-subtle',
+  '[&_th]:text-start [&_th]:font-semibold [&_.selectedCell]:bg-primary-soft',
 );
 
 export const editorStyle = tv({
@@ -46,7 +46,7 @@ export const editorStyle = tv({
     barItems: 'flex items-center gap-0.5',
     separator: 'mx-0.5 h-5 self-center',
     blockType: [
-      'w-auto shrink-0 rounded-standard text-neutral-bold',
+      'w-auto shrink-0 rounded-standard text-neutral-strong',
       'transition-[color,background-color,box-shadow,--ids-state-opacity]',
       'state-layer hover:state-hover active:state-press ring-0! inset-ring-transparent!',
     ],
@@ -56,15 +56,15 @@ export const editorStyle = tv({
     ],
     document: 'relative',
     content: [
-      'min-h-24 outline-none text-neutral-bold',
-      'selection:bg-primary/30 selection:text-neutral-bold',
+      'min-h-24 outline-none text-neutral-strong',
+      'selection:bg-primary-solid/30 selection:text-neutral-strong',
       proseMirrorBaseline,
       documentText,
       editorBlocks,
       codeTokens,
       placeholder,
     ],
-    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-bold'],
+    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-strong'],
     bubble: 'w-auto concentric-p-1 p-0 [&>[data-scroll-area]>[data-scroll-area-viewport]]:p-0',
     bubbleBar: 'flex items-center gap-0.5 p-1',
     bubbleAnchor: 'pointer-events-none absolute',
@@ -111,7 +111,7 @@ export const editorStyle = tv({
     tableSizeCell: [
       'size-4 cursor-pointer rounded-indicator bg-field-outline inset-ring-1 inset-ring-neutral',
       'focus-ring focus-ring-visible:z-10',
-      'data-covered:bg-primary-subtle data-covered:inset-ring-primary',
+      'data-covered:bg-primary-soft data-covered:inset-ring-primary-strong',
     ],
     tableSizeLabel: 'text-center text-caption-c1-regular text-neutral tabular-nums',
     detailsPlaceholder: 'pointer-events-none absolute start-0 top-2 font-medium text-neutral',
@@ -128,7 +128,7 @@ export const editorStyle = tv({
         root: fieldSurface.variant.soft,
         bar: 'border-field-bar',
         content:
-          '[&_:is([data-code-block],th)]:bg-neutral-subtler [&_:not(pre)>code]:bg-neutral-subtler',
+          '[&_:is([data-code-block],th)]:bg-block [&_:not(pre)>code]:bg-block',
       },
     } satisfies Record<EditorVariant, object>,
     size: {

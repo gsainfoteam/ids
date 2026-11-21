@@ -1,20 +1,21 @@
 # Color
 
-IDS 색은 네 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는 값일 뿐이고, 시맨틱 역할(`--ids-color-<역할>`)이 팔레트 한 단계를 가리키고, scheme(`bg-scheme`, `text-on-scheme`)이 한 계열의 역할을 가리키고, 컴포넌트 토큰(`bg-panel`, `border-control-outline`)이 모드마다 역할 하나를 가리킵니다. 컴포넌트 토큰은 [ComponentTokens](../component-tokens/README.md) 에 있습니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 색에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
+IDS 색은 네 층입니다. 팔레트(계열마다 라이트와 다크의 9단계 스케일)는 값일 뿐이고, 시맨틱 역할(`--ids-color-<역할>`)이 스케일 한 단계를 가리키고, scheme(`bg-scheme-solid`, `text-on-scheme-solid`)이 한 계열의 역할을 가리키고, 컴포넌트 토큰(`bg-control-outline`, `border-field-outline`)이 모드마다 역할 하나를 가리킵니다. 컴포넌트 토큰은 [ComponentTokens](../component-tokens/README.md) 에 있습니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 색에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
 
 ```tsx
-<div className="bg-neutral-subtlest text-neutral-bold">
-  <button className="bg-primary text-on-primary state-layer hover:state-hover active:state-press">저장</button>
-  <span className="bg-danger-subtle text-on-danger-subtle">실패</span>
+<div className="bg-base text-on-base">
+  <button className="bg-primary-solid text-on-primary-solid state-layer hover:state-hover active:state-press">저장</button>
+  <span className="bg-danger-soft text-on-danger-soft">실패</span>
   <p className="text-neutral">보조 글자</p>
 </div>
 ```
 
-- 역할 이름은 문법으로만 짓습니다: `{속성}-{계열}[-{세기}]`, `text-on-{계열}[-{세기}]`. `surface` 같은 쓰임새 이름은 없습니다.
-- 속성은 `bg`, `text`, `border` 입니다. 유틸리티 앞머리가 속성을 말합니다. `bg-*` 는 배경, `text-*` 는 글자(와 `fill-*`), `border-*` 는 선(과 `ring-*`, `inset-ring-*`, `outline-*`, `stroke-*`, `divide-*`)입니다.
-- 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 입니다. `bolder`, `boldest` 는 비워 둡니다. 세기는 사다리의 자리이지 팔레트 단계가 아닙니다.
-- CSS 변수는 `--ids-color-{역할}` 입니다(`--ids-color-bg-primary-subtle`). 공유 `--color-*` 이름은 없어서 `bg-on-primary` 같은 클래스는 만들어지지 않습니다.
-- 역할을 다른 속성으로 쓸 때만 임의 값을 씁니다: 끄는 손잡이의 `bg-(--ids-color-text-neutral)`, 차트 점 둘레의 `stroke-(--ids-color-bg-neutral-subtlest)`.
+- 배경은 쓰임새로 부릅니다: `bg-base`, `bg-surface`, `bg-block`, `bg-X-soft`, `bg-X-solid`.
+- 선과 글자는 세기로 부릅니다: `border-X`, `border-X-strong`, `text-X`, `text-X-strong`. 세기 단어는 `strong` 하나입니다(`bold` 는 글꼴 굵기와 헷갈립니다).
+- 배경 위 글자는 `text-on-{배경}` 입니다(`text-on-base`, `text-on-primary-solid`). 단계를 가리키지 않고 IdsProvider 가 APCA 로 고릅니다.
+- 속성은 `bg`, `text`, `border` 입니다. `bg-*` 는 배경, `text-*` 는 글자(와 `fill-*`), `border-*` 는 선(과 `ring-*`, `inset-ring-*`, `outline-*`, `stroke-*`, `divide-*`)입니다.
+- CSS 변수는 `--ids-color-{역할}` 입니다(`--ids-color-bg-primary-soft`). 공유 `--color-*` 이름은 없어서 `bg-on-primary` 같은 클래스는 만들어지지 않습니다.
+- 역할을 다른 속성으로 쓸 때만 임의 값을 씁니다: 손잡이의 `bg-(--ids-color-border-neutral-strong)`, 끄는 손잡이의 `bg-(--ids-color-text-neutral)`, 차트 점 둘레의 `stroke-(--ids-color-bg-base)`.
 - 두 색을 `color-mix` 로 섞은 토큰은 없습니다.
 - 값은 `IdsProvider` 안에서만 정의됩니다.
 
@@ -28,62 +29,67 @@ IDS 색은 네 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는
 | `tertiary` | `theme.tertiary`, 없으면 primary hue 를 +60°(상태 색과 겹치면 −60°) 돌리고 채도 1/3 |
 | `success`, `warning`, `danger`, `info` | 기준 green, yellow, red, sky 를 primary 쪽으로 돌린 색(`'harmonized'`), 기준 그대로(`'fixed'`), 또는 앱이 고른 색 |
 
-## 역할
+## 스케일
 
-모든 계열이 가지는 역할입니다.
+계열마다 모드별 9단계이고, 번호가 클수록 페이지에서 멀어집니다(Radix Colors 처럼).
+
+| 단계 | 쓰임 | 역할 | neutral light | neutral dark |
+| --- | --- | --- | --- | --- |
+| 1 | base | `bg-base` | `#ffffff` | `#0a0a0a` |
+| 2 | surface | `bg-surface` | `#ffffff` | `#171717` |
+| 3 | block | `bg-block` | `#fafafa` | `#1e1e1e` |
+| 4 | soft | `bg-X-soft` | `#f5f5f5` | `#262626` |
+| 5 | 선 | `border-X` | `#e5e5e5` | `#2e2e2e` |
+| 6 | 진한 선 | `border-X-strong` | `#d4d4d4` | `#3a3a3a` |
+| 7 | solid | `bg-X-solid` | `#a3a3a3` (역할 없음) | `#737373` (역할 없음) |
+| 8 | 글자 | `text-X` | `#525252` | `#d4d4d4` |
+| 9 | 진한 글자 | `text-X-strong` | `#0a0a0a` | `#fafafa` |
+
+- neutral 값은 shadcn/ui 의 neutral 테마를 따릅니다. 다크 선 `#2e2e2e` 는 shadcn 의 10% 흰색을 카드 위에 얹은 값이고, 다크 진한 글자는 APCA 때문에 `#e5e5e5` 대신 `#fafafa` 입니다.
+- neutral 의 solid 는 9단계를 읽습니다(`bg-neutral-solid`: 뒤집힌 채움, Tooltip, neutral solid Button). 7단계는 역할이 없습니다.
+- base, surface, block 은 neutral 만 가집니다. 브랜드 스케일의 1~3단계는 순서를 맞추려고 있을 뿐 역할이 없습니다.
+- solid 는 그 위 글자 대비로 고르므로 순서에서 벗어날 수 있습니다. 다크에서는 Lc 45 를 넘는 진한 선(6)이 흰 글자를 얹는 solid(7)보다 밝고, 노랑처럼 밝은 색은 라이트에서 solid 가 선보다 옅습니다. 글자(8, 9)는 언제나 solid 와 같거나 더 멉니다.
+
+## 역할
 
 | 역할 | 쓰임 |
 | --- | --- |
-| `bg-X-subtler` | 띠. subtle 보다 옅다. light 는 팔레트 50, dark 는 950 을 페이지 쪽으로 절반(OKLab) 섞은 색 |
-| `bg-X-subtle` | 옅은 채움 (soft variant, soft Badge, 상태 Alert) |
-| `bg-X` | 채움 (solid Button, Progress 막대, solid Badge) |
-| `text-on-X-subtler` | `bg-X-subtler` 위 글자 |
-| `text-on-X-subtle` | `bg-X-subtle` 위 글자 |
-| `text-on-X` | `bg-X` 위 글자 |
-| `text-X` | 채움 없는 바탕, `bg-X-subtler`, `bg-X-subtle` 위 글자와 아이콘 (Link, outline Badge, Rating 별) |
-| `border-X` | 선. `text-X` 와 같은 단계 |
+| `bg-base` | 페이지 |
+| `bg-surface` | 카드, 다이얼로그, 팝업, 토스트. 다크에서 페이지보다 한 단계 밝다 |
+| `bg-block` | base 나 surface 위에서 구역을 나누는 바탕: Card, Dialog footer, Table 머리와 줄무늬, CodeBlock, soft Item, Empty, Accordion, Image placeholder, Editor 코드 |
+| `bg-X-soft` | 옅은 채움: soft 컨트롤과 필드, soft Badge, 상태 Alert, Calendar 범위, Avatar, Skeleton |
+| `bg-X-solid` | 채움: solid Button, Progress 막대, solid Badge |
+| `border-X` | 구조선(`border-neutral`). 브랜드는 옅은 색 선 |
+| `border-X-strong` | 진한 선. 브랜드는 Lc 45 를 넘는 색 선(focus ring, invalid 테두리), neutral 은 손잡이와 다크 outline 테두리 |
+| `text-X` | 색 글자와 아이콘(Link, outline Badge, Rating 별). neutral 은 보조 글자 |
+| `text-X-strong` | 진한 글자. neutral 은 본문 |
+| `text-on-base`, `text-on-surface`, `text-on-block` | 그 바탕 위 글자 |
+| `text-on-X-soft`, `text-on-X-solid` | 그 바탕 위 글자 |
 
-neutral 만 가지는 역할입니다.
-
-| 역할 | light | dark | 쓰임 |
-| --- | --- | --- | --- |
-| `bg-neutral-subtlest` / `text-on-neutral-subtlest` | 0 / 900 | 950 / 50 | 페이지, 팝업, 카드 |
-| `bg-neutral-subtler` / `text-on-neutral-subtler` | 50 / 900 | 900 / 50 | 띠, 트레이: Card, Dialog 의 footer, 표 머리 |
-| `bg-neutral-subtle` | 100 | 800 | soft 컨트롤, 흐린 행 |
-| `bg-neutral` | 300 | 700 | 손잡이, 트랙 |
-| `bg-neutral-bold` / `text-on-neutral-bold` | 900 / 0 | 50 / 950 | 뒤집힌 채움: Tooltip, neutral solid Button, Badge |
-| `text-neutral-bold` | 900 | 50 | 본문 글자 |
-| `text-neutral` | 600 | 300 | 보조 글자 |
-| `border-neutral` | 200 | 800 | 구조선 |
-
+- `text-on-{배경}` 은 그 배경 계열의 스케일 끝(진한 글자 쪽과 base 쪽)에서 시작해 램프, 흰색이나 neutral 950 으로 바깥쪽을 따라가며 hover, press 층 아래에서 Lc 75 를 처음 넘는 색입니다. 양쪽이 다 넘으면 Lc 가 큰 쪽입니다. 그래서 solid 위 글자도 계열 색이 섞일 수 있습니다(다크 노랑 solid 위 `#fefdec`).
 - hover, active 역할은 없습니다. 상태는 컴포넌트가 그리는 state layer 입니다([상태 층](#상태-층)).
-- 채움 위 글자는 색을 직접 고르지 말고 `text-on-X` 로 칠합니다. 밝은 팔레트에서는 검은 글자가 됩니다.
-- 배경마다 짝이 있습니다. `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 입니다. 색 글자로 강조할 때만 `text-X` 를 씁니다.
-- `text-neutral-bold`, `text-neutral` 은 neutral 바탕 어디에나 놓는 본문 글자와 보조 글자입니다.
-- `bg-primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 Lc 60 도 안 됩니다.
-- 노란 `warning` 채움 위 글자도 `text-on-warning` 입니다. 흰 바탕 위 경고 글자는 `text-warning` 입니다.
+- 배경마다 짝이 있습니다. `bg-X-soft` 위 글자는 `text-on-X-soft`, `bg-X-solid` 위 글자는 `text-on-X-solid` 입니다. 색 글자로 강조할 때만 `text-X` 를 씁니다.
+- `text-neutral-strong`, `text-neutral` 은 neutral 바탕 어디에나 놓는 본문 글자와 보조 글자입니다.
+- `bg-primary-solid` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 Lc 60 도 안 됩니다.
+- 노란 `warning` 채움 위 글자도 `text-on-warning-solid` 입니다. 흰 바탕 위 경고 글자는 `text-warning` 입니다.
 
 ### 바뀐 이름
 
 | 예전 | 지금 |
 | --- | --- |
-| `surface` | `bg-neutral-subtlest` |
-| `on-surface` | `text-neutral-bold` |
-| `bg-X-soft` / `text-on-X-soft` | `bg-X-subtle` / `text-on-X-subtle` |
-| `bg-X-hover`, `bg-X-active` | 없음. `state-layer` 와 `state-hover`, `state-press` |
-| `bg-X-soft-hover`, `bg-X-soft-active` | 없음. 위와 같다 |
-| `bg-neutral-hover`, `bg-neutral-active` (손잡이) | 없음. hover 와 끄는 동안 `bg-(--ids-color-text-neutral)` |
-| `secondary` / `on-secondary` | `bg-primary-subtle` / `text-on-primary-subtle` |
-| `accent` | `text-primary` |
-| `outline` | `border-primary` |
-| `muted` | `bg-neutral-subtle` |
-| `on-muted` | `text-neutral` |
-| `border` | `border-neutral` |
-| `handle` | `bg-neutral` |
-| `{상태}` / `on-{상태}` | `bg-{상태}` / `text-on-{상태}` |
-| `{상태}-strong` | `text-{상태}` |
-| 상태 색 10~20% 틴트 | `bg-{상태}-subtle` 와 `text-on-{상태}-subtle` |
-| `chart-1` ~ `chart-5` | 없음. Chart 기본 색은 `bg-primary`, `bg-secondary`, `bg-tertiary` |
+| `bg-neutral-subtlest` / `text-on-neutral-subtlest` | `bg-base` / `text-on-base` |
+| `bg-panel` (컴포넌트 토큰), `shadow-panel` | `bg-surface`, `shadow-surface` |
+| `bg-band` (컴포넌트 토큰), `bg-neutral-subtler` | `bg-block` |
+| `bg-X-subtle` / `text-on-X-subtle` | `bg-X-soft` / `text-on-X-soft` |
+| `bg-X-subtler` / `text-on-X-subtler` | 없음. `bg-X-soft` / `text-on-X-soft` |
+| `bg-X` / `text-on-X` | `bg-X-solid` / `text-on-X-solid` |
+| `bg-neutral-bold` / `text-on-neutral-bold` | `bg-neutral-solid` / `text-on-neutral-solid` |
+| `bg-neutral` (손잡이) | `bg-(--ids-color-border-neutral-strong)` |
+| 브랜드 `border-X` (색 글자와 같은 단계) | `border-X-strong` |
+| `text-neutral-bold` | `text-neutral-strong` |
+| `surface` / `on-surface` | `bg-base` / `text-neutral-strong` |
+| `bg-X-hover`, `bg-X-active`, `bg-X-soft-hover` | 없음. `state-layer` 와 `state-hover`, `state-press` |
+| `chart-1` ~ `chart-5` | 없음. Chart 기본 색은 `bg-primary-solid`, `bg-secondary-solid`, `bg-tertiary-solid` |
 
 ## 팔레트에서 고르기
 
@@ -93,12 +99,13 @@ neutral 만 가지는 역할입니다.
 </IdsProvider>
 ```
 
-- 앱은 브랜드 색을 50 ~ 950 의 11단계 팔레트나 색 하나로 줍니다. IDS 에는 기본 색이 없습니다.
+- 앱은 브랜드 색을 색 하나, 50 ~ 950 의 램프, 또는 모드별 9단계 스케일 둘로 줍니다. 앞의 둘은 IDS 가 두 스케일로 바꿉니다. IDS 에는 기본 색이 없습니다.
 - 대비는 APCA 의 Lc 입니다.
-  - 채움은 600 에서 시작해 글자가 Lc 75 에 닿을 때까지 이웃 단계로 옮깁니다.
-  - `text-on-` 글자는 Lc 75, 페이지와 subtler, subtle 위 색 글자는 Lc 60 을 넘는 첫 단계입니다.
+  - solid 는 600 에서 시작해 흰 글자나 neutral 950 이 Lc 75 에 닿을 때까지 이웃 단계로 옮깁니다.
+  - 진한 선은 300(다크 900)부터, base, surface, block, 자기 soft 위에서 Lc 45 를 넘는 첫 단계입니다.
+  - 글자는 solid 단계부터 바깥으로 Lc 60 을, 진한 글자는 글자 다음 단계부터 Lc 75 를 넘는 첫 단계입니다. 그래서 둘이 같은 색이 되지 않습니다.
   - 모두 쉴 때뿐 아니라 hover, press 층 아래에서도 잽니다.
-  - 선은 색 글자와 같은 단계입니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
+  - 다크 1~5단계는 같은 번호 neutral 의 밝기에 놓고, 램프 끝(950)의 채도를 밝기 비율의 제곱근만큼 남깁니다. 단순히 섞을 때보다 덜 칙칙합니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
 - Storybook 툴바의 Primary 는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)에서 고릅니다. 패키지에는 들어 있지 않습니다.
 
 ## 중립
@@ -108,10 +115,10 @@ neutral 만 가지는 역할입니다.
 hover 와 press 는 색 역할이 아니라 컴포넌트가 그리는 층입니다.
 
 ```tsx
-<button className="bg-neutral-subtle text-on-neutral-subtle state-layer data-hovered:state-hover data-active:state-press">
+<button className="bg-neutral-soft text-on-neutral-soft state-layer data-hovered:state-hover data-active:state-press">
   채움
 </button>
-<span className="bg-neutral hover:bg-(--ids-color-text-neutral) data-dragging:bg-(--ids-color-text-neutral)" />
+<span className="bg-(--ids-color-border-neutral-strong) hover:bg-(--ids-color-text-neutral) data-dragging:bg-(--ids-color-text-neutral)" />
 ```
 
 | 유틸리티 | 하는 일 |
@@ -127,23 +134,23 @@ hover 와 press 는 색 역할이 아니라 컴포넌트가 그리는 층입니�
 | 면 | 층 | hover / press |
 | --- | --- | --- |
 | 채움(solid Button, Chip, Badge, 고른 Calendar 날짜, 끝난 Stepper 단계) | 검정, `state-fill` | 10% / 18% |
-| 색 있는 soft 면, 상태 색의 outline, ghost | 계열 채움(`bg-X`), `--ids-state-tint-*` | 8% / 12% |
+| 색 있는 soft 면, 상태 색의 outline, ghost | 계열 채움(`bg-X-solid`), `--ids-state-tint-*` | 8% / 12% |
 | neutral, 브랜드 색의 outline, ghost | 글자색 | 6% / 10% |
 
 - IdsProvider 는 글자 단계를 고를 때 각 면이 그리는 층 아래의 대비까지 잽니다.
 - 켜진 ghost, outline Toggle, 선택한 Table 행과 Item, 현재 ghost Pagination 링크는 `state-press` 입니다. 열린 Menu 항목과 강조된 옵션은 `state-hover` 입니다.
 - `transition-[…]` 에 `--ids-state-opacity` 를 넣어 층이 함께 바뀌게 합니다.
-- hover 색(`hover:bg-neutral-subtle`)을 쓰거나 채운 브랜드 색을 `/90` 으로 흐리지 않습니다.
+- hover 색(`hover:bg-neutral-soft`)을 쓰거나 채운 브랜드 색을 `/90` 으로 흐리지 않습니다.
 - `state-layer` 가 `background-image` 를 차지하므로, 자기 그라디언트가 있는 요소(glossy)는 층 대신 그라디언트 정지점을 옮깁니다.
 - 예외:
-  - 손잡이(ScrollArea thumb, Drawer 손잡이, 크기 조절 손잡이, DataTable 열 크기 조절, Carousel 점)는 2~4px 막대라 6~10% 층이 보이지 않습니다. `bg-neutral` 에서 hover 와 끄는 동안 `bg-(--ids-color-text-neutral)` 로 바뀝니다.
-    - ScrollArea thumb 만 한 단계 더 있습니다: `bg-neutral/60` → hover `bg-neutral` → 끄는 동안 `bg-(--ids-color-text-neutral)`.
+  - 손잡이(ScrollArea thumb, Drawer 손잡이, 크기 조절 손잡이, DataTable 열 크기 조절, Carousel 점)는 2~4px 막대라 6~10% 층이 보이지 않습니다. `bg-(--ids-color-border-neutral-strong)` 에서 hover 와 끄는 동안 `bg-(--ids-color-text-neutral)` 로 바뀝니다.
+    - ScrollArea thumb 만 한 단계 더 있습니다: `bg-(--ids-color-border-neutral-strong)/60` → hover `bg-(--ids-color-border-neutral-strong)` → 끄는 동안 `bg-(--ids-color-text-neutral)`.
   - IDS 가 모르는 배경 위의 반투명 층은 그대로입니다: Image 의 hover 가림막, Chip 선, ScrollArea 트랙, DataTable 로딩 가림막, disabled 투명도, backdrop.
 
 ### 구조선
 
 - 필드 테두리, 카드 가장자리, 구분선은 `border-neutral` 입니다. 꾸밈 선이라 대비 규칙이 없습니다.
-- 선 자체가 브랜드로 읽혀야 하는 드문 자리만 `border-primary` 를 씁니다.
+- 선 자체가 브랜드로 읽혀야 하는 드문 자리만 `border-primary-strong` 를 씁니다.
 
 ## 실시간으로 조정하기
 
@@ -166,6 +173,6 @@ hover 와 press 는 색 역할이 아니라 컴포넌트가 그리는 층입니�
 - 테마 하나의 대비는 Storybook `Foundations/Color` 의 Lab 에서 보고, 데모 팔레트 17개 전체는 `tests/tokens-contrast.test.ts` 가 검사합니다.
 - Lab 의 역할 표는 `tokens/color-roles.ts`(core 의 `color-roles.json` 에서 생성)의 계열과 역할을 읽어 그리므로 계열이나 역할을 더하면 저절로 나타납니다.
 - 테스트:
-  - `tests/tokens-contrast.test.ts`: 데모 팔레트 17개 × 두 모드 × pure·tinted × harmonized·fixed 에서 모든 계열의 채움과 subtle 위 글자가 Lc 75, `text-X` 가 Lc 60, 선이 Lc 45 이상이다. hover, press 층 아래에서도 잰다. `ids.css` 에 `-hover`, `-active`, `-soft` 역할이 없다.
+  - `tests/tokens-contrast.test.ts`: 데모 팔레트 17개 × 두 모드 × pure·tinted × harmonized·fixed 에서 모든 `text-on-*` 와 `text-X-strong` 이 Lc 75, `text-X` 가 Lc 60, `border-X-strong` 이 Lc 45 이상이다. hover, press 층 아래에서도 잰다. `ids.css` 에 `-hover`, `-active` 역할이 없다.
   - `tests/theme-roles.test.ts`: 데모 팔레트 17개가 역할 규칙을 모두 통과한다. `checkIdsTheme` 의 입력 검사.
   - `tests/theme-colors.test.ts`: harmonize, tinted neutral, `checkIdsTheme` 의 구별 검사와 그 기준값.

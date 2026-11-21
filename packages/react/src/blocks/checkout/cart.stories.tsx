@@ -8,6 +8,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Alert } from '../../components/feedback/alert';
 import { toast } from '../../components/feedback/toast';
 import { NumberField } from '../../components/form/number-field';
@@ -77,7 +78,7 @@ export const PC: Story = {
             </Empty>
           ) : (
             <Card size="tiny">
-              <Item.Group aria-label="담은 상품">
+              <ItemGroup aria-label="담은 상품">
                 {lines.map((product) => (
                   <Item key={product.id}>
                     <Item.Media>
@@ -112,7 +113,7 @@ export const PC: Story = {
                     </Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           )}
         </section>

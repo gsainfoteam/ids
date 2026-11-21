@@ -214,7 +214,7 @@ export const PC: Story = {
                       </AvatarGroup>
                       {riders.length}/{ride.seats}명 · 1인 {ride.fare}
                     </Card.Content>
-                    <Card.Footer className="border-t">
+                    <Card.Footer>
                       <Button
                         className="w-full"
                         variant={joined.includes(ride.id) ? 'outline' : 'solid'}

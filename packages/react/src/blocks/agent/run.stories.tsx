@@ -16,6 +16,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 import { Alert } from '../../components/feedback/alert';
 import { Marker } from '../../components/feedback/marker';
@@ -234,7 +235,7 @@ export const PC: Story = {
                   </Table.Body>
                 </Table>
               </Card.Content>
-              <Card.Footer className="border-t">
+              <Card.Footer>
                 <Item variant="outline" size="tiny" className="w-auto">
                   <Item.Media variant="soft">
                     <DocumentTextIcon />
@@ -321,7 +322,7 @@ export const PC: Story = {
                   <h2>쓸 수 있는 도구</h2>
                 </Card.Title>
               </Card.Header>
-              <Item.Group size="tiny" aria-label="쓸 수 있는 도구">
+              <ItemGroup size="tiny" aria-label="쓸 수 있는 도구">
                 {TOOLS.map((tool) => (
                   <Item key={tool.name}>
                     <Item.Content>
@@ -336,7 +337,7 @@ export const PC: Story = {
                     </Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </aside>
         </main>

@@ -13,13 +13,13 @@ export type ChartIndicator = 'dot' | 'line' | 'dashed';
 export const DEFAULT_SERIES: readonly IdsBrandFamily[] = ['primary', 'secondary', 'tertiary'];
 
 const FAMILY_COLORS: { [color: string]: string } = {
-  primary: 'var(--ids-color-bg-primary)',
-  secondary: 'var(--ids-color-bg-secondary)',
-  tertiary: 'var(--ids-color-bg-tertiary)',
-  success: 'var(--ids-color-bg-success)',
-  warning: 'var(--ids-color-bg-warning)',
-  danger: 'var(--ids-color-bg-danger)',
-  info: 'var(--ids-color-bg-info)',
+  primary: 'var(--ids-color-bg-primary-solid)',
+  secondary: 'var(--ids-color-bg-secondary-solid)',
+  tertiary: 'var(--ids-color-bg-tertiary-solid)',
+  success: 'var(--ids-color-bg-success-solid)',
+  warning: 'var(--ids-color-bg-warning-solid)',
+  danger: 'var(--ids-color-bg-danger-solid)',
+  info: 'var(--ids-color-bg-info-solid)',
   neutral: 'var(--ids-color-text-neutral)',
 };
 

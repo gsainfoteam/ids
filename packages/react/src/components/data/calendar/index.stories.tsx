@@ -66,7 +66,10 @@ const valueFor = {
 export const Gallery: Story = {
   render: () => (
     <Showcase>
-      <Showcase.Section title="Selection mode × Size">
+      <Showcase.Section
+        title="Selection mode × Size"
+        description="고른 날은 primary 로 채우고, 기간 안의 날은 primary soft, 오늘은 primary 글자와 테두리입니다."
+      >
         <Showcase.Matrix
           rows={sizes}
           columns={modes}
@@ -387,7 +390,7 @@ export const Parts: Story = {
                   state.modifiers.event
                     ? state.selected
                       ? 'mt-0.5 size-1 rounded-full bg-current'
-                      : 'bg-primary mt-0.5 size-1 rounded-full'
+                      : 'bg-primary-solid mt-0.5 size-1 rounded-full'
                     : 'mt-0.5 size-1'
                 }
               />

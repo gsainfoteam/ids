@@ -15,6 +15,7 @@ import { Button } from '../../action/button';
 import { TextField } from '../../form/text-field';
 import { Card } from '../card';
 import { Item } from '../item';
+import { ItemGroup } from '../item-group';
 
 import { Empty } from '.';
 
@@ -262,7 +263,7 @@ export const ListEmptyState: Story = {
           <MagnifyingGlassIcon />
         </TextField>
         {matches.length > 0 ? (
-          <Item.Group aria-label="도시">
+          <ItemGroup aria-label="도시">
             {matches.map((city) => (
               <Item key={city} size="tiny">
                 <Item.Content>
@@ -270,7 +271,7 @@ export const ListEmptyState: Story = {
                 </Item.Content>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         ) : (
           <Empty size="tiny">
             <Empty.Media>

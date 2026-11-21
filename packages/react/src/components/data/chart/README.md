@@ -80,14 +80,14 @@ const shares = rows.map((row) => ({ ...row, fill: `var(--chart-${row.service})` 
 
 ```tsx
 const config = {
-  web: { label: '웹' },                        // bg-primary
-  app: { label: '앱' },                        // bg-secondary
-  kiosk: { label: '키오스크' },                // bg-tertiary
+  web: { label: '웹' },                        // bg-primary-solid
+  app: { label: '앱' },                        // bg-secondary-solid
+  kiosk: { label: '키오스크' },                // bg-tertiary-solid
   other: { label: '기타', color: 'neutral' },  // 네 번째부터는 color 를 준다
 } satisfies Chart.Config;
 ```
 
-- `color` 를 생략한 계열은 config 순서대로 `bg-primary`, `bg-secondary`, `bg-tertiary` 를 씁니다. 기본 색은 이 세 개뿐입니다.
+- `color` 를 생략한 계열은 config 순서대로 `bg-primary-solid`, `bg-secondary-solid`, `bg-tertiary-solid` 를 씁니다. 기본 색은 이 세 개뿐입니다.
 - 테마가 `primary` 만 주면 `secondary` 와 `tertiary` 는 IdsProvider 가 primary 에서 만든 색입니다([만든 secondary 와 tertiary](../../utility/ids-provider/README.md#secondary-와-tertiary)). 테마가 몇 계열을 주든 세 색은 서로 다릅니다.
 - `color` 없는 계열이 네 개 이상이면 네 번째부터 `neutral` 로 칠하고 개발 모드에서 경고합니다. 네 번째부터는 `color` 에 `neutral`, 상태 이름, CSS 색 중 하나를 줍니다.
 - 상태 색(`success`, `warning`, `danger`, `info`)은 의미가 있으므로 기본 순서에 들지 않습니다.
@@ -112,7 +112,7 @@ const config = {
 ```
 
 - 기본은 차트 안에 `Chart.Tooltip`/`Chart.Legend` 나 Recharts `Tooltip`/`Legend` 가 없을 때만 붙습니다. Server Component 가 넘긴 차트도 같은 방법으로 찾습니다.
-- Recharts `Tooltip` 을 그대로 쓰면 흰 바탕에 값을 계열 색으로 씁니다. 다크 모드에서는 대비가 모자라므로 `contentStyle` 에 `var(--ids-color-bg-neutral-subtlest)`, `itemStyle` 에 `var(--ids-color-text-neutral-bold)` 를 줍니다.
+- Recharts `Tooltip` 을 그대로 쓰면 흰 바탕에 값을 계열 색으로 씁니다. 다크 모드에서는 대비가 모자라므로 `contentStyle` 에 `var(--ids-color-bg-base)`, `itemStyle` 에 `var(--ids-color-text-neutral-strong)` 를 줍니다.
 - 두 파트는 Recharts `Tooltip`/`Legend` 의 속성을 그대로 받고, 더해서 `indicator`(`'dot' | 'line' | 'dashed'`)를 받습니다.
 - `Chart.Tooltip` 의 `formatter(value, name, item, index, payload)` 와 `labelFormatter(label, payload)` 는 Recharts 와 같습니다. `[값, 이름]` 배열을 돌려주면 이름도 바꿉니다. `hideLabel` 은 맨 위 항목 이름을 숨깁니다.
 - `Chart.Legend` 의 `formatter(label, item, index)` 는 config 의 label 을 받아 바꿉니다.

@@ -11,6 +11,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
 import { Select } from '../../components/form/select';
@@ -165,7 +166,7 @@ export const PC: Story = {
                 </TextArea>
               </Field>
             </Card.Content>
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button type="submit">저장</Button>
             </Card.Footer>
           </form>
@@ -178,7 +179,7 @@ export const PC: Story = {
             </Card.Title>
             <Card.Description>휴대폰과 브라우저로 받을 알림을 골라요.</Card.Description>
           </Card.Header>
-          <Item.Group aria-label="알림">
+          <ItemGroup aria-label="알림">
             {NOTIFICATIONS.map((notification) => (
               <Item key={notification.id}>
                 <Item.Content>
@@ -197,7 +198,7 @@ export const PC: Story = {
                 </Item.Actions>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Card>
 
         <Card>
@@ -216,7 +217,7 @@ export const PC: Story = {
               </Button>
             </Card.Action>
           </Card.Header>
-          <Item.Group aria-label="로그인한 기기">
+          <ItemGroup aria-label="로그인한 기기">
             {DEVICES.map((device) => (
               <Item key={device.id}>
                 <Item.Media variant="soft">{device.icon}</Item.Media>
@@ -240,7 +241,7 @@ export const PC: Story = {
                 </Item.Actions>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Card>
 
         <Card>
@@ -252,7 +253,7 @@ export const PC: Story = {
               글과 댓글, 예약 기록이 모두 지워지고 되돌릴 수 없어요.
             </Card.Description>
           </Card.Header>
-          <Card.Footer className="justify-end border-t">
+          <Card.Footer className="justify-end">
             <Dialog onOpenChange={() => setConfirmation('')}>
               <Dialog.Trigger asChild>
                 <Button variant="outline" colorScheme="danger">

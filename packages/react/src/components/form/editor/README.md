@@ -55,7 +55,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | 부품                                                   | 하는 일                                                         |
 | ------------------------------------------------------ | --------------------------------------------------------------- |
 | `Bold` `Italic` `Underline` `Strike` `Code`            | 글자 서식. 누른 상태가 커서 자리의 서식을 따릅니다               |
-| `Highlight`                                            | 형광펜. 색은 `bg-warning-subtle` 와 `text-on-warning-subtle` 입니다  |
+| `Highlight`                                            | 형광펜. 색은 `bg-warning-soft` 와 `text-on-warning-soft` 입니다  |
 | `BulletList` `OrderedList` `Blockquote`                | 블록 서식                                                       |
 | `CodeBlock`                                            | 코드 블록. 본문의 코드 블록에는 언어 Select 와 복사 버튼이 붙고, 고른 언어로 색을 칠합니다 |
 | `Callout`                                              | 콜아웃을 넣거나 종류(참고, 팁, 중요, 경고, 주의)를 바꾸는 Menu   |

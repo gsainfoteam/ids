@@ -5,8 +5,9 @@ import { Fragment } from 'react';
 import { GLYPH_ICONS } from './glyph-icons';
 import { orderedKeys, splitGlyphs, type KbdLabel, type ResolvedKey } from './keys';
 import { kbdStyle } from './style';
-import { KbdGroupContext, useKbd } from './use-kbd';
+import { useKbd } from './use-kbd';
 import { useTranslate } from '../../../internal/translate';
+import { kbdGroupStyle } from '../kbd-group/style';
 
 import type { Kbd } from '.';
 
@@ -78,7 +79,7 @@ export function KbdRoot({
         data-kbd-group=""
         data-size={kbd.size}
         data-platform={kbd.platform}
-        className={styles.group({ className: resolve(className, state) })}
+        className={kbdGroupStyle({ size: kbd.size, className: resolve(className, state) })}
       >
         {ordered.map((keyInfo, index) => (
           <Fragment key={`${index}:${keyInfo.id}`}>
@@ -130,30 +131,3 @@ export function KbdRoot({
     </kbd>
   );
 }
-
-export function KbdGroup({
-  size,
-  platform,
-  labels,
-  className,
-  children,
-  ...rest
-}: Kbd.Group.Props) {
-  const kbd = useKbd({ size, platform, labels });
-  const state: Kbd.State = { size: kbd.size, platform: kbd.platform, combination: true };
-  return (
-    <KbdGroupContext value={{ size: kbd.size, platform: kbd.platform, labels: kbd.labels }}>
-      <kbd
-        {...rest}
-        data-kbd-group=""
-        data-size={kbd.size}
-        data-platform={kbd.platform}
-        className={kbdStyle({ size: kbd.size }).group({ className: resolve(className, state) })}
-      >
-        {children}
-      </kbd>
-    </KbdGroupContext>
-  );
-}
-
-KbdGroup.displayName = 'Kbd.Group';

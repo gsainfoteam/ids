@@ -11,7 +11,7 @@ export const documentText = cn(
   '[&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-6 [&_li>*+*]:mt-1 [&_li+li]:mt-1',
   '[&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
   '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
-  '[&_mark]:bg-warning-subtle [&_mark]:text-on-warning-subtle',
+  '[&_mark]:bg-warning-soft [&_mark]:text-on-warning-soft',
   '[&_ul[data-type=taskList]]:list-none [&_ul[data-type=taskList]]:ps-0',
   '[&_ul[data-type=taskList]>li]:flex [&_ul[data-type=taskList]>li]:items-start [&_ul[data-type=taskList]>li]:gap-2',
   '[&_ul[data-type=taskList]>li>div]:min-w-0 [&_ul[data-type=taskList]>li>div]:grow',
@@ -25,9 +25,9 @@ export const mentionChip = chipStyle({ variant: 'soft', size: 'tiny' }).root({
 export const richTextStyle = tv({
   slots: {
     root: [
-      'min-w-0 break-words text-neutral-bold',
+      'min-w-0 break-words text-neutral-strong',
       documentText,
-      '[&_:not(pre)>code]:bg-neutral-subtler',
+      '[&_:not(pre)>code]:bg-block',
     ],
     taskBox: 'mt-[calc((1lh_-_1rem)/2)]',
     figure: 'flex flex-col gap-1',
