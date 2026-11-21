@@ -1,5 +1,62 @@
 {
   "ids(singleInterface=IdsMessages)": {
     "spinnerLabel": "Loading"
+  },
+  "demo": {
+    "specimen": "Aa Wi 0123 한글",
+    "divider": {
+      "above": "Above",
+      "below": "Below",
+      "or": "or",
+      "account": "Account",
+      "settings": "Settings",
+      "help": "Help",
+      "signInWithEmail": "Sign in with email",
+      "signInWithSchool": "Sign in with your school account"
+    },
+    "field": {
+      "label": "Email",
+      "description": "We send notices to this address.",
+      "hint": "This is a sample address. Nothing is sent.",
+      "error": "Enter a valid email address.",
+      "value": "hello@ids.example",
+      "longLabel": "The school or personal email address that receives notices"
+    },
+    "label": {
+      "text": "Email",
+      "longText": "The school or personal email address that receives notices"
+    },
+    "spinner": {
+      "loadingList": "Loading the list"
+    }
+  },
+  "examples": {
+    "divider": {
+      "separateAlternatives": "Put a labelled divider between choices the user picks one of, such as sign-in methods.",
+      "splitAToolbar": "Wrap the toolbar Row in IntrinsicHeight and each vertical divider is as tall as the line of text."
+    },
+    "field": {
+      "reportAnInvalidValue": "Turn on invalid when the value is wrong. The border and error turn danger, and the error replaces the hint."
+    },
+    "spinner": {
+      "showProgressBesideText": "A spinner without a size follows IconTheme, so it matches the size and color of the text beside it."
+    },
+    "provider": {
+      "nestScopes": "IdsProviderScope inherits the parent theme and changes only what it sets. Only a scope that sets mode owns its mode.",
+      "connectSlang": "Pass slang's translations as translation and IDS strings follow the app language. State under a scope survives the change."
+    }
+  },
+  "notes": {
+    "divider": {
+      "vertical": "Without a height to fill, it is as tall as the line of text."
+    },
+    "spinner": {
+      "size": "Leave it off to follow IconTheme.",
+      "color": "The color comes from IconTheme."
+    },
+    "provider": {
+      "familyByMode": "Each family as a solid fill, a soft surface and text, from the theme the IDS theme addon picks.",
+      "translation": "The slang catalog handed to IdsProvider."
+    }
   }
 }

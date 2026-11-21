@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 
-import '../ids_theme.dart';
+import '../../catalog/palettes.dart';
+import '../../catalog/strings.dart';
 
 String hexOf(Color color) =>
     '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
@@ -53,9 +54,11 @@ class ProviderPreview extends StatelessWidget {
                       Text(
                         'Text scale: ${MediaQuery.textScalerOf(context).scale(16) / 16}',
                       ),
-                      const IdsLabel(
+                      IdsLabel(
                         required: true,
-                        child: Text('IDS sans: Aa Wi 0123 한글'),
+                        child: Text(
+                          'IDS sans: ${context.strings.demo.specimen}',
+                        ),
                       ),
                       Text(
                         'IDS mono: Aa Wi 0123',
@@ -66,7 +69,7 @@ class ProviderPreview extends StatelessWidget {
                         ),
                       ),
                       for (final family in IdsColorRoles.families)
-                        _FamilySwatch(family: family, colors: colors),
+                        FamilySwatch(family: family, colors: colors),
                       Text(
                         ids.translation?.spinnerLabel ??
                             IdsMessages.ko.spinnerLabel,
@@ -97,8 +100,8 @@ class ProviderPreview extends StatelessWidget {
   }
 }
 
-class _FamilySwatch extends StatelessWidget {
-  const _FamilySwatch({required this.family, required this.colors});
+class FamilySwatch extends StatelessWidget {
+  const FamilySwatch({super.key, required this.family, required this.colors});
 
   final String family;
   final IdsColors colors;
