@@ -42,9 +42,12 @@ export const calendarStyle = tv({
       'first:rounded-s-standard last:rounded-e-standard',
       '[[data-hidden]+&]:rounded-s-standard [&:has(+[data-hidden])]:rounded-e-standard',
     ],
-    rangeStart: 'rounded-s-standard bg-neutral-subtle',
-    rangeMiddle: 'bg-neutral-subtle',
-    rangeEnd: 'rounded-e-standard bg-neutral-subtle',
+    rangeStart: 'rounded-s-standard bg-primary-subtle',
+    rangeMiddle: 'bg-primary-subtle',
+    rangeEnd: 'rounded-e-standard bg-primary-subtle',
+    previewStart: 'rounded-s-standard bg-neutral-subtle',
+    previewMiddle: 'bg-neutral-subtle',
+    previewEnd: 'rounded-e-standard bg-neutral-subtle',
     hidden: 'invisible',
     dayButton: [
       'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
@@ -78,15 +81,18 @@ export const calendarStyle = tv({
         dayButton: 'bg-primary font-medium text-on-primary state-fill',
       },
     },
-    onBand: { true: {} },
+    band: {
+      none: {},
+      range: { dayButton: 'scheme-primary text-on-scheme-subtle state-scheme' },
+      preview: {},
+    },
     unavailable: { true: { dayButton: 'cursor-not-allowed opacity-50' } },
   },
   compoundVariants: [
     {
       selected: false,
-      onBand: false,
       today: true,
-      class: { dayButton: 'bg-neutral-subtle' },
+      class: { dayButton: 'text-primary inset-ring-1 inset-ring-primary' },
     },
     {
       unavailable: false,
@@ -96,7 +102,7 @@ export const calendarStyle = tv({
   defaultVariants: {
     size: 'standard',
     selected: false,
-    onBand: false,
+    band: 'none',
     today: false,
     outside: false,
     unavailable: false,

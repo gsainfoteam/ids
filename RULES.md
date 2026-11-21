@@ -496,7 +496,9 @@ provider always writes all three.
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
-the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
+the theme color, while `outline` and `ghost` stay neutral. A current or selected mark is content,
+not chrome: the current Pagination page in `ghost` and the selected Tabs label take `text-X`.
+`border-neutral` is decorative and
 exempt from contrast. `border-primary` and every other family's `border-X`, for the rare edge that
 should itself read as that color, is the same step as `text-X`, so a line and the text beside it
 (an invalid field's border, its label and error message) are one color.
@@ -605,6 +607,14 @@ Developer warnings stay English and out of the catalog. A default that has to be
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
 keys and that no Korean literal sits in component code; `tests/translate.test.tsx` renders every
 story in English.
+
+**Variants are the looks an app cannot build from IDS parts.** A `variant` or `appearance` value is
+a component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
+and `ghost`, Tabs' `underline`, `pill`, `enclosed` and `segmented`. A look an app can compose from
+IDS components and props (a Card holding a Tabs, a Field around a SegmentedControl) stays a
+composition and never becomes a prop value. Two components that read alike share an internal
+surface (`internal/surfaces/segment-surface.ts` for SegmentedControl and segmented Tabs) instead of
+one copying the other's classes.
 
 **Callbacks.** A value callback is `onValueChange(value)`; other state callbacks are
 `onCheckedChange`, `onPressedChange`, `onOpenChange` and so on. `onChange` keeps the native event

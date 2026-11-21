@@ -67,7 +67,7 @@ export const PC: Story = {
           </Card.Header>
 
           <Card.Content>
-            <Tabs defaultValue="qr" appearance="pill" className="flex flex-col gap-5">
+            <Tabs defaultValue="qr" appearance="segmented" className="gap-5">
               <Tabs.List aria-label="로그인 방법" stretch>
                 <Tabs.Trigger value="qr">
                   <QrCodeIcon />
@@ -79,43 +79,45 @@ export const PC: Story = {
                 </Tabs.Trigger>
               </Tabs.List>
 
-              <Tabs.Content value="qr" className="flex flex-col items-center gap-5">
-                <QRCode
-                  value={`https://gistory.me/login/qr/${SESSIONS[session]}`}
-                  aria-label="로그인 QR 코드"
-                  shape="rounded"
-                  size={176}
-                >
-                  <QRCode.Logo>
-                    <CubeTransparentIcon />
-                  </QRCode.Logo>
-                </QRCode>
+              <Tabs.Content value="qr">
+                <div className="flex flex-col items-center gap-5">
+                  <QRCode
+                    value={`https://gistory.me/login/qr/${SESSIONS[session]}`}
+                    aria-label="로그인 QR 코드"
+                    shape="rounded"
+                    size={176}
+                  >
+                    <QRCode.Logo>
+                      <CubeTransparentIcon />
+                    </QRCode.Logo>
+                  </QRCode>
 
-                <ItemGroup
-                  ordered
-                  aria-label="QR 코드로 로그인하는 법"
-                  size="tiny"
-                  className="w-full"
-                >
-                  {STEPS.map((step, index) => (
-                    <Item key={step}>
-                      <Item.Media variant="soft" aria-hidden>
-                        {index + 1}
-                      </Item.Media>
-                      <Item.Content>
-                        <Item.Title>{step}</Item.Title>
-                      </Item.Content>
-                    </Item>
-                  ))}
-                </ItemGroup>
+                  <ItemGroup
+                    ordered
+                    aria-label="QR 코드로 로그인하는 법"
+                    size="tiny"
+                    className="w-full"
+                  >
+                    {STEPS.map((step, index) => (
+                      <Item key={step}>
+                        <Item.Media variant="soft" aria-hidden>
+                          {index + 1}
+                        </Item.Media>
+                        <Item.Content>
+                          <Item.Title>{step}</Item.Title>
+                        </Item.Content>
+                      </Item>
+                    ))}
+                  </ItemGroup>
 
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  onClick={() => setSession((session + 1) % SESSIONS.length)}
-                >
-                  <ArrowPathIcon />새 코드 받기
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="tiny"
+                    onClick={() => setSession((session + 1) % SESSIONS.length)}
+                  >
+                    <ArrowPathIcon />새 코드 받기
+                  </Button>
+                </div>
               </Tabs.Content>
 
               <Tabs.Content value="password">

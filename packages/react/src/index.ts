@@ -113,6 +113,7 @@ export { Checkbox } from './components/form/checkbox';
 export { Switch } from './components/form/switch';
 export { Radio } from './components/form/radio';
 export { RadioGroup } from './components/form/radio-group';
+export { SegmentedControl } from './components/form/segmented-control';
 export { CheckboxGroup } from './components/form/checkbox-group';
 export { Slider } from './components/form/slider';
 export { TextField } from './components/form/text-field';
