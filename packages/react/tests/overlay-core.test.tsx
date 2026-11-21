@@ -109,7 +109,7 @@ test('a top layer box escapes a scaled ancestor and still takes its theme from t
   expect(lifted.getBoundingClientRect().width).toBe(100);
   expect(fixed.getBoundingClientRect().width, 'a plain fixed box shrinks with it').toBe(50);
   const primary = (element: Element) =>
-    getComputedStyle(element).getPropertyValue('--ids-color-bg-primary');
+    getComputedStyle(element).getPropertyValue('--ids-color-bg-primary-solid');
   expect(primary(lifted)).toBe(primary(fixed));
   expect(primary(lifted)).not.toBe(primary(document.body));
 });

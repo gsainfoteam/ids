@@ -152,7 +152,7 @@ export const PC: Story = {
               )}
             </Card.Content>
 
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button variant="outline">취소</Button>
               <Button type="submit" disabled={from === to}>
                 모집 열기

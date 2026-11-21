@@ -7,8 +7,8 @@ export const highlightStyle = tv({
   },
   variants: {
     variant: {
-      soft: { mark: 'bg-primary-subtle text-on-primary-subtle' },
-      solid: { mark: 'bg-primary text-on-primary' },
+      soft: { mark: 'bg-primary-soft text-on-primary-soft' },
+      solid: { mark: 'bg-primary-solid text-on-primary-solid' },
     },
   },
   defaultVariants: { variant: 'soft' },

@@ -17,6 +17,8 @@ import type { IdsMode } from '../src/tokens/types';
 
 type ComponentColor = keyof typeof IDS_COMPONENT_COLORS;
 
+type Background = ComponentColor | 'bg-surface' | 'bg-block';
+
 const TOKEN_NAMES = [...Object.keys(IDS_COMPONENT_COLORS), ...Object.keys(IDS_COMPONENT_SHADOWS)];
 
 const PROPERTIES = ['bg', 'text', 'border', 'shadow'];
@@ -34,7 +36,7 @@ const WORDS_THAT_NAME_A_USE_OR_A_ROLE = [
   'background',
 ];
 
-const STRENGTHS = ['subtlest', 'subtler', 'subtle', 'bold', 'bolder', 'boldest'];
+const STRENGTHS = ['strong', 'subtlest', 'subtler', 'subtle', 'bold', 'bolder', 'boldest'];
 
 const WORDS_A_GROUP_CANNOT_TAKE = [...IDS_COLOR_FAMILIES, 'scheme', ...STRENGTHS];
 
@@ -53,8 +55,11 @@ const themes = paletteHues.flatMap((primary) =>
   })),
 );
 
-const tokenIn = (roles: Record<IdsMode, Record<string, string>>, mode: IdsMode) => (token: ComponentColor) =>
-  roles[mode][IDS_COMPONENT_COLORS[token][mode]]!;
+const isComponentColor = (name: Background): name is ComponentColor => name in IDS_COMPONENT_COLORS;
+
+const tokenIn =
+  (roles: Record<IdsMode, Record<string, string>>, mode: IdsMode) => (name: Background) =>
+    roles[mode][isComponentColor(name) ? IDS_COMPONENT_COLORS[name][mode] : name]!;
 
 describe('component token names', () => {
   test.each(TOKEN_NAMES)('%s is {property}-{group}[-{part}][-{variant}]', (name) => {
@@ -63,57 +68,79 @@ describe('component token names', () => {
     expect(PROPERTIES).toContain(property);
     expect(group).toBeDefined();
     expect(WORDS_A_GROUP_CANNOT_TAKE).not.toContain(group);
-    expect(name.split('-').filter((word) => WORDS_THAT_NAME_A_USE_OR_A_ROLE.includes(word))).toEqual([]);
+    expect(
+      name.split('-').filter((word) => WORDS_THAT_NAME_A_USE_OR_A_ROLE.includes(word)),
+    ).toEqual([]);
     expect(rest.slice(0, -1).filter((word) => VARIANT_ONLY_WORDS.includes(word))).toEqual([]);
   });
 
   test('a color token carries a color property and a shadow token the shadow property', () => {
-    for (const name of Object.keys(IDS_COMPONENT_COLORS)) expect(name).toMatch(/^(bg|text|border)-/);
+    for (const name of Object.keys(IDS_COMPONENT_COLORS))
+      expect(name).toMatch(/^(bg|text|border)-/);
     for (const name of Object.keys(IDS_COMPONENT_SHADOWS)) expect(name).toMatch(/^shadow-/);
   });
 });
 
 describe.each(themes)('component tokens for $name', ({ roles }) => {
-  test('bg-panel stands apart from the page in dark mode', () => {
+  test('bg-surface stands apart from the page in dark mode, and bg-block from both', () => {
     const token = tokenIn(roles, 'dark');
 
-    expect(differenceInOklab(token('bg-panel'), roles.dark['bg-neutral-subtlest']!)).toBeGreaterThan(
+    expect(differenceInOklab(token('bg-surface'), roles.dark['bg-base']!)).toBeGreaterThan(
+      SURFACES_APART_IN_OKLAB,
+    );
+    expect(differenceInOklab(token('bg-block'), roles.dark['bg-base']!)).toBeGreaterThan(
       SURFACES_APART_IN_OKLAB,
     );
   });
 
-  test.each(MODES)('an outline control reads apart from bg-panel and bg-band in %s mode', (mode) => {
-    const token = tokenIn(roles, mode);
+  test.each(MODES)(
+    'an outline control reads apart from bg-surface and bg-block in %s mode',
+    (mode) => {
+      const token = tokenIn(roles, mode);
 
-    for (const surface of ['bg-panel', 'bg-band'] as const) {
-      for (const [fill, border] of [
-        ['bg-control-outline', 'border-control-outline'],
-        ['bg-field-outline', 'border-field-outline'],
-      ] as const) {
-        const apart = Math.max(
-          differenceInOklab(token(fill), token(surface)),
-          differenceInOklab(token(border), token(surface)),
-        );
+      for (const surface of ['bg-surface', 'bg-block'] as const) {
+        for (const [fill, border] of [
+          ['bg-control-outline', 'border-control-outline'],
+          ['bg-field-outline', 'border-field-outline'],
+        ] as const) {
+          const apart = Math.max(
+            differenceInOklab(token(fill), token(surface)),
+            differenceInOklab(token(border), token(surface)),
+          );
 
-        expect(apart, `${fill} on ${surface}`).toBeGreaterThan(SURFACES_APART_IN_OKLAB);
+          expect(apart, `${fill} on ${surface}`).toBeGreaterThan(SURFACES_APART_IN_OKLAB);
+        }
       }
-    }
-  });
+    },
+  );
 
   test.each(MODES)('text on every component background reaches its contrast in %s mode', (mode) => {
     const token = tokenIn(roles, mode);
     const pairs = [
-      ...(['bg-panel', 'bg-band', 'bg-control-outline', 'bg-field-outline', 'bg-field-code-outline'] as const).flatMap(
-        (background) => [
-          { text: roles[mode]['text-neutral-bold']!, background, lc: TEXT_LC },
-          { text: roles[mode]['text-neutral']!, background, lc: ACCENT_TEXT_LC },
-        ],
-      ),
+      ...(
+        [
+          'bg-surface',
+          'bg-block',
+          'bg-control-outline',
+          'bg-field-outline',
+          'bg-field-code-outline',
+        ] as const
+      ).flatMap((background) => [
+        { text: roles[mode]['text-neutral-strong']!, background, lc: TEXT_LC },
+        { text: roles[mode]['text-neutral']!, background, lc: ACCENT_TEXT_LC },
+      ]),
       { text: token('text-qr-code'), background: 'bg-qr-code' as const, lc: TEXT_LC },
-      { text: token('text-qr-code-inverse'), background: 'bg-qr-code-inverse' as const, lc: TEXT_LC },
+      {
+        text: token('text-qr-code-inverse'),
+        background: 'bg-qr-code-inverse' as const,
+        lc: TEXT_LC,
+      },
     ];
 
     for (const { text, background, lc } of pairs)
-      expect(Math.abs(lightnessContrast(text, token(background))), `${text} on ${background}`).toBeGreaterThanOrEqual(lc);
+      expect(
+        Math.abs(lightnessContrast(text, token(background))),
+        `${text} on ${background}`,
+      ).toBeGreaterThanOrEqual(lc);
   });
 });

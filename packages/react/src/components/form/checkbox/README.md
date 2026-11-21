@@ -120,7 +120,7 @@ import { Checkbox, Label } from '@gsainfoteam/ids-react';
 | `focused`       | `data-focused`               | 포커스                            |
 | `focusVisible`  | `data-focus-visible`         | 키보드 포커스. 포커스 링이 보인다 |
 
-- 체크 색은 scheme 의 `bg-scheme`, 체크 표시 색은 `text-on-scheme` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다. 다른 계열은 `scheme-*` 클래스로 바꿉니다.
+- 체크 색은 scheme 의 `bg-scheme-solid`, 체크 표시 색은 `text-on-scheme-solid` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다. 다른 계열은 `scheme-*` 클래스로 바꿉니다.
 - `Checkbox.Indicator` 에도 `data-state` 가 붙습니다.
 
 ## 폼

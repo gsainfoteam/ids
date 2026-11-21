@@ -539,8 +539,8 @@ export const ControlledOpen: Story = {
 
 const statuses = [
   ['todo', '할 일', cn('bg-(--ids-color-text-neutral)')],
-  ['doing', '진행 중', cn('bg-info')],
-  ['done', '완료', cn('bg-success')],
+  ['doing', '진행 중', cn('bg-info-solid')],
+  ['done', '완료', cn('bg-success-solid')],
 ] as const;
 
 export const CustomItems: Story = {

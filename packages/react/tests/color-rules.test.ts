@@ -6,7 +6,10 @@ import { expect, test } from 'vitest';
 
 const SRC = fileURLToPath(new URL('../src/', import.meta.url));
 
-const css = readFileSync(createRequire(import.meta.url).resolve('@gsainfoteam/ids-css/no-fonts.css'), 'utf8');
+const css = readFileSync(
+  createRequire(import.meta.url).resolve('@gsainfoteam/ids-css/no-fonts.css'),
+  'utf8',
+);
 
 const isComponentCode = (file: string) =>
   /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file) && !file.startsWith('tokens/');
@@ -31,14 +34,18 @@ const COLOR_WITH_OPACITY =
 
 const COLORS_OUTSIDE_IDS = new Set(['black', 'white', 'current', 'transparent', 'inherit']);
 
-const FOCUS_HALO = ['ring-primary/40', 'stroke-primary/40', 'inset-ring-(--ids-color-text-on-primary)/60'];
-const TEXT_SELECTION = ['bg-primary/30'];
-const VEIL_OVER_UNKNOWN_CONTENT = ['bg-neutral-subtlest/60', 'bg-neutral-subtlest/95'];
-const SCROLL_AREA_TRACK = ['bg-neutral-subtle/50', 'bg-neutral/60'];
+const FOCUS_HALO = [
+  'ring-primary-strong/40',
+  'stroke-primary-strong/40',
+  'inset-ring-(--ids-color-text-on-primary-solid)/60',
+];
+const TEXT_SELECTION = ['bg-primary-solid/30'];
+const VEIL_OVER_UNKNOWN_CONTENT = ['bg-base/60', 'bg-base/95'];
+const SCROLL_AREA_TRACK = ['bg-neutral-soft/50', 'bg-(--ids-color-border-neutral-strong)/60'];
 const EDGE_OVER_UNKNOWN_CONTENT = [
-  'inset-ring-(--ids-color-text-neutral-bold)/8',
-  'inset-ring-(--ids-color-text-neutral-bold)/10',
-  'inset-ring-(--ids-color-text-neutral-bold)/15',
+  'inset-ring-(--ids-color-text-neutral-strong)/8',
+  'inset-ring-(--ids-color-text-neutral-strong)/10',
+  'inset-ring-(--ids-color-text-neutral-strong)/15',
 ];
 
 const translucentOnPurpose = new Set([
@@ -64,7 +71,9 @@ test('component code mixes no colors with color-mix', () => {
 test('component code fades no IDS color with an opacity modifier, except the translucent layers', () => {
   const faded = componentModules.flatMap((file) =>
     [...source(file).matchAll(COLOR_WITH_OPACITY)]
-      .filter(([utility, color]) => !COLORS_OUTSIDE_IDS.has(color!) && !translucentOnPurpose.has(utility))
+      .filter(
+        ([utility, color]) => !COLORS_OUTSIDE_IDS.has(color!) && !translucentOnPurpose.has(utility),
+      )
       .map(([utility]) => `${file}: ${utility}`),
   );
 

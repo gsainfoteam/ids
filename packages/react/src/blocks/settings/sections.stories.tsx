@@ -166,7 +166,7 @@ export const PC: Story = {
                 </TextArea>
               </Field>
             </Card.Content>
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button type="submit">저장</Button>
             </Card.Footer>
           </form>
@@ -253,7 +253,7 @@ export const PC: Story = {
               글과 댓글, 예약 기록이 모두 지워지고 되돌릴 수 없어요.
             </Card.Description>
           </Card.Header>
-          <Card.Footer className="justify-end border-t">
+          <Card.Footer className="justify-end">
             <Dialog onOpenChange={() => setConfirmation('')}>
               <Dialog.Trigger asChild>
                 <Button variant="outline" colorScheme="danger">

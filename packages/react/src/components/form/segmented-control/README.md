@@ -80,10 +80,10 @@ type Period = 'day' | 'week' | 'month';
 
 ## 모양
 
-- 모양은 segmented `Tabs` 와 같습니다. 트랙은 `bg-neutral-subtle`, 고른 칸은 `bg-segment` 카드에 `shadow-xs` 입니다. 카드는 밝은 모드에서 `bg-neutral-subtlest`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다.
-- 글자는 고르지 않은 칸이 `text-neutral`, 고른 칸이 `text-neutral-bold` 입니다.
+- 모양은 segmented `Tabs` 와 같습니다. 트랙은 `bg-neutral-soft`, 고른 칸은 `bg-segment` 카드에 `shadow-xs` 입니다. 카드는 밝은 모드에서 `bg-base`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다.
+- 글자는 고르지 않은 칸이 `text-neutral`, 고른 칸이 `text-neutral-strong` 입니다.
 - 고르지 않은 칸의 hover 와 press 는 state layer 입니다. 글자색은 바뀌지 않습니다.
-- 키보드 포커스는 칸에 ring 을 그립니다. `invalid` 면 트랙에 `border-danger` 테두리가 붙습니다.
+- 키보드 포커스는 칸에 ring 을 그립니다. `invalid` 면 트랙에 `border-danger-strong` 테두리가 붙습니다.
 
 ## 상태와 스타일
 

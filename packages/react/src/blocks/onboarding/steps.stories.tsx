@@ -157,7 +157,7 @@ export const PC: Story = {
                 )}
               </Card.Content>
 
-              <Card.Footer className="justify-between border-t">
+              <Card.Footer className="justify-between">
                 <Button
                   variant="outline"
                   onClick={() => setStep(step === 0 ? STEPS.length : step - 1)}

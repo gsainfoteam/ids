@@ -133,7 +133,7 @@ export const PC: Story = {
             </Field>
           </Card.Content>
 
-          <Card.Footer className="justify-end border-t">
+          <Card.Footer className="justify-end">
             <Button variant="outline">취소</Button>
             <Button type="submit">올리기</Button>
           </Card.Footer>

@@ -235,7 +235,7 @@ export const PC: Story = {
                   </Table.Body>
                 </Table>
               </Card.Content>
-              <Card.Footer className="border-t">
+              <Card.Footer>
                 <Item variant="outline" size="tiny" className="w-auto">
                   <Item.Media variant="soft">
                     <DocumentTextIcon />

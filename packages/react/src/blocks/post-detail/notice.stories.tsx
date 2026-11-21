@@ -100,7 +100,7 @@ export const PC: Story = {
             <p>문의는 학사팀(062-715-2000)으로 해 주세요.</p>
           </Card.Content>
 
-          <Card.Footer className="flex-col items-stretch border-t">
+          <Card.Footer className="flex-col items-stretch">
             <ItemGroup size="tiny" aria-label="첨부 파일">
               {ATTACHMENTS.map((file) => (
                 <Item key={file.name}>

@@ -159,7 +159,7 @@ export const Gallery: Story = {
                   className={cn(
                     'rounded-standard flex cursor-pointer items-start gap-3 p-4',
                     'inset-ring-neutral inset-ring-1',
-                    'has-data-[state=checked]:bg-primary-subtle has-data-[state=checked]:inset-ring-primary',
+                    'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
                   )}
                 >
                   <Item value={plan.value} className="mt-0.5" />
@@ -193,7 +193,7 @@ export const Cards: Story = {
             className={cn(
               'rounded-standard flex cursor-pointer items-start gap-3 p-4',
               'inset-ring-neutral inset-ring-1',
-              'has-data-[state=checked]:bg-primary-subtle has-data-[state=checked]:inset-ring-primary',
+              'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
             )}
           >
             <Item value={plan.value} className="mt-0.5" />

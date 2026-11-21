@@ -185,7 +185,7 @@ export const PC: Story = {
                   </Toggle>
                 </ToggleGroup>
               </Card.Content>
-              <Card.Footer className="border-t">
+              <Card.Footer>
                 <AvatarGroup max={4} size="tiny" aria-label="참석하는 사람">
                   {ATTENDEES.map((name) => (
                     <Avatar key={name} name={name} />

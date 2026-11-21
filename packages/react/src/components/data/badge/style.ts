@@ -25,9 +25,9 @@ export const badgeStyle = tv({
       info: { indicator: 'scheme-info' },
     } satisfies Record<BadgeColorScheme, object>,
     variant: {
-      solid: { indicator: 'bg-scheme text-on-scheme' },
-      soft: { indicator: 'bg-scheme-subtle text-on-scheme-subtle' },
-      outline: { indicator: 'bg-neutral-subtlest text-scheme inset-ring-1 inset-ring-neutral' },
+      solid: { indicator: 'bg-scheme-solid text-on-scheme-solid' },
+      soft: { indicator: 'bg-scheme-soft text-on-scheme-soft' },
+      outline: { indicator: 'bg-base text-scheme inset-ring-1 inset-ring-neutral' },
     } satisfies Record<BadgeVariant, object>,
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
     dot: { true: {}, false: {} },

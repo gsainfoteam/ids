@@ -128,7 +128,7 @@ export function Workspace({ layout }: { layout?: number[] }) {
   </Splitter.Panel>
 </Splitter>
 
-<Splitter.Handle className="w-1 bg-neutral-subtle" />   {/* 모양은 className 으로 */}
+<Splitter.Handle className="w-1 bg-neutral-soft" />   {/* 모양은 className 으로 */}
 
 <Splitter.Handle asChild>
   <hr />                                                    {/* 자식 요소 하나가 핸들이 된다 */}

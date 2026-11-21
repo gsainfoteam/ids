@@ -80,17 +80,17 @@ const [section, setSection] = useState<Section>('docs');
 
 ```tsx
 <Tabs appearance="underline" />                  // 기본. 고른 탭의 글자와 아래 선이 primary
-<Tabs appearance="pill" />                       // 고른 탭을 bg-primary-subtle 로 채운다
+<Tabs appearance="pill" />                       // 고른 탭을 bg-primary-soft 로 채운다
 <Tabs appearance="enclosed" />                   // 고른 탭이 내용 쪽으로 열린 상자
 <Tabs appearance="segmented" />                  // SegmentedControl 과 같은 트랙과 칸
 <Tabs orientation="vertical" />                  // 목록이 앞에, 내용이 옆에
 <Tabs size="tiny" />                             // standard(기본) / tiny
 ```
 
-- 고르지 않은 탭은 흐린 글자(`text-neutral`)입니다. `underline` 과 `enclosed` 의 고른 탭은 `text-primary`, 선은 `border-primary` 입니다. `colorScheme` 을 주면 그 계열의 `text-X` 와 `border-X` 입니다.
-- `pill` 의 고른 탭은 `bg-primary-subtle` 과 `text-on-primary-subtle` 입니다. 고르지 않은 탭은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹습니다.
-- `enclosed` 의 고른 탭은 놓인 면의 색(`--ids-bg-current`)으로 칠해 목록 선을 덮습니다. 페이지, `bg-panel` 카드, `bg-band` 띠 위에서 따로 맞추지 않아도 됩니다.
-- `segmented` 는 `SegmentedControl` 과 같은 모양입니다. 목록이 `bg-neutral-subtle` 트랙이고, 고른 탭이 `bg-segment` 칸에 `shadow-xs` 입니다. 글자는 `text-neutral` 에서 `text-neutral-bold` 로 바뀌고 `colorScheme` 은 쓰지 않습니다. 트랙은 탭 높이에 `concentric-p-1` 을 두른 다른 컨트롤과 같은 높이이고, `stretch` 가 아니면 내용 폭만큼만 차지합니다.
+- 고르지 않은 탭은 흐린 글자(`text-neutral`)입니다. `underline` 과 `enclosed` 의 고른 탭은 `text-primary`, 선은 `border-primary-strong` 입니다. `colorScheme` 을 주면 그 계열의 `text-X` 와 `border-X-strong` 입니다.
+- `pill` 의 고른 탭은 `bg-primary-soft` 과 `text-on-primary-soft` 입니다. 고르지 않은 탭은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹습니다.
+- `enclosed` 의 고른 탭은 놓인 면의 색(`--ids-bg-current`)으로 칠해 목록 선을 덮습니다. 페이지, `bg-surface` 카드, `bg-block` 띠 위에서 따로 맞추지 않아도 됩니다.
+- `segmented` 는 `SegmentedControl` 과 같은 모양입니다. 목록이 `bg-neutral-soft` 트랙이고, 고른 탭이 `bg-segment` 칸에 `shadow-xs` 입니다. 글자는 `text-neutral` 에서 `text-neutral-strong` 로 바뀌고 `colorScheme` 은 쓰지 않습니다. 트랙은 탭 높이에 `concentric-p-1` 을 두른 다른 컨트롤과 같은 높이이고, `stretch` 가 아니면 내용 폭만큼만 차지합니다.
 - 로그인 방법(QR 코드, 비밀번호)처럼 패널을 오가지만 컨트롤처럼 보여야 하면 `segmented` 를 씁니다. 패널 없이 값만 고르면 `SegmentedControl` 입니다.
 - `<Tabs.List stretch>` 는 가로 탭이 목록 폭을 똑같이 나눠 채웁니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 

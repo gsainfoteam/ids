@@ -108,14 +108,14 @@ import { Skeleton } from '@gsainfoteam/ids-react';
 ## 애니메이션
 
 ```tsx
-<Skeleton animation="pulse" />  // 기본. `bg-neutral-subtle` 와 페이지에 가까운 `bg-neutral-subtler` 사이를 오간다
-<Skeleton animation="wave" />   // `bg-neutral-subtler` 빛 줄기가 글 방향으로 지나간다. RTL 이면 반대로
+<Skeleton animation="pulse" />  // 기본. `bg-neutral-soft` 와 페이지에 가까운 `bg-block` 사이를 오간다
+<Skeleton animation="wave" />   // `bg-block` 빛 줄기가 글 방향으로 지나간다. RTL 이면 반대로
 <Skeleton animation="none" />   // 움직이지 않는다
 ```
 
-- 바탕은 `--ids-color-bg-neutral-subtle`, 밝아질 때와 빛 줄기는 `--ids-color-bg-neutral-subtler` 입니다(페이지 쪽으로 한 세기).
+- 바탕은 `--ids-color-bg-neutral-soft`, 밝아질 때와 빛 줄기는 `--ids-color-bg-block` 입니다(페이지 쪽으로 한 세기).
 - 움직임은 CSS 패키지의 `animate-skeleton-pulse`, `animate-skeleton-wave` 이고 한 번에 2초입니다.
-- `prefers-reduced-motion` 이면 움직이지 않고 `bg-neutral-subtle` 바탕만 남습니다.
+- `prefers-reduced-motion` 이면 움직이지 않고 `bg-neutral-soft` 바탕만 남습니다.
 
 ## data 속성
 

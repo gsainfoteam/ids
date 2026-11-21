@@ -176,8 +176,8 @@ test('the inset body is a Card in the server HTML, and a plain main beside other
       )
       .querySelector('main[data-sidebar-inset]')!;
 
-  expect(insetOf('inset').className).toContain('shadow-panel');
-  expect(insetOf('sidebar').className).not.toContain('shadow-panel');
+  expect(insetOf('inset').className).toContain('shadow-surface');
+  expect(insetOf('sidebar').className).not.toContain('shadow-surface');
 });
 
 test('a nested item opens as an accordion, and as a menu in the icon rail', async () => {

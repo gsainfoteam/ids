@@ -131,7 +131,7 @@ export const PC: Story = {
                   )}
                 </RadioGroup>
               </Card.Content>
-              <Card.Footer className="justify-between border-t">
+              <Card.Footer className="justify-between">
                 <Button
                   variant="outline"
                   disabled={index === 0}

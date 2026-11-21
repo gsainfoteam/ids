@@ -244,15 +244,15 @@ test('light: the selected segment is a card on a neutral track as tall as a cont
 
   await expect
     .poll(() => getComputedStyle(track).backgroundColor)
-    .toBe(colorOf('--ids-color-bg-neutral-subtle'));
+    .toBe(colorOf('--ids-color-bg-neutral-soft'));
   expect(getComputedStyle(selected).backgroundColor).toBe(
     colorOf('--ids-color-bg-segment'),
   );
   expect(getComputedStyle(selected).backgroundColor).toBe(
-    colorOf('--ids-color-bg-neutral-subtlest'),
+    colorOf('--ids-color-bg-base'),
   );
   expect(getComputedStyle(selected).boxShadow).not.toBe('none');
-  expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-text-neutral-bold'));
+  expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-text-neutral-strong'));
   expect(getComputedStyle(other).color).toBe(colorOf('--ids-color-text-neutral'));
   expect(getComputedStyle(other).backgroundColor).toBe('rgba(0, 0, 0, 0)');
   expect(track.getBoundingClientRect().height).toBeCloseTo(
@@ -287,11 +287,11 @@ test('dark: the selected card sits one neutral step above the track', async () =
   const selected = segmentOf(screen.getByRole('radio', { name: 'day' }));
   await expect
     .poll(() => getComputedStyle(selected).backgroundColor)
-    .toBe(colorOf('--ids-color-bg-neutral', root));
+    .toBe(colorOf('--ids-color-border-neutral-strong', root));
   expect(getComputedStyle(screen.getByRole('radiogroup').element()).backgroundColor).toBe(
-    colorOf('--ids-color-bg-neutral-subtle', root),
+    colorOf('--ids-color-bg-neutral-soft', root),
   );
-  expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-text-neutral-bold', root));
+  expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-text-neutral-strong', root));
 });
 
 test('an unstretched control keeps its width and follows the parent alignment', async () => {
