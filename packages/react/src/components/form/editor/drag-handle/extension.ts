@@ -24,6 +24,24 @@ function distanceFromTheRows(dom: HTMLElement, y: number) {
 const blockNearest = (view: EditorView, y: number) =>
   minBy(topLevelBlocks(view), (block) => distanceFromTheRows(block.dom, y)) ?? null;
 
+function topLevelStartAt(view: EditorView, pos: number, isNodeStart: boolean) {
+  const resolved = view.state.doc.resolve(pos);
+  if (resolved.depth > 0) return resolved.before(1);
+  return isNodeStart ? pos : null;
+}
+
+function blockUnderThePointer(view: EditorView, event: MouseEvent): HoveredBlock | null {
+  const hit = view.posAtCoords({ left: event.clientX, top: event.clientY });
+  if (!hit) return null;
+  const pos =
+    hit.inside >= 0
+      ? topLevelStartAt(view, hit.inside, true)
+      : topLevelStartAt(view, hit.pos, false);
+  if (pos === null) return null;
+  const dom = view.nodeDOM(pos);
+  return dom instanceof HTMLElement ? { pos, dom } : null;
+}
+
 export const BlockHandle = Extension.create<{ store: BlockHoverStore | null }>({
   name: 'idsBlockHandle',
 
@@ -41,7 +59,11 @@ export const BlockHandle = Extension.create<{ store: BlockHoverStore | null }>({
         props: {
           handleDOMEvents: {
             mousemove: (view, event) => {
-              store.set(view.editable ? blockNearest(view, event.clientY) : null);
+              if (!view.editable) {
+                store.set(null);
+                return false;
+              }
+              store.set(blockUnderThePointer(view, event) ?? blockNearest(view, event.clientY));
               return false;
             },
           },
