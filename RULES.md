@@ -654,6 +654,85 @@ has them all: drawn as text they fall back to a system font that sits them off c
 
 ## Component API
 
+**Props.** Looks go through `className` and `style`, behaviour through parts and hooks, so the
+props an app has to remember stay few. A root takes only:
+
+- the state it owns, as a trio: `value` / `defaultValue` / `onValueChange`, or `checked`, `open`,
+  `pressed`, `page` with their `default*` and `on*Change` (see Callbacks);
+- `variant`, `size` and the color prop (`colorScheme`; renaming it `color` is still open);
+- `className`, `style`, `children` and `asChild`;
+- native attributes of the element it renders (`disabled`, `name`, `required`, `min`, `step`,
+  `id`, `aria-*`);
+- the accessible name it needs (`aria-label`, Image `alt`, Avatar `name`) and the input it draws
+  when children cannot carry it (QRCode `value`, Highlight `query`, Chart `config`).
+
+Every other prop is an option. The rules for options:
+
+- **No styling-only or one-flag props.** `striped`, `stickyHeader`, `highlightOnHover`,
+  `headingLevel`, `external`: fold the look into a `variant` value, pick the tag with `asChild` on
+  a part (`<Card.Title asChild><h2>…</h2></Card.Title>`), or derive it from a native attribute
+  (`target="_blank"`, `aria-busy`, `aria-hidden`, `value={null}` for indeterminate). A second look
+  axis is an enum named for what it sets (`shape`, `align`, `orientation`), never a boolean.
+- **Shape, not role.** A prop names what the reader sees or where it sits (`shape="plain"`,
+  `align="end"`), never who it is for (`from="user"`).
+- **Presence, not `show`/`hide`.** An element is drawn because its data or its part is given and
+  left out because it is not. There is no `hideClose`, `hideStepper` or `showZero`.
+- **Screen elements are parts.** A toolbar, caption, empty state or pager is a part
+  (`DataTable.Toolbar`, `.Content`, `.Empty`, `.Pagination`), each optional with a default (see
+  Parts), never a `ReactNode` prop such as `empty={…}` or `caption={…}`.
+- **`X.Part` is a piece of one X; a container of many X is `XGroup`.** `Select.Group` sits inside
+  one Select; `ButtonGroup`, `AvatarGroup` and `RadioGroup` hold many and are components of their
+  own. An X changes only through the context such a group gives it, never by detecting what
+  surrounds it.
+- **More than three options, or a feature with props of its own, go into a hook.** Count the
+  root's options. Up to three single-value options (`orientation`, `loop`, `side`) stay on the
+  root. Past three, or as soon as one feature needs more than one prop (a switch, a mode and its
+  state, like `enableSorting`, `manualSorting` and `sorting`), the component takes its behaviour
+  from a `useX()` hook exported beside it. The hook takes one object per feature, on when the
+  object is given, with the feature's state inside as a trio, and the root takes the result as one
+  prop. The same result reaches parts the app renders outside the root.
+- **Existing props that break this rule are debt, not precedent.** Some components still carry
+  them (Drawer's `scaleBackground`, Table's `striped`, Dialog's `hideClose`), and other sections
+  of this file may still describe them. A new prop follows this rule, never their example.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  sorting: { multiple: true, defaultValue: [{ id: 'name', desc: false }] },
+  selection: { value: selected, onValueChange: setSelected },
+  pagination: { manual: true, rowCount, defaultValue: { pageIndex: 0, pageSize: 20 } },
+});
+
+<DataTable table={table} variant="outline" size="tiny" className="h-96">
+  <DataTable.Toolbar />
+  <DataTable.Content />
+  <DataTable.Pagination />
+</DataTable>
+```
+
+Ark UI's `useX` with `X.RootProvider`, TanStack Table's `useReactTable` and Mantine React Table's
+`<MantineReactTable table={table} />` work the same way. Sorting, selection, pagination, editor
+extensions and scheduler views belong in a hook; a value trio and two options do not.
+
+**Props in Flutter.** ids_flutter widgets follow the same rule in Flutter's own idiom. The design
+is decided in React; where the ecosystems differ, Flutter does what a Flutter developer expects
+instead of copying React's names:
+
+| React | Flutter |
+|---|---|
+| `value` / `defaultValue` / `onValueChange` | `value` + `onChanged`, controlled the Material way; an uncontrolled start is `initialValue`, and other callbacks are `onXChanged` (`onModeChanged`) |
+| a native `<input>` holding the text | `controller` (`TextEditingController`) and `focusNode`, made inside when not given, as `TextField` does; selection, scroll and animation state take a controller too |
+| `disabled` on a control | a `null` callback (`onPressed: null`), as in Material; `disabled` stays on a widget with no callback of its own that hands the state down (`IdsField`) |
+| `className`, `style` | none: the app wraps the widget (`Padding`, `SizedBox`); no `padding`, `color` or `textStyle` parameters |
+| `asChild`, a part's tag | a `Widget` slot; heading semantics come from the part's own `Semantics` |
+| native attributes, `aria-label` | the framework's parameters (`key`, `focusNode`, `autofocus`) and `semanticLabel` |
+| `X.Part` | an `IdsXPart` widget (`IdsFieldLabel`), placed in `children`, or in a named `Widget?` slot (`header:`, `leading:`) when it has one fixed place; a `null` slot draws nothing |
+| `useX()` hook | `IdsXController`, a `ChangeNotifier` the app creates in its `State`, disposes there and hands over as `controller:`, like `TabController` or `PaginatedDataTable`'s `source` |
+
+`variant`, `size` and the color prop take the same enums on both platforms. The option count, the
+flag ban, shape over role, presence over `show`/`hide` and `XGroup` apply unchanged.
+
 **Strings.** User-facing strings go through `useTranslate()` with a stable dotted key
 (`t('dialog.close')`, `t('textArea.remaining', { remaining })`), never a Korean literal and never
 a module-level read of `messages`, so the nearest `IdsProvider translate` decides the language on
@@ -1053,6 +1132,7 @@ ids_flutter follows ids-react's theme. The design is decided in React; Flutter p
   `inherit: false`, the fixed fonts (Pretendard GOV, Geist Mono) and `scale`; sizes go through
   `dimension`, corners through `radius` and `shape()`.
 - IDS styles stay inside IDS components; Material and Cupertino themes are not touched.
+- Widget parameters follow **Props in Flutter** under Component API.
 
 Flutter strings use the generated `IdsMessages` mixin. Consumers supply a slang object through `translation`; component code falls back per member with `t?.spinnerLabel ?? IdsMessages.ko.spinnerLabel`. Edit `packages/core/messages/ko.json` and `en.json`, then run `pnpm codegen`. Do not hand-edit generated Dart messages or catalogs.
 
