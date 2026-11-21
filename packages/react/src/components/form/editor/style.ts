@@ -80,7 +80,7 @@ export const editorStyle = tv({
     codeCopyStatus: 'sr-only',
     codePre: 'px-2 py-1 font-mono whitespace-pre-wrap',
     glyphButton: [
-      '-m-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-indicator p-1',
+      '-m-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard p-1',
       'focus-ring state-layer data-hovered:state-hover data-active:state-press',
       'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'disabled:cursor-default',
@@ -143,7 +143,7 @@ export const editorStyle = tv({
         root: 'text-caption-c1-regular',
         barItems: 'p-0.5',
         content: 'px-2 py-1.5',
-        blockHandle: 'size-5 p-0.5',
+        blockHandle: 'size-5 rounded-indicator p-0.5',
         count: 'px-1.5 text-caption-c2-regular',
       },
     } satisfies Record<IdsSize, object>,
