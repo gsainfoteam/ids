@@ -1,4 +1,17 @@
-import { tv } from '../../../utils';
+import { cn, tv } from '../../../utils';
+
+export const codeTokens = cn(
+  '[&_[data-token=comment]]:text-neutral [&_[data-token=comment]]:italic',
+  '[&_[data-token=keyword]]:text-primary',
+  '[&_[data-token=string]]:text-success',
+  '[&_[data-token=inserted]]:text-success',
+  '[&_[data-token=number]]:text-warning',
+  '[&_[data-token=function]]:text-tertiary',
+  '[&_[data-token=property]]:text-secondary',
+  '[&_[data-token=tag]]:text-secondary',
+  '[&_[data-token=deleted]]:text-danger',
+  '[&_[data-token=punctuation]]:text-neutral',
+);
 
 export const codeBlockStyle = tv({
   slots: {
@@ -14,19 +27,7 @@ export const codeBlockStyle = tv({
     status: 'sr-only',
     scroller: 'min-w-0 rounded-[inherit]',
     pre: 'rounded-[inherit] py-3 font-mono text-body-b3-regular',
-    code: [
-      'block [--code-block-gutter:0px]',
-      '[&_[data-token=comment]]:text-neutral [&_[data-token=comment]]:italic',
-      '[&_[data-token=keyword]]:text-primary',
-      '[&_[data-token=string]]:text-success',
-      '[&_[data-token=inserted]]:text-success',
-      '[&_[data-token=number]]:text-warning',
-      '[&_[data-token=function]]:text-tertiary',
-      '[&_[data-token=property]]:text-secondary',
-      '[&_[data-token=tag]]:text-secondary',
-      '[&_[data-token=deleted]]:text-danger',
-      '[&_[data-token=punctuation]]:text-neutral',
-    ],
+    code: ['block [--code-block-gutter:0px]', codeTokens],
     line: [
       'inline-block min-h-lh w-full pe-4 align-top',
       'ps-[calc(--spacing(4)+var(--code-block-gutter))]',
@@ -37,7 +38,7 @@ export const codeBlockStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-base p-px shadow-xs inset-ring-1 inset-ring-neutral',
+        root: 'p-px shadow-xs inset-ring-1 inset-ring-neutral',
         line: 'data-highlighted:bg-neutral-soft',
       },
       soft: {

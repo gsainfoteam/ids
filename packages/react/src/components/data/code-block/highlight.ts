@@ -80,6 +80,62 @@ export const LAZY_NAMES: ReadonlySet<string> = new Set([
   'toml',
 ]);
 
+export const CODE_LANGUAGES = [
+  'bash',
+  'c',
+  'cpp',
+  'csharp',
+  'css',
+  'dart',
+  'diff',
+  'docker',
+  'go',
+  'graphql',
+  'html',
+  'ini',
+  'java',
+  'javascript',
+  'json',
+  'jsx',
+  'kotlin',
+  'lua',
+  'makefile',
+  'markdown',
+  'objectivec',
+  'php',
+  'python',
+  'ruby',
+  'rust',
+  'scss',
+  'sql',
+  'swift',
+  'toml',
+  'tsx',
+  'typescript',
+  'yaml',
+] as const;
+
+const LISTED_NAME_OF_ALIAS: Readonly<Record<string, (typeof CODE_LANGUAGES)[number]>> = {
+  cs: 'csharp',
+  dotnet: 'csharp',
+  dockerfile: 'docker',
+  js: 'javascript',
+  kt: 'kotlin',
+  kts: 'kotlin',
+  markup: 'html',
+  md: 'markdown',
+  objc: 'objectivec',
+  py: 'python',
+  rb: 'ruby',
+  sh: 'bash',
+  shell: 'bash',
+  ts: 'typescript',
+  yml: 'yaml',
+};
+
+export const listedLanguageName = (language: string) =>
+  LISTED_NAME_OF_ALIAS[languageKey(language)] ?? languageKey(language);
+
 const PLAIN_TEXT: ReadonlySet<string> = new Set(['', 'text', 'plain', 'plaintext', 'txt']);
 
 const TOKEN_OF_PRISM_TYPE: Readonly<Record<string, CodeBlockToken>> = {

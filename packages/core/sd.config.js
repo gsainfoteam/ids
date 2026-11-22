@@ -544,11 +544,11 @@ ${focusRingUtility("focus-ring-current", "current")}
   & :where(blockquote) {
     @apply border-s-2 border-neutral ps-4 text-neutral;
   }
-  & :where(pre) {
+  & :where(pre:not(figure pre)) {
     @apply rounded-standard border border-neutral px-4 py-3 font-mono leading-b2 whitespace-pre-wrap;
   }
   & :where(:not(pre) > code) {
-    @apply rounded-indicator border border-neutral bg-neutral-soft px-1.5 py-px font-mono;
+    @apply rounded-indicator border border-neutral bg-neutral-soft px-1.5 py-px font-mono text-[0.875em];
   }
   & :where(a) {
     @apply font-medium underline decoration-(--ids-color-border-neutral-strong) underline-offset-4 hover:decoration-current;

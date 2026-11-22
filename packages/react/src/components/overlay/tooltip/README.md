@@ -54,12 +54,13 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 ## 단축키
 
 ```tsx
-<Tooltip content={<>저장 <Kbd keys="Mod+S" /></>}>
+<Tooltip content={<>저장<Kbd keys="Mod+S" /></>}>
   <IconButton icon={<DocumentIcon />} aria-label="저장" />
 </Tooltip>
 ```
 
 - 말풍선 안의 `Kbd` 는 `tiny` 로 그려져 한 줄 높이에 맞습니다. `size` 를 주면 그 값을 씁니다.
+- 말풍선 바로 안의 `Kbd` 는 앞 글자와 6px 띄워집니다. 사이에 공백을 넣지 않습니다.
 - 키는 말풍선의 글자색으로 칠해지고, 스크린 리더는 "저장 커맨드 S" 처럼 기호 대신 이름을 읽습니다.
 
 ## 열고 닫기

@@ -26,13 +26,19 @@ const isReexportOnly = (code: string) =>
         line.trim() === '' || /^(import |export (type )?\{|export \* from |\}|\s)/.test(line),
     );
 
+const RICH_TEXT = 'components/typography/rich-text/';
+const RENDERED_ONLY_ON_THE_SERVER = new Set([`${RICH_TEXT}index.tsx`, `${RICH_TEXT}render.tsx`]);
+const isRenderedOnlyOnTheServer = (file: string) =>
+  RENDERED_ONLY_ON_THE_SERVER.has(file) || file.startsWith(`${RICH_TEXT}nodes/`);
+
 const isComponentIndex = (file: string) => COMPONENT_INDEX.test(file);
 const rootOf = (file: string) => file.replace(/index\.tsx$/, 'root.tsx');
 
 const runsOnTheClient = (file: string, code: string) =>
-  CALLS_A_HOOK.test(code) ||
-  CREATES_A_CONTEXT.test(code) ||
-  (file.endsWith('.tsx') && !isReexportOnly(code) && !isComponentIndex(file));
+  !isRenderedOnlyOnTheServer(file) &&
+  (CALLS_A_HOOK.test(code) ||
+    CREATES_A_CONTEXT.test(code) ||
+    (file.endsWith('.tsx') && !isReexportOnly(code) && !isComponentIndex(file)));
 
 const clientModules = sourceModules.filter((file) => runsOnTheClient(file, source(file)));
 const componentIndexes = sourceModules.filter(isComponentIndex);
@@ -49,7 +55,9 @@ test('every component keeps its index server-safe and its root in root.tsx', () 
     return USE_CLIENT.test(code) || CALLS_A_HOOK.test(code) || CREATES_A_CONTEXT.test(code);
   });
   const rootsMissingOrServerSide = componentIndexes.filter(
-    (file) => !existsSync(SRC + rootOf(file)) || !USE_CLIENT.test(source(rootOf(file))),
+    (file) =>
+      !isRenderedOnlyOnTheServer(file) &&
+      (!existsSync(SRC + rootOf(file)) || !USE_CLIENT.test(source(rootOf(file)))),
   );
 
   expect(componentIndexes.length).toBeGreaterThan(50);
@@ -74,6 +82,7 @@ test('dist keeps one module per source file behind the same entry paths', () => 
     'index.js',
     'chart.js',
     'editor.js',
+    'rich-text.js',
     'react-hook-form.js',
     'tanstack-form.js',
   ])

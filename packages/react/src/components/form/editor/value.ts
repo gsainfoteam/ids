@@ -1,3 +1,5 @@
+import { keepAllowedImages } from '../../typography/rich-text/schema/url-rules';
+
 import type { Editor as TiptapEditor, JSONContent } from '@tiptap/core';
 
 export type EditorFormat = 'html' | 'markdown' | 'json';
@@ -10,12 +12,22 @@ export function readValue(editor: TiptapEditor, format: EditorFormat): EditorVal
   return format === 'markdown' ? editor.getMarkdown() : editor.getHTML();
 }
 
+export function writable(value: EditorValue, format: EditorFormat, uploaded: ReadonlySet<string>) {
+  return format === 'json' && typeof value !== 'string'
+    ? keepAllowedImages(value, uploaded)
+    : value;
+}
+
 export function writeValue(
   editor: TiptapEditor,
   value: EditorValue | undefined,
   format: EditorFormat,
+  uploaded: ReadonlySet<string>,
 ) {
-  editor.commands.setContent(value ?? '', { emitUpdate: false, contentType: format });
+  editor.commands.setContent(writable(value ?? '', format, uploaded), {
+    emitUpdate: false,
+    contentType: format,
+  });
 }
 
 export function formText(value: EditorValue | undefined, empty: boolean) {
