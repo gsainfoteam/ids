@@ -6,6 +6,7 @@ export const documentText = cn(
   'document-text',
   '[&_:is([data-document-blocks],[data-type=detailsContent])>*+*]:mt-2',
   '[&_li[data-checked]>*+*]:mt-0',
+  '[&_tr>:is(td,th):not(:last-child)]:border-e',
   '[&_:is([data-callout],[data-callout-title])]:text-[length:inherit] [&_:is([data-callout],[data-callout-title])]:leading-[inherit]',
   '[&_mark]:bg-warning-soft [&_mark]:text-on-warning-soft',
   '[&_mark[data-color=primary]]:bg-primary-soft [&_mark[data-color=primary]]:text-on-primary-soft [&_span[data-color=primary]]:text-primary',
