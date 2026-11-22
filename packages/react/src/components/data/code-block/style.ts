@@ -38,7 +38,7 @@ export const codeBlockStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-base p-px shadow-xs inset-ring-1 inset-ring-neutral',
+        root: 'p-px shadow-xs inset-ring-1 inset-ring-neutral',
         line: 'data-highlighted:bg-neutral-soft',
       },
       soft: {
