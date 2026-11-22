@@ -129,7 +129,7 @@ export const editorStyle = tv({
       'focus-ring state-layer hover:state-hover active:state-press',
       'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
-    tableSizePicker: 'flex flex-col gap-2',
+    tableSizePicker: 'flex w-max flex-col gap-2',
     tableSizeGrid: 'grid grid-cols-10 gap-1',
     tableSizeCell: [
       'size-4 cursor-pointer rounded-indicator bg-field-outline inset-ring-1 inset-ring-neutral',

@@ -67,7 +67,6 @@ export function EditorTableSizePicker({
       <Popover.Trigger asChild>{children}</Popover.Trigger>
       <Popover.Content
         aria-label={t('editor.tableInsert')}
-        className="w-max"
         initialFocus={cellSelector(NEW_TABLE_SIZE)}
         side="bottom"
         align="start"
