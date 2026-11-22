@@ -76,7 +76,7 @@ GitHub 마크다운에 아래를 더합니다. 모두 Editor 가 마크다운으
 
 - 링크는 `http:`, `https:`, `mailto:`, `tel:` 과 상대 주소만 `Link` 가 됩니다. `javascript:` 같은 주소의 링크는 글자만 남습니다.
 - 그림은 `http:`, `https:` 와 상대 주소만 그립니다. `data:` 와 `javascript:` 주소의 그림은 빠집니다. Editor 와 같은 규칙입니다.
-- 링크는 같은 탭에서 엽니다.
+- 링크는 같은 탭에서 엽니다. 본문과 같은 색에 옅은 밑줄을 긋는 `Link colorScheme="neutral"` 로 그립니다.
 
 ## Props
 

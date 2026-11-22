@@ -30,7 +30,7 @@ const proseMirrorBaseline = cn(
 
 const editorBlocks = cn(
   '[&_.suggestion]:text-primary',
-  '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
+  '[&_a]:underline [&_a]:decoration-current/40 [&_a]:underline-offset-[0.2em] [&_a:hover]:decoration-current',
   '[&_hr:not([data-divider])]:my-3 [&_hr:not([data-divider])]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard',
   '[&_table]:w-full! [&_:is(td,th)]:break-words [&_.selectedCell]:bg-primary-soft',
@@ -64,8 +64,8 @@ export const editorStyle = tv({
     bubble: 'w-auto concentric-p-1 p-0 [&>[data-scroll-area]>[data-scroll-area-viewport]]:p-0',
     bubbleBar: 'flex items-center gap-0.5 p-1',
     bubbleAnchor: 'pointer-events-none absolute',
-    linkForm: 'flex flex-col gap-2',
-    linkActions: 'flex justify-end gap-2',
+    linkForm: 'flex w-60 flex-col gap-2',
+    linkActions: 'grid auto-cols-fr grid-flow-col gap-2',
     imageInput: 'hidden',
     imageFrame: [
       'block w-full',
