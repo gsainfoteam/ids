@@ -135,7 +135,7 @@
 - `Playground`, `Usage`, `Gallery`가 파일 맨 앞에 이 순서로 오지 않는 경우, `Gallery`가 없거나 `Showcase` kit을 쓰지 않는 경우
 - 예제 스토리의 이름이 독자가 하려는 일을 말하지 않는 경우(`Loading`, `Separator`, `Mixed`). `ShowProgressWhileSaving`처럼 씁니다
 - 키보드, 오른쪽에서 왼쪽, 개발 경고, 경계 사례 스토리에 `tags: ['verification']`이 없거나 예제보다 앞에 있는 경우
-- 새로 만들거나 손댄 스토리 파일이 세 층으로 옮겨지지 않았거나 `tests/story-layers.ssr.test.tsx`의 `FILES_ON_THE_THREE_LAYERS`에 추가되지 않은 경우
+- 손댄 기존 스토리 파일이 세 층으로 옮겨지지 않았거나, 옮긴 뒤에도 `tests/story-layers.ssr.test.tsx`의 `NOT_YET_ON_THE_THREE_LAYERS`에 남아 있는 경우. 새 파일을 이 목록에 넣어 검사를 피한 경우도 지적합니다. 새 파일은 처음부터 검사를 받습니다
 - meta가 `satisfies Meta<typeof X>`와 `tags: ['autodocs']`를 갖지 않는 경우
 - 스토리 파일에 데모 컴포넌트를 따로 선언한 경우(`AGENTS.md`가 정한 예외는 제외). 데모는 `render` 안에 inline으로 씁니다
 - hook을 쓰는 `render`가 `function Render()` 꼴이 아닌 경우

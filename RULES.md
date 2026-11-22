@@ -313,11 +313,14 @@ hydration and translation checks run it like any other. A future MDX page shows 
 it names with `<Canvas of>` and never names a verification story. Do not use `'!autodocs'` or a
 name prefix for this.
 
-**`tests/story-layers.ssr.test.tsx` checks the layers** for the files in its
-`FILES_ON_THE_THREE_LAYERS` list: the basic three first and in order, examples before verification
-stories, a description on every example, and the verification tag on every `Keyboard`,
-`RightToLeft` and `DevelopmentWarnings` story. Most files predate the layers. A new story file,
-and an existing one a change touches, moves to the layers and joins the list in the same commit.
+**`tests/story-layers.ssr.test.tsx` checks the layers** in every `src/components/**/*.stories.tsx`:
+the basic three first and in order, examples before verification stories, a description on every
+example, and the verification tag on every `Keyboard`, `RightToLeft` and `DevelopmentWarnings`
+story. Blocks, foundations and the overview have rules of their own and are left out. A new story
+file is checked from its first commit, so it starts on the layers. The files that predate the
+layers sit in `NOT_YET_ON_THE_THREE_LAYERS`; a change that touches one moves it to the layers and
+takes it off that list in the same commit. A listed file that already passes fails the test, so
+the list only shrinks.
 
 Declare the meta as `const meta = { ... } satisfies Meta<typeof X>` with `tags: ['autodocs']`, which
 gives each component a Docs page (every story with Show code, plus the props table); foundation
