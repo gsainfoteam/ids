@@ -137,7 +137,7 @@ export const PC: Story = {
               </p>
             )}
             <Divider />
-            <p className="text-subtitle-s2-semibold flex justify-between">
+            <p className="text-body-b2-semibold flex justify-between">
               결제 금액<span>{won.format(Math.max(total, 0))}원</span>
             </p>
             <TextField

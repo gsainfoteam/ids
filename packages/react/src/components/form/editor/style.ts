@@ -31,8 +31,6 @@ const proseMirrorBaseline = cn(
 
 const editorBlocks = cn(
   '[&_.suggestion]:text-primary',
-  '[&_a]:underline [&_a]:decoration-current/40 [&_a]:underline-offset-[0.2em] [&_a:hover]:decoration-current',
-  '[&_hr:not([data-divider])]:my-3 [&_hr:not([data-divider])]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard',
   '[&_table]:w-full! [&_:is(td,th)]:break-words [&_.selectedCell]:bg-primary-soft',
 );
@@ -155,19 +153,19 @@ export const editorStyle = tv({
       standard: {
         root: 'text-body-b3-regular',
         barItems: 'p-1',
-        content: 'px-3 py-2',
+        content: 'px-3 py-2 text-body-b2-regular leading-prose',
         blockHandle: 'size-6',
         detailsToggle: 'top-[calc(--spacing(4)+(1lh-var(--spacing)*6)/2)]',
-        detailsPlaceholder: 'top-4 text-body-b3-medium',
+        detailsPlaceholder: 'top-4 text-body-b2-medium',
         count: 'px-2 text-caption-c1-regular',
       },
       tiny: {
         root: 'text-caption-c1-regular',
         barItems: 'p-0.5',
-        content: 'px-2 py-1.5',
+        content: 'px-2 py-1.5 text-body-b3-regular',
         blockHandle: 'size-5 rounded-indicator p-0.5',
         detailsToggle: 'top-[calc(--spacing(3)+(1lh-var(--spacing)*6)/2)]',
-        detailsPlaceholder: 'top-3 text-caption-c1-medium',
+        detailsPlaceholder: 'top-3 text-body-b3-medium',
         count: 'px-1.5 text-caption-c2-regular',
       },
     } satisfies Record<IdsSize, object>,

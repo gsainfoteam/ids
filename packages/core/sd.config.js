@@ -83,6 +83,14 @@ const readTypographyEntries = (palette) => {
   }));
 };
 
+const lineHeightAsMultiplier = (lineHeight, fontSize) => {
+  const raw = String(lineHeight);
+  if (raw.endsWith("px")) return parseFloat(raw) / parseFloat(fontSize);
+  return parseFloat(raw);
+};
+
+const isPixelLength = (value) => String(value).endsWith("px");
+
 const letterSpacingToPx = (letterSpacing, fontSize) => {
   const raw = String(letterSpacing);
   if (raw.endsWith("em")) return parseFloat(raw) * parseFloat(fontSize);
@@ -487,6 +495,68 @@ ${focusRingUtility("focus-ring-current", "current")}
     animation: none;
   }
 }
+
+@utility document-text {
+  & > :where(* + *) {
+    @apply mt-5;
+  }
+  & > :where(* + :is(h1, h2)) {
+    @apply mt-9;
+  }
+  & > :where(* + :is(h3, h4, h5, h6)) {
+    @apply mt-7;
+  }
+  & > :where(:is(h1, h2, h3, h4, h5, h6) + *) {
+    @apply mt-3;
+  }
+  & :where(li + li, li > * + *, blockquote > * + *) {
+    @apply mt-2;
+  }
+
+  & :where(h1) {
+    @apply text-headline-h4-semibold;
+  }
+  & :where(h2) {
+    @apply text-headline-h5-semibold;
+  }
+  & :where(h3) {
+    @apply text-headline-h6-semibold;
+  }
+  & :where(h4) {
+    @apply text-body-b1-semibold tracking-snug;
+  }
+  & :where(h5, h6) {
+    @apply text-body-b2-semibold tracking-snug;
+  }
+
+  & :where(ul, ol) {
+    @apply ps-6;
+  }
+  & :where(ul) {
+    @apply list-disc marker:text-(--ids-color-border-neutral-strong);
+  }
+  & :where(ul ul) {
+    list-style-type: circle;
+  }
+  & :where(ol) {
+    @apply list-decimal marker:text-neutral;
+  }
+  & :where(blockquote) {
+    @apply border-s-2 border-neutral ps-4 text-neutral;
+  }
+  & :where(pre:not(figure pre)) {
+    @apply rounded-standard border border-neutral px-4 py-3 font-mono leading-b2 whitespace-pre-wrap;
+  }
+  & :where(:not(pre) > code) {
+    @apply rounded-indicator border border-neutral bg-neutral-soft px-1.5 py-px font-mono;
+  }
+  & :where(a) {
+    @apply font-medium underline decoration-(--ids-color-border-neutral-strong) underline-offset-4 hover:decoration-current;
+  }
+  & :where(hr) {
+    @apply border-neutral;
+  }
+}
 `;
 
 const CONCENTRIC_PADS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8];
@@ -695,11 +765,14 @@ const radiusFromTheProvider = (dictionary) =>
     );
 
 const lengthsTheScaleMultiplies = (dictionary) => [
-  ...readTypographyEntries(buildPalette(dictionary)).map(({ name, fontSize }) => [
-    `--ids-text-${name}`,
-    fontSize,
+  ...readTypographyEntries(buildPalette(dictionary)).flatMap(({ name, fontSize, lineHeight }) => [
+    [`--ids-text-${name}`, fontSize],
+    ...(isPixelLength(lineHeight) ? [[`--ids-text-${name}--line-height`, lineHeight]] : []),
   ]),
   ...byPath(dictionary, "font-size").map((t) => [idsVar("font-size", t), toVal(t)]),
+  ...byPath(dictionary, "line-height")
+    .filter((t) => isPixelLength(toVal(t)))
+    .map((t) => [idsVar("line-height", t), toVal(t)]),
   ...byCategory(dictionary, "size").map((t) => [idsVar("size", t), toVal(t)]),
 ];
 
@@ -1128,8 +1201,8 @@ const dartTypographyFormatter = ({ dictionary }) => {
           FONT_PACKAGE: fontPackage,
           FONT_SIZE: parseFloat(fontSize),
           FONT_WEIGHT: parseInt(fontWeight),
-          LINE_HEIGHT: parseFloat(lineHeight),
-          LETTER_SPACING: letterSpacingToPx(letterSpacing, fontSize),
+          LINE_HEIGHT: lineHeightAsMultiplier(lineHeight, fontSize),
+          LETTER_SPACING: Number(letterSpacingToPx(letterSpacing, fontSize).toFixed(4)),
         })};`,
     ),
   ];

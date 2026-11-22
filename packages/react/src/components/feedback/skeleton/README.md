@@ -30,7 +30,7 @@ import { Skeleton } from '@gsainfoteam/ids-react';
 <Skeleton shape="circle" className="size-6" />  {/* Avatar tiny 자리 */}
 <Skeleton shape="text" />                       {/* 한 줄. 주변 글자 스타일을 따른다 */}
 <Skeleton shape="text" lines={3} className="text-body-b3-regular" />   {/* 세 줄, 마지막 줄 60% */}
-<Skeleton shape="text" className="w-1/3 text-subtitle-s2-semibold" />  {/* 짧은 제목 한 줄 */}
+<Skeleton shape="text" className="w-1/3 text-body-b2-semibold" />     {/* 짧은 제목 한 줄 */}
 ```
 
 - rect 의 16px 는 내용 높이입니다. `h-*`, `aspect-*`, `absolute inset-0`, flex 와 grid 의 늘이기처럼 크기를 정하는 것이 늘 이깁니다.

@@ -46,7 +46,7 @@ export const PC: Story = {
         <footer className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-12 sm:px-6">
           <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
             <div className="flex flex-col gap-4">
-              <div className="text-subtitle-s2-semibold flex items-center gap-2">
+              <div className="text-body-b2-semibold flex items-center gap-2">
                 <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
                   <Avatar.Fallback>
                     <CubeTransparentIcon />

@@ -26,7 +26,7 @@ export const drawerStyle = tv({
       'hover:bg-(--ids-color-text-neutral) data-dragging:bg-(--ids-color-text-neutral)',
     ],
     header: 'flex flex-col gap-1.5 pe-8 text-start',
-    title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
+    title: 'text-body-b1-semibold [overflow-wrap:anywhere]',
     description: 'text-body-b3-regular text-neutral',
     footer: 'mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
     close: 'absolute end-4 top-4',

@@ -30,7 +30,12 @@ export function EditorCodeBlockView({ node, editor, updateAttributes }: ReactNod
         </div>
         <ScrollArea orientation="horizontal" className={styles.scroller()}>
           <ScrollArea.Viewport asChild>
-            <pre dir="ltr" className={styles.pre({ className: codePre() })}>
+            <pre
+              dir="ltr"
+              contentEditable="inherit"
+              suppressContentEditableWarning
+              className={styles.pre({ className: codePre() })}
+            >
               <NodeViewContent<'code'> as="code" className={styles.code()} />
             </pre>
           </ScrollArea.Viewport>

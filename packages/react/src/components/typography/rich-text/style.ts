@@ -3,14 +3,9 @@ import { cn, tv } from '../../../utils';
 import type { IdsSize } from '../../../tokens/types';
 
 export const documentText = cn(
-  '[&>*+*]:mt-3 [&_:is(blockquote,[data-document-blocks],[data-type=detailsContent])>*+*]:mt-2',
-  '[&_h1]:text-headline-h4-bold [&_h2]:text-headline-h5-bold [&_h3]:text-headline-h6-bold',
-  '[&_h4]:text-body-b1-bold [&_h5]:text-body-b2-bold [&_h6]:text-body-b3-bold',
-  '[&>*+:is(h1,h2)]:mt-8 [&>*+:is(h3,h4,h5,h6)]:mt-6',
-  '[&_:is(h1,h2,h3,h4,h5,h6)+:not(h1,h2,h3,h4,h5,h6)]:mt-4',
-  '[&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-6 [&_li:not([data-checked])>*+*]:mt-1 [&_li+li]:mt-1',
-  '[&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
-  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
+  'document-text',
+  '[&_:is([data-document-blocks],[data-type=detailsContent])>*+*]:mt-2',
+  '[&_li[data-checked]>*+*]:mt-0',
   '[&_mark]:bg-warning-soft [&_mark]:text-on-warning-soft',
   '[&_mark[data-color=primary]]:bg-primary-soft [&_mark[data-color=primary]]:text-on-primary-soft [&_span[data-color=primary]]:text-primary',
   '[&_mark[data-color=secondary]]:bg-secondary-soft [&_mark[data-color=secondary]]:text-on-secondary-soft [&_span[data-color=secondary]]:text-secondary',
@@ -38,7 +33,7 @@ export const mentionStyle = tv({
 
 export const richTextStyle = tv({
   slots: {
-    root: ['min-w-0 break-words text-neutral-strong', documentText, '[&_:not(pre)>code]:bg-block'],
+    root: ['min-w-0 break-words text-neutral-strong', documentText],
     taskBox: 'mt-[calc((1lh_-_1rem)/2)]',
     figure: 'flex flex-col gap-1',
     caption: 'text-neutral',
@@ -46,8 +41,8 @@ export const richTextStyle = tv({
   },
   variants: {
     size: {
-      standard: { root: 'text-body-b3-regular [&_figcaption]:text-caption-c1-regular' },
-      tiny: { root: 'text-caption-c1-regular [&_figcaption]:text-caption-c2-regular' },
+      standard: { root: 'text-body-b2-regular leading-prose [&_figcaption]:text-body-b3-regular' },
+      tiny: { root: 'text-body-b3-regular [&_figcaption]:text-caption-c1-regular' },
     } satisfies Record<IdsSize, object>,
   },
   defaultVariants: { size: 'standard' },

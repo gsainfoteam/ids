@@ -41,7 +41,7 @@ export const PC: Story = {
     return (
       <div className="flex min-h-dvh flex-col break-keep">
         <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <div className="text-subtitle-s2-semibold flex items-center gap-2">
+          <div className="text-body-b2-semibold flex items-center gap-2">
             <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
               <Avatar.Fallback>
                 <CubeTransparentIcon />
