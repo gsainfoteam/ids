@@ -9,7 +9,7 @@ export function CalloutNode({ node, children }: DocumentNodeProps) {
   const kind = calloutKindOf(node.attrs.kind);
 
   return (
-    <Alert role="note" colorScheme={kind} variant="soft">
+    <Alert role="note" data-callout="" colorScheme={kind} variant="soft">
       <Alert.Icon>
         <RichTextCalloutIcon kind={kind} />
       </Alert.Icon>

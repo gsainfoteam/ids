@@ -37,7 +37,7 @@ export function EditorCalloutView({ node, editor, getPos, updateAttributes }: Re
         />
       </span>
       <div className={styles.content()}>
-        <span contentEditable={false} className={styles.title()}>
+        <span contentEditable={false} data-callout-title="" className={styles.title()}>
           {t(CALLOUT_TITLE[kind])}
         </span>
         <NodeViewContent data-document-blocks="" className={styles.description()} />
