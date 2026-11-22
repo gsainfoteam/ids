@@ -135,6 +135,39 @@ const [events, setEvents] = useState(initialEvents);
 - 집고, 옮기고, 놓을 때마다 "알고리즘을(를) 집었습니다.", "11월 18일 수요일 오전 9:30 시작", "알고리즘을(를) 옮겼습니다."를 알립니다. 사용법은 root 의 `aria-describedby` 로 읽힙니다.
 - 놓은 일정이 다른 날 칸으로 가면 포커스가 그 일정을 따라갑니다.
 
+## 월 보기에서 옮기기
+
+- 월 보기에서는 일정(종일 일정 포함)을 다른 날 칸으로 끌어 놓습니다. 날짜만 하루 단위로 바뀌고 시각은 그대로입니다. `onEventChange(event, { start, end })` 의 두 값이 같은 날 수만큼 움직입니다.
+- 끄는 동안 일정은 포인터 아래의 날 칸에 맞춰 붙습니다. 여러 주에 걸친 막대는 잡은 날을 기준으로, 잡은 주의 조각이 움직입니다.
+- 보이는 날 칸(앞뒤 달의 날 포함) 안에서만 옮깁니다.
+- 포인터 4px, 터치 250ms 규칙과 끌기를 마친 click 을 삼키는 것은 시간 격자와 같습니다.
+
+| 키보드           | 동작                                   |
+| ---------------- | -------------------------------------- |
+| 일정에서 `Space` | 집는다                                 |
+| `←` `→`          | 하루. RTL 에서는 맞바뀐다              |
+| `↑` `↓`          | 한 주                                  |
+| `Enter`, `Space` | 놓는다                                 |
+| `Escape`, 포커스 떠남 | 제자리에 둔다                     |
+
+- 옮길 때마다 "2026년 11월 27일 금요일 시작"처럼 새 시작을 알립니다. 사용법은 root 의 `aria-describedby` 로 읽힙니다.
+
+## 빈 칸을 끌어 고르기
+
+```tsx
+<Scheduler
+  events={events}
+  onSlotSelect={({ start, end, allDay }) => openCreateDialog({ start, end, allDay })}
+/>
+```
+
+- `onSlotSelect` 를 주면 빈 곳을 마우스로 끌어 기간을 고릅니다. 놓을 때 한 번 `{ start, end, allDay }` 를 넘깁니다. 일정을 만드는 것은 앱입니다.
+- 시간 격자에서는 누른 날 칸 안에서 위아래로 끌어 15분 단위로 고릅니다. 끄는 동안 고른 시간("오후 2:00 – 오후 3:30")이 칸 위에 그려지고, `allDay` 는 `false` 입니다.
+- 월 보기에서는 날 칸을 가로질러 끌어 여러 날을 고릅니다. 고른 날 칸은 `bg-primary-soft` 로 칠해지고, `start` 는 첫날 `00:00`, `end` 는 마지막 날 다음 날 `00:00`, `allDay` 는 `true` 입니다.
+- 4px 를 움직여야 고르기가 시작됩니다. 그냥 누르면 아무것도 넘기지 않습니다. Escape 는 고르기를 취소합니다.
+- 일정, 버튼(`+N개`) 위에서 누르면 고르지 않습니다. 오른쪽 버튼과 수정 키(`Ctrl`, `Shift`, `Alt`, `Meta`)를 누른 채로 누를 때도 고르지 않습니다.
+- 터치는 스크롤이라 고르지 않습니다. 키보드로 고르는 방법도 없습니다. 키보드와 터치로 일정을 만들려면 앱이 "새 일정" 버튼이나 `slotMenu` 를 함께 둡니다.
+
 ## 우클릭 메뉴
 
 ```tsx
@@ -162,8 +195,8 @@ const [events, setEvents] = useState(initialEvents);
 ```
 
 - `eventMenu(event)` 는 일정(종일 일정 포함)을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 메뉴 이름은 일정 제목입니다.
-- `slotMenu({ start, end })` 는 시간 칸의 빈 곳을 우클릭했을 때 엽니다. 포인터 아래의 30분 칸이 `CalendarDateTime` 으로 넘어오고, 메뉴 이름은 "11월 18일 수요일 오후 2:30" 입니다.
-- 월 보기에서는 날 칸의 빈 곳을 우클릭하면 그날 하루(`00:00` 부터 다음 날 `00:00` 까지)가 넘어오고, 메뉴 이름은 "2026년 11월 25일 수요일" 입니다.
+- `slotMenu({ start, end, allDay })` 는 시간 칸의 빈 곳을 우클릭했을 때 엽니다. 포인터 아래의 30분 칸이 `CalendarDateTime` 으로 넘어오고, 메뉴 이름은 "11월 18일 수요일 오후 2:30" 입니다.
+- 월 보기에서는 날 칸의 빈 곳을 우클릭하면 그날 하루(`00:00` 부터 다음 날 `00:00` 까지, `allDay: true`)가 넘어오고, 메뉴 이름은 "2026년 11월 25일 수요일" 입니다.
 - 메뉴는 `Menu triggerType="contextmenu"` 라서 우클릭한 자리에 뜹니다. 고르는 법, 키보드, 닫는 법은 Menu 와 같습니다.
 - 메뉴를 주지 않은 곳(`eventMenu` 없이 일정, `slotMenu` 없이 빈 칸, 종일 줄의 빈 곳)은 브라우저 메뉴가 그대로 뜹니다.
 - `onEventChange` 와 함께 써도 우클릭은 일정을 집지 않습니다.
@@ -200,7 +233,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 - 날 칸은 보드 너비에 맞춰 줄어듭니다. 칸이 좁으면(120px 아래) 시작 시각을 숨기고 점과 제목만 남깁니다.
 - 긴 막대부터, 같은 길이면 종일 일정, 시작 시각 순으로 빈 줄에 채웁니다.
 - 하루에 세 줄을 넘는 일정은 `+N개` 버튼으로 접습니다. 누르면 그날의 일 보기로 가고, `onViewChange('day')` 와 `onDateChange` 를 부릅니다.
-- 월 보기의 일정은 옮기거나 길이를 바꿀 수 없습니다. 주, N일, 일 보기에서 옮깁니다.
+- `onEventChange` 를 주면 월 보기의 일정도 다른 날 칸으로 끌어 옮깁니다(아래 "월 보기에서 옮기기"). 길이는 주, N일, 일 보기에서 바꿉니다.
 - 각 주는 날짜 범위로 이름 붙은 `group` 이고, 일정은 그 안의 ItemGroup 입니다.
 
 ## 지금 시각
@@ -245,12 +278,13 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | `now`                                   | `CalendarDateTime`                    | 클라이언트 시계      |
 | `onEventChange`                         | `(event, { start, end }) => void`     | 없음(옮기지 않음)    |
 | `eventMenu`                             | `(event) => ReactNode`                | 없음(브라우저 메뉴)  |
-| `slotMenu`                              | `({ start, end }) => ReactNode`       | 없음(브라우저 메뉴)  |
+| `slotMenu`                              | `({ start, end, allDay }) => ReactNode` | 없음(브라우저 메뉴) |
+| `onSlotSelect`                          | `({ start, end, allDay }) => void`    | 없음(고르지 않음)    |
 | `children`                              | `(event) => ReactNode`                | `<Scheduler.Event />` |
 
 나머지 `div` props 는 root 에 갑니다.
 
 ## 다음 판
 
-- 종일 일정 옮기기, 시작 시각 끌기, 자정을 넘겨 늘이기.
-- 빈 칸을 눌러 일정 만들기, 보이는 시간 범위(`startHour`, `endHour`)와 숨길 요일.
+- 주 보기의 종일 일정 옮기기, 시작 시각 끌기, 자정을 넘겨 늘이기, 월 보기에서 여러 날 일정 늘이기.
+- 키보드와 터치로 빈 칸 고르기, 보이는 시간 범위(`startHour`, `endHour`)와 숨길 요일.

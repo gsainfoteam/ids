@@ -53,7 +53,7 @@ export type SchedulerEventChange<E extends SchedulerEventData = SchedulerEventDa
 
 export type SchedulerShift = { days: number; minutes: number };
 
-export type SchedulerSlot = { start: CalendarDateTime; end: CalendarDateTime };
+export type SchedulerSlot = { start: CalendarDateTime; end: CalendarDateTime; allDay: boolean };
 
 export type SchedulerAllDayBar<E extends SchedulerEventData = SchedulerEventData> = {
   event: E;
@@ -269,6 +269,41 @@ export const isShifted = ({ days, minutes }: SchedulerShift) => days !== 0 || mi
 
 export const snappedMinutes = (hours: number) =>
   Math.round((hours * MINUTES_IN_HOUR) / SNAP_MINUTES) * SNAP_MINUTES;
+
+const MINUTES_IN_DAY = HOURS_IN_DAY * MINUTES_IN_HOUR;
+
+export function snappedRange(from: number, to: number) {
+  const first = clamp(
+    Math.floor(Math.min(from, to) / SNAP_MINUTES) * SNAP_MINUTES,
+    0,
+    MINUTES_IN_DAY - SNAP_MINUTES,
+  );
+  const last = clamp(
+    Math.ceil(Math.max(from, to) / SNAP_MINUTES) * SNAP_MINUTES,
+    first + SNAP_MINUTES,
+    MINUTES_IN_DAY,
+  );
+  return { first, last };
+}
+
+export function timesBetween(day: CalendarDate, from: number, to: number): SchedulerSlot {
+  const { first, last } = snappedRange(from, to);
+  const midnight = toCalendarDateTime(day);
+  return {
+    start: midnight.add({ minutes: first }),
+    end: midnight.add({ minutes: last }),
+    allDay: false,
+  };
+}
+
+export function daysBetween(from: CalendarDate, to: CalendarDate): SchedulerSlot {
+  const [first, last] = compareDays(from, to) <= 0 ? [from, to] : [to, from];
+  return {
+    start: toCalendarDateTime(first),
+    end: toCalendarDateTime(last.add({ days: 1 })),
+    allDay: true,
+  };
+}
 
 type Columned<E extends SchedulerEventData> = UnplacedSegment<E> & { column: number };
 

@@ -300,6 +300,7 @@
       "cancel": "{event}을(를) 제자리에 두었습니다.",
       "end": "{event}을(를) 옮겼습니다.",
       "hint": "일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.",
+      "monthHint": "일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.",
       "start": "{event}을(를) 집었습니다."
     },
     "goToDate": "날짜로 이동",

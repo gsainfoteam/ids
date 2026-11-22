@@ -3,11 +3,12 @@
 import { useId, useRef, type CSSProperties, type ReactNode } from 'react';
 
 import {
+  parseDate,
   toCalendarDateTime,
   type CalendarDate,
   type CalendarDateTime,
 } from '@internationalized/date';
-import { range } from 'es-toolkit';
+import { clamp, range } from 'es-toolkit';
 
 import { SchedulerEventContext, type SchedulerContextValue } from './context';
 import { SchedulerContextMenu } from './context-menu';
@@ -16,8 +17,11 @@ import {
   allDayBarsIn,
   dateOf,
   firstHourOf,
+  HOURS_IN_DAY,
   hourOfDay,
+  snappedRange,
   timedSegmentsOn,
+  timesBetween,
   type SchedulerAllDayBar,
   type SchedulerEventChange,
   type SchedulerEventData,
@@ -26,6 +30,7 @@ import {
 import { SchedulerMovable } from './movable';
 import { useFirstHourScroll } from './use-first-hour-scroll';
 import { useHourHeight } from './use-hour-height';
+import { usePointerSelection } from './use-pointer-selection';
 import { useTranslate } from '../../../internal/translate';
 import { Divider } from '../../layout/divider';
 import { ScrollArea } from '../../layout/scroll-area';
@@ -34,6 +39,20 @@ import { ItemGroup } from '../item-group';
 
 const HOURS = range(24);
 const WORKDAY_START_HOUR = 8;
+const MINUTES_IN_HOUR = 60;
+const MINUTES_IN_DAY = HOURS_IN_DAY * MINUTES_IN_HOUR;
+
+type PressedTime = { day: CalendarDate; minutes: number };
+
+const columnOf = (target: Element) => target.closest<HTMLElement>('[data-scheduler-column]');
+
+function timeAt(column: HTMLElement, _x: number, y: number): PressedTime {
+  const { top, height } = column.getBoundingClientRect();
+  return {
+    day: parseDate(column.getAttribute('data-scheduler-column')!),
+    minutes: clamp(((y - top) / height) * MINUTES_IN_DAY, 0, MINUTES_IN_DAY),
+  };
+}
 
 type SchedulerGridProps<E extends SchedulerEventData> = SchedulerContextValue & {
   days: CalendarDate[];
@@ -44,6 +63,7 @@ type SchedulerGridProps<E extends SchedulerEventData> = SchedulerContextValue & 
   onEventChange: ((event: E, change: SchedulerEventChange<E>) => void) | undefined;
   eventMenu: ((event: E) => ReactNode) | undefined;
   slotMenu: ((slot: SchedulerSlot) => ReactNode) | undefined;
+  onSlotSelect: ((slot: SchedulerSlot) => void) | undefined;
   hintId: string | undefined;
 };
 
@@ -67,6 +87,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   onEventChange,
   eventMenu,
   slotMenu,
+  onSlotSelect,
   hintId,
 }: SchedulerGridProps<E>) {
   const t = useTranslate();
@@ -83,10 +104,39 @@ export function SchedulerGrid<E extends SchedulerEventData>({
 
   useFirstHourScroll(viewportRef, bodyRef, firstHour);
 
+  const { selection, handlers } = usePointerSelection<PressedTime>({
+    areaOf: columnOf,
+    valueAt: timeAt,
+    onSelect:
+      onSlotSelect &&
+      (({ from, to }) => onSlotSelect(timesBetween(from.day, from.minutes, to.minutes))),
+  });
+
+  const selectionOn = (day: CalendarDate) => {
+    if (!selection || !sameDay(selection.from.day, day)) return null;
+    const { first, last } = snappedRange(selection.from.minutes, selection.to.minutes);
+    const slot = timesBetween(day, selection.from.minutes, selection.to.minutes);
+    return (
+      <div
+        aria-hidden="true"
+        data-scheduler-selection=""
+        className={styles.selection()}
+        style={
+          {
+            '--scheduler-selection-start': first / MINUTES_IN_HOUR,
+            '--scheduler-selection-hours': (last - first) / MINUTES_IN_HOUR,
+          } as CSSProperties
+        }
+      >
+        {format.time(slot.start)} – {format.time(slot.end)}
+      </div>
+    );
+  };
+
   const columns = { '--scheduler-days': days.length } as CSSProperties;
 
   const body = (
-    <div ref={bodyRef} className={styles.columns({ className: styles.body() })}>
+    <div ref={bodyRef} {...handlers} className={styles.columns({ className: styles.body() })}>
       <div aria-hidden="true" data-scroll-area-pinned="start" className={styles.gutter()}>
         {HOURS.map((hour) => (
           <div key={hour} className={styles.hour()}>
@@ -112,6 +162,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                 style={{ '--scheduler-now': hourOfDay(now) } as CSSProperties}
               />
             )}
+            {selectionOn(day)}
             {segments.length > 0 && (
               <ItemGroup variant="ghost" className={styles.dayEvents()}>
                 {segments.map((segment) => {

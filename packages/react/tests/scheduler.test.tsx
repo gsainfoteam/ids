@@ -440,13 +440,37 @@ test('a right-click on an empty month day hands slotMenu the whole day', async (
   expect(slot.end.toString()).toBe('2026-11-26T00:00:00');
 });
 
-test('month events read as one line with their start, and are not movable', async () => {
-  const screen = await render(inProvider({ defaultView: 'month', onEventChange: vi.fn() }));
+test('month events read as one line with their start, and add no Tab stop without onEventChange', async () => {
+  const screen = await render(inProvider({ defaultView: 'month' }));
   await expect.element(screen.getByText('Algorithms')).toBeVisible();
   const algo = document.querySelector('[data-scheduler-event="algo"]')!;
   expect(algo.textContent).toContain('오전 9:00');
   expect(algo.getAttribute('tabindex')).toBeNull();
   expect(document.querySelector('[data-resizable-handle]')).toBeNull();
+});
+
+test('keyboard: in month view Space picks an event up, the arrows move it by days and weeks, Enter drops it', async () => {
+  const onEventChange = vi.fn();
+  const screen = await render(inProvider({ defaultView: 'month', onEventChange }));
+  await expect.element(screen.getByText('Festival')).toBeVisible();
+  expect(document.querySelector('[data-resizable-handle]')).toBeNull();
+
+  document.querySelector<HTMLElement>('[data-scheduler-event="fest"]')!.focus();
+  await userEvent.keyboard('[Space]{ArrowRight}{ArrowDown}{Enter}');
+  await vi.waitFor(() => expect(onEventChange).toHaveBeenCalledTimes(1));
+  const [festival, moved] = onEventChange.mock.calls[0]!;
+  expect(festival.id).toBe('fest');
+  expect(moved.start.toString()).toBe('2026-11-27');
+  expect(moved.end.toString()).toBe('2026-11-28');
+
+  document.querySelector<HTMLElement>('[data-scheduler-event="algo"]')!.focus();
+  await userEvent.keyboard('[Space]{ArrowLeft}{ArrowUp}{Escape}');
+  expect(onEventChange).toHaveBeenCalledTimes(1);
+  await userEvent.keyboard('[Space]{ArrowLeft}{Enter}');
+  await vi.waitFor(() => expect(onEventChange).toHaveBeenCalledTimes(2));
+  const [, shifted] = onEventChange.mock.calls[1]!;
+  expect(shifted.start.toString()).toBe('2026-11-16T09:00:00');
+  expect(shifted.end.toString()).toBe('2026-11-16T10:30:00');
 });
 
 test('locale names the days and times, and picks the first weekday', () => {
@@ -537,6 +561,114 @@ test('pointer: dragging an event moves it by whole days and quarter hours, and t
   expect(change.start.toString()).toBe('2026-11-16T10:00:00');
   expect(change.end.toString()).toBe('2026-11-16T11:30:00');
   expect(onClick).not.toHaveBeenCalled();
+});
+
+test('pointer: a month event dragged onto another day keeps its time and moves by whole days', async (context) => {
+  skipWithoutCdp(context);
+  const onEventChange = vi.fn();
+  const screen = await render(inProvider({ defaultView: 'month', onEventChange }));
+  await expect.element(screen.getByText('Algorithms')).toBeVisible();
+  const algo = document.querySelector('[data-scheduler-event="algo"]')!.getBoundingClientRect();
+  const target = document
+    .querySelector('[data-scheduler-month-day="2026-11-25"]')!
+    .getBoundingClientRect();
+  const from = { x: algo.left + 12, y: algo.top + algo.height / 2 };
+  const to = { x: target.left + target.width / 2, y: target.top + target.height / 2 };
+
+  await mouse('mousePressed', from.x, from.y);
+  for (let step = 1; step <= 8; step++)
+    await mouse(
+      'mouseMoved',
+      from.x + ((to.x - from.x) * step) / 8,
+      from.y + ((to.y - from.y) * step) / 8,
+    );
+  await new Promise(requestAnimationFrame);
+  const lifted = document.querySelector('[data-scheduler-event="algo"]')!.getBoundingClientRect();
+  expect(
+    Math.abs(
+      lifted.left -
+        algo.left -
+        (target.left -
+          document.querySelector('[data-scheduler-month-day="2026-11-17"]')!.getBoundingClientRect()
+            .left),
+    ),
+  ).toBeLessThan(1);
+  await mouse('mouseReleased', to.x, to.y);
+
+  await vi.waitFor(() => expect(onEventChange).toHaveBeenCalledTimes(1));
+  const [, change] = onEventChange.mock.calls[0]!;
+  expect(change.start.toString()).toBe('2026-11-25T09:00:00');
+  expect(change.end.toString()).toBe('2026-11-25T10:30:00');
+});
+
+test('pointer: dragging over empty time selects quarter hours, and a plain press selects nothing', async (context) => {
+  skipWithoutCdp(context);
+  const onSlotSelect = vi.fn();
+  const screen = await render(inProvider({ onSlotSelect }));
+  await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
+  const column = document.querySelector('[data-scheduler-column="2026-11-18"]')!;
+  const { left, top, height } = column.getBoundingClientRect();
+  const hour = height / 24;
+  const x = left + 8;
+
+  await mouse('mousePressed', x, top + hour * 14.1);
+  await mouse('mouseReleased', x, top + hour * 14.1);
+  expect(onSlotSelect).not.toHaveBeenCalled();
+
+  await mouse('mousePressed', x, top + hour * 14.1);
+  await mouse('mouseMoved', x, top + hour * 15);
+  await mouse('mouseMoved', x, top + hour * 15.6);
+  await expect
+    .element(page.elementLocator(document.querySelector('[data-scheduler-selection]')!))
+    .toHaveTextContent('오후 2:00 – 오후 3:45');
+  await mouse('mouseReleased', x, top + hour * 15.6);
+
+  expect(onSlotSelect).toHaveBeenCalledTimes(1);
+  const [slot] = onSlotSelect.mock.calls[0]!;
+  expect(slot.start.toString()).toBe('2026-11-18T14:00:00');
+  expect(slot.end.toString()).toBe('2026-11-18T15:45:00');
+  expect(slot.allDay).toBe(false);
+  expect(document.querySelector('[data-scheduler-selection]')).toBeNull();
+});
+
+test('pointer: dragging across month days selects whole days, and Escape cancels', async (context) => {
+  skipWithoutCdp(context);
+  const onSlotSelect = vi.fn();
+  const screen = await render(inProvider({ defaultView: 'month', onSlotSelect }));
+  await expect.element(screen.getByText('Algorithms')).toBeVisible();
+  const pointIn = (day: string) => {
+    const { left, bottom, width } = document
+      .querySelector(`[data-scheduler-month-day="${day}"]`)!
+      .getBoundingClientRect();
+    return { x: left + width / 2, y: bottom - 6 };
+  };
+  const selectedDays = () =>
+    [...document.querySelectorAll('[data-scheduler-month-day][data-selected]')].map((cell) =>
+      cell.getAttribute('data-scheduler-month-day'),
+    );
+
+  const start = pointIn('2026-11-26');
+  await mouse('mousePressed', start.x, start.y);
+  await mouse('mouseMoved', pointIn('2026-11-25').x, start.y);
+  await mouse('mouseMoved', pointIn('2026-11-24').x, start.y);
+  await vi.waitFor(() =>
+    expect(selectedDays()).toEqual(['2026-11-24', '2026-11-25', '2026-11-26']),
+  );
+  await mouse('mouseReleased', pointIn('2026-11-24').x, start.y);
+
+  expect(onSlotSelect).toHaveBeenCalledTimes(1);
+  const [slot] = onSlotSelect.mock.calls[0]!;
+  expect(slot.start.toString()).toBe('2026-11-24T00:00:00');
+  expect(slot.end.toString()).toBe('2026-11-27T00:00:00');
+  expect(slot.allDay).toBe(true);
+
+  await mouse('mousePressed', start.x, start.y);
+  await mouse('mouseMoved', pointIn('2026-11-27').x, start.y);
+  await vi.waitFor(() => expect(selectedDays()).toHaveLength(2));
+  await userEvent.keyboard('{Escape}');
+  await vi.waitFor(() => expect(selectedDays()).toEqual([]));
+  await mouse('mouseReleased', pointIn('2026-11-27').x, start.y);
+  expect(onSlotSelect).toHaveBeenCalledTimes(1);
 });
 
 test('pointer: dragging the bottom edge changes only the end, in quarter hours', async (context) => {

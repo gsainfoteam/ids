@@ -61,3 +61,20 @@ export type SchedulerDragValue = {
 };
 
 export const SchedulerDragContext = createContext<SchedulerDragValue | null>(null);
+
+export type SchedulerMonthPiece = {
+  key: string;
+  event: SchedulerEventData;
+  day: CalendarDate;
+  element: () => HTMLElement | null;
+};
+
+export type SchedulerMonthDragValue = {
+  grabbed: { key: string; offset: { x: number; y: number } } | null;
+  grab: (piece: SchedulerMonthPiece) => void;
+  nudge: (days: number) => void;
+  drop: () => void;
+  cancel: () => void;
+};
+
+export const SchedulerMonthDragContext = createContext<SchedulerMonthDragValue | null>(null);

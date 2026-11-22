@@ -221,6 +221,7 @@
     "schedulerDragCancel": "{event}을(를) 제자리에 두었습니다.",
     "schedulerDragEnd": "{event}을(를) 옮겼습니다.",
     "schedulerDragHint": "일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.",
+    "schedulerDragMonthHint": "일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.",
     "schedulerDragStart": "{event}을(를) 집었습니다.",
     "schedulerGoToDate": "날짜로 이동",
     "schedulerLabel": "일정표",

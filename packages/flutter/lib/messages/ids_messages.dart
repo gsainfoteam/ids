@@ -445,6 +445,8 @@ mixin IdsMessages {
 
   String? get schedulerDragHint => null;
 
+  String? get schedulerDragMonthHint => null;
+
   String? schedulerDragStart({required Object event}) => null;
 
   String? get schedulerGoToDate => null;
@@ -1262,6 +1264,9 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get schedulerDragHint => '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.';
+
+  @override
+  String get schedulerDragMonthHint => '일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.';
 
   @override
   String schedulerDragStart({required Object event}) => '${_format(event)}을(를) 집었습니다.';

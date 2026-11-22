@@ -81,7 +81,7 @@ function measureSlot(slot: SchedulerSlotData, element: HTMLElement, hourHeight: 
   };
 }
 
-function focusTheEvent(body: HTMLElement | null, id: string) {
+export function focusTheEvent(body: HTMLElement | null, id: string) {
   const slot = body?.querySelector(`[data-scheduler-slot="${CSS.escape(id)}"]`);
   slot
     ?.querySelector<HTMLElement>('[data-surface-trigger], [data-scheduler-event][tabindex]')
@@ -97,6 +97,17 @@ export type SchedulerDragProps = {
   children: ReactNode;
 };
 
+export const useSchedulerSensors = () =>
+  useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: POINTER_TRAVEL_BEFORE_DRAG } }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: TOUCH_HOLD_BEFORE_DRAG,
+        tolerance: TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING,
+      },
+    }),
+  );
+
 export function SchedulerDrag({
   events,
   format,
@@ -111,15 +122,7 @@ export function SchedulerDrag({
   const [grab, setGrab] = useState<Grab | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: POINTER_TRAVEL_BEFORE_DRAG } }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: TOUCH_HOLD_BEFORE_DRAG,
-        tolerance: TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING,
-      },
-    }),
-  );
+  const sensors = useSchedulerSensors();
 
   useEffect(() => {
     const id = pendingFocus.current;

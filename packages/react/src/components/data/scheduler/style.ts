@@ -59,6 +59,13 @@ export const schedulerStyle = tv({
       'bg-[linear-gradient(to_bottom,var(--ids-color-border-neutral)_1px,transparent_1px)] bg-size-[100%_var(--scheduler-hour)]',
     ],
     dayEvents: 'absolute inset-0',
+    selection: [
+      'pointer-events-none absolute inset-x-1 z-3 rounded-standard px-1.5 py-0.5',
+      'bg-primary-soft text-on-primary-soft inset-ring inset-ring-primary-strong',
+      'text-caption-c1-medium tabular-nums',
+      'top-[calc(var(--scheduler-hour)*var(--scheduler-selection-start))]',
+      'h-[calc(var(--scheduler-hour)*var(--scheduler-selection-hours))]',
+    ],
     slot: [
       'absolute flex p-px hover:z-4 has-focus-visible:z-4 has-data-dragging:z-4',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-event-start))]',
@@ -105,6 +112,7 @@ export const schedulerStyle = tv({
       'pointer-events-none col-start-1 -col-end-1 row-start-1 grid grid-cols-7 content-start gap-y-0.5 pt-9 pb-1',
       '*:pointer-events-auto',
     ],
+    monthMovable: 'relative isolate flex w-full min-w-0 rounded-standard',
     monthMore:
       'col-start-(--scheduler-bar-column) row-start-(--scheduler-bar-row) flex min-w-0 px-1',
     now: [
@@ -124,6 +132,10 @@ export const schedulerStyle = tv({
     },
     outside: {
       true: { monthDay: 'bg-block', monthDate: 'text-neutral' },
+      false: {},
+    },
+    selected: {
+      true: { monthDay: 'bg-primary-soft' },
       false: {},
     },
     startsAt: {
@@ -146,7 +158,10 @@ export const schedulerStyle = tv({
       false: {},
     },
     dragging: {
-      true: { movable: cn('z-5', dragSurface.lifted) },
+      true: {
+        movable: cn('z-5', dragSurface.lifted),
+        monthMovable: cn('z-5', dragSurface.lifted),
+      },
       false: {},
     },
     view: {
@@ -187,6 +202,7 @@ export const schedulerStyle = tv({
     view: 'week',
     today: false,
     outside: false,
+    selected: false,
     startsAt: false,
     line: false,
     fromBefore: false,

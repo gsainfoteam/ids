@@ -11,7 +11,7 @@ import {
 import { parseDate, toCalendarDate, toCalendarDateTime } from '@internationalized/date';
 import { clamp } from 'es-toolkit';
 
-import { HOURS_IN_DAY, type SchedulerEventData, type SchedulerSlot } from './layout';
+import { daysBetween, HOURS_IN_DAY, type SchedulerEventData, type SchedulerSlot } from './layout';
 import { part } from '../../../utils';
 import { Menu } from '../../overlay/menu';
 import { useMenuContext } from '../../overlay/menu/context';
@@ -35,13 +35,13 @@ export function slotAt(column: HTMLElement, clientY: number): SchedulerSlot {
     MINUTES_IN_DAY - SLOT_MINUTES,
   );
   const start = toCalendarDateTime(day).add({ minutes });
-  return { start, end: start.add({ minutes: SLOT_MINUTES }) };
+  return { start, end: start.add({ minutes: SLOT_MINUTES }), allDay: false };
 }
 
-function wholeDayOf(cell: Element): SchedulerSlot {
-  const start = toCalendarDateTime(parseDate(cell.getAttribute('data-scheduler-month-day')!));
-  return { start, end: start.add({ days: 1 }) };
-}
+export const dayOfCell = (cell: Element) =>
+  parseDate(cell.getAttribute('data-scheduler-month-day')!);
+
+const wholeDayOf = (cell: Element) => daysBetween(dayOfCell(cell), dayOfCell(cell));
 
 function TriggerWhereAMenuIs({
   opens,

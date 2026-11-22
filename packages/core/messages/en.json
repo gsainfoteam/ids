@@ -300,6 +300,7 @@
       "cancel": "Returned {event} to its place.",
       "end": "Moved {event}.",
       "hint": "Press Space on an event to pick it up, the arrow keys to move it by 15 minutes or a day, and Enter to drop it. Shift with the up and down arrows moves an hour. Escape cancels.",
+      "monthHint": "Press Space on an event to pick it up, the left and right arrows to move it a day, the up and down arrows to move it a week, and Enter to drop it. Escape cancels.",
       "start": "Picked up {event}."
     },
     "goToDate": "Go to date",

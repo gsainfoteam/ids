@@ -774,6 +774,142 @@ export const ContextMenu: Story = {
   },
 };
 
+export const CreateBySelecting: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`onSlotSelect` 를 주면 빈 시간 칸을 마우스로 끌어 시간을 고릅니다. 15분 단위로 맞고, 끄는 동안 고른 시간이 칸 위에 보이며, 놓을 때 한 번 `{ start, end, allDay: false }` 를 넘깁니다. 그냥 누르면 고르지 않고, Escape 는 취소합니다. 터치는 스크롤이라 고르지 않습니다. 앱은 넘어온 시간으로 일정을 만들거나 만들기 창을 엽니다.',
+      },
+    },
+  },
+  render: function Render() {
+    const [events, setEvents] = useState(EVENTS);
+    const [selected, setSelected] = useState('');
+
+    return (
+      <div className="flex w-full flex-col gap-3">
+        <Scheduler
+          events={events}
+          defaultDate={TODAY}
+          now={NOW}
+          onSlotSelect={({ start, end, allDay }) => {
+            setEvents((previous) => [
+              ...previous,
+              { id: `new-${start.toString()}`, title: '새 일정', start, end, allDay },
+            ]);
+            setSelected(`${start.toString()} – ${end.toString()}`);
+          }}
+        />
+        <p className="text-body-b3-regular" data-testid="selected">
+          {selected}
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const wednesday = canvasElement.querySelector<HTMLElement>(
+      '[data-scheduler-column="2026-11-18"]',
+    )!;
+    const { left, top, height } = wednesday.getBoundingClientRect();
+    const hour = height / 24;
+    const at = (hours: number) => ({ clientX: left + 8, clientY: top + hour * hours });
+
+    await userEvent.pointer([
+      { keys: '[MouseLeft>]', target: wednesday, coords: at(14.1) },
+      { target: wednesday, coords: at(15) },
+      { target: wednesday, coords: at(15.4) },
+    ]);
+    await expect(canvasElement.querySelector('[data-scheduler-selection]')).toHaveTextContent(
+      '오후 2:00 – 오후 3:30',
+    );
+    await userEvent.pointer({ keys: '[/MouseLeft]', target: wednesday, coords: at(15.4) });
+
+    await waitFor(() =>
+      expect(canvas.getByTestId('selected')).toHaveTextContent(
+        '2026-11-18T14:00:00 – 2026-11-18T15:30:00',
+      ),
+    );
+    await expect(canvasElement.querySelector('[data-scheduler-selection]')).toBeNull();
+    await expect(canvas.getByText('새 일정')).toBeVisible();
+  },
+};
+
+export const MonthMoveAndSelect: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '월 보기에서도 `onEventChange` 를 주면 일정을 끌어 다른 날로 옮깁니다. 시각은 그대로 두고 날짜만 하루 단위로 바뀌며, 여러 주에 걸친 막대도 잡은 날을 기준으로 움직입니다. 키보드로는 Space 로 집고 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter 로 놓습니다. `onSlotSelect` 를 주면 빈 날 칸을 끌어 여러 날을 고르고, 놓을 때 `{ start, end, allDay: true }` 를 넘깁니다.',
+      },
+    },
+  },
+  render: function Render() {
+    const [events, setEvents] = useState(EVENTS);
+    const [done, setDone] = useState('');
+
+    return (
+      <div className="flex w-full flex-col gap-3">
+        <Scheduler
+          events={events}
+          defaultView="month"
+          defaultDate={TODAY}
+          now={NOW}
+          onEventChange={(event, { start, end }) => {
+            setEvents((previous) =>
+              previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
+            );
+            setDone(`${event.title} ${start.toString()} – ${end.toString()}`);
+          }}
+          onSlotSelect={({ start, end, allDay }) => {
+            setEvents((previous) => [
+              ...previous,
+              { id: `new-${start.toString()}`, title: '새 일정', start, end, allDay },
+            ]);
+            setDone(`새 일정 ${start.toString()} – ${end.toString()}`);
+          }}
+        />
+        <p className="text-body-b3-regular" data-testid="done">
+          {done}
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const done = canvas.getByTestId('done');
+
+    canvasElement.querySelector<HTMLElement>('[data-scheduler-event="festival"]')!.focus();
+    await userEvent.keyboard('[Space]{ArrowRight}{ArrowDown}');
+    await expect(canvas.getByText('2026년 11월 27일 금요일 시작')).toBeInTheDocument();
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(done).toHaveTextContent('지스트 축제 2026-11-27 – 2026-11-28'));
+
+    const cell = (day: string) =>
+      canvasElement.querySelector<HTMLElement>(`[data-scheduler-month-day="${day}"]`)!;
+    const middleOf = (element: HTMLElement) => {
+      const { left, bottom, width } = element.getBoundingClientRect();
+      return { clientX: left + width / 2, clientY: bottom - 6 };
+    };
+    await userEvent.pointer([
+      { keys: '[MouseLeft>]', target: cell('2026-11-09'), coords: middleOf(cell('2026-11-09')) },
+      { target: cell('2026-11-10'), coords: middleOf(cell('2026-11-10')) },
+      { target: cell('2026-11-11'), coords: middleOf(cell('2026-11-11')) },
+    ]);
+    await expect(
+      canvasElement.querySelectorAll('[data-scheduler-month-day][data-selected]'),
+    ).toHaveLength(3);
+    await userEvent.pointer({
+      keys: '[/MouseLeft]',
+      target: cell('2026-11-11'),
+      coords: middleOf(cell('2026-11-11')),
+    });
+    await waitFor(() =>
+      expect(done).toHaveTextContent('새 일정 2026-11-09T00:00:00 – 2026-11-12T00:00:00'),
+    );
+    await expect(canvas.getByText('새 일정')).toBeVisible();
+  },
+};
+
 export const CustomContent: Story = {
   parameters: {
     docs: {

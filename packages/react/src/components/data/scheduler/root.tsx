@@ -52,6 +52,7 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
   onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
   eventMenu?: (event: E) => ReactNode;
   slotMenu?: (slot: SchedulerSlot) => ReactNode;
+  onSlotSelect?: (slot: SchedulerSlot) => void;
   children?: (event: E) => ReactNode;
 };
 
@@ -74,6 +75,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   onEventChange,
   eventMenu,
   slotMenu,
+  onSlotSelect,
   children = defaultEvent,
   className,
   'aria-label': ariaLabel,
@@ -151,6 +153,9 @@ export function SchedulerRoot<E extends SchedulerEventData>({
             renderEvent={children}
             eventMenu={eventMenu}
             slotMenu={slotMenu}
+            onSlotSelect={onSlotSelect}
+            onEventChange={onEventChange}
+            hintId={hintId}
             onShowDay={(day) => {
               setDate(day);
               setView('day');
@@ -168,6 +173,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
             onEventChange={onEventChange}
             eventMenu={eventMenu}
             slotMenu={slotMenu}
+            onSlotSelect={onSlotSelect}
             hintId={hintId}
           />
         )}
