@@ -15,6 +15,7 @@ import { Spinner } from '../../../feedback/spinner';
 import { Popover } from '../../../overlay/popover';
 import { isWebAddress } from '../../../typography/rich-text/schema/url-rules';
 import { TextField } from '../../text-field';
+import { editorMessages } from '../messages-catalog';
 import { isPlainEnter, withProtocol } from '../popover-form';
 import { EditorToolTip, useEditorToolProps, useToolState, type EditorToolProps } from '../tool';
 
@@ -40,7 +41,7 @@ function warnThereIsNoUpload() {
 type ImagePopover = 'insert' | 'alt';
 
 export function EditorImage({ icon, 'aria-label': ariaLabel, className }: EditorImageProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, images, styles } = useEditorContext('Editor.Image');
   const state = useToolState(IMAGE);
   const tool = useEditorToolProps('Image');

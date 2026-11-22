@@ -5,6 +5,7 @@ import { Table } from 'lucide-react';
 import { useTranslate } from '../../../../internal/translate';
 import { IconButton } from '../../../action/icon-button';
 import { useEditorContext } from '../context';
+import { editorMessages } from '../messages-catalog';
 import { extensionIsLoaded, hasExtension, useEditorToolProps, type EditorToolProps } from '../tool';
 import { useEditorSelector } from '../use-editor-selector';
 import { EditorTableEditMenu } from './edit-menu';
@@ -24,7 +25,7 @@ function tableState(editor: TiptapEditor) {
 }
 
 export function EditorTable({ icon, 'aria-label': ariaLabel, className }: EditorTableProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable } = useEditorContext('Editor.Table');
   const tool = useEditorToolProps('Table');
   const loaded = extensionIsLoaded(editor, 'Table', 'table');
