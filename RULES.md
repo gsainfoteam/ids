@@ -292,6 +292,14 @@ IDS elements appear, the hook code does not. The exceptions, which stay componen
 
 Plain helpers (play queries, data factories, formatters) stay at module level.
 
+**Menu rows should start with one icon.** In stories, blocks and README examples, prefer giving
+each `Menu.Item` and each submenu `Menu.Trigger` one leading heroicon (or an `Avatar` for a
+person), so the labels line up. It is a recommendation, not a hard rule: a row may stay a label
+alone when no icon fits it. The icon comes from the set the file already imports:
+`@heroicons/react/16/solid` in component stories and READMEs, `24/outline` in blocks. A
+`Menu.CheckboxItem` in a group of such items takes an icon too; a menu of only checkbox and radio
+items stays bare, since their check or dot sits at the end and marks them already.
+
 ## Blocks
 
 `src/blocks/<category>/` holds blocks: screens built only from IDS components, with several takes

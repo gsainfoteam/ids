@@ -4,6 +4,9 @@ import {
   ChatBubbleLeftIcon,
   CheckIcon,
   EllipsisHorizontalIcon,
+  FlagIcon,
+  LinkIcon,
+  NoSymbolIcon,
   UserPlusIcon,
 } from '@heroicons/react/24/outline';
 
@@ -151,10 +154,17 @@ export const PC: Story = {
               </Menu.Trigger>
               <Menu.Content>
                 <Menu.Item onSelect={() => toast.success('프로필 주소를 복사했어요')}>
+                  <LinkIcon />
                   프로필 주소 복사
                 </Menu.Item>
-                <Menu.Item>차단하기</Menu.Item>
-                <Menu.Item>신고하기</Menu.Item>
+                <Menu.Item>
+                  <NoSymbolIcon />
+                  차단하기
+                </Menu.Item>
+                <Menu.Item>
+                  <FlagIcon />
+                  신고하기
+                </Menu.Item>
               </Menu.Content>
             </Menu>
           </Card.Footer>

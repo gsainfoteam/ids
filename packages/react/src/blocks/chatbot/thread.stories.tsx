@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
 import {
+  ArchiveBoxIcon,
   ArrowPathIcon,
   ArrowUpIcon,
   Bars3Icon,
@@ -11,9 +12,11 @@ import {
   HandThumbDownIcon,
   HandThumbUpIcon,
   PaperClipIcon,
+  PencilIcon,
   PencilSquareIcon,
   ShareIcon,
   SparklesIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -218,10 +221,19 @@ export const PC: Story = {
                 />
               </Menu.Trigger>
               <Menu.Content>
-                <Menu.Item>이름 바꾸기</Menu.Item>
-                <Menu.Item>보관하기</Menu.Item>
+                <Menu.Item>
+                  <PencilIcon />
+                  이름 바꾸기
+                </Menu.Item>
+                <Menu.Item>
+                  <ArchiveBoxIcon />
+                  보관하기
+                </Menu.Item>
                 <Menu.Separator />
-                <Menu.Item>지우기</Menu.Item>
+                <Menu.Item>
+                  <TrashIcon />
+                  지우기
+                </Menu.Item>
               </Menu.Content>
             </Menu>
           </header>

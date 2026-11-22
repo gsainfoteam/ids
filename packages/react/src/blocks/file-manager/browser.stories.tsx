@@ -1,17 +1,21 @@
 import { useState, type ReactNode } from 'react';
 
 import {
+  ArrowDownTrayIcon,
   ArrowUpTrayIcon,
   DocumentTextIcon,
   EllipsisHorizontalIcon,
+  FolderArrowDownIcon,
   FolderIcon,
   FolderPlusIcon,
   ListBulletIcon,
   MagnifyingGlassIcon,
+  PencilIcon,
   PhotoIcon,
   PresentationChartBarIcon,
   Squares2X2Icon,
   TableCellsIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -96,11 +100,23 @@ export const PC: Story = {
           />
         </Menu.Trigger>
         <Menu.Content>
-          <Menu.Item onSelect={() => toast(`${name}을 내려받아요`)}>내려받기</Menu.Item>
-          <Menu.Item>이름 바꾸기</Menu.Item>
-          <Menu.Item>옮기기</Menu.Item>
+          <Menu.Item onSelect={() => toast(`${name}을 내려받아요`)}>
+            <ArrowDownTrayIcon />
+            내려받기
+          </Menu.Item>
+          <Menu.Item>
+            <PencilIcon />
+            이름 바꾸기
+          </Menu.Item>
+          <Menu.Item>
+            <FolderArrowDownIcon />
+            옮기기
+          </Menu.Item>
           <Menu.Separator />
-          <Menu.Item onSelect={() => toast(`${name}을 휴지통으로 옮겼어요`)}>지우기</Menu.Item>
+          <Menu.Item onSelect={() => toast(`${name}을 휴지통으로 옮겼어요`)}>
+            <TrashIcon />
+            지우기
+          </Menu.Item>
         </Menu.Content>
       </Menu>
     );
