@@ -552,7 +552,7 @@ test('the end handle sits inside its event, so an event starting right after it 
     expect(document.elementFromPoint(x, y)).toBe(edge.element());
 });
 
-test('hovering an event covered by a later one brings it and its end handle to the front', async () => {
+test('pressing an event covered by a later one brings it and its end handle to the front, and hovering does not', async () => {
   const screen = await render(
     inProvider({
       onEventChange: vi.fn(),
@@ -574,6 +574,12 @@ test('hovering an event covered by a later one brings it and its end handle to t
   );
 
   await userEvent.hover(screen.getByText('Lunch'));
+  expect(document.elementFromPoint(x, y)?.closest('[data-scheduler-slot]')).toHaveAttribute(
+    'data-scheduler-slot',
+    'graph',
+  );
+
+  await userEvent.click(screen.getByText('Lunch'));
 
   await vi.waitFor(() => expect(document.elementFromPoint(x, y)).toBe(edge.element()));
 });
