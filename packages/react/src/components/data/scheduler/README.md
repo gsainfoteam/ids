@@ -22,7 +22,7 @@ const events = [
     id: 'fest',
     title: '지스트 축제',
     start: new CalendarDate(2026, 11, 19),
-    end: new CalendarDate(2026, 11, 20),
+    end: new CalendarDate(2026, 11, 21),
     colorScheme: 'warning',
   },
 ];
@@ -61,7 +61,7 @@ type EventData = {
 };
 ```
 
-- `start` 가 `CalendarDate` 이거나 `allDay` 면 종일 일정입니다. 머리줄 아래 종일 줄에 `start` 부터 `end` 까지(양 끝 포함, Calendar 의 기간과 같음) 이어진 막대 하나로 놓입니다. 막대가 겹치면 아래 줄로 내려갑니다.
+- `start` 가 `CalendarDate` 이거나 `allDay` 면 종일 일정입니다. 머리줄 아래 종일 줄에 `start` 부터 `end` 전날까지 이어진 막대 하나로 놓입니다. `end` 는 iCal, Google Calendar 처럼 마지막 날의 다음 날이라, 11월 19일과 20일 이틀짜리 일정은 `end` 가 21일입니다. `onSlotSelect` 가 넘기는 `end` 와 같은 규칙입니다. `end` 가 `start` 와 같으면 그날 하루로 그립니다. 막대가 겹치면 아래 줄로 내려갑니다.
 - 종일 줄은 "종일"이라는 이름의 목록 하나입니다. 막대마다 화면에 보이지 않는 날짜 범위가 설명으로 붙어, 화면 읽기는 "지스트 축제, 2026년 11월 19일 목요일 – 20일 금요일"처럼 읽습니다.
 - 시각이 있는 일정은 날짜와 시각으로 자리를 잡습니다. 자정을 넘으면 두 날에 나눠 그리고, 두 칸 모두 원래 시작과 끝 시각을 적습니다.
 - `ZonedDateTime` 은 그 시간대의 벽시계 시각으로 놓습니다. 보는 사람의 시간대로 옮기려면 `toTimeZone(value, getLocalTimeZone())` 을 거쳐 넘깁니다.

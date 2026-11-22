@@ -5,6 +5,7 @@ import { use, type ReactNode } from 'react';
 import { toCalendarDate } from '@internationalized/date';
 
 import { SchedulerDragContext, useSchedulerEventContext } from './context';
+import { lastDayBefore } from './layout';
 import { Item } from '../item';
 
 import type { SchedulerColorScheme } from './layout';
@@ -74,7 +75,10 @@ export function SchedulerEvent({
           </Item.Title>
           <Item.Description className={styles.eventTime({ allDay: oneLine })}>
             {allDay ? (
-              format.dates(toCalendarDate(start), toCalendarDate(end))
+              format.dates(
+                toCalendarDate(start),
+                lastDayBefore(toCalendarDate(start), toCalendarDate(end)),
+              )
             ) : inMonth ? (
               <time dateTime={start.toString()}>{format.moment(start)}</time>
             ) : (

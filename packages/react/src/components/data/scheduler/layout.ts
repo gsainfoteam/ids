@@ -145,17 +145,18 @@ export function allDayBarsIn<E extends SchedulerEventData>(
       (event) =>
         isAllDay(event) &&
         compareDays(dateOf(event.start), last) <= 0 &&
-        compareDays(dateOf(event.end), first) >= 0,
+        compareDays(lastDayOf(event), first) >= 0,
     )
     .map((event) => {
       const column = columnOf(dateOf(event.start));
+      const lastDay = lastDayOf(event);
       return {
         event,
         column,
-        span: columnOf(dateOf(event.end)) - column + 1,
+        span: columnOf(lastDay) - column + 1,
         row: 0,
         fromBefore: compareDays(dateOf(event.start), first) < 0,
-        pastEnd: compareDays(dateOf(event.end), last) > 0,
+        pastEnd: compareDays(lastDay, last) > 0,
       };
     })
     .sort((a, b) => a.column - b.column || b.span - a.span);
@@ -173,8 +174,13 @@ function packedIntoRows<B extends { column: number; span: number; row: number }>
   return bars;
 }
 
+export function lastDayBefore(start: CalendarDate, end: CalendarDate) {
+  const last = end.subtract({ days: 1 });
+  return compareDays(last, start) < 0 ? start : last;
+}
+
 function lastDayOf(event: SchedulerEventData) {
-  if (isAllDay(event)) return dateOf(event.end);
+  if (isAllDay(event)) return lastDayBefore(dateOf(event.start), dateOf(event.end));
   const start = wallTime(event.start);
   const end = wallTime(event.end);
   const endsAtMidnight = end.hour === 0 && end.minute === 0 && end.compare(start) > 0;

@@ -39,7 +39,7 @@ const EVENTS: Scheduler.EventData[] = [
     id: 'festival',
     title: '지스트 축제',
     start: on(19),
-    end: on(20),
+    end: on(21),
     allDay: true,
     colorScheme: 'warning',
   },
@@ -47,7 +47,7 @@ const EVENTS: Scheduler.EventData[] = [
     id: 'conference',
     title: '해외 학회 출장',
     start: on(26),
-    end: new CalendarDate(2026, 12, 4),
+    end: new CalendarDate(2026, 12, 5),
     allDay: true,
     colorScheme: 'success',
   },
@@ -55,7 +55,7 @@ const EVENTS: Scheduler.EventData[] = [
     id: 'no-class',
     title: '휴강',
     start: on(18),
-    end: on(18),
+    end: on(19),
     allDay: true,
     colorScheme: 'neutral',
   },
@@ -63,7 +63,7 @@ const EVENTS: Scheduler.EventData[] = [
     id: 'grades',
     title: '중간고사 성적 공개',
     start: on(20),
-    end: on(20),
+    end: on(21),
     allDay: true,
     colorScheme: 'info',
   },
@@ -71,7 +71,7 @@ const EVENTS: Scheduler.EventData[] = [
     id: 'hackathon',
     title: 'GIST 해커톤',
     start: on(21),
-    end: on(22),
+    end: on(23),
     allDay: true,
     colorScheme: 'secondary',
   },
@@ -79,7 +79,7 @@ const EVENTS: Scheduler.EventData[] = [
     id: 'finals',
     title: '기말고사',
     start: new CalendarDate(2026, 12, 14),
-    end: new CalendarDate(2026, 12, 18),
+    end: new CalendarDate(2026, 12, 19),
     allDay: true,
     colorScheme: 'danger',
   },
@@ -890,7 +890,7 @@ export const MonthMoveAndSelect: Story = {
     await userEvent.keyboard('[Space]{ArrowRight}{ArrowDown}');
     await expect(canvas.getByText('2026년 11월 27일 금요일 시작')).toBeInTheDocument();
     await userEvent.keyboard('{Enter}');
-    await waitFor(() => expect(done).toHaveTextContent('지스트 축제 2026-11-27 – 2026-11-28'));
+    await waitFor(() => expect(done).toHaveTextContent('지스트 축제 2026-11-27 – 2026-11-29'));
 
     const cell = (day: string) =>
       canvasElement.querySelector<HTMLElement>(`[data-scheduler-month-day="${day}"]`)!;

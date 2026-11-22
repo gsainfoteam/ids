@@ -45,7 +45,7 @@ const EVENTS: Scheduler.EventData[] = [
   { id: 'room', title: 'Study room', start: at(17, 10), end: at(17, 12) },
   { id: 'lunch', title: 'Lunch', start: at(17, 12), end: at(17, 13) },
   { id: 'late', title: 'Deadline', start: at(19, 23), end: at(20, 1) },
-  { id: 'fest', title: 'Festival', start: on(19), end: on(20), allDay: true },
+  { id: 'fest', title: 'Festival', start: on(19), end: on(21), allDay: true },
 ];
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -326,9 +326,9 @@ test('all-day events become one bar across their days, clipped to the range and 
   const bars = allDayBarsIn(
     [
       ...EVENTS,
-      { id: 'trip', title: 'Trip', start: on(12), end: on(16), allDay: true },
-      { id: 'exam', title: 'Exam', start: on(20), end: on(25), allDay: true },
-      { id: 'later', title: 'Later', start: on(23), end: on(23), allDay: true },
+      { id: 'trip', title: 'Trip', start: on(12), end: on(17), allDay: true },
+      { id: 'exam', title: 'Exam', start: on(20), end: on(26), allDay: true },
+      { id: 'later', title: 'Later', start: on(23), end: on(24), allDay: true },
     ],
     [15, 16, 17, 18, 19, 20, 21].map(on),
   );
@@ -336,6 +336,24 @@ test('all-day events become one bar across their days, clipped to the range and 
     ['trip', 0, 2, 0],
     ['fest', 4, 2, 0],
     ['exam', 5, 2, 1],
+  ]);
+});
+
+test('an all-day end is the day after the last day, and an end on the start day still shows that day', () => {
+  const week = [15, 16, 17, 18, 19, 20, 21].map(on);
+  const bars = allDayBarsIn(
+    [
+      { id: 'one', title: 'One day', start: on(16), end: on(17), allDay: true },
+      { id: 'same', title: 'Same day', start: on(18), end: on(18), allDay: true },
+      { id: 'weekend', title: 'Weekend', start: on(20), end: on(22), allDay: true },
+      { id: 'before', title: 'Before', start: on(14), end: on(15), allDay: true },
+    ],
+    week,
+  );
+  expect(bars.map(({ event, column, span }) => [event.id, column, span])).toEqual([
+    ['one', 1, 1],
+    ['same', 3, 1],
+    ['weekend', 5, 2],
   ]);
 });
 
@@ -367,7 +385,7 @@ test('a month week packs all-day and timed events into rows, long bars first, an
     [
       ...EVENTS,
       { id: 'midnight', title: 'Midnight', start: at(18, 22), end: at(19, 0) },
-      { id: 'trip', title: 'Trip', start: on(12), end: on(16), allDay: true },
+      { id: 'trip', title: 'Trip', start: on(12), end: on(17), allDay: true },
     ],
     week,
   );
@@ -389,7 +407,7 @@ test('a bar longer than a week wraps onto the next week with flat ends where it 
     id: 'trip',
     title: 'Trip',
     start: on(26),
-    end: new CalendarDate(2026, 12, 4),
+    end: new CalendarDate(2026, 12, 5),
     allDay: true,
   };
   const weeks = [
@@ -463,7 +481,7 @@ test('keyboard: in month view Space picks an event up, the arrows move it by day
   const [festival, moved] = onEventChange.mock.calls[0]!;
   expect(festival.id).toBe('fest');
   expect(moved.start.toString()).toBe('2026-11-27');
-  expect(moved.end.toString()).toBe('2026-11-28');
+  expect(moved.end.toString()).toBe('2026-11-29');
 
   document.querySelector<HTMLElement>('[data-scheduler-event="algo"]')!.focus();
   await userEvent.keyboard('[Space]{ArrowLeft}{ArrowUp}{Escape}');
