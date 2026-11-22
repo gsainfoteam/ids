@@ -29,6 +29,9 @@ export function SchedulerEvent({
     end,
     allDay,
     inMonth = false,
+    line = false,
+    fromBefore = false,
+    pastEnd = false,
   } = useSchedulerEventContext('Scheduler.Event');
   const oneLine = allDay || inMonth;
   const startsAt = inMonth && !allDay;
@@ -47,6 +50,9 @@ export function SchedulerEvent({
       className={(state) =>
         styles.event({
           allDay: oneLine,
+          line,
+          fromBefore,
+          pastEnd,
           colorScheme: scheme,
           className: typeof className === 'function' ? className(state) : className,
         })
@@ -54,12 +60,16 @@ export function SchedulerEvent({
     >
       {children ?? (
         <Item.Content className={styles.eventContent({ allDay: oneLine, startsAt })}>
+          {line && <span aria-hidden="true" className={styles.eventDot()} />}
           {startsAt && (
-            <span aria-hidden="true" className={styles.eventStart()}>
+            <span aria-hidden="true" className={styles.eventStart({ line })}>
               {format.time(start)}
             </span>
           )}
-          <Item.Title truncate={oneLine} className={styles.eventTitle({ allDay: oneLine })}>
+          <Item.Title
+            truncate={oneLine}
+            className={styles.eventTitle({ allDay: oneLine, startsAt })}
+          >
             {event.title}
           </Item.Title>
           <Item.Description className={styles.eventTime({ allDay: oneLine })}>

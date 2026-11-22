@@ -44,6 +44,14 @@ const EVENTS: Scheduler.EventData[] = [
     colorScheme: 'warning',
   },
   {
+    id: 'conference',
+    title: '해외 학회 출장',
+    start: on(26),
+    end: new CalendarDate(2026, 12, 4),
+    allDay: true,
+    colorScheme: 'success',
+  },
+  {
     id: 'no-class',
     title: '휴강',
     start: on(18),

@@ -108,7 +108,10 @@ export function SchedulerMonth<E extends SchedulerEventData>({
                         <li
                           key={bar.event.id}
                           data-scheduler-slot={bar.event.id}
-                          className={styles.allDayBar()}
+                          className={styles.allDayBar({
+                            fromBefore: bar.fromBefore,
+                            pastEnd: bar.pastEnd,
+                          })}
                           style={barPlace(bar)}
                         >
                           <SchedulerEventContext
@@ -118,6 +121,9 @@ export function SchedulerMonth<E extends SchedulerEventData>({
                               end: bar.end,
                               allDay: bar.allDay,
                               inMonth: true,
+                              line: !bar.allDay && !bar.multiDay,
+                              fromBefore: bar.fromBefore,
+                              pastEnd: bar.pastEnd,
                             }}
                           >
                             {renderEvent(bar.event)}

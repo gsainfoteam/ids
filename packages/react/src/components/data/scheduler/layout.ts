@@ -60,6 +60,8 @@ export type SchedulerAllDayBar<E extends SchedulerEventData = SchedulerEventData
   column: number;
   span: number;
   row: number;
+  fromBefore: boolean;
+  pastEnd: boolean;
 };
 
 export type SchedulerMonthBar<E extends SchedulerEventData = SchedulerEventData> =
@@ -67,6 +69,7 @@ export type SchedulerMonthBar<E extends SchedulerEventData = SchedulerEventData>
     start: CalendarDateTime;
     end: CalendarDateTime;
     allDay: boolean;
+    multiDay: boolean;
   };
 
 const DAYS_IN_WEEK = 7;
@@ -146,7 +149,14 @@ export function allDayBarsIn<E extends SchedulerEventData>(
     )
     .map((event) => {
       const column = columnOf(dateOf(event.start));
-      return { event, column, span: columnOf(dateOf(event.end)) - column + 1, row: 0 };
+      return {
+        event,
+        column,
+        span: columnOf(dateOf(event.end)) - column + 1,
+        row: 0,
+        fromBefore: compareDays(dateOf(event.start), first) < 0,
+        pastEnd: compareDays(dateOf(event.end), last) > 0,
+      };
     })
     .sort((a, b) => a.column - b.column || b.span - a.span);
 
@@ -189,12 +199,16 @@ export function monthBarsIn<E extends SchedulerEventData>(
     .map((event) => {
       const column = columnOf(dateOf(event.start));
       const allDay = isAllDay(event);
+      const lastDay = lastDayOf(event);
       return {
         event,
         column,
-        span: columnOf(lastDayOf(event)) - column + 1,
+        span: columnOf(lastDay) - column + 1,
         row: 0,
+        fromBefore: compareDays(dateOf(event.start), first) < 0,
+        pastEnd: compareDays(lastDay, last) > 0,
         allDay,
+        multiDay: compareDays(lastDay, dateOf(event.start)) > 0,
         start: allDay ? toCalendarDateTime(dateOf(event.start)) : wallTime(event.start),
         end: allDay ? toCalendarDateTime(dateOf(event.end)) : wallTime(event.end),
       };
@@ -203,7 +217,7 @@ export function monthBarsIn<E extends SchedulerEventData>(
       (a, b) =>
         a.column - b.column ||
         b.span - a.span ||
-        Number(b.allDay) - Number(a.allDay) ||
+        Number(b.allDay || b.multiDay) - Number(a.allDay || a.multiDay) ||
         a.start.compare(b.start),
     );
 

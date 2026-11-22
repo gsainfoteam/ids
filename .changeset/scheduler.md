@@ -15,6 +15,6 @@ returns `<Scheduler.Event>` for each event. With
 `onEventChange(event, { start, end })` a timed event moves by dragging (or Space, the arrow keys and
 Enter) in 15-minute and one-day steps, and its bottom edge, a vertical Resizable, changes the end. `eventMenu(event)` and
 `slotMenu({ start, end })` return the Menu items a right-click on an event or on an empty half hour
-opens. In month view, all-day and multi-day events are bars across their days, timed
-events a line with their start time, and a day with more than three rows folds the rest into a
+opens. In month view, all-day and multi-day events are filled bars that wrap onto the next week with
+flat ends, one-day timed events an unfilled line with a colored dot and their start time, and a day with more than three rows folds the rest into a
 `+N` button that opens that day; a right-click on an empty day hands `slotMenu` the whole day.

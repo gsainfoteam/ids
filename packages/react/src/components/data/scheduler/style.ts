@@ -45,7 +45,7 @@ export const schedulerStyle = tv({
       'grid-cols-[repeat(var(--scheduler-days),minmax(0,1fr))]',
     ],
     allDayBar: [
-      'flex min-w-0 px-1',
+      '@container flex min-w-0 px-1',
       'col-start-(--scheduler-bar-column) col-span-(--scheduler-bar-span) row-start-(--scheduler-bar-row)',
     ],
     body: 'relative',
@@ -83,7 +83,8 @@ export const schedulerStyle = tv({
       'data-dragging:before:bg-(--ids-color-text-scheme)',
     ],
     eventContent: '',
-    eventStart: 'shrink-0 text-caption-c1-regular tabular-nums',
+    eventStart: 'hidden shrink-0 text-caption-c1-regular tabular-nums @min-[7.5rem]:inline',
+    eventDot: 'size-2 shrink-0 self-center rounded-full bg-scheme-solid',
     eventTitle: '',
     eventTime: '',
     monthCanvas:
@@ -126,7 +127,22 @@ export const schedulerStyle = tv({
       false: {},
     },
     startsAt: {
-      true: { eventContent: 'flex-row items-baseline gap-1' },
+      true: { eventContent: 'flex-row items-baseline gap-1', eventTitle: 'min-w-0 flex-1' },
+      false: {},
+    },
+    line: {
+      true: {
+        event: 'bg-transparent text-neutral-strong',
+        eventStart: 'text-neutral',
+      },
+      false: {},
+    },
+    fromBefore: {
+      true: { allDayBar: 'ps-0', event: 'rounded-s-none' },
+      false: {},
+    },
+    pastEnd: {
+      true: { allDayBar: 'pe-0', event: 'rounded-e-none' },
       false: {},
     },
     dragging: {
@@ -134,7 +150,7 @@ export const schedulerStyle = tv({
       false: {},
     },
     view: {
-      month: { root: '[--scheduler-days:7] [--scheduler-day-min:calc(var(--spacing)*22)]' },
+      month: { root: '[--scheduler-days:7] [--scheduler-day-min:0px]' },
       week: { root: '[--scheduler-day-min:calc(var(--spacing)*22)]' },
       days: { root: '[--scheduler-day-min:calc(var(--spacing)*22)]' },
       day: { root: '[--scheduler-day-min:0px]' },
@@ -172,6 +188,9 @@ export const schedulerStyle = tv({
     today: false,
     outside: false,
     startsAt: false,
+    line: false,
+    fromBefore: false,
+    pastEnd: false,
     allDay: false,
     dragging: false,
     colorScheme: 'primary',

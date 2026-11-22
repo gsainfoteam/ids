@@ -382,6 +382,48 @@ test('a month week packs all-day and timed events into rows, long bars first, an
   expect(hiddenOn(bars, 2, 3)).toBe(0);
 });
 
+test('a bar longer than a week wraps onto the next week with flat ends where it is cut', async () => {
+  const trip = {
+    id: 'trip',
+    title: 'Trip',
+    start: on(26),
+    end: new CalendarDate(2026, 12, 4),
+    allDay: true,
+  };
+  const weeks = [
+    [22, 23, 24, 25, 26, 27, 28].map(on),
+    [on(29), on(30), ...[1, 2, 3, 4, 5].map((day) => new CalendarDate(2026, 12, day))],
+  ];
+  const cut = weeks.map((week) =>
+    monthBarsIn([trip], week).map(({ column, span, fromBefore, pastEnd }) => [
+      column,
+      span,
+      fromBefore,
+      pastEnd,
+    ]),
+  );
+  expect(cut).toEqual([[[4, 3, false, true]], [[0, 6, true, false]]]);
+
+  const screen = await render(inProvider({ defaultView: 'month', events: [...EVENTS, trip] }));
+  await expect.element(screen.getByText('Trip').first()).toBeVisible();
+  const [first, second] = document.querySelectorAll<HTMLElement>('[data-scheduler-event="trip"]');
+  expect(getComputedStyle(first).borderEndEndRadius).toBe('0px');
+  expect(getComputedStyle(first).borderStartStartRadius).not.toBe('0px');
+  expect(getComputedStyle(second).borderStartStartRadius).toBe('0px');
+  expect(getComputedStyle(second).borderEndEndRadius).not.toBe('0px');
+});
+
+test('in month view a one-day timed event is a dotted line without a fill, and an all-day one a filled bar', async () => {
+  const screen = await render(inProvider({ defaultView: 'month' }));
+  await expect.element(screen.getByText('Algorithms')).toBeVisible();
+  const timed = document.querySelector<HTMLElement>('[data-scheduler-event="algo"]')!;
+  const allDay = document.querySelector<HTMLElement>('[data-scheduler-event="fest"]')!;
+  const overnight = document.querySelector<HTMLElement>('[data-scheduler-event="late"]')!;
+  expect(getComputedStyle(timed).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+  expect(getComputedStyle(allDay).backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  expect(getComputedStyle(overnight).backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+});
+
 test('a right-click on an empty month day hands slotMenu the whole day', async () => {
   const slotMenu = vi.fn((slot: Scheduler.Slot) => (
     <Menu.Item>Create on {slot.start.day}</Menu.Item>

@@ -18,6 +18,7 @@ import {
   firstHourOf,
   hourOfDay,
   timedSegmentsOn,
+  type SchedulerAllDayBar,
   type SchedulerEventChange,
   type SchedulerEventData,
   type SchedulerSlot,
@@ -46,11 +47,13 @@ type SchedulerGridProps<E extends SchedulerEventData> = SchedulerContextValue & 
   hintId: string | undefined;
 };
 
-const allDayContext = (event: SchedulerEventData) => ({
+const allDayContext = ({ event, fromBefore, pastEnd }: SchedulerAllDayBar) => ({
   event,
   start: toCalendarDateTime(dateOf(event.start)),
   end: toCalendarDateTime(dateOf(event.end)),
   allDay: true,
+  fromBefore,
+  pastEnd,
 });
 
 export function SchedulerGrid<E extends SchedulerEventData>({
@@ -218,7 +221,10 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                       <li
                         key={bar.event.id}
                         data-scheduler-slot={bar.event.id}
-                        className={styles.allDayBar()}
+                        className={styles.allDayBar({
+                          fromBefore: bar.fromBefore,
+                          pastEnd: bar.pastEnd,
+                        })}
                         style={
                           {
                             '--scheduler-bar-column': bar.column + 1,
@@ -227,7 +233,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                           } as CSSProperties
                         }
                       >
-                        <SchedulerEventContext value={allDayContext(bar.event)}>
+                        <SchedulerEventContext value={allDayContext(bar)}>
                           {renderEvent(bar.event)}
                         </SchedulerEventContext>
                       </li>
