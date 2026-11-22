@@ -5,7 +5,7 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { QuestionnaireDraft, QuestionnaireSelectionMode } from './answers';
-import type { QuestionnaireAppearance, QuestionnaireOrientation } from './style';
+import type { QuestionnaireVariant, QuestionnaireOrientation } from './style';
 import type { IdsSize } from '../../../tokens/types';
 
 export type QuestionnaireContextValue = {
@@ -30,7 +30,7 @@ export type QuestionContextValue = {
   name: string;
   selectionMode: QuestionnaireSelectionMode;
   orientation: QuestionnaireOrientation;
-  appearance: QuestionnaireAppearance;
+  variant: QuestionnaireVariant;
   draft: QuestionnaireDraft;
   descriptionId: string;
   size: IdsSize | undefined;

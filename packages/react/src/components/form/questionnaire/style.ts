@@ -5,7 +5,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export type QuestionnaireOrientation = 'vertical' | 'horizontal';
 
-export type QuestionnaireAppearance = 'card' | 'toggle';
+export type QuestionnaireVariant = 'card' | 'toggle';
 
 export const questionnaireStyle = tv({
   slots: {

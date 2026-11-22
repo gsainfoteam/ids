@@ -161,7 +161,7 @@ export type {
   TabsProps,
   TabsState,
   TabsRenderProps,
-  TabsAppearance,
+  TabsVariant,
   TabsOrientation,
   TabsActivationMode,
 } from './components/navigation/tabs';
@@ -201,7 +201,7 @@ export { Questionnaire } from './components/form/questionnaire';
 export type {
   QuestionnaireAnswer,
   QuestionnaireAnswers,
-  QuestionnaireAppearance,
+  QuestionnaireVariant,
   QuestionnaireOrientation,
   QuestionnaireProps,
   QuestionnaireSelectionMode,

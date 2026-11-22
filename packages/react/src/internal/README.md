@@ -980,7 +980,7 @@ searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
 ### 쓰는 곳
 
 - SegmentedControl: 루트(`<fieldset>`)에 `track`, 칸(`<label>`)에 `segment` 와 `height`
-- Tabs: `appearance="segmented"` 일 때 `Tabs.List` 에 `track`, `Tabs.Trigger` 에 `segment` 와 `height`
+- Tabs: `variant="segmented"` 일 때 `Tabs.List` 에 `track`, `Tabs.Trigger` 에 `segment` 와 `height`
 
 ### 쓰는 법
 
@@ -990,7 +990,7 @@ segmented: {
   list: segmentSurface.track,
   trigger: [segmentSurface.segment, 'not-aria-selected:data-hovered:text-neutral'],
 },
-{ appearance: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
+{ variant: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
 ```
 
 ### 왜 이렇게

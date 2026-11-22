@@ -137,10 +137,10 @@ export const Gallery: Story = {
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section title="Appearance">
+      <Showcase.Section title="Variant">
         <Showcase.Row label="toggle, single">
           <Questionnaire className="w-96" defaultValue={{ tone: 'casual' }}>
-            <Questionnaire.Question name="tone" appearance="toggle" orientation="horizontal">
+            <Questionnaire.Question name="tone" variant="toggle" orientation="horizontal">
               어떤 말투로 쓸까요?
               <Questionnaire.Option value="formal">격식</Questionnaire.Option>
               <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
@@ -154,7 +154,7 @@ export const Gallery: Story = {
             <Questionnaire.Question
               name="goods"
               selectionMode="multiple"
-              appearance="toggle"
+              variant="toggle"
               orientation="horizontal"
             >
               어떤 굿즈를 팔까요?
@@ -172,7 +172,7 @@ export const Gallery: Story = {
       <Showcase.Section title="Suggested prompts">
         <Showcase.Row label="toggle, advanceOnSelect">
           <Questionnaire advanceOnSelect size="tiny" className="w-120">
-            <Questionnaire.Question name="prompt" appearance="toggle" orientation="horizontal">
+            <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
               무엇을 도와드릴까요?
               <Questionnaire.Option value="학식">오늘 학식</Questionnaire.Option>
               <Questionnaire.Option value="셔틀">셔틀 시간표</Questionnaire.Option>
@@ -391,7 +391,7 @@ export const SuggestedPrompts: Story = {
       </Card.Header>
       <Card.Content>
         <Questionnaire advanceOnSelect size="tiny" onComplete={args.onComplete}>
-          <Questionnaire.Question name="prompt" appearance="toggle" orientation="horizontal">
+          <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
             이런 걸 물어볼 수 있어요
             <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
             <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
@@ -405,7 +405,7 @@ export const SuggestedPrompts: Story = {
     docs: {
       description: {
         story:
-          '채팅 시작 화면의 추천 질문은 한 단계짜리 Questionnaire 입니다. appearance="toggle" 이라 보기가 라디오 없는 Toggle 로 그려집니다. advanceOnSelect 면 하나만 고르는 질문은 보기를 누르는 순간 넘어가고, 질문이 하나뿐이라 바로 onComplete 가 불립니다. 화살표 키로 옮겨 다니는 동안은 넘어가지 않고 Space 나 Enter 로 고릅니다.',
+          '채팅 시작 화면의 추천 질문은 한 단계짜리 Questionnaire 입니다. variant="toggle" 이라 보기가 라디오 없는 Toggle 로 그려집니다. advanceOnSelect 면 하나만 고르는 질문은 보기를 누르는 순간 넘어가고, 질문이 하나뿐이라 바로 onComplete 가 불립니다. 화살표 키로 옮겨 다니는 동안은 넘어가지 않고 Space 나 Enter 로 고릅니다.',
       },
     },
   },

@@ -79,10 +79,10 @@ const [section, setSection] = useState<Section>('docs');
 ## 모양
 
 ```tsx
-<Tabs appearance="underline" />                  // 기본. 고른 탭의 글자와 아래 선이 primary
-<Tabs appearance="pill" />                       // 고른 탭을 bg-primary-soft 로 채운다
-<Tabs appearance="enclosed" />                   // 고른 탭이 내용 쪽으로 열린 상자
-<Tabs appearance="segmented" />                  // SegmentedControl 과 같은 트랙과 칸
+<Tabs variant="underline" />                  // 기본. 고른 탭의 글자와 아래 선이 primary
+<Tabs variant="pill" />                       // 고른 탭을 bg-primary-soft 로 채운다
+<Tabs variant="enclosed" />                   // 고른 탭이 내용 쪽으로 열린 상자
+<Tabs variant="segmented" />                  // SegmentedControl 과 같은 트랙과 칸
 <Tabs orientation="vertical" />                  // 목록이 앞에, 내용이 옆에
 <Tabs size="tiny" />                             // standard(기본) / tiny
 ```
@@ -122,8 +122,8 @@ const [section, setSection] = useState<Section>('docs');
 ```
 
 - `Tabs.Trigger` 와 `Tabs.Content` 의 `className`, `style`, `children` 은 상태 함수를 받습니다. Trigger 는 `selected` 와 `hovered`, `focusVisible` 같은 상호작용 상태, Content 는 `selected` 를 줍니다.
-- `Tabs` 의 `className` 과 `style` 은 `value`, `orientation`, `appearance`, `size` 를 받습니다. `Tabs` 의 함수 children 은 상태가 아니라 파트를 받습니다.
-- `data-selected` 가 고른 탭과 내용에, `data-orientation` 이 모든 파트에 붙습니다. 루트에는 `data-appearance`, `data-size`, `data-activation-mode` 가 붙습니다.
+- `Tabs` 의 `className` 과 `style` 은 `value`, `orientation`, `variant`, `size` 를 받습니다. `Tabs` 의 함수 children 은 상태가 아니라 파트를 받습니다.
+- `data-selected` 가 고른 탭과 내용에, `data-orientation` 이 모든 파트에 붙습니다. 루트에는 `data-variant`, `data-size`, `data-activation-mode` 가 붙습니다.
 
 ## 속성
 
@@ -131,7 +131,7 @@ const [section, setSection] = useState<Section>('docs');
 | ------------------------ | ---------------------------------------------------------------- |
 | `value` / `defaultValue` | 고른 탭의 값. 없으면 첫 번째 활성 탭                             |
 | `onValueChange`          | 탭을 고를 때 새 값으로                                           |
-| `appearance`             | `underline`(기본) / `pill` / `enclosed` / `segmented`            |
+| `variant`             | `underline`(기본) / `pill` / `enclosed` / `segmented`            |
 | `colorScheme`            | `primary`(기본) / `secondary` / `tertiary`. 고른 탭의 글자, 선, 채움 |
 | `orientation`            | `horizontal`(기본) / `vertical`                                  |
 | `activationMode`         | `automatic`(기본) / `manual`                                     |

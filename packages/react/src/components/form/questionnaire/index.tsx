@@ -10,7 +10,7 @@ import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './questi
 import { QuestionnaireRoot, type QuestionnaireProps } from './root';
 import {
   questionnaireStyle,
-  type QuestionnaireAppearance,
+  type QuestionnaireVariant,
   type QuestionnaireOrientation,
 } from './style';
 
@@ -24,7 +24,7 @@ export namespace Questionnaire {
   export type Answers = QuestionnaireAnswers;
   export type SelectionMode = QuestionnaireSelectionMode;
   export type Orientation = QuestionnaireOrientation;
-  export type Appearance = QuestionnaireAppearance;
+  export type Variant = QuestionnaireVariant;
 
   export type QuestionProps = QuestionnaireQuestionProps;
   export type OptionProps = QuestionnaireOptionProps;
@@ -44,5 +44,5 @@ export type {
   QuestionnaireAnswers,
   QuestionnaireSelectionMode,
 } from './answers';
-export type { QuestionnaireAppearance, QuestionnaireOrientation } from './style';
+export type { QuestionnaireVariant, QuestionnaireOrientation } from './style';
 export type { QuestionnaireProps } from './root';

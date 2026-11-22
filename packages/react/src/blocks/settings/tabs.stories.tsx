@@ -173,7 +173,7 @@ export const PC: Story = {
             <Tabs.List aria-label="설정 분류">
               <Tabs.Trigger value="general">일반</Tabs.Trigger>
               <Tabs.Trigger value="notifications">알림</Tabs.Trigger>
-              <Tabs.Trigger value="appearance">화면</Tabs.Trigger>
+              <Tabs.Trigger value="display">화면</Tabs.Trigger>
               <Tabs.Trigger value="security">보안</Tabs.Trigger>
             </Tabs.List>
 
@@ -290,7 +290,7 @@ export const PC: Story = {
               </Card>
             </Tabs.Content>
 
-            <Tabs.Content value="appearance">
+            <Tabs.Content value="display">
               <Card>
                 <Card.Header>
                   <Card.Title asChild>
