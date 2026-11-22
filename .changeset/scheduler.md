@@ -1,5 +1,5 @@
 ---
-'@gsainfoteam/ids-react': minor
+"@gsainfoteam/ids-react": minor
 ---
 
 Add `Scheduler`, a week (default) and day time grid for events. Each event is `{ id, title, start,
@@ -13,4 +13,6 @@ client clock after hydration or fixed with `now`. `view`, `date` and their defau
 controllable, `locale` and `weekStartsOn` work as in Calendar, and the render-function child
 returns `<Scheduler.Event>` for each event. With
 `onEventChange(event, { start, end })` a timed event moves by dragging (or Space, the arrow keys and
-Enter) in 15-minute and one-day steps, and its bottom edge, a vertical Resizable, changes the end.
+Enter) in 15-minute and one-day steps, and its bottom edge, a vertical Resizable, changes the end. `eventMenu(event)` and
+`slotMenu({ start, end })` return the Menu items a right-click on an event or on an empty half hour
+opens.

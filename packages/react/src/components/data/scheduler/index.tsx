@@ -3,6 +3,7 @@ import {
   type SchedulerColorScheme,
   type SchedulerEventChange,
   type SchedulerEventData,
+  type SchedulerSlot,
   type SchedulerView,
 } from './layout';
 import { SchedulerRoot, type SchedulerProps } from './root';
@@ -21,6 +22,7 @@ export namespace Scheduler {
   export type EventChange<E extends SchedulerEventData = SchedulerEventData> =
     SchedulerEventChange<E>;
   export type ColorScheme = SchedulerColorScheme;
+  export type Slot = SchedulerSlot;
 
   export const Event = SchedulerEvent;
   export namespace Event {
@@ -35,5 +37,6 @@ export type {
   SchedulerColorScheme,
   SchedulerEventChange,
   SchedulerEventData,
+  SchedulerSlot,
   SchedulerView,
 } from './layout';

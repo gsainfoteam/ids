@@ -18,6 +18,7 @@ import {
   daysOf,
   type SchedulerEventChange,
   type SchedulerEventData,
+  type SchedulerSlot,
   type SchedulerView,
 } from './layout';
 import { schedulerStyle } from './style';
@@ -43,6 +44,8 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
   weekStartsOn?: WeekDay;
   now?: CalendarDateTime;
   onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
+  eventMenu?: (event: E) => ReactNode;
+  slotMenu?: (slot: SchedulerSlot) => ReactNode;
   children?: (event: E) => ReactNode;
 };
 
@@ -60,6 +63,8 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   weekStartsOn,
   now: nowProp,
   onEventChange,
+  eventMenu,
+  slotMenu,
   children = defaultEvent,
   className,
   'aria-label': ariaLabel,
@@ -127,6 +132,8 @@ export function SchedulerRoot<E extends SchedulerEventData>({
           now={now}
           renderEvent={children}
           onEventChange={onEventChange}
+          eventMenu={eventMenu}
+          slotMenu={slotMenu}
           hintId={hintId}
         />
       </div>

@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { Menu } from '../../overlay/menu';
 import { Item } from '../item';
 
 import { Scheduler } from '.';
@@ -549,6 +550,94 @@ export const MoveAndResize: Story = {
     await userEvent.keyboard('[Space]{ArrowDown}{Escape}');
     await expect(changed).not.toHaveTextContent('점심');
     await expect(canvas.getByText('점심을(를) 제자리에 두었습니다.')).toBeInTheDocument();
+  },
+};
+
+export const ContextMenu: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`eventMenu` 는 일정을 우클릭했을 때, `slotMenu` 는 빈 시간 칸을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 빈 칸은 포인터 아래의 30분 `{ start, end }` 로 넘어옵니다. 메뉴를 주지 않은 곳은 브라우저 메뉴가 그대로 뜹니다.',
+      },
+    },
+  },
+  render: function Render() {
+    const [events, setEvents] = useState(EVENTS);
+    const [done, setDone] = useState('');
+
+    return (
+      <div className="flex w-full flex-col gap-3">
+        <Scheduler
+          events={events}
+          defaultDate={TODAY}
+          now={NOW}
+          eventMenu={(event) => (
+            <>
+              <Menu.Item onSelect={() => setDone(`${event.title} 열기`)}>열기</Menu.Item>
+              <Menu.Item onSelect={() => setDone(`${event.title} 복제`)}>복제</Menu.Item>
+              <Menu.Separator />
+              <Menu.Item
+                onSelect={() => {
+                  setEvents((previous) => previous.filter((item) => item.id !== event.id));
+                  setDone(`${event.title} 삭제`);
+                }}
+              >
+                삭제
+              </Menu.Item>
+            </>
+          )}
+          slotMenu={({ start, end }) => (
+            <Menu.Item
+              onSelect={() => {
+                setEvents((previous) => [
+                  ...previous,
+                  { id: `new-${start.toString()}`, title: '새 일정', start, end },
+                ]);
+                setDone(`새 일정 ${start.toString()} – ${end.toString()}`);
+              }}
+            >
+              여기에 일정 만들기
+            </Menu.Item>
+          )}
+        >
+          {(event) => <Scheduler.Event onClick={() => setDone(event.title)} />}
+        </Scheduler>
+        <p className="text-body-b3-regular" data-testid="done">
+          {done}
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const done = canvas.getByTestId('done');
+
+    await userEvent.pointer({
+      keys: '[MouseRight]',
+      target: canvas.getByRole('button', { name: '알고리즘 스터디' }),
+    });
+    const eventMenu = await canvas.findByRole('menu', { name: '알고리즘 스터디' });
+    await expect(eventMenu).toBeVisible();
+    await userEvent.click(canvas.getByRole('menuitem', { name: '삭제' }));
+    await waitFor(() => expect(done).toHaveTextContent('알고리즘 스터디 삭제'));
+    await expect(canvas.queryByRole('button', { name: '알고리즘 스터디' })).toBeNull();
+
+    const sunday = canvasElement.querySelector<HTMLElement>(
+      '[data-scheduler-column="2026-11-15"]',
+    )!;
+    const { left, top, height } = sunday.getBoundingClientRect();
+    await userEvent.pointer({
+      keys: '[MouseRight]',
+      target: sunday,
+      coords: { clientX: left + 8, clientY: top + (height / 24) * 9.2 },
+    });
+    await expect(
+      await canvas.findByRole('menu', { name: '11월 15일 일요일 오전 9:00' }),
+    ).toBeVisible();
+    await userEvent.click(canvas.getByRole('menuitem', { name: '여기에 일정 만들기' }));
+    await waitFor(() =>
+      expect(done).toHaveTextContent('새 일정 2026-11-15T09:00:00 – 2026-11-15T09:30:00'),
+    );
   },
 };
 

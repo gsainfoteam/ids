@@ -50,6 +50,8 @@ export type SchedulerEventChange<E extends SchedulerEventData = SchedulerEventDa
 
 export type SchedulerShift = { days: number; minutes: number };
 
+export type SchedulerSlot = { start: CalendarDateTime; end: CalendarDateTime };
+
 export type SchedulerAllDayBar<E extends SchedulerEventData = SchedulerEventData> = {
   event: E;
   column: number;

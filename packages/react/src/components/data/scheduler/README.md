@@ -135,6 +135,29 @@ const [events, setEvents] = useState(initialEvents);
 - 집고, 옮기고, 놓을 때마다 "알고리즘을(를) 집었습니다.", "11월 18일 수요일 오전 9:30 시작", "알고리즘을(를) 옮겼습니다."를 알립니다. 사용법은 root 의 `aria-describedby` 로 읽힙니다.
 - 놓은 일정이 다른 날 칸으로 가면 포커스가 그 일정을 따라갑니다.
 
+## 우클릭 메뉴
+
+```tsx
+<Scheduler
+  events={events}
+  eventMenu={(event) => (
+    <>
+      <Menu.Item onSelect={() => open(event)}>열기</Menu.Item>
+      <Menu.Item onSelect={() => remove(event)}>삭제</Menu.Item>
+    </>
+  )}
+  slotMenu={({ start, end }) => (
+    <Menu.Item onSelect={() => create({ start, end })}>여기에 일정 만들기</Menu.Item>
+  )}
+/>
+```
+
+- `eventMenu(event)` 는 일정(종일 일정 포함)을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 메뉴 이름은 일정 제목입니다.
+- `slotMenu({ start, end })` 는 시간 칸의 빈 곳을 우클릭했을 때 엽니다. 포인터 아래의 30분 칸이 `CalendarDateTime` 으로 넘어오고, 메뉴 이름은 "11월 18일 수요일 오후 2:30" 입니다.
+- 메뉴는 `Menu triggerType="contextmenu"` 라서 우클릭한 자리에 뜹니다. 고르는 법, 키보드, 닫는 법은 Menu 와 같습니다.
+- 메뉴를 주지 않은 곳(`eventMenu` 없이 일정, `slotMenu` 없이 빈 칸, 종일 줄의 빈 곳)은 브라우저 메뉴가 그대로 뜹니다.
+- `onEventChange` 와 함께 써도 우클릭은 일정을 집지 않습니다.
+
 ## 보기와 날짜
 
 ```tsx
@@ -191,6 +214,8 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |
 | `now`                                   | `CalendarDateTime`                    | 클라이언트 시계      |
 | `onEventChange`                         | `(event, { start, end }) => void`     | 없음(옮기지 않음)    |
+| `eventMenu`                             | `(event) => ReactNode`                | 없음(브라우저 메뉴)  |
+| `slotMenu`                              | `({ start, end }) => ReactNode`       | 없음(브라우저 메뉴)  |
 | `children`                              | `(event) => ReactNode`                | `<Scheduler.Event />` |
 
 나머지 `div` props 는 root 에 갑니다.

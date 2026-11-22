@@ -259,6 +259,8 @@ export type {
   SchedulerView,
   SchedulerEventData,
   SchedulerColorScheme,
+  SchedulerEventChange,
+  SchedulerSlot,
 } from './components/data/scheduler';
 
 export { TimeField } from './components/form/time-field';

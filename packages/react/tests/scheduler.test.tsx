@@ -6,7 +6,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { cdp, page, server, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Scheduler } from '../src';
+import { IdsProvider, Menu, Scheduler } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 import { allDayBarsIn, timedSegmentsOn } from '../src/components/data/scheduler/layout';
@@ -448,4 +448,70 @@ test('keyboard: an event without onClick takes focus, Space picks it up and Esca
     .toBeInTheDocument();
   expect(onEventChange).not.toHaveBeenCalled();
   expect(algo!.closest<HTMLElement>('[data-scheduler-movable]')!.style.translate).toBe('');
+});
+
+const rightClickEvent = (target: Element, clientY = 0) => {
+  const event = new MouseEvent('contextmenu', {
+    bubbles: true,
+    cancelable: true,
+    button: 2,
+    clientY,
+  });
+  target.dispatchEvent(event);
+  return event;
+};
+
+test('a right-click with no menu for its target leaves the browser menu alone', async () => {
+  const screen = await render(inProvider({ eventMenu: () => null }));
+  await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
+  const column = document.querySelector('[data-scheduler-column="2026-11-16"]')!;
+  expect(rightClickEvent(column).defaultPrevented).toBe(false);
+
+  const bare = await render(inProvider({}));
+  const event = bare.container.querySelector('[data-scheduler-event="algo"]')!;
+  expect(rightClickEvent(event).defaultPrevented).toBe(false);
+  expect(document.querySelector('[role="menu"]')).toBeNull();
+});
+
+test('a right-click on an all-day bar opens the event menu named after it', async () => {
+  const eventMenu = vi.fn((event: Scheduler.EventData) => (
+    <Menu.Item>Open {event.title}</Menu.Item>
+  ));
+  const slotMenu = vi.fn(() => <Menu.Item>Create here</Menu.Item>);
+  const screen = await render(inProvider({ eventMenu, slotMenu }));
+  await userEvent.click(screen.getByText('Festival'), { button: 'right' });
+  await expect.element(screen.getByRole('menu', { name: 'Festival' })).toBeVisible();
+  await expect.element(screen.getByRole('menuitem', { name: 'Open Festival' })).toBeVisible();
+  expect(slotMenu).not.toHaveBeenCalled();
+});
+
+test('a right-click on an empty column hands slotMenu the half hour under the pointer', async () => {
+  const slotMenu = vi.fn((slot: Scheduler.Slot) => (
+    <Menu.Item>Create at {slot.start.hour}</Menu.Item>
+  ));
+  const screen = await render(inProvider({ slotMenu }));
+  await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
+  const column = document.querySelector<HTMLElement>('[data-scheduler-column="2026-11-18"]')!;
+  const hour = column.getBoundingClientRect().height / 24;
+
+  await userEvent.click(column, { button: 'right', position: { x: 8, y: hour * 14.7 } });
+
+  await expect
+    .element(screen.getByRole('menu', { name: '11월 18일 수요일 오후 2:30' }))
+    .toBeVisible();
+  const [slot] = slotMenu.mock.lastCall!;
+  expect(slot.start.toString()).toBe('2026-11-18T14:30:00');
+  expect(slot.end.toString()).toBe('2026-11-18T15:00:00');
+});
+
+test('a movable event still opens its menu on a right-click, without moving', async () => {
+  const onEventChange = vi.fn();
+  const screen = await render(
+    inProvider({ onEventChange, eventMenu: () => <Menu.Item>Delete</Menu.Item> }),
+  );
+  await userEvent.click(screen.getByText('Lunch'), { button: 'right' });
+  await expect.element(screen.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(screen.getByRole('menu')).not.toBeInTheDocument();
+  expect(onEventChange).not.toHaveBeenCalled();
 });

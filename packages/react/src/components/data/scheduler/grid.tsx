@@ -10,6 +10,7 @@ import {
 import { range } from 'es-toolkit';
 
 import { SchedulerEventContext, type SchedulerContextValue } from './context';
+import { SchedulerContextMenu } from './context-menu';
 import { SchedulerDrag, type SchedulerDragProps } from './drag';
 import {
   allDayBarsIn,
@@ -19,6 +20,7 @@ import {
   timedSegmentsOn,
   type SchedulerEventChange,
   type SchedulerEventData,
+  type SchedulerSlot,
 } from './layout';
 import { SchedulerMovable } from './movable';
 import { useFirstHourScroll } from './use-first-hour-scroll';
@@ -39,6 +41,8 @@ type SchedulerGridProps<E extends SchedulerEventData> = SchedulerContextValue & 
   now: CalendarDateTime | undefined;
   renderEvent: (event: E) => ReactNode;
   onEventChange: ((event: E, change: SchedulerEventChange<E>) => void) | undefined;
+  eventMenu: ((event: E) => ReactNode) | undefined;
+  slotMenu: ((slot: SchedulerSlot) => ReactNode) | undefined;
   hintId: string | undefined;
 };
 
@@ -58,6 +62,8 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   now,
   renderEvent,
   onEventChange,
+  eventMenu,
+  slotMenu,
   hintId,
 }: SchedulerGridProps<E>) {
   const t = useTranslate();
@@ -158,91 +164,99 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   return (
     <ScrollArea orientation="both" className={styles.board()} style={columns}>
       <ScrollArea.Viewport ref={viewportRef}>
-        <div className={styles.canvas()}>
-          <div className={styles.sticky()}>
-            <div className={styles.columns({ className: styles.header() })}>
-              <div aria-hidden="true" className={styles.corner()} />
-              {days.map((day) => {
-                const isToday = today !== undefined && sameDay(day, today);
-                return (
-                  <div
-                    key={day.toString()}
-                    id={headId(day)}
-                    className={styles.dayHead({ today: isToday })}
-                    aria-current={isToday ? 'date' : undefined}
-                    data-scheduler-day={day.toString()}
-                  >
-                    <span aria-hidden="true">{format.weekday(day)}</span>
-                    <span aria-hidden="true" className={styles.dayNumber({ today: isToday })}>
-                      {format.dayNumber(day)}
-                    </span>
-                    <time dateTime={day.toString()} className={styles.hidden()}>
-                      {format.fullDate(day)}
-                    </time>
+        <SchedulerContextMenu
+          events={events}
+          format={format}
+          eventMenu={eventMenu}
+          slotMenu={slotMenu}
+        >
+          <div className={styles.canvas()}>
+            <div className={styles.sticky()}>
+              <div className={styles.columns({ className: styles.header() })}>
+                <div aria-hidden="true" className={styles.corner()} />
+                {days.map((day) => {
+                  const isToday = today !== undefined && sameDay(day, today);
+                  return (
+                    <div
+                      key={day.toString()}
+                      id={headId(day)}
+                      className={styles.dayHead({ today: isToday })}
+                      aria-current={isToday ? 'date' : undefined}
+                      data-scheduler-day={day.toString()}
+                    >
+                      <span aria-hidden="true">{format.weekday(day)}</span>
+                      <span aria-hidden="true" className={styles.dayNumber({ today: isToday })}>
+                        {format.dayNumber(day)}
+                      </span>
+                      <time dateTime={day.toString()} className={styles.hidden()}>
+                        {format.fullDate(day)}
+                      </time>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {allDayBars.length > 0 && (
+                <div className={styles.columns({ className: styles.allDay() })}>
+                  <div id={allDayLabelId} className={styles.allDayLabel()}>
+                    {t('scheduler.allDay')}
                   </div>
-                );
-              })}
+                  {days.map((day, index) => (
+                    <div
+                      key={day.toString()}
+                      aria-hidden="true"
+                      className={styles.allDayCell()}
+                      style={{ '--scheduler-cell-column': index + 2 } as CSSProperties}
+                    />
+                  ))}
+                  <ItemGroup
+                    variant="ghost"
+                    aria-labelledby={allDayLabelId}
+                    className={styles.allDayList()}
+                  >
+                    {allDayBars.map((bar) => (
+                      <li
+                        key={bar.event.id}
+                        data-scheduler-slot={bar.event.id}
+                        className={styles.allDayBar()}
+                        style={
+                          {
+                            '--scheduler-bar-column': bar.column + 1,
+                            '--scheduler-bar-span': bar.span,
+                            '--scheduler-bar-row': bar.row + 1,
+                          } as CSSProperties
+                        }
+                      >
+                        <SchedulerEventContext value={allDayContext(bar.event)}>
+                          {renderEvent(bar.event)}
+                        </SchedulerEventContext>
+                      </li>
+                    ))}
+                  </ItemGroup>
+                </div>
+              )}
             </div>
 
-            {allDayBars.length > 0 && (
-              <div className={styles.columns({ className: styles.allDay() })}>
-                <div id={allDayLabelId} className={styles.allDayLabel()}>
-                  {t('scheduler.allDay')}
-                </div>
-                {days.map((day, index) => (
-                  <div
-                    key={day.toString()}
-                    aria-hidden="true"
-                    className={styles.allDayCell()}
-                    style={{ '--scheduler-cell-column': index + 2 } as CSSProperties}
-                  />
-                ))}
-                <ItemGroup
-                  variant="ghost"
-                  aria-labelledby={allDayLabelId}
-                  className={styles.allDayList()}
-                >
-                  {allDayBars.map((bar) => (
-                    <li
-                      key={bar.event.id}
-                      className={styles.allDayBar()}
-                      style={
-                        {
-                          '--scheduler-bar-column': bar.column + 1,
-                          '--scheduler-bar-span': bar.span,
-                          '--scheduler-bar-row': bar.row + 1,
-                        } as CSSProperties
-                      }
-                    >
-                      <SchedulerEventContext value={allDayContext(bar.event)}>
-                        {renderEvent(bar.event)}
-                      </SchedulerEventContext>
-                    </li>
-                  ))}
-                </ItemGroup>
-              </div>
+            {onEventChange ? (
+              <SchedulerDrag
+                events={events}
+                format={format}
+                hourHeight={hourHeight}
+                bodyRef={bodyRef}
+                onEventChange={onEventChange as SchedulerDragProps['onEventChange']}
+              >
+                {body}
+              </SchedulerDrag>
+            ) : (
+              body
+            )}
+            {hintId && (
+              <span id={hintId} hidden>
+                {t('scheduler.drag.hint')}
+              </span>
             )}
           </div>
-
-          {onEventChange ? (
-            <SchedulerDrag
-              events={events}
-              format={format}
-              hourHeight={hourHeight}
-              bodyRef={bodyRef}
-              onEventChange={onEventChange as SchedulerDragProps['onEventChange']}
-            >
-              {body}
-            </SchedulerDrag>
-          ) : (
-            body
-          )}
-          {hintId && (
-            <span id={hintId} hidden>
-              {t('scheduler.drag.hint')}
-            </span>
-          )}
-        </div>
+        </SchedulerContextMenu>
       </ScrollArea.Viewport>
     </ScrollArea>
   );
