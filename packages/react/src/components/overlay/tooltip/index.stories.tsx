@@ -102,7 +102,8 @@ export const Gallery: Story = {
             open
             content={
               <>
-                저장 <Kbd keys="Mod+S" platform="mac" />
+                저장
+                <Kbd keys="Mod+S" platform="mac" />
               </>
             }
           >
@@ -113,7 +114,8 @@ export const Gallery: Story = {
             arrow
             content={
               <>
-                다시 실행 <Kbd keys="Mod+Shift+Z" platform="mac" />
+                다시 실행
+                <Kbd keys="Mod+Shift+Z" platform="mac" />
               </>
             }
           >
@@ -125,7 +127,8 @@ export const Gallery: Story = {
             open
             content={
               <>
-                저장 <Kbd keys="Mod+S" platform="windows" />
+                저장
+                <Kbd keys="Mod+S" platform="windows" />
               </>
             }
           >
@@ -135,7 +138,7 @@ export const Gallery: Story = {
             open
             content={
               <>
-                지우기 <Kbd platform="mac">⌫</Kbd>
+                지우기<Kbd platform="mac">⌫</Kbd>
               </>
             }
           >
