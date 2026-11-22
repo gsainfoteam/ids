@@ -94,6 +94,7 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
   }, [events, bodyRef]);
 
   const move = ({ event }: SchedulerDragPiece, shift: SchedulerShift) => {
+    pendingFocus.current = event.id;
     onEventChange(event, {
       start: shiftedBy(event.start, shift),
       end: shiftedBy(event.end, shift),
@@ -156,9 +157,7 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
       const { piece } = grab.measure;
       const moved = isShifted(grab.shift);
       endGrab(t(moved ? 'scheduler.drag.end' : 'scheduler.drag.cancel', { event: titleOf(piece) }));
-      if (!moved) return;
-      pendingFocus.current = piece.event.id;
-      move(piece, grab.shift);
+      if (moved) move(piece, grab.shift);
     },
     cancel: () => {
       if (grab) endGrab(t('scheduler.drag.cancel', { event: titleOf(grab.measure.piece) }));

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import axe from 'axe-core';
 import { hydrateRoot } from 'react-dom/client';
@@ -599,6 +601,47 @@ test('pointer: a month event dragged onto another day keeps its time and moves b
   const [, change] = onEventChange.mock.calls[0]!;
   expect(change.start.toString()).toBe('2026-11-25T09:00:00');
   expect(change.end.toString()).toBe('2026-11-25T10:30:00');
+});
+
+test('pointer: a dropped event takes focus, the same as a keyboard drop', async (context) => {
+  skipWithoutCdp(context);
+  function Moving() {
+    const [events, setEvents] = useState(EVENTS);
+    return (
+      <IdsProvider theme={testTheme}>
+        <Scheduler
+          events={events}
+          defaultDate={on(17)}
+          defaultView="month"
+          now={NOW}
+          onEventChange={(event, change) =>
+            setEvents((all) => all.map((each) => (each.id === event.id ? { ...each, ...change } : each)))
+          }
+        />
+      </IdsProvider>
+    );
+  }
+  const screen = await render(<Moving />);
+  await expect.element(screen.getByText('Algorithms')).toBeVisible();
+  const algo = document.querySelector('[data-scheduler-event="algo"]')!.getBoundingClientRect();
+  const target = document
+    .querySelector('[data-scheduler-month-day="2026-11-25"]')!
+    .getBoundingClientRect();
+  const from = { x: algo.left + 12, y: algo.top + algo.height / 2 };
+  const to = { x: target.left + target.width / 2, y: target.top + target.height / 2 };
+
+  await mouse('mousePressed', from.x, from.y);
+  for (let step = 1; step <= 8; step++)
+    await mouse(
+      'mouseMoved',
+      from.x + ((to.x - from.x) * step) / 8,
+      from.y + ((to.y - from.y) * step) / 8,
+    );
+  await mouse('mouseReleased', to.x, to.y);
+
+  await expect
+    .poll(() => document.activeElement?.closest('[data-scheduler-slot]')?.getAttribute('data-scheduler-slot'))
+    .toBe('algo');
 });
 
 test('pointer: dragging over empty time selects quarter hours, and a plain press selects nothing', async (context) => {
