@@ -33,6 +33,7 @@ const TASK_LIST: EditorToggleSpec = {
   can: (editor) => editor.can().toggleTaskList(),
   run: (editor) => editor.chain().toggleTaskList().run(),
   extension: 'taskList',
+  shortcut: 'Mod+Shift+9',
 };
 
 const BLOCKQUOTE: EditorToggleSpec = {

@@ -24,11 +24,13 @@ function markSpec(
   mark: 'bold' | 'italic' | 'underline' | 'strike' | 'code' | LazyMark,
   label: EditorToggleSpec['label'],
   icon: EditorToggleSpec['icon'],
+  shortcut: EditorToggleSpec['shortcut'],
 ): EditorToggleSpec {
   return {
     name,
     label,
     icon,
+    shortcut,
     isActive: (editor) => editor.isActive(mark),
     can: (editor) => editor.can().toggleMark(mark),
     run: (editor) => editor.chain().toggleMark(mark).run(),
@@ -36,14 +38,32 @@ function markSpec(
   };
 }
 
-const BOLD = markSpec('Bold', 'bold', 'editor.bold', <BoldIcon />);
-const ITALIC = markSpec('Italic', 'italic', 'editor.italic', <ItalicIcon />);
-const UNDERLINE = markSpec('Underline', 'underline', 'editor.underline', <UnderlineIcon />);
-const STRIKE = markSpec('Strike', 'strike', 'editor.strike', <StrikethroughIcon />);
-const CODE = markSpec('Code', 'code', 'editor.code', <CodeBracketIcon />);
-const HIGHLIGHT = markSpec('Highlight', 'highlight', 'editor.highlight', <Highlighter />);
-const SUBSCRIPT = markSpec('Subscript', 'subscript', 'editor.subscript', <Subscript />);
-const SUPERSCRIPT = markSpec('Superscript', 'superscript', 'editor.superscript', <Superscript />);
+const BOLD = markSpec('Bold', 'bold', 'editor.bold', <BoldIcon />, 'Mod+B');
+const ITALIC = markSpec('Italic', 'italic', 'editor.italic', <ItalicIcon />, 'Mod+I');
+const UNDERLINE = markSpec(
+  'Underline',
+  'underline',
+  'editor.underline',
+  <UnderlineIcon />,
+  'Mod+U',
+);
+const STRIKE = markSpec('Strike', 'strike', 'editor.strike', <StrikethroughIcon />, 'Mod+Shift+S');
+const CODE = markSpec('Code', 'code', 'editor.code', <CodeBracketIcon />, 'Mod+E');
+const HIGHLIGHT = markSpec(
+  'Highlight',
+  'highlight',
+  'editor.highlight',
+  <Highlighter />,
+  'Mod+Shift+H',
+);
+const SUBSCRIPT = markSpec('Subscript', 'subscript', 'editor.subscript', <Subscript />, 'Mod+,');
+const SUPERSCRIPT = markSpec(
+  'Superscript',
+  'superscript',
+  'editor.superscript',
+  <Superscript />,
+  'Mod+.',
+);
 
 export function EditorBold(props: EditorMarkProps) {
   return <EditorToggleTool {...props} spec={BOLD} />;

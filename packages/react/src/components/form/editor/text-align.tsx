@@ -5,12 +5,13 @@ import type { ReactElement } from 'react';
 import { TextAlignCenter, TextAlignEnd, TextAlignJustify, TextAlignStart } from 'lucide-react';
 
 import { useEditorContext } from './context';
-import { extensionIsLoaded, hasExtension, useEditorToolProps } from './tool';
+import { EditorToolTip, extensionIsLoaded, hasExtension, useEditorToolProps } from './tool';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate } from '../../../internal/translate';
 import { IconToggle } from '../../action/icon-toggle';
 
 import type { IdsMessageKey } from '../../../internal/messages';
+import type { Hotkey } from '@tanstack/react-hotkeys';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorTextAlignment = 'left' | 'center' | 'right' | 'justify';
@@ -25,11 +26,14 @@ const THE_DEFAULT: EditorTextAlignment = 'left';
 
 const DEFAULT_ALIGNMENTS: readonly EditorTextAlignment[] = ['left', 'center', 'right'];
 
-const ALIGNMENT: Record<EditorTextAlignment, { label: IdsMessageKey; icon: ReactElement }> = {
-  left: { label: 'editor.alignLeft', icon: <TextAlignStart /> },
-  center: { label: 'editor.alignCenter', icon: <TextAlignCenter /> },
-  right: { label: 'editor.alignRight', icon: <TextAlignEnd /> },
-  justify: { label: 'editor.alignJustify', icon: <TextAlignJustify /> },
+const ALIGNMENT: Record<
+  EditorTextAlignment,
+  { label: IdsMessageKey; icon: ReactElement; shortcut: Hotkey }
+> = {
+  left: { label: 'editor.alignLeft', icon: <TextAlignStart />, shortcut: 'Mod+Shift+L' },
+  center: { label: 'editor.alignCenter', icon: <TextAlignCenter />, shortcut: 'Mod+Shift+E' },
+  right: { label: 'editor.alignRight', icon: <TextAlignEnd />, shortcut: 'Mod+Shift+R' },
+  justify: { label: 'editor.alignJustify', icon: <TextAlignJustify />, shortcut: 'Mod+Shift+J' },
 };
 
 function currentAlignment(editor: TiptapEditor, alignments: readonly EditorTextAlignment[]) {
@@ -51,22 +55,25 @@ function AlignmentToggle({
 }) {
   const t = useTranslate();
   const tool = useEditorToolProps(`TextAlign-${alignment}`);
+  const { label, icon, shortcut } = ALIGNMENT[alignment];
 
   return (
-    <IconToggle
-      {...tool}
-      variant="soft"
-      size="tiny"
-      icon={ALIGNMENT[alignment].icon}
-      aria-label={t(ALIGNMENT[alignment].label)}
-      pressed={pressed}
-      disabled={disabled}
-      onPressedChange={() => {
-        if (!editor) return;
-        if (pressed || alignment === THE_DEFAULT) editor.chain().unsetTextAlign().run();
-        else editor.chain().setTextAlign(alignment).run();
-      }}
-    />
+    <EditorToolTip label={t(label)} shortcut={shortcut} disabled={disabled}>
+      <IconToggle
+        {...tool}
+        variant="soft"
+        size="tiny"
+        icon={icon}
+        aria-label={t(label)}
+        pressed={pressed}
+        disabled={disabled}
+        onPressedChange={() => {
+          if (!editor) return;
+          if (pressed || alignment === THE_DEFAULT) editor.chain().unsetTextAlign().run();
+          else editor.chain().setTextAlign(alignment).run();
+        }}
+      />
+    </EditorToolTip>
   );
 }
 

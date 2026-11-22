@@ -3,7 +3,7 @@
 import { MinusIcon } from '@heroicons/react/16/solid';
 
 import { useEditorContext } from './context';
-import { useEditorToolProps, type EditorToolProps } from './tool';
+import { EditorToolTip, useEditorToolProps, type EditorToolProps } from './tool';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate } from '../../../internal/translate';
 import { IconButton } from '../../action/icon-button';
@@ -20,18 +20,23 @@ export function EditorHorizontalRule({
   const tool = useEditorToolProps('HorizontalRule');
   const enabled = useEditorSelector(editor, (current) => current.can().setHorizontalRule(), true);
 
+  const label = ariaLabel ?? t('editor.horizontalRule');
+  const disabled = !editable || !enabled;
+
   return (
-    <IconButton
-      {...tool}
-      variant="ghost"
-      colorScheme="neutral"
-      size="tiny"
-      icon={icon ?? <MinusIcon />}
-      aria-label={ariaLabel ?? t('editor.horizontalRule')}
-      className={className}
-      disabled={!editable || !enabled}
-      onClick={() => editor?.chain().setHorizontalRule().run()}
-    />
+    <EditorToolTip label={label} disabled={disabled}>
+      <IconButton
+        {...tool}
+        variant="ghost"
+        colorScheme="neutral"
+        size="tiny"
+        icon={icon ?? <MinusIcon />}
+        aria-label={label}
+        className={className}
+        disabled={disabled}
+        onClick={() => editor?.chain().setHorizontalRule().run()}
+      />
+    </EditorToolTip>
   );
 }
 

@@ -33,6 +33,9 @@ export function EditorTable({ icon, 'aria-label': ariaLabel, className }: Editor
     insertable: false,
   });
 
+  const label = ariaLabel ?? t('editor.table');
+  const disabled = !editable || !loaded || (!inTable && !insertable);
+
   const button = (
     <IconButton
       {...tool}
@@ -40,16 +43,19 @@ export function EditorTable({ icon, 'aria-label': ariaLabel, className }: Editor
       colorScheme="neutral"
       size="tiny"
       icon={icon ?? <Table />}
-      aria-label={ariaLabel ?? t('editor.table')}
+      aria-label={label}
       className={className}
-      disabled={!editable || !loaded || (!inTable && !insertable)}
+      disabled={disabled}
     />
   );
 
-  if (inTable) return <EditorTableEditMenu>{button}</EditorTableEditMenu>;
+  const tooltip = { label, disabled };
+
+  if (inTable) return <EditorTableEditMenu tooltip={tooltip}>{button}</EditorTableEditMenu>;
 
   return (
     <EditorTableSizePicker
+      tooltip={tooltip}
       disabled={!insertable}
       onPick={(size) => {
         if (editor) insertTable(editor.chain().focus(), size).run();

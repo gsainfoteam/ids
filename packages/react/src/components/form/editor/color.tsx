@@ -7,7 +7,13 @@ import { noop } from 'es-toolkit';
 import { Baseline } from 'lucide-react';
 
 import { useEditorContext } from './context';
-import { extensionIsLoaded, hasExtension, useEditorToolProps, type EditorToolProps } from './tool';
+import {
+  EditorToolTip,
+  extensionIsLoaded,
+  hasExtension,
+  useEditorToolProps,
+  type EditorToolProps,
+} from './tool';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate } from '../../../internal/translate';
 import { IconToggle } from '../../action/icon-toggle';
@@ -63,6 +69,8 @@ export function EditorColor({ icon, 'aria-label': ariaLabel, className }: Editor
   const picked = useEditorSelector(editor, pickedIn, NOTHING_PICKED);
   const enabled = useEditorSelector(editor, canColor, true);
   const loaded = extensionIsLoaded(editor, 'Color', 'textColor');
+  const toolLabel = ariaLabel ?? t('editor.color');
+  const disabled = !editable || !loaded || !enabled;
 
   const paint = (apply: (editor: TiptapEditor) => void) => () => {
     if (!editor) return;
@@ -97,19 +105,21 @@ export function EditorColor({ icon, 'aria-label': ariaLabel, className }: Editor
 
   return (
     <Popover>
-      <Popover.Trigger asChild>
-        <IconToggle
-          {...tool}
-          variant="soft"
-          size="tiny"
-          icon={icon ?? <Baseline />}
-          aria-label={ariaLabel ?? t('editor.color')}
-          className={className}
-          pressed={picked.text !== null || picked.highlight !== null}
-          disabled={!editable || !loaded || !enabled}
-          onPressedChange={noop}
-        />
-      </Popover.Trigger>
+      <EditorToolTip label={toolLabel} disabled={disabled}>
+        <Popover.Trigger asChild>
+          <IconToggle
+            {...tool}
+            variant="soft"
+            size="tiny"
+            icon={icon ?? <Baseline />}
+            aria-label={toolLabel}
+            className={className}
+            pressed={picked.text !== null || picked.highlight !== null}
+            disabled={disabled}
+            onPressedChange={noop}
+          />
+        </Popover.Trigger>
+      </EditorToolTip>
       <Popover.Content aria-label={t('editor.color')} side="bottom" align="start" className="w-max">
         <div className={styles.colorPanel()}>
           <div role="group" aria-labelledby={textTitleId} className={styles.colorSection()}>

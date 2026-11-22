@@ -7,7 +7,7 @@ import { noop } from 'es-toolkit';
 
 import { useEditorContext } from './context';
 import { isPlainEnter, withProtocol } from './popover-form';
-import { useEditorToolProps, useToolState, type EditorToolProps } from './tool';
+import { EditorToolTip, useEditorToolProps, useToolState, type EditorToolProps } from './tool';
 import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 import { IconToggle } from '../../action/icon-toggle';
@@ -30,6 +30,8 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
   const tool = useEditorToolProps('Link');
   const [open, setOpen] = useState(false);
   const [href, setHref] = useState('');
+  const label = ariaLabel ?? t('editor.link');
+  const disabled = !editable || !state.enabled;
 
   const removeLink = () => {
     editor?.chain().focus().extendMarkRange('link').unsetLink().run();
@@ -70,19 +72,21 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
         setOpen(next);
       }}
     >
-      <Popover.Trigger asChild>
-        <IconToggle
-          {...tool}
-          variant="soft"
-          size="tiny"
-          icon={icon ?? <LinkIcon />}
-          aria-label={ariaLabel ?? t('editor.link')}
-          className={className}
-          pressed={state.active}
-          disabled={!editable || !state.enabled}
-          onPressedChange={noop}
-        />
-      </Popover.Trigger>
+      <EditorToolTip label={label} disabled={disabled}>
+        <Popover.Trigger asChild>
+          <IconToggle
+            {...tool}
+            variant="soft"
+            size="tiny"
+            icon={icon ?? <LinkIcon />}
+            aria-label={label}
+            className={className}
+            pressed={state.active}
+            disabled={disabled}
+            onPressedChange={noop}
+          />
+        </Popover.Trigger>
+      </EditorToolTip>
       <Popover.Content
         aria-label={t('editor.link')}
         className="w-max"

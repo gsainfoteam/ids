@@ -16,7 +16,7 @@ import { Popover } from '../../../overlay/popover';
 import { isWebAddress } from '../../../typography/rich-text/schema/url-rules';
 import { TextField } from '../../text-field';
 import { isPlainEnter, withProtocol } from '../popover-form';
-import { useEditorToolProps, useToolState, type EditorToolProps } from '../tool';
+import { EditorToolTip, useEditorToolProps, useToolState, type EditorToolProps } from '../tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
@@ -57,6 +57,7 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
   }
 
   const uploading = images.pending > 0;
+  const label = ariaLabel ?? t('editor.image');
 
   const applyAlt = () => {
     editor?.chain().focus().updateAttributes('image', { alt: alt.trim() }).run();
@@ -103,20 +104,22 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
           setOpen('insert');
         }}
       >
-        <Popover.Trigger asChild>
-          <IconToggle
-            {...tool}
-            variant="soft"
-            size="tiny"
-            icon={uploading ? <Spinner decorative /> : (icon ?? <PhotoIcon />)}
-            aria-label={ariaLabel ?? t('editor.image')}
-            aria-busy={uploading || undefined}
-            className={className}
-            pressed={state.active}
-            disabled={!editable}
-            onPressedChange={noop}
-          />
-        </Popover.Trigger>
+        <EditorToolTip label={label} disabled={!editable}>
+          <Popover.Trigger asChild>
+            <IconToggle
+              {...tool}
+              variant="soft"
+              size="tiny"
+              icon={uploading ? <Spinner decorative /> : (icon ?? <PhotoIcon />)}
+              aria-label={label}
+              aria-busy={uploading || undefined}
+              className={className}
+              pressed={state.active}
+              disabled={!editable}
+              onPressedChange={noop}
+            />
+          </Popover.Trigger>
+        </EditorToolTip>
         <Popover.Content
           aria-label={open === 'alt' ? t('editor.imageAlt') : t('editor.image')}
           initialFocus="input"

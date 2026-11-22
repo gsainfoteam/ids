@@ -8,6 +8,7 @@ import { keyHandler } from '../../../../internal/keys';
 import { useTranslate } from '../../../../internal/translate';
 import { Popover } from '../../../overlay/popover';
 import { useEditorContext } from '../context';
+import { EditorToolTip, type EditorToolTipProps } from '../tool';
 import { NEW_TABLE_SIZE, type TableSize } from './insert';
 
 const MOST = { rows: 8, cols: 10 } as const satisfies TableSize;
@@ -23,10 +24,12 @@ const within = (size: TableSize): TableSize => ({
 const cellSelector = ({ rows, cols }: TableSize) => `[data-table-size-cell="${rows}x${cols}"]`;
 
 export function EditorTableSizePicker({
+  tooltip,
   disabled,
   onPick,
   children,
 }: {
+  tooltip: EditorToolTipProps;
   disabled: boolean;
   onPick: (size: TableSize) => void;
   children: ReactElement;
@@ -64,7 +67,9 @@ export function EditorTableSizePicker({
         setOpen(next);
       }}
     >
-      <Popover.Trigger asChild>{children}</Popover.Trigger>
+      <EditorToolTip {...tooltip}>
+        <Popover.Trigger asChild>{children}</Popover.Trigger>
+      </EditorToolTip>
       <Popover.Content
         aria-label={t('editor.tableInsert')}
         initialFocus={cellSelector(NEW_TABLE_SIZE)}

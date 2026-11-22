@@ -5,6 +5,7 @@ import { type ReactElement } from 'react';
 import { useTranslate } from '../../../../internal/translate';
 import { Menu } from '../../../overlay/menu';
 import { useEditorContext } from '../context';
+import { EditorToolTip, type EditorToolTipProps } from '../tool';
 import { useEditorSelector } from '../use-editor-selector';
 
 import type { IdsMessageKey } from '../../../../internal/messages';
@@ -43,7 +44,13 @@ function cellState(editor: TiptapEditor) {
   };
 }
 
-export function EditorTableEditMenu({ children }: { children: ReactElement }) {
+export function EditorTableEditMenu({
+  tooltip,
+  children,
+}: {
+  tooltip: EditorToolTipProps;
+  children: ReactElement;
+}) {
   const t = useTranslate();
   const { editor, format } = useEditorContext('Editor.Table');
   const { headerRow, mergeable, splittable } = useEditorSelector(editor, cellState, {
@@ -65,7 +72,9 @@ export function EditorTableEditMenu({ children }: { children: ReactElement }) {
 
   return (
     <Menu>
-      <Menu.Trigger asChild>{children}</Menu.Trigger>
+      <EditorToolTip {...tooltip}>
+        <Menu.Trigger asChild>{children}</Menu.Trigger>
+      </EditorToolTip>
       <Menu.Content side="bottom" align="start">
         {ADD.map(item)}
         {!markdownKeepsOnlyPlainGrids && (
