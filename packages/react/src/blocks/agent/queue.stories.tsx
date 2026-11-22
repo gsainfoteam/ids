@@ -1,9 +1,12 @@
 import {
+  ArrowPathIcon,
   CheckCircleIcon,
+  ClockIcon,
   EllipsisHorizontalIcon,
   ExclamationTriangleIcon,
   PlusIcon,
   QueueListIcon,
+  StopIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -186,11 +189,20 @@ export const PC: Story = {
                           />
                         </Menu.Trigger>
                         <Menu.Content>
-                          <Menu.Item>실행 기록 보기</Menu.Item>
+                          <Menu.Item>
+                            <ClockIcon />
+                            실행 기록 보기
+                          </Menu.Item>
                           {job.state === 'done' ? (
-                            <Menu.Item>다시 실행</Menu.Item>
+                            <Menu.Item>
+                              <ArrowPathIcon />
+                              다시 실행
+                            </Menu.Item>
                           ) : (
-                            <Menu.Item>멈추기</Menu.Item>
+                            <Menu.Item>
+                              <StopIcon />
+                              멈추기
+                            </Menu.Item>
                           )}
                         </Menu.Content>
                       </Menu>

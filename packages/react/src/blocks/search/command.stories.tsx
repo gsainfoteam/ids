@@ -6,6 +6,7 @@ import {
   Cog6ToothIcon,
   MagnifyingGlassIcon,
   MegaphoneIcon,
+  MoonIcon,
   PencilSquareIcon,
   TruckIcon,
 } from '@heroicons/react/24/outline';
@@ -98,6 +99,7 @@ export const PC: Story = {
                   <Menu.Shortcut keys="Mod+N" />
                 </Menu.Item>
                 <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
+                  <MoonIcon />
                   어두운 화면
                 </Menu.CheckboxItem>
                 <Menu.Item onSelect={() => toast('설정을 열어요')}>

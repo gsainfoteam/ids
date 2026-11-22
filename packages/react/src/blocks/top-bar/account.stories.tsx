@@ -1,9 +1,12 @@
 import {
+  ArrowRightStartOnRectangleIcon,
   Bars3Icon,
   BellIcon,
   ChevronDownIcon,
+  Cog6ToothIcon,
   CubeTransparentIcon,
   MagnifyingGlassIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -129,10 +132,18 @@ export const PC: Story = {
               </Button>
             </Menu.Trigger>
             <Menu.Content>
-              <Menu.Item>내 프로필</Menu.Item>
-              <Menu.Item>설정</Menu.Item>
+              <Menu.Item>
+                <UserIcon />내 프로필
+              </Menu.Item>
+              <Menu.Item>
+                <Cog6ToothIcon />
+                설정
+              </Menu.Item>
               <Menu.Separator />
-              <Menu.Item>로그아웃</Menu.Item>
+              <Menu.Item>
+                <ArrowRightStartOnRectangleIcon />
+                로그아웃
+              </Menu.Item>
             </Menu.Content>
           </Menu>
         </div>
