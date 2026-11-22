@@ -7,7 +7,7 @@ import { CheckIcon, TrashIcon } from '@heroicons/react/16/solid';
 import { useTranslate } from '../../../../internal/translate';
 import { Menu } from '../../../overlay/menu';
 import { CALLOUT_ICON } from '../../../typography/rich-text/callout-icon';
-import { CALLOUT_SCHEME, CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
+import { CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
 import {
   CALLOUT_KINDS,
   calloutKindOf,
@@ -18,7 +18,7 @@ import { editorStyle } from '../style';
 
 const kindIcon = (kind: CalloutKind) =>
   cloneElement(CALLOUT_ICON[kind] as ReactElement<{ className?: string }>, {
-    className: editorStyle({ calloutScheme: CALLOUT_SCHEME[kind] }).calloutKindIcon(),
+    className: editorStyle({ calloutKind: kind }).calloutKindIcon(),
   });
 
 export function EditorCalloutKindMenu({

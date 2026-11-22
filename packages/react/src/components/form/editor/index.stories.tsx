@@ -753,7 +753,7 @@ export const FullDocument: Story = {
     defaultValue: [
       '<h1>가을 축제 부스 안내</h1>',
       '<p>올해 부스는 <strong>학생회관 앞</strong>에 섭니다. <mark>신청은 금요일까지</mark>입니다.</p>',
-      '<div data-type="callout" data-kind="tip"><p>신청서는 동아리 대표가 냅니다.</p></div>',
+      '<div data-type="callout" data-kind="success"><p>신청서는 동아리 대표가 냅니다.</p></div>',
       '<h2>준비물</h2>',
       '<ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>이름표</p></li><li data-type="taskItem" data-checked="false"><p>노트북</p></li></ul>',
       '<pre><code class="language-tsx">export const booth = { place: "학생회관", day: "금" };</code></pre>',

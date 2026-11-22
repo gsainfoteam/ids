@@ -11,7 +11,7 @@ upload returned become images, so `javascript:` and `data:` never do.
 
 New tools: `Editor.Highlight`, `Editor.TaskList` (drawn as IDS Checkboxes), `Editor.HorizontalRule`,
 `Editor.TextAlign`, `Editor.Table` (pick a size from a grid; add and delete rows and columns; outside
-markdown, toggle the header row and merge and split cells), `Editor.Callout` (GitHub alerts in
+markdown, toggle the header row and merge and split cells), `Editor.Callout` (the four IDS statuses, saved as GitHub alerts in
 markdown) and `Editor.Details` (a toggle block). Blocks in the Editor are drawn like the IDS
 components RichText renders: code blocks as `CodeBlock` (with its copy button and a language
 Select), callouts as `Alert`, toggle blocks as `Accordion` and tables as `Table`. Each of these loads its Tiptap extension with `import()` only when

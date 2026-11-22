@@ -1111,7 +1111,7 @@ test('a GitHub alert in markdown is a callout whose kind menu rewrites the marke
   const content = await editable('본문');
   await expect
     .poll(() => content.element().querySelector('[data-callout]')?.getAttribute('data-kind'))
-    .toBe('note');
+    .toBe('info');
   await expect.element(content).toMatchTextContent('참고');
 
   await userEvent.click(page.getByRole('button', { name: '콜아웃 종류' }));

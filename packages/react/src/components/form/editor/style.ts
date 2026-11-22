@@ -5,7 +5,6 @@ import { documentText } from '../../typography/rich-text/style';
 
 import type { EditorVariant } from './root';
 import type { IdsSize } from '../../../tokens/types';
-import type { CALLOUT_SCHEME } from '../../typography/rich-text/callout-kinds';
 import type { CalloutKind } from '../../typography/rich-text/schema/callout';
 
 const placeholder = cn(
@@ -159,13 +158,12 @@ export const editorStyle = tv({
       true: { root: 'concentric-p-1', scrollArea: 'rounded-standard' },
       false: { scrollArea: 'rounded-[inherit]' },
     },
-    calloutScheme: {
+    calloutKind: {
       info: { calloutKindIcon: 'scheme-info' },
       success: { calloutKindIcon: 'scheme-success' },
-      primary: { calloutKindIcon: 'scheme-primary' },
       warning: { calloutKindIcon: 'scheme-warning' },
       danger: { calloutKindIcon: 'scheme-danger' },
-    } satisfies Record<(typeof CALLOUT_SCHEME)[CalloutKind], object>,
+    } satisfies Record<CalloutKind, object>,
     editable: {
       true: {},
       false: { content: 'cursor-default' },

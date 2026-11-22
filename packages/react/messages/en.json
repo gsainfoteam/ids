@@ -341,10 +341,9 @@
     "width": "Width"
   },
   "richText": {
-    "calloutCaution": "Caution",
-    "calloutImportant": "Important",
-    "calloutNote": "Note",
-    "calloutTip": "Tip",
+    "calloutDanger": "Danger",
+    "calloutInfo": "Note",
+    "calloutSuccess": "Tip",
     "calloutWarning": "Warning"
   },
   "select": {

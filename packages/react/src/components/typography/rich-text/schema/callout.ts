@@ -2,16 +2,31 @@ import { mergeAttributes, Node } from '@tiptap/core';
 
 import type { JSONContent, MarkdownToken } from '@tiptap/core';
 
-export const CALLOUT_KINDS = ['note', 'tip', 'important', 'warning', 'caution'] as const;
+export const CALLOUT_KINDS = ['info', 'success', 'warning', 'danger'] as const;
 
 export type CalloutKind = (typeof CALLOUT_KINDS)[number];
+
+const GITHUB_ALERT_KIND: Record<string, CalloutKind> = {
+  note: 'info',
+  tip: 'success',
+  important: 'info',
+  warning: 'warning',
+  caution: 'danger',
+};
+
+const GITHUB_ALERT_OF: Record<CalloutKind, string> = {
+  info: 'NOTE',
+  success: 'TIP',
+  warning: 'WARNING',
+  danger: 'CAUTION',
+};
 
 export const isCalloutKind = (value: unknown): value is CalloutKind =>
   CALLOUT_KINDS.includes(value as CalloutKind);
 
 export const calloutKindOf = (value: unknown): CalloutKind => {
-  const lower = typeof value === 'string' ? value.toLowerCase() : value;
-  return isCalloutKind(lower) ? lower : 'note';
+  const lower = typeof value === 'string' ? value.toLowerCase() : '';
+  return isCalloutKind(lower) ? lower : (GITHUB_ALERT_KIND[lower] ?? 'info');
 };
 
 const GITHUB_ALERT =
@@ -45,7 +60,7 @@ export const Callout = Node.create({
   addAttributes() {
     return {
       kind: {
-        default: 'note' satisfies CalloutKind,
+        default: 'info' satisfies CalloutKind,
         parseHTML: (element) => calloutKindOf(element.getAttribute('data-kind')),
         renderHTML: (attributes) => ({ 'data-kind': calloutKindOf(attributes.kind) }),
       },
@@ -84,7 +99,7 @@ export const Callout = Node.create({
   },
 
   renderMarkdown: (node, helpers) => {
-    const kind = calloutKindOf(node.attrs?.kind).toUpperCase();
+    const kind = GITHUB_ALERT_OF[calloutKindOf(node.attrs?.kind)];
     const body = (node.content ?? []).map((child) => helpers.renderChildren([child])).join('\n\n');
     return `> [!${kind}]\n${quoted(body)}`;
   },
@@ -92,11 +107,11 @@ export const Callout = Node.create({
   addCommands() {
     return {
       setCallout:
-        (kind = 'note') =>
+        (kind = 'info') =>
         ({ commands }) =>
           commands.wrapIn(this.name, { kind }),
       toggleCallout:
-        (kind = 'note') =>
+        (kind = 'info') =>
         ({ commands }) =>
           commands.toggleWrap(this.name, { kind }),
       updateCallout:

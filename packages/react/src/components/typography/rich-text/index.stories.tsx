@@ -10,7 +10,7 @@ const POST = `# 2학기 수강 신청 안내
 
 수강 신청은 **8월 12일 오전 10시**에 열립니다. 바뀐 규정은 [학사 일정](#calendar)에서 다시 확인하세요.
 
-> [!IMPORTANT]
+> [!WARNING]
 > 신청 전에 졸업 요건 점검표를 내야 합니다.
 
 ## 준비할 것
@@ -92,19 +92,16 @@ export const Gallery: Story = {
         title="Callout"
         description="GitHub alert 문법(> [!NOTE])이 Alert 로 그려집니다."
       >
-        <Showcase.Row label="note">
+        <Showcase.Row label="info">
           <RichText value={'> [!NOTE]\n> 참고할 내용입니다.'} />
         </Showcase.Row>
-        <Showcase.Row label="tip">
+        <Showcase.Row label="success">
           <RichText value={'> [!TIP]\n> 도움이 되는 내용입니다.'} />
-        </Showcase.Row>
-        <Showcase.Row label="important">
-          <RichText value={'> [!IMPORTANT]\n> 꼭 알아야 할 내용입니다.'} />
         </Showcase.Row>
         <Showcase.Row label="warning">
           <RichText value={'> [!WARNING]\n> 주의가 필요한 내용입니다.'} />
         </Showcase.Row>
-        <Showcase.Row label="caution">
+        <Showcase.Row label="danger">
           <RichText value={'> [!CAUTION]\n> 되돌릴 수 없는 내용입니다.'} />
         </Showcase.Row>
       </Showcase.Section>
@@ -166,7 +163,7 @@ export const BlogPost: Story = {
     await expect(
       canvas.getByRole('heading', { level: 1, name: '2학기 수강 신청 안내' }),
     ).toBeVisible();
-    await expect(canvas.getByRole('note')).toHaveTextContent(/중요/);
+    await expect(canvas.getByRole('note')).toHaveTextContent(/경고/);
     await expect(canvas.getByRole('table')).toBeVisible();
     await expect(canvas.getByRole('checkbox', { name: '졸업 요건 점검표 제출' })).toBeChecked();
     await expect(canvas.getByRole('link', { name: '학사팀' })).toHaveAttribute(
@@ -190,7 +187,7 @@ export const Json: Story = {
           },
           {
             type: 'callout',
-            attrs: { kind: 'tip' },
+            attrs: { kind: 'success' },
             content: [
               {
                 type: 'paragraph',

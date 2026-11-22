@@ -79,7 +79,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `Highlight`                                            | 형광펜. 색은 `bg-warning-soft` 와 `text-on-warning-soft` 입니다  |
 | `BulletList` `OrderedList` `Blockquote`                | 블록 서식                                                       |
 | `CodeBlock`                                            | 코드 블록. 본문의 코드 블록에는 언어 Select 와 복사 버튼이 붙고, 고른 언어로 색을 칠합니다 |
-| `Callout`                                              | 콜아웃을 넣거나 종류(참고, 팁, 중요, 경고, 주의)를 바꾸는 Menu   |
+| `Callout`                                              | 콜아웃을 넣거나 종류(참고, 팁, 경고, 위험)를 바꾸는 Menu   |
 | `Details`                                              | 접는 블록(토글)을 넣는 버튼                                      |
 | `TaskList`                                             | 할 일 목록. 체크박스는 IDS Checkbox 와 같은 모양입니다           |
 | `HorizontalRule`                                       | 구분선을 넣는 버튼                                              |
@@ -171,7 +171,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 - 본문의 블록은 RichText 가 그리는 IDS 컴포넌트와 같은 모양입니다. 그래서 Editor 로 쓴 글을 RichText 로 그려도 모양이 같습니다.
   - 코드 블록은 [CodeBlock](../../data/code-block/README.md) 의 모양, 색, 복사 버튼을 씁니다. 언어 이름 자리에 언어 Select 가 있습니다. 언어를 고르면 마크다운에 ```` ```python ```` 처럼 남습니다.
   - 콜아웃은 [Alert](../../feedback/alert/README.md), 접는 블록은 [Accordion](../../data/accordion/README.md), 표는 [Table](../../data/table/README.md) 의 모양입니다.
-- 콜아웃은 GitHub 의 `> [!NOTE]` 문법으로 저장합니다. 왼쪽 아이콘을 누르면 종류를 바꾸거나 콜아웃을 풉니다.
+- 콜아웃 종류는 IDS 의 상태 네 가지(`info`, `success`, `warning`, `danger`)이고, 마크다운에는 GitHub 의 `> [!NOTE]` `[!TIP]` `[!WARNING]` `[!CAUTION]` 문법으로 저장합니다. GitHub 의 `[!IMPORTANT]` 는 `info` 로 읽습니다. 왼쪽 아이콘을 누르면 종류를 바꾸거나 콜아웃을 풉니다.
 - 접는 블록은 요약과 내용을 모두 고칠 수 있고, 오른쪽 버튼으로 펼치고 접습니다. 펼친 상태도 값에 남습니다.
 
 ## 표

@@ -34,7 +34,7 @@ GitHub 마크다운에 아래를 더합니다. 모두 Editor 가 마크다운으
 
 ```md
 > [!NOTE]
-> 콜아웃. NOTE, TIP, IMPORTANT, WARNING, CAUTION
+> 콜아웃. NOTE, TIP, WARNING, CAUTION
 
 :::details {open}
 
@@ -57,13 +57,14 @@ GitHub 마크다운에 아래를 더합니다. 모두 Editor 가 마크다운으
 ==형광펜==
 ```
 
-| 콜아웃 | Alert `colorScheme` |
-|---|---|
-| `NOTE` | `info` |
-| `TIP` | `success` |
-| `IMPORTANT` | `primary` |
-| `WARNING` | `warning` |
-| `CAUTION` | `danger` |
+| 콜아웃 | `kind`, Alert `colorScheme` | 제목 |
+|---|---|---|
+| `NOTE` | `info` | 참고 |
+| `TIP` | `success` | 팁 |
+| `WARNING` | `warning` | 경고 |
+| `CAUTION` | `danger` | 위험 |
+
+- 콜아웃 종류는 IDS 의 상태 네 가지와 같습니다. GitHub 의 `IMPORTANT` 는 `info` 로 읽고 `NOTE` 로 저장합니다.
 
 - 콜아웃은 `role="note"` 이고, 종류 이름("참고", "경고" 등)을 제목으로 보여 줍니다. 제목은 `IdsProvider` 의 `translate` 를 따릅니다.
 - 접는 블록은 `Accordion` 한 항목입니다. 요약은 제목 태그로 감싸지 않으므로 글의 제목 구조를 흐트러뜨리지 않습니다.

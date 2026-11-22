@@ -3,7 +3,6 @@
 import type { ReactElement } from 'react';
 
 import {
-  ExclamationCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
   LightBulbIcon,
@@ -13,11 +12,10 @@ import {
 import type { CalloutKind } from './schema/callout';
 
 export const CALLOUT_ICON: Record<CalloutKind, ReactElement> = {
-  note: <InformationCircleIcon aria-hidden="true" />,
-  tip: <LightBulbIcon aria-hidden="true" />,
-  important: <ExclamationCircleIcon aria-hidden="true" />,
+  info: <InformationCircleIcon aria-hidden="true" />,
+  success: <LightBulbIcon aria-hidden="true" />,
   warning: <ExclamationTriangleIcon aria-hidden="true" />,
-  caution: <XCircleIcon aria-hidden="true" />,
+  danger: <XCircleIcon aria-hidden="true" />,
 };
 
 export function RichTextCalloutIcon({ kind }: { kind: CalloutKind }) {

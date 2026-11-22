@@ -5,13 +5,13 @@ import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from '@tipt
 import { EditorCalloutKindMenu } from './kind-menu';
 import { useTranslate } from '../../../../internal/translate';
 import { alertStyle } from '../../../feedback/alert/style';
-import { CALLOUT_SCHEME, CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
+import { CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
 import { calloutKindOf } from '../../../typography/rich-text/schema/callout';
 
 export function EditorCalloutView({ node, editor, getPos, updateAttributes }: ReactNodeViewProps) {
   const t = useTranslate();
   const kind = calloutKindOf(node.attrs.kind);
-  const styles = alertStyle({ colorScheme: CALLOUT_SCHEME[kind], variant: 'soft', icon: true });
+  const styles = alertStyle({ colorScheme: kind, variant: 'soft', icon: true });
 
   const unwrap = () => {
     const pos = getPos();
