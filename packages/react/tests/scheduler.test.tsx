@@ -608,7 +608,7 @@ test('a right-click with no menu for its target still reaches the app’s own ha
   expect(document.querySelector('[role="menu"]')).toBeNull();
 });
 
-test('the end handle sits inside its event, so an event starting right after it does not cover it', async () => {
+test('the end handle straddles the bottom edge, and the hovered event rises above the one starting right after it', async () => {
   const screen = await render(
     inProvider({
       onEventChange: vi.fn(),
@@ -624,12 +624,15 @@ test('the end handle sits inside its event, so an event starting right after it 
   const handle = edge.element().getBoundingClientRect();
   const event = document.querySelector('[data-scheduler-event="lunch"]')!.getBoundingClientRect();
   const slot = document.querySelector('[data-scheduler-slot="lunch"]')!.getBoundingClientRect();
-  expect(handle.bottom).toBeLessThanOrEqual(event.bottom);
-  expect(event.bottom).toBeLessThanOrEqual(slot.bottom);
-
   const x = handle.left + handle.width / 2;
-  for (const y of [handle.top - 4, handle.top + handle.height / 2, event.bottom - 0.5])
-    expect(document.elementFromPoint(x, y)).toBe(edge.element());
+  const above = event.bottom - 2;
+  const below = slot.bottom + 2;
+  expect(document.elementFromPoint(x, above)).toBe(edge.element());
+  await userEvent.hover(screen.getByText('Graph theory'));
+  expect(document.elementFromPoint(x, below)).not.toBe(edge.element());
+
+  await userEvent.hover(screen.getByText('Lunch'));
+  for (const y of [above, below]) expect(document.elementFromPoint(x, y)).toBe(edge.element());
 });
 
 test('no event box covers another, so every end handle can be grabbed', async () => {
