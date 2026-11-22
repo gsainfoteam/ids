@@ -170,7 +170,7 @@ export const Scales: Story = {
     <Showcase>
       <Showcase.Section
         title="Headline"
-        description="text-headline-{h1~h6}-{굵기}. 행간은 크기 + 8px. 자간은 h5·h6 0, h3·h4 -1.5%, h1·h2 -2.5%. 페이지와 영역의 제목입니다."
+        description="text-headline-{h1~h6}-{굵기}. 행간은 크기 + 8px. 자간은 h6 -1.5%, h3~h5 -2.5%, h1·h2 -3.5%. 페이지와 영역의 제목입니다."
       >
         <Scale styles={headline} sample="제목 Aa" />
       </Showcase.Section>
@@ -210,7 +210,7 @@ export const Prose: Story = {
     <Showcase>
       <Showcase.Section
         title="긴 글"
-        description="document-text 는 블록 사이를 8px 띄우고, 제목을 semibold로 h1 24px, h2 20px, h3 18px, h4 16px로 그리며 제목 위를 16px 더 띄웁니다. 본문 크기는 text-body-b2-regular leading-prose(16px, 행간 28px)로 따로 줍니다."
+        description="document-text 는 블록 사이를 20px, 제목 아래를 12px, 제목 위를 28~36px 띄우고 제목을 semibold로 h1 24px, h2 20px, h3 18px, h4 16px로 그립니다. 본문 크기는 text-body-b2-regular leading-prose(16px, 행간 28px)로 따로 줍니다."
       >
         <article className="document-text text-body-b2-regular leading-prose text-neutral-strong max-w-prose">
           <h1>2학기 수강 신청 안내</h1>

@@ -361,7 +361,7 @@ export const Document: Story = {
     docs: {
       description: {
         story:
-          '본문은 `document-text` 유틸리티로 그립니다. 블록 사이는 gap 8px, 본문은 16px에 행간 28px, 제목은 semibold로 h1 24px부터 한 단계씩 작아집니다.',
+          '본문은 `document-text` 유틸리티로 그립니다. 블록 사이는 20px, 제목 아래는 12px, 제목 위는 28~36px이고, 본문은 16px에 행간 28px, 제목은 semibold로 h1 24px부터 한 단계씩 작아집니다.',
       },
     },
   },
