@@ -41,7 +41,6 @@ import {
 } from './commands';
 import { markTheDraggedBlock, topLevelBlocks } from './extension';
 import { swallowTheClickThatEndsADrag } from '../../../../internal/drag-surface';
-import { showInTopLayer } from '../../../../internal/overlay/top-layer';
 import { useTranslate } from '../../../../internal/translate';
 import { cn, mergeRefs } from '../../../../utils';
 import { Menu } from '../../../overlay/menu';
@@ -90,13 +89,10 @@ function firstLineOf(block: HTMLElement) {
 
 const editorRootOf = (element: Element) => element.closest<HTMLElement>('[data-editor]');
 
-function placeBesideTheFirstLine(block: HTMLElement, handle: HTMLElement): CSSProperties {
+function besideTheFirstLine(block: HTMLElement, handle: HTMLElement): CSSProperties {
   const line = firstLineOf(block);
-  const box = editorRootOf(block)?.getBoundingClientRect();
-  return {
-    top: line.top + (line.height - handle.offsetHeight) / 2,
-    left: Math.max(0, (box?.left ?? block.getBoundingClientRect().left) - handle.offsetWidth),
-  };
+  const documentTop = block.closest('[data-editor-document]')?.getBoundingClientRect().top ?? 0;
+  return { top: line.top - documentTop + (line.height - handle.offsetHeight) / 2 };
 }
 
 function useBesideTheFirstLine(block: HoveredBlock | null) {
@@ -105,19 +101,13 @@ function useBesideTheFirstLine(block: HoveredBlock | null) {
 
   useLayoutEffect(() => {
     const handle = handleRef.current;
-    if (!handle) return;
-    showInTopLayer(handle);
-    if (!block) return;
+    if (!handle || !block) return;
 
-    const follow = () => setPlace(placeBesideTheFirstLine(block.dom, handle));
+    const follow = () => setPlace(besideTheFirstLine(block.dom, handle));
     follow();
-    const view = handle.ownerDocument.defaultView;
-    view?.addEventListener('scroll', follow, { capture: true, passive: true });
-    view?.addEventListener('resize', follow);
-    return () => {
-      view?.removeEventListener('scroll', follow, { capture: true });
-      view?.removeEventListener('resize', follow);
-    };
+    const resizes = new ResizeObserver(follow);
+    resizes.observe(block.dom);
+    return () => resizes.disconnect();
   }, [block]);
 
   return [handleRef, place] as const;
@@ -225,8 +215,9 @@ const showTheClone =
 function DraggableGrip({
   shown,
   handleRef,
+  ref,
   ...props
-}: Omit<ComponentProps<typeof EditorGlyphButton>, 'ref'> & {
+}: ComponentProps<typeof EditorGlyphButton> & {
   shown: boolean;
   handleRef: RefObject<HTMLButtonElement | null>;
 }) {
@@ -240,7 +231,7 @@ function DraggableGrip({
         props.onMouseDown?.(event);
         listeners?.onMouseDown?.(event);
       }}
-      ref={mergeRefs(handleRef, setNodeRef)}
+      ref={mergeRefs(ref, handleRef, setNodeRef)}
       onDragStart={(event) => event.preventDefault()}
     />
   );
@@ -336,7 +327,6 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
             data-editor-block-handle=""
             className={styles.blockHandle()}
             style={place}
-            popover="manual"
             onMouseDown={() => {
               grabbedRef.current = block;
             }}

@@ -1413,9 +1413,9 @@ test('dragging a block by its handle moves it', async (context) => {
   expect(dropLine()).toBeNull();
 });
 
-test('the block handle hangs outside the box, and a toolbar Editor has none', async () => {
+test('the block handle sits in a gutter inside the box, opens its menu below itself, and a toolbar Editor has none', async () => {
   render(
-    <div className="flex flex-col gap-4 ps-10">
+    <div className="flex flex-col gap-4">
       <Editor aria-label="손잡이 없음" defaultValue="<p>글</p>" />
       <Editor type="block" aria-label="손잡이 있음" defaultValue="<p>글</p>">
         <Editor.Content />
@@ -1424,8 +1424,9 @@ test('the block handle hangs outside the box, and a toolbar Editor has none', as
   );
   const without = await editable('손잡이 없음');
   const withHandle = await editable('손잡이 있음');
-  const inlineStart = (element: Element) => getComputedStyle(element).paddingInlineStart;
-  expect(inlineStart(withHandle.element())).toBe(inlineStart(without.element()));
+  const inlineStart = (element: Element) =>
+    Number.parseFloat(getComputedStyle(element).paddingInlineStart);
+  expect(inlineStart(withHandle.element())).toBeGreaterThan(inlineStart(without.element()));
 
   await userEvent.hover(without.getByText('글'));
   expect(page.getByRole('button', { name: '블록 메뉴' }).query()).toBeNull();
@@ -1434,10 +1435,17 @@ test('the block handle hangs outside the box, and a toolbar Editor has none', as
   const handle = page.getByRole('button', { name: '블록 메뉴' });
   await expect.element(handle).toBeVisible();
   const box = withHandle.element().closest('[data-editor]')!.getBoundingClientRect();
-  expect(handle.element().getBoundingClientRect().right).toBeLessThanOrEqual(box.left + 1);
+  const grip = handle.element().getBoundingClientRect();
+  const text = withHandle.getByText('글').element().getBoundingClientRect();
+  expect(grip.left).toBeGreaterThanOrEqual(box.left);
+  expect(grip.right).toBeLessThanOrEqual(text.left);
 
-  await userEvent.hover(handle);
-  await expect.element(handle).toBeVisible();
+  await userEvent.click(handle);
+  const menu = page.getByRole('menu');
+  await expect.element(menu).toBeVisible();
+  const opened = menu.element().getBoundingClientRect();
+  expect(opened.top).toBeGreaterThanOrEqual(grip.bottom);
+  expect(Math.abs(opened.left - grip.left)).toBeLessThanOrEqual(8);
 });
 
 test('a read-only Editor has no block handle', async () => {

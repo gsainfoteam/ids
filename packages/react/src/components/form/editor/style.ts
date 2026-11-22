@@ -104,7 +104,7 @@ export const editorStyle = tv({
     mentionLabel: 'truncate',
     mentionDescription: 'truncate text-caption-c1-regular text-neutral',
     blockHandle: [
-      'fixed inset-auto z-50 m-0 overflow-visible border-0 bg-transparent',
+      'absolute z-10 m-0',
       'cursor-grab text-neutral active:cursor-grabbing [&_svg]:size-4',
       'transition-[opacity,visibility,--ids-state-opacity] transition-discrete duration-(--ids-motion-fast) motion-reduce:transition-none',
       'data-hidden:pointer-events-none data-hidden:invisible data-hidden:opacity-0',
@@ -164,12 +164,26 @@ export const editorStyle = tv({
       warning: { calloutKindIcon: 'scheme-warning' },
       danger: { calloutKindIcon: 'scheme-danger' },
     } satisfies Record<CalloutKind, object>,
+    blockEditor: {
+      true: {},
+      false: {},
+    },
     editable: {
       true: {},
       false: { content: 'cursor-default' },
     },
   },
   compoundVariants: [
+    {
+      blockEditor: true,
+      size: 'standard',
+      class: { content: 'ps-10', blockHandle: 'start-2' },
+    },
+    {
+      blockEditor: true,
+      size: 'tiny',
+      class: { content: 'ps-8', blockHandle: 'start-1.5' },
+    },
     {
       framed: true,
       variant: 'outline',
@@ -189,5 +203,6 @@ export const editorStyle = tv({
     size: 'standard',
     editable: true,
     framed: false,
+    blockEditor: false,
   },
 });

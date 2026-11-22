@@ -18,8 +18,8 @@ Select), callouts as `Alert`, toggle blocks as `Accordion` and tables as `Table`
 its part is in the Editor, and image uploading only with `onImageUpload`.
 
 An editable Editor opens a block menu on `/`. `type="block"` makes a block editor: no toolbar,
-every block in the `/` menu, a default BubbleMenu and a handle outside the Editor's left edge
-beside the hovered block, with no gutter inside the box. The default `type="toolbar"` sets its
+every block in the `/` menu, a default BubbleMenu and a handle in a left gutter
+beside the hovered block. The default `type="toolbar"` sets its
 bars on a gray tray around the document card, like DataTable. It drags the block the
 way Sidebar drags an item (a copy follows the pointer, a primary line marks the drop) or opens a
 menu to insert, turn into, duplicate or delete it. A selected block takes a light primary tint

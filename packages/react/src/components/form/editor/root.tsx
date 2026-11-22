@@ -348,6 +348,7 @@ export function EditorRoot(props: Editor.Props) {
     variant,
     size,
     editable,
+    blockEditor,
     framed: top.length > 0 || bottom.length > 0,
   });
   const contentAttributes = definedOnly({
