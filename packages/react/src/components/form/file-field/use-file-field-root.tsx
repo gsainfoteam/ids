@@ -14,6 +14,9 @@ import type { FileFieldProps, FileFieldState } from './root';
 
 export type FileFieldLook = 'field' | 'dropzone' | 'embedded';
 
+const componentNameOf = (look: FileFieldLook): 'FileField' | 'FileDropzone' =>
+  look === 'dropzone' ? 'FileDropzone' : 'FileField';
+
 const joinIds = (...ids: Array<string | undefined | false>) =>
   ids.filter(Boolean).join(' ') || undefined;
 
@@ -57,13 +60,14 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
     'aria-required': ariaRequired,
     ...native
   } = props;
+  const owner = componentNameOf(look);
   invariant(
     maxSize === undefined || (Number.isFinite(maxSize) && maxSize >= 0),
-    'FileField: maxSize must be non-negative bytes.',
+    `${owner}: maxSize must be non-negative bytes.`,
   );
   invariant(
     maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
-    'FileField: maxCount must be a non-negative integer.',
+    `${owner}: maxCount must be a non-negative integer.`,
   );
 
   const { rootRef, pickerRef, triggerRef, ...field } = useFileField({
@@ -85,9 +89,9 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
     multiple
       ? Array.isArray(s.value) && s.value.every(isFile)
       : s.value === null || isFile(s.value),
-    'FileField: single requires File | null; multiple requires File[].',
+    `${owner}: single requires File | null; multiple requires File[].`,
   );
-  invariant(isValidAccept(s.tokens), 'FileField: accept must contain MIME types or extensions.');
+  invariant(isValidAccept(s.tokens), `${owner}: accept must contain MIME types or extensions.`);
 
   const setRoot = useCallback(
     (node: HTMLElement | null) => {
@@ -231,6 +235,7 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
 
   return {
     context: {
+      owner,
       field,
       state,
       size: resolvedSize,

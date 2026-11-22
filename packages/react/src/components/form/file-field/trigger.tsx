@@ -23,7 +23,7 @@ export function FileTrigger({ asChild, children, className, ...props }: FileTrig
     !flattenFragments(children).some(
       (node) => isType(FileClear)(node) || isType(FileList)(node) || isType(FileItem)(node),
     ),
-    'FileField: Clear/List/Item must be siblings of Trigger.',
+    `${c.owner}: Clear/List/Item must be siblings of Trigger.`,
   );
 
   return part(

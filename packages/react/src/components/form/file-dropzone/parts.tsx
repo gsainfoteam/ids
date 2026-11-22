@@ -34,3 +34,11 @@ export const FileDropzonePreview = renamedPart<FilePreviewProps>(
   FilePreview,
   'FileDropzone.Preview',
 );
+
+export type FileDropzoneTriggerProps = FileTriggerProps;
+export type FileDropzoneValueProps = FileValueProps;
+export type FileDropzoneClearProps = FileClearProps;
+export type FileDropzoneListProps = FileListProps;
+export type FileDropzoneItemProps = FileItemProps;
+export type FileDropzoneRemoveProps = FileRemoveProps;
+export type FileDropzonePreviewProps = FilePreviewProps;

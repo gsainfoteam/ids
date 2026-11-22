@@ -25,6 +25,7 @@ export function FileRemove({ file, className, onClick, ...props }: FileRemovePro
       disabled={c.state.disabled}
       data-file-field-remove=""
       size={c.size}
+      owner={c.owner}
       className={c.styles.itemRemove({ className })}
       onClick={(event) => {
         onClick?.(event);

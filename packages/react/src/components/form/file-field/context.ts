@@ -10,6 +10,7 @@ import type { useFileField } from './use-file-field';
 import type { IdsSize } from '../../../tokens/types';
 
 type FileFieldContextValue = {
+  owner: 'FileField' | 'FileDropzone';
   field: Omit<ReturnType<typeof useFileField>, 'rootRef' | 'pickerRef' | 'triggerRef'>;
   state: FileFieldState;
   size: IdsSize;

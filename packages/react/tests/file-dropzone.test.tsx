@@ -1,3 +1,4 @@
+import { renderToString } from 'react-dom/server';
 import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 
@@ -67,4 +68,20 @@ test('a FileField part also works inside FileDropzone', async () => {
     </FileDropzone>,
   );
   await expect.element(screen.getByRole('button', { name: 'Files', exact: true })).toBeVisible();
+});
+
+test('development errors name the component the app wrote', () => {
+  expect(() => renderToString(<FileDropzone accept="pdf" />)).toThrow(
+    /^\[IDS\] FileDropzone: accept/,
+  );
+  expect(() => renderToString(<FileField accept="pdf" />)).toThrow(/^\[IDS\] FileField: accept/);
+  expect(() =>
+    renderToString(
+      <FileDropzone>
+        <FileDropzone.Trigger>
+          <FileDropzone.Clear />
+        </FileDropzone.Trigger>
+      </FileDropzone>,
+    ),
+  ).toThrow(/^\[IDS\] FileDropzone: Clear\/List\/Item must be siblings/);
 });
