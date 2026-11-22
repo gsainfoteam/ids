@@ -1,12 +1,20 @@
 'use client';
 
-import { useState, type MouseEvent, type ReactElement, type ReactNode } from 'react';
+import {
+  useState,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 import { parseDate, toCalendarDateTime } from '@internationalized/date';
 import { clamp } from 'es-toolkit';
 
 import { HOURS_IN_DAY, type SchedulerEventData, type SchedulerSlot } from './layout';
+import { part } from '../../../utils';
 import { Menu } from '../../overlay/menu';
+import { useMenuContext } from '../../overlay/menu/context';
 
 import type { SchedulerFormat } from './format';
 
@@ -26,6 +34,31 @@ export function slotAt(column: HTMLElement, clientY: number): SchedulerSlot {
   );
   const start = toCalendarDateTime(day).add({ minutes });
   return { start, end: start.add({ minutes: SLOT_MINUTES }) };
+}
+
+function TriggerWhereAMenuIs({
+  opens,
+  children,
+}: {
+  opens: (event: MouseEvent<HTMLElement>) => boolean;
+  children: ReactElement;
+}) {
+  const { root } = useMenuContext('Scheduler');
+
+  return part('div', true, children, {
+    ref: root.setTrigger,
+    'data-popup-open': root.open ? '' : undefined,
+    onContextMenu: (event: MouseEvent<HTMLElement>) => {
+      if (event.defaultPrevented || !opens(event)) return;
+      event.preventDefault();
+      root.openAt(event.nativeEvent);
+    },
+    onPointerDown: (event: PointerEvent<HTMLElement>) => {
+      const plainPress = event.button === 0 && !event.ctrlKey;
+      const pressedInMenu = !!root.content?.contains(event.target as Node);
+      if (root.open && plainPress && !pressedInMenu) root.setOpen(false, event.nativeEvent);
+    },
+  });
 }
 
 export type SchedulerContextMenuProps<E extends SchedulerEventData> = {
@@ -66,16 +99,15 @@ export function SchedulerContextMenu<E extends SchedulerEventData>({
 
   return (
     <Menu triggerType="contextmenu">
-      <Menu.Trigger
-        asChild
-        onContextMenuCapture={(event: MouseEvent<HTMLElement>) => {
+      <TriggerWhereAMenuIs
+        opens={(event) => {
           const next = targetOf(event);
-          if (!next) return event.stopPropagation();
-          setTarget(next);
+          if (next) setTarget(next);
+          return next !== null;
         }}
       >
         {children}
-      </Menu.Trigger>
+      </TriggerWhereAMenuIs>
       <Menu.Content aria-label={label ?? undefined}>
         {target && ('event' in target ? eventMenu?.(target.event) : slotMenu?.(target.slot))}
       </Menu.Content>

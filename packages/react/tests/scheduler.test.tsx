@@ -515,3 +515,15 @@ test('a movable event still opens its menu on a right-click, without moving', as
   await expect.element(screen.getByRole('menu')).not.toBeInTheDocument();
   expect(onEventChange).not.toHaveBeenCalled();
 });
+
+test('a right-click with no menu for its target still reaches the app’s own handlers', async () => {
+  const onContextMenu = vi.fn();
+  const screen = await render(
+    inProvider({ slotMenu: () => <Menu.Item>Create here</Menu.Item>, onContextMenu }),
+  );
+  await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
+  const event = document.querySelector('[data-scheduler-event="algo"]')!;
+  expect(rightClickEvent(event).defaultPrevented).toBe(false);
+  expect(onContextMenu).toHaveBeenCalledTimes(1);
+  expect(document.querySelector('[role="menu"]')).toBeNull();
+});
