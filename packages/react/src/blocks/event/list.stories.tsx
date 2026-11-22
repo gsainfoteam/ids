@@ -9,6 +9,7 @@ import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -131,7 +132,7 @@ export const PC: Story = {
           </Empty>
         ) : (
           <Card size="tiny">
-            <Item.Group aria-label="10월 행사">
+            <ItemGroup aria-label="10월 행사">
               {shown.map((event) => (
                 <Item key={event.id}>
                   <Item.Media variant="outline" aria-hidden>
@@ -163,7 +164,7 @@ export const PC: Story = {
                   </Item.Actions>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Card>
         )}
       </main>

@@ -29,7 +29,7 @@ const variants = ['hover', 'auto', 'always', 'none'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const frame = cn('h-40 w-56 rounded-standard border border-neutral text-body-b3-regular');
-const panel = cn('h-56 w-64 concentric-p-1 p-0 border border-neutral bg-neutral-subtlest shadow-md');
+const panel = cn('h-56 w-64 concentric-p-1 p-0 border border-neutral bg-base shadow-md');
 
 const paragraphs = [
   '스크롤 영역은 브라우저의 스크롤을 그대로 씁니다. 휠, 트랙패드, 터치, 키보드가 평소처럼 움직입니다.',
@@ -58,7 +58,7 @@ function Wide() {
       {Array.from({ length: 16 }, (_, index) => (
         <div
           key={index}
-          className="rounded-standard text-body-b3-medium bg-neutral-subtle flex size-20 shrink-0 items-center justify-center"
+          className="rounded-standard text-body-b3-medium bg-neutral-soft flex size-20 shrink-0 items-center justify-center"
         >
           {index + 1}
         </div>
@@ -73,7 +73,7 @@ function Grid() {
       {Array.from({ length: 96 }, (_, index) => (
         <div
           key={index}
-          className="rounded-standard text-caption-c1-regular bg-neutral-subtle flex h-12 items-center justify-center"
+          className="rounded-standard text-caption-c1-regular bg-neutral-soft flex h-12 items-center justify-center"
         >
           {index + 1}
         </div>
@@ -249,7 +249,7 @@ export const Gallery: Story = {
             <IdsProvider.Scope
               key={mode}
               mode={mode}
-              className="rounded-standard bg-neutral-subtlest text-neutral-bold p-4"
+              className="rounded-standard bg-base text-neutral-strong p-4"
             >
               <ScrollArea variant="always" className={frame}>
                 <Text />
@@ -356,7 +356,7 @@ export const ListboxAsViewport: Story = {
               role="option"
               aria-selected={index === 0}
               tabIndex={index === 0 ? 0 : -1}
-              className="focus-ring rounded-standard aria-selected:bg-neutral-subtle px-2.5 py-1.5"
+              className="focus-ring rounded-standard aria-selected:bg-neutral-soft px-2.5 py-1.5"
             >
               도시 {index + 1}
             </div>
@@ -446,12 +446,70 @@ export const OverflowEdges: Story = {
   },
 };
 
+export const PinnedEdges: Story = {
+  render: () => (
+    <ScrollArea
+      orientation="both"
+      variant="always"
+      className="rounded-standard border-neutral text-body-b3-regular h-56 w-72 border"
+    >
+      <div className="w-[36rem]">
+        <div
+          data-scroll-area-pinned="top"
+          className="bg-block border-neutral sticky top-0 z-10 flex border-b"
+        >
+          <div className="bg-block border-neutral sticky start-0 w-16 shrink-0 border-e px-2 py-2">
+            시각
+          </div>
+          {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
+            <div key={day} className="flex-1 px-2 py-2">
+              {day}
+            </div>
+          ))}
+        </div>
+        {Array.from({ length: 12 }, (_, hour) => (
+          <div key={hour} className="flex h-10">
+            <div
+              data-scroll-area-pinned="start"
+              className="bg-block border-neutral sticky start-0 w-16 shrink-0 border-e px-2"
+            >
+              {hour + 9}시
+            </div>
+            <div className="flex-1" />
+          </div>
+        ))}
+      </div>
+    </ScrollArea>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`sticky` 머리와 열에 `data-scroll-area-pinned="top"` / `"start"` 를 붙이면 세로 막대는 머리 아래에서, 가로 막대는 열 다음에서 시작합니다. 막대가 실제로 움직이는 칸에만 놓입니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const head = canvasElement.querySelector('[data-scroll-area-pinned="top"]')!;
+    const column = canvasElement.querySelector('[data-scroll-area-pinned="start"]')!;
+    const bar = (orientation: string) =>
+      canvasElement
+        .querySelector(`[data-scroll-area-scrollbar][data-orientation="${orientation}"]`)!
+        .getBoundingClientRect();
+
+    await waitFor(() =>
+      expect(bar('vertical').top).toBeGreaterThan(head.getBoundingClientRect().bottom),
+    );
+    await expect(bar('horizontal').left).toBeGreaterThan(column.getBoundingClientRect().right);
+  },
+};
+
 export const CustomThumb: Story = {
   render: () => (
     <ScrollArea variant="auto" className={frame}>
       <Text />
       <ScrollArea.Scrollbar>
-        <ScrollArea.Thumb className="bg-primary hover:bg-primary" />
+        <ScrollArea.Thumb className="bg-primary-solid hover:bg-primary-solid" />
       </ScrollArea.Scrollbar>
     </ScrollArea>
   ),
@@ -465,6 +523,6 @@ export const CustomThumb: Story = {
   play: async ({ canvasElement }) => {
     const thumb = canvasElement.querySelector<HTMLElement>('[data-scroll-area-thumb]')!;
     await waitFor(() => expect(thumb).toBeVisible());
-    await expect(thumb.className).toMatch(/(^| )bg-primary( |$)/);
+    await expect(thumb.className).toMatch(/(^| )bg-primary-solid( |$)/);
   },
 };

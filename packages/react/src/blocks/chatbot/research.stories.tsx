@@ -14,6 +14,7 @@ import { IconToggle } from '../../components/action/icon-toggle';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Alert } from '../../components/feedback/alert';
 import { toast } from '../../components/feedback/toast';
 import { TextArea } from '../../components/form/text-area';
@@ -119,7 +120,7 @@ export const PC: Story = {
               .
             </p>
 
-            <Item.Group ordered aria-label="신청하는 순서">
+            <ItemGroup ordered aria-label="신청하는 순서">
               {STEPS.map((step, index) => (
                 <Item key={step.text}>
                   <Item.Media variant="soft" aria-hidden>
@@ -131,7 +132,7 @@ export const PC: Story = {
                   </Item.Content>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
 
             <Alert colorScheme="info">
               <Alert.Title>주말과 공휴일 외박도 신청해요</Alert.Title>
@@ -159,7 +160,7 @@ export const PC: Story = {
                 이어서 많이 묻는 질문
               </h2>
               <Card size="tiny">
-                <Item.Group aria-label="이어서 많이 묻는 질문">
+                <ItemGroup aria-label="이어서 많이 묻는 질문">
                   {RELATED.map((question) => (
                     <Item key={question} onClick={() => setDraft(question)}>
                       <Item.Content>
@@ -167,14 +168,14 @@ export const PC: Story = {
                       </Item.Content>
                     </Item>
                   ))}
-                </Item.Group>
+                </ItemGroup>
               </Card>
             </section>
           </Tabs.Content>
 
           <Tabs.Content value="sources">
             <Card size="tiny">
-              <Item.Group aria-label="출처">
+              <ItemGroup aria-label="출처">
                 {SOURCES.map((source, index) => (
                   <Item key={source.id} asChild>
                     <a href={`#${source.id}`}>
@@ -190,7 +191,7 @@ export const PC: Story = {
                     </a>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </Tabs.Content>
         </Tabs>

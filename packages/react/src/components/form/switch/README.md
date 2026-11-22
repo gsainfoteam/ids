@@ -63,7 +63,7 @@ import { Field, Switch } from '@gsainfoteam/ids-react';
   </Switch.Thumb>
 </Switch>
 
-<Switch className="data-[state=checked]:bg-success" />   {/* 트랙은 루트다 */}
+<Switch className="data-[state=checked]:bg-success-solid" />   {/* 트랙은 루트다 */}
 ```
 
 - 루트가 트랙입니다. `className` 과 `style` 은 트랙으로 갑니다.
@@ -87,7 +87,7 @@ import { Field, Switch } from '@gsainfoteam/ids-react';
 | `focused`      | `data-focused`           | 포커스                            |
 | `focusVisible` | `data-focus-visible`     | 키보드 포커스. 포커스 링이 보인다 |
 
-- 켜진 트랙 색은 `bg-scheme`, 켜진 thumb 색은 `text-on-scheme` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다.
+- 켜진 트랙 색은 `bg-scheme-solid`, 켜진 thumb 색은 `text-on-scheme-solid` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다.
 
 ## 폼
 

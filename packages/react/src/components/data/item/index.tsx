@@ -3,7 +3,6 @@ import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 import { ItemActions, type ItemActionsProps } from './actions';
 import { ItemContent, type ItemContentProps } from './content';
 import { ItemDescription, type ItemDescriptionProps } from './description';
-import { ItemGroup, type ItemGroupProps, type ItemGroupVariant } from './group';
 import { ItemMedia, type ItemMediaProps } from './media';
 import { type ItemPartProps } from './part';
 import { ItemRoot, type ItemVariant } from './root';
@@ -65,12 +64,6 @@ export namespace Item {
     export type Props = ItemActionsProps;
   }
 
-  export const Group = ItemGroup;
-  export namespace Group {
-    export type Variant = ItemGroupVariant;
-    export type Props = ItemGroupProps;
-  }
-
   export const Separator = ItemSeparator;
   export namespace Separator {
     export type Props = ItemSeparatorProps;
@@ -79,5 +72,4 @@ export namespace Item {
   export const Style = itemStyle;
 }
 
-export type { ItemGroupVariant } from './group';
 export type { ItemVariant } from './root';

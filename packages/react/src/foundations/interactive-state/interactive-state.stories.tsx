@@ -23,7 +23,7 @@ function StateDump({ state }: { state: InteractiveState }) {
   return (
     <pre
       data-testid="state"
-      className="rounded-standard text-caption-c1-regular bg-neutral-subtle text-neutral px-3 py-2 font-mono"
+      className="rounded-standard text-caption-c1-regular bg-neutral-soft text-neutral px-3 py-2 font-mono"
     >
       {JSON.stringify(state, null, 2)}
     </pre>
@@ -43,7 +43,7 @@ export const NodeLocal: Story = {
           </Button>
         </Showcase.Row>
         <Showcase.Row label="data-* 스타일">
-          <Button variant="outline" className="data-hovered:inset-ring-primary">
+          <Button variant="outline" className="data-hovered:inset-ring-primary-strong">
             data-hovered로 테두리
           </Button>
         </Showcase.Row>

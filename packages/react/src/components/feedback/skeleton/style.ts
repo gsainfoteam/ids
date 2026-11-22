@@ -5,7 +5,7 @@ import type { Skeleton } from '.';
 export const skeletonStyle = tv({
   slots: {
     root: '',
-    paint: 'bg-neutral-subtle',
+    paint: 'bg-neutral-soft',
     line: 'flex h-[1lh] items-center',
     bar: 'h-[1em] w-full rounded-indicator',
     content: 'contents',
@@ -20,7 +20,7 @@ export const skeletonStyle = tv({
       pulse: { paint: 'animate-skeleton-pulse motion-reduce:animate-none' },
       wave: {
         paint: [
-          'bg-linear-to-r from-transparent via-neutral-subtler to-transparent',
+          'bg-linear-to-r from-transparent via-(--ids-color-bg-block) to-transparent',
           'bg-[length:50%_100%] bg-no-repeat',
           'animate-skeleton-wave rtl:[animation-direction:reverse]',
           'motion-reduce:animate-none motion-reduce:bg-none',

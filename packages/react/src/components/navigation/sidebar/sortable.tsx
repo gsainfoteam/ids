@@ -6,12 +6,8 @@ import {
   DndContext,
   DragOverlay,
   MeasuringStrategy,
-  MouseSensor,
-  TouchSensor,
   useDraggable,
   useDroppable,
-  useSensor,
-  useSensors,
   type Announcements,
   type CollisionDetection,
   type DragMoveEvent,
@@ -43,16 +39,17 @@ import {
   type SidebarTreeItem,
   type SidebarTreeMove,
 } from './tree';
+import { useDragSensors } from '../../../internal/drag-sensors';
+import {
+  swallowTheClickThatEndsADrag,
+  swallowTheSpaceKeyupThatWouldPress,
+} from '../../../internal/drag-surface';
 import { keyHandler } from '../../../internal/keys';
 import { useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 import { Item } from '../../data/item';
 
 const ITEM_SELECTOR = '[data-sidebar-item]';
-const POINTER_TRAVEL_BEFORE_DRAG = 4;
-const TOUCH_HOLD_BEFORE_DRAG = 250;
-const TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING = 5;
-const SPACE = ' ';
 const REACH_BEYOND_THE_ROWS = 36;
 const SAME_HEIGHT = 2;
 const LINE_INSET = 4;
@@ -80,24 +77,6 @@ const rowAtThePointerHeight: CollisionDetection = ({
 
 const sameDrop = (a: SidebarDrop | null, b: SidebarDrop | null) =>
   a?.key === b?.key && a?.position === b?.position;
-
-function swallowTheClickThatEndsADrag() {
-  const swallow = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  window.addEventListener('click', swallow, { capture: true, once: true });
-  setTimeout(() => window.removeEventListener('click', swallow, { capture: true }));
-}
-
-function swallowTheSpaceKeyupThatWouldPressTheRow() {
-  const swallow = (event: KeyboardEvent) => {
-    if (event.key !== SPACE) return;
-    event.preventDefault();
-    window.removeEventListener('keyup', swallow, { capture: true });
-  };
-  window.addEventListener('keyup', swallow, { capture: true });
-}
 
 type Grab = { key: string; stops: SidebarKeyboardStop[]; at: number };
 
@@ -135,15 +114,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
     null,
   );
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: POINTER_TRAVEL_BEFORE_DRAG } }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: TOUCH_HOLD_BEFORE_DRAG,
-        tolerance: TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING,
-      },
-    }),
-  );
+  const sensors = useDragSensors();
 
   useEffect(() => {
     const move = pending.current;
@@ -473,7 +444,7 @@ function SortableFrame({
   }, [register, dragKey, element, preview, folded]);
 
   const pressSpace = (action: () => void) => () => {
-    swallowTheSpaceKeyupThatWouldPressTheRow();
+    swallowTheSpaceKeyupThatWouldPress();
     action();
   };
 

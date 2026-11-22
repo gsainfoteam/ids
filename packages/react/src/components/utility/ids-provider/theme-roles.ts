@@ -1,25 +1,36 @@
-import { clampChroma, formatHex, interpolate, parse } from 'culori/fn';
-import { maxBy } from 'es-toolkit';
+import { clampChroma, formatHex, parse } from 'culori/fn';
 
-import {
-  ACCENT_TEXT_LC,
-  DARK_TEXT,
-  LIGHT_TEXT,
-  MARK_LC,
-  TEXT_LC,
-  lightnessContrast,
-  reaches,
-} from './contrast';
+import { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC, reaches } from './contrast';
 import { derivedSecondary, derivedTertiary } from './derived-brands';
-import { createIdsPalette, hueOf, shadeOf } from './palette-seed';
+import {
+  FILL_LAYER,
+  IDS_NEUTRAL_PALETTE,
+  SCALE_RULES,
+  SCALE_STEP,
+  contentLayer,
+  paletteFromRamp,
+  readsOn,
+  stepOf,
+  textBases,
+  textOn,
+  tintLayer,
+  underStateLayers,
+  withStateLayer,
+  type Backdrop,
+  type StateLayer,
+} from './palette-scales';
+import { createIdsRamp, hueOf, shadeOf } from './palette-seed';
 import { fixedStatusPalette, harmonizedStatusPalettes } from './status';
 import {
-  PALETTE_STEPS,
+  COLOR_KEYS,
+  RAMP_STEPS,
+  SCALE_STEPS,
   type IdsColorFamily,
   type IdsColorRoles,
   type IdsNeutral,
   type IdsPalette,
-  type IdsPaletteStep,
+  type IdsRamp,
+  type IdsScale,
   type IdsStatusFamily,
   type IdsTheme,
   type IdsThemeColor,
@@ -31,10 +42,7 @@ import {
   IDS_COLOR_FAMILIES,
   IDS_FAMILY_SLOTS,
   IDS_NEUTRAL_ONLY_SLOTS,
-  IDS_NEUTRAL_PALETTE,
   IDS_NEUTRAL_STEPS,
-  IDS_STATE_FILL_COLOR,
-  IDS_STATE_OPACITY,
   IDS_STATUS_FAMILIES,
 } from '../../../tokens/color-roles';
 
@@ -42,109 +50,76 @@ import type { IdsMode } from '../../../tokens/types';
 
 export { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC };
 
+export {
+  FILL_LAYER,
+  SCALE_RULES,
+  contentLayer,
+  tintLayer,
+  underStateLayers,
+  withStateLayer,
+  type StateLayer,
+};
+
 export const MODES: readonly IdsMode[] = ['light', 'dark'];
 
-export type StateLayer = { color: string; opacities: readonly number[] };
-
-export const contentLayer = (content: string): StateLayer => ({
-  color: content,
-  opacities: [IDS_STATE_OPACITY.hover, IDS_STATE_OPACITY.press],
-});
-
-export const tintLayer = (fill: string): StateLayer => ({
-  color: fill,
-  opacities: [IDS_STATE_OPACITY.tintHover, IDS_STATE_OPACITY.tintPress],
-});
-
-export const FILL_LAYER: StateLayer = {
-  color: IDS_STATE_FILL_COLOR,
-  opacities: [IDS_STATE_OPACITY.fillHover, IDS_STATE_OPACITY.fillPress],
-};
-
 export const TINTED_NEUTRAL_CHROMA = 0.02;
-
-const FILL_STEPS_OUTWARD_FROM_600: readonly (readonly IdsPaletteStep[])[] = [
-  [600],
-  [500, 700],
-  [400, 800],
-];
-
-type ModeRule = {
-  fill: readonly (readonly IdsPaletteStep[])[];
-  subtler: IdsPaletteStep;
-  subtlerTowardSurface: number;
-  subtle: IdsPaletteStep;
-  onSubtle: readonly IdsPaletteStep[];
-  text: readonly IdsPaletteStep[];
-};
-
-export const ROLE_RULES: { [mode in IdsMode]: ModeRule } = {
-  light: {
-    fill: FILL_STEPS_OUTWARD_FROM_600,
-    subtler: 50,
-    subtlerTowardSurface: 0,
-    subtle: 100,
-    onSubtle: [700, 800, 900, 950],
-    text: [600, 700, 800, 900, 950],
-  },
-  dark: {
-    fill: FILL_STEPS_OUTWARD_FROM_600,
-    subtler: 950,
-    subtlerTowardSurface: 0.5,
-    subtle: 950,
-    onSubtle: [400, 300, 200, 100, 50],
-    text: [500, 400, 300, 200, 100, 50],
-  },
-};
 
 export type IdsThemeIssue = {
   path: string;
   message: string;
 };
 
-export type NeutralPalette = { [step: string]: string };
+type ColoredFamily = Exclude<IdsColorFamily, 'neutral'>;
 
 export type ResolvedColors = {
-  palettes: { [family in Exclude<IdsColorFamily, 'neutral'>]: IdsPalette };
-  neutral: NeutralPalette;
+  ramps: { [family in ColoredFamily]: IdsRamp };
+  palettes: { [family in ColoredFamily]: IdsPalette };
+  neutral: IdsPalette;
   given: readonly IdsColorFamily[];
   roles: IdsThemeRoles;
 };
 
-const isNeutralOnly = (slot: string) => (IDS_NEUTRAL_ONLY_SLOTS as readonly string[]).includes(slot);
+type FamilyColors = { ramp: IdsRamp; palette?: IdsPalette };
+
+const isNeutralOnly = (slot: string) =>
+  (IDS_NEUTRAL_ONLY_SLOTS as readonly string[]).includes(slot);
 
 export const slotsOf = (family: IdsColorFamily) =>
   IDS_FAMILY_SLOTS.filter((slot) => family === 'neutral' || !isNeutralOnly(slot)).map((slot) =>
     slot.replace('{family}', family),
   );
 
-export function parsePalette(
-  value: IdsThemeColor | undefined,
-  path: string,
-): { shades: IdsPalette | undefined; issues: IdsThemeIssue[] } {
-  if (typeof value === 'string') {
-    const generated = createIdsPalette(value);
-    return generated === undefined
-      ? { shades: undefined, issues: [{ path, message: `${path} is not a CSS color: ${value}.` }] }
-      : { shades: generated, issues: [] };
+const isPalette = (value: object): value is Partial<IdsPalette> =>
+  'light' in value || 'dark' in value;
+
+function parseScale(value: unknown, path: string, issues: IdsThemeIssue[]): IdsScale | undefined {
+  if (!Array.isArray(value) || value.length !== SCALE_STEPS.length) {
+    issues.push({
+      path,
+      message: `${path} takes ${SCALE_STEPS.length} colors, steps 1 to ${SCALE_STEPS.length}.`,
+    });
+    return undefined;
   }
 
-  if (value === undefined || value === null || typeof value !== 'object')
-    return {
-      shades: undefined,
-      issues: [
-        {
-          path,
-          message: `The theme needs ${path}: steps 50 to 950, or one CSS color to build them from.`,
-        },
-      ],
-    };
+  const colors = value.map((step: unknown, index) => {
+    const color = typeof step === 'string' ? parse(step) : undefined;
+    if (color === undefined)
+      issues.push({
+        path: `${path}.${index + 1}`,
+        message: `Step ${index + 1} is not a CSS color: ${String(step)}.`,
+      });
+    return color === undefined ? undefined : formatHex(color);
+  });
 
-  const issues: IdsThemeIssue[] = [];
-  const shades = {} as IdsPalette;
+  return colors.includes(undefined) ? undefined : (colors as unknown as IdsScale);
+}
 
-  for (const step of PALETTE_STEPS) {
-    const stepValue = (value as Partial<IdsPalette>)[step];
+function parseRamp(value: object, path: string, issues: IdsThemeIssue[]): IdsRamp | undefined {
+  const before = issues.length;
+  const shades = {} as IdsRamp;
+
+  for (const step of RAMP_STEPS) {
+    const stepValue = (value as Partial<IdsRamp>)[step];
     const color = typeof stepValue === 'string' ? parse(stepValue) : undefined;
 
     if (color === undefined) {
@@ -161,121 +136,129 @@ export function parsePalette(
     shades[step] = formatHex(color);
   }
 
-  return { shades: issues.length === 0 ? shades : undefined, issues };
+  return issues.length === before ? shades : undefined;
 }
 
-const mixed = (from: string, to: string, amount: number) =>
-  formatHex(interpolate([from, to], 'oklab')(amount));
-
-export const withStateLayer = (base: string, layer: string, opacity: number) =>
-  formatHex(interpolate([base, layer], 'rgb')(opacity));
-
-export const underStateLayers = (base: string, layers: readonly StateLayer[]) => [
-  base,
-  ...layers.flatMap(({ color, opacities }) =>
-    opacities.map((opacity) => withStateLayer(base, color, opacity)),
-  ),
-];
-
-function firstReadableOn(
-  shades: IdsPalette,
-  candidates: readonly IdsPaletteStep[],
-  bases: readonly string[],
-  familyFill: string,
-  lc = TEXT_LC,
-) {
-  const step = candidates.find((candidate) =>
-    reaches(
-      shades[candidate],
-      bases.flatMap((base) =>
-        underStateLayers(base, [contentLayer(shades[candidate]), tintLayer(familyFill)]),
-      ),
-      lc,
-    ),
-  );
-  return step === undefined ? undefined : shades[step];
-}
-
-const lowestContrastUnderStateLayers = (text: string, fill: string) =>
-  Math.min(...underStateLayers(fill, [FILL_LAYER]).map((state) => lightnessContrast(text, state)));
-
-function mostReadable(fills: string[]) {
-  return maxBy(
-    fills.flatMap((fill) =>
-      [LIGHT_TEXT, DARK_TEXT].map((text) => ({
-        fill,
-        text,
-        lc: lowestContrastUnderStateLayers(text, fill),
-      })),
-    ),
-    (pair) => pair.lc,
-  )!;
-}
-
-function readableFill(shades: IdsPalette, stepsOutward: ModeRule['fill']) {
-  for (const steps of stepsOutward) {
-    const best = mostReadable(steps.map((step) => shades[step]));
-    if (best.lc >= TEXT_LC) return best;
+export function parseThemeColor(
+  value: IdsThemeColor | undefined,
+  path: string,
+): { colors: FamilyColors | undefined; issues: IdsThemeIssue[] } {
+  if (typeof value === 'string') {
+    const ramp = createIdsRamp(value);
+    return ramp === undefined
+      ? { colors: undefined, issues: [{ path, message: `${path} is not a CSS color: ${value}.` }] }
+      : { colors: { ramp }, issues: [] };
   }
-  return undefined;
+
+  if (value === undefined || value === null || typeof value !== 'object')
+    return {
+      colors: undefined,
+      issues: [
+        {
+          path,
+          message: `The theme needs ${path}: one CSS color, steps 50 to 950, or light and dark scales of ${SCALE_STEPS.length} colors.`,
+        },
+      ],
+    };
+
+  const issues: IdsThemeIssue[] = [];
+
+  if (isPalette(value)) {
+    const light = parseScale(value.light, `${path}.light`, issues);
+    const dark = parseScale(value.dark, `${path}.dark`, issues);
+    if (light === undefined || dark === undefined) return { colors: undefined, issues };
+    return {
+      colors: { ramp: createIdsRamp(stepOf(light, SCALE_STEP.solid))!, palette: { light, dark } },
+      issues,
+    };
+  }
+
+  const ramp = parseRamp(value, path, issues);
+  return { colors: ramp === undefined ? undefined : { ramp }, issues };
 }
 
-const lastOf = (shades: IdsPalette, steps: readonly IdsPaletteStep[]) =>
-  shades[steps[steps.length - 1]!];
+const textOnRole = (
+  role: string,
+  background: string,
+  backdrop: Backdrop,
+  scale: IdsScale,
+  mode: IdsMode,
+  ramp: IdsRamp | undefined,
+  path: string,
+  issues: IdsThemeIssue[],
+) => {
+  const on = textOn(background, backdrop, scale, mode, ramp);
+  if (!on.reaches)
+    issues.push({
+      path,
+      message: `${mode}: no color of the scale, its ramp, white or neutral 950 reaches Lc ${TEXT_LC} as ${role}, under the hover and press layers too.`,
+    });
+  return on.text;
+};
 
 export function familyRoles(
-  family: Exclude<IdsColorFamily, 'neutral'>,
-  shades: IdsPalette,
+  family: ColoredFamily,
+  scale: IdsScale,
   mode: IdsMode,
-  surface: string,
+  neutral: IdsScale,
+  ramp?: IdsRamp,
   path: string = family,
 ): { roles: IdsColorRoles; issues: IdsThemeIssue[] } {
-  const rule = ROLE_RULES[mode];
   const issues: IdsThemeIssue[] = [];
-  const subtler = mixed(shades[rule.subtler], surface, rule.subtlerTowardSurface);
-  const subtle = shades[rule.subtle];
+  const soft = stepOf(scale, SCALE_STEP.soft);
+  const solid = stepOf(scale, SCALE_STEP.solid);
+  const strongBorder = stepOf(scale, SCALE_STEP.strongBorder);
+  const text = stepOf(scale, SCALE_STEP.text);
+  const strongText = stepOf(scale, SCALE_STEP.strongText);
+  const bases = textBases(neutral, soft);
+  const surfaces = `base, surface, block and ${family}-soft`;
 
-  const readable = readableFill(shades, rule.fill);
-  if (readable === undefined)
+  if (!reaches(strongBorder, bases, MARK_LC))
     issues.push({
       path,
-      message: `${mode}: neither white nor neutral 950 reaches Lc ${TEXT_LC} on ${family} steps ${rule.fill.flat().join(', ')} and under their hover and press layers.`,
+      message: `${mode}: border-${family}-strong (step ${SCALE_STEP.strongBorder}) does not reach Lc ${MARK_LC} on ${surfaces}.`,
     });
-  const { fill, text: onFill } = readable ?? mostReadable([shades[600]]);
 
-  const onSubtler = firstReadableOn(shades, rule.onSubtle, [subtler], fill);
-  if (onSubtler === undefined)
+  if (!readsOn(text, bases, solid, ACCENT_TEXT_LC))
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.onSubtle.join(', ')} reaches Lc ${TEXT_LC} on ${family}-subtler and under its hover and press layers.`,
+      message: `${mode}: text-${family} (step ${SCALE_STEP.text}) does not reach Lc ${ACCENT_TEXT_LC} on ${surfaces}, under their hover and press layers too.`,
     });
 
-  const onSubtle = firstReadableOn(shades, rule.onSubtle, [subtle], fill);
-  if (onSubtle === undefined)
+  if (!readsOn(strongText, bases, solid))
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.onSubtle.join(', ')} reaches Lc ${TEXT_LC} on ${family}-subtle (step ${rule.subtle}) and under its hover and press layers.`,
+      message: `${mode}: text-${family}-strong (step ${SCALE_STEP.strongText}) does not reach Lc ${TEXT_LC} on ${surfaces}, under their hover and press layers too.`,
     });
-
-  const text = firstReadableOn(shades, rule.text, [surface, subtler, subtle], fill, ACCENT_TEXT_LC);
-  if (text === undefined)
-    issues.push({
-      path,
-      message: `${mode}: no step of ${rule.text.join(', ')} reaches Lc ${ACCENT_TEXT_LC} as ${family} text on the surface, ${family}-subtler and ${family}-subtle, under their hover and press layers too.`,
-    });
-
-  const accent = text ?? lastOf(shades, rule.text);
 
   return {
     roles: {
-      [`bg-${family}-subtler`]: subtler,
-      [`bg-${family}-subtle`]: subtle,
-      [`bg-${family}`]: fill,
-      [`text-on-${family}-subtler`]: onSubtler ?? lastOf(shades, rule.onSubtle),
-      [`text-on-${family}-subtle`]: onSubtle ?? lastOf(shades, rule.onSubtle),
-      [`text-on-${family}`]: onFill,
-      [`text-${family}`]: accent,
-      [`border-${family}`]: accent,
+      [`bg-${family}-soft`]: soft,
+      [`bg-${family}-solid`]: solid,
+      [`border-${family}`]: stepOf(scale, SCALE_STEP.border),
+      [`border-${family}-strong`]: strongBorder,
+      [`text-${family}`]: text,
+      [`text-${family}-strong`]: strongText,
+      [`text-on-${family}-soft`]: textOnRole(
+        `text-on-${family}-soft`,
+        soft,
+        { kind: 'tinted', solid },
+        scale,
+        mode,
+        ramp,
+        path,
+        issues,
+      ),
+      [`text-on-${family}-solid`]: textOnRole(
+        `text-on-${family}-solid`,
+        solid,
+        { kind: 'solid' },
+        scale,
+        mode,
+        ramp,
+        path,
+        issues,
+      ),
     },
     issues,
   };
@@ -283,39 +266,69 @@ export function familyRoles(
 
 const bell = (lightness: number) => 4 * lightness * (1 - lightness);
 
-export function neutralPalette(kind: IdsNeutral, primary: IdsPalette): NeutralPalette {
-  if (kind !== 'tinted') return { ...IDS_NEUTRAL_PALETTE };
+const tintedScale = (scale: IdsScale, hue: number) =>
+  scale.map((pure) => {
+    const { l } = shadeOf(pure);
+    const tinted = { mode: 'oklch' as const, l, c: TINTED_NEUTRAL_CHROMA * bell(l), h: hue };
+    return formatHex(clampChroma(tinted, 'oklch'));
+  }) as unknown as IdsScale;
+
+export function neutralPalette(kind: IdsNeutral, primary: IdsRamp): IdsPalette {
+  if (kind !== 'tinted') return IDS_NEUTRAL_PALETTE;
 
   const hue = hueOf(primary);
-  return Object.fromEntries(
-    Object.entries(IDS_NEUTRAL_PALETTE).map(([step, pure]) => {
-      const { l } = shadeOf(pure);
-      const tinted = { mode: 'oklch' as const, l, c: TINTED_NEUTRAL_CHROMA * bell(l), h: hue };
-      return [step, formatHex(clampChroma(tinted, 'oklch'))];
-    }),
-  );
+  return {
+    light: tintedScale(IDS_NEUTRAL_PALETTE.light, hue),
+    dark: tintedScale(IDS_NEUTRAL_PALETTE.dark, hue),
+  };
 }
 
-export function neutralRoles(neutral: NeutralPalette, mode: IdsMode): IdsColorRoles {
-  return Object.fromEntries(
-    Object.entries(IDS_NEUTRAL_STEPS[mode]).map(([slot, step]) => [slot, neutral[step]!]),
+const NEUTRAL_TEXT_ON: readonly (readonly [string, string, Backdrop])[] = [
+  ['text-on-base', 'bg-base', { kind: 'neutral' }],
+  ['text-on-surface', 'bg-surface', { kind: 'neutral' }],
+  ['text-on-block', 'bg-block', { kind: 'neutral' }],
+  ['text-on-neutral-soft', 'bg-neutral-soft', { kind: 'neutral' }],
+  ['text-on-neutral-solid', 'bg-neutral-solid', { kind: 'solid' }],
+];
+
+export function neutralRoles(
+  neutral: IdsScale,
+  mode: IdsMode,
+  issues: IdsThemeIssue[] = [],
+): IdsColorRoles {
+  const roles: IdsColorRoles = Object.fromEntries(
+    Object.entries(IDS_NEUTRAL_STEPS).map(([slot, step]) => [slot, neutral[step - 1]!]),
   );
+
+  for (const [role, background, backdrop] of NEUTRAL_TEXT_ON)
+    roles[role] = textOnRole(
+      role,
+      roles[background]!,
+      backdrop,
+      neutral,
+      mode,
+      undefined,
+      'neutral',
+      issues,
+    );
+
+  return roles;
 }
 
 const isStatus = (family: IdsColorFamily): family is IdsStatusFamily =>
   (IDS_STATUS_FAMILIES as readonly string[]).includes(family);
 
-function statusPalette(
+function statusColors(
   family: IdsStatusFamily,
   status: IdsTheme['status'],
-  harmonized: () => { [family in IdsStatusFamily]: IdsPalette },
-): { shades: IdsPalette | undefined; issues: IdsThemeIssue[] } {
-  if (status === 'fixed') return { shades: fixedStatusPalette(family), issues: [] };
+  harmonized: () => { [family in IdsStatusFamily]: IdsRamp },
+): { colors: FamilyColors | undefined; issues: IdsThemeIssue[] } {
+  if (status === 'fixed') return { colors: { ramp: fixedStatusPalette(family) }, issues: [] };
 
   const given = typeof status === 'object' && status !== null ? status[family] : undefined;
-  if (given !== undefined) return parsePalette(given, `status.${family}`);
+  if (given !== undefined) return parseThemeColor(given, `status.${family}`);
 
-  return { shades: harmonized()[family], issues: [] };
+  return { colors: { ramp: harmonized()[family] }, issues: [] };
 }
 
 function checkKnownValues(theme: IdsThemeOverrides, issues: IdsThemeIssue[]) {
@@ -350,45 +363,69 @@ export function resolveColors(theme: IdsThemeOverrides): {
   const issues: IdsThemeIssue[] = [];
   checkKnownValues(theme, issues);
 
-  const primary = parsePalette(theme.primary, 'primary');
+  const primary = parseThemeColor(theme.primary, 'primary');
   issues.push(...primary.issues);
-  if (primary.shades === undefined) return { colors: undefined, issues };
+  if (primary.colors === undefined) return { colors: undefined, issues };
 
-  const palettes = { primary: primary.shades } as ResolvedColors['palettes'];
+  const families = { primary: primary.colors } as { [family in ColoredFamily]: FamilyColors };
   const given: IdsColorFamily[] = ['primary'];
 
   for (const family of IDS_BRAND_FAMILIES) {
     if (family === 'primary' || theme[family] === undefined) continue;
-    const parsed = parsePalette(theme[family], family);
+    const parsed = parseThemeColor(theme[family], family);
     issues.push(...parsed.issues);
-    if (parsed.shades === undefined) continue;
-    palettes[family] = parsed.shades;
+    if (parsed.colors === undefined) continue;
+    families[family] = parsed.colors;
     given.push(family);
   }
 
-  let harmonized: { [family in IdsStatusFamily]: IdsPalette } | undefined;
-  const harmonizedOnce = () => (harmonized ??= harmonizedStatusPalettes(primary.shades!));
+  const primaryRamp = primary.colors.ramp;
+  let harmonized: { [family in IdsStatusFamily]: IdsRamp } | undefined;
+  const harmonizedOnce = () => (harmonized ??= harmonizedStatusPalettes(primaryRamp));
 
   for (const family of IDS_STATUS_FAMILIES) {
-    const parsed = statusPalette(family, theme.status, harmonizedOnce);
+    const parsed = statusColors(family, theme.status, harmonizedOnce);
     issues.push(...parsed.issues);
-    palettes[family] = parsed.shades ?? fixedStatusPalette(family);
+    families[family] = parsed.colors ?? { ramp: fixedStatusPalette(family) };
   }
 
-  palettes.secondary ??= derivedSecondary(primary.shades);
-  palettes.tertiary ??= derivedTertiary(primary.shades, palettes);
+  const statusRamps = Object.fromEntries(
+    IDS_STATUS_FAMILIES.map((family) => [family, families[family].ramp]),
+  ) as { [family in IdsStatusFamily]: IdsRamp };
 
-  const neutral = neutralPalette(theme.neutral ?? 'pure', primary.shades);
+  families.secondary ??= { ramp: derivedSecondary(primaryRamp) };
+  families.tertiary ??= { ramp: derivedTertiary(primaryRamp, statusRamps) };
+
+  const neutral = neutralPalette(theme.neutral ?? 'pure', primaryRamp);
+
+  const coloredFamilies = IDS_COLOR_FAMILIES.filter(
+    (family): family is ColoredFamily => family !== 'neutral',
+  );
+
+  const ramps = Object.fromEntries(
+    coloredFamilies.map((family) => [family, families[family].ramp]),
+  ) as ResolvedColors['ramps'];
+
+  const palettes = Object.fromEntries(
+    coloredFamilies.map((family) => [
+      family,
+      families[family].palette ?? paletteFromRamp(families[family].ramp, neutral),
+    ]),
+  ) as ResolvedColors['palettes'];
 
   const rolesIn = (mode: IdsMode) => {
-    const roles = neutralRoles(neutral, mode);
-    const surface = roles['bg-neutral-subtlest']!;
+    const roles = neutralRoles(neutral[mode], mode, issues);
 
-    for (const family of IDS_COLOR_FAMILIES) {
-      if (family === 'neutral') continue;
-
+    for (const family of coloredFamilies) {
       const path = isStatus(family) ? `status.${family}` : family;
-      const resolved = familyRoles(family, palettes[family], mode, surface, path);
+      const resolved = familyRoles(
+        family,
+        palettes[family][mode],
+        mode,
+        neutral[mode],
+        ramps[family],
+        path,
+      );
       issues.push(...resolved.issues);
       Object.assign(roles, resolved.roles);
     }
@@ -397,18 +434,43 @@ export function resolveColors(theme: IdsThemeOverrides): {
   };
 
   return {
-    colors: { palettes, neutral, given, roles: { light: rolesIn('light'), dark: rolesIn('dark') } },
+    colors: {
+      ramps,
+      palettes,
+      neutral,
+      given,
+      roles: { light: rolesIn('light'), dark: rolesIn('dark') },
+    },
     issues,
   };
 }
 
-const resolvedThemes = new WeakMap<object, ReturnType<typeof resolveColors>>();
+const RESOLVED_COLOR_SETS_KEPT = 64;
+
+const resolvedColorSets = new Map<string, ReturnType<typeof resolveColors>>();
+
+function colorSetKey(theme: IdsThemeOverrides) {
+  try {
+    return JSON.stringify(COLOR_KEYS.map((key) => theme[key]));
+  } catch {
+    return undefined;
+  }
+}
 
 export function resolveColorsOnce(theme: IdsThemeOverrides) {
-  let resolved = resolvedThemes.get(theme);
-  if (resolved === undefined) {
-    resolved = resolveColors(theme);
-    resolvedThemes.set(theme, resolved);
+  const key = colorSetKey(theme);
+  if (key === undefined) return resolveColors(theme);
+
+  const kept = resolvedColorSets.get(key);
+  if (kept !== undefined) {
+    resolvedColorSets.delete(key);
+    resolvedColorSets.set(key, kept);
+    return kept;
   }
+
+  const resolved = resolveColors(theme);
+  resolvedColorSets.set(key, resolved);
+  if (resolvedColorSets.size > RESOLVED_COLOR_SETS_KEPT)
+    resolvedColorSets.delete(resolvedColorSets.keys().next().value!);
   return resolved;
 }

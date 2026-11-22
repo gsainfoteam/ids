@@ -4,9 +4,9 @@ import type { ChartIndicator } from './config';
 
 export const chartStyle = tv({
   slots: {
-    root: 'm-0 flex min-w-0 flex-col gap-4 text-neutral-bold',
+    root: 'm-0 flex min-w-0 flex-col gap-4 text-neutral-strong',
     caption: 'flex flex-col gap-1',
-    title: 'text-subtitle-s2-semibold [overflow-wrap:anywhere]',
+    title: 'text-body-b2-semibold [overflow-wrap:anywhere]',
     description: 'text-body-b3-regular text-neutral',
     frame: [
       'text-caption-c1-regular',
@@ -15,7 +15,7 @@ export const chartStyle = tv({
       '[&_.recharts-cartesian-axis-line]:stroke-neutral [&_.recharts-cartesian-axis-tick-line]:stroke-neutral',
       '[&_.recharts-cartesian-grid_line]:stroke-neutral [&_.recharts-polar-grid_*]:stroke-neutral',
       '[&_.recharts-reference-line_line]:stroke-neutral',
-      '[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-(--ids-color-bg-neutral-subtle)',
+      '[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-(--ids-color-bg-neutral-soft)',
       '[&_.recharts-curve.recharts-tooltip-cursor]:stroke-neutral',
       '[&_.recharts-dot]:fill-(--ids-bg-current) [&_.recharts-active-dot_.recharts-dot]:stroke-(--ids-bg-current)',
       '[&_.recharts-sector]:stroke-(--ids-bg-current)',

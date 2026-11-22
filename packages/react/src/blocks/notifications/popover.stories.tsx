@@ -7,6 +7,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
 import { Popover } from '../../components/overlay/popover';
@@ -40,7 +41,7 @@ export const PC: Story = {
     return (
       <div className="flex min-h-dvh flex-col break-keep">
         <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <div className="text-subtitle-s2-semibold flex items-center gap-2">
+          <div className="text-body-b2-semibold flex items-center gap-2">
             <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
               <Avatar.Fallback>
                 <CubeTransparentIcon />
@@ -67,7 +68,7 @@ export const PC: Story = {
                     모두 읽음
                   </Button>
                 </div>
-                <Item.Group size="tiny" aria-label="최근 알림">
+                <ItemGroup size="tiny" aria-label="최근 알림">
                   {RECENT.map((notification) => (
                     <Item
                       key={notification.id}
@@ -87,7 +88,7 @@ export const PC: Story = {
                       </Item.Content>
                     </Item>
                   ))}
-                </Item.Group>
+                </ItemGroup>
                 <Divider />
                 <Button asChild variant="soft" size="tiny" className="w-full">
                   <a href="#notifications">알림 모두 보기</a>

@@ -1,11 +1,10 @@
-import { isValidElement, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { ImageViewerCaption, type ImageViewerCaptionProps } from './caption';
 import { ImageViewerClose, type ImageViewerCloseProps } from './close';
 import { ImageViewerCounter, type ImageViewerCounterProps } from './counter';
 import { ImageViewerDownload, type ImageViewerDownloadProps } from './download';
 import { ImageFallback, type ImageFallbackProps } from './fallback';
-import { ImageGroup, type ImageGroupLayout, type ImageGroupProps } from './group';
 import { ImageViewerNext, type ImageViewerNextProps } from './next';
 import { ImagePlaceholder, type ImagePlaceholderProps } from './placeholder';
 import { ImageViewerPrev, type ImageViewerPrevProps } from './prev';
@@ -21,7 +20,6 @@ import { ImageViewerZoomOut, type ImageViewerZoomOutProps } from './zoom-out';
 import { ImageViewerZoomReset, type ImageViewerZoomResetProps } from './zoom-reset';
 import { type ImageStatus } from '../../../internal/image-status';
 import { type StateValue } from '../../../internal/state-props';
-import { elementTypeOf, flattenFragments } from '../../../utils';
 
 export function Image(props: Image.Props) {
   return <ImageRoot {...props} />;
@@ -48,7 +46,6 @@ export namespace Image {
 
   export type PlaceholderProps = ImagePlaceholderProps;
   export type FallbackProps = ImageFallbackProps;
-  export type GroupProps = ImageGroupProps;
   export type ViewerProps = ImageViewerProps;
 
   export const Placeholder = ImagePlaceholder;
@@ -59,24 +56,6 @@ export namespace Image {
   export const Fallback = ImageFallback;
   export namespace Fallback {
     export type Props = ImageFallbackProps;
-  }
-
-  export function Group({ children, ...props }: Group.Props) {
-    const nodes = flattenFragments(children);
-    const viewer = nodes.find(isTheViewer);
-
-    return (
-      <ImageGroup {...props} viewer={viewer}>
-        {nodes.filter((node) => node !== viewer)}
-      </ImageGroup>
-    );
-  }
-
-  Group.displayName = 'Image.Group';
-
-  export namespace Group {
-    export type Layout = ImageGroupLayout;
-    export type Props = ImageGroupProps;
   }
 
   export function Viewer(props: Viewer.Props) {
@@ -172,11 +151,4 @@ export namespace Image {
   export const Style = imageStyle;
 }
 
-const viewerAsWrittenOrServerRendered: unknown[] = [Image.Viewer, ImageViewer];
-
-function isTheViewer(node: ReactNode) {
-  return isValidElement(node) && viewerAsWrittenOrServerRendered.includes(elementTypeOf(node));
-}
-
-export type { ImageGroupLayout } from './group';
 export type { ImageViewerItem } from './viewer';

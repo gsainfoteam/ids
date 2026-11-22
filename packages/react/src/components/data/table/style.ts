@@ -7,11 +7,11 @@ export const tableStyle = tv({
   slots: {
     root: 'w-full max-w-full',
     viewport: 'isolate',
-    table: 'w-full border-separate border-spacing-0 text-neutral-bold',
+    table: 'w-full border-separate border-spacing-0 text-neutral-strong',
     caption: 'caption-bottom text-start text-neutral',
     header: '',
     body: '',
-    footer: 'bg-neutral-subtle',
+    footer: 'bg-block',
     row: 'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     head: 'border-b border-neutral align-middle whitespace-nowrap',
     cell: 'border-b border-neutral align-middle',
@@ -19,21 +19,22 @@ export const tableStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'rounded-container border border-neutral',
-        header: 'bg-neutral-subtle',
+        root: '[--table-radius:var(--radius-container)] rounded-(--table-radius) border border-neutral',
+        viewport: 'rounded-[calc(var(--table-radius)-1px)]',
+        header: 'bg-block',
       },
       ghost: { header: 'bg-(--ids-bg-current)' },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {
         caption: 'px-4 py-3 text-body-b3-regular',
-        head: 'h-11 px-4 text-body-b3-medium',
-        cell: 'px-4 py-3 text-body-b3-regular',
+        head: 'h-10 px-4 text-body-b3-medium',
+        cell: 'px-4 py-2.5 text-body-b3-regular',
       },
       tiny: {
         caption: 'px-3 py-2 text-caption-c1-regular',
-        head: 'h-9 px-3 text-caption-c1-medium',
-        cell: 'px-3 py-2 text-caption-c1-regular',
+        head: 'h-8 px-3 text-caption-c1-medium',
+        cell: 'px-3 py-1.5 text-caption-c1-regular',
       },
     } satisfies Record<IdsSize, object>,
     layout: {
@@ -49,14 +50,16 @@ export const tableStyle = tv({
       header: { head: 'text-neutral' },
       body: {
         row: [
-          'state-layer data-selected:state-press',
+          'state-layer',
+          'data-selected:scheme-primary data-selected:state-scheme',
+          'data-selected:bg-scheme-soft data-selected:text-on-scheme-soft',
           'last:*:border-b-0',
         ],
       },
       footer: { head: 'border-t border-b-0', cell: 'border-t border-b-0' },
     } satisfies Record<TableSection, object>,
     hoverable: {
-      true: { row: 'not-data-selected:hover:state-hover' },
+      true: { row: 'hover:state-hover' },
       false: {},
     },
     clickable: {
@@ -70,7 +73,7 @@ export const tableStyle = tv({
     } satisfies Record<TableAlign, object>,
   },
   compoundVariants: [
-    { striped: true, section: 'body', class: { row: 'even:bg-neutral-subtle' } },
+    { striped: true, section: 'body', class: { row: 'even:not-data-selected:bg-block' } },
   ],
   defaultVariants: {
     variant: 'outline',

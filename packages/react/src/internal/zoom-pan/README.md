@@ -11,7 +11,7 @@
 ## 쓰는 곳
 
 - Image 의 뷰어(`components/data/image/viewer-layer.tsx`)가 `useZoomPan` 으로 지금 보는 장의 영역과 상자에 붙입니다. 장을 넘기면 앞 장에서 떼고(그 장의 배율은 1 로 돌아간다) 새 장에 붙습니다.
-- 뷰어는 배율을 Image.Group 의 `zoom` 으로 제어하고, 확대 중에는 슬라이드 트랙이 끌리지 않게 `watchDrag` 에서 `isZoomed()` 를 묻습니다. 쓸어 닫기의 `presence` 는 대화상자와 배경막의 `--image-viewer-presence` 로 칠합니다.
+- 뷰어는 배율을 ImageGroup 의 `zoom` 으로 제어하고, 확대 중에는 슬라이드 트랙이 끌리지 않게 `watchDrag` 에서 `isZoomed()` 를 묻습니다. 쓸어 닫기의 `presence` 는 대화상자와 배경막의 `--image-viewer-presence` 로 칠합니다.
 
 ## 쓰는 법
 

@@ -99,7 +99,7 @@ const answer = 42;
 
 - 줄 번호는 `::before` 의 CSS counter 입니다(`content: counter(line) / ''`). 글자가 아니라서 골라 복사해도 섞이지 않고, 대체 텍스트가 빈 문자열이라 스크린 리더도 읽지 않습니다.
 - 번호 칸의 폭은 줄 수의 자릿수(`--code-block-digits`, `ch` 단위)입니다.
-- 강조한 줄은 `data-highlighted` 를 받고 바탕(outline 은 `bg-neutral-subtle`, soft 는 `bg-neutral-subtlest`)과 왼쪽 2px `primary` 막대로 보입니다. 글자 대비를 크게 해치지 않는 옅은 바탕입니다.
+- 강조한 줄은 `data-highlighted` 를 받고 바탕(outline 은 `bg-neutral-soft`, soft 는 `bg-base`)과 왼쪽 2px `primary` 막대로 보입니다. 글자 대비를 크게 해치지 않는 옅은 바탕입니다.
 - 줄마다 `data-line` 에 1부터 센 번호가 있습니다.
 
 ## 넘침
@@ -152,7 +152,8 @@ const answer = 42;
 <CodeBlock variant="soft" />      // 옅은 바탕, 테두리 없음
 ```
 
-- caption 아래 선은 `Divider`(`decorative`)입니다. `soft`에서는 그 선을 `border`가 아니라 `bg-neutral-subtlest` 색으로 칠합니다. 다크 모드에서 `border`는 `bg-neutral-subtle` 바탕과 같은 색이라 보이지 않습니다.
+- `outline`은 바탕을 칠하지 않습니다. 페이지, Card, Editor 처럼 놓인 면의 색이 그대로 비칩니다.
+- caption 아래 선은 `Divider`(`decorative`)입니다. `soft`에서는 그 선을 `border`가 아니라 `bg-base` 색으로 칠합니다. 다크 모드에서 `border`는 `bg-neutral-soft` 바탕과 같은 색이라 보이지 않습니다.
 
 - 모서리는 `container`(16px)입니다. 모서리 안쪽에 붙는 것은 6px 떨어진 10px 복사 버튼이라 `10 + 6` 이 `container` 에서 멈춥니다.
 - 글자는 `font-mono` `text-body-b3-regular` 입니다.

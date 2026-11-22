@@ -10,12 +10,16 @@ export type EditorContentProps = {
   className?: string;
 };
 
-function asReactProps({ class: className, ...attributes }: Record<string, string>) {
-  return { ...attributes, className };
+function asReactProps({
+  class: className,
+  spellcheck: spellCheck,
+  ...attributes
+}: Record<string, string>) {
+  return { ...attributes, className, spellCheck: spellCheck === 'true' };
 }
 
 export function EditorContentPart(_: EditorContentProps) {
-  const { editor, styles, contentAttributes, bubbles, EngineContent } =
+  const { editor, styles, contentAttributes, floating, EngineContent } =
     useEditorContext('Editor.Content');
 
   const focusTheEndFromTheSpaceBelow = (event: MouseEvent<HTMLDivElement>) => {
@@ -37,7 +41,7 @@ export function EditorContentPart(_: EditorContentProps) {
           ) : (
             <div {...asReactProps(contentAttributes)} />
           )}
-          {bubbles}
+          {floating}
         </div>
       </ScrollArea.Viewport>
     </ScrollArea>

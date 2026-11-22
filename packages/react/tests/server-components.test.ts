@@ -98,7 +98,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     (name) => /^[A-Z][a-z]/.test(name) && ids[name].$$typeof === clientReference,
   );
 
-  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, defineIdsTheme, checkIdsTheme } = ids;
+  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, ImageGroup, defineIdsTheme, checkIdsTheme } = ids;
   const palette = { 50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff', 600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456' };
   const theme = defineIdsTheme({ primary: palette, radius: 12 });
   if (checkIdsTheme(theme).length) {
@@ -133,7 +133,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     ),
     h(TextField, { name: 'note' }, h(TextField.Clear)),
     h(
-      Image.Group,
+      ImageGroup,
       { 'aria-label': 'Photos' },
       h(Image, { src: '/lake.png', alt: 'Lake' }),
       h(
@@ -242,15 +242,45 @@ const renderChartFromAServerComponent = renderEntryFromAServerComponent({
 const renderEditorFromAServerComponent = renderEntryFromAServerComponent({
   entry: 'editor',
   component: 'Editor',
-  parts: ['Content', 'BlockType', 'Bold', 'Link', 'Separator', 'BubbleMenu', 'Count', 'Style'],
+  parts: [
+    'Content',
+    'BlockType',
+    'Bold',
+    'Highlight',
+    'Link',
+    'Image',
+    'TaskList',
+    'HorizontalRule',
+    'Table',
+    'TextAlign',
+    'Separator',
+    'BubbleMenu',
+    'Count',
+    'Style',
+  ],
   page: `h(
     Editor,
     { name: 'body', defaultValue: '<p>Hello</p>' },
     h(Editor.Bold),
+    h(Editor.Highlight),
     h(Editor.Link),
+    h(Editor.TaskList),
+    h(Editor.HorizontalRule),
+    h(Editor.Table),
+    h(Editor.TextAlign),
     h(Editor.Content),
     h(Editor.Count),
   )`,
+});
+
+const renderRichTextFromAServerComponent = renderEntryFromAServerComponent({
+  entry: 'rich-text',
+  component: 'RichText',
+  parts: ['Style'],
+  page: `h(RichText, {
+    value: '# 공지\\n\\n> [!NOTE]\\n> 참고하세요\\n\\n\\u0060\\u0060\\u0060ts\\nconst a = 1;\\n\\u0060\\u0060\\u0060',
+    mentionHref: (id) => '/users/' + id,
+  })`,
 });
 
 test(
@@ -275,10 +305,30 @@ test(
       'EditorRoot',
       'EditorBold',
       'EditorLink',
+      'EditorHighlight',
+      'EditorTaskList',
+      'EditorHorizontalRule',
+      'EditorTable',
+      'EditorTextAlign',
       'EditorContentPart',
       'EditorCount',
     ])
       expect(rendered.stdout).toContain(`"${reference}"`);
+  },
+  coldNodeStartOnABusyRunner,
+);
+
+test(
+  'a Server Component renders RichText from the rich-text entry without shipping Tiptap',
+  () => {
+    const rendered = runNode(['react-server'], renderRichTextFromAServerComponent);
+    expect(rendered.status, rendered.stderr).toBe(0);
+
+    expect(rendered.stdout).toContain('공지');
+    expect(rendered.stdout).toContain('"h1"');
+    for (const reference of ['AlertRoot', 'CodeBlockRoot', 'RichTextCalloutTitle'])
+      expect(rendered.stdout).toContain(`"${reference}"`);
+    expect(rendered.stdout).not.toMatch(/@tiptap/);
   },
   coldNodeStartOnABusyRunner,
 );
@@ -302,7 +352,7 @@ test(
 
     expect(clientComponents).toEqual(['ThemeContext', 'TooltipDelayGroup']);
     expect(namespaced.Image).toEqual(
-      expect.arrayContaining(['Group', 'Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
+      expect.arrayContaining(['Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
     );
     expect(payload).toContain('"600":"#155dfc"');
     for (const reference of [
@@ -316,7 +366,7 @@ test(
       'SelectRoot',
       'SelectItem',
       'FieldLabel',
-      'ImageGroup',
+      'ImageGroupRoot',
       'ImageViewer',
       'ImageViewerToolbar',
       'ImageViewerClose',

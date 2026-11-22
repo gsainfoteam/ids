@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
-import 'package:ids_flutter_example/components/provider_preview.dart';
+import 'package:ids_flutter_example/components/utility/provider_preview.dart';
 import 'package:ids_flutter_example/i18n/translations.g.dart';
-import 'package:ids_flutter_example/ids_theme.dart';
+import 'package:ids_flutter_example/catalog/palettes.dart';
 
 void main() {
   testWidgets(
@@ -27,13 +27,13 @@ void main() {
             ),
           );
           await tester.pump();
-          final bgPrimary = IdsResolvedTheme(
+          final bgPrimarySolid = IdsResolvedTheme(
             theme: theme,
             mode: mode,
-          ).colors.bgPrimary;
+          ).colors.bgPrimarySolid;
           expect(find.text('Loading'), findsOneWidget);
           expect(find.text('닫기'), findsOneWidget);
-          expect(find.text('primary ${hexOf(bgPrimary)}'), findsOneWidget);
+          expect(find.text('primary ${hexOf(bgPrimarySolid)}'), findsOneWidget);
           expect(tester.takeException(), isNull);
         }
       }

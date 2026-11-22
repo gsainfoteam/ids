@@ -29,7 +29,7 @@ export function CalendarDayButton({
   const styles = calendarStyle({
     size: c.size,
     selected: !!modifiers.selected && !modifiers.range_middle,
-    onBand: !!modifiers.range_middle || preview,
+    band: modifiers.range_middle ? 'range' : preview ? 'preview' : 'none',
     today: !!modifiers.today,
     outside: !!modifiers.outside,
     unavailable: !!modifiers.disabled,

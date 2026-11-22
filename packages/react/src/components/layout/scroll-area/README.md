@@ -102,6 +102,24 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - 네 변수는 상속되지 않는 `<length>` 로 등록합니다(`CSS.registerProperty`, 초기값 `0px`). 스크롤마다 바뀌는 값을 내용이 물려받으면 프레임마다 내용 전체의 스타일을 다시 계산하기 때문입니다.
 - 그래서 변수는 viewport 자신에서만 읽힙니다. 안쪽 요소는 data 속성으로 고릅니다(`in-data-overflow-y-start:`).
 
+## 고정된 머리와 열
+
+```tsx
+<ScrollArea orientation="both">
+  <div data-scroll-area-pinned="top" className="sticky top-0">요일</div>
+  <div className="flex">
+    <div data-scroll-area-pinned="start" className="sticky start-0">시각</div>
+    ...
+  </div>
+</ScrollArea>
+```
+
+- 내용 안의 `sticky` 머리나 열에 `data-scroll-area-pinned="top"` / `"start"` 를 붙이면, 세로 막대는 그 머리 아래에서, 가로 막대는 그 열 다음에서 시작합니다. 막대가 실제로 움직이는 칸에만 놓입니다.
+- 막대는 그 요소의 높이(`top`) 또는 너비(`start`)에 간격(`--scroll-area-gap`)을 더한 자리에서 시작합니다. 둥근 모서리에서 떨어지는 거리보다 작으면 그 거리를 씁니다.
+- thumb 의 길이와 위치는 고정된 몫을 뺀 보이는 칸과 내용으로 잽니다.
+- 표시한 요소의 크기가 바뀌면(종일 줄이 생기는 Scheduler 머리) 다시 잽니다. 같은 가장자리에 여럿이면 가장 큰 것을 씁니다.
+- Scheduler 의 요일 머리와 시각 열이 씁니다.
+
 ## 파트와 자리
 
 ```tsx
@@ -109,7 +127,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
   <ScrollArea.Scrollbar orientation="vertical" />   {/* 내용 앞: 시작 쪽(LTR 왼쪽) */}
   <ScrollArea.Viewport>...</ScrollArea.Viewport>
   <ScrollArea.Scrollbar orientation="horizontal">   {/* 내용 뒤: 아래 */}
-    <ScrollArea.Thumb className="bg-primary" />
+    <ScrollArea.Thumb className="bg-primary-solid" />
   </ScrollArea.Scrollbar>
   <ScrollArea.Corner />
 </ScrollArea>
@@ -215,10 +233,10 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 | 토큰                              | 불투명도 | 쓰임                                    |
 | --------------------------------- | -------- | --------------------------------------- |
-| `--ids-color-bg-neutral`          | 60%      | thumb                                   |
-| `--ids-color-bg-neutral`          | 100%     | thumb 에 올렸을 때                      |
+| `--ids-color-border-neutral-strong`          | 60%      | thumb                                   |
+| `--ids-color-border-neutral-strong`          | 100%     | thumb 에 올렸을 때                      |
 | `--ids-color-text-neutral`        | 100%     | thumb 을 끌 때                          |
-| `--ids-color-bg-neutral-subtle`   | 50%      | `always` 트랙, 막대에 올렸을 때, Corner |
+| `--ids-color-bg-neutral-soft`   | 50%      | `always` 트랙, 막대에 올렸을 때, Corner |
 
 - 막대는 내용 위에 겹쳐 그려지므로 반투명합니다. 밑의 글자가 비쳐 보여 막대가 내용을 덜 가립니다.
 - thumb 은 글자색 층(`state-layer`)을 쓰지 않습니다. 몇 px 막대에서 6~10% 층은 보이지 않아 색 자체를 바꿉니다.

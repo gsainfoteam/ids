@@ -3,6 +3,7 @@ export {
   ThemeContext,
   checkIdsTheme,
   createIdsPalette,
+  createIdsRamp,
   defineIdsTheme,
   useTheme,
 } from './components/utility/ids-provider';
@@ -12,7 +13,10 @@ export type {
   IdsCornerShape,
   IdsNeutral,
   IdsPalette,
-  IdsPaletteStep,
+  IdsRamp,
+  IdsRampStep,
+  IdsScale,
+  IdsScaleStep,
   IdsStatus,
   IdsStatusColors,
   IdsStatusFamily,
@@ -50,6 +54,8 @@ export { Card } from './components/data/card';
 export { Chip } from './components/data/chip';
 export { Badge } from './components/data/badge';
 export { Bubble } from './components/data/bubble';
+export { Message } from './components/data/message';
+export { MessageGroup } from './components/data/message-group';
 export { Alert } from './components/feedback/alert';
 export { Dialog } from './components/overlay/dialog';
 export { Drawer } from './components/overlay/drawer';
@@ -75,10 +81,12 @@ export {
 export { Avatar, initialsOf } from './components/data/avatar';
 export { AvatarGroup } from './components/data/avatar-group';
 export { Item } from './components/data/item';
+export { ItemGroup } from './components/data/item-group';
 export { Accordion } from './components/data/accordion';
 export { Empty } from './components/data/empty';
 export { Image } from './components/data/image';
-export type { ImageGroupLayout, ImageViewerItem } from './components/data/image';
+export type { ImageViewerItem } from './components/data/image';
+export { ImageGroup, type ImageGroupLayout } from './components/data/image-group';
 export { QRCode } from './components/data/qr-code';
 export { CodeBlock } from './components/data/code-block';
 export { Marquee } from './components/data/marquee';
@@ -111,6 +119,7 @@ export { Checkbox } from './components/form/checkbox';
 export { Switch } from './components/form/switch';
 export { Radio } from './components/form/radio';
 export { RadioGroup } from './components/form/radio-group';
+export { SegmentedControl } from './components/form/segmented-control';
 export { CheckboxGroup } from './components/form/checkbox-group';
 export { Slider } from './components/form/slider';
 export { TextField } from './components/form/text-field';
@@ -126,6 +135,7 @@ export { Marker } from './components/feedback/marker';
 export { Label } from './components/typography/label';
 export { Highlight } from './components/typography/highlight';
 export { Kbd } from './components/typography/kbd';
+export { KbdGroup } from './components/typography/kbd-group';
 export { Link } from './components/typography/link';
 
 export { Pagination } from './components/navigation/pagination';
@@ -165,6 +175,7 @@ export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
 export type { IdsTranslate } from './internal/translate';
 
 export { Field } from './components/form/field';
+export { FieldGroup } from './components/form/field-group';
 export type {
   FieldProps,
   FieldState,
@@ -241,6 +252,16 @@ export type {
   TimePrecision,
   HourCycle,
 } from './components/data/time-picker';
+
+export { Scheduler } from './components/data/scheduler';
+export type {
+  SchedulerProps,
+  SchedulerView,
+  SchedulerEventData,
+  SchedulerColorScheme,
+  SchedulerEventChange,
+  SchedulerSlot,
+} from './components/data/scheduler';
 
 export { TimeField } from './components/form/time-field';
 export type { TimeFieldProps } from './components/form/time-field';

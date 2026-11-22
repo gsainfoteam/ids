@@ -6,6 +6,7 @@ import { AvatarGroup } from '../../components/data/avatar-group';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -73,7 +74,7 @@ export const PC: Story = {
                 <Badge content="3" variant="soft" colorScheme="primary" />
               </Card.Action>
             </Card.Header>
-            <Item.Group size="tiny">
+            <ItemGroup size="tiny">
               {NOTICES.map((notice) => (
                 <Item key={notice.id}>
                   <Item.Media variant="soft">
@@ -87,7 +88,7 @@ export const PC: Story = {
                   </Item.Content>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Card>
           <div className="flex flex-col gap-3">
             <Card>

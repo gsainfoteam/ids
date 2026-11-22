@@ -13,6 +13,7 @@ import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { Checkbox } from '../../components/form/checkbox';
 import { Field } from '../../components/form/field';
@@ -205,7 +206,7 @@ export const PC: Story = {
                 <h2>주문 상품</h2>
               </Card.Title>
             </Card.Header>
-            <Item.Group size="tiny" aria-label="주문 상품">
+            <ItemGroup size="tiny" aria-label="주문 상품">
               {LINES.map((line) => (
                 <Item key={line.id}>
                   <Item.Media>
@@ -218,7 +219,7 @@ export const PC: Story = {
                   <Item.Actions>{won.format(line.price)}원</Item.Actions>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
             <Card.Content className="flex flex-col gap-3">
               <Divider />
               <p className="flex justify-between">
@@ -228,7 +229,7 @@ export const PC: Story = {
                 배송비<span>{fee === 0 ? '무료' : `${won.format(fee)}원`}</span>
               </p>
               <Divider />
-              <p className="text-subtitle-s2-semibold flex justify-between">
+              <p className="text-body-b2-semibold flex justify-between">
                 결제 금액<span>{won.format(total)}원</span>
               </p>
               <Label>

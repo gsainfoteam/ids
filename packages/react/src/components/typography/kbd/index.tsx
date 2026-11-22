@@ -1,7 +1,7 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
 import { type KbdKeys, type KbdLabels, type KbdPlatform } from './keys';
-import { KbdRoot, KbdGroup } from './root';
+import { KbdRoot } from './root';
 import { kbdStyle } from './style';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -29,16 +29,6 @@ export namespace Kbd {
     separator?: ReactNode;
     className?: string | ((state: State) => string | undefined);
   };
-
-  export const Group = KbdGroup;
-  export namespace Group {
-    export type Props = Omit<ComponentProps<'kbd'>, 'className'> & {
-      size?: IdsSize;
-      platform?: Platform;
-      labels?: Labels;
-      className?: string | ((state: State) => string | undefined);
-    };
-  }
 
   export const Style = kbdStyle;
 }

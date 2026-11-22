@@ -4,6 +4,9 @@ import {
   ChatBubbleLeftIcon,
   CheckIcon,
   EllipsisHorizontalIcon,
+  FlagIcon,
+  LinkIcon,
+  NoSymbolIcon,
   UserPlusIcon,
 } from '@heroicons/react/24/outline';
 
@@ -14,6 +17,7 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { Tabs } from '../../components/navigation/tabs';
 import { Menu } from '../../components/overlay/menu';
@@ -117,7 +121,7 @@ export const PC: Story = {
                       <Card.Description>{stat.label}</Card.Description>
                     </dt>
                     <dd>
-                      <Card.Title asChild className="text-subtitle-s1-bold">
+                      <Card.Title asChild className="text-body-b1-bold">
                         <span>{stat.value}</span>
                       </Card.Title>
                     </dd>
@@ -126,7 +130,7 @@ export const PC: Story = {
               ))}
             </dl>
           </Card.Content>
-          <Card.Footer className="border-t">
+          <Card.Footer>
             <Button
               variant={following ? 'outline' : 'solid'}
               className="flex-1"
@@ -150,10 +154,17 @@ export const PC: Story = {
               </Menu.Trigger>
               <Menu.Content>
                 <Menu.Item onSelect={() => toast.success('프로필 주소를 복사했어요')}>
+                  <LinkIcon />
                   프로필 주소 복사
                 </Menu.Item>
-                <Menu.Item>차단하기</Menu.Item>
-                <Menu.Item>신고하기</Menu.Item>
+                <Menu.Item>
+                  <NoSymbolIcon />
+                  차단하기
+                </Menu.Item>
+                <Menu.Item>
+                  <FlagIcon />
+                  신고하기
+                </Menu.Item>
               </Menu.Content>
             </Menu>
           </Card.Footer>
@@ -168,7 +179,7 @@ export const PC: Story = {
 
           <Tabs.Content value="posts">
             <Card size="tiny">
-              <Item.Group aria-label="쓴 글">
+              <ItemGroup aria-label="쓴 글">
                 {POSTS.map((post) => (
                   <Item key={post.id} asChild>
                     <a href={`#${post.id}`}>
@@ -181,13 +192,13 @@ export const PC: Story = {
                     </a>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </Tabs.Content>
 
           <Tabs.Content value="comments">
             <Card size="tiny">
-              <Item.Group aria-label="쓴 댓글">
+              <ItemGroup aria-label="쓴 댓글">
                 {COMMENTS.map((comment) => (
                   <Item key={comment.id} asChild>
                     <a href={`#${comment.id}`}>
@@ -200,12 +211,12 @@ export const PC: Story = {
                     </a>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </Tabs.Content>
 
           <Tabs.Content value="clubs">
-            <Item.Group variant="separated" aria-label="동아리">
+            <ItemGroup variant="separated" aria-label="동아리">
               {CLUBS.map((club) => (
                 <Item key={club.id} asChild>
                   <a href={`#${club.id}`}>
@@ -224,7 +235,7 @@ export const PC: Story = {
                   </a>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Tabs.Content>
         </Tabs>
       </main>

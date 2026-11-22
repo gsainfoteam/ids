@@ -11,7 +11,7 @@ import { Resizable } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const panel = cn('concentric-p-4 border border-neutral bg-neutral-subtlest text-body-b3-regular');
+const panel = cn('concentric-p-4 border border-neutral bg-base text-body-b3-regular');
 
 const meta = {
   title: 'Layout/Resizable',
@@ -88,14 +88,14 @@ export const Gallery: Story = {
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="text-body-b3-regular border-neutral bg-neutral-subtlest rounded-none border p-4"
+            className="text-body-b3-regular border-neutral bg-base rounded-none border p-4"
           >
             0
           </Resizable>
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="rounded-standard text-body-b3-regular border-neutral bg-neutral-subtlest border p-4"
+            className="rounded-standard text-body-b3-regular border-neutral bg-base border p-4"
           >
             standard
           </Resizable>
@@ -105,7 +105,7 @@ export const Gallery: Story = {
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="text-body-b3-regular border-neutral bg-neutral-subtlest rounded-full border px-8 py-4"
+            className="text-body-b3-regular border-neutral bg-base rounded-full border px-8 py-4"
           >
             full
           </Resizable>
@@ -155,7 +155,7 @@ export const Gallery: Story = {
         <Showcase.Row label="edge">
           <Resizable direction="horizontal" defaultWidth={260} className={cn(panel, 'h-28')}>
             테마 색 막대가 손잡이입니다.
-            <Resizable.Handle className="bg-primary inset-y-3 -end-0.5 w-1 before:hidden" />
+            <Resizable.Handle className="bg-primary-solid inset-y-3 -end-0.5 w-1 before:hidden" />
           </Resizable>
         </Showcase.Row>
         <Showcase.Row label="corner color">
@@ -282,6 +282,51 @@ export const PointerDrag: Story = {
 
     await userEvent.dblClick(target);
     await waitFor(() => expect(root.style.width).toBe('240px'));
+  },
+};
+
+export const Step: Story = {
+  render: () => (
+    <Resizable
+      direction="vertical"
+      step={12}
+      defaultHeight={96}
+      minHeight={48}
+      maxHeight={240}
+      getValueLabel={(size) => `${size / 48}시간`}
+      className={cn(panel, 'w-64')}
+    >
+      아래 가장자리를 끌면 높이가 12px 단위로 맞습니다.
+    </Resizable>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`step` 을 주면 끄는 크기가 그 배수에 맞고, 방향키는 한 칸, `Shift` 와 함께면 네 칸을 옮깁니다. `getValueLabel` 은 스크린 리더가 읽는 값(`aria-valuetext`)을 px 대신 그 글자로 바꿉니다. Scheduler 가 일정의 끝 시각을 15분 단위로 바꿀 때 이 둘을 씁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const root = canvasElement.querySelector<HTMLElement>('[data-resizable]')!;
+    const edge = canvas.getByRole('separator', { name: '높이' });
+    await expect(edge).toHaveAttribute('aria-valuetext', '2시간');
+
+    edge.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(valueOf(edge)).toBe(108));
+    await expect(edge).toHaveAttribute('aria-valuetext', '2.25시간');
+    await userEvent.keyboard('{Shift>}{ArrowDown}{/Shift}');
+    await waitFor(() => expect(valueOf(edge)).toBe(156));
+
+    const { left, width, top, height } = edge.getBoundingClientRect();
+    const from = { clientX: left + width / 2, clientY: top + height / 2 };
+    await userEvent.pointer([
+      { keys: '[MouseLeft>]', target: edge, coords: from },
+      { target: edge, coords: { ...from, clientY: from.clientY + 17 } },
+      { keys: '[/MouseLeft]', target: edge, coords: { ...from, clientY: from.clientY + 17 } },
+    ]);
+    await waitFor(() => expect(root.style.height).toBe('168px'));
   },
 };
 

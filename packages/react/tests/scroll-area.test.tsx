@@ -169,6 +169,34 @@ test('the native bar takes no width and the thumb is sized by the visible share 
   expect(thumb().getBoundingClientRect().height).toBeCloseTo(expected, 0);
 });
 
+test('pinned sticky edges push each bar past them, and the thumb measures only the moving part', async () => {
+  await render(
+    <ScrollArea orientation="both" variant="always" className="h-40 w-48">
+      <div className="w-96">
+        <div data-scroll-area-pinned="top" className="sticky top-0 h-10">
+          head
+        </div>
+        <div className="flex">
+          <div data-scroll-area-pinned="start" className="sticky start-0 w-12 shrink-0">
+            <Lines count={10} />
+          </div>
+        </div>
+      </div>
+    </ScrollArea>,
+  );
+  await expect.element(thumb()).toBeVisible();
+  const view = viewport();
+  const top = view.getBoundingClientRect().top;
+  const left = view.getBoundingClientRect().left;
+
+  expect(bar().getBoundingClientRect().top - top).toBeCloseTo(40 + GAP, 0);
+  expect(bar('horizontal').getBoundingClientRect().left - left).toBeCloseTo(48 + GAP, 0);
+
+  const track = bar().getBoundingClientRect().height;
+  const expected = (track * (view.clientHeight - 40)) / (view.scrollHeight - 40);
+  expect(thumb().getBoundingClientRect().height).toBeCloseTo(expected, 0);
+});
+
 test('a long content keeps the thumb at the minimum length and the thumb follows the scroll', async () => {
   await render(
     <ScrollArea variant="always" className="h-40 w-48">

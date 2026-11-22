@@ -23,7 +23,7 @@ export namespace Showcase {
     return (
       <section className="flex flex-col gap-4">
         <header className="border-neutral flex flex-col gap-1 border-b pb-2">
-          <h2 className="text-subtitle-s2-semibold">{title}</h2>
+          <h2 className="text-body-b2-semibold">{title}</h2>
           {description !== undefined && (
             <p className="text-body-b3-regular text-neutral">{description}</p>
           )}
@@ -83,12 +83,12 @@ export namespace Showcase {
   }
 }
 
-export function holdTheNextCall(spy: unknown) {
+export function holdTheNextCall<T = void>(spy: unknown, resolvesTo?: T) {
   let release = () => {};
   (spy as Mock).mockImplementationOnce(
     () =>
-      new Promise<void>((resolve) => {
-        release = resolve;
+      new Promise<T | undefined>((resolve) => {
+        release = () => resolve(resolvesTo);
       }),
   );
   return () => release();

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, type KeyboardEvent } from 'react';
+import { useState } from 'react';
 
 import { LinkIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useEditorContext } from './context';
-import { useEditorToolProps, useToolState, type EditorToolProps } from './tool';
+import { editorMessages } from './messages-catalog';
+import { isPlainEnter, withProtocol } from './popover-form';
+import { EditorToolTip, useEditorToolProps, useToolState, type EditorToolProps } from './tool';
 import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 import { IconToggle } from '../../action/icon-toggle';
@@ -17,33 +19,20 @@ import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorLinkProps = EditorToolProps;
 
-const HAS_SCHEME = /^[a-z][a-z\d+.-]*:/i;
-const STAYS_ON_THIS_SITE = /^[/#?]/;
-
-export function withProtocol(url: string) {
-  return HAS_SCHEME.test(url) || STAYS_ON_THIS_SITE.test(url) ? url : `https://${url}`;
-}
-
 const LINK = {
   isActive: (editor: TiptapEditor) => editor.isActive('link'),
   can: (editor: TiptapEditor) => !editor.isActive('codeBlock') && !editor.isActive('code'),
 };
 
-const isPlainEnter = (event: KeyboardEvent) =>
-  event.key === 'Enter' &&
-  !event.nativeEvent.isComposing &&
-  !event.shiftKey &&
-  !event.altKey &&
-  !event.ctrlKey &&
-  !event.metaKey;
-
 export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorLinkProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor.Link');
   const state = useToolState(LINK);
   const tool = useEditorToolProps('Link');
   const [open, setOpen] = useState(false);
   const [href, setHref] = useState('');
+  const label = ariaLabel ?? t('editor.link');
+  const disabled = !editable || !state.enabled;
 
   const removeLink = () => {
     editor?.chain().focus().extendMarkRange('link').unsetLink().run();
@@ -84,29 +73,33 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
         setOpen(next);
       }}
     >
-      <Popover.Trigger asChild>
-        <IconToggle
-          {...tool}
-          variant="soft"
-          size="tiny"
-          icon={icon ?? <LinkIcon />}
-          aria-label={ariaLabel ?? t('editor.link')}
-          className={className}
-          pressed={state.active}
-          disabled={!editable || !state.enabled}
-          onPressedChange={noop}
-        />
-      </Popover.Trigger>
+      <EditorToolTip label={label} disabled={disabled}>
+        <Popover.Trigger asChild>
+          <IconToggle
+            {...tool}
+            variant="soft"
+            size="tiny"
+            icon={icon ?? <LinkIcon />}
+            aria-label={label}
+            className={className}
+            pressed={state.active}
+            disabled={disabled}
+            onPressedChange={noop}
+          />
+        </Popover.Trigger>
+      </EditorToolTip>
       <Popover.Content
         aria-label={t('editor.link')}
+        className="w-max"
         initialFocus="input"
         side="bottom"
         align="start"
       >
-        <div className={styles.linkForm()}>
+        <div className={styles.linkRow()}>
           <TextField
             type="url"
             size="tiny"
+            className={styles.linkUrl()}
             aria-label={t('editor.linkUrl')}
             placeholder="https://"
             value={href}
@@ -119,16 +112,14 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
             data-1p-ignore=""
             data-lpignore="true"
           />
-          <div className={styles.linkActions()}>
-            {state.active && (
-              <Button variant="outline" size="tiny" onClick={removeLink}>
-                {t('editor.linkRemove')}
-              </Button>
-            )}
-            <Button size="tiny" onClick={applyLink}>
-              {t('editor.linkApply')}
+          {state.active && (
+            <Button variant="outline" size="tiny" onClick={removeLink}>
+              {t('editor.linkRemove')}
             </Button>
-          </div>
+          )}
+          <Button size="tiny" onClick={applyLink}>
+            {t('editor.linkApply')}
+          </Button>
         </div>
       </Popover.Content>
     </Popover>

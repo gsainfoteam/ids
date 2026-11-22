@@ -91,12 +91,14 @@ test('Close is a ghost IconButton in the alert scheme, and its child replaces th
   const danger = close({ colorScheme: 'danger' });
   expect(danger.dataset.variant).toBe('ghost');
   expect(danger.className).toMatch(/(^| )scheme-danger( |$)/);
-  expect(danger.className, 'a status ghost button takes the status text').toMatch(/(^| )text-scheme( |$)/);
+  expect(danger.className, 'a status ghost button takes the status text').toMatch(
+    /(^| )text-scheme( |$)/,
+  );
   expect(danger.className).toMatch(/rounded-full/);
   expect(
     close({ colorScheme: 'danger', variant: 'solid' }).className,
     'on the fill it takes the fill contrast color',
-  ).toMatch(/(^| )text-on-scheme( |$)/);
+  ).toMatch(/(^| )text-on-scheme-solid( |$)/);
   expect(close({}, <svg id="glyph" />).querySelector('#glyph')).not.toBeNull();
 });
 

@@ -3,6 +3,7 @@
 import { useId, useRef, type ReactNode } from 'react';
 
 import { EditorBarContext, useEditorContext } from './context';
+import { editorMessages } from './messages-catalog';
 import { useTranslate } from '../../../internal/translate';
 import { ScrollArea } from '../../layout/scroll-area';
 import { useRovingFocus } from '../../utility/group/use-roving-focus';
@@ -22,7 +23,7 @@ export function EditorBar({
   className,
   children,
 }: EditorBarProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { contentId, styles } = useEditorContext('Editor');
   const id = useId();
   const rootRef = useRef<HTMLDivElement>(null);

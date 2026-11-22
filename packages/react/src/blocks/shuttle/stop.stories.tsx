@@ -8,6 +8,7 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -74,7 +75,7 @@ export const PC: Story = {
         </div>
 
         <Card size="tiny">
-          <Item.Group aria-label={`${stop}에 곧 오는 셔틀`}>
+          <ItemGroup aria-label={`${stop}에 곧 오는 셔틀`}>
             {arrivals.map((arrival, index) => (
               <Item key={arrival.id}>
                 <Item.Content>
@@ -91,7 +92,7 @@ export const PC: Story = {
                 </Item.Actions>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Card>
 
         <div className="flex gap-2">

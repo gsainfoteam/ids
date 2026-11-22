@@ -19,6 +19,7 @@ import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { CodeBlock } from '../../components/data/code-block';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { ChipField } from '../../components/form/chip-field';
 import { Field } from '../../components/form/field';
@@ -158,7 +159,7 @@ export const PC: Story = {
                   도구
                 </h2>
                 <Card size="tiny">
-                  <Item.Group aria-labelledby="tools">
+                  <ItemGroup aria-labelledby="tools">
                     {TOOLS.map((tool) => (
                       <Item key={tool.id}>
                         <Item.Media variant="soft">{tool.icon}</Item.Media>
@@ -180,7 +181,7 @@ export const PC: Story = {
                         </Item.Actions>
                       </Item>
                     ))}
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
               </section>
 
@@ -194,7 +195,7 @@ export const PC: Story = {
                   accept=".pdf,.docx,.txt,.md"
                 />
               </Field>
-              <Item.Group variant="separated" size="tiny" aria-label="올린 문서">
+              <ItemGroup variant="separated" size="tiny" aria-label="올린 문서">
                 {KNOWLEDGE.map((file) => (
                   <Item key={file.name}>
                     <Item.Media variant="soft">
@@ -214,7 +215,7 @@ export const PC: Story = {
                     </Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
 
               <Field>
                 <Field.Label>대화 시작 문장</Field.Label>
@@ -228,7 +229,7 @@ export const PC: Story = {
               </Field>
             </Card.Content>
 
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button variant="outline" onClick={() => toast('초안을 저장했어요')}>
                 초안 저장
               </Button>
@@ -266,7 +267,7 @@ export const PC: Story = {
                   ))}
                 </div>
               </Card.Content>
-              <Card.Footer className="border-t">
+              <Card.Footer>
                 <TextField
                   aria-label="미리 물어보기"
                   placeholder="미리 물어보기"

@@ -12,6 +12,8 @@ export function Resizable(props: Resizable.Props) {
 export namespace Resizable {
   export type Direction = 'both' | 'horizontal' | 'vertical';
 
+  export type Dimension = 'width' | 'height';
+
   export type State = {
     direction: Direction;
     width: number | undefined;
@@ -32,6 +34,8 @@ export namespace Resizable {
     maxWidth?: number;
     minHeight?: number;
     maxHeight?: number;
+    step?: number;
+    getValueLabel?: (size: number, dimension: Dimension) => string;
     disabled?: boolean;
     asChild?: boolean;
     className?: StateValue<string | undefined, State>;

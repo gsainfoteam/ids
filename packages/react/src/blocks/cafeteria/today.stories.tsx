@@ -237,7 +237,7 @@ export const PC: Story = {
                             />
                           )}
                         </Card.Content>
-                        <Card.Footer className="justify-between border-t">
+                        <Card.Footer className="justify-between">
                           평점 {menu.score.toFixed(1)}
                           <Rating
                             size="tiny"

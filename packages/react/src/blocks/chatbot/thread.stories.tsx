@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
 import {
+  ArchiveBoxIcon,
   ArrowPathIcon,
   ArrowUpIcon,
   Bars3Icon,
@@ -11,9 +12,11 @@ import {
   HandThumbDownIcon,
   HandThumbUpIcon,
   PaperClipIcon,
+  PencilIcon,
   PencilSquareIcon,
   ShareIcon,
   SparklesIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -26,6 +29,7 @@ import { Badge } from '../../components/data/badge';
 import { Bubble } from '../../components/data/bubble';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 import { Spinner } from '../../components/feedback/spinner';
 import { toast } from '../../components/feedback/toast';
@@ -113,7 +117,7 @@ export const PC: Story = {
         {HISTORY.map((group) => (
           <div key={group.day} className="flex flex-col gap-1">
             <h2 className="text-caption-c1-medium px-2">{group.day}</h2>
-            <Item.Group size="tiny" aria-label={group.day}>
+            <ItemGroup size="tiny" aria-label={group.day}>
               {group.chats.map((chat) => (
                 <Item
                   key={chat.id}
@@ -130,7 +134,7 @@ export const PC: Story = {
                   </a>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </div>
         ))}
       </nav>
@@ -217,10 +221,19 @@ export const PC: Story = {
                 />
               </Menu.Trigger>
               <Menu.Content>
-                <Menu.Item>이름 바꾸기</Menu.Item>
-                <Menu.Item>보관하기</Menu.Item>
+                <Menu.Item>
+                  <PencilIcon />
+                  이름 바꾸기
+                </Menu.Item>
+                <Menu.Item>
+                  <ArchiveBoxIcon />
+                  보관하기
+                </Menu.Item>
                 <Menu.Separator />
-                <Menu.Item>지우기</Menu.Item>
+                <Menu.Item>
+                  <TrashIcon />
+                  지우기
+                </Menu.Item>
               </Menu.Content>
             </Menu>
           </header>

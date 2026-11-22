@@ -8,6 +8,7 @@ import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
 import { Card } from '../../data/card';
 import { Item } from '../../data/item';
+import { ItemGroup } from '../../data/item-group';
 
 import { Skeleton } from '.';
 
@@ -74,9 +75,9 @@ export const Gallery: Story = {
         title="Text"
         description="줄마다 그 글자 스타일의 줄 높이 한 칸에 1em 막대를 그립니다. 여러 줄이면 마지막 줄은 60% 입니다."
       >
-        <Showcase.Row label="subtitle-s2" className="items-start">
-          <Skeleton shape="text" className="text-subtitle-s2-semibold w-48" />
-          <p className="text-subtitle-s2-semibold w-48">학기 공지</p>
+        <Showcase.Row label="body-b2 semibold" className="items-start">
+          <Skeleton shape="text" className="text-body-b2-semibold w-48" />
+          <p className="text-body-b2-semibold w-48">학기 공지</p>
         </Showcase.Row>
         <Showcase.Row label="body-b3 × 3" className="items-start">
           <Skeleton shape="text" lines={3} className="text-body-b3-regular w-48" />
@@ -111,8 +112,8 @@ export const Gallery: Story = {
             <Skeleton className="aspect-video" />
           </Card>
         </Showcase.Row>
-        <Showcase.Row label="Item.Group" className="items-start">
-          <Item.Group aria-label="멤버" aria-busy className="w-80">
+        <Showcase.Row label="ItemGroup" className="items-start">
+          <ItemGroup aria-label="멤버" aria-busy className="w-80">
             {[0, 1, 2].map((index) => (
               <Item key={index}>
                 <Item.Media>
@@ -124,7 +125,7 @@ export const Gallery: Story = {
                 </Item.Content>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -297,9 +298,9 @@ export const TextHeight: Story = {
         <Skeleton
           data-testid="title-skeleton"
           shape="text"
-          className="text-subtitle-s2-semibold w-40"
+          className="text-body-b2-semibold w-40"
         />
-        <p data-testid="title-text" className="text-subtitle-s2-semibold">
+        <p data-testid="title-text" className="text-body-b2-semibold">
           학기 공지
         </p>
       </div>
@@ -331,7 +332,7 @@ export const BusyRegion: Story = {
         <Button variant="outline" onClick={() => setLoading((value) => !value)}>
           {loading ? '불러오기 끝내기' : '다시 불러오기'}
         </Button>
-        <Item.Group aria-label="멤버" aria-busy={loading} className="w-full">
+        <ItemGroup aria-label="멤버" aria-busy={loading} className="w-full">
           {loading
             ? members.map((name) => (
                 <Item key={name}>
@@ -355,7 +356,7 @@ export const BusyRegion: Story = {
                   </Item.Content>
                 </Item>
               ))}
-        </Item.Group>
+        </ItemGroup>
       </div>
     );
   },

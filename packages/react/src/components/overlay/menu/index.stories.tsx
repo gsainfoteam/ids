@@ -1,17 +1,23 @@
 import { useState } from 'react';
 
 import {
+  ArrowDownTrayIcon,
   ArrowRightStartOnRectangleIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
-  ArrowDownTrayIcon,
+  ArrowsPointingInIcon,
+  CameraIcon,
+  ChatBubbleLeftIcon,
   ClipboardIcon,
+  CodeBracketIcon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
   DocumentPlusIcon,
+  DocumentTextIcon,
   EllipsisHorizontalIcon,
   EnvelopeIcon,
   FolderOpenIcon,
+  GlobeAltIcon,
   LinkIcon,
   MagnifyingGlassIcon,
   MoonIcon,
@@ -20,6 +26,7 @@ import {
   PrinterIcon,
   ScissorsIcon,
   ShareIcon,
+  SparklesIcon,
   TrashIcon,
   UserIcon,
 } from '@heroicons/react/16/solid';
@@ -330,9 +337,15 @@ export const Gallery: Story = {
                   </Menu.Content>
                 </Menu>
                 <Menu>
-                  <Menu.Trigger disabled>내보내기</Menu.Trigger>
+                  <Menu.Trigger disabled>
+                    <ArrowDownTrayIcon />
+                    내보내기
+                  </Menu.Trigger>
                   <Menu.Content>
-                    <Menu.Item>PDF</Menu.Item>
+                    <Menu.Item>
+                      <DocumentTextIcon />
+                      PDF
+                    </Menu.Item>
                   </Menu.Content>
                 </Menu>
               </Menu.Content>
@@ -353,32 +366,62 @@ export const Gallery: Story = {
                     내보내기
                   </Menu.Trigger>
                   <Menu.Content>
-                    <Menu.Item>PDF 문서</Menu.Item>
+                    <Menu.Item>
+                      <DocumentTextIcon />
+                      PDF 문서
+                    </Menu.Item>
                     <Menu>
                       <Menu.Trigger>
                         <PhotoIcon />
                         이미지
                       </Menu.Trigger>
                       <Menu.Content>
-                        <Menu.Item>PNG</Menu.Item>
+                        <Menu.Item>
+                          <PhotoIcon />
+                          PNG
+                        </Menu.Item>
                         <Menu>
-                          <Menu.Trigger>JPEG</Menu.Trigger>
+                          <Menu.Trigger>
+                            <CameraIcon />
+                            JPEG
+                          </Menu.Trigger>
                           <Menu.Content>
-                            <Menu.Item>고화질</Menu.Item>
-                            <Menu.Item>보통</Menu.Item>
+                            <Menu.Item>
+                              <SparklesIcon />
+                              고화질
+                            </Menu.Item>
+                            <Menu.Item>
+                              <PhotoIcon />
+                              보통
+                            </Menu.Item>
                             <Menu>
-                              <Menu.Trigger>저화질</Menu.Trigger>
+                              <Menu.Trigger>
+                                <ArrowsPointingInIcon />
+                                저화질
+                              </Menu.Trigger>
                               <Menu.Content>
-                                <Menu.Item>메일 첨부용 (1MB 이하)</Menu.Item>
-                                <Menu.Item>메신저용 (300KB 이하)</Menu.Item>
+                                <Menu.Item>
+                                  <EnvelopeIcon />
+                                  메일 첨부용 (1MB 이하)
+                                </Menu.Item>
+                                <Menu.Item>
+                                  <ChatBubbleLeftIcon />
+                                  메신저용 (300KB 이하)
+                                </Menu.Item>
                               </Menu.Content>
                             </Menu>
                           </Menu.Content>
                         </Menu>
-                        <Menu.Item>WebP</Menu.Item>
+                        <Menu.Item>
+                          <GlobeAltIcon />
+                          WebP
+                        </Menu.Item>
                       </Menu.Content>
                     </Menu>
-                    <Menu.Item>HTML 웹 페이지</Menu.Item>
+                    <Menu.Item>
+                      <CodeBracketIcon />
+                      HTML 웹 페이지
+                    </Menu.Item>
                   </Menu.Content>
                 </Menu>
                 <Menu.Item>
@@ -752,32 +795,62 @@ export const NestedSubmenus: Story = {
             내보내기
           </Menu.Trigger>
           <Menu.Content>
-            <Menu.Item>PDF 문서</Menu.Item>
+            <Menu.Item>
+              <DocumentTextIcon />
+              PDF 문서
+            </Menu.Item>
             <Menu>
               <Menu.Trigger>
                 <PhotoIcon />
                 이미지
               </Menu.Trigger>
               <Menu.Content>
-                <Menu.Item>PNG</Menu.Item>
+                <Menu.Item>
+                  <PhotoIcon />
+                  PNG
+                </Menu.Item>
                 <Menu>
-                  <Menu.Trigger>JPEG</Menu.Trigger>
+                  <Menu.Trigger>
+                    <CameraIcon />
+                    JPEG
+                  </Menu.Trigger>
                   <Menu.Content>
-                    <Menu.Item>고화질</Menu.Item>
-                    <Menu.Item>보통</Menu.Item>
+                    <Menu.Item>
+                      <SparklesIcon />
+                      고화질
+                    </Menu.Item>
+                    <Menu.Item>
+                      <PhotoIcon />
+                      보통
+                    </Menu.Item>
                     <Menu>
-                      <Menu.Trigger>저화질</Menu.Trigger>
+                      <Menu.Trigger>
+                        <ArrowsPointingInIcon />
+                        저화질
+                      </Menu.Trigger>
                       <Menu.Content>
-                        <Menu.Item>메일 첨부용 (1MB 이하)</Menu.Item>
-                        <Menu.Item>메신저용 (300KB 이하)</Menu.Item>
+                        <Menu.Item>
+                          <EnvelopeIcon />
+                          메일 첨부용 (1MB 이하)
+                        </Menu.Item>
+                        <Menu.Item>
+                          <ChatBubbleLeftIcon />
+                          메신저용 (300KB 이하)
+                        </Menu.Item>
                       </Menu.Content>
                     </Menu>
                   </Menu.Content>
                 </Menu>
-                <Menu.Item>WebP</Menu.Item>
+                <Menu.Item>
+                  <GlobeAltIcon />
+                  WebP
+                </Menu.Item>
               </Menu.Content>
             </Menu>
-            <Menu.Item>HTML 웹 페이지</Menu.Item>
+            <Menu.Item>
+              <CodeBracketIcon />
+              HTML 웹 페이지
+            </Menu.Item>
           </Menu.Content>
         </Menu>
         <Menu.Item>

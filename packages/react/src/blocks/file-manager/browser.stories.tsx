@@ -1,17 +1,21 @@
 import { useState, type ReactNode } from 'react';
 
 import {
+  ArrowDownTrayIcon,
   ArrowUpTrayIcon,
   DocumentTextIcon,
   EllipsisHorizontalIcon,
+  FolderArrowDownIcon,
   FolderIcon,
   FolderPlusIcon,
   ListBulletIcon,
   MagnifyingGlassIcon,
+  PencilIcon,
   PhotoIcon,
   PresentationChartBarIcon,
   Squares2X2Icon,
   TableCellsIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -22,6 +26,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { FileField } from '../../components/form/file-field';
@@ -95,11 +100,23 @@ export const PC: Story = {
           />
         </Menu.Trigger>
         <Menu.Content>
-          <Menu.Item onSelect={() => toast(`${name}을 내려받아요`)}>내려받기</Menu.Item>
-          <Menu.Item>이름 바꾸기</Menu.Item>
-          <Menu.Item>옮기기</Menu.Item>
+          <Menu.Item onSelect={() => toast(`${name}을 내려받아요`)}>
+            <ArrowDownTrayIcon />
+            내려받기
+          </Menu.Item>
+          <Menu.Item>
+            <PencilIcon />
+            이름 바꾸기
+          </Menu.Item>
+          <Menu.Item>
+            <FolderArrowDownIcon />
+            옮기기
+          </Menu.Item>
           <Menu.Separator />
-          <Menu.Item onSelect={() => toast(`${name}을 휴지통으로 옮겼어요`)}>지우기</Menu.Item>
+          <Menu.Item onSelect={() => toast(`${name}을 휴지통으로 옮겼어요`)}>
+            <TrashIcon />
+            지우기
+          </Menu.Item>
         </Menu.Content>
       </Menu>
     );
@@ -239,7 +256,7 @@ export const PC: Story = {
             </ul>
           ) : (
             <Card size="tiny">
-              <Item.Group aria-label="파일">
+              <ItemGroup aria-label="파일">
                 {shown.map((file) => (
                   <Item key={file.id}>
                     <Item.Media variant="soft">{KIND_ICON[file.kind]}</Item.Media>
@@ -252,7 +269,7 @@ export const PC: Story = {
                     <Item.Actions>{fileMenu(file.name)}</Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           )}
         </section>
