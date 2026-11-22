@@ -811,8 +811,16 @@ export const CreateBySelecting: Story = {
     const wednesday = canvasElement.querySelector<HTMLElement>(
       '[data-scheduler-column="2026-11-18"]',
     )!;
-    const { left, top, height } = wednesday.getBoundingClientRect();
-    const hour = height / 24;
+    const viewport = wednesday.closest<HTMLElement>('[data-scroll-area-viewport]')!;
+    const board = viewport.getBoundingClientRect();
+    const column = wednesday.getBoundingClientRect();
+    const hour = column.height / 24;
+    viewport.scrollBy({
+      left: column.left + column.width / 2 - (board.left + board.width / 2),
+      top: column.top + hour * 14.75 - (board.top + board.height / 2),
+      behavior: 'instant',
+    });
+    const { left, top } = wednesday.getBoundingClientRect();
     const at = (hours: number) => ({ clientX: left + 8, clientY: top + hour * hours });
 
     await userEvent.pointer([
