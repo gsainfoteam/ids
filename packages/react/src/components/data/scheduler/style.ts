@@ -81,8 +81,29 @@ export const schedulerStyle = tv({
       'data-dragging:before:bg-(--ids-color-text-scheme)',
     ],
     eventContent: '',
+    eventStart: 'shrink-0 text-caption-c1-regular tabular-nums',
     eventTitle: '',
     eventTime: '',
+    monthCanvas:
+      'flex min-h-full min-w-[calc(var(--scheduler-days)*var(--scheduler-day-min))] flex-col',
+    monthHead: 'sticky top-0 z-20 grid grid-cols-7 border-b border-neutral bg-block',
+    monthWeekday: [
+      'border-e border-neutral py-2 text-center last:border-e-0',
+      'text-caption-c1-medium text-neutral',
+    ],
+    monthWeek: 'grid min-h-28 flex-1 grid-cols-7 border-b border-neutral last:border-b-0',
+    monthDay:
+      'col-start-(--scheduler-cell-column) row-start-1 min-w-0 border-e border-neutral p-1 last-of-type:border-e-0',
+    monthDate: [
+      'flex size-7 items-center justify-center rounded-full',
+      'text-caption-c1-medium text-neutral-strong tabular-nums',
+    ],
+    monthList: [
+      'pointer-events-none col-start-1 -col-end-1 row-start-1 grid grid-cols-7 content-start gap-y-0.5 pt-9 pb-1',
+      '*:pointer-events-auto',
+    ],
+    monthMore:
+      'col-start-(--scheduler-bar-column) row-start-(--scheduler-bar-row) flex min-w-0 px-1',
     now: [
       'pointer-events-none absolute inset-x-0 z-1 h-0.5 bg-danger-solid',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-now)-1px)]',
@@ -91,7 +112,19 @@ export const schedulerStyle = tv({
   },
   variants: {
     today: {
-      true: { dayHead: 'text-primary', dayNumber: 'bg-primary-solid text-on-primary-solid' },
+      true: {
+        dayHead: 'text-primary',
+        dayNumber: 'bg-primary-solid text-on-primary-solid',
+        monthDate: 'bg-primary-solid text-on-primary-solid',
+      },
+      false: {},
+    },
+    outside: {
+      true: { monthDay: 'bg-block', monthDate: 'text-neutral' },
+      false: {},
+    },
+    startsAt: {
+      true: { eventContent: 'flex-row items-baseline gap-1' },
       false: {},
     },
     dragging: {
@@ -99,7 +132,9 @@ export const schedulerStyle = tv({
       false: {},
     },
     view: {
+      month: { root: '[--scheduler-days:7] [--scheduler-day-min:calc(var(--spacing)*22)]' },
       week: { root: '[--scheduler-day-min:calc(var(--spacing)*22)]' },
+      days: { root: '[--scheduler-day-min:calc(var(--spacing)*22)]' },
       day: { root: '[--scheduler-day-min:0px]' },
     } satisfies Record<SchedulerView, object>,
     allDay: {
@@ -133,6 +168,8 @@ export const schedulerStyle = tv({
   defaultVariants: {
     view: 'week',
     today: false,
+    outside: false,
+    startsAt: false,
     allDay: false,
     dragging: false,
     colorScheme: 'primary',

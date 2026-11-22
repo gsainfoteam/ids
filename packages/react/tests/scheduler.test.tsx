@@ -9,7 +9,14 @@ import { render } from 'vitest-browser-react';
 import { IdsProvider, Menu, Scheduler } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
-import { allDayBarsIn, timedSegmentsOn } from '../src/components/data/scheduler/layout';
+import {
+  allDayBarsIn,
+  daysOf,
+  hiddenOn,
+  monthBarsIn,
+  stepOf,
+  timedSegmentsOn,
+} from '../src/components/data/scheduler/layout';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -327,6 +334,75 @@ test('all-day events become one bar across their days, clipped to the range and 
     ['fest', 4, 2, 0],
     ['exam', 5, 2, 1],
   ]);
+});
+
+test('month shows whole weeks from the week of the 1st to the week of the last day', () => {
+  const sundays = daysOf('month', on(17), 0);
+  expect(sundays).toHaveLength(35);
+  expect([sundays[0].toString(), sundays.at(-1)!.toString()]).toEqual(['2026-11-01', '2026-12-05']);
+
+  const mondays = daysOf('month', on(17), 1);
+  expect(mondays).toHaveLength(42);
+  expect([mondays[0].toString(), mondays.at(-1)!.toString()]).toEqual(['2026-10-26', '2026-12-06']);
+});
+
+test('days shows dayCount days from the date and steps by them', () => {
+  expect(daysOf('days', on(17), 0, 4).map(String)).toEqual([
+    '2026-11-17',
+    '2026-11-18',
+    '2026-11-19',
+    '2026-11-20',
+  ]);
+  expect(stepOf('days', 4)).toEqual({ days: 4 });
+  expect(stepOf('month')).toEqual({ months: 1 });
+});
+
+test('a month week packs all-day and timed events into rows, long bars first, and counts the rest', () => {
+  const week = [15, 16, 17, 18, 19, 20, 21].map(on);
+  const bars = monthBarsIn(
+    [
+      ...EVENTS,
+      { id: 'midnight', title: 'Midnight', start: at(18, 22), end: at(19, 0) },
+      { id: 'trip', title: 'Trip', start: on(12), end: on(16), allDay: true },
+    ],
+    week,
+  );
+  expect(bars.map(({ event, column, span, row }) => [event.id, column, span, row])).toEqual([
+    ['trip', 0, 2, 0],
+    ['algo', 2, 1, 0],
+    ['room', 2, 1, 1],
+    ['lunch', 2, 1, 2],
+    ['midnight', 3, 1, 0],
+    ['fest', 4, 2, 0],
+    ['late', 4, 2, 1],
+  ]);
+  expect(hiddenOn(bars, 2, 2)).toBe(1);
+  expect(hiddenOn(bars, 2, 3)).toBe(0);
+});
+
+test('a right-click on an empty month day hands slotMenu the whole day', async () => {
+  const slotMenu = vi.fn((slot: Scheduler.Slot) => (
+    <Menu.Item>Create on {slot.start.day}</Menu.Item>
+  ));
+  const screen = await render(inProvider({ defaultView: 'month', slotMenu }));
+  await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
+  const day = document.querySelector<HTMLElement>('[data-scheduler-month-day="2026-11-25"]')!;
+
+  await userEvent.click(day, { button: 'right', position: { x: 40, y: 60 } });
+
+  await expect.element(screen.getByRole('menu', { name: '2026년 11월 25일 수요일' })).toBeVisible();
+  const [slot] = slotMenu.mock.lastCall!;
+  expect(slot.start.toString()).toBe('2026-11-25T00:00:00');
+  expect(slot.end.toString()).toBe('2026-11-26T00:00:00');
+});
+
+test('month events read as one line with their start, and are not movable', async () => {
+  const screen = await render(inProvider({ defaultView: 'month', onEventChange: vi.fn() }));
+  await expect.element(screen.getByText('Algorithms')).toBeVisible();
+  const algo = document.querySelector('[data-scheduler-event="algo"]')!;
+  expect(algo.textContent).toContain('오전 9:00');
+  expect(algo.getAttribute('tabindex')).toBeNull();
+  expect(document.querySelector('[data-resizable-handle]')).toBeNull();
 });
 
 test('locale names the days and times, and picks the first weekday', () => {

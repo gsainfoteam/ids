@@ -23,6 +23,7 @@ const THE_FOCUSABLE_DAY = '[data-calendar-day][tabindex="0"]';
 
 type SchedulerToolbarProps = SchedulerContextValue & {
   view: SchedulerView;
+  dayCount: number;
   onViewChange: (view: SchedulerView) => void;
   date: CalendarDate;
   onDateChange: (date: CalendarDate) => void;
@@ -36,6 +37,7 @@ export function SchedulerToolbar({
   styles,
   format,
   view,
+  dayCount,
   onViewChange,
   date,
   onDateChange,
@@ -46,15 +48,27 @@ export function SchedulerToolbar({
 }: SchedulerToolbarProps) {
   const t = useTranslate();
   const [picking, setPicking] = useState(false);
-  const step = stepOf(view);
-  const range = format.range(view, days);
+  const step = stepOf(view, dayCount);
+  const range = format.range(view, days, date);
+  const previousLabel = {
+    month: t('scheduler.previousMonth'),
+    week: t('scheduler.previousWeek'),
+    days: t('scheduler.previousDays', { count: dayCount }),
+    day: t('scheduler.previousDay'),
+  }[view];
+  const nextLabel = {
+    month: t('scheduler.nextMonth'),
+    week: t('scheduler.nextWeek'),
+    days: t('scheduler.nextDays', { count: dayCount }),
+    day: t('scheduler.nextDay'),
+  }[view];
 
   return (
     <div className={styles.toolbar()} data-scheduler-toolbar="">
       <ButtonGroup variant="outline" aria-label={t('scheduler.navigation')}>
         <IconButton
           icon={<ChevronLeftIcon aria-hidden="true" className="rtl:-scale-x-100" />}
-          aria-label={t(view === 'week' ? 'scheduler.previousWeek' : 'scheduler.previousDay')}
+          aria-label={previousLabel}
           onClick={() => onDateChange(date.subtract(step))}
         />
         <Button onClick={() => onDateChange(today ?? todayIn(getLocalTimeZone()))}>
@@ -62,7 +76,7 @@ export function SchedulerToolbar({
         </Button>
         <IconButton
           icon={<ChevronRightIcon aria-hidden="true" className="rtl:-scale-x-100" />}
-          aria-label={t(view === 'week' ? 'scheduler.nextWeek' : 'scheduler.nextDay')}
+          aria-label={nextLabel}
           onClick={() => onDateChange(date.add(step))}
         />
       </ButtonGroup>
@@ -105,7 +119,9 @@ export function SchedulerToolbar({
         onValueChange={(next) => next && onViewChange(next as SchedulerView)}
         className={styles.views()}
       >
+        <Toggle value="month">{t('scheduler.month')}</Toggle>
         <Toggle value="week">{t('scheduler.week')}</Toggle>
+        <Toggle value="days">{t('scheduler.days', { count: dayCount })}</Toggle>
         <Toggle value="day">{t('scheduler.day')}</Toggle>
       </ToggleGroup>
     </div>

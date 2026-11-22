@@ -42,6 +42,7 @@ export const schedulerFormat = memoize((locale: string) => {
     minute: '2-digit',
     timeZone: WALL_CLOCK,
   });
+  const month = dateFormatter(locale, { year: 'numeric', month: 'long', timeZone: WALL_CLOCK });
   const digits = numberFormatter(locale, { useGrouping: false });
 
   return {
@@ -53,10 +54,11 @@ export const schedulerFormat = memoize((locale: string) => {
     time: (value: CalendarDateTime) => time.format(onTheWall(value)),
     moment: (value: CalendarDateTime) => moment.format(onTheWall(value)),
     hour: (value: number) => hour.format(new Date(Date.UTC(SAMPLE_YEAR, 0, 1, value))),
-    range: (view: SchedulerView, days: CalendarDate[]) =>
-      view === 'day'
-        ? dayDate.format(onTheWall(days[0]))
-        : rangeDate.formatRange(onTheWall(days[0]), onTheWall(days[days.length - 1])),
+    range: (view: SchedulerView, days: CalendarDate[], date: CalendarDate) => {
+      if (view === 'month') return month.format(onTheWall(date));
+      if (days.length === 1) return dayDate.format(onTheWall(days[0]));
+      return rangeDate.formatRange(onTheWall(days[0]), onTheWall(days[days.length - 1]));
+    },
   };
 });
 

@@ -431,6 +431,8 @@ mixin IdsMessages {
 
   String? get schedulerDay => null;
 
+  String? schedulerDays({required Object count}) => null;
+
   String? schedulerDragAt({required Object time}) => null;
 
   String? schedulerDragCancel({required Object event}) => null;
@@ -445,13 +447,27 @@ mixin IdsMessages {
 
   String? get schedulerLabel => null;
 
+  String? get schedulerMonth => null;
+
+  String? schedulerMore({required Object count}) => null;
+
+  String? schedulerMoreLabel({required Object date, required Object count}) => null;
+
   String? get schedulerNavigation => null;
 
   String? get schedulerNextDay => null;
 
+  String? schedulerNextDays({required Object count}) => null;
+
+  String? get schedulerNextMonth => null;
+
   String? get schedulerNextWeek => null;
 
   String? get schedulerPreviousDay => null;
+
+  String? schedulerPreviousDays({required Object count}) => null;
+
+  String? get schedulerPreviousMonth => null;
 
   String? get schedulerPreviousWeek => null;
 
@@ -1221,6 +1237,9 @@ final class IdsKoreanMessages with IdsMessages {
   String get schedulerDay => '일';
 
   @override
+  String schedulerDays({required Object count}) => '${_format(count)}일';
+
+  @override
   String schedulerDragAt({required Object time}) => '${_format(time)} 시작';
 
   @override
@@ -1242,16 +1261,37 @@ final class IdsKoreanMessages with IdsMessages {
   String get schedulerLabel => '일정표';
 
   @override
+  String get schedulerMonth => '월';
+
+  @override
+  String schedulerMore({required Object count}) => '+${_format(count)}개';
+
+  @override
+  String schedulerMoreLabel({required Object date, required Object count}) => '${_format(date)} 일정 ${_format(count)}개 더 보기';
+
+  @override
   String get schedulerNavigation => '날짜 이동';
 
   @override
   String get schedulerNextDay => '다음 날';
 
   @override
+  String schedulerNextDays({required Object count}) => '다음 ${_format(count)}일';
+
+  @override
+  String get schedulerNextMonth => '다음 달';
+
+  @override
   String get schedulerNextWeek => '다음 주';
 
   @override
   String get schedulerPreviousDay => '이전 날';
+
+  @override
+  String schedulerPreviousDays({required Object count}) => '이전 ${_format(count)}일';
+
+  @override
+  String get schedulerPreviousMonth => '이전 달';
 
   @override
   String get schedulerPreviousWeek => '이전 주';

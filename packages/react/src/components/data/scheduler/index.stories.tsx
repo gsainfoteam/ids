@@ -234,7 +234,8 @@ const meta = {
   component: Scheduler,
   tags: ['autodocs'],
   argTypes: {
-    defaultView: { control: 'radio', options: ['week', 'day'] },
+    defaultView: { control: 'radio', options: ['month', 'week', 'days', 'day'] },
+    dayCount: { control: { type: 'number', min: 2, max: 7 } },
     locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP'] },
     weekStartsOn: { control: { type: 'number', min: 0, max: 6 } },
   },
@@ -266,14 +267,35 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="View"
-        description="week는 locale의 첫 요일부터 7일, day는 하루입니다. 오늘 열은 머리줄 숫자를 칠하고, 지금 시각에 선을 긋습니다."
+        description="month는 그달이 든 주들, week는 locale의 첫 요일부터 7일, days는 고른 날부터 dayCount일, day는 하루입니다. 오늘은 날짜 숫자를 칠하고, 지금 시각에 선을 긋습니다."
       >
+        <Showcase.Row label="month">
+          <Scheduler
+            events={EVENTS}
+            defaultView="month"
+            defaultDate={TODAY}
+            now={NOW}
+            aria-label="월 보기"
+            className="h-160"
+          />
+        </Showcase.Row>
         <Showcase.Row label="week">
           <Scheduler
             events={EVENTS}
             defaultDate={TODAY}
             now={NOW}
             aria-label="주 보기"
+            className="h-120"
+          />
+        </Showcase.Row>
+        <Showcase.Row label="days">
+          <Scheduler
+            events={EVENTS}
+            defaultView="days"
+            dayCount={3}
+            defaultDate={TODAY}
+            now={NOW}
+            aria-label="3일 보기"
             className="h-120"
           />
         </Showcase.Row>
@@ -360,7 +382,7 @@ export const Navigation: Story = {
     docs: {
       description: {
         story:
-          '이전, 오늘, 다음은 보기만큼(주 또는 하루) 옮깁니다. 바뀐 기간은 화면 읽기 프로그램에 status로 알립니다.',
+          '이전, 오늘, 다음은 보기만큼(한 달, 한 주, `dayCount` 일, 하루) 옮깁니다. 바뀐 기간은 화면 읽기 프로그램에 status로 알립니다.',
       },
     },
   },
@@ -391,6 +413,58 @@ export const Navigation: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '이전 날' }));
     await expect(args.onDateChange).toHaveBeenLastCalledWith(on(16));
     await expect(shownDays(canvasElement)).toEqual(['2026-11-16']);
+  },
+};
+
+export const MonthView: Story = {
+  args: { defaultView: 'month' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '월 보기는 그달의 1일이 든 주부터 마지막 날이 든 주까지 보여 줍니다. 하루 종일과 여러 날 일정은 막대로 이어지고, 시간이 있는 일정은 시작 시각과 제목을 한 줄에 씁니다. 하루에 세 줄을 넘는 일정은 `+N개` 로 접고, 누르면 그날의 일 보기로 갑니다. 이전과 다음은 한 달씩 옮깁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    const monthDays = () => canvasElement.querySelectorAll('[data-scheduler-month-day]');
+
+    await expect(range(canvasElement)).toHaveTextContent('2026년 11월');
+    await expect(monthDays()).toHaveLength(35);
+    await expect(monthDays()[0]).toHaveAttribute('data-scheduler-month-day', '2026-11-01');
+    await expect(canvas.getByText('알고리즘 스터디')).toBeVisible();
+
+    await userEvent.click(canvas.getByRole('button', { name: '다음 달' }));
+    await expect(args.onDateChange).toHaveBeenLastCalledWith(new CalendarDate(2026, 12, 17));
+    await expect(range(canvasElement)).toHaveTextContent('2026년 12월');
+    await expect(monthDays()[0]).toHaveAttribute('data-scheduler-month-day', '2026-11-29');
+
+    await userEvent.click(canvas.getByRole('button', { name: '이전 달' }));
+    await userEvent.click(
+      canvas.getByRole('button', { name: '2026년 11월 17일 화요일 일정 5개 더 보기' }),
+    );
+    await expect(args.onViewChange).toHaveBeenLastCalledWith('day');
+    await expect(shownDays(canvasElement)).toEqual(['2026-11-17']);
+  },
+};
+
+export const DaysView: Story = {
+  args: { defaultView: 'days', dayCount: 3 },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`view="days"` 는 고른 날부터 `dayCount` 일(기본 3일)을 주 보기와 같은 시간 격자로 보여 줍니다. 이전과 다음은 `dayCount` 일씩 옮깁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    await expect(canvas.getByRole('radio', { name: '3일' })).toBeChecked();
+    await expect(shownDays(canvasElement)).toEqual(['2026-11-17', '2026-11-18', '2026-11-19']);
+
+    await userEvent.click(canvas.getByRole('button', { name: '다음 3일' }));
+    await expect(args.onDateChange).toHaveBeenLastCalledWith(on(20));
+    await expect(shownDays(canvasElement)).toEqual(['2026-11-20', '2026-11-21', '2026-11-22']);
   },
 };
 
@@ -435,9 +509,15 @@ export const ViewByKeyboard: Story = {
     await userEvent.tab();
     await expect(canvas.getByRole('radio', { name: '주' })).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('radio', { name: '3일' })).toHaveFocus();
+    await expect(args.onViewChange).toHaveBeenLastCalledWith('days');
+    await userEvent.keyboard('{ArrowRight}');
     await expect(canvas.getByRole('radio', { name: '일' })).toHaveFocus();
     await expect(args.onViewChange).toHaveBeenLastCalledWith('day');
     await expect(canvas.getByRole('button', { name: '이전 날' })).toBeVisible();
+    await userEvent.keyboard('{Home}');
+    await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
+    await expect(args.onViewChange).toHaveBeenLastCalledWith('month');
   },
 };
 

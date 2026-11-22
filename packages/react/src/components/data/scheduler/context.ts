@@ -21,6 +21,7 @@ export type SchedulerEventContextValue = {
   start: CalendarDateTime;
   end: CalendarDateTime;
   allDay: boolean;
+  inMonth?: boolean;
 };
 
 export const SchedulerEventContext = createContext<SchedulerEventContextValue | null>(null);

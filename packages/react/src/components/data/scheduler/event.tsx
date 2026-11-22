@@ -21,9 +21,19 @@ export function SchedulerEvent({
   children,
   ...props
 }: SchedulerEventPartProps) {
-  const { styles, format, event, start, end, allDay } = useSchedulerEventContext('Scheduler.Event');
+  const {
+    styles,
+    format,
+    event,
+    start,
+    end,
+    allDay,
+    inMonth = false,
+  } = useSchedulerEventContext('Scheduler.Event');
+  const oneLine = allDay || inMonth;
+  const startsAt = inMonth && !allDay;
   const scheme = colorScheme ?? event.colorScheme ?? 'primary';
-  const movable = use(SchedulerDragContext) !== null && !allDay;
+  const movable = use(SchedulerDragContext) !== null && !oneLine;
   const focusableToMove = movable && props.onClick === undefined;
 
   return (
@@ -36,20 +46,27 @@ export function SchedulerEvent({
       data-color-scheme={scheme}
       className={(state) =>
         styles.event({
-          allDay,
+          allDay: oneLine,
           colorScheme: scheme,
           className: typeof className === 'function' ? className(state) : className,
         })
       }
     >
       {children ?? (
-        <Item.Content className={styles.eventContent({ allDay })}>
-          <Item.Title truncate={allDay} className={styles.eventTitle({ allDay })}>
+        <Item.Content className={styles.eventContent({ allDay: oneLine, startsAt })}>
+          {startsAt && (
+            <span aria-hidden="true" className={styles.eventStart()}>
+              {format.time(start)}
+            </span>
+          )}
+          <Item.Title truncate={oneLine} className={styles.eventTitle({ allDay: oneLine })}>
             {event.title}
           </Item.Title>
-          <Item.Description className={styles.eventTime({ allDay })}>
+          <Item.Description className={styles.eventTime({ allDay: oneLine })}>
             {allDay ? (
               format.dates(toCalendarDate(start), toCalendarDate(end))
+            ) : inMonth ? (
+              <time dateTime={start.toString()}>{format.moment(start)}</time>
             ) : (
               <>
                 <time dateTime={start.toString()}>{format.time(start)}</time>

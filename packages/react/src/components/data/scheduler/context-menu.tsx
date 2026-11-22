@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 
-import { parseDate, toCalendarDateTime } from '@internationalized/date';
+import { parseDate, toCalendarDate, toCalendarDateTime } from '@internationalized/date';
 import { clamp } from 'es-toolkit';
 
 import { HOURS_IN_DAY, type SchedulerEventData, type SchedulerSlot } from './layout';
@@ -21,7 +21,9 @@ import type { SchedulerFormat } from './format';
 const MINUTES_IN_DAY = HOURS_IN_DAY * 60;
 const SLOT_MINUTES = 30;
 
-type Target<E extends SchedulerEventData> = { event: E } | { slot: SchedulerSlot };
+type Target<E extends SchedulerEventData> =
+  | { event: E; label: string }
+  | { slot: SchedulerSlot; label: string };
 
 export function slotAt(column: HTMLElement, clientY: number): SchedulerSlot {
   const day = parseDate(column.getAttribute('data-scheduler-column')!);
@@ -34,6 +36,11 @@ export function slotAt(column: HTMLElement, clientY: number): SchedulerSlot {
   );
   const start = toCalendarDateTime(day).add({ minutes });
   return { start, end: start.add({ minutes: SLOT_MINUTES }) };
+}
+
+function wholeDayOf(cell: Element): SchedulerSlot {
+  const start = toCalendarDateTime(parseDate(cell.getAttribute('data-scheduler-month-day')!));
+  return { start, end: start.add({ days: 1 }) };
 }
 
 function TriggerWhereAMenuIs({
@@ -87,15 +94,25 @@ export function SchedulerContextMenu<E extends SchedulerEventData>({
     if (slotted) {
       const id = slotted.getAttribute('data-scheduler-slot');
       const found = events.find((item) => item.id === id);
-      return found && eventMenu ? { event: found } : null;
+      return found && eventMenu ? { event: found, label: found.title } : null;
     }
 
-    const column = event.target.closest<HTMLElement>('[data-scheduler-column]');
-    return column && slotMenu ? { slot: slotAt(column, event.clientY) } : null;
-  };
+    if (!slotMenu) return null;
 
-  const label =
-    target && ('event' in target ? target.event.title : format.moment(target.slot.start));
+    const column = event.target.closest<HTMLElement>('[data-scheduler-column]');
+    if (column) {
+      const slot = slotAt(column, event.clientY);
+      return { slot, label: format.moment(slot.start) };
+    }
+
+    const cell = event.target.closest('[data-scheduler-month-day]');
+    if (cell) {
+      const slot = wholeDayOf(cell);
+      return { slot, label: format.fullDate(toCalendarDate(slot.start)) };
+    }
+
+    return null;
+  };
 
   return (
     <Menu triggerType="contextmenu">
@@ -108,7 +125,7 @@ export function SchedulerContextMenu<E extends SchedulerEventData>({
       >
         {children}
       </TriggerWhereAMenuIs>
-      <Menu.Content aria-label={label ?? undefined}>
+      <Menu.Content aria-label={target?.label}>
         {target && ('event' in target ? eventMenu?.(target.event) : slotMenu?.(target.slot))}
       </Menu.Content>
     </Menu>

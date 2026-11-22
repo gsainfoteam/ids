@@ -16,11 +16,13 @@ import { SchedulerGrid } from './grid';
 import {
   dateOf,
   daysOf,
+  DEFAULT_DAY_COUNT,
   type SchedulerEventChange,
   type SchedulerEventData,
   type SchedulerSlot,
   type SchedulerView,
 } from './layout';
+import { SchedulerMonth } from './month';
 import { schedulerStyle } from './style';
 import { SchedulerToolbar } from './toolbar';
 import { useNow } from './use-now';
@@ -37,6 +39,7 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
   view?: SchedulerView;
   defaultView?: SchedulerView;
   onViewChange?: (view: SchedulerView) => void;
+  dayCount?: number;
   date?: CalendarDate;
   defaultDate?: CalendarDate;
   onDateChange?: (date: CalendarDate) => void;
@@ -56,6 +59,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   view: viewProp,
   defaultView = 'week',
   onViewChange,
+  dayCount = DEFAULT_DAY_COUNT,
   date: dateProp,
   defaultDate,
   onDateChange,
@@ -95,7 +99,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
     onValueChange: onDateChange,
   });
 
-  const days = daysOf(view, date, weekStart);
+  const days = daysOf(view, date, weekStart, dayCount);
   const styles = schedulerStyle({ view });
   const format = schedulerFormat(resolvedLocale);
 
@@ -115,6 +119,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
           styles={styles}
           format={format}
           view={view}
+          dayCount={dayCount}
           onViewChange={setView}
           date={date}
           onDateChange={setDate}
@@ -123,19 +128,37 @@ export function SchedulerRoot<E extends SchedulerEventData>({
           locale={resolvedLocale}
           weekStartsOn={weekStart}
         />
-        <SchedulerGrid
-          styles={styles}
-          format={format}
-          days={days}
-          events={events}
-          today={today}
-          now={now}
-          renderEvent={children}
-          onEventChange={onEventChange}
-          eventMenu={eventMenu}
-          slotMenu={slotMenu}
-          hintId={hintId}
-        />
+        {view === 'month' ? (
+          <SchedulerMonth
+            styles={styles}
+            format={format}
+            days={days}
+            month={date}
+            events={events}
+            today={today}
+            renderEvent={children}
+            eventMenu={eventMenu}
+            slotMenu={slotMenu}
+            onShowDay={(day) => {
+              setDate(day);
+              setView('day');
+            }}
+          />
+        ) : (
+          <SchedulerGrid
+            styles={styles}
+            format={format}
+            days={days}
+            events={events}
+            today={today}
+            now={now}
+            renderEvent={children}
+            onEventChange={onEventChange}
+            eventMenu={eventMenu}
+            slotMenu={slotMenu}
+            hintId={hintId}
+          />
+        )}
       </div>
     </SchedulerContext>
   );

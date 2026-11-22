@@ -1,6 +1,8 @@
 import {
   type CalendarDate,
   CalendarDateTime,
+  endOfMonth,
+  startOfMonth,
   toCalendarDate,
   toCalendarDateTime,
   type DateValue,
@@ -10,7 +12,7 @@ import { compareDays, ownDate, weekdayOf } from '../calendar/date';
 
 import type { WeekDay } from '../../../internal/date-locale';
 
-export type SchedulerView = 'week' | 'day';
+export type SchedulerView = 'month' | 'week' | 'days' | 'day';
 
 export type SchedulerColorScheme =
   | 'neutral'
@@ -59,6 +61,13 @@ export type SchedulerAllDayBar<E extends SchedulerEventData = SchedulerEventData
   row: number;
 };
 
+export type SchedulerMonthBar<E extends SchedulerEventData = SchedulerEventData> =
+  SchedulerAllDayBar<E> & {
+    start: CalendarDateTime;
+    end: CalendarDateTime;
+    allDay: boolean;
+  };
+
 const DAYS_IN_WEEK = 7;
 const MINUTES_IN_HOUR = 60;
 export const HOURS_IN_DAY = 24;
@@ -74,16 +83,42 @@ export const dateOf = (value: DateValue) => ownDate(toCalendarDate(value));
 
 export const isAllDay = (event: SchedulerEventData) => event.allDay ?? !('hour' in event.start);
 
-export function daysOf(view: SchedulerView, date: CalendarDate, weekStart: WeekDay) {
+export const DEFAULT_DAY_COUNT = 3;
+
+const daysFrom = (first: CalendarDate, count: number) =>
+  Array.from({ length: count }, (_, index) => first.add({ days: index }));
+
+const weekStartOn = (day: CalendarDate, weekStart: WeekDay) =>
+  day.subtract({ days: (weekdayOf(day) - weekStart + DAYS_IN_WEEK) % DAYS_IN_WEEK });
+
+export function daysOf(
+  view: SchedulerView,
+  date: CalendarDate,
+  weekStart: WeekDay,
+  dayCount = DEFAULT_DAY_COUNT,
+) {
   const anchor = ownDate(date);
   if (view === 'day') return [anchor];
+  if (view === 'days') return daysFrom(anchor, dayCount);
+  if (view === 'week') return daysFrom(weekStartOn(anchor, weekStart), DAYS_IN_WEEK);
 
-  const sinceWeekStart = (weekdayOf(anchor) - weekStart + DAYS_IN_WEEK) % DAYS_IN_WEEK;
-  const first = anchor.subtract({ days: sinceWeekStart });
-  return Array.from({ length: DAYS_IN_WEEK }, (_, index) => first.add({ days: index }));
+  const first = weekStartOn(startOfMonth(anchor), weekStart);
+  const last = endOfMonth(anchor);
+  const weeks = Math.ceil((compareDays(last, first) + 1) / DAYS_IN_WEEK);
+  return daysFrom(first, weeks * DAYS_IN_WEEK);
 }
 
-export const stepOf = (view: SchedulerView) => (view === 'week' ? { weeks: 1 } : { days: 1 });
+export const weeksIn = (days: CalendarDate[]) =>
+  Array.from({ length: days.length / DAYS_IN_WEEK }, (_, week) =>
+    days.slice(week * DAYS_IN_WEEK, (week + 1) * DAYS_IN_WEEK),
+  );
+
+export function stepOf(view: SchedulerView, dayCount = DEFAULT_DAY_COUNT) {
+  if (view === 'month') return { months: 1 };
+  if (view === 'week') return { weeks: 1 };
+  if (view === 'days') return { days: dayCount };
+  return { days: 1 };
+}
 
 export const hourOfDay = (time: CalendarDateTime) => time.hour + time.minute / MINUTES_IN_HOUR;
 
@@ -109,6 +144,10 @@ export function allDayBarsIn<E extends SchedulerEventData>(
     })
     .sort((a, b) => a.column - b.column || b.span - a.span);
 
+  return packedIntoRows(bars);
+}
+
+function packedIntoRows<B extends { column: number; span: number; row: number }>(bars: B[]) {
   const rowEnds: number[] = [];
   for (const bar of bars) {
     const freeRow = rowEnds.findIndex((rowEnd) => rowEnd < bar.column);
@@ -116,6 +155,63 @@ export function allDayBarsIn<E extends SchedulerEventData>(
     rowEnds[bar.row] = bar.column + bar.span - 1;
   }
   return bars;
+}
+
+function lastDayOf(event: SchedulerEventData) {
+  if (isAllDay(event)) return dateOf(event.end);
+  const start = wallTime(event.start);
+  const end = wallTime(event.end);
+  const endsAtMidnight = end.hour === 0 && end.minute === 0 && end.compare(start) > 0;
+  const last = dateOf(endsAtMidnight ? end.subtract({ days: 1 }) : end);
+  return compareDays(last, dateOf(start)) < 0 ? dateOf(start) : last;
+}
+
+export function monthBarsIn<E extends SchedulerEventData>(
+  events: readonly E[],
+  week: CalendarDate[],
+): SchedulerMonthBar<E>[] {
+  const first = week[0];
+  const last = week[week.length - 1];
+  const columnOf = (day: CalendarDate) =>
+    Math.min(Math.max(compareDays(day, first), 0), week.length - 1);
+
+  const bars = events
+    .filter(
+      (event) =>
+        compareDays(dateOf(event.start), last) <= 0 && compareDays(lastDayOf(event), first) >= 0,
+    )
+    .map((event) => {
+      const column = columnOf(dateOf(event.start));
+      const allDay = isAllDay(event);
+      return {
+        event,
+        column,
+        span: columnOf(lastDayOf(event)) - column + 1,
+        row: 0,
+        allDay,
+        start: allDay ? toCalendarDateTime(dateOf(event.start)) : wallTime(event.start),
+        end: allDay ? toCalendarDateTime(dateOf(event.end)) : wallTime(event.end),
+      };
+    })
+    .sort(
+      (a, b) =>
+        a.column - b.column ||
+        b.span - a.span ||
+        Number(b.allDay) - Number(a.allDay) ||
+        a.start.compare(b.start),
+    );
+
+  return packedIntoRows(bars);
+}
+
+export function hiddenOn<E extends SchedulerEventData>(
+  bars: SchedulerMonthBar<E>[],
+  column: number,
+  shownRows: number,
+) {
+  return bars.filter(
+    (bar) => bar.row >= shownRows && bar.column <= column && column < bar.column + bar.span,
+  ).length;
 }
 
 type UnplacedSegment<E extends SchedulerEventData> = Omit<SchedulerSegment<E>, 'left' | 'width'>;

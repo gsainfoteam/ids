@@ -1,8 +1,8 @@
 # Scheduler
 
-일정을 주나 하루의 시간 격자에 놓는 컴포넌트입니다. 수강 시간표, 스터디룸 예약, 동아리 일정처럼 시각이 정해진 일을 보여 줍니다.
+일정을 달력이나 주, 며칠, 하루의 시간 격자에 놓는 컴포넌트입니다. 수강 시간표, 스터디룸 예약, 동아리 일정처럼 시각이 정해진 일을 보여 줍니다.
 
-- **보기는 주와 하루.** `week`(기본)는 locale 의 첫 요일부터 7일, `day` 는 하루입니다. 월 보기는 없습니다.
+- **보기는 넷.** `month` 는 그달이 든 주들, `week`(기본)는 locale 의 첫 요일부터 7일, `days` 는 `date` 부터 `dayCount` 일(기본 3일), `day` 는 하루입니다.
 - **IDS 로 짓습니다.** 이동은 ButtonGroup, 보기 전환은 ToggleGroup, 날짜로 이동은 Popover 안의 Calendar, 격자는 ScrollArea, 일정은 Item, 지금 시각은 Divider 입니다.
 - **날짜는 `@internationalized/date`.** `date` 는 `CalendarDate`, 일정의 `start` / `end` 는 `CalendarDateTime` 입니다. 시간대가 없는 벽시계 시각이라 로컬 시간대가 값을 흔들지 않습니다.
 - **locale.** 요일, 날짜, 시각의 글자와 첫 요일을 Calendar 와 같은 방식으로 locale 에서 읽습니다.
@@ -163,6 +163,7 @@ const [events, setEvents] = useState(initialEvents);
 
 - `eventMenu(event)` 는 일정(종일 일정 포함)을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 메뉴 이름은 일정 제목입니다.
 - `slotMenu({ start, end })` 는 시간 칸의 빈 곳을 우클릭했을 때 엽니다. 포인터 아래의 30분 칸이 `CalendarDateTime` 으로 넘어오고, 메뉴 이름은 "11월 18일 수요일 오후 2:30" 입니다.
+- 월 보기에서는 날 칸의 빈 곳을 우클릭하면 그날 하루(`00:00` 부터 다음 날 `00:00` 까지)가 넘어오고, 메뉴 이름은 "2026년 11월 25일 수요일" 입니다.
 - 메뉴는 `Menu triggerType="contextmenu"` 라서 우클릭한 자리에 뜹니다. 고르는 법, 키보드, 닫는 법은 Menu 와 같습니다.
 - 메뉴를 주지 않은 곳(`eventMenu` 없이 일정, `slotMenu` 없이 빈 칸, 종일 줄의 빈 곳)은 브라우저 메뉴가 그대로 뜹니다.
 - `onEventChange` 와 함께 써도 우클릭은 일정을 집지 않습니다.
@@ -171,17 +172,32 @@ const [events, setEvents] = useState(initialEvents);
 
 ```tsx
 <Scheduler events={events} defaultView="day" defaultDate={new CalendarDate(2026, 11, 17)} />
+<Scheduler events={events} defaultView="days" dayCount={4} />
 
 const [view, setView] = useState<Scheduler.View>('week');
 const [date, setDate] = useState(today(getLocalTimeZone()));
 <Scheduler events={events} view={view} onViewChange={setView} date={date} onDateChange={setDate} />
 ```
 
-- `date` 는 보이는 기간 안의 아무 날입니다. 주 보기는 그날이 든 주를 그립니다.
-- 이전, 다음은 보기만큼(한 주, 하루) 옮깁니다. 오늘은 오늘로 갑니다.
+- `date` 는 보이는 기간 안의 아무 날입니다. 월 보기는 그날이 든 달, 주 보기는 그날이 든 주, `days` 는 그날부터 `dayCount` 일을 그립니다.
+- 이전, 다음은 보기만큼(한 달, 한 주, `dayCount` 일, 하루) 옮깁니다. 오늘은 오늘로 갑니다.
+- 보기 전환의 N일 버튼 이름은 `dayCount` 를 따릅니다("3일").
 - 기간 버튼은 Calendar 를 엽니다. 포커스가 `date` 로 들어가고, 날을 고르면 그날로 옮기며 닫힙니다. Escape 는 닫고 포커스를 기간 버튼에 돌려줍니다.
 - 보기 전환은 라디오 그룹이라 다시 눌러도 풀리지 않습니다.
 - `date` 의 기본은 오늘입니다. 서버와 클라이언트가 다른 날이면 hydration 이 어긋나므로, 서버에서 그리는 앱은 `defaultDate` 를 넘깁니다.
+
+## 월 보기
+
+```tsx
+<Scheduler events={events} defaultView="month" />
+```
+
+- 그달 1일이 든 주부터 마지막 날이 든 주까지 그립니다. 앞뒤 달의 날은 `bg-block` 으로 가라앉힙니다.
+- 종일 일정과 여러 날에 걸친 일정은 날들을 잇는 막대입니다. 시간이 있는 일정은 시작 시각과 제목을 한 줄에 씁니다. 자정에 끝나는 일정은 그 전날까지만 그립니다.
+- 긴 막대부터, 같은 길이면 종일 일정, 시작 시각 순으로 빈 줄에 채웁니다.
+- 하루에 세 줄을 넘는 일정은 `+N개` 버튼으로 접습니다. 누르면 그날의 일 보기로 가고, `onViewChange('day')` 와 `onDateChange` 를 부릅니다.
+- 월 보기의 일정은 옮기거나 길이를 바꿀 수 없습니다. 주, N일, 일 보기에서 옮깁니다.
+- 각 주는 날짜 범위로 이름 붙은 `group` 이고, 일정은 그 안의 ItemGroup 입니다.
 
 ## 지금 시각
 
@@ -199,7 +215,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 
 - 처음 그릴 때 보이는 기간의 가장 이른 일정, 그것이 오전 8시보다 늦으면 오전 8시로 내려 둡니다. 그 시각 글자가 머리줄에 가리지 않도록 15분 위에서 멈춥니다. 날짜를 옮겨도 다시 내리지 않습니다.
 - 높이는 기본 `h-144` 입니다. `className="h-full"` 처럼 바꾸면 격자가 남은 높이를 씁니다.
-- 주 보기의 하루 칸은 88px 보다 좁아지지 않습니다. 좁은 화면에서는 격자가 가로로 스크롤되고, 시각 열은 왼쪽에 남습니다. 하루 보기는 가로로 스크롤되지 않습니다.
+- 월, 주, N일 보기의 하루 칸은 88px 보다 좁아지지 않습니다. 좁은 화면에서는 격자가 가로로 스크롤되고, 시각 열은 왼쪽에 남습니다. 하루 보기는 가로로 스크롤되지 않습니다.
 
 ## locale
 
@@ -217,7 +233,8 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | Prop                                    | Type                                  | Default              |
 | --------------------------------------- | ------------------------------------- | -------------------- |
 | `events`                                | `Scheduler.EventData[]` 를 넓힌 배열   | -                    |
-| `view` / `defaultView` / `onViewChange` | `'week' \| 'day'`                     | `'week'`             |
+| `view` / `defaultView` / `onViewChange` | `'month' \| 'week' \| 'days' \| 'day'` | `'week'`             |
+| `dayCount`                              | `number` (`days` 보기의 날 수)         | `3`                  |
 | `date` / `defaultDate` / `onDateChange` | `CalendarDate`                        | 오늘                 |
 | `locale`                                | `string` (BCP 47)                     | Provider locale      |
 | `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |
