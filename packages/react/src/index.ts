@@ -253,6 +253,16 @@ export type {
   HourCycle,
 } from './components/data/time-picker';
 
+export { Scheduler } from './components/data/scheduler';
+export type {
+  SchedulerProps,
+  SchedulerView,
+  SchedulerEventData,
+  SchedulerColorScheme,
+  SchedulerEventChange,
+  SchedulerSlot,
+} from './components/data/scheduler';
+
 export { TimeField } from './components/form/time-field';
 export type { TimeFieldProps } from './components/form/time-field';
 

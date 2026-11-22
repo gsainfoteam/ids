@@ -565,6 +565,66 @@ mixin IdsMessages {
 
   String? get richTextCalloutWarning => null;
 
+  String? get schedulerAddDay => null;
+
+  String? get schedulerAllDay => null;
+
+  String? get schedulerDay => null;
+
+  String? get schedulerDayCount => null;
+
+  String? schedulerDays({required Object count}) => null;
+
+  String? schedulerDragAt({required Object time}) => null;
+
+  String? schedulerDragCancel({required Object event}) => null;
+
+  String? schedulerDragEnd({required Object event}) => null;
+
+  String? get schedulerDragHint => null;
+
+  String? get schedulerDragMonthHint => null;
+
+  String? schedulerDragStart({required Object event}) => null;
+
+  String? get schedulerGoToDate => null;
+
+  String? get schedulerLabel => null;
+
+  String? get schedulerMonth => null;
+
+  String? schedulerMore({required Object count}) => null;
+
+  String? schedulerMoreLabel({required Object date, required Object count}) => null;
+
+  String? get schedulerNavigation => null;
+
+  String? get schedulerNextDay => null;
+
+  String? schedulerNextDays({required Object count}) => null;
+
+  String? get schedulerNextMonth => null;
+
+  String? get schedulerNextWeek => null;
+
+  String? get schedulerPreviousDay => null;
+
+  String? schedulerPreviousDays({required Object count}) => null;
+
+  String? get schedulerPreviousMonth => null;
+
+  String? get schedulerPreviousWeek => null;
+
+  String? get schedulerRemoveDay => null;
+
+  String? schedulerResize({required Object event}) => null;
+
+  String? get schedulerToday => null;
+
+  String? get schedulerView => null;
+
+  String? get schedulerWeek => null;
+
   String? get selectClear => null;
 
   String? get selectEmpty => null;
@@ -1522,6 +1582,96 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get richTextCalloutWarning => '경고';
+
+  @override
+  String get schedulerAddDay => '하루 늘리기';
+
+  @override
+  String get schedulerAllDay => '종일';
+
+  @override
+  String get schedulerDay => '일';
+
+  @override
+  String get schedulerDayCount => '보여 줄 날 수';
+
+  @override
+  String schedulerDays({required Object count}) => '${_format(count)}일';
+
+  @override
+  String schedulerDragAt({required Object time}) => '${_format(time)} 시작';
+
+  @override
+  String schedulerDragCancel({required Object event}) => '${_format(event)}을(를) 제자리에 두었습니다.';
+
+  @override
+  String schedulerDragEnd({required Object event}) => '${_format(event)}을(를) 옮겼습니다.';
+
+  @override
+  String get schedulerDragHint => '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.';
+
+  @override
+  String get schedulerDragMonthHint => '일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.';
+
+  @override
+  String schedulerDragStart({required Object event}) => '${_format(event)}을(를) 집었습니다.';
+
+  @override
+  String get schedulerGoToDate => '날짜로 이동';
+
+  @override
+  String get schedulerLabel => '일정표';
+
+  @override
+  String get schedulerMonth => '월';
+
+  @override
+  String schedulerMore({required Object count}) => '+${_format(count)}개';
+
+  @override
+  String schedulerMoreLabel({required Object date, required Object count}) => '${_format(date)} 일정 ${_format(count)}개 더 보기';
+
+  @override
+  String get schedulerNavigation => '날짜 이동';
+
+  @override
+  String get schedulerNextDay => '다음 날';
+
+  @override
+  String schedulerNextDays({required Object count}) => '다음 ${_format(count)}일';
+
+  @override
+  String get schedulerNextMonth => '다음 달';
+
+  @override
+  String get schedulerNextWeek => '다음 주';
+
+  @override
+  String get schedulerPreviousDay => '이전 날';
+
+  @override
+  String schedulerPreviousDays({required Object count}) => '이전 ${_format(count)}일';
+
+  @override
+  String get schedulerPreviousMonth => '이전 달';
+
+  @override
+  String get schedulerPreviousWeek => '이전 주';
+
+  @override
+  String get schedulerRemoveDay => '하루 줄이기';
+
+  @override
+  String schedulerResize({required Object event}) => '${_format(event)} 끝 시각';
+
+  @override
+  String get schedulerToday => '오늘';
+
+  @override
+  String get schedulerView => '보기';
+
+  @override
+  String get schedulerWeek => '주';
 
   @override
   String get selectClear => '선택 지우기';

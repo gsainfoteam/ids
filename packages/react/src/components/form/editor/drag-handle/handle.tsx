@@ -15,10 +15,7 @@ import {
 import {
   DndContext,
   DragOverlay,
-  MouseSensor,
   useDraggable,
-  useSensor,
-  useSensors,
   type DragMoveEvent,
 } from '@dnd-kit/core';
 import { getEventCoordinates } from '@dnd-kit/utilities';
@@ -41,6 +38,7 @@ import {
   turnBlockInto,
 } from './commands';
 import { markTheDraggedBlock, topLevelBlocks } from './extension';
+import { useDragSensors } from '../../../../internal/drag-sensors';
 import { swallowTheClickThatEndsADrag } from '../../../../internal/drag-surface';
 import { useTranslate } from '../../../../internal/translate';
 import { cn, mergeRefs } from '../../../../utils';
@@ -48,6 +46,7 @@ import { Menu } from '../../../overlay/menu';
 import { blocksAvailableIn, turnsIntoOtherBlocks } from '../blocks/catalog';
 import { useEditorContext } from '../context';
 import { EditorGlyphButton } from '../glyph-button';
+import { editorMessages } from '../messages-catalog';
 import { EditorTableMenuItems } from '../table/edit-menu';
 
 import type { BlockHoverStore, HoveredBlock } from './store';
@@ -67,7 +66,6 @@ const isATable = (node: ProseMirrorNode) => node.type.name === 'table';
 
 const FIRST_LINE = 'p,h1,h2,h3,h4,h5,h6,pre,[data-type=detailsSummary]';
 const DRAG_ID = 'ids-editor-block';
-const POINTER_TRAVEL_BEFORE_DRAG = 4;
 const REACH_BEYOND_THE_BLOCKS = 36;
 const PREVIEW_PADDING = 8;
 const SILENT = {
@@ -242,7 +240,7 @@ function DraggableGrip({
 }
 
 export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor');
   const hovered = useSyncExternalStore(store.subscribe, store.getSnapshot, () => null);
   const [menuBlock, setMenuBlock] = useState<HoveredBlock | null>(null);
@@ -254,9 +252,7 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
   const block = menuBlock ?? dragged?.block ?? hovered;
   const [handleRef, place] = useBesideTheFirstLine(block);
   const node = block && editor?.state.doc.nodeAt(block.pos);
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: POINTER_TRAVEL_BEFORE_DRAG } }),
-  );
+  const sensors = useDragSensors({ touch: false });
 
   useForgetTheBlockWhenThePointerLeaves(store, handleRef);
 

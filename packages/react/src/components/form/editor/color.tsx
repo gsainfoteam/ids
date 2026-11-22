@@ -7,6 +7,7 @@ import { noop } from 'es-toolkit';
 import { Baseline } from 'lucide-react';
 
 import { useEditorContext } from './context';
+import { editorMessages } from './messages-catalog';
 import {
   EditorToolTip,
   extensionIsLoaded,
@@ -61,7 +62,7 @@ const canColor = (editor: TiptapEditor) =>
   !editor.isActive('codeBlock') && !editor.isActive('code');
 
 export function EditorColor({ icon, 'aria-label': ariaLabel, className }: EditorColorProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor.Color');
   const tool = useEditorToolProps('Color');
   const textTitleId = useId();

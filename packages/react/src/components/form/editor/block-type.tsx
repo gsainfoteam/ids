@@ -1,6 +1,7 @@
 'use client';
 
 import { useEditorContext } from './context';
+import { editorMessages } from './messages-catalog';
 import { useEditorToolProps } from './tool';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate } from '../../../internal/translate';
@@ -32,7 +33,7 @@ export function EditorBlockType({
   'aria-label': ariaLabel,
   className,
 }: EditorBlockTypeProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor.BlockType');
   const tool = useEditorToolProps('BlockType', { keepFocus: false });
   const value = useEditorSelector(

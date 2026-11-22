@@ -5,20 +5,14 @@ export {
   resizeKeyMap,
   separatorOrientation,
   separatorProps,
+  snapToStep,
   type ResizeAxis,
   type ResizeDimension,
   type ResizeOrientation,
   type ResizeRange,
   type SeparatorOptions,
 } from './axis';
-export {
-  GRIP_HALO,
-  GRIP_STROKE,
-  GRIP_TARGET,
-  gripArc,
-  type GripArc,
-  type ResizeBand,
-} from './arc';
+export { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from './arc';
 export { ResizeEdge, type ResizeEdgeProps } from './edge';
 export { ResizeGrip, type ResizeGripProps } from './grip';
 export {

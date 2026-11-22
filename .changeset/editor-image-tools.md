@@ -27,6 +27,12 @@ instead of an outline. `mentions(query, signal)` turns on `@` mentions, drawn as
 name and saved as `[@ id="" label="" avatar=""]` in markdown. Lists and blank paragraphs
 pasted from Word and Google Docs are cleaned up.
 
+Every toolbar and BubbleMenu tool shows its name in a Tooltip, with its shortcut as a `Kbd` where it
+has one. The link tool opens the address field and its buttons in one row. A table's block handle
+menu holds the same row, column, header and cell actions as `Editor.Table`'s menu. Tables in the
+Editor and in RichText draw a line between columns, keep each column at least 160px wide and scroll
+sideways when they are wider than the text.
+
 Add `RichText` from the new `@gsainfoteam/ids-react/rich-text` entry. It draws saved markdown or
 Editor JSON with IDS components (CodeBlock, Alert, Accordion, Table, Image, Checkbox, Avatar, Link)
 and has no hooks, so a Server Component renders a post without sending Tiptap to the browser. It

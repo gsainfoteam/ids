@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { IntlMessageFormat } from 'intl-messageformat';
 import { expect, test } from 'vitest';
 
-import { formatDefaultMessage, messages } from '../src/internal/messages';
+import { everyMessage } from '../src/internal/every-message';
+import { formatDefaultMessage } from '../src/internal/messages';
 
 type Catalog = { [name: string]: string | Catalog };
 
@@ -35,7 +36,7 @@ const koreanCatalog = catalog('ko.json');
 const englishCatalog = catalog('en.json');
 const korean = Object.fromEntries(leaves(koreanCatalog));
 const english = Object.fromEntries(leaves(englishCatalog));
-const keys = leaves(messages).map(([key]) => key);
+const keys = leaves(everyMessage).map(([key]) => key);
 
 const SIMPLE_ARGUMENT = 1;
 const LITERAL = 0;
@@ -52,7 +53,7 @@ const parse = (pattern: string, locale: string) =>
   new IntlMessageFormat(pattern, locale).getAst() as Element[];
 
 test('ko.json is the defaults the code falls back to', () => {
-  expect(koreanCatalog).toEqual(messages);
+  expect(koreanCatalog).toEqual(everyMessage);
 });
 
 test('en.json has exactly the leaf paths of the code', () => {
@@ -60,7 +61,7 @@ test('en.json has exactly the leaf paths of the code', () => {
 });
 
 test('the defaults and both catalogs are sorted by group and key', () => {
-  for (const tree of [messages, koreanCatalog, englishCatalog])
+  for (const tree of [everyMessage, koreanCatalog, englishCatalog])
     expect(JSON.stringify(tree)).toBe(JSON.stringify(sortedDeep(tree)));
 });
 
@@ -87,8 +88,7 @@ test('every key is used by the code', () => {
   const source = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
     .filter((file) => /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file))
     .filter(
-      (file) =>
-        !file.endsWith('internal/messages.ts') && !file.endsWith('internal/messages-catalog.ts'),
+      (file) => !file.endsWith('internal/messages.ts') && !file.endsWith('messages-catalog.ts'),
     )
     .map((file) => readFileSync(SRC + file, 'utf8'))
     .join('\n');
@@ -106,8 +106,7 @@ test('no Korean string is written into a component outside the defaults', () => 
   const withKorean = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
     .filter((file) => /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file))
     .filter(
-      (file) =>
-        !file.endsWith('internal/messages.ts') && !file.endsWith('internal/messages-catalog.ts'),
+      (file) => !file.endsWith('internal/messages.ts') && !file.endsWith('messages-catalog.ts'),
     )
     .filter((file) => KOREAN_STRING.test(readFileSync(SRC + file, 'utf8')));
 

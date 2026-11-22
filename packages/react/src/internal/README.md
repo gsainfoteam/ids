@@ -15,6 +15,7 @@
 | [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer                                                                                                                                                                                       |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`drag-surface.ts`](#drag-surfacets)             | 끌어 옮기는 항목의 놓을 자리 선, 따라오는 복사본, 들어 올린 모양, 끌기를 끝낸 click 과 Space 삼키기 | Sidebar, Editor, Scheduler |
+| [`drag-sensors.ts`](#drag-sensorsts)             | 끌기를 시작하는 규칙: 마우스 4px, 터치 250ms 누르기 | Sidebar, Editor, Scheduler |
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`surfaces/field-surface.ts`](#surfacesfield-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
@@ -305,6 +306,36 @@ swallowTheSpaceKeyupThatWouldPress(); // 버튼 위에서 Space 로 집거나 �
 ### 알아둘 것
 
 - 선, 복사본, 들어 올린 모양을 바꾸면 이 모듈을 쓰는 모든 컴포넌트의 끌기가 함께 바뀝니다.
+
+## drag-sensors.ts
+
+dnd-kit 끌기를 시작하는 규칙을 한곳에 둔 hook 입니다. 끌어 옮기는 컴포넌트가 모두 같은 조건에서 끌기를 시작합니다.
+
+### 쓰는 곳
+
+- Sidebar: `sortable.tsx` 가 메뉴 항목을 끌 때 씁니다.
+- Scheduler: `drag.tsx` 가 일정을 옮기거나 빈 칸을 고를 때 씁니다.
+- Editor: `drag-handle/handle.tsx` 가 블록을 끌 때 `touch: false` 로 씁니다.
+
+### 쓰는 법
+
+```tsx
+const sensors = useDragSensors(); // 마우스와 터치
+const sensors = useDragSensors({ touch: false }); // 마우스만
+
+<DndContext sensors={sensors}>...</DndContext>
+```
+
+### 왜 이렇게
+
+- 마우스는 4px 를 움직여야 끌기가 시작됩니다. 그 전에 떼면 그냥 누른 것이라 `onClick` 이 그대로 불립니다.
+- 터치는 250ms 를 누르고 있어야 시작되고, 그동안 5px 까지는 움직여도 됩니다. 그 전에 움직이면 스크롤입니다.
+- Editor 의 블록 손잡이는 마우스를 블록 위에 올렸을 때만 보입니다. 터치에는 올려 두는 동작이 없어 손잡이를 잡을 수 없으므로 터치 sensor 를 넣지 않습니다.
+- 스타일 조각을 담은 `drag-surface.ts` 와 파일을 나눴습니다. 그 조각은 `style.ts` 가 가져가는데, hook 이 같은 파일에 있으면 `'use client'` 가 붙어 서버에서 `X.Style()` 을 부를 수 없습니다.
+
+### 알아둘 것
+
+- 값을 바꾸면 Sidebar, Editor, Scheduler 의 끌기 시작 조건이 함께 바뀝니다.
 
 ## decimal.ts
 
@@ -768,7 +799,7 @@ slots: {
 
 - [translate.ts](#translatets): 앱의 `translate` 가 답하지 않을 때 `formatDefaultMessage` 로 기본값을 채웁니다.
 - [date-locale.ts](#date-localets): `DEFAULT_LOCALE`(`'ko-KR'`).
-- `vite.config.ts`: 빌드 때 `messages` 를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 core에서 생성한 영어 카탈로그이고 같은 곳으로 복사됩니다.
+- `vite.config.ts`: 빌드 때 `every-message.ts` 의 `everyMessage`(공용 카탈로그와 Editor 카탈로그를 합친 것)를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 core에서 생성한 영어 카탈로그이고 같은 곳으로 복사됩니다.
 - `src/index.ts`: 앱이 쓰는 `IdsMessageKey`, `IdsMessageValues` 타입.
 
 ### 쓰는 법
@@ -789,11 +820,13 @@ formatDefaultMessage('calendar.weekNumber', { week: 3 }); // '3주차'
 - 기본값은 컴포넌트 이름 아래에 중첩한 객체입니다. 키는 점으로 이은 경로(`'calendar.previousMonth'`)이고, `IdsMessageKey` 는 그 잎 경로들의 union 타입입니다. next-intl, i18next 가 중첩 카탈로그를 같은 점 경로로 읽어서, 앱은 `ko.json`, `en.json` 을 `ids` 아래에 그대로 붙일 수 있습니다.
 - 그룹과 키는 알파벳 순서입니다. 두 카탈로그도 같은 순서라 diff 가 읽기 쉽습니다(`tests/messages.test.ts` 가 확인).
 - 값은 ICU 메시지 문자열입니다. 번역(`en.json`)은 `{count, plural, one {…} other {…}}` 같은 복수형을 쓰고, 그것을 포맷하는 것은 앱의 i18n 라이브러리입니다.
+- Editor 의 문구(`editor.*`)는 공용 `messages-catalog.ts` 에 없고 `components/form/editor/messages-catalog.ts` 의 `editorMessages` 에 있습니다. 공용 카탈로그는 문구를 쓰는 모든 컴포넌트가 싣기 때문에, Editor 만 쓰는 문구 3 kB 가 Button, Dialog 의 import 에도 실리지 않게 나눴습니다. Editor 의 컴포넌트는 `useTranslate(editorMessages)` 로 읽습니다. `IdsMessageKey` 는 두 카탈로그의 키를 모두 담습니다.
 - 한국어 기본값은 복수형이 필요 없어서 `{name}` 자리만 씁니다. 그래서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). 이 약속은 `tests/messages.test.ts` 가 ICU 파서로 확인합니다.
 
 ### 알아둘 것
 
 - 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`와 `messages/en.json`을 생성합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
+- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 쓰고, `every-message.ts` 가 다시 합칩니다. 카탈로그를 넘기지 않은 `useTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 
@@ -1276,7 +1309,7 @@ export const toggleStyle = tv({
 ### 쓰는 곳
 
 - `IdsProvider`: `LanguageContext` 를 제공합니다. `translate`, `locale` 을 주지 않은 provider 는 바깥 것을 물려받습니다.
-- 문구를 그리는 모든 컴포넌트와 hook: `useTranslate()`.
+- 문구를 그리는 모든 컴포넌트와 hook: `useTranslate()`. Editor 는 자기 카탈로그를 넘깁니다(`useTranslate(editorMessages)`).
 - 날짜, 시간, 숫자, 전화번호 컴포넌트: `useProviderLocale()`.
 
 ### 쓰는 법
@@ -1292,7 +1325,7 @@ const getValueLabel = getValueLabelProp ?? ((value: number, max: number) => t('r
 
 ### 왜 이렇게
 
-- `t(key, values)` 는 앱의 `translate(key, values)` 를 먼저 부르고, `undefined` 이거나 키 그대로가 오면 한국어 기본값을 씁니다. i18n 라이브러리 대부분이 빠진 키에 키를 돌려주기 때문입니다.
+- `t(key, values)` 는 앱의 `translate(key, values)` 를 먼저 부르고, `undefined` 이거나 키 그대로가 오면 한국어 기본값을 씁니다. 기본값은 넘긴 카탈로그에서 먼저 찾고, 없으면 공용 카탈로그에서 찾습니다. i18n 라이브러리 대부분이 빠진 키에 키를 돌려주기 때문입니다.
 - 문구는 렌더 중에 hook 으로 읽습니다. 모듈 최상위에서 읽으면 앱의 언어를 알 수 없고, 서버에서 요청마다 언어가 다를 때 섞입니다. 그래서 `messages` 를 직접 읽는 곳은 이 모듈뿐입니다.
 - 컴포넌트 밖에서 만들어지는 문구(toast 의 기본 loading 문구)는 저장해 두지 않고, 그 toast 를 그리는 `ToastView` 가 렌더할 때 `t` 로 채웁니다.
 - 순수 함수(`describeLimits`, `dayPickerLabels`)는 `Translate` 를 인자로 받습니다.

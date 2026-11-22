@@ -76,7 +76,23 @@
       "react-hook-form",
       "tailwindcss"
     ],
-    "limit": "480 kB",
+    "limit": "530 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Scheduler }",
+    "path": "dist/index.js",
+    "import": "{ Scheduler }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "190 kB",
     "gzip": true
   },
   {
@@ -192,7 +208,7 @@
       "react-hook-form",
       "tailwindcss"
     ],
-    "limit": "122 kB",
+    "limit": "135 kB",
     "gzip": true
   },
   {
@@ -208,7 +224,7 @@
       "react-hook-form",
       "tailwindcss"
     ],
-    "limit": "400 kB",
+    "limit": "430 kB",
     "gzip": true
   },
   {
