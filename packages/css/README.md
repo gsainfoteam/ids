@@ -144,8 +144,8 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 <button class="text-caption-c1-medium">작은 CTA</button>
 
 <!-- 프리미티브 -->
-<span class="text-h1 font-bold tracking-tight leading-tight">48px</span>
-<span class="font-semibold tracking-normal leading-snug">…</span>
+<span class="text-h1 font-bold tracking-tight leading-h1">48px</span>
+<article class="text-b2 leading-prose">긴 글…</article>
 ```
 
 ### 타이포 스타일 이름
@@ -153,9 +153,13 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 | 그룹 | 클래스 예 |
 |---|---|
 | headline | `text-headline-h1-bold` … `text-headline-h6-medium` |
-| subtitle | `text-subtitle-s1-semibold`, `text-subtitle-s2-medium` |
 | body | `text-body-b1-regular` … `text-body-b3-bold` |
 | caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
+
+- 행간은 정수 px 값이고(c2 14px 말고는 4px 격자) `--ids-scale` 을 따라 함께 커진다. 프리미티브는 크기 단계와 같은 이름이다(`leading-b3` 는 20px).
+- `leading-prose` 는 긴 글의 행간 28px 다. `text-body-b2-regular leading-prose` 처럼 크기 뒤에 쓴다.
+- 자간은 크기를 따른다: 20~24px 은 0, 28~32px 은 `tracking-snug`(-0.015em), 40~48px 은 `tracking-tight`(-0.025em).
+- 소제목은 body 의 semibold 를 쓴다. subtitle 스타일은 body 와 크기가 겹쳐서 없앴다.
 
 ### focus-ring-visible
 
