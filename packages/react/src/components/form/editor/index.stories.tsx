@@ -361,7 +361,7 @@ export const Document: Story = {
     docs: {
       description: {
         story:
-          '본문은 `document-text` 유틸리티로 그립니다. 블록 사이는 20px, 제목 아래는 12px, 제목 위는 28~36px이고, 본문은 16px에 행간 28px, 제목은 semibold로 h1 24px부터 한 단계씩 작아집니다.',
+          '본문은 `document-text` 유틸리티로 그립니다. 블록 사이는 20px, 제목 아래는 12px, 제목 위는 28~36px이고, 본문은 16px에 행간 28px, 제목은 semibold로 h1 28px, h2 24px, h3 20px입니다. 코드 블록은 바탕 없이 테두리만 그립니다.',
       },
     },
   },
@@ -385,9 +385,9 @@ export const Document: Story = {
       'em',
     ])
       await expect(content.querySelector(selector)).not.toBeNull();
-    await expect(size('h1')).toBe('24px');
-    await expect(size('h2')).toBe('20px');
-    await expect(size('h3')).toBe('18px');
+    await expect(size('h1')).toBe('28px');
+    await expect(size('h2')).toBe('24px');
+    await expect(size('h3')).toBe('20px');
     await expect(getComputedStyle(content.querySelector('p')!).lineHeight).toBe('28px');
   },
 };

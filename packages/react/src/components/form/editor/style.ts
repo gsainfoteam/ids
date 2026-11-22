@@ -58,12 +58,12 @@ export const editorStyle = tv({
       outline: {
         root: fieldSurface.variant.outline,
         bar: 'border-field-bar',
-        content: '[&_pre]:bg-field-code-outline [&_:not(pre)>code]:bg-field-code-outline',
+        content: '[&_:not(pre)>code]:bg-field-code-outline',
       },
       soft: {
         root: fieldSurface.variant.soft,
         bar: 'border-field-bar',
-        content: '[&_pre]:bg-block [&_:not(pre)>code]:bg-block',
+        content: '[&_:not(pre)>code]:bg-block',
       },
     } satisfies Record<EditorVariant, object>,
     size: {

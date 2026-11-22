@@ -210,7 +210,7 @@ export const Prose: Story = {
     <Showcase>
       <Showcase.Section
         title="긴 글"
-        description="document-text 는 블록 사이를 20px, 제목 아래를 12px, 제목 위를 28~36px 띄우고 제목을 semibold로 h1 24px, h2 20px, h3 18px, h4 16px로 그립니다. 본문 크기는 text-body-b2-regular leading-prose(16px, 행간 28px)로 따로 줍니다."
+        description="document-text 는 블록 사이를 20px, 제목 아래를 12px, 제목 위를 28~36px 띄우고 제목을 semibold로 h1 28px, h2 24px, h3 20px, h4 18px로 그립니다. 본문 크기는 text-body-b2-regular leading-prose(16px, 행간 28px)로 따로 줍니다."
       >
         <article className="document-text text-body-b2-regular leading-prose text-neutral-strong max-w-prose">
           <h1>2학기 수강 신청 안내</h1>
@@ -245,7 +245,7 @@ export const Prose: Story = {
 
     await expect(getComputedStyle(prose).fontSize).toBe('16px');
     await expect(getComputedStyle(prose).lineHeight).toBe('28px');
-    await expect(getComputedStyle(h1).fontSize).toBe('24px');
+    await expect(getComputedStyle(h1).fontSize).toBe('28px');
     await expect(getComputedStyle(h1).fontWeight).toBe('600');
   },
 };

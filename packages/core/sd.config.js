@@ -514,15 +514,18 @@ ${focusRingUtility("focus-ring-current", "current")}
   }
 
   & :where(h1) {
-    @apply text-headline-h5-semibold;
+    @apply text-headline-h4-semibold;
   }
   & :where(h2) {
-    @apply text-headline-h6-semibold;
+    @apply text-headline-h5-semibold;
   }
   & :where(h3) {
+    @apply text-headline-h6-semibold;
+  }
+  & :where(h4) {
     @apply text-body-b1-semibold tracking-snug;
   }
-  & :where(h4, h5, h6) {
+  & :where(h5, h6) {
     @apply text-body-b2-semibold tracking-snug;
   }
 
@@ -542,7 +545,7 @@ ${focusRingUtility("focus-ring-current", "current")}
     @apply border-s-2 border-neutral ps-4 text-neutral;
   }
   & :where(pre) {
-    @apply rounded-standard bg-neutral-soft px-4 py-3 font-mono leading-b2 whitespace-pre-wrap;
+    @apply rounded-standard border border-neutral px-4 py-3 font-mono leading-b2 whitespace-pre-wrap;
   }
   & :where(:not(pre) > code) {
     @apply rounded-indicator border border-neutral bg-neutral-soft px-1.5 py-px font-mono;
