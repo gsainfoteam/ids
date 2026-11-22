@@ -21,10 +21,10 @@ export const documentText = cn(
 export const mentionStyle = tv({
   slots: {
     root: [
-      'scheme-primary inline rounded-full bg-scheme-soft py-0.5 ps-0.5 pe-1.5 font-medium text-on-scheme-soft',
-      'whitespace-nowrap box-decoration-clone',
+      'scheme-primary inline-flex items-center gap-1 rounded-full bg-scheme-soft py-0.5 ps-0.5 pe-1.5 align-middle font-medium leading-none text-on-scheme-soft',
+      'whitespace-nowrap',
     ],
-    avatar: 'me-1 size-[1.3em]',
+    avatar: 'size-[1.3em]',
     link: 'no-underline state-layer hover:state-hover',
   },
 });
