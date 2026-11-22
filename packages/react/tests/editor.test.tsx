@@ -1194,6 +1194,32 @@ test('typing / opens the block menu, the query filters it and Enter turns the li
   expect(content.element().hasAttribute('aria-activedescendant')).toBe(false);
 });
 
+test('a block Editor shows no toolbar, offers every block in the / menu and formats with the bubble menu', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  render(
+    <Editor type="block" aria-label="본문" defaultValue="<p>글</p>">
+      <Editor.Bold />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  expect(page.getByRole('toolbar').query()).toBeNull();
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('`<Editor type="block">` shows no toolbar'),
+  );
+  warn.mockRestore();
+
+  await userEvent.click(content);
+  await userEvent.keyboard('{End}{Enter}/');
+  const menu = page.getByRole('listbox', { name: '블록 넣기' });
+  for (const block of ['표', '콜아웃', '토글', '할 일 목록'])
+    await expect.element(menu.getByRole('option', { name: block })).toBeVisible();
+  await userEvent.keyboard('{Escape}');
+
+  await userEvent.tripleClick(page.getByText('글'));
+  await expect.element(page.getByRole('toolbar', { name: '선택한 글 서식' })).toBeVisible();
+});
+
 test('the block menu offers only the blocks the Editor loaded and says when nothing matches', async () => {
   render(
     <Editor aria-label="본문">
@@ -1294,13 +1320,13 @@ test('hovering a block shows its handle, whose menu turns, duplicates and delete
   const onValueChange = vi.fn();
   render(
     <Editor
+      type="block"
       format="markdown"
       aria-label="본문"
       defaultValue={'첫 줄\n\n둘째 줄'}
       onValueChange={onValueChange}
     >
       <Editor.Content />
-      <Editor.BlockHandle />
     </Editor>,
   );
   const content = await editable('본문');
@@ -1330,13 +1356,13 @@ test('Add a block below opens the block menu on a new line under the block', asy
   const onValueChange = vi.fn();
   render(
     <Editor
+      type="block"
       format="markdown"
       aria-label="본문"
       defaultValue={'위\n\n아래'}
       onValueChange={onValueChange}
     >
       <Editor.Content />
-      <Editor.BlockHandle />
     </Editor>,
   );
   const content = await editable('본문');
@@ -1354,13 +1380,13 @@ test('dragging a block by its handle moves it', async (context) => {
   const onValueChange = vi.fn();
   render(
     <Editor
+      type="block"
       format="markdown"
       aria-label="본문"
       defaultValue={'하나\n\n둘\n\n- 셋'}
       onValueChange={onValueChange}
     >
       <Editor.Content />
-      <Editor.BlockHandle />
     </Editor>,
   );
   const content = await editable('본문');
@@ -1387,13 +1413,12 @@ test('dragging a block by its handle moves it', async (context) => {
   expect(dropLine()).toBeNull();
 });
 
-test('the block handle hangs outside the box, and an Editor without Editor.BlockHandle has none', async () => {
+test('the block handle hangs outside the box, and a toolbar Editor has none', async () => {
   render(
     <div className="flex flex-col gap-4 ps-10">
       <Editor aria-label="손잡이 없음" defaultValue="<p>글</p>" />
-      <Editor aria-label="손잡이 있음" defaultValue="<p>글</p>">
+      <Editor type="block" aria-label="손잡이 있음" defaultValue="<p>글</p>">
         <Editor.Content />
-        <Editor.BlockHandle />
       </Editor>
     </div>,
   );
@@ -1417,9 +1442,8 @@ test('the block handle hangs outside the box, and an Editor without Editor.Block
 
 test('a read-only Editor has no block handle', async () => {
   render(
-    <Editor readOnly aria-label="본문" defaultValue="<p>읽기만</p>">
+    <Editor type="block" readOnly aria-label="본문" defaultValue="<p>읽기만</p>">
       <Editor.Content />
-      <Editor.BlockHandle />
     </Editor>,
   );
   const content = page.getByRole('textbox', { name: '본문' });

@@ -169,7 +169,6 @@ export const Gallery: Story = {
             <Editor.HorizontalRule />
             <Editor.Table />
             <Editor.Content />
-            <Editor.BlockHandle />
           </Editor>
         </Showcase.Row>
         <Showcase.Row label="default with upload">
@@ -682,32 +681,29 @@ export const SlashMenuAndMentions: Story = {
   },
 };
 
-export const BlockHandle: Story = {
+export const BlockEditor: Story = {
   args: {
+    type: 'block',
     format: 'markdown',
     defaultValue: '## 준비물\n\n이름표와 노트북을 챙기세요.\n\n- 9시 집합\n- 10시 발표',
     'aria-label': '블록 본문',
   },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.BlockType />
-      <Editor.Separator />
-      <Editor.Bold />
-      <Editor.Italic />
-      <Editor.Content />
-      <Editor.BlockHandle />
+    <Editor {...args} className="w-[40rem]">
+      <Editor.Content placeholder="/ 로 블록을 넣으세요" />
     </Editor>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'Editor.BlockHandle 을 넣으면 편집할 수 있는 Editor 가 포인터를 올린 블록의 첫 줄 옆, 상자 바깥 왼쪽에 손잡이를 보여 줍니다. 상자 안쪽 여백은 늘지 않고, 넣지 않은 Editor 에는 손잡이가 없습니다. 손잡이를 끌면 Sidebar 처럼 블록의 복사본이 따라오고 놓을 자리에 primary 선이 그어지며, 놓은 블록은 옅은 틴트로 골라집니다. 누르면 메뉴가 열립니다. 메뉴로 아래에 블록을 넣거나(블록 메뉴가 바로 열립니다), 글이 담긴 블록을 다른 종류로 바꾸거나, 복제하거나, 지울 수 있습니다. 손잡이는 Tab 순서에 들지 않습니다. 같은 일은 키보드로도 할 수 있어서(/ 메뉴, 잘라 내기와 붙여 넣기, 실행 취소), 손잡이는 포인터를 위한 지름길입니다.',
+          'type="block" 인 Editor 는 툴바 없이 본문만 보여 줍니다. 블록은 / 메뉴로 넣고, 글자를 고르면 뜨는 BubbleMenu 로 꾸밉니다. / 메뉴에는 표, 콜아웃, 접는 블록, 할 일 목록까지 모든 블록이 나옵니다. 편집할 수 있으면 포인터를 올린 블록의 첫 줄 옆, 상자 바깥 왼쪽에 손잡이가 나옵니다. 상자 안쪽 여백은 늘지 않습니다. 손잡이를 끌면 Sidebar 처럼 블록의 복사본이 따라오고 놓을 자리에 primary 선이 그어지며, 놓은 블록은 옅은 틴트로 골라집니다. 누르면 메뉴가 열려 아래에 블록을 넣거나, 다른 종류로 바꾸거나, 복제하거나, 지울 수 있습니다. 손잡이는 Tab 순서에 들지 않습니다. 같은 일은 키보드로도 할 수 있어서(/ 메뉴, 잘라 내기와 붙여 넣기, 실행 취소), 손잡이는 포인터를 위한 지름길입니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     const content = await editableContent(canvas, '블록 본문');
+    await expect(canvas.queryByRole('toolbar')).toBeNull();
     await userEvent.hover(within(content).getByText('이름표와 노트북을 챙기세요.'));
     const handle = await canvas.findByRole('button', { name: '블록 메뉴' });
     await userEvent.click(handle);
@@ -798,7 +794,6 @@ export const FullDocument: Story = {
       <Editor.HorizontalRule />
       <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
       <Editor.BubbleMenu />
-      <Editor.BlockHandle />
       <Editor.Count />
     </Editor>
   ),
@@ -806,7 +801,7 @@ export const FullDocument: Story = {
     docs: {
       description: {
         story:
-          '모든 부품을 한 Editor 에 넣은 문서입니다. 툴바, / 메뉴, @ 멘션, 블록 손잡이, 글자를 고르면 뜨는 BubbleMenu, 그림 올리기와 크기 조절, 표, 콜아웃, 접는 블록, 코드 블록을 함께 써 볼 수 있습니다.',
+          '모든 툴바 부품을 한 Editor 에 넣은 문서입니다. 툴바, / 메뉴, @ 멘션, 글자를 고르면 뜨는 BubbleMenu, 그림 올리기와 크기 조절, 표, 콜아웃, 접는 블록, 코드 블록을 함께 써 볼 수 있습니다.',
       },
     },
   },

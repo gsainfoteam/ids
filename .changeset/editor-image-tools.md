@@ -17,8 +17,10 @@ components RichText renders: code blocks as `CodeBlock` (with its copy button an
 Select), callouts as `Alert`, toggle blocks as `Accordion` and tables as `Table`. Each of these loads its Tiptap extension with `import()` only when
 its part is in the Editor, and image uploading only with `onImageUpload`.
 
-An editable Editor opens a block menu on `/`. `Editor.BlockHandle` adds a handle outside the
-Editor's left edge beside the hovered block, with no gutter inside the box. It drags the block the
+An editable Editor opens a block menu on `/`. `type="block"` makes a block editor: no toolbar,
+every block in the `/` menu, a default BubbleMenu and a handle outside the Editor's left edge
+beside the hovered block, with no gutter inside the box. The default `type="toolbar"` sets its
+bars on a gray tray around the document card, like DataTable. It drags the block the
 way Sidebar drags an item (a copy follows the pointer, a primary line marks the drop) or opens a
 menu to insert, turn into, duplicate or delete it. A selected block takes a light primary tint
 instead of an outline. `mentions(query, signal)` turns on `@` mentions, drawn as an avatar and a

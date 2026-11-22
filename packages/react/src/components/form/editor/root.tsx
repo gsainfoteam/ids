@@ -16,7 +16,6 @@ import {
 import { isEqual } from 'es-toolkit';
 
 import { EditorBar } from './bar';
-import { EditorBlockHandlePart } from './block-handle';
 import { EditorBlockType } from './block-type';
 import {
   EditorBlockquote,
@@ -69,6 +68,7 @@ import { useFormReset } from '../../../hooks/use-form-reset';
 import { FormValue } from '../../../internal/form-value';
 import { useTranslate, type Translate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { toast } from '../../feedback/toast/toast-store';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
@@ -77,6 +77,8 @@ import type { FindMentions } from './mention/node';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorVariant = 'outline' | 'soft';
+
+export type EditorType = 'toolbar' | 'block';
 
 export type EditorState = {
   disabled: boolean;
@@ -134,12 +136,34 @@ const DEFAULT_TOOLBAR_WITH_IMAGE = defaultToolbar({ withImage: true });
 const isOfType = (type: unknown) => (node: ReactNode) =>
   isValidElement(node) && elementTypeOf(node) === type;
 
-const isFloating = (node: ReactNode) =>
-  isOfType(EditorBubbleMenu)(node) || isOfType(EditorBlockHandlePart)(node);
-
-const BLOCK_HANDLE = new Set<unknown>([EditorBlockHandlePart]);
+const isFloating = isOfType(EditorBubbleMenu);
 
 const isTool = (node: ReactNode) => isValidElement(node) && TOOLS.has(elementTypeOf(node));
+
+const BLOCK_EDITOR_BUBBLE_MENU = (
+  <EditorBubbleMenu key="block-editor-bubble-menu">
+    <EditorBold />
+    <EditorItalic />
+    <EditorUnderline />
+    <EditorStrike />
+    <EditorCode />
+    <EditorHighlight />
+    <EditorLink />
+  </EditorBubbleMenu>
+);
+
+let warnedAboutToolsInABlockEditor = false;
+
+function dropTheToolbar(items: ReactNode[]) {
+  const kept = items.filter((item) => !isTool(item));
+  if (isDevelopment && kept.length < items.length && !warnedAboutToolsInABlockEditor) {
+    warnedAboutToolsInABlockEditor = true;
+    console.warn(
+      '`<Editor type="block">` shows no toolbar, so the tools placed beside `<Editor.Content>` are left out. Put them in `<Editor.BubbleMenu>`, or use `type="toolbar"`.',
+    );
+  }
+  return kept;
+}
 
 function splitByContent(children: ReactNode) {
   const items = flattenFragments(children);
@@ -185,12 +209,12 @@ const FEATURE_TOOLS: Record<ToolFeature, unknown> = {
 
 function featuresIn(
   source: ReactNode,
-  props: Record<'imageUpload' | 'mention', boolean>,
+  props: Record<'imageUpload' | 'mention' | 'everyBlock', boolean>,
 ): EditorFeature[] {
   return EDITOR_FEATURES.filter((feature) =>
     feature === 'imageUpload' || feature === 'mention'
       ? props[feature]
-      : containsElementOfType(source, new Set([FEATURE_TOOLS[feature]])),
+      : props.everyBlock || containsElementOfType(source, new Set([FEATURE_TOOLS[feature]])),
   );
 }
 
@@ -223,6 +247,7 @@ function taskLabelIn(t: Translate) {
 export function EditorRoot(props: Editor.Props) {
   const {
     format = 'html',
+    type = 'toolbar',
     onImageUpload,
     mentions,
     value,
@@ -256,13 +281,24 @@ export function EditorRoot(props: Editor.Props) {
   const contentRef = useRef<HTMLElement | null>(null);
   const notifyField = use(FieldNotifyContext);
   const insertable = onImageUpload !== undefined;
+  const blockEditor = type === 'block';
   const shown =
-    children === undefined ? (insertable ? DEFAULT_TOOLBAR_WITH_IMAGE : DEFAULT_TOOLBAR) : children;
-  const withHandle = containsElementOfType(children, BLOCK_HANDLE) === true;
-  const { bubbles, top, content, bottom, items } = splitByContent(shown);
+    children !== undefined || blockEditor
+      ? children
+      : insertable
+        ? DEFAULT_TOOLBAR_WITH_IMAGE
+        : DEFAULT_TOOLBAR;
+  const laidOut = splitByContent(shown);
+  const { content, items } = laidOut;
+  const top = blockEditor ? dropTheToolbar(laidOut.top) : laidOut.top;
+  const bottom = blockEditor ? dropTheToolbar(laidOut.bottom) : laidOut.bottom;
+  const bubbles =
+    blockEditor && laidOut.bubbles.length === 0 ? [BLOCK_EDITOR_BUBBLE_MENU] : laidOut.bubbles;
+  const withHandle = blockEditor;
   const features = featuresIn(shown, {
     imageUpload: insertable,
     mention: mentions !== undefined,
+    everyBlock: blockEditor,
   });
   const hasCount = items.some(isOfType(EditorCount));
   const editable = !disabled && !readOnly;
@@ -473,6 +509,7 @@ export function EditorRoot(props: Editor.Props) {
         data-editor=""
         data-size={size}
         data-variant={variant}
+        data-type={type}
         data-disabled={disabled ? '' : undefined}
         data-readonly={readOnly ? '' : undefined}
         data-invalid={invalid ? '' : undefined}

@@ -1,6 +1,5 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { EditorBlockHandlePart, type EditorBlockHandleProps } from './block-handle';
 import { EditorBlockType, type EditorBlockTypeProps, type EditorHeadingLevel } from './block-type';
 import {
   EditorBlockquote,
@@ -26,7 +25,7 @@ import {
   EditorUnderline,
   type EditorMarkProps,
 } from './marks';
-import { EditorRoot, type EditorState, type EditorVariant } from './root';
+import { EditorRoot, type EditorState, type EditorType, type EditorVariant } from './root';
 import { EditorSeparator, type EditorSeparatorProps } from './separator';
 import { editorStyle } from './style';
 import { EditorTable, type EditorTableProps } from './table/tool';
@@ -66,6 +65,7 @@ export namespace Editor {
     maxLength?: number;
     onImageUpload?: (file: File) => Promise<string>;
     mentions?: FindMentions;
+    type?: EditorType;
     variant?: EditorVariant;
     size?: IdsSize;
     id?: string;
@@ -80,6 +80,7 @@ export namespace Editor {
   };
   export type State = EditorState;
   export type Variant = EditorVariant;
+  export type Type = EditorType;
   export type Format = EditorFormat;
   export type Json = JSONContent;
   export type HeadingLevel = EditorHeadingLevel;
@@ -99,7 +100,6 @@ export namespace Editor {
   export type DetailsProps = EditorDetailsProps;
   export type SeparatorProps = EditorSeparatorProps;
   export type BubbleMenuProps = EditorBubbleMenuProps;
-  export type BlockHandleProps = EditorBlockHandleProps;
   export type CountProps = EditorCountProps;
 
   export const Content = EditorContentPart;
@@ -124,7 +124,6 @@ export namespace Editor {
   export const Details = EditorDetails;
   export const Separator = EditorSeparator;
   export const BubbleMenu = EditorBubbleMenu;
-  export const BlockHandle = EditorBlockHandlePart;
   export const Count = EditorCount;
 
   export const Style = editorStyle;
