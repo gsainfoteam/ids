@@ -38,6 +38,8 @@ export function ResizableRoot({
   maxWidth = Infinity,
   minHeight = 0,
   maxHeight = Infinity,
+  step,
+  getValueLabel,
   disabled = false,
   asChild = false,
   id,
@@ -73,6 +75,8 @@ export function ResizableRoot({
       min: minHeight,
       max: maxHeight,
     },
+    step,
+    getValueLabel,
     controls: rootId,
   });
 
