@@ -527,3 +527,27 @@ test('a right-click with no menu for its target still reaches the app’s own ha
   expect(onContextMenu).toHaveBeenCalledTimes(1);
   expect(document.querySelector('[role="menu"]')).toBeNull();
 });
+
+test('the end handle sits inside its event, so an event starting right after it does not cover it', async () => {
+  const screen = await render(
+    inProvider({
+      onEventChange: vi.fn(),
+      events: [
+        { id: 'lunch', title: 'Lunch', start: at(17, 12), end: at(17, 13) },
+        { id: 'graph', title: 'Graph theory', start: at(17, 13), end: at(17, 14) },
+      ],
+    }),
+  );
+  const edge = screen.getByRole('separator', { name: 'Lunch 끝 시각' });
+  await expect.element(edge).toBeInTheDocument();
+  edge.element().scrollIntoView({ block: 'center' });
+  const handle = edge.element().getBoundingClientRect();
+  const event = document.querySelector('[data-scheduler-event="lunch"]')!.getBoundingClientRect();
+  const slot = document.querySelector('[data-scheduler-slot="lunch"]')!.getBoundingClientRect();
+  expect(handle.bottom).toBeLessThanOrEqual(event.bottom);
+  expect(event.bottom).toBeLessThanOrEqual(slot.bottom);
+
+  const x = handle.left + handle.width / 2;
+  for (const y of [handle.top - 4, handle.top + handle.height / 2, event.bottom - 0.5])
+    expect(document.elementFromPoint(x, y)).toBe(edge.element());
+});

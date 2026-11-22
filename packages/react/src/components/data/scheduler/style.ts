@@ -58,7 +58,7 @@ export const schedulerStyle = tv({
     ],
     dayEvents: 'absolute inset-0',
     slot: [
-      'absolute flex p-px',
+      'absolute flex p-px has-focus-visible:z-4',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-event-start))]',
       'h-[calc(var(--scheduler-hour)*var(--scheduler-event-hours))]',
       'start-[calc(100%*var(--scheduler-event-left))] w-[calc(100%*var(--scheduler-event-width))]',
@@ -67,9 +67,10 @@ export const schedulerStyle = tv({
       'min-h-0 overflow-hidden rounded-standard px-1.5 py-0.5 outline-1 outline-(--ids-bg-current)',
       'bg-scheme-soft text-on-scheme-soft state-scheme [&_[data-item-description]]:text-on-scheme-soft',
     ],
-    movable: 'group/slot relative isolate flex size-full rounded-standard',
+    movable:
+      'group/slot relative isolate -my-px flex h-[calc(100%+2px)] w-full rounded-standard py-px',
     resizeHandle: [
-      'after:h-2 before:opacity-0 group-hover/slot:before:opacity-100',
+      'bottom-1 after:h-3 before:opacity-0 group-hover/slot:before:opacity-100',
       'focus-visible:before:opacity-100 data-dragging:before:opacity-100',
     ],
     eventContent: '',
