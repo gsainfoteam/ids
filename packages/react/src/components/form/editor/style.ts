@@ -218,7 +218,10 @@ export const editorStyle = tv({
       variant: 'outline',
       class: {
         root: 'bg-neutral-soft shadow-none inset-ring-transparent',
-        scrollArea: 'bg-field-outline shadow-xs inset-ring-1 inset-ring-field-outline',
+        scrollArea: [
+          'bg-field-outline shadow-xs',
+          'after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:inset-ring-1 after:inset-ring-field-outline',
+        ],
       },
     },
     {
