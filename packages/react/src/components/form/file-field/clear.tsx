@@ -25,6 +25,7 @@ export function FileClear({ className, onClick, ...props }: FileClearProps) {
       disabled={c.state.disabled}
       data-file-field-clear=""
       size={c.size}
+      owner={c.owner}
       className={c.styles.clear({ className })}
       onClick={(event) => {
         onClick?.(event);

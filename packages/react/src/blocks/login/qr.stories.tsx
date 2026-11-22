@@ -67,7 +67,7 @@ export const PC: Story = {
           </Card.Header>
 
           <Card.Content>
-            <Tabs defaultValue="qr" appearance="segmented" className="gap-5">
+            <Tabs defaultValue="qr" variant="segmented" className="gap-5">
               <Tabs.List aria-label="로그인 방법" stretch>
                 <Tabs.Trigger value="qr">
                   <QrCodeIcon />

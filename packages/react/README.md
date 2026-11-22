@@ -605,6 +605,10 @@ RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규�
 
 파일 선택·드롭·목록 삭제와 형식·크기·개수 제한을 지원합니다. [FileField API](./src/components/file-field/README.md).
 
+## FileDropzone
+
+FileField 와 같은 동작을 넓은 끌어 놓기 영역으로 그립니다. [FileDropzone API](./src/components/form/file-dropzone/README.md).
+
 ## Calendar
 
 단일·범위·다중 날짜 선택과 키보드 월 탐색을 제공합니다. [Calendar API](./src/components/data/calendar/README.md).

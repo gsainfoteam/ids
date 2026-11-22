@@ -161,7 +161,7 @@ export type {
   TabsProps,
   TabsState,
   TabsRenderProps,
-  TabsAppearance,
+  TabsVariant,
   TabsOrientation,
   TabsActivationMode,
 } from './components/navigation/tabs';
@@ -201,7 +201,7 @@ export { Questionnaire } from './components/form/questionnaire';
 export type {
   QuestionnaireAnswer,
   QuestionnaireAnswers,
-  QuestionnaireAppearance,
+  QuestionnaireVariant,
   QuestionnaireOrientation,
   QuestionnaireProps,
   QuestionnaireSelectionMode,
@@ -231,6 +231,8 @@ export type { ChipFieldProps } from './components/form/chip-field';
 
 export { FileField } from './components/form/file-field';
 export type { FileFieldProps, FileFieldRejection } from './components/form/file-field';
+export { FileDropzone } from './components/form/file-dropzone';
+export type { FileDropzoneProps } from './components/form/file-dropzone';
 
 export { Calendar } from './components/data/calendar';
 export type {

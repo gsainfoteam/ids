@@ -6,7 +6,7 @@ import { TabsContent, type TabsContentProps } from './content';
 import {
   TabsContext,
   type TabsActivationMode,
-  type TabsAppearance,
+  type TabsVariant,
   type TabsColorScheme,
   type TabsOrientation,
 } from './context';
@@ -21,7 +21,7 @@ import type { IdsSize } from '../../../tokens/types';
 export type TabsState<T extends string = string> = {
   value: T | undefined;
   orientation: TabsOrientation;
-  appearance: TabsAppearance;
+  variant: TabsVariant;
   size: IdsSize;
 };
 
@@ -36,7 +36,7 @@ export type TabsProps<T extends string = string> = Omit<
   'children' | 'className' | 'style' | 'defaultValue' | 'onChange'
 > &
   Omit<StateRenderProps<TabsState<T>>, 'children'> & {
-    appearance?: TabsAppearance;
+    variant?: TabsVariant;
     value?: T;
     defaultValue?: NoInfer<T>;
     onValueChange?: (value: T) => void;
@@ -58,7 +58,7 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
     orientation = 'horizontal',
     activationMode = 'automatic',
     loop = true,
-    appearance = 'underline',
+    variant = 'underline',
     size = 'standard',
     colorScheme = 'primary',
     className,
@@ -76,15 +76,15 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
     loop,
   });
 
-  const styles = tabsStyle({ colorScheme, orientation, appearance, size });
-  const state: TabsState<T> = { value: tabs.value as T | undefined, orientation, appearance, size };
+  const styles = tabsStyle({ colorScheme, orientation, variant, size });
+  const state: TabsState<T> = { value: tabs.value as T | undefined, orientation, variant, size };
 
   return (
     <TabsContext value={{ ...tabs, styles }}>
       <div
         {...rest}
         data-orientation={orientation}
-        data-appearance={appearance}
+        data-variant={variant}
         data-size={size}
         data-color-scheme={colorScheme}
         data-activation-mode={activationMode}

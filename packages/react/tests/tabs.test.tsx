@@ -274,7 +274,7 @@ test('render children hand over the parts', async () => {
 
 test('state props: selected, disabled and interaction reach className and children', async () => {
   await render(
-    tabs({ defaultValue: 'a', appearance: 'enclosed' }, ['a', 'b'], {
+    tabs({ defaultValue: 'a', variant: 'enclosed' }, ['a', 'b'], {
       a: { className: ({ selected }) => (selected ? 'is-selected' : 'not-selected') },
       b: { children: ({ selected }) => (selected ? 'b (on)' : 'b (off)') },
     }),
@@ -282,8 +282,8 @@ test('state props: selected, disabled and interaction reach className and childr
   await expect.element(tab('a')).toHaveClass('is-selected');
   await expect.element(tab('b (off)')).toBeInTheDocument();
   await expect.element(tab('a')).toHaveAttribute('data-selected', '');
-  const root = document.querySelector('[data-appearance]')!;
-  expect(root.getAttribute('data-appearance')).toBe('enclosed');
+  const root = document.querySelector('[data-variant]')!;
+  expect(root.getAttribute('data-variant')).toBe('enclosed');
 });
 
 test('nested tabs keep their own roving focus', async () => {
@@ -370,9 +370,7 @@ test('underline draws the selected label and its line in primary', async () => {
 
 test('enclosed draws the selected label in primary', async () => {
   await render(
-    <IdsProvider theme={testTheme}>
-      {tabs({ defaultValue: 'b', appearance: 'enclosed' })}
-    </IdsProvider>,
+    <IdsProvider theme={testTheme}>{tabs({ defaultValue: 'b', variant: 'enclosed' })}</IdsProvider>,
   );
   await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
 
@@ -384,7 +382,7 @@ test('enclosed draws the selected label in primary', async () => {
 
 test('pill fills the selected tab with the primary subtle pair', async () => {
   await render(
-    <IdsProvider theme={testTheme}>{tabs({ defaultValue: 'b', appearance: 'pill' })}</IdsProvider>,
+    <IdsProvider theme={testTheme}>{tabs({ defaultValue: 'b', variant: 'pill' })}</IdsProvider>,
   );
   await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
 
@@ -401,7 +399,7 @@ test('segmented draws the same track and segment as SegmentedControl', async () 
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <div>
-        {tabs({ defaultValue: 'b', appearance: 'segmented' })}
+        {tabs({ defaultValue: 'b', variant: 'segmented' })}
         <SegmentedControl aria-label="Period" defaultValue="b">
           <SegmentedControl.Item value="a">a</SegmentedControl.Item>
           <SegmentedControl.Item value="b">b</SegmentedControl.Item>
@@ -454,7 +452,7 @@ test('segmented draws the same track and segment as SegmentedControl', async () 
 test('segmented in dark lifts the selected tab one neutral step above the track', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme} mode="dark">
-      {tabs({ defaultValue: 'a', appearance: 'segmented', size: 'tiny' })}
+      {tabs({ defaultValue: 'a', variant: 'segmented', size: 'tiny' })}
     </IdsProvider>,
   );
   const root = document.querySelector('[data-mode="dark"]')!;

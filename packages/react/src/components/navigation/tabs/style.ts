@@ -1,7 +1,7 @@
 import { segmentSurface } from '../../../internal/surfaces/segment-surface';
 import { tv } from '../../../utils';
 
-import type { TabsAppearance, TabsColorScheme, TabsOrientation } from './context';
+import type { TabsVariant, TabsColorScheme, TabsOrientation } from './context';
 import type { IdsSize } from '../../../tokens/types';
 
 export const tabsStyle = tv({
@@ -41,7 +41,7 @@ export const tabsStyle = tv({
         trigger: 'justify-start text-start',
       },
     } satisfies Record<TabsOrientation, object>,
-    appearance: {
+    variant: {
       underline: {
         trigger: [
           'rounded-standard',
@@ -67,7 +67,7 @@ export const tabsStyle = tv({
         list: segmentSurface.track,
         trigger: [segmentSurface.segment, 'not-aria-selected:data-hovered:text-neutral'],
       },
-    } satisfies Record<TabsAppearance, object>,
+    } satisfies Record<TabsVariant, object>,
     size: {
       standard: {
         root: 'gap-4',
@@ -90,7 +90,7 @@ export const tabsStyle = tv({
   compoundVariants: [
     { orientation: 'horizontal', stretch: true, class: { list: '[&>[role=tab]]:flex-1' } },
     {
-      appearance: 'underline',
+      variant: 'underline',
       orientation: 'horizontal',
       class: {
         list: 'border-b border-neutral',
@@ -98,7 +98,7 @@ export const tabsStyle = tv({
       },
     },
     {
-      appearance: 'underline',
+      variant: 'underline',
       orientation: 'vertical',
       class: {
         list: 'border-e border-neutral',
@@ -106,7 +106,7 @@ export const tabsStyle = tv({
       },
     },
     {
-      appearance: 'enclosed',
+      variant: 'enclosed',
       orientation: 'horizontal',
       class: {
         list: 'border-b border-neutral',
@@ -114,7 +114,7 @@ export const tabsStyle = tv({
       },
     },
     {
-      appearance: 'enclosed',
+      variant: 'enclosed',
       orientation: 'vertical',
       class: {
         list: 'border-e border-neutral',
@@ -122,23 +122,23 @@ export const tabsStyle = tv({
       },
     },
     {
-      appearance: 'segmented',
+      variant: 'segmented',
       orientation: 'horizontal',
       stretch: false,
       class: { list: 'w-fit' },
     },
-    { appearance: 'segmented', orientation: 'vertical', class: { list: 'self-start' } },
+    { variant: 'segmented', orientation: 'vertical', class: { list: 'self-start' } },
     {
-      appearance: 'segmented',
+      variant: 'segmented',
       size: 'standard',
       class: { trigger: segmentSurface.height.standard },
     },
-    { appearance: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
+    { variant: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
   ],
   defaultVariants: {
     colorScheme: 'primary',
     orientation: 'horizontal',
-    appearance: 'underline',
+    variant: 'underline',
     size: 'standard',
   },
 });

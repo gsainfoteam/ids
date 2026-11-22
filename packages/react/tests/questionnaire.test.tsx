@@ -148,12 +148,12 @@ test('toggle options draw no radio, join FormData and move on with advanceOnSele
   const onComplete = vi.fn();
   const screen = await render(
     <Questionnaire advanceOnSelect onComplete={onComplete}>
-      <Questionnaire.Question name="size" appearance="toggle" orientation="horizontal">
+      <Questionnaire.Question name="size" variant="toggle" orientation="horizontal">
         몇 칸을 쓸까요?
         <Questionnaire.Option value="one">한 칸</Questionnaire.Option>
         <Questionnaire.Option value="two">두 칸</Questionnaire.Option>
       </Questionnaire.Question>
-      <Questionnaire.Question name="people" appearance="toggle" orientation="horizontal">
+      <Questionnaire.Question name="people" variant="toggle" orientation="horizontal">
         몇 명인가요?
         <Questionnaire.Option value="few">4명 이하</Questionnaire.Option>
         <Questionnaire.Option value="many">5명 이상</Questionnaire.Option>

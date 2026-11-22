@@ -299,29 +299,6 @@ test('image previews use object URLs that are revoked when the file goes', async
   await expect.poll(() => loads(b)).toBe(false);
 });
 
-test('dropzone: limits are described up front, and a single file is listed with its preview', async () => {
-  const screen = await render(
-    <FileField
-      aria-label="Files"
-      appearance="dropzone"
-      accept="image/*,.pdf,application/x-zip"
-      maxSize={5 * 1024 * 1024}
-      defaultValue={file('cover.png', 'x', 'image/png')}
-    />,
-  );
-  await expect
-    .element(screen.getByRole('button', { name: 'Files', exact: true }))
-    .toHaveAccessibleDescription('이미지, PDF, ZIP · 파일당 최대 5 MB');
-  expect(fieldRoot(screen.container).dataset.appearance).toBe('dropzone');
-  const rows = screen.getByRole('listitem').elements();
-  expect(rows).toHaveLength(1);
-  expect(rows[0].querySelector('[data-file-field-item]')).not.toBeNull();
-  await expect
-    .poll(() => rows[0].querySelector('[data-file-field-preview] img')?.getAttribute('src'))
-    .toMatch(/^blob:/);
-  expect(screen.container.querySelector('[data-file-field-control]')).toBeNull();
-});
-
 test('rows are outline Items in a group; Clear and Remove are ghost IconButtons', async () => {
   const screen = await render(
     <FileField
