@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import { expect, fn, waitFor } from 'storybook/test';
+import { expect, fn, waitFor, within } from 'storybook/test';
 
-import { Showcase } from '~story-kit';
+import { Showcase, holdTheNextCall } from '~story-kit';
 
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
@@ -17,6 +17,12 @@ const sizes = ['standard', 'tiny'] as const;
 
 const NOTICE =
   '<h2>동아리 박람회</h2><p>3월 12일 학생회관 앞에서 <strong>동아리 박람회</strong>가 열립니다. 자세한 일정은 <a href="https://gistory.me">공지</a>를 보세요.</p><ul><li>부스 신청: 3월 5일까지</li><li>장소 배정: 3월 8일</li></ul>';
+
+const MEMBERS = [
+  { id: 'kim', label: '김지스트', description: '회장' },
+  { id: 'lee', label: '이인포', description: '프론트엔드' },
+  { id: 'park', label: '박디자인', description: '디자인' },
+];
 
 const DOCUMENT = `# 동아리 박람회 안내
 
@@ -103,6 +109,15 @@ function selectText(root: HTMLElement, text: string, { caretAfter = false } = {}
   selection.addRange(range);
 }
 
+const PICTURE = `data:image/svg+xml;base64,${btoa(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="200" viewBox="0 0 480 200"><rect width="480" height="200" fill="hsl(210 70% 88%)"/><circle cx="350" cy="60" r="22" fill="hsl(40 90% 66%)"/><path d="M0 200 L130 92 L250 160 L350 104 L480 200 Z" fill="hsl(210 32% 40%)"/></svg>',
+)}`;
+
+const TOOLS_NOTICE =
+  '<h2>박람회 준비</h2><p style="text-align: center">부스마다 <mark>안내판</mark>을 세웁니다.</p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>부스 신청</p></li><li data-type="taskItem" data-checked="false"><p>장소 배정</p></li></ul><hr><p>문의는 학생회로 해 주세요.</p>';
+
+const pictureFile = () => new File(['<svg/>'], '지도.png', { type: 'image/png' });
+
 const modifierKey = () => (/Mac|iP(hone|[oa]d)/.test(navigator.platform) ? 'Meta' : 'Control');
 
 export const Playground: Story = {};
@@ -157,6 +172,45 @@ export const Gallery: Story = {
             <Editor.Content placeholder="툴바 없이 단축키로 서식을 넣습니다" />
             <Editor.BubbleMenu />
           </Editor>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Tools"
+        description="형광펜, 할 일 목록, 구분선, 정렬은 부품을 넣으면 그 확장이 함께 실립니다. 그림은 onImageUpload 가 있을 때만 툴바에 나옵니다."
+      >
+        <Showcase.Row label="every tool">
+          <Editor
+            aria-label="모든 도구"
+            defaultValue={TOOLS_NOTICE}
+            onImageUpload={async () => PICTURE}
+            className="w-[40rem]"
+          >
+            <Editor.BlockType />
+            <Editor.Separator />
+            <Editor.Bold />
+            <Editor.Italic />
+            <Editor.Highlight />
+            <Editor.Link />
+            <Editor.Separator />
+            <Editor.BulletList />
+            <Editor.OrderedList />
+            <Editor.TaskList />
+            <Editor.Separator />
+            <Editor.TextAlign />
+            <Editor.Separator />
+            <Editor.Image />
+            <Editor.HorizontalRule />
+            <Editor.Table />
+            <Editor.Content />
+          </Editor>
+        </Showcase.Row>
+        <Showcase.Row label="default with upload">
+          <Editor
+            aria-label="업로드가 있는 기본 툴바"
+            onImageUpload={async () => PICTURE}
+            className="w-[40rem]"
+          />
         </Showcase.Row>
       </Showcase.Section>
 
@@ -286,13 +340,24 @@ export const Formats: Story = {
     const [markdown, setMarkdown] = useState(
       '## 회의록\n\n- **안건**: 축제 부스\n- 결정: 다음 주에',
     );
+    const [html, setHtml] = useState('<p><strong>HTML</strong> 로 저장합니다</p>');
     const [json, setJson] = useState<Editor.Json>({
       type: 'doc',
       content: [{ type: 'paragraph', content: [{ type: 'text', text: 'JSON 으로 저장합니다' }] }],
     });
 
     return (
-      <div className="grid w-full max-w-3xl gap-6 md:grid-cols-2">
+      <div className="grid w-full max-w-5xl gap-6 md:grid-cols-3">
+        <div className="flex flex-col gap-2">
+          <Editor format="html" aria-label="HTML" value={html} onValueChange={setHtml}>
+            <Editor.Bold />
+            <Editor.Italic />
+            <Editor.Content />
+          </Editor>
+          <pre data-testid="html" className="text-caption-c1-regular font-mono whitespace-pre-wrap">
+            {html}
+          </pre>
+        </div>
         <div className="flex flex-col gap-2">
           <Editor
             format="markdown"
@@ -329,6 +394,9 @@ export const Formats: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
+    const html = await editableContent(canvas, 'HTML');
+    await expect(html.querySelector('strong')).toHaveTextContent('HTML');
+
     const markdown = await editableContent(canvas, '마크다운');
     await expect(markdown.querySelector('h2')).toHaveTextContent('회의록');
     await expect(markdown.querySelector('strong')).toHaveTextContent('안건');
@@ -450,5 +518,409 @@ export const FormSubmitAndReset: Story = {
       expect(canvas.getByRole('textbox', { name: '본문' })).toHaveTextContent(/^초안$/),
     );
     await expect(args.onValueChange).toHaveBeenCalledTimes(calls);
+  },
+};
+
+export const ImageUpload: Story = {
+  args: {
+    defaultValue: '<p>학생회관 가는 길</p>',
+    'aria-label': '그림 본문',
+    onImageUpload: fn(async () => PICTURE),
+  },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Bold />
+      <Editor.Image />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'onImageUpload 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor.Image 를 누르면 그림 주소를 넣거나 파일을 고르는 Popover 가 열리고, 붙여넣거나 끌어 놓은 그림도 같은 함수로 올립니다. 주소는 http 나 https 만 받습니다. 올리는 동안 본문의 그 자리에 자리표시가 서고 도구가 aria-busy 가 됩니다. 그림을 고른 채 Editor.Image 를 누르면 대체 텍스트를 넣는 Popover 가 열립니다. html 과 json 에서는 그림 좌우의 손잡이를 끌어 너비를 바꾸고, 마크다운은 너비를 담지 못해 손잡이가 없습니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const finishUpload = holdTheNextCall(args.onImageUpload, PICTURE);
+    const content = await editableContent(canvas, '그림 본문');
+    await userEvent.click(content);
+    selectText(content, '가는 길', { caretAfter: true });
+    const input = canvasElement.querySelector<HTMLInputElement>('[data-editor-image-input]')!;
+    await userEvent.upload(input, pictureFile());
+
+    await waitFor(() => expect(args.onImageUpload).toHaveBeenCalledOnce());
+    await expect(canvas.getByRole('button', { name: '그림' })).toHaveAttribute('aria-busy', 'true');
+    await expect(content.querySelector('[data-editor-upload]')).not.toBeNull();
+
+    finishUpload();
+    await waitFor(() => expect(content.querySelector('img')).not.toBeNull());
+    await expect(content.querySelector('[data-editor-upload]')).toBeNull();
+
+    await userEvent.click(content.querySelector('img')!);
+    await userEvent.click(canvas.getByRole('button', { name: '그림' }));
+    const alt = await waitFor(() => canvas.getByRole('textbox', { name: '대체 텍스트' }));
+    await waitFor(() => expect(alt).toHaveFocus());
+    await userEvent.type(alt, '학생회관 지도{Enter}');
+    await waitFor(() =>
+      expect(args.onValueChange).toHaveBeenLastCalledWith(
+        `<p>학생회관 가는 길</p><img src="${PICTURE}" alt="학생회관 지도">`,
+      ),
+    );
+  },
+};
+
+export const Highlight: Story = {
+  args: { defaultValue: '<p>마감은 3월 5일입니다.</p>', 'aria-label': '형광펜 본문' },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Bold />
+      <Editor.Highlight />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.Highlight 는 고른 글에 형광펜을 칠합니다. 색은 warning 계열의 soft 역할이라 테마를 따릅니다. 마크다운에서는 ==글== 로 씁니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const content = await editableContent(canvas, '형광펜 본문');
+    await userEvent.click(content);
+    selectText(content, '3월 5일');
+    await userEvent.click(canvas.getByRole('button', { name: '형광펜' }));
+    await waitFor(() =>
+      expect(args.onValueChange).toHaveBeenLastCalledWith(
+        '<p>마감은 <mark>3월 5일</mark>입니다.</p>',
+      ),
+    );
+  },
+};
+
+export const Color: Story = {
+  args: { defaultValue: '<p>마감은 3월 5일입니다.</p>', 'aria-label': '색 본문' },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Bold />
+      <Editor.Color />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.Color 는 고른 글에 글자 색과 형광펜 색을 칠합니다. 색은 hex 가 아니라 IDS 색 계열(강조 1~3, 정보, 성공, 경고, 위험)이라 테마와 다크 모드를 따르고, 글자는 text-X, 형광펜은 bg-X-soft 와 text-on-X-soft 로 그립니다. 마크다운에서는 <span data-color="danger">, <mark data-color="success"> 로 씁니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const content = await editableContent(canvas, '색 본문');
+    await userEvent.click(content);
+    selectText(content, '3월 5일');
+    await userEvent.click(canvas.getByRole('button', { name: '색' }));
+    const text = await within(document.body).findByRole('group', { name: '글자 색' });
+    await userEvent.click(within(text).getByRole('button', { name: '위험' }));
+    await waitFor(() =>
+      expect(args.onValueChange).toHaveBeenLastCalledWith(
+        '<p>마감은 <span data-color="danger">3월 5일</span>입니다.</p>',
+      ),
+    );
+  },
+};
+
+export const TaskList: Story = {
+  args: { defaultValue: '<p>부스 신청</p>', 'aria-label': '할 일 본문' },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.BulletList />
+      <Editor.TaskList />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.TaskList 는 문단을 할 일 목록으로 바꿉니다. 체크박스는 IDS Checkbox 와 같은 모양이고, 이름은 그 할 일의 글입니다. 마크다운에서는 - [ ] 와 - [x] 로 씁니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const content = await editableContent(canvas, '할 일 본문');
+    await userEvent.click(content);
+    await userEvent.click(canvas.getByRole('button', { name: '할 일 목록' }));
+    const checkbox = await waitFor(() =>
+      canvas.getByRole('checkbox', { name: '할 일: 부스 신청' }),
+    );
+    await userEvent.click(checkbox);
+    await waitFor(() =>
+      expect(args.onValueChange).toHaveBeenLastCalledWith(
+        '<ul data-type="taskList"><li data-checked="true" data-type="taskItem"><label><input type="checkbox" checked="checked"><span></span></label><div><p>부스 신청</p></div></li></ul>',
+      ),
+    );
+  },
+};
+
+export const HorizontalRule: Story = {
+  args: { defaultValue: '<p>1부</p>', 'aria-label': '구분선 본문' },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Bold />
+      <Editor.HorizontalRule />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.HorizontalRule 은 커서 자리 뒤에 구분선을 넣습니다. 누르는 상태가 없는 버튼이라 IconButton 입니다. 마크다운에서는 --- 로 씁니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const content = await editableContent(canvas, '구분선 본문');
+    await userEvent.click(content);
+    selectText(content, '1부', { caretAfter: true });
+    await userEvent.click(canvas.getByRole('button', { name: '구분선' }));
+    await waitFor(() =>
+      expect(args.onValueChange).toHaveBeenLastCalledWith('<p>1부</p><hr><p></p>'),
+    );
+  },
+};
+
+export const Table: Story = {
+  args: {
+    defaultValue:
+      '<table><tbody><tr><th><p>시간</p></th><th><p>순서</p></th></tr><tr><td><p>10:00</p></td><td><p>개회</p></td></tr></tbody></table><p></p>',
+    'aria-label': '표 본문',
+  },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Bold />
+      <Editor.Table />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.Table 은 표 밖에서 누르면 크기 격자를 엽니다. 포인터나 화살표로 행과 열 수를 고르고 누르거나 Enter 를 치면 그 크기의 표가 머리글 행과 함께 들어갑니다. 표 안에서 누르면 커서가 있는 칸을 기준으로 행과 열을 더하거나 지우는 메뉴가 열립니다. HTML 과 JSON 에서는 머리글 행을 끄고, 고른 칸을 합치거나 합친 칸을 나눌 수도 있습니다. 마크다운의 GFM 표는 머리글 행이 꼭 있고 칸을 합칠 수 없어서, 마크다운에서는 이 셋을 메뉴에 두지 않습니다. 열 너비를 끌어 바꾸지는 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const content = await editableContent(canvas, '표 본문');
+    await userEvent.click(content);
+    selectText(content, '개회', { caretAfter: true });
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: '표' })).toHaveAttribute('aria-haspopup', 'menu'),
+    );
+    await userEvent.click(canvas.getByRole('button', { name: '표' }));
+    await userEvent.click(await canvas.findByRole('menuitem', { name: '아래에 행 추가' }));
+    await waitFor(() => expect(content.querySelectorAll('tr')).toHaveLength(3));
+    await waitFor(() => expect(content).toHaveFocus());
+  },
+};
+
+export const CalloutAndDetails: Story = {
+  args: {
+    format: 'markdown',
+    defaultValue:
+      '> [!TIP]\n> 신청 전에 졸업 요건 점검표를 확인하세요.\n\n:::details {open}\n\n:::detailsSummary\n\n재수강 규정\n\n:::\n\n:::detailsContent\n\n재수강한 과목은 성적이 A0 를 넘지 않습니다.\n\n:::\n\n:::',
+    'aria-label': '안내 본문',
+  },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Callout />
+      <Editor.Details />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.Callout 은 GitHub alert(> [!TIP])를 RichText 와 같은 Alert 모양으로 편집합니다. 왼쪽 아이콘을 누르면 종류를 바꾸거나 콜아웃을 풀 수 있고, 인용문 첫 줄에 [!tip] 을 쓰면 인용문이 콜아웃이 됩니다. Editor.Details 는 고른 블록을 접히는 토글로 감싸고, 펼침 상태는 마크다운의 {open} 으로 남습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await editableContent(canvas, '안내 본문');
+    const toggle = canvas.getByRole('button', { name: '내용 펼치기' });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.click(toggle);
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'false'));
+  },
+};
+
+export const SlashMenuAndMentions: Story = {
+  args: {
+    format: 'markdown',
+    defaultValue: '',
+    'aria-label': '회의록 본문',
+  },
+  render: (args) => (
+    <Editor
+      {...args}
+      mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
+    >
+      <Editor.Callout />
+      <Editor.Details />
+      <Editor.Table />
+      <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '줄에서 / 를 치면 블록 메뉴가 열립니다. 메뉴에는 Editor 가 불러온 블록만 나오고, 글자를 더 치면 이름과 영어 키워드(h2, todo, quote)로 좁혀집니다. 위아래 화살표로 고르고 Enter 로 넣으며, Escape 는 메뉴만 닫습니다. mentions 를 주면 @ 뒤의 글자로 그 함수를 불러 사람을 찾고, 고른 사람은 마크다운에 [@ id="" label=""] 로 남습니다. 함수는 Promise 를 돌려줘도 되고, 두 번째 인자인 AbortSignal 로 지난 요청을 끊을 수 있습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const content = await editableContent(canvas, '회의록 본문');
+    await userEvent.click(content);
+    await userEvent.keyboard('/');
+    const menu = await canvas.findByRole('listbox', { name: '블록 넣기' });
+    await expect(menu).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.queryByRole('listbox')).toBeNull());
+  },
+};
+
+export const BlockEditor: Story = {
+  args: {
+    type: 'block',
+    format: 'markdown',
+    defaultValue: '## 준비물\n\n이름표와 노트북을 챙기세요.\n\n- 9시 집합\n- 10시 발표',
+    'aria-label': '블록 본문',
+  },
+  render: (args) => (
+    <Editor {...args} className="w-[40rem]">
+      <Editor.Content placeholder="/ 로 블록을 넣으세요" />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'type="block" 인 Editor 는 툴바 없이 본문만 보여 줍니다. 블록은 / 메뉴로 넣고, 글자를 고르면 뜨는 BubbleMenu 로 꾸밉니다. / 메뉴에는 표, 콜아웃, 접는 블록, 할 일 목록까지 모든 블록이 나옵니다. 편집할 수 있으면 포인터를 올린 블록의 첫 줄 옆, 상자 바깥 왼쪽에 손잡이가 나옵니다. 상자 안쪽 여백은 늘지 않습니다. 손잡이를 끌면 Sidebar 처럼 블록의 복사본이 따라오고 놓을 자리에 primary 선이 그어지며, 놓은 블록은 옅은 틴트로 골라집니다. 누르면 메뉴가 열려 아래에 블록을 넣거나, 다른 종류로 바꾸거나, 복제하거나, 지울 수 있습니다. 손잡이는 Tab 순서에 들지 않습니다. 같은 일은 키보드로도 할 수 있어서(/ 메뉴, 잘라 내기와 붙여 넣기, 실행 취소), 손잡이는 포인터를 위한 지름길입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const content = await editableContent(canvas, '블록 본문');
+    await expect(canvas.queryByRole('toolbar')).toBeNull();
+    await userEvent.hover(within(content).getByText('이름표와 노트북을 챙기세요.'));
+    const handle = await canvas.findByRole('button', { name: '블록 메뉴' });
+    await userEvent.click(handle);
+    await expect(await canvas.findByRole('menuitem', { name: '복제' })).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+  },
+};
+
+export const TextAlign: Story = {
+  args: { defaultValue: '<p>행사 안내</p>', 'aria-label': '정렬 본문' },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.BlockType />
+      <Editor.Separator />
+      <Editor.TextAlign />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.TextAlign 은 문단과 제목을 정렬하는 토글 묶음입니다. 기본은 왼쪽, 가운데, 오른쪽이고 alignments 로 양쪽 정렬을 더합니다. 누른 정렬을 다시 누르거나 왼쪽을 누르면 정렬을 지웁니다. 마크다운에는 정렬을 담을 문법이 없어 HTML 과 JSON 에서만 남습니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const content = await editableContent(canvas, '정렬 본문');
+    await userEvent.click(content);
+    await userEvent.click(canvas.getByRole('button', { name: '가운데 정렬' }));
+    await waitFor(() =>
+      expect(args.onValueChange).toHaveBeenLastCalledWith(
+        '<p style="text-align: center;">행사 안내</p>',
+      ),
+    );
+    await expect(canvas.getByRole('button', { name: '가운데 정렬' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  },
+};
+
+export const FullDocument: Story = {
+  args: {
+    'aria-label': '문서 본문',
+    defaultValue: [
+      '<h1>가을 축제 부스 안내</h1>',
+      '<p>올해 부스는 <strong>학생회관 앞</strong>에 섭니다. <mark>신청은 금요일까지</mark>입니다.</p>',
+      '<div data-type="callout" data-kind="success"><p>신청서는 동아리 대표가 냅니다.</p></div>',
+      '<h2>준비물</h2>',
+      '<ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>이름표</p></li><li data-type="taskItem" data-checked="false"><p>노트북</p></li></ul>',
+      '<pre><code class="language-tsx">export const booth = { place: "학생회관", day: "금" };</code></pre>',
+      '<table><tbody><tr><th><p>시간</p></th><th><p>할 일</p></th></tr><tr><td><p>9시</p></td><td><p>집합</p></td></tr><tr><td><p>10시</p></td><td><p>발표</p></td></tr></tbody></table>',
+      '<details open><summary>자주 묻는 질문</summary><div data-type="detailsContent"><p>부스는 두 곳까지 신청할 수 있습니다.</p></div></details>',
+      '<p></p>',
+    ].join(''),
+  },
+  render: (args) => (
+    <Editor
+      {...args}
+      className="w-[48rem]"
+      onImageUpload={async () => PICTURE}
+      mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
+    >
+      <Editor.BlockType />
+      <Editor.Separator />
+      <Editor.Bold />
+      <Editor.Italic />
+      <Editor.Underline />
+      <Editor.Strike />
+      <Editor.Code />
+      <Editor.Highlight />
+      <Editor.Color />
+      <Editor.Subscript />
+      <Editor.Superscript />
+      <Editor.Link />
+      <Editor.Separator />
+      <Editor.BulletList />
+      <Editor.OrderedList />
+      <Editor.TaskList />
+      <Editor.Blockquote />
+      <Editor.CodeBlock />
+      <Editor.Separator />
+      <Editor.TextAlign />
+      <Editor.Separator />
+      <Editor.Image />
+      <Editor.Table />
+      <Editor.Callout />
+      <Editor.Details />
+      <Editor.HorizontalRule />
+      <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+      <Editor.BubbleMenu />
+      <Editor.Count />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '모든 툴바 부품을 한 Editor 에 넣은 문서입니다. 툴바, / 메뉴, @ 멘션, 글자를 고르면 뜨는 BubbleMenu, 그림 올리기와 크기 조절, 표, 콜아웃, 접는 블록, 코드 블록을 함께 써 볼 수 있습니다.',
+      },
+    },
   },
 };

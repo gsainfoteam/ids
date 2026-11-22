@@ -1,6 +1,8 @@
 import { Extension } from '@tiptap/core';
 import { Plugin } from '@tiptap/pm/state';
 
+import { aSuggestionIsOpen } from './suggestion/keys';
+
 export const LeaveEscapeToTheLayers = Extension.create({
   name: 'idsLeaveEscapeToTheLayers',
   addProseMirrorPlugins() {
@@ -8,7 +10,8 @@ export const LeaveEscapeToTheLayers = Extension.create({
       new Plugin({
         props: {
           handleDOMEvents: {
-            keydown: (_view, event) => event.key === 'Escape' && !event.isComposing,
+            keydown: (view, event) =>
+              event.key === 'Escape' && !event.isComposing && !aSuggestionIsOpen(view.state),
           },
         },
       }),

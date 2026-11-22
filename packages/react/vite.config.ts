@@ -7,7 +7,7 @@ import preserveDirectives from 'rollup-preserve-directives';
 import { defineConfig, type Plugin } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-import { messages } from './src/internal/messages';
+import { everyMessage } from './src/internal/every-message';
 
 const manifest = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   dependencies?: Record<string, string>;
@@ -27,7 +27,7 @@ const messageCatalogs = (): Plugin => ({
     this.emitFile({
       type: 'asset',
       fileName: 'messages/ko.json',
-      source: `${JSON.stringify(messages, null, 2)}\n`,
+      source: `${JSON.stringify(everyMessage, null, 2)}\n`,
     });
     this.emitFile({ type: 'asset', fileName: 'messages/en.json', source: english });
   },
@@ -52,6 +52,7 @@ export default defineConfig({
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         chart: fileURLToPath(new URL('./src/chart.ts', import.meta.url)),
         editor: fileURLToPath(new URL('./src/editor.ts', import.meta.url)),
+        'rich-text': fileURLToPath(new URL('./src/rich-text.ts', import.meta.url)),
         'react-hook-form': fileURLToPath(new URL('./src/react-hook-form.tsx', import.meta.url)),
         'tanstack-form': fileURLToPath(new URL('./src/tanstack-form.tsx', import.meta.url)),
       },

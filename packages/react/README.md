@@ -617,6 +617,10 @@ Calendar 팝업으로 날짜·기간·여러 날짜를 선택하고, 날짜를 �
 
 시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/data/time-picker/README.md).
 
+## Scheduler
+
+주와 하루의 시간 격자에 일정을 놓고, 날짜 이동, 보기 전환, Calendar 로 날짜 이동을 제공합니다. [Scheduler API](./src/components/data/scheduler/README.md).
+
 ## TimeField
 
 TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/components/form/time-field/README.md).
@@ -636,6 +640,11 @@ Recharts 차트를 테마의 브랜드 계열에서 고른 계열 색, 툴팁, �
 Tiptap 3 위의 서식 편집기입니다. 툴바, 버블 메뉴, 링크 Popover, 글자 수를 IDS 부품으로 그리고, 값은 HTML, 마크다운, JSON 으로 받습니다.
 `@gsainfoteam/ids-react/editor` 에서 가져오고, Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다. Tiptap 은 Editor 가 마운트될 때 `import()` 로 불러옵니다.
 [Editor API](./src/components/form/editor/README.md).
+
+## RichText
+
+저장해 둔 마크다운이나 Editor 의 JSON 을 IDS 컴포넌트로 그리는 렌더러입니다. Server Component 에서 그리면 Tiptap 은 서버에서만 돌고 브라우저로 가지 않습니다.
+`@gsainfoteam/ids-react/rich-text` 에서 가져옵니다. [RichText API](./src/components/typography/rich-text/README.md).
 
 ## Interaction feedback
 

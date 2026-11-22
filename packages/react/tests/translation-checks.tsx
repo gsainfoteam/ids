@@ -9,7 +9,7 @@ import * as preview from '../.storybook/preview';
 import englishCatalog from '../messages/en.json';
 import { IdsProvider, type IdsTranslate } from '../src';
 import { testTheme } from './theme';
-import { messages } from '../src/internal/messages';
+import { everyMessage } from '../src/internal/every-message';
 
 import type { StoryFiles } from './story-checks';
 
@@ -38,7 +38,7 @@ export const inEnglish = (children: ReactNode) => (
 
 const HANGUL = /[ᄀ-ᇿ㄰-㆏가-힯]/;
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const koreanDefaults = leafValues(messages)
+const koreanDefaults = leafValues(everyMessage)
   .filter((pattern) => HANGUL.test(pattern))
   .map((pattern) => new RegExp(`^${escape(pattern).replace(/\\\{\w+\\\}/g, '.+')}$`));
 const NAMING_ATTRIBUTES = [

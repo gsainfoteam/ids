@@ -7,6 +7,7 @@
     "border-field-outline":   { "$type": "component", "$value": { "light": "border-neutral", "dark": "border-neutral-strong" } },
     "border-field-bar":       { "$type": "component", "$value": { "light": "border-neutral", "dark": "border-neutral-strong" } },
     "bg-field-code-outline":  { "$type": "component", "$value": { "light": "bg-neutral-soft", "dark": "bg-surface" } },
+    "bg-field-block-outline": { "$type": "component", "$value": { "light": "bg-block", "dark": "bg-surface" } },
     "bg-switch-thumb":        { "$type": "component", "$value": { "light": "bg-base", "dark": "bg-neutral-solid" } },
     "bg-segment":             { "$type": "component", "$value": { "light": "bg-base", "dark": "border-neutral-strong" } },
     "bg-qr-code":             { "$type": "component", "$value": { "light": "bg-base", "dark": "bg-neutral-solid" } },

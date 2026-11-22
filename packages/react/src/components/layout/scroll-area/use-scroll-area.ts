@@ -70,10 +70,33 @@ function pageToward(viewport: HTMLElement, axis: Axis, thumb: HTMLElement, point
   viewport.scrollBy(axis === 'y' ? { top: direction * page } : { left: direction * page });
 }
 
-function measureThumb(viewport: HTMLElement, axis: Axis, track: number) {
+function measureThumb(viewport: HTMLElement, axis: Axis, track: number, pinned: number) {
   return axis === 'y'
-    ? thumbAlong(track, viewport.clientHeight, viewport.scrollHeight, viewport.scrollTop)
-    : thumbAlong(track, viewport.clientWidth, viewport.scrollWidth, Math.abs(viewport.scrollLeft));
+    ? thumbAlong(
+        track,
+        viewport.clientHeight - pinned,
+        viewport.scrollHeight - pinned,
+        viewport.scrollTop,
+      )
+    : thumbAlong(
+        track,
+        viewport.clientWidth - pinned,
+        viewport.scrollWidth - pinned,
+        Math.abs(viewport.scrollLeft),
+      );
+}
+
+const PINNED = '[data-scroll-area-pinned]';
+const NOTHING_PINNED: Record<Axis, number> = { x: 0, y: 0 };
+
+function measurePinned(viewport: HTMLElement): Record<Axis, number> {
+  const pinned = { x: 0, y: 0 };
+  for (const element of viewport.querySelectorAll<HTMLElement>(PINNED)) {
+    const edge = element.getAttribute('data-scroll-area-pinned');
+    if (edge === 'top') pinned.y = Math.max(pinned.y, element.offsetHeight);
+    if (edge === 'start') pinned.x = Math.max(pinned.x, element.offsetWidth);
+  }
+  return pinned;
 }
 
 const takesFocusItself = (viewport: HTMLElement) =>
@@ -117,6 +140,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
     let shape: Shape = readShape(root);
     let current: Overflow = { x: false, y: false };
     let cornerBox: CornerBox | null = null;
+    let pinned = NOTHING_PINNED;
     let frame = 0;
 
     const write = (element: HTMLElement, name: string, px: number) => {
@@ -154,10 +178,15 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
           return Math.max(byCrossBar, cornerLength + shape.gap);
         };
 
-        const start = edgeInset(corners.start, shape, takenAt('start'));
+        const pinnedLength = pinned[axis];
+        const pastThePinnedEdge = pinnedLength > 0 ? pinnedLength + shape.gap : 0;
+        const start = Math.max(
+          edgeInset(corners.start, shape, takenAt('start')),
+          pastThePinnedEdge,
+        );
         const end = edgeInset(corners.end, shape, takenAt('end'));
         const track = (axis === 'y' ? shape.height : shape.width) - start - end;
-        const thumb = measureThumb(viewport, axis, track);
+        const thumb = measureThumb(viewport, axis, track, pinnedLength);
         thumbs.current[axis] = thumb;
 
         write(bar.element, '--scroll-area-inset-start', start);
@@ -195,6 +224,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
     const measure = () => {
       shape = readShape(root);
       cornerBox = measureCorner();
+      pinned = measurePinned(viewport);
       const next = {
         x: scrollsX && viewport.scrollWidth - viewport.clientWidth > SUBPIXEL_ROUNDING,
         y: scrollsY && viewport.scrollHeight - viewport.clientHeight > SUBPIXEL_ROUNDING,
@@ -238,6 +268,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       resize.observe(root);
       resize.observe(viewport);
       for (const child of viewport.children) resize.observe(child);
+      for (const element of viewport.querySelectorAll(PINNED)) resize.observe(element);
       if (occupiedCorner.current) resize.observe(occupiedCorner.current.element);
     };
     const children = new MutationObserver(observeContent);

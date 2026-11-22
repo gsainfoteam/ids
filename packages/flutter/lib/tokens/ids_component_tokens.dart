@@ -23,6 +23,7 @@ abstract final class IdsComponentTokens {
       'border-field-outline': 'border-neutral',
       'border-field-bar': 'border-neutral',
       'bg-field-code-outline': 'bg-neutral-soft',
+      'bg-field-block-outline': 'bg-block',
       'bg-switch-thumb': 'bg-base',
       'bg-segment': 'bg-base',
       'bg-qr-code': 'bg-base',
@@ -37,6 +38,7 @@ abstract final class IdsComponentTokens {
       'border-field-outline': 'border-neutral-strong',
       'border-field-bar': 'border-neutral-strong',
       'bg-field-code-outline': 'bg-surface',
+      'bg-field-block-outline': 'bg-surface',
       'bg-switch-thumb': 'bg-neutral-solid',
       'bg-segment': 'border-neutral-strong',
       'bg-qr-code': 'bg-neutral-solid',
@@ -68,6 +70,7 @@ class IdsComponentColors {
     required this.borderFieldOutline,
     required this.borderFieldBar,
     required this.bgFieldCodeOutline,
+    required this.bgFieldBlockOutline,
     required this.bgSwitchThumb,
     required this.bgSegment,
     required this.bgQrCode,
@@ -86,6 +89,7 @@ class IdsComponentColors {
       borderFieldOutline: token('border-field-outline'),
       borderFieldBar: token('border-field-bar'),
       bgFieldCodeOutline: token('bg-field-code-outline'),
+      bgFieldBlockOutline: token('bg-field-block-outline'),
       bgSwitchThumb: token('bg-switch-thumb'),
       bgSegment: token('bg-segment'),
       bgQrCode: token('bg-qr-code'),
@@ -101,6 +105,7 @@ class IdsComponentColors {
   final Color borderFieldOutline;
   final Color borderFieldBar;
   final Color bgFieldCodeOutline;
+  final Color bgFieldBlockOutline;
   final Color bgSwitchThumb;
   final Color bgSegment;
   final Color bgQrCode;
@@ -115,6 +120,7 @@ class IdsComponentColors {
     'border-field-outline': borderFieldOutline,
     'border-field-bar': borderFieldBar,
     'bg-field-code-outline': bgFieldCodeOutline,
+    'bg-field-block-outline': bgFieldBlockOutline,
     'bg-switch-thumb': bgSwitchThumb,
     'bg-segment': bgSegment,
     'bg-qr-code': bgQrCode,
@@ -132,6 +138,7 @@ class IdsComponentColors {
       other.borderFieldOutline == borderFieldOutline &&
       other.borderFieldBar == borderFieldBar &&
       other.bgFieldCodeOutline == bgFieldCodeOutline &&
+      other.bgFieldBlockOutline == bgFieldBlockOutline &&
       other.bgSwitchThumb == bgSwitchThumb &&
       other.bgSegment == bgSegment &&
       other.bgQrCode == bgQrCode &&

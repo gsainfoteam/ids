@@ -153,6 +153,24 @@ mixin IdsMessages {
 
   String? get drawerHandle => null;
 
+  String? get editorAlignCenter => null;
+
+  String? get editorAlignJustify => null;
+
+  String? get editorAlignLeft => null;
+
+  String? get editorAlignRight => null;
+
+  String? get editorBlockDelete => null;
+
+  String? get editorBlockDuplicate => null;
+
+  String? get editorBlockHandle => null;
+
+  String? get editorBlockInsertBelow => null;
+
+  String? get editorBlockTurnInto => null;
+
   String? get editorBlockType => null;
 
   String? get editorBlockquote => null;
@@ -163,13 +181,75 @@ mixin IdsMessages {
 
   String? get editorBulletList => null;
 
+  String? get editorCallout => null;
+
+  String? get editorCalloutKind => null;
+
+  String? get editorCalloutRemove => null;
+
   String? get editorCode => null;
 
   String? get editorCodeBlock => null;
 
+  String? get editorCodeLanguage => null;
+
+  String? get editorCodeLanguageSearch => null;
+
+  String? get editorCodePlainText => null;
+
+  String? get editorColor => null;
+
+  String? get editorColorDanger => null;
+
+  String? get editorColorDefault => null;
+
+  String? get editorColorInfo => null;
+
+  String? get editorColorNone => null;
+
+  String? get editorColorPrimary => null;
+
+  String? get editorColorSecondary => null;
+
+  String? get editorColorSuccess => null;
+
+  String? get editorColorTertiary => null;
+
+  String? get editorColorWarning => null;
+
   String? get editorContent => null;
 
+  String? get editorDetails => null;
+
+  String? get editorDetailsSummary => null;
+
+  String? get editorDetailsToggle => null;
+
   String? editorHeading({required Object level}) => null;
+
+  String? get editorHighlight => null;
+
+  String? get editorHighlightColor => null;
+
+  String? get editorHorizontalRule => null;
+
+  String? get editorImage => null;
+
+  String? get editorImageAlt => null;
+
+  String? get editorImageAltPlaceholder => null;
+
+  String? get editorImageInsert => null;
+
+  String? get editorImagePickFiles => null;
+
+  String? get editorImageUploadFailed => null;
+
+  String? get editorImageUploading => null;
+
+  String? get editorImageUrl => null;
+
+  String? get editorImageUrlInvalid => null;
 
   String? get editorItalic => null;
 
@@ -181,11 +261,61 @@ mixin IdsMessages {
 
   String? get editorLinkUrl => null;
 
+  String? get editorMentionEmpty => null;
+
+  String? get editorMentionMenu => null;
+
+  String? get editorMentionSearching => null;
+
   String? get editorOrderedList => null;
 
   String? get editorParagraph => null;
 
+  String? get editorSlashMenu => null;
+
+  String? get editorSlashMenuEmpty => null;
+
   String? get editorStrike => null;
+
+  String? get editorSubscript => null;
+
+  String? get editorSuperscript => null;
+
+  String? get editorTable => null;
+
+  String? get editorTableAddColumnAfter => null;
+
+  String? get editorTableAddColumnBefore => null;
+
+  String? get editorTableAddRowAfter => null;
+
+  String? get editorTableAddRowBefore => null;
+
+  String? get editorTableDelete => null;
+
+  String? get editorTableDeleteColumn => null;
+
+  String? get editorTableDeleteRow => null;
+
+  String? get editorTableHeaderRow => null;
+
+  String? get editorTableInsert => null;
+
+  String? get editorTableMergeCells => null;
+
+  String? editorTableSize({required Object rows, required Object cols}) => null;
+
+  String? get editorTableSplitCell => null;
+
+  String? editorTaskItem({required Object text}) => null;
+
+  String? get editorTaskItemEmpty => null;
+
+  String? get editorTaskList => null;
+
+  String? get editorTextAlign => null;
+
+  String? get editorTextColor => null;
 
   String? get editorToolbar => null;
 
@@ -426,6 +556,74 @@ mixin IdsMessages {
   String? resizableValue({required Object value}) => null;
 
   String? get resizableWidth => null;
+
+  String? get richTextCalloutDanger => null;
+
+  String? get richTextCalloutInfo => null;
+
+  String? get richTextCalloutSuccess => null;
+
+  String? get richTextCalloutWarning => null;
+
+  String? get schedulerAddDay => null;
+
+  String? get schedulerAllDay => null;
+
+  String? get schedulerDay => null;
+
+  String? get schedulerDayCount => null;
+
+  String? schedulerDays({required Object count}) => null;
+
+  String? schedulerDragAt({required Object time}) => null;
+
+  String? schedulerDragCancel({required Object event}) => null;
+
+  String? schedulerDragEnd({required Object event}) => null;
+
+  String? get schedulerDragHint => null;
+
+  String? get schedulerDragMonthHint => null;
+
+  String? schedulerDragStart({required Object event}) => null;
+
+  String? get schedulerGoToDate => null;
+
+  String? get schedulerLabel => null;
+
+  String? get schedulerMonth => null;
+
+  String? schedulerMore({required Object count}) => null;
+
+  String? schedulerMoreLabel({required Object date, required Object count}) => null;
+
+  String? get schedulerNavigation => null;
+
+  String? get schedulerNextDay => null;
+
+  String? schedulerNextDays({required Object count}) => null;
+
+  String? get schedulerNextMonth => null;
+
+  String? get schedulerNextWeek => null;
+
+  String? get schedulerPreviousDay => null;
+
+  String? schedulerPreviousDays({required Object count}) => null;
+
+  String? get schedulerPreviousMonth => null;
+
+  String? get schedulerPreviousWeek => null;
+
+  String? get schedulerRemoveDay => null;
+
+  String? schedulerResize({required Object event}) => null;
+
+  String? get schedulerToday => null;
+
+  String? get schedulerView => null;
+
+  String? get schedulerWeek => null;
 
   String? get selectClear => null;
 
@@ -768,6 +966,33 @@ final class IdsKoreanMessages with IdsMessages {
   String get drawerHandle => '끌어서 크기 조절';
 
   @override
+  String get editorAlignCenter => '가운데 정렬';
+
+  @override
+  String get editorAlignJustify => '양쪽 정렬';
+
+  @override
+  String get editorAlignLeft => '왼쪽 정렬';
+
+  @override
+  String get editorAlignRight => '오른쪽 정렬';
+
+  @override
+  String get editorBlockDelete => '삭제';
+
+  @override
+  String get editorBlockDuplicate => '복제';
+
+  @override
+  String get editorBlockHandle => '블록 메뉴';
+
+  @override
+  String get editorBlockInsertBelow => '아래에 블록 넣기';
+
+  @override
+  String get editorBlockTurnInto => '바꾸기';
+
+  @override
   String get editorBlockType => '문단 모양';
 
   @override
@@ -783,16 +1008,109 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorBulletList => '글머리 기호 목록';
 
   @override
+  String get editorCallout => '콜아웃';
+
+  @override
+  String get editorCalloutKind => '콜아웃 종류';
+
+  @override
+  String get editorCalloutRemove => '콜아웃 해제';
+
+  @override
   String get editorCode => '코드';
 
   @override
   String get editorCodeBlock => '코드 블록';
 
   @override
+  String get editorCodeLanguage => '코드 언어';
+
+  @override
+  String get editorCodeLanguageSearch => '언어 찾기';
+
+  @override
+  String get editorCodePlainText => '일반 텍스트';
+
+  @override
+  String get editorColor => '색';
+
+  @override
+  String get editorColorDanger => '위험';
+
+  @override
+  String get editorColorDefault => '기본';
+
+  @override
+  String get editorColorInfo => '정보';
+
+  @override
+  String get editorColorNone => '없음';
+
+  @override
+  String get editorColorPrimary => '강조 1';
+
+  @override
+  String get editorColorSecondary => '강조 2';
+
+  @override
+  String get editorColorSuccess => '성공';
+
+  @override
+  String get editorColorTertiary => '강조 3';
+
+  @override
+  String get editorColorWarning => '경고';
+
+  @override
   String get editorContent => '본문';
 
   @override
+  String get editorDetails => '토글';
+
+  @override
+  String get editorDetailsSummary => '제목';
+
+  @override
+  String get editorDetailsToggle => '내용 펼치기';
+
+  @override
   String editorHeading({required Object level}) => '제목 ${_format(level)}';
+
+  @override
+  String get editorHighlight => '형광펜';
+
+  @override
+  String get editorHighlightColor => '형광펜 색';
+
+  @override
+  String get editorHorizontalRule => '구분선';
+
+  @override
+  String get editorImage => '그림';
+
+  @override
+  String get editorImageAlt => '대체 텍스트';
+
+  @override
+  String get editorImageAltPlaceholder => '그림을 설명하는 글';
+
+  @override
+  String get editorImageInsert => '넣기';
+
+  @override
+  String get editorImagePickFiles => '파일에서 고르기';
+
+  @override
+  String get editorImageUploadFailed => '그림을 올리지 못했습니다';
+
+  @override
+  String get editorImageUploading => '그림을 올리는 중입니다';
+
+  @override
+  String get editorImageUrl => '그림 주소';
+
+  @override
+  String get editorImageUrlInvalid => 'http 나 https 로 시작하는 주소를 넣어 주세요';
 
   @override
   String get editorItalic => '기울임';
@@ -810,13 +1128,88 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorLinkUrl => '링크 주소';
 
   @override
+  String get editorMentionEmpty => '맞는 사람이 없습니다';
+
+  @override
+  String get editorMentionMenu => '멘션';
+
+  @override
+  String get editorMentionSearching => '찾는 중…';
+
+  @override
   String get editorOrderedList => '번호 목록';
 
   @override
   String get editorParagraph => '문단';
 
   @override
+  String get editorSlashMenu => '블록 넣기';
+
+  @override
+  String get editorSlashMenuEmpty => '맞는 블록이 없습니다';
+
+  @override
   String get editorStrike => '취소선';
+
+  @override
+  String get editorSubscript => '아래 첨자';
+
+  @override
+  String get editorSuperscript => '위 첨자';
+
+  @override
+  String get editorTable => '표';
+
+  @override
+  String get editorTableAddColumnAfter => '오른쪽에 열 추가';
+
+  @override
+  String get editorTableAddColumnBefore => '왼쪽에 열 추가';
+
+  @override
+  String get editorTableAddRowAfter => '아래에 행 추가';
+
+  @override
+  String get editorTableAddRowBefore => '위에 행 추가';
+
+  @override
+  String get editorTableDelete => '표 지우기';
+
+  @override
+  String get editorTableDeleteColumn => '열 지우기';
+
+  @override
+  String get editorTableDeleteRow => '행 지우기';
+
+  @override
+  String get editorTableHeaderRow => '머리글 행';
+
+  @override
+  String get editorTableInsert => '표 넣기';
+
+  @override
+  String get editorTableMergeCells => '셀 합치기';
+
+  @override
+  String editorTableSize({required Object rows, required Object cols}) => '${_format(rows)}행 ${_format(cols)}열';
+
+  @override
+  String get editorTableSplitCell => '셀 나누기';
+
+  @override
+  String editorTaskItem({required Object text}) => '할 일: ${_format(text)}';
+
+  @override
+  String get editorTaskItemEmpty => '빈 할 일';
+
+  @override
+  String get editorTaskList => '할 일 목록';
+
+  @override
+  String get editorTextAlign => '정렬';
+
+  @override
+  String get editorTextColor => '글자 색';
 
   @override
   String get editorToolbar => '서식';
@@ -1177,6 +1570,108 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get resizableWidth => '너비';
+
+  @override
+  String get richTextCalloutDanger => '위험';
+
+  @override
+  String get richTextCalloutInfo => '참고';
+
+  @override
+  String get richTextCalloutSuccess => '팁';
+
+  @override
+  String get richTextCalloutWarning => '경고';
+
+  @override
+  String get schedulerAddDay => '하루 늘리기';
+
+  @override
+  String get schedulerAllDay => '종일';
+
+  @override
+  String get schedulerDay => '일';
+
+  @override
+  String get schedulerDayCount => '보여 줄 날 수';
+
+  @override
+  String schedulerDays({required Object count}) => '${_format(count)}일';
+
+  @override
+  String schedulerDragAt({required Object time}) => '${_format(time)} 시작';
+
+  @override
+  String schedulerDragCancel({required Object event}) => '${_format(event)}을(를) 제자리에 두었습니다.';
+
+  @override
+  String schedulerDragEnd({required Object event}) => '${_format(event)}을(를) 옮겼습니다.';
+
+  @override
+  String get schedulerDragHint => '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.';
+
+  @override
+  String get schedulerDragMonthHint => '일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.';
+
+  @override
+  String schedulerDragStart({required Object event}) => '${_format(event)}을(를) 집었습니다.';
+
+  @override
+  String get schedulerGoToDate => '날짜로 이동';
+
+  @override
+  String get schedulerLabel => '일정표';
+
+  @override
+  String get schedulerMonth => '월';
+
+  @override
+  String schedulerMore({required Object count}) => '+${_format(count)}개';
+
+  @override
+  String schedulerMoreLabel({required Object date, required Object count}) => '${_format(date)} 일정 ${_format(count)}개 더 보기';
+
+  @override
+  String get schedulerNavigation => '날짜 이동';
+
+  @override
+  String get schedulerNextDay => '다음 날';
+
+  @override
+  String schedulerNextDays({required Object count}) => '다음 ${_format(count)}일';
+
+  @override
+  String get schedulerNextMonth => '다음 달';
+
+  @override
+  String get schedulerNextWeek => '다음 주';
+
+  @override
+  String get schedulerPreviousDay => '이전 날';
+
+  @override
+  String schedulerPreviousDays({required Object count}) => '이전 ${_format(count)}일';
+
+  @override
+  String get schedulerPreviousMonth => '이전 달';
+
+  @override
+  String get schedulerPreviousWeek => '이전 주';
+
+  @override
+  String get schedulerRemoveDay => '하루 줄이기';
+
+  @override
+  String schedulerResize({required Object event}) => '${_format(event)} 끝 시각';
+
+  @override
+  String get schedulerToday => '오늘';
+
+  @override
+  String get schedulerView => '보기';
+
+  @override
+  String get schedulerWeek => '주';
 
   @override
   String get selectClear => '선택 지우기';

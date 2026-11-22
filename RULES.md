@@ -29,7 +29,9 @@ These files are written by `pnpm codegen` (Style Dictionary, message generation 
 - `packages/react/src/tokens/component-tokens.ts` and
   `packages/flutter/lib/tokens/ids_component_tokens.dart` (`IdsComponentColors`,
   `IdsComponentShadows`), written from `packages/core/tokens/component.json` and `shadow.json`
-- `packages/react/src/internal/messages-catalog.ts`
+- `packages/react/src/internal/messages-catalog.ts` and
+  `packages/react/src/components/form/editor/messages-catalog.ts` (the `editor` group, kept out of the
+  shared catalog every component loads)
 - `packages/react/messages/en.json`
 - `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
   `packages/core/color-roles.json`)
@@ -92,6 +94,10 @@ A root that recognises another component also accepts that component's root
 root (`docsReadFromTheRoot` in `.storybook/main.ts`), because the wrapper has no destructured
 defaults to read. `tests/use-client.test.ts` checks both directions, and
 `tests/server-components.test.ts` renders components, parts and `Style` from a Server Component.
+`RichText` (`typography/rich-text`) is the one component rendered only on the server: its
+`index.tsx` and `render.tsx` parse and draw the document with no client root, so a Server Component
+sends IDS components and no Tiptap. `tests/use-client.test.ts` lists them in
+`RENDERED_ONLY_ON_THE_SERVER`.
 
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 
@@ -121,6 +127,9 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     `editor/engine.tsx` imports it at runtime, and `load-engine.ts` loads that with `import()`
     when an Editor mounts; Markdown goes through `@tiptap/markdown`, loaded the same way only for
     `format="markdown"`. The shell, toolbar and parts are IDS's code and use Tiptap's types only.
+    The document schema (nodes, markdown rules, image and link checks) and the text styles live in
+    `typography/rich-text`, which the `@gsainfoteam/ids-react/rich-text` entry renders on the
+    server with `@tiptap/static-renderer`, mapping each block to an IDS component.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a
@@ -466,8 +475,9 @@ mode. No layer mixes two tokens with `color-mix`.
   | `shadow-surface` | `shadow-1` | `shadow-0` | an outline Card |
   | `bg-control-outline`, `border-control-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline buttons, Checkbox, Radio, pill Tabs |
   | `bg-field-outline`, `border-field-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline fields |
-  | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea and Editor bar seam |
+  | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea bar seam |
   | `bg-field-code-outline` | `bg-neutral-soft` | `bg-surface` | code in an outline Editor |
+  | `bg-field-block-outline` | `bg-block` | `bg-surface` | a table header in an outline Editor |
   | `bg-switch-thumb` | `bg-base` | `bg-neutral-solid` | an off Switch thumb |
   | `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode |
   | `bg-qr-code-inverse`, `text-qr-code-inverse` | `bg-neutral-solid`, `text-on-neutral-solid` | `bg-base`, `text-neutral-strong` | an inverted QRCode |
@@ -626,7 +636,7 @@ layer, soft and accent text under the text-color layer and the family-fill layer
 - Translucent layers over a background IDS does not know stay as they are: Image's hover scrim,
   Chip lines, the ScrollArea track, the DataTable loading veil, disabled opacity and backdrops,
   the hairline round an image, a color swatch or a slider track (`inset-ring-(--ids-color-text-neutral-strong)/N`),
-  with the focus halo and text selection. They are the only opacity modifiers on an IDS color;
+  with the focus halo and text and block selection. They are the only opacity modifiers on an IDS color;
   `tests/color-rules.test.ts` lists them and fails on any other, on `dark:`, on `color-mix` and on
   an `--ids-*` variable `ids.css` does not have.
 
@@ -653,7 +663,9 @@ height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regu
 utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which matches Pretendard GOV's
 x-height (0.53), so Geist Mono draws at full size level with the body text and any fallback font
 comes to the same x-height. Pretendard follows the monospace fonts in the stack, so Hangul in code
-falls back to it. Do not shrink it again with `text-[0.9em]`.
+falls back to it. Do not shrink it again with `text-[0.9em]`. The one exception is inline code in
+`document-text`, which sits at `0.875em` among 16px prose, where a full-size monospace word reads
+louder than the sentence around it.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
