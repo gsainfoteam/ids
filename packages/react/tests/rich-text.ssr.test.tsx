@@ -129,3 +129,20 @@ test('json content renders the same tree', () => {
   expect(html).toContain('<p>본문</p>');
   expect(html).not.toContain('<img');
 });
+
+test('a callout kind named like an Object property falls back to a note', () => {
+  const callout = (kind: string) => ({
+    type: 'callout',
+    attrs: { kind },
+    content: [{ type: 'paragraph', content: [{ type: 'text', text: kind }] }],
+  });
+  const html = renderToString(
+    <RichText
+      format="json"
+      value={{ type: 'doc', content: ['constructor', 'toString', '__proto__'].map(callout) }}
+    />,
+  );
+
+  expect(html.match(/role="note"/g)).toHaveLength(3);
+  expect(html.match(/참고/g)).toHaveLength(3);
+});

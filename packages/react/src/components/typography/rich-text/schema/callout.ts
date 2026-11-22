@@ -6,13 +6,13 @@ export const CALLOUT_KINDS = ['info', 'success', 'warning', 'danger'] as const;
 
 export type CalloutKind = (typeof CALLOUT_KINDS)[number];
 
-const GITHUB_ALERT_KIND: Record<string, CalloutKind> = {
-  note: 'info',
-  tip: 'success',
-  important: 'info',
-  warning: 'warning',
-  caution: 'danger',
-};
+const GITHUB_ALERT_KIND = new Map<string, CalloutKind>([
+  ['note', 'info'],
+  ['tip', 'success'],
+  ['important', 'info'],
+  ['warning', 'warning'],
+  ['caution', 'danger'],
+]);
 
 const GITHUB_ALERT_OF: Record<CalloutKind, string> = {
   info: 'NOTE',
@@ -26,7 +26,7 @@ export const isCalloutKind = (value: unknown): value is CalloutKind =>
 
 export const calloutKindOf = (value: unknown): CalloutKind => {
   const lower = typeof value === 'string' ? value.toLowerCase() : '';
-  return isCalloutKind(lower) ? lower : (GITHUB_ALERT_KIND[lower] ?? 'info');
+  return isCalloutKind(lower) ? lower : (GITHUB_ALERT_KIND.get(lower) ?? 'info');
 };
 
 const GITHUB_ALERT =
