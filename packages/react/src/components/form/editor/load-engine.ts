@@ -6,7 +6,12 @@ import type { IdsSize } from '../../../tokens/types';
 import type { AnyExtension } from '@tiptap/core';
 
 const FEATURE_LOADERS = {
-  highlight: once(() => import('@tiptap/extension-highlight').then((module) => module.Highlight)),
+  highlight: once(() =>
+    import('../../typography/rich-text/schema/color').then((module) => module.DocumentHighlight),
+  ),
+  textColor: once(() =>
+    import('../../typography/rich-text/schema/color').then((module) => module.DocumentTextColor),
+  ),
   subscript: once(() =>
     import('../../typography/rich-text/schema/script').then((module) => module.DocumentSubscript),
   ),

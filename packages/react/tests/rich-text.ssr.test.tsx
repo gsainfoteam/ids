@@ -154,3 +154,14 @@ test('sub and sup tags in markdown become subscript and superscript', () => {
   expect(html).toContain('mc<sup>2</sup>');
   expect(html).not.toContain('&lt;sub&gt;');
 });
+
+test('colored text and highlights draw IDS color roles, and an unknown color is dropped', () => {
+  const html = render(
+    '<span data-color="danger">마감</span> <mark data-color="success">완료</mark> ==기본== <span data-color="hotpink">분홍</span>',
+  );
+
+  expect(html).toContain('<span data-color="danger">마감</span>');
+  expect(html).toContain('<mark data-color="success">완료</mark>');
+  expect(html).toContain('<mark>기본</mark>');
+  expect(html).not.toContain('data-color="hotpink"');
+});

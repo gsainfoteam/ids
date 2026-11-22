@@ -831,6 +831,43 @@ test('Subscript and Superscript mark the selection and write sub and sup tags in
   await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('H<sub>2</sub><sup>O</sup>');
 });
 
+test('Color paints text and highlights with IDS color families and writes them as tags in markdown', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <IdsProvider theme={testTheme}>
+      <Editor format="markdown" aria-label="본문" defaultValue="마감" onValueChange={onValueChange}>
+        <Editor.Color />
+        <Editor.Content />
+      </Editor>
+    </IdsProvider>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await press('a');
+  await userEvent.click(page.getByRole('button', { name: '색' }));
+  const text = page.getByRole('group', { name: '글자 색' });
+  const highlight = page.getByRole('group', { name: '형광펜 색' });
+  await expect
+    .element(text.getByRole('button', { name: '기본' }))
+    .toHaveAttribute('aria-pressed', 'true');
+
+  await userEvent.click(text.getByRole('button', { name: '위험' }));
+  await userEvent.click(highlight.getByRole('button', { name: '성공' }));
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('<mark data-color="success"><span data-color="danger">마감</span></mark>');
+  await expect
+    .element(text.getByRole('button', { name: '위험' }))
+    .toHaveAttribute('aria-pressed', 'true');
+  const painted = content.element().querySelector('span[data-color="danger"]')!;
+  expect(getComputedStyle(painted).color).not.toBe(getComputedStyle(content.element()).color);
+
+  await userEvent.click(highlight.getByRole('button', { name: '없음' }));
+  await userEvent.click(text.getByRole('button', { name: '기본' }));
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('마감');
+});
+
 test('an extension loads only when its part is in the Editor', async () => {
   render(
     <>

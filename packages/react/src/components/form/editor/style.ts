@@ -5,6 +5,7 @@ import { documentText } from '../../typography/rich-text/style';
 
 import type { EditorVariant } from './root';
 import type { IdsSize } from '../../../tokens/types';
+import type { DocumentColor } from '../../typography/rich-text/document-colors';
 import type { CalloutKind } from '../../typography/rich-text/schema/callout';
 
 const placeholder = cn(
@@ -113,6 +114,22 @@ export const editorStyle = tv({
     dropCursor: cn(dragSurface.dropLine, 'translate-y-0'),
     dragPreview: cn('pointer-events-none concentric-p-2', dragSurface.preview),
     imageUrlError: 'text-caption-c1-regular text-danger',
+    colorPanel: 'flex w-max flex-col gap-3',
+    colorSection: 'flex flex-col gap-1.5',
+    colorTitle: 'text-caption-c1-medium text-neutral',
+    colorGrid: 'grid grid-cols-4 gap-1.5',
+    textSwatch: [
+      'inline-flex size-8 cursor-pointer items-center justify-center rounded-standard bg-surface text-body-b2-medium',
+      'inset-ring-1 inset-ring-neutral aria-pressed:inset-ring-2 aria-pressed:inset-ring-primary-strong',
+      'focus-ring state-layer hover:state-hover active:state-press',
+      'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+    ],
+    highlightSwatch: [
+      'inline-flex size-8 cursor-pointer items-center justify-center rounded-standard [&_svg]:size-4',
+      'aria-pressed:inset-ring-2 aria-pressed:inset-ring-primary-strong',
+      'focus-ring state-layer hover:state-hover active:state-press',
+      'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+    ],
     tableSizePicker: 'flex flex-col gap-2',
     tableSizeGrid: 'grid grid-cols-10 gap-1',
     tableSizeCell: [
@@ -164,6 +181,19 @@ export const editorStyle = tv({
       warning: { calloutKindIcon: 'scheme-warning' },
       danger: { calloutKindIcon: 'scheme-danger' },
     } satisfies Record<CalloutKind, object>,
+    swatch: {
+      none: {
+        textSwatch: 'text-neutral-strong',
+        highlightSwatch: 'bg-surface text-neutral inset-ring-1 inset-ring-neutral',
+      },
+      primary: { textSwatch: 'text-primary', highlightSwatch: 'bg-primary-soft' },
+      secondary: { textSwatch: 'text-secondary', highlightSwatch: 'bg-secondary-soft' },
+      tertiary: { textSwatch: 'text-tertiary', highlightSwatch: 'bg-tertiary-soft' },
+      info: { textSwatch: 'text-info', highlightSwatch: 'bg-info-soft' },
+      success: { textSwatch: 'text-success', highlightSwatch: 'bg-success-soft' },
+      warning: { textSwatch: 'text-warning', highlightSwatch: 'bg-warning-soft' },
+      danger: { textSwatch: 'text-danger', highlightSwatch: 'bg-danger-soft' },
+    } satisfies Record<DocumentColor | 'none', object>,
     blockEditor: {
       true: {},
       false: {},

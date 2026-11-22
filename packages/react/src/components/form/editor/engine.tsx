@@ -86,6 +86,7 @@ export function extensionsFor({
     }),
     ...(features.imageUpload ? features.imageUpload.imageUploadExtensions(images.start) : []),
     ...(features.highlight ? [features.highlight] : []),
+    ...(features.textColor ? [features.textColor] : []),
     ...(features.subscript ? [features.subscript] : []),
     ...(features.superscript ? [features.superscript] : []),
     ...(features.taskList ? features.taskList(taskLabel) : []),

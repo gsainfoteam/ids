@@ -24,7 +24,7 @@
 | 툴바 | `Editor.Content` 위아래의 부품 | 없음. 도구 부품을 넣으면 개발 중 경고를 띄우고 뺍니다 |
 | 불러오는 블록 | 넣은 부품의 블록만 | 표, 콜아웃, 토글, 할 일, 정렬, 형광펜까지 모두 |
 | `/` 블록 메뉴 | 불러온 블록만 | 모든 블록 |
-| BubbleMenu | 넣을 때만 | 늘 있음. 자식이 없으면 굵게, 기울임, 밑줄, 취소선, 코드, 형광펜, 링크 |
+| BubbleMenu | 넣을 때만 | 늘 있음. 자식이 없으면 굵게, 기울임, 밑줄, 취소선, 코드, 색, 링크 |
 | 블록 손잡이 | 없음 | 편집할 수 있으면 본문 왼쪽 여백에 나옴 |
 
 - 위아래 바가 있으면 Editor 는 회색 트레이가 되고 본문은 그 안의 카드가 됩니다. [DataTable](../../data/data-table/README.md) 과 같은 모양입니다. 바가 없으면 본문 상자 하나입니다.
@@ -77,6 +77,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | ------------------------------------------------------ | --------------------------------------------------------------- |
 | `Bold` `Italic` `Underline` `Strike` `Code`            | 글자 서식. 누른 상태가 커서 자리의 서식을 따릅니다               |
 | `Highlight`                                            | 형광펜. 색은 `bg-warning-soft` 와 `text-on-warning-soft` 입니다  |
+| `Color`                                                | 글자 색과 형광펜 색을 고르는 Popover. 색은 IDS 색 계열(강조 1~3, 정보, 성공, 경고, 위험)이라 테마와 다크 모드를 따릅니다 |
 | `Subscript` `Superscript`                              | 아래 첨자와 위 첨자. 마크다운에는 `<sub>2</sub>`, `<sup>2</sup>` 로 남습니다 |
 | `BulletList` `OrderedList` `Blockquote`                | 블록 서식                                                       |
 | `CodeBlock`                                            | 코드 블록. 본문의 코드 블록에는 언어 Select 와 복사 버튼이 붙고, 고른 언어로 색을 칠합니다. 긴 줄은 접지 않고 가로로 스크롤합니다 |
@@ -94,7 +95,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `Count`                                                | `maxLength` 에 대한 글자 수. TextArea.Count 와 같습니다           |
 
 - 도구는 `icon` 과 `aria-label` 로 아이콘과 이름을 바꿀 수 있습니다.
-- `Highlight`, `Subscript`, `Superscript`, `TaskList`, `TextAlign`, `Table`, `Callout`, `Details` 는 Editor 의 자식(`BubbleMenu` 의 자식 포함)에 있을 때만 그 Tiptap 확장을 엔진과 함께 `import()` 로 불러옵니다. 쓰지 않는 앱은 그 코드를 받지 않고, 스키마와 플러그인도 돌리지 않습니다.
+- `Highlight`, `Color`, `Subscript`, `Superscript`, `TaskList`, `TextAlign`, `Table`, `Callout`, `Details` 는 Editor 의 자식(`BubbleMenu` 의 자식 포함)에 있을 때만 그 Tiptap 확장을 엔진과 함께 `import()` 로 불러옵니다. 쓰지 않는 앱은 그 코드를 받지 않고, 스키마와 플러그인도 돌리지 않습니다.
 - 그래서 그 부품이 없으면 값에 있던 형광펜, 할 일, 정렬, 표, 콜아웃, 접는 블록도 읽지 않고 버립니다. 저장한 글에 쓰인 서식의 부품은 계속 둡니다.
 - 그림 노드는 저장된 그림을 지키려고 늘 엔진에 있습니다. 올리기, 자리표시, 파일 붙여넣기와 끌어 놓기는 `onImageUpload` 가 있을 때만 따로 불러옵니다.
 - 부품을 앱의 컴포넌트 안에 감싸 넣으면 Editor 가 찾지 못합니다. 개발 중에는 콘솔 경고가 뜨고 도구가 꺼집니다.
@@ -123,6 +124,14 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 
 - `Escape` 는 본문이 먹지 않고 위의 레이어로 넘깁니다. Dialog 안의 Editor 에서 `Escape` 를 누르면 Dialog 가 닫힙니다.
 - 블록 메뉴나 멘션 목록이 열려 있으면 `Escape` 는 그 목록만 닫고 Dialog 는 그대로 둡니다.
+
+## 색
+
+- `Editor.Color` 는 글자 색 여덟 칸(기본과 일곱 계열)과 형광펜 색 여덟 칸(없음과 일곱 계열)을 보여 줍니다. 고른 글에 지금 칠해진 색이 눌린 칸으로 보입니다.
+- 저장하는 값은 hex 가 아니라 계열 이름입니다(`primary`, `secondary`, `tertiary`, `info`, `success`, `warning`, `danger`). 앱이 테마를 바꾸거나 다크 모드로 바뀌어도 같은 글이 그 테마의 색으로 다시 그려집니다.
+- 글자 색은 `text-X`, 형광펜은 `bg-X-soft` 와 `text-on-X-soft` 입니다. 두 역할 모두 바탕에서 읽히는 대비를 IDS 가 보장하므로 임의의 색을 고르는 ColorPicker 는 두지 않습니다.
+- HTML 과 JSON 에는 `<span data-color="danger">`, `<mark data-color="success">` 로, 마크다운에도 같은 태그로 남습니다. 색이 없는 형광펜은 그대로 `==글==` 입니다.
+- 알 수 없는 계열 이름은 읽을 때 버립니다.
 
 ## 링크
 

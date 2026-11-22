@@ -10,6 +10,7 @@ import {
 } from './blocks';
 import { EditorBubbleMenu, type EditorBubbleMenuProps } from './bubble-menu';
 import { EditorCallout, type EditorCalloutProps } from './callout/tool';
+import { EditorColor, type EditorColorProps } from './color';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorCount, type EditorCountProps, type EditorCountState } from './count';
 import { EditorDetails, type EditorDetailsProps } from './details/tool';
@@ -95,6 +96,7 @@ export namespace Editor {
   export type ToolProps = EditorMarkProps;
   export type BlockTypeProps = EditorBlockTypeProps;
   export type LinkProps = EditorLinkProps;
+  export type ColorProps = EditorColorProps;
   export type ImageProps = EditorImageProps;
   export type HorizontalRuleProps = EditorHorizontalRuleProps;
   export type TableProps = EditorTableProps;
@@ -115,6 +117,7 @@ export namespace Editor {
   export const Highlight = EditorHighlight;
   export const Subscript = EditorSubscript;
   export const Superscript = EditorSuperscript;
+  export const Color = EditorColor;
   export const Link = EditorLink;
   export const Image = EditorImage;
   export const BulletList = EditorBulletList;

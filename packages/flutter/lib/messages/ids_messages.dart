@@ -197,6 +197,26 @@ mixin IdsMessages {
 
   String? get editorCodePlainText => null;
 
+  String? get editorColor => null;
+
+  String? get editorColorDanger => null;
+
+  String? get editorColorDefault => null;
+
+  String? get editorColorInfo => null;
+
+  String? get editorColorNone => null;
+
+  String? get editorColorPrimary => null;
+
+  String? get editorColorSecondary => null;
+
+  String? get editorColorSuccess => null;
+
+  String? get editorColorTertiary => null;
+
+  String? get editorColorWarning => null;
+
   String? get editorContent => null;
 
   String? get editorDetails => null;
@@ -208,6 +228,8 @@ mixin IdsMessages {
   String? editorHeading({required Object level}) => null;
 
   String? get editorHighlight => null;
+
+  String? get editorHighlightColor => null;
 
   String? get editorHorizontalRule => null;
 
@@ -292,6 +314,8 @@ mixin IdsMessages {
   String? get editorTaskList => null;
 
   String? get editorTextAlign => null;
+
+  String? get editorTextColor => null;
 
   String? get editorToolbar => null;
 
@@ -948,6 +972,36 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorCodePlainText => '일반 텍스트';
 
   @override
+  String get editorColor => '색';
+
+  @override
+  String get editorColorDanger => '위험';
+
+  @override
+  String get editorColorDefault => '기본';
+
+  @override
+  String get editorColorInfo => '정보';
+
+  @override
+  String get editorColorNone => '없음';
+
+  @override
+  String get editorColorPrimary => '강조 1';
+
+  @override
+  String get editorColorSecondary => '강조 2';
+
+  @override
+  String get editorColorSuccess => '성공';
+
+  @override
+  String get editorColorTertiary => '강조 3';
+
+  @override
+  String get editorColorWarning => '경고';
+
+  @override
   String get editorContent => '본문';
 
   @override
@@ -964,6 +1018,9 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorHighlight => '형광펜';
+
+  @override
+  String get editorHighlightColor => '형광펜 색';
 
   @override
   String get editorHorizontalRule => '구분선';
@@ -1090,6 +1147,9 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorTextAlign => '정렬';
+
+  @override
+  String get editorTextColor => '글자 색';
 
   @override
   String get editorToolbar => '서식';

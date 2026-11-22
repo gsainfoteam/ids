@@ -26,6 +26,7 @@ import {
 } from './blocks';
 import { EditorBubbleMenu } from './bubble-menu';
 import { EditorCallout } from './callout/tool';
+import { EditorColor } from './color';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorContext, type EditorImages } from './context';
 import { EditorCount } from './count';
@@ -98,6 +99,7 @@ const TOOLS = new Set<unknown>([
   EditorStrike,
   EditorCode,
   EditorHighlight,
+  EditorColor,
   EditorSubscript,
   EditorSuperscript,
   EditorLink,
@@ -151,7 +153,7 @@ const BLOCK_EDITOR_BUBBLE_MENU = (
     <EditorUnderline />
     <EditorStrike />
     <EditorCode />
-    <EditorHighlight />
+    <EditorColor />
     <EditorLink />
   </EditorBubbleMenu>
 );
@@ -202,15 +204,16 @@ function definedOnly(record: Record<string, string | undefined>) {
 
 type ToolFeature = Exclude<EditorFeature, 'imageUpload' | 'mention'>;
 
-const FEATURE_TOOLS: Record<ToolFeature, unknown> = {
-  highlight: EditorHighlight,
-  subscript: EditorSubscript,
-  superscript: EditorSuperscript,
-  taskList: EditorTaskList,
-  textAlign: EditorTextAlign,
-  table: EditorTable,
-  callout: EditorCallout,
-  details: EditorDetails,
+const FEATURE_TOOLS: Record<ToolFeature, unknown[]> = {
+  highlight: [EditorHighlight, EditorColor],
+  textColor: [EditorColor],
+  subscript: [EditorSubscript],
+  superscript: [EditorSuperscript],
+  taskList: [EditorTaskList],
+  textAlign: [EditorTextAlign],
+  table: [EditorTable],
+  callout: [EditorCallout],
+  details: [EditorDetails],
 };
 
 function featuresIn(
@@ -220,7 +223,7 @@ function featuresIn(
   return EDITOR_FEATURES.filter((feature) =>
     feature === 'imageUpload' || feature === 'mention'
       ? props[feature]
-      : props.everyBlock || containsElementOfType(source, new Set([FEATURE_TOOLS[feature]])),
+      : props.everyBlock || containsElementOfType(source, new Set(FEATURE_TOOLS[feature])),
   );
 }
 

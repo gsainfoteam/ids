@@ -518,6 +518,38 @@ export const Highlight: Story = {
   },
 };
 
+export const Color: Story = {
+  args: { defaultValue: '<p>마감은 3월 5일입니다.</p>', 'aria-label': '색 본문' },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Bold />
+      <Editor.Color />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.Color 는 고른 글에 글자 색과 형광펜 색을 칠합니다. 색은 hex 가 아니라 IDS 색 계열(강조 1~3, 정보, 성공, 경고, 위험)이라 테마와 다크 모드를 따르고, 글자는 text-X, 형광펜은 bg-X-soft 와 text-on-X-soft 로 그립니다. 마크다운에서는 <span data-color="danger">, <mark data-color="success"> 로 씁니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const content = await editableContent(canvas, '색 본문');
+    await userEvent.click(content);
+    selectText(content, '3월 5일');
+    await userEvent.click(canvas.getByRole('button', { name: '색' }));
+    const text = await within(document.body).findByRole('group', { name: '글자 색' });
+    await userEvent.click(within(text).getByRole('button', { name: '위험' }));
+    await waitFor(() =>
+      expect(args.onValueChange).toHaveBeenLastCalledWith(
+        '<p>마감은 <span data-color="danger">3월 5일</span>입니다.</p>',
+      ),
+    );
+  },
+};
+
 export const TaskList: Story = {
   args: { defaultValue: '<p>부스 신청</p>', 'aria-label': '할 일 본문' },
   render: (args) => (
@@ -777,6 +809,7 @@ export const FullDocument: Story = {
       <Editor.Strike />
       <Editor.Code />
       <Editor.Highlight />
+      <Editor.Color />
       <Editor.Subscript />
       <Editor.Superscript />
       <Editor.Link />
