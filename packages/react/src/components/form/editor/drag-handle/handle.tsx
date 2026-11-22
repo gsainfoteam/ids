@@ -35,6 +35,7 @@ import {
   deleteBlock,
   duplicateBlock,
   insertBlockBelow,
+  keepTheCaretInTheTable,
   moveBlock,
   selectBlock,
   turnBlockInto,
@@ -47,6 +48,7 @@ import { Menu } from '../../../overlay/menu';
 import { blocksAvailableIn, turnsIntoOtherBlocks } from '../blocks/catalog';
 import { useEditorContext } from '../context';
 import { EditorGlyphButton } from '../glyph-button';
+import { EditorTableMenuItems } from '../table/edit-menu';
 
 import type { BlockHoverStore, HoveredBlock } from './store';
 import type { Editor as TiptapEditor } from '@tiptap/core';
@@ -60,6 +62,8 @@ type Gap = { pos: number; y: number };
 type DropLine = { pos: number; style: CSSProperties };
 
 type Dragged = { block: HoveredBlock; clone: Node; box: CSSProperties };
+
+const isATable = (node: ProseMirrorNode) => node.type.name === 'table';
 
 const FIRST_LINE = 'p,h1,h2,h3,h4,h5,h6,pre,[data-type=detailsSummary]';
 const DRAG_ID = 'ids-editor-block';
@@ -312,7 +316,10 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
       <Menu
         open={menuBlock !== null}
         onOpenChange={(open) => {
-          if (open && editor && block) selectBlock(editor, block.pos);
+          if (open && editor && block && node) {
+            if (isATable(node)) keepTheCaretInTheTable(editor, block.pos, node);
+            else selectBlock(editor, block.pos);
+          }
           setMenuBlock(open ? block : null);
           if (!open && editor) handBackFocusTo(editor, handleRef.current);
         }}
@@ -366,6 +373,12 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
             <DocumentDuplicateIcon aria-hidden="true" />
             {t('editor.blockDuplicate')}
           </Menu.Item>
+          {node && isATable(node) && (
+            <>
+              <Menu.Separator />
+              <EditorTableMenuItems deletesTheTable={false} />
+            </>
+          )}
           <Menu.Separator />
           <Menu.Item onSelect={run(deleteBlock)} className={styles.destructiveItem()}>
             <TrashIcon aria-hidden="true" />

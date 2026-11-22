@@ -55,6 +55,21 @@ export function selectBlock(editor: TiptapEditor, pos: number) {
   editor.commands.setNodeSelection(pos);
 }
 
+const INSIDE_THE_LAST_CELL = 4;
+
+export function keepTheCaretInTheTable(editor: TiptapEditor, pos: number, table: ProseMirrorNode) {
+  const { from, to } = editor.state.selection;
+  if (from > pos && to < after(pos, table)) return;
+  editor
+    .chain()
+    .command(({ tr }) => {
+      const lastCell = tr.doc.resolve(after(pos, table) - INSIDE_THE_LAST_CELL);
+      tr.setSelection(TextSelection.near(lastCell, -1));
+      return true;
+    })
+    .run();
+}
+
 export function moveBlock(editor: TiptapEditor, from: number, to: number) {
   const { state } = editor.view;
   const node = state.doc.nodeAt(from);
