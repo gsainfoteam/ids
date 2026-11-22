@@ -1,8 +1,21 @@
-import { tv } from '../../../utils';
+import { cn, tv } from '../../../utils';
+
+export const codeTokens = cn(
+  '[&_[data-token=comment]]:text-neutral [&_[data-token=comment]]:italic',
+  '[&_[data-token=keyword]]:text-primary',
+  '[&_[data-token=string]]:text-success',
+  '[&_[data-token=inserted]]:text-success',
+  '[&_[data-token=number]]:text-warning',
+  '[&_[data-token=function]]:text-tertiary',
+  '[&_[data-token=property]]:text-secondary',
+  '[&_[data-token=tag]]:text-secondary',
+  '[&_[data-token=deleted]]:text-danger',
+  '[&_[data-token=punctuation]]:text-neutral',
+);
 
 export const codeBlockStyle = tv({
   slots: {
-    root: 'relative flex min-w-0 flex-col rounded-container text-neutral-bold',
+    root: 'relative flex min-w-0 flex-col rounded-container text-neutral-strong',
     caption: [
       'flex min-h-[calc(var(--ids-size-control-tiny)+--spacing(3))] min-w-0 items-center gap-2',
       'ps-4 pe-[calc(var(--ids-size-control-tiny)+--spacing(3))]',
@@ -14,36 +27,24 @@ export const codeBlockStyle = tv({
     status: 'sr-only',
     scroller: 'min-w-0 rounded-[inherit]',
     pre: 'rounded-[inherit] py-3 font-mono text-body-b3-regular',
-    code: [
-      'block [--code-block-gutter:0px]',
-      '[&_[data-token=comment]]:text-neutral [&_[data-token=comment]]:italic',
-      '[&_[data-token=keyword]]:text-primary',
-      '[&_[data-token=string]]:text-success',
-      '[&_[data-token=inserted]]:text-success',
-      '[&_[data-token=number]]:text-warning',
-      '[&_[data-token=function]]:text-tertiary',
-      '[&_[data-token=property]]:text-secondary',
-      '[&_[data-token=tag]]:text-secondary',
-      '[&_[data-token=deleted]]:text-danger',
-      '[&_[data-token=punctuation]]:text-neutral',
-    ],
+    code: ['block [--code-block-gutter:0px]', codeTokens],
     line: [
       'inline-block min-h-lh w-full pe-4 align-top',
       'ps-[calc(--spacing(4)+var(--code-block-gutter))]',
-      'data-highlighted:shadow-[inset_2px_0_0_var(--ids-color-bg-primary)]',
+      'data-highlighted:shadow-[inset_2px_0_0_var(--ids-color-bg-primary-solid)]',
     ],
     fold: 'flex justify-center px-4 pb-3',
   },
   variants: {
     variant: {
       outline: {
-        root: 'bg-neutral-subtlest p-px shadow-xs inset-ring-1 inset-ring-neutral',
-        line: 'data-highlighted:bg-neutral-subtle',
+        root: 'p-px shadow-xs inset-ring-1 inset-ring-neutral',
+        line: 'data-highlighted:bg-neutral-soft',
       },
       soft: {
-        root: 'bg-neutral-subtle',
-        divider: 'bg-neutral-subtlest',
-        line: 'data-highlighted:bg-neutral-subtlest',
+        root: 'bg-block',
+        divider: 'bg-base',
+        line: 'data-highlighted:bg-base',
       },
     },
     wrap: {

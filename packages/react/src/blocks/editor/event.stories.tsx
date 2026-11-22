@@ -6,6 +6,7 @@ import { Button } from '../../components/action/button';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { DateField } from '../../components/form/date-field';
 import { Editor } from '../../components/form/editor';
@@ -147,7 +148,7 @@ export const PC: Story = {
               )}
             </Card.Content>
 
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button variant="outline">취소</Button>
               <Button type="submit">만들기</Button>
             </Card.Footer>
@@ -168,7 +169,7 @@ export const PC: Story = {
               />
               <Card.Title className="text-headline-h5-bold">{name || '행사 이름'}</Card.Title>
             </Card.Header>
-            <Item.Group size="tiny" aria-label="행사 정보">
+            <ItemGroup size="tiny" aria-label="행사 정보">
               <Item>
                 <Item.Content>
                   <Item.Description>날짜</Item.Description>
@@ -195,7 +196,7 @@ export const PC: Story = {
                   <Item.Title>{capacity ? `${capacity}명` : '제한 없음'}</Item.Title>
                 </Item.Content>
               </Item>
-            </Item.Group>
+            </ItemGroup>
             <Card.Footer>
               <Button className="w-full" disabled={!signUp}>
                 {signUp ? '신청하기' : '신청을 받지 않아요'}

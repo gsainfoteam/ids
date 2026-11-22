@@ -1,12 +1,12 @@
 import { tv } from '../../../utils';
 
-import type { ItemGroupVariant, ItemVariant } from '.';
+import type { ItemVariant } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
 export const itemStyle = tv({
   slots: {
     root: [
-      'group/item relative isolate flex w-full min-w-0 items-center text-start text-neutral-bold',
+      'group/item relative isolate flex w-full min-w-0 items-center text-start text-neutral-strong',
       'state-layer data-selected:state-press',
       'transition-[--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
@@ -22,27 +22,18 @@ export const itemStyle = tv({
       'ms-auto flex shrink-0 items-center gap-2',
       "[&>svg]:pointer-events-none [&>svg:not([class*='text-'])]:text-neutral [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ],
-    group: 'flex min-w-0 flex-col',
-    groupItem: 'flex',
   },
   variants: {
-    groupVariant: {
-      bordered: {
-        group: 'divide-y divide-neutral [&>li>[data-item]]:rounded-none',
-      },
-      separated: { group: 'gap-2' },
-      ghost: {},
-    } satisfies Record<ItemGroupVariant, object>,
     variant: {
       ghost: {},
       outline: { root: 'inset-ring-1 inset-ring-neutral' },
-      soft: { root: 'bg-neutral-subtle' },
+      soft: { root: 'bg-block' },
     } satisfies Record<ItemVariant, object>,
     media: {
       ghost: {},
-      soft: { media: 'rounded-standard bg-neutral-subtle text-neutral-bold' },
+      soft: { media: 'rounded-standard bg-neutral-soft text-neutral-strong' },
       outline: {
-        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-neutral-bold',
+        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-neutral-strong',
       },
     } satisfies Record<ItemVariant, object>,
     size: {
@@ -50,8 +41,8 @@ export const itemStyle = tv({
         root: [
           'min-h-14 gap-3 concentric-p-3 [--item-padding:calc(var(--spacing)*3)]',
           '[--item-media-ratio:calc(8/14)] [--item-row-height:calc(var(--spacing)*14)]',
-          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-body-b3-medium)*var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular)*var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
-          '[--item-row-largest:calc(var(--ids-text-body-b3-medium)*var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular)*var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
+          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
+          '[--item-row-largest:calc(var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
         ],
         title: 'text-body-b3-medium',
         description: 'text-body-b3-regular',
@@ -60,8 +51,8 @@ export const itemStyle = tv({
         root: [
           'min-h-10 gap-2 concentric-p-2 [--item-padding:calc(var(--spacing)*2)]',
           '[--item-media-ratio:calc(7/11)] [--item-row-height:calc(var(--spacing)*11)]',
-          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-caption-c1-medium)*var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular)*var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
-          '[--item-row-largest:calc(var(--ids-text-caption-c1-medium)*var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular)*var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
+          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
+          '[--item-row-largest:calc(var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
         ],
         title: 'text-caption-c1-medium',
         description: 'text-caption-c1-regular',
@@ -95,7 +86,6 @@ export const itemStyle = tv({
     },
   ],
   defaultVariants: {
-    groupVariant: 'ghost',
     variant: 'ghost',
     media: 'ghost',
     size: 'standard',

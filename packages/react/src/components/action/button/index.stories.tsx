@@ -273,7 +273,7 @@ export const MarkADestructiveAction: Story = {
     <div className="flex gap-2">
       <Button variant="outline">취소</Button>
       <Button colorScheme="danger">삭제</Button>
-      <span data-probe className="bg-danger ring-danger/40 hidden" />
+      <span data-probe className="bg-danger-solid ring-danger-strong/40 hidden" />
     </div>
   ),
   parameters: {

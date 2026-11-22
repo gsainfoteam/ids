@@ -6,6 +6,7 @@ import { Showcase } from '~story-kit';
 
 import { Card } from '../../data/card';
 import { Item } from '../../data/item';
+import { ItemGroup } from '../../data/item-group';
 import { TextField } from '../../form/text-field';
 
 import { Highlight } from '.';
@@ -136,7 +137,7 @@ export const SearchResults: Story = {
           data-lpignore="true"
         />
         <Card size="tiny">
-          <Item.Group aria-label="검색 결과">
+          <ItemGroup aria-label="검색 결과">
             {POSTS.map((post) => (
               <Item key={post.id}>
                 <Item.Content>
@@ -149,7 +150,7 @@ export const SearchResults: Story = {
                 </Item.Content>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Card>
       </div>
     );

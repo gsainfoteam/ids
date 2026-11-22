@@ -89,7 +89,7 @@ export const PC: Story = {
             </form>
           </Card.Content>
 
-          <Card.Footer className="justify-center border-t">
+          <Card.Footer className="justify-center">
             처음이신가요?
             <Link href="#sign-up">회원가입</Link>
           </Card.Footer>

@@ -1,4 +1,4 @@
-import { type FormEvent } from 'react';
+import type { FormEvent } from 'react';
 
 import { DevicePhoneMobileIcon, KeyIcon } from '@heroicons/react/24/outline';
 
@@ -42,7 +42,7 @@ export const PC: Story = {
         </Card.Header>
 
         <Card.Content>
-          <Tabs defaultValue="app" className="flex flex-col gap-5">
+          <Tabs defaultValue="app" appearance="segmented" className="gap-5">
             <Tabs.List aria-label="인증 방법" stretch>
               <Tabs.Trigger value="app">
                 <DevicePhoneMobileIcon />
@@ -113,7 +113,7 @@ export const PC: Story = {
           </Tabs>
         </Card.Content>
 
-        <Card.Footer className="justify-center border-t">
+        <Card.Footer className="justify-center">
           휴대폰을 잃어버렸나요?
           <Link href="#account-recovery">도움 받기</Link>
         </Card.Footer>

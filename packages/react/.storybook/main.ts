@@ -21,6 +21,7 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: ['@storybook/addon-themes', '@storybook/addon-docs', '@storybook/addon-a11y'],
   tags: { verification: { excludeFromDocsStories: true } },
+  staticDirs: ['./public'],
   framework: {
     name: '@storybook/react-vite',
     options: {},

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { ChartBarIcon, EnvelopeIcon, ShieldCheckIcon, UserIcon } from '@heroicons/react/16/solid';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -38,6 +39,46 @@ const columns = column.columns([
   column.accessor('email', { header: '이메일', enableSorting: false }),
   column.accessor('role', { header: '역할' }),
   column.accessor('score', { header: '점수', meta: { align: 'end' } }),
+]);
+
+const iconColumns = column.columns([
+  column.accessor('name', {
+    header: () => (
+      <>
+        <UserIcon />
+        이름
+      </>
+    ),
+    meta: { label: '이름' },
+  }),
+  column.accessor('email', {
+    header: () => (
+      <>
+        <EnvelopeIcon />
+        이메일
+      </>
+    ),
+    meta: { label: '이메일' },
+    enableSorting: false,
+  }),
+  column.accessor('role', {
+    header: () => (
+      <>
+        <ShieldCheckIcon />
+        역할
+      </>
+    ),
+    meta: { label: '역할' },
+  }),
+  column.accessor('score', {
+    header: () => (
+      <>
+        <ChartBarIcon />
+        점수
+      </>
+    ),
+    meta: { label: '점수', align: 'end' },
+  }),
 ]);
 
 const rowId = (member: Member) => member.id;
@@ -100,7 +141,7 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section title="Selection · Pagination">
-        <Showcase.Row>
+        <Showcase.Row label="selection">
           <DataTable
             columns={columns}
             data={MANY_MEMBERS}
@@ -110,9 +151,36 @@ export const Gallery: Story = {
             defaultRowSelection={{ m2: true, m3: true }}
             enablePagination
             defaultPagination={{ pageIndex: 0, pageSize: 4 }}
-            striped
             aria-label="선택과 페이지"
-            className="w-[30rem]"
+            className="w-[34rem]"
+          />
+        </Showcase.Row>
+        <Showcase.Row label="striped">
+          <DataTable
+            columns={columns}
+            data={MANY_MEMBERS}
+            getRowId={rowId}
+            getRowLabel={rowLabel}
+            enableRowSelection
+            defaultRowSelection={{ m2: true }}
+            enablePagination
+            defaultPagination={{ pageIndex: 0, pageSize: 4 }}
+            striped
+            size="tiny"
+            aria-label="줄무늬"
+            className="w-[34rem]"
+          />
+        </Showcase.Row>
+        <Showcase.Row label="column icons">
+          <DataTable
+            columns={iconColumns}
+            data={MEMBERS.slice(0, 4)}
+            getRowId={rowId}
+            getRowLabel={rowLabel}
+            enableRowSelection
+            defaultSorting={[{ id: 'name', desc: false }]}
+            aria-label="머리글 아이콘"
+            className="w-[34rem]"
           />
         </Showcase.Row>
       </Showcase.Section>

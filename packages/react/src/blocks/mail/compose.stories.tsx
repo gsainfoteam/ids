@@ -113,7 +113,7 @@ export const PC: Story = {
               </Field>
             </Card.Content>
 
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button type="button" variant="outline" onClick={() => toast('임시 저장했어요')}>
                 임시 저장
               </Button>

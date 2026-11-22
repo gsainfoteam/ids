@@ -1,7 +1,7 @@
 import { COLOR_KEYS, type IdsCornerShape, type IdsTheme, type IdsThemeOverrides } from './theme';
 import { checkColorDistinction } from './theme-checks';
 import { MODES, resolveColorsOnce, slotsOf, type IdsThemeIssue } from './theme-roles';
-import { IDS_COLOR_FAMILIES } from '../../../tokens/color-roles';
+import { IDS_COLOR_FAMILIES, IDS_NEUTRAL_STEPS } from '../../../tokens/color-roles';
 
 import type { IdsMode } from '../../../tokens/types';
 
@@ -79,9 +79,12 @@ function cornerShapeVariables(
 
 const writesColors = (theme: IdsThemeOverrides) => COLOR_KEYS.some((key) => key in theme);
 
-function writtenFamilies(theme: IdsThemeOverrides, complete: boolean) {
-  if (complete) return IDS_COLOR_FAMILIES;
-  return IDS_COLOR_FAMILIES.filter((family) => family !== 'neutral' || theme.neutral === 'tinted');
+const neutralSlotsWithACssFallback = new Set(Object.keys(IDS_NEUTRAL_STEPS));
+
+function writtenSlots(theme: IdsThemeOverrides, complete: boolean) {
+  const slots = IDS_COLOR_FAMILIES.flatMap(slotsOf);
+  if (complete || theme.neutral === 'tinted') return slots;
+  return slots.filter((slot) => !neutralSlotsWithACssFallback.has(slot));
 }
 
 function colorVariables(
@@ -94,8 +97,7 @@ function colorVariables(
   if (colors === undefined) return {};
   issues.push(...checkColorDistinction(colors));
 
-  const families = writtenFamilies(theme, complete);
-  const slots = families.flatMap(slotsOf);
+  const slots = writtenSlots(theme, complete);
 
   const variables: ThemeVariables = {};
   for (const mode of MODES)

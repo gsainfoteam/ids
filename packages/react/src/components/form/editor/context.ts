@@ -5,12 +5,19 @@ import { createContext, use, type KeyboardEvent, type ReactNode } from 'react';
 import { invariant } from '../../../utils';
 
 import type { editorStyle } from './style';
+import type { EditorFormat } from './value';
 import type { IdsSize } from '../../../tokens/types';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 import type { EditorContent } from '@tiptap/react';
 
+export type EditorImages = {
+  upload: (files: readonly File[], at: number) => void;
+  pending: number;
+};
+
 export type EditorContextValue = {
   editor: TiptapEditor | null;
+  format: EditorFormat;
   editable: boolean;
   disabled: boolean;
   readOnly: boolean;
@@ -19,7 +26,8 @@ export type EditorContextValue = {
   countId: string;
   maxLength: number | undefined;
   contentAttributes: Record<string, string>;
-  bubbles: ReactNode;
+  floating: ReactNode;
+  images: EditorImages | null;
   styles: ReturnType<typeof editorStyle>;
   EngineContent: typeof EditorContent | null;
 };

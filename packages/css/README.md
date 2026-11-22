@@ -65,33 +65,49 @@ React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다
 ```html
 <div
   data-mode="light"
-  style="--ids-theme-light-bg-primary: #155dfc; --ids-theme-light-text-on-primary: #ffffff; /* … 계열 × 역할 × 두 모드 */"
+  style="--ids-theme-light-bg-primary-solid: #155dfc; --ids-theme-light-text-on-primary-solid: #ffffff; /* … 계열 × 역할 × 두 모드 */"
 >
   <!-- 이 하위에서 CSS 변수 활성화 -->
 </div>
 ```
 
-- 색은 계열 여덟 개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`)가 같은 역할을 가진다. 이름은 `{bg|text|border}-{계열}[-{세기}]` 와 `text-on-{계열}[-{세기}]` 문법으로만 짓는다. 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 다.
+- 색은 계열 여덟 개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`)가 같은 역할을 가진다. 배경은 쓰임새로, 선과 글자는 세기로 부른다. 세기 단어는 `strong` 하나다.
 
   | 역할 | 쓰임 |
   |---|---|
-  | `bg-X` | 채움 |
-  | `bg-X-subtle` | 옅은 채움 |
-  | `bg-X-subtler` | 페이지와 `subtle` 사이의 띠, 트레이 |
-  | `text-on-X` | 채움 위 글자 |
-  | `text-on-X-subtle` | 옅은 채움 위 글자 |
-  | `text-on-X-subtler` | 띠 위 글자 |
-  | `text-X` | 채움 없는 바탕 위 글자와 아이콘 |
-  | `border-X` | 선. 브랜드와 상태는 `text-X` 와 같은 색, `border-neutral` 은 구조선 |
+  | `bg-X-solid` | 채움 |
+  | `bg-X-soft` | 옅은 채움 |
+  | `text-on-X-solid` | 채움 위 글자 |
+  | `text-on-X-soft` | 옅은 채움 위 글자 |
+  | `text-X` | 채움 없는 바탕 위 색 글자와 아이콘. neutral 은 보조 글자 |
+  | `text-X-strong` | 진한 글자. neutral 은 본문 |
+  | `border-X` | 옅은 선. `border-neutral` 은 구조선 |
+  | `border-X-strong` | 진한 선. 브랜드와 상태는 focus ring, invalid 테두리 |
 
-- 배경마다 짝이 있다. `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 다.
-- neutral 만 가진 역할: 페이지 바탕 `bg-neutral-subtlest`(light 0, dark 950)와 그 위 글자 `text-on-neutral-subtlest`, 본문 글자 `text-neutral-bold`(900 / 50), 중립 채움 `bg-neutral-bold` 와 그 위 글자 `text-on-neutral-bold`. `bg-neutral`(300 / 700)은 손잡이 회색, `text-neutral`(600 / 300)은 흐린 글자다.
+- neutral 만 가진 역할: 페이지 `bg-base`, 카드와 팝업의 면 `bg-surface`, 그 위에서 구역을 나누는 `bg-block`, 그리고 각각의 위 글자 `text-on-base`, `text-on-surface`, `text-on-block`.
+- 배경마다 짝이 있다. `bg-{배경}` 위 글자는 언제나 `text-on-{배경}` 이다.
+- 값은 계열마다 모드별 9단계 스케일에서 온다. neutral 은 아래 값이고, 다른 계열은 IdsProvider 가 앱의 색에서 만든다.
+
+  | 단계 | 역할 | light | dark |
+  |---|---|---|---|
+  | 1 | `bg-base` | `#ffffff` | `#0a0a0a` |
+  | 2 | `bg-surface` | `#ffffff` | `#171717` |
+  | 3 | `bg-block` | `#fafafa` | `#1e1e1e` |
+  | 4 | `bg-neutral-soft` | `#f5f5f5` | `#262626` |
+  | 5 | `border-neutral` | `#e5e5e5` | `#2e2e2e` |
+  | 6 | `border-neutral-strong` (손잡이) | `#d4d4d4` | `#3a3a3a` |
+  | 7 | 없음 | `#a3a3a3` | `#737373` |
+  | 8 | `text-neutral` | `#525252` | `#d4d4d4` |
+  | 9 | `text-neutral-strong`, `bg-neutral-solid` | `#0a0a0a` | `#fafafa` |
+
+- `text-on-*` 는 단계를 읽지 않는다. IdsProvider 가 배경마다 hover, press 층 아래에서도 APCA Lc 75 를 넘는 색을 골라 쓴다. 그래서 `text-on-*` 변수는 fallback 이 없다.
+- 손잡이는 `bg-(--ids-color-border-neutral-strong)` 다. 역할을 다른 속성으로 쓸 때만 임의 값을 쓴다.
 - hover 와 press 역할은 없다. 컴포넌트가 [`state-layer`](#state-layer) 로 그린다.
 
 - 역할 변수는 `--ids-color-{역할}` 이고, `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 연결한다.
-- 브랜드와 상태 계열의 변수는 IdsProvider 가 모두 쓴다. 테마가 `secondary`, `tertiary` 를 생략해도 primary 에서 만든 값을 쓴다. neutral 만 변수가 없으면 IDS 의 회색으로 그린다.
-- 공유 `--color-*` 이름은 없다. 유틸리티마다 이름공간이 따로라 앞머리가 속성을 말한다: `bg-primary-subtle`(배경), `text-on-primary-subtle`(글자), `border-primary`·`ring-primary`·`outline-primary`·`stroke-primary`(선), `fill-primary`(글자 역할).
-- `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`, `--ids-corner-shape` 를 요소에 주면 그 아래만 바뀐다. Tailwind 유틸리티(`rounded-standard`, `font-sans`, `bg-primary`)는 `@theme inline` 이라 이 변수를 바로 읽는다.
+- 브랜드와 상태 계열의 변수는 IdsProvider 가 모두 쓴다. 테마가 `secondary`, `tertiary` 를 생략해도 primary 에서 만든 값을 쓴다. neutral 은 `text-on-*` 를 뺀 역할에 위 회색이 fallback 으로 있다.
+- 공유 `--color-*` 이름은 없다. 유틸리티마다 이름공간이 따로라 앞머리가 속성을 말한다: `bg-primary-soft`(배경), `text-on-primary-soft`(글자), `border-primary-strong`·`ring-primary-strong`·`outline-primary-strong`·`stroke-primary-strong`(선), `fill-primary`(글자 역할).
+- `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`, `--ids-corner-shape` 를 요소에 주면 그 아래만 바뀐다. Tailwind 유틸리티(`rounded-standard`, `font-sans`, `bg-primary-solid`)는 `@theme inline` 이라 이 변수를 바로 읽는다.
 
 ### 폰트
 
@@ -116,10 +132,10 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 
 ```html
 <!-- 색상 -->
-<button class="bg-primary text-on-primary state-layer hover:state-hover active:state-press">확인</button>
-<span class="bg-primary-subtle text-on-primary-subtle">새 글</span>
+<button class="bg-primary-solid text-on-primary-solid state-layer hover:state-hover active:state-press">확인</button>
+<span class="bg-primary-soft text-on-primary-soft">새 글</span>
 <a class="text-primary">자세히 보기</a>
-<div class="border border-neutral bg-neutral-subtlest text-neutral-bold">카드</div>
+<div class="border border-neutral bg-base text-neutral-strong">카드</div>
 
 <!-- 타이포 (피그마 Text style = 크기+weight+leading+tracking 묶음) -->
 <p class="text-headline-h5-semibold">제목</p>
@@ -128,8 +144,8 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 <button class="text-caption-c1-medium">작은 CTA</button>
 
 <!-- 프리미티브 -->
-<span class="text-h1 font-bold tracking-tight leading-tight">48px</span>
-<span class="font-semibold tracking-normal leading-snug">…</span>
+<span class="text-h1 font-bold tracking-tight leading-h1">48px</span>
+<article class="text-b2 leading-prose">긴 글…</article>
 ```
 
 ### 타이포 스타일 이름
@@ -137,9 +153,29 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 | 그룹 | 클래스 예 |
 |---|---|
 | headline | `text-headline-h1-bold` … `text-headline-h6-medium` |
-| subtitle | `text-subtitle-s1-semibold`, `text-subtitle-s2-medium` |
 | body | `text-body-b1-regular` … `text-body-b3-bold` |
 | caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
+
+- 행간은 정수 px 값이고(c2 14px 말고는 4px 격자) `--ids-scale` 을 따라 함께 커진다. 프리미티브는 크기 단계와 같은 이름이다(`leading-b3` 는 20px).
+- `leading-prose` 는 긴 글의 행간 28px 다. `text-body-b2-regular leading-prose` 처럼 크기 뒤에 쓴다.
+- 자간은 headline 에만 있다: 20px 은 `tracking-snug`(-0.015em), 24~32px 은 `tracking-tight`(-0.025em), 40~48px 은 `tracking-tighter`(-0.035em).
+- 소제목은 body 의 semibold 를 쓴다. subtitle 스타일은 body 와 크기가 겹쳐서 없앴다.
+
+### document-text
+
+마크다운이나 Editor 처럼 태그만 있는 긴 글을 IDS 타입 스케일로 그린다.
+
+```html
+<article class="document-text text-body-b2-regular leading-prose text-neutral-strong">
+  <h1>제목</h1>
+  <p>본문</p>
+</article>
+```
+
+- 블록 사이 20px, 제목 바로 아래 12px, h1·h2 위 36px, h3~h6 위 28px, 목록 항목과 인용 안 문단 사이 8px.
+- h1 28px, h2 24px, h3 20px, h4 18px, h5·h6 16px, 모두 semibold. body 크기 제목은 `tracking-snug`. 목록(옅은 글머리표), 인용, 코드(블록은 테두리만, 인라인은 `bg-neutral-soft` 에 테두리), 링크(본문색에 옅은 밑줄), 구분선을 그린다.
+- 본문 크기와 행간은 넣지 않는다. 쓰는 쪽이 `text-body-*` 와 `leading-prose` 로 준다.
+- 안쪽 선택자는 `:where()` 라서 안쪽 태그에 준 클래스가 이긴다.
 
 ### focus-ring-visible
 
@@ -157,7 +193,7 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 hover 와 press 를 배경 위에 얹는 층으로 그린다. 색 역할이 아니다.
 
 ```html
-<button class="bg-primary-subtle text-on-primary-subtle state-layer data-hovered:state-hover data-active:state-press">…</button>
+<button class="bg-primary-soft text-on-primary-soft state-layer data-hovered:state-hover data-active:state-press">…</button>
 ```
 
 - `state-layer` 는 `--ids-state-color`(기본 `currentColor`, 요소의 글자색)를 `--ids-state-opacity` 만큼 `background-image` 로 칠한다. 쉴 때 불투명도는 0% 다.
@@ -165,13 +201,13 @@ hover 와 press 를 배경 위에 얹는 층으로 그린다. 색 역할이 아�
 - `state-fill` 은 채움 위의 층이다. 색을 검정(`--ids-state-fill-color`)으로, 불투명도를 `--ids-state-fill-hover`(10%), `--ids-state-fill-press`(18%)로 둔다. 채움이 회색 쪽이 아니라 같은 색의 진한 쪽으로 간다.
 
   ```html
-  <button class="bg-danger text-on-danger state-layer state-fill data-hovered:state-hover data-active:state-press">삭제</button>
+  <button class="bg-danger-solid text-on-danger-solid state-layer state-fill data-hovered:state-hover data-active:state-press">삭제</button>
   ```
 
-- 색 있는 soft 면과 상태 색의 outline, ghost 는 층 색을 계열 채움(`bg-X`)으로, 불투명도를 `--ids-state-tint-hover`(8%), `--ids-state-tint-press`(12%)로 둔다. 컴포넌트가 `--ids-state-color`, `--ids-state-layer-hover`, `--ids-state-layer-press` 에 직접 넣는다.
+- 색 있는 soft 면과 상태 색의 outline, ghost 는 층 색을 계열 채움(`bg-X-solid`)으로, 불투명도를 `--ids-state-tint-hover`(8%), `--ids-state-tint-press`(12%)로 둔다. 컴포넌트가 `--ids-state-color`, `--ids-state-layer-hover`, `--ids-state-layer-press` 에 직접 넣는다.
 - 나머지(neutral, 브랜드 색의 outline, ghost)는 글자색 층이다. IdsProvider 는 각 면이 그리는 층 아래에서도 글자 대비를 확인한다.
 - 고른, 켜진, 현재 항목도 같은 층을 쓴다(`state-press`, 열린 메뉴 항목과 강조된 목록 옵션은 `state-hover`).
-- 2~4px 막대(ScrollArea thumb, Drawer 손잡이, 크기 조절 손잡이)에서는 6~10% 층이 보이지 않는다. 이들은 `bg-neutral` 에서 hover 와 끌기 때 `text-neutral` 색(`bg-(--ids-color-text-neutral)`)으로 바뀐다.
+- 2~4px 막대(ScrollArea thumb, Drawer 손잡이, 크기 조절 손잡이)에서는 6~10% 층이 보이지 않는다. 이들은 `bg-(--ids-color-border-neutral-strong)` 에서 hover 와 끌기 때 `text-neutral` 색(`bg-(--ids-color-text-neutral)`)으로 바뀐다.
 
 ### shimmer
 
@@ -181,14 +217,14 @@ hover 와 press 를 배경 위에 얹는 층으로 그린다. 색 역할이 아�
 <p role="status" class="shimmer text-neutral">생각하는 중</p>
 ```
 
-- 바탕은 글자색(`currentColor`)이고, 띠는 `--ids-color-text-neutral-bold` 입니다. 띠가 지나가는 동안 대비가 글자색보다 낮아지지 않습니다.
+- 바탕은 글자색(`currentColor`)이고, 띠는 `--ids-color-text-neutral-strong` 입니다. 띠가 지나가는 동안 대비가 글자색보다 낮아지지 않습니다.
 - 글자만 칠합니다(`background-clip: text`). 같은 요소 안의 아이콘은 `currentColor` 로 그대로 그려집니다.
 - 쓰는 방향을 따릅니다. 오른쪽에서 왼쪽 글에서는 오른쪽에서 왼쪽으로 지나갑니다.
 - `prefers-reduced-motion: reduce` 면 움직이지 않고 보통 글자로 보입니다.
 
 | 변수 | 기본 | 뜻 |
 |---|---|---|
-| `--ids-shimmer-color` | `var(--ids-color-text-neutral-bold)` | 띠 색 |
+| `--ids-shimmer-color` | `var(--ids-color-text-neutral-strong)` | 띠 색 |
 | `--ids-shimmer-spread` | `3em` | 띠 가운데에서 한쪽 끝까지의 폭 |
 | `--ids-shimmer-duration` | `2s` | 한 번 지나가는 시간 |
 
@@ -201,8 +237,9 @@ hover 와 press 를 배경 위에 얹는 층으로 그린다. 색 역할이 아�
 - 이 패키지에는 브랜드 팔레트가 없다. 앱이 `IdsProvider theme` 에 `primary`(와 `secondary`, `tertiary`)를 주면 역할 색을 대비로 골라 위 변수로 넣는다.
 - corner shape: Provider 아래 요소는 `corner-shape: var(--ids-corner-shape, round)` 를 받고, `::before` `::after` 는 자기 요소의 모양을 물려받는다. `rounded-full` 은 `before:`, `after:` 같은 variant 를 붙여도 언제나 `round` 다.
   - `corner-shape` 를 지원하는 브라우저에서 `--ids-radius-*` 와 `concentric-p-*` 의 radius 는 `--ids-theme-corner-radius-scale`(squircle 이면 1.84) 배가 된다. squircle 모서리가 round 만큼 깊어진다.
-- 브랜드 색 글자는 배경에 따라 고른다. `bg-primary` 위는 `text-on-primary`, `bg-primary-subtle` 위는 `text-on-primary-subtle`, 채움 없는 페이지 위는 `text-primary` 다. 앞의 둘은 APCA Lc 75, `text-primary` 는 바탕과 `bg-primary-subtle` 에서 Lc 60 을 넘는다.
-- `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않는다. 밝은 색상은 흰 바탕에서 Lc 60 도 안 된다.
+- 브랜드 색 글자는 배경에 따라 고른다. `bg-primary-solid` 위는 `text-on-primary-solid`, `bg-primary-soft` 위는 `text-on-primary-soft`, 채움 없는 바탕 위는 `text-primary` 나 `text-primary-strong` 이다. `text-on-*` 와 `text-primary-strong` 은 APCA Lc 75, `text-primary` 는 `bg-base`, `bg-surface`, `bg-block`, `bg-primary-soft` 에서 Lc 60 을 넘는다.
+- 색 선은 `border-primary-strong` 이다(Lc 45). `border-primary` 는 옅은 선이라 대비 규칙이 없다.
+- `bg-primary-solid` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않는다. 밝은 색상은 흰 바탕에서 Lc 60 도 안 된다.
 
 `data-mode`는 `light` / `dark`.
 

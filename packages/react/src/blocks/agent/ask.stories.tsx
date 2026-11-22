@@ -5,6 +5,7 @@ import { SparklesIcon } from '@heroicons/react/24/outline';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Spinner } from '../../components/feedback/spinner';
 import { Questionnaire } from '../../components/form/questionnaire';
 
@@ -79,7 +80,7 @@ export const PC: Story = {
             {answers ? (
               <>
                 <Card size="tiny">
-                  <Item.Group size="tiny" aria-label="고른 답">
+                  <ItemGroup size="tiny" aria-label="고른 답">
                     {QUESTIONS.map((question) => {
                       const answer = answers[question.id];
                       const chosen = question.choices.find((choice) => choice.value === answer);
@@ -93,7 +94,7 @@ export const PC: Story = {
                         </Item>
                       );
                     })}
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
                 <p role="status" className="flex items-center gap-2">
                   <Spinner size="tiny" decorative />

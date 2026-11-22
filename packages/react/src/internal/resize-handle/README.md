@@ -269,7 +269,7 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 ### 왜 이렇게
 
 - SVG 한 장에 path 셋을 겹칩니다. 아래부터 포커스 띠, 선, 누를 띠입니다.
-  - 선은 `stroke: currentColor` 라 손잡이 상자의 글자색(쉴 때 `bg-neutral` 색, hover 와 `data-dragging` 에서 `text-neutral`)을 그대로 따릅니다.
+  - 선은 `stroke: currentColor` 라 손잡이 상자의 글자색(쉴 때 `bg-(--ids-color-border-neutral-strong)` 색, hover 와 `data-dragging` 에서 `text-neutral`)을 그대로 따릅니다.
   - 포커스 띠는 선보다 양쪽 3px 넓은 `primary` 40% 선이고, 안의 separator 에 포커스가 있을 때(`:has(:focus-visible)`)만 보입니다. 그때 선은 `primary` 가 됩니다. `focus-ring` 의 3px 링과 테두리 색을 호에 옮긴 것입니다.
   - 누를 띠는 투명한 24px 선에 `pointer-events="stroke"` 를 줍니다. 손잡이 상자와 SVG 는 `pointer-events: none` 이라, 누를 곳은 호를 따라가는 띠뿐이고 상자의 나머지(호 안쪽의 내용)는 그대로 눌립니다.
 - 띠에서 시작한 `pointerdown` 은 손잡이 상자의 React 핸들러로 올라가고, 끌기는 상자에 pointer capture 를 겁니다. capture 는 `pointer-events` 와 상관없이 걸립니다.
@@ -290,7 +290,7 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 | `resizeHandle.cursor.*`        | `ew-resize`, `ns-resize`, `nwse-resize`(RTL `nesw-resize`)                                   |
 | `resizeHandle.focus`           | `focus-ring`                                                                                 |
 | `resizeHandle.focusWithin`     | 안의 separator 가 `:focus-visible` 일 때 그리는 링                                           |
-| `resizeHandle.ladder.ink/pill` | 손잡이 색: `bg-neutral` → hover 와 `data-dragging` 에서 `text-neutral` 색                     |
+| `resizeHandle.ladder.ink/pill` | 손잡이 색: `bg-(--ids-color-border-neutral-strong)` → hover 와 `data-dragging` 에서 `text-neutral` 색                     |
 | `resizeHandle.ladder.line`     | 배경으로 그린 선: `border-neutral` 색 → hover 와 `data-dragging` 에서 `text-neutral` 색       |
 | `resizeHandle.disabled`        | `data-disabled` 면 포인터를 받지 않고 흐리게                                                 |
 | `resizeEdgeStyle`              | 가장자리 손잡이. `dimension` 이 자리와 막대, `band` 가 누를 띠를 정한다                      |

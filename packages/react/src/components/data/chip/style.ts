@@ -35,8 +35,8 @@ export const chipStyle = tv({
       info: { root: 'scheme-info' },
     } satisfies Record<ChipColorScheme, object>,
     variant: {
-      solid: { root: 'bg-scheme text-on-scheme state-fill' },
-      soft: { root: 'bg-scheme-subtle text-on-scheme-subtle state-scheme' },
+      solid: { root: 'bg-scheme-solid text-on-scheme-solid state-fill' },
+      soft: { root: 'bg-scheme-soft text-on-scheme-soft state-scheme' },
       outline: { root: 'bg-transparent text-scheme inset-ring-1 inset-ring-neutral state-scheme' },
     } satisfies Record<ChipVariant, object>,
     size: {
@@ -56,7 +56,7 @@ export const chipStyle = tv({
           'transition-[color,background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast)',
           'motion-reduce:transition-none',
           'data-hovered:state-hover data-active:state-press',
-          'data-selected:bg-scheme data-selected:text-on-scheme data-selected:state-fill',
+          'data-selected:bg-scheme-solid data-selected:text-on-scheme-solid data-selected:state-fill',
           'disabled:cursor-not-allowed disabled:opacity-50',
         ],
       },

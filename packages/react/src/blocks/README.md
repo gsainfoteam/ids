@@ -19,6 +19,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Profile](profile/README.md) | Members, Page |
 | [Search](search/README.md) | Command, Results |
 | [Sidebar](sidebar/README.md) | Collapsible, Inset, Simple |
+| [TopBar](top-bar/README.md) | Account, Simple |
 | [Mail](mail/README.md) | Compose, Inbox |
 | [Chat](chat/README.md) | Channel |
 | [Chatbot](chatbot/README.md) | Research, Simple, Thread, Welcome, Widget |
@@ -62,11 +63,12 @@ login/
   - 배치: `flex`, `grid`, 간격, 여백, 너비와 높이, 정렬, `hidden md:flex` 같은 폭별 표시.
   - 글자: 제목과 문단의 IDS 글자 크기(`text-headline-h3-bold`, `text-body-b2-regular`), `text-center`, `break-keep`.
   - 색, 테두리, 배경, 모서리, 그림자, `style` 은 쓰지 않습니다. 선은 `Divider`, 면은 `Card` 와 `Item`, 흐린 글자는 각 컴포넌트의 `Description` 파트가 그립니다.
-  - IDS 컴포넌트가 문서로 받는 className 은 씁니다: `Card.Header` 와 `Card.Footer` 의 `border-b`, `border-t`.
+  - IDS 컴포넌트가 문서로 받는 className 은 씁니다: `Card.Header` 의 `border-b`. `Card.Footer` 는 띠가 선을 그리므로 `border-t` 를 붙이지 않습니다.
 - **ghost 는 쓰지 않습니다.** 버튼은 `solid`, `outline`, `soft` 입니다.
 - **링크.**
   - 글 속 링크와 "비밀번호 찾기", "회원가입" 같은 안내 링크는 `Link` 입니다.
   - 표 칸과 바닥글 목록의 링크는 `Link colorScheme="neutral" underline="hover"` 입니다. 목록 안이라 밑줄 없이도 구별됩니다.
+  - 상단 바의 메뉴 링크는 `Link colorScheme="neutral" underline="none"` 이고, 지금 페이지에 `aria-current="page"` 를 줍니다.
   - 눈에 띄어야 할 행동은 `<a>` 를 감싼 `solid`, `outline`, `soft` 버튼(`Button asChild`)입니다.
   - 행과 카드 전체가 링크면 `Item asChild`, `Card asChild` 입니다.
   - 맨 `<a>` 는 `Button`, `IconButton`, `Item`, `Card`, `Link` 의 `asChild` 자식으로만 씁니다.

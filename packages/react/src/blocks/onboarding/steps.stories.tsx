@@ -8,6 +8,7 @@ import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Field } from '../../components/form/field';
 import { Switch } from '../../components/form/switch';
 import { TextField } from '../../components/form/text-field';
@@ -116,7 +117,7 @@ export const PC: Story = {
                       <h1 className="text-headline-h4-bold">알림을 받을까요?</h1>
                       <p className="text-body-b2-regular">나중에 설정에서 언제든 바꿀 수 있어요.</p>
                     </div>
-                    <Item.Group variant="separated" aria-label="알림">
+                    <ItemGroup variant="separated" aria-label="알림">
                       {ALERTS.map((alert) => (
                         <Item key={alert.id}>
                           <Item.Content>
@@ -131,7 +132,7 @@ export const PC: Story = {
                           </Item.Actions>
                         </Item>
                       ))}
-                    </Item.Group>
+                    </ItemGroup>
                   </>
                 )}
 
@@ -156,7 +157,7 @@ export const PC: Story = {
                 )}
               </Card.Content>
 
-              <Card.Footer className="justify-between border-t">
+              <Card.Footer className="justify-between">
                 <Button
                   variant="outline"
                   onClick={() => setStep(step === 0 ? STEPS.length : step - 1)}

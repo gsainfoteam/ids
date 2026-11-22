@@ -9,7 +9,7 @@ export const ratingStyle = tv({
     root: [
       'relative inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-standard outline-none',
       'scheme-primary data-invalid:scheme-danger',
-      'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-primary/40',
+      'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-primary-strong/40',
       'data-disabled:opacity-50',
     ],
     item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',

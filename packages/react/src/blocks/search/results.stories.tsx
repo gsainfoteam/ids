@@ -13,6 +13,7 @@ import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { TextField } from '../../components/form/text-field';
 import { Tabs } from '../../components/navigation/tabs';
 import { Highlight } from '../../components/typography/highlight';
@@ -171,7 +172,7 @@ export const PC: Story = {
                   </Empty>
                 ) : (
                   <Card size="tiny">
-                    <Item.Group aria-label={`${kind.label} 결과`}>
+                    <ItemGroup aria-label={`${kind.label} 결과`}>
                       {ofKind.map((result) => (
                         <Item key={result.id} asChild>
                           <a href={`#${result.id}`}>
@@ -189,7 +190,7 @@ export const PC: Story = {
                           </a>
                         </Item>
                       ))}
-                    </Item.Group>
+                    </ItemGroup>
                   </Card>
                 )}
               </Tabs.Content>

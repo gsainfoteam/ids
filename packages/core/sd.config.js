@@ -43,15 +43,7 @@ const resolveRef = (value, palette) => {
   return m ? (palette[m[1]] ?? value) : value;
 };
 
-const readColorEntriesWithoutCollision = (color, mode, palette) => {
-  const json = JSON.parse(
-    readFileSync(`./tokens/semantic/${color}.${mode}.json`, "utf8"),
-  );
-  return Object.entries(json.color ?? {}).map(([name, token]) => ({
-    name,
-    value: resolveRef(token.$value ?? token.value, palette),
-  }));
-};
+const NEUTRAL_ROLE_STEPS = JSON.parse(readFileSync("./neutral-roles.json", "utf8"));
 
 const isTypographyToken = (node) =>
   node &&
@@ -90,6 +82,14 @@ const readTypographyEntries = (palette) => {
     letterSpacing: resolveRef(entry.letterSpacing, palette),
   }));
 };
+
+const lineHeightAsMultiplier = (lineHeight, fontSize) => {
+  const raw = String(lineHeight);
+  if (raw.endsWith("px")) return parseFloat(raw) / parseFloat(fontSize);
+  return parseFloat(raw);
+};
+
+const isPixelLength = (value) => String(value).endsWith("px");
 
 const letterSpacingToPx = (letterSpacing, fontSize) => {
   const raw = String(letterSpacing);
@@ -297,7 +297,7 @@ const buildColorBridgeCSS = () =>
 const schemeLayer = (family) =>
   SCHEME_LAYER_IN_TEXT_COLOR.includes(family)
     ? ["currentColor", "var(--ids-state-hover)", "var(--ids-state-press)"]
-    : [`var(${colorVar(`bg-${family}`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
+    : [`var(${colorVar(`bg-${family}-solid`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
 
 const buildSchemeCSS = () =>
   COLOR_FAMILIES.map((family) => {
@@ -350,7 +350,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-skeleton-pulse {
   50% {
-    background-color: var(--ids-color-bg-neutral-subtler);
+    background-color: var(--ids-color-bg-block);
   }
 }
 
@@ -419,26 +419,26 @@ const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:wh
 }
 `;
 
-const focusRingUtility = (name, family) => `@utility ${name} {
+const focusRingUtility = (name, line) => `@utility ${name} {
   outline: none;
 
   ${focusRingTriggers("  ")} {
-    @apply ring-[3px] ring-${family}/40 inset-ring-${family};
+    @apply ring-[3px] ring-${line}/40 inset-ring-${line};
   }
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-danger;
+    @apply inset-ring-danger-strong;
 
     ${focusRingTriggers("    ")} {
-      @apply ring-danger/40 inset-ring-danger;
+      @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
 }
 `;
 
-const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary")}
-${focusRingUtility("focus-ring-scheme", "scheme")}
+const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary-strong")}
+${focusRingUtility("focus-ring-scheme", "scheme-strong")}
 ${focusRingUtility("focus-ring-current", "current")}
 
 @utility state-layer {
@@ -476,7 +476,7 @@ ${focusRingUtility("focus-ring-current", "current")}
   background-image: linear-gradient(
     90deg,
     currentColor calc(50% - var(--ids-shimmer-spread, 3em)),
-    var(--ids-shimmer-color, var(--ids-color-text-neutral-bold)) 50%,
+    var(--ids-shimmer-color, var(--ids-color-text-neutral-strong)) 50%,
     currentColor calc(50% + var(--ids-shimmer-spread, 3em))
   );
   background-size: calc(200% + 2 * var(--ids-shimmer-spread, 3em)) 100%;
@@ -493,6 +493,68 @@ ${focusRingUtility("focus-ring-current", "current")}
     background-image: none;
     -webkit-text-fill-color: currentColor;
     animation: none;
+  }
+}
+
+@utility document-text {
+  & > :where(* + *) {
+    @apply mt-5;
+  }
+  & > :where(* + :is(h1, h2)) {
+    @apply mt-9;
+  }
+  & > :where(* + :is(h3, h4, h5, h6)) {
+    @apply mt-7;
+  }
+  & > :where(:is(h1, h2, h3, h4, h5, h6) + *) {
+    @apply mt-3;
+  }
+  & :where(li + li, li > * + *, blockquote > * + *) {
+    @apply mt-2;
+  }
+
+  & :where(h1) {
+    @apply text-headline-h4-semibold;
+  }
+  & :where(h2) {
+    @apply text-headline-h5-semibold;
+  }
+  & :where(h3) {
+    @apply text-headline-h6-semibold;
+  }
+  & :where(h4) {
+    @apply text-body-b1-semibold tracking-snug;
+  }
+  & :where(h5, h6) {
+    @apply text-body-b2-semibold tracking-snug;
+  }
+
+  & :where(ul, ol) {
+    @apply ps-6;
+  }
+  & :where(ul) {
+    @apply list-disc marker:text-(--ids-color-border-neutral-strong);
+  }
+  & :where(ul ul) {
+    list-style-type: circle;
+  }
+  & :where(ol) {
+    @apply list-decimal marker:text-neutral;
+  }
+  & :where(blockquote) {
+    @apply border-s-2 border-neutral ps-4 text-neutral;
+  }
+  & :where(pre:not(figure pre)) {
+    @apply rounded-standard border border-neutral px-4 py-3 font-mono leading-b2 whitespace-pre-wrap;
+  }
+  & :where(:not(pre) > code) {
+    @apply rounded-indicator border border-neutral bg-neutral-soft px-1.5 py-px font-mono text-[0.875em];
+  }
+  & :where(a) {
+    @apply font-medium underline decoration-(--ids-color-border-neutral-strong) underline-offset-4 hover:decoration-current;
+  }
+  & :where(hr) {
+    @apply border-neutral;
   }
 }
 `;
@@ -593,12 +655,12 @@ const buildTypographyCSS = (dictionary) => {
   });
 };
 
-const neutralFallbacks = (dictionary, mode) =>
-  Object.fromEntries(
-    readColorEntriesWithoutCollision("neutral", mode, buildPalette(dictionary)).map(
-      ({ name, value }) => [name, value],
-    ),
+const neutralFallbacks = (dictionary, mode) => {
+  const scale = neutralScale(dictionary, mode);
+  return Object.fromEntries(
+    Object.entries(NEUTRAL_ROLE_STEPS).map(([slot, step]) => [slot, scale[step - 1]]),
   );
+};
 
 const providerValue = (mode, slot, fallbacks) => {
   if (slot in fallbacks) return `var(${themeVar(mode, slot)}, ${fallbacks[slot]})`;
@@ -644,16 +706,16 @@ const T_CSS_CORNER_SHAPE = `@layer base {
 
 const T_CSS_BACKGROUND_UNDERNEATH = `@layer base {
   [data-mode]:not([data-mode] [data-mode]),
-  [data-mode].bg-neutral-subtlest {
-    --ids-bg-current: var(--ids-color-bg-neutral-subtlest);
+  [data-mode].bg-base {
+    --ids-bg-current: var(--ids-color-bg-base);
   }
 
-  .bg-panel {
-    --ids-bg-current: var(--ids-color-bg-panel);
+  .bg-surface {
+    --ids-bg-current: var(--ids-color-bg-surface);
   }
 
-  .bg-band {
-    --ids-bg-current: var(--ids-color-bg-band);
+  .bg-block {
+    --ids-bg-current: var(--ids-color-bg-block);
   }
 }
 `;
@@ -703,11 +765,14 @@ const radiusFromTheProvider = (dictionary) =>
     );
 
 const lengthsTheScaleMultiplies = (dictionary) => [
-  ...readTypographyEntries(buildPalette(dictionary)).map(({ name, fontSize }) => [
-    `--ids-text-${name}`,
-    fontSize,
+  ...readTypographyEntries(buildPalette(dictionary)).flatMap(({ name, fontSize, lineHeight }) => [
+    [`--ids-text-${name}`, fontSize],
+    ...(isPixelLength(lineHeight) ? [[`--ids-text-${name}--line-height`, lineHeight]] : []),
   ]),
   ...byPath(dictionary, "font-size").map((t) => [idsVar("font-size", t), toVal(t)]),
+  ...byPath(dictionary, "line-height")
+    .filter((t) => isPixelLength(toVal(t)))
+    .map((t) => [idsVar("line-height", t), toVal(t)]),
   ...byCategory(dictionary, "size").map((t) => [idsVar("size", t), toVal(t)]),
 ];
 
@@ -764,14 +829,6 @@ const tsTypesFormatter = ({ dictionary }) => {
   });
 };
 
-const stepOf = (reference) => Number(reference.match(/^\{neutral\.(\d+)\}$/)[1]);
-
-const neutralSteps = (mode) => {
-  const json = JSON.parse(readFileSync(`./tokens/semantic/neutral.${mode}.json`, "utf8"));
-  return Object.fromEntries(
-    Object.entries(json.color).map(([slot, token]) => [slot, stepOf(token.$value)]),
-  );
-};
 
 const tsList = (values) => `[${values.map((v) => `'${v}'`).join(", ")}]`;
 
@@ -780,10 +837,11 @@ const tsRecord = (entries, indent) =>
     .map(([key, value]) => `${indent}  '${key}': ${value},`)
     .join("\n")}\n${indent}}`;
 
-const neutralPalette = (dictionary) =>
-  Object.fromEntries(
-    byPath(dictionary, "neutral").map((t) => [t.path[1], `'${val(t)}'`]),
-  );
+const neutralScale = (dictionary, mode) =>
+  byPath(dictionary, "neutral")
+    .filter((t) => t.path[1] === mode)
+    .sort((a, b) => Number(a.path[2]) - Number(b.path[2]))
+    .map(val);
 
 const stateTokens = (dictionary, type) =>
   byCategory(dictionary, "state").filter((t) => (t.$type ?? t.type) === type);
@@ -805,10 +863,10 @@ const tsColorRolesFormatter = ({ dictionary }) =>
       `export const IDS_NEUTRAL_ONLY_SLOTS = ${tsList(NEUTRAL_ONLY_SLOTS)} as const;`,
       `export const IDS_STATE_OPACITY = ${tsRecord(stateOpacity(dictionary), "")} as const;`,
       `export const IDS_STATE_FILL_COLOR = '${stateFillColor(dictionary)}';`,
-      `export const IDS_NEUTRAL_PALETTE = ${tsRecord(neutralPalette(dictionary), "")} as const;`,
-      `export const IDS_NEUTRAL_STEPS = {\n${["light", "dark"]
-        .map((mode) => `  ${mode}: ${tsRecord(neutralSteps(mode), "  ")},`)
-        .join("\n")}\n} as const;`,
+      `export const IDS_NEUTRAL_SCALES = {\n${MODES.map(
+        (mode) => `  ${mode}: ${tsList(neutralScale(dictionary, mode))},`,
+      ).join("\n")}\n} as const;`,
+      `export const IDS_NEUTRAL_STEPS = ${tsRecord(NEUTRAL_ROLE_STEPS, "")} as const;`,
     ].join("\n\n"),
   });
 
@@ -846,11 +904,11 @@ import 'ids_enums.dart';
 abstract final class IdsColorRoles {
 {{LISTS}}
 
-  static const neutralPalette = <int, Color>{
-{{NEUTRAL_PALETTE}}
+  static const neutralScales = <IdsMode, List<Color>>{
+{{NEUTRAL_SCALES}}
   };
 
-  static const neutralSteps = <IdsMode, Map<String, int>>{
+  static const neutralSteps = <String, int>{
 {{NEUTRAL_STEPS}}
   };
 
@@ -913,18 +971,18 @@ const dartColorRolesFormatter = ({ dictionary }) => {
     `  static const neutralOnlySlots = ${dartList(NEUTRAL_ONLY_SLOTS)};`,
     `  static const all = ${dartList(allSlots)};`,
   ];
-  const neutral = Object.entries(neutralPalette(dictionary)).map(
-    ([step, hex]) => `    ${step}: ${hexToFlutterColor(hex.replaceAll("'", "")).replace(/^const /, "")},`,
-  );
-  const steps = ["light", "dark"].map(
+  const scales = MODES.map(
     (mode) =>
-      `    IdsMode.${mode}: {\n${Object.entries(neutralSteps(mode))
-        .map(([slot, step]) => `      '${slot}': ${step},`)
-        .join("\n")}\n    },`,
+      `    IdsMode.${mode}: [\n${neutralScale(dictionary, mode)
+        .map((hex) => `      ${hexToFlutterColor(hex).replace(/^const /, "")},`)
+        .join("\n")}\n    ],`,
+  );
+  const steps = Object.entries(NEUTRAL_ROLE_STEPS).map(
+    ([slot, step]) => `    '${slot}': ${step},`,
   );
   return render(T_DART_COLOR_ROLES, {
     LISTS: lists.join("\n"),
-    NEUTRAL_PALETTE: neutral.join("\n"),
+    NEUTRAL_SCALES: scales.join("\n"),
     NEUTRAL_STEPS: steps.join("\n"),
     STATE_FILL_COLOR: `0xFF${stateFillColor(dictionary).slice(1).toUpperCase()}`,
     STATE_OPACITY: Object.entries(stateOpacity(dictionary))
@@ -1143,8 +1201,8 @@ const dartTypographyFormatter = ({ dictionary }) => {
           FONT_PACKAGE: fontPackage,
           FONT_SIZE: parseFloat(fontSize),
           FONT_WEIGHT: parseInt(fontWeight),
-          LINE_HEIGHT: parseFloat(lineHeight),
-          LETTER_SPACING: letterSpacingToPx(letterSpacing, fontSize),
+          LINE_HEIGHT: lineHeightAsMultiplier(lineHeight, fontSize),
+          LETTER_SPACING: Number(letterSpacingToPx(letterSpacing, fontSize).toFixed(4)),
         })};`,
     ),
   ];

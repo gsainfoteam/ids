@@ -6,7 +6,9 @@ import type { IdsSize } from '../../../tokens/types';
 
 const alreadyDimmedByField = cn('data-disabled:opacity-100');
 
-const ownTriggerLook = cn('flex min-w-0 cursor-pointer items-center text-start text-neutral-bold');
+const ownTriggerLook = cn(
+  'flex min-w-0 cursor-pointer items-center text-start text-neutral-strong',
+);
 
 export const fileFieldStyle = tv({
   slots: {
@@ -24,7 +26,7 @@ export const fileFieldStyle = tv({
     dropzoneTitle: 'font-medium break-keep text-balance',
     dropzoneHint: 'text-caption-c1-regular text-neutral break-keep text-balance',
     list: 'flex flex-col gap-1',
-    item: 'bg-panel',
+    item: 'bg-surface',
     preview: 'text-neutral',
     itemSize: 'text-caption-c1-regular',
     itemRemove: fieldAction.base,
@@ -41,9 +43,9 @@ export const fileFieldStyle = tv({
           'min-h-32 w-full flex-col justify-center gap-1 text-center concentric-p-4',
           'border border-dashed focus-ring',
           'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-          'data-dragging:border-primary data-dragging:bg-primary-subtle',
-          'data-dragging:text-on-primary-subtle',
-          'aria-invalid:border-danger',
+          'data-dragging:border-primary-strong data-dragging:bg-primary-soft',
+          'data-dragging:text-on-primary-soft',
+          'aria-invalid:border-danger-strong',
           'disabled:opacity-50',
         ],
       },
@@ -103,7 +105,7 @@ export const fileFieldStyle = tv({
       variant: 'soft',
       class: {
         trigger: [
-          'border-transparent bg-neutral-subtle',
+          'border-transparent bg-neutral-soft',
           'state-layer hover:state-hover active:state-press',
         ],
       },

@@ -46,9 +46,11 @@ test.each(['light', 'dark'] as const)(
     const card = screen.getByTestId('card').element();
     const [onPage, onCard] = [...page.querySelectorAll('table')];
 
-    expect(getComputedStyle(headerOf(onPage!)).backgroundColor).toBe(roleColor(page, 'bg-neutral-subtlest'));
-    expect(getComputedStyle(headerOf(onCard!)).backgroundColor).toBe(getComputedStyle(card).backgroundColor);
-    expect(getComputedStyle(card).backgroundColor).toBe(roleColor(page, 'bg-panel'));
+    expect(getComputedStyle(headerOf(onPage!)).backgroundColor).toBe(roleColor(page, 'bg-base'));
+    expect(getComputedStyle(headerOf(onCard!)).backgroundColor).toBe(
+      getComputedStyle(card).backgroundColor,
+    );
+    expect(getComputedStyle(card).backgroundColor).toBe(roleColor(page, 'bg-surface'));
   },
 );
 
@@ -68,7 +70,11 @@ test('a Scope that keeps the mode keeps the card behind it, one that switches pa
   const light = screen.getByTestId('light').element();
   const [sameMode, switched] = [...card.querySelectorAll('table')];
 
-  expect(getComputedStyle(headerOf(sameMode!)).backgroundColor).toBe(getComputedStyle(card).backgroundColor);
-  expect(getComputedStyle(headerOf(switched!)).backgroundColor).toBe(getComputedStyle(light).backgroundColor);
+  expect(getComputedStyle(headerOf(sameMode!)).backgroundColor).toBe(
+    getComputedStyle(card).backgroundColor,
+  );
+  expect(getComputedStyle(headerOf(switched!)).backgroundColor).toBe(
+    getComputedStyle(light).backgroundColor,
+  );
   expect(getComputedStyle(light).backgroundColor).not.toBe(getComputedStyle(card).backgroundColor);
 });

@@ -22,7 +22,7 @@ final _palettes = {
                   as Map<String, dynamic>)['themes']
               as List)
           .cast<Map<String, dynamic>>())
-    theme['primary'] as String: IdsPalette.fromSeed(
+    theme['primary'] as String: IdsRamp.fromSeed(
       _color(theme['seed'] as String),
     ),
 };
@@ -35,8 +35,8 @@ void main() {
   }
 
   test('reports a palette whose text roles cannot reach their Lc', () {
-    final washedOut = IdsPalette([
-      for (final _ in IdsPalette.steps) const Color(0xFF9CA3AF),
+    final washedOut = IdsRamp([
+      for (final _ in IdsRamp.steps) const Color(0xFF9CA3AF),
     ]);
     expect(checkIdsTheme(IdsTheme(primary: washedOut)), isNotEmpty);
   });
@@ -77,10 +77,10 @@ void main() {
 
   test('reads any color as its opaque 8-bit sRGB value', () {
     final blue = _palettes['blue']!;
-    final translucent = IdsPalette([
+    final translucent = IdsRamp([
       for (final color in blue.colors) color.withValues(alpha: .5),
     ]);
-    final displayP3 = IdsPalette([
+    final displayP3 = IdsRamp([
       for (final color in blue.colors)
         color.withValues(colorSpace: ColorSpace.displayP3),
     ]);

@@ -19,7 +19,7 @@ export const chipFieldStyle = tv({
     chip: [
       'max-w-full min-w-0 gap-0.5 data-disabled:opacity-60',
       'transition-[color,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'data-focus-visible:bg-primary-subtle data-focus-visible:text-on-primary-subtle',
+      'data-focus-visible:bg-primary-soft data-focus-visible:text-on-primary-soft',
     ],
     chipRemove: 'relative ring-0! after:absolute after:-inset-1',
     inputSizer: 'inline-grid min-w-0 flex-auto',
@@ -42,7 +42,7 @@ export const chipFieldStyle = tv({
   variants: {
     variant: {
       outline: { root: fieldTrigger.variant.outline },
-      soft: { root: fieldTrigger.variant.soft, chip: 'bg-neutral-subtlest' },
+      soft: { root: fieldTrigger.variant.soft, chip: 'bg-base' },
       ghost: { root: fieldTrigger.variant.ghost },
     } satisfies Record<ChipFieldVariant, object>,
     size: {

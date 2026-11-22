@@ -22,7 +22,7 @@ import {
 import {
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,
-  IDS_NEUTRAL_PALETTE,
+  IDS_NEUTRAL_SCALES,
   IDS_NEUTRAL_STEPS,
   IDS_STATUS_FAMILIES,
 } from '../src/tokens/color-roles';
@@ -67,7 +67,7 @@ const textLayer: LayersOf = (_, text) => [contentLayer(text)];
 
 const textAndFamilyLayers =
   (family: string): LayersOf =>
-  (roles, text) => [contentLayer(text), tintLayer(roles[`bg-${family}`]!)];
+  (roles, text) => [contentLayer(text), tintLayer(roles[`bg-${family}-solid`]!)];
 
 const pair = (foreground: string, backgrounds: string[], lc: number, layers: LayersOf): Pair => ({
   foreground,
@@ -76,33 +76,29 @@ const pair = (foreground: string, backgrounds: string[], lc: number, layers: Lay
   layers,
 });
 
-const LAYERS = ['bg-neutral-subtlest', 'bg-neutral-subtler'];
+const CONTAINERS = ['bg-base', 'bg-surface', 'bg-block'];
 
 const pairsFor = (family: string): Pair[] => {
   if (family === 'neutral')
     return [
-      pair('text-on-neutral', ['bg-neutral'], TEXT_LC, noLayer),
-      pair('text-on-neutral-subtler', ['bg-neutral-subtler'], TEXT_LC, textLayer),
-      pair('text-on-neutral-subtle', ['bg-neutral-subtle'], TEXT_LC, textLayer),
-      pair('text-on-neutral-subtlest', ['bg-neutral-subtlest'], TEXT_LC, textLayer),
-      pair('text-on-neutral-bold', ['bg-neutral-bold'], TEXT_LC, fillLayer),
-      pair('text-neutral-bold', [...LAYERS, 'bg-neutral-subtle'], TEXT_LC, textLayer),
-      pair('text-neutral', [...LAYERS, 'bg-neutral-subtle'], TEXT_LC, noLayer),
+      pair('text-on-base', ['bg-base'], TEXT_LC, textLayer),
+      pair('text-on-surface', ['bg-surface'], TEXT_LC, textLayer),
+      pair('text-on-block', ['bg-block'], TEXT_LC, textLayer),
+      pair('text-on-neutral-soft', ['bg-neutral-soft'], TEXT_LC, textLayer),
+      pair('text-on-neutral-solid', ['bg-neutral-solid'], TEXT_LC, fillLayer),
+      pair('text-neutral-strong', [...CONTAINERS, 'bg-neutral-soft'], TEXT_LC, textLayer),
+      pair('text-neutral', [...CONTAINERS, 'bg-neutral-soft'], TEXT_LC, noLayer),
     ];
 
   const familyLayers = textAndFamilyLayers(family);
+  const surfaces = [...CONTAINERS, `bg-${family}-soft`];
 
   return [
-    pair(`text-on-${family}`, [`bg-${family}`], TEXT_LC, fillLayer),
-    pair(`text-on-${family}-subtler`, [`bg-${family}-subtler`], TEXT_LC, familyLayers),
-    pair(`text-on-${family}-subtle`, [`bg-${family}-subtle`], TEXT_LC, familyLayers),
-    pair(
-      `text-${family}`,
-      [...LAYERS, `bg-${family}-subtler`, `bg-${family}-subtle`],
-      ACCENT_TEXT_LC,
-      familyLayers,
-    ),
-    pair(`border-${family}`, ['bg-neutral-subtlest'], MARK_LC, noLayer),
+    pair(`text-on-${family}-solid`, [`bg-${family}-solid`], TEXT_LC, fillLayer),
+    pair(`text-on-${family}-soft`, [`bg-${family}-soft`], TEXT_LC, familyLayers),
+    pair(`text-${family}`, surfaces, ACCENT_TEXT_LC, familyLayers),
+    pair(`text-${family}-strong`, surfaces, TEXT_LC, familyLayers),
+    pair(`border-${family}-strong`, surfaces, MARK_LC, noLayer),
   ];
 };
 
@@ -154,14 +150,12 @@ test.each(MODES)(
 test.each(MODES)('ids.css falls back to the pure %s neutral without a provider value', (mode) => {
   const mapped = mappedSlots(mode);
 
-  for (const [slot, step] of Object.entries(IDS_NEUTRAL_STEPS[mode]))
-    expect(mapped[slot]).toBe(
-      `${themeVar(mode, slot)}, ${IDS_NEUTRAL_PALETTE[String(step) as keyof typeof IDS_NEUTRAL_PALETTE]}`,
-    );
+  for (const [slot, step] of Object.entries(IDS_NEUTRAL_STEPS))
+    expect(mapped[slot]).toBe(`${themeVar(mode, slot)}, ${IDS_NEUTRAL_SCALES[mode][step - 1]}`);
 });
 
 test.each(MODES)('the pure %s neutral fallback reaches its Lc', (mode) => {
-  const roles = neutralRoles({ ...IDS_NEUTRAL_PALETTE }, mode);
+  const roles = neutralRoles(IDS_NEUTRAL_SCALES[mode], mode);
 
   for (const checked of pairsFor('neutral'))
     expect(lowestContrast(roles, checked), checked.foreground).toBeGreaterThanOrEqual(checked.lc);
@@ -169,21 +163,21 @@ test.each(MODES)('the pure %s neutral fallback reaches its Lc', (mode) => {
 
 test('ids.css emits no shared color namespace and no chart colors', () => {
   expect(css).not.toMatch(/--color-(primary|secondary|danger|neutral|surface)\b/);
-  expect(css).not.toMatch(/--ids-color-[\w-]*-(hover|active|soft)\b/);
+  expect(css).not.toMatch(/--ids-color-[\w-]*-(hover|active)\b/);
   expect(css).not.toMatch(/--ids-color-chart-/);
   expect(css).not.toMatch(/data-color/);
 });
 
 test('every utility namespace reads a family role', () => {
   for (const family of [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES, 'neutral']) {
+    expect(css).toContain(`--background-color-${family}-soft: var(--ids-color-bg-${family}-soft);`);
     expect(css).toContain(
-      `--background-color-${family}-subtle: var(--ids-color-bg-${family}-subtle);`,
-    );
-    expect(css).toContain(
-      `--text-color-on-${family}-subtle: var(--ids-color-text-on-${family}-subtle);`,
+      `--text-color-on-${family}-soft: var(--ids-color-text-on-${family}-soft);`,
     );
     expect(css).toContain(`--border-color-${family}: var(--ids-color-border-${family});`);
-    expect(css).toContain(`--ring-color-${family}: var(--ids-color-border-${family});`);
+    expect(css).toContain(
+      `--ring-color-${family}-strong: var(--ids-color-border-${family}-strong);`,
+    );
   }
 });
 
@@ -210,28 +204,16 @@ test('the default entry loads the fonts, and no-fonts.css is the tokens alone', 
 
 const neutrals: IdsNeutral[] = ['pure', 'tinted'];
 
-test.each(MODES)(
-  'every family × slot reaches its Lc with all three brands given in %s',
-  (mode) => {
-    for (const hue of paletteHues) {
-      const { colors, issues } = resolveColors({
-        primary: palettes[hue],
-        secondary: palettes[paletteHues[(paletteHues.indexOf(hue) + 4) % paletteHues.length]!],
-        tertiary: palettes[paletteHues[(paletteHues.indexOf(hue) + 8) % paletteHues.length]!],
-      });
-
-      expect(issues, hue).toEqual([]);
-      expect(failingPairs(colors!.roles[mode]), hue).toEqual([]);
-    }
-  },
-);
-
-test.each(MODES)('a %s line is the color of the text beside it', (mode) => {
+test.each(MODES)('every family × slot reaches its Lc with all three brands given in %s', (mode) => {
   for (const hue of paletteHues) {
-    const roles = resolveColors({ primary: palettes[hue] }).colors!.roles[mode];
+    const { colors, issues } = resolveColors({
+      primary: palettes[hue],
+      secondary: palettes[paletteHues[(paletteHues.indexOf(hue) + 4) % paletteHues.length]!],
+      tertiary: palettes[paletteHues[(paletteHues.indexOf(hue) + 8) % paletteHues.length]!],
+    });
 
-    for (const family of [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES])
-      expect(roles[`border-${family}`], `${hue} ${family}`).toBe(roles[`text-${family}`]);
+    expect(issues, hue).toEqual([]);
+    expect(failingPairs(colors!.roles[mode]), hue).toEqual([]);
   }
 });
 

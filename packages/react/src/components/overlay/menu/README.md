@@ -22,13 +22,25 @@ import { Menu } from '@gsainfoteam/ids-react';
       복사
       <Menu.Shortcut keys="Mod+C" />
     </Menu.Item>
-    <Menu.Item disabled>붙여넣기</Menu.Item>
+    <Menu.Item disabled>
+      <ClipboardIcon />
+      붙여넣기
+    </Menu.Item>
     <Menu.Separator />
     <Menu>
-      <Menu.Trigger>공유</Menu.Trigger>
+      <Menu.Trigger>
+        <ShareIcon />
+        공유
+      </Menu.Trigger>
       <Menu.Content>
-        <Menu.Item>메일로 보내기</Menu.Item>
-        <Menu.Item>링크 복사</Menu.Item>
+        <Menu.Item>
+          <EnvelopeIcon />
+          메일로 보내기
+        </Menu.Item>
+        <Menu.Item>
+          <LinkIcon />
+          링크 복사
+        </Menu.Item>
       </Menu.Content>
     </Menu>
   </Menu.Content>
@@ -59,11 +71,20 @@ import { Menu } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Menu.Content>
-  <Menu.Item>새 문서</Menu.Item>
+  <Menu.Item>
+    <DocumentPlusIcon />
+    새 문서
+  </Menu.Item>
   <Menu>
-    <Menu.Trigger>내보내기</Menu.Trigger>
+    <Menu.Trigger>
+      <ArrowDownTrayIcon />
+      내보내기
+    </Menu.Trigger>
     <Menu.Content>
-      <Menu.Item>PDF</Menu.Item>
+      <Menu.Item>
+        <DocumentTextIcon />
+        PDF
+      </Menu.Item>
     </Menu.Content>
   </Menu>
 </Menu.Content>
@@ -78,14 +99,14 @@ import { Menu } from '@gsainfoteam/ids-react';
 ## 항목
 
 ```tsx
-<Menu.Item onSelect={(event) => event.preventDefault()}>열린 채로</Menu.Item>
-<Menu.Item disabled>못 고름</Menu.Item>
-<Menu.Item textValue="Settings">⚙️ 설정</Menu.Item>        // 글자 검색에 쓸 글자
-<Menu.Item asChild><a href="/help">도움말</a></Menu.Item>  // Enter 도 링크를 연다
+<Menu.Item onSelect={(event) => event.preventDefault()}><StarIcon />즐겨찾기</Menu.Item>  // 고른 뒤에도 열려 있다
+<Menu.Item disabled><ClipboardIcon />붙여넣기</Menu.Item>                                  // 고를 수 없다
+<Menu.Item textValue="Settings"><Cog6ToothIcon />설정</Menu.Item>                          // 보이는 글자와 다른 글자(S)로 찾는다
+<Menu.Item asChild><a href="/help"><QuestionMarkCircleIcon />도움말</a></Menu.Item>        // Enter 도 링크를 연다
 ```
 
 - `onSelect(event)` 의 `event` 는 취소할 수 있는 `Event` 입니다. `preventDefault()` 하면 메뉴가 닫히지 않습니다.
-- 항목 앞의 아이콘은 그냥 자식으로 넣습니다. 크기는 메뉴가 맞춥니다.
+- 항목 앞의 아이콘은 그냥 자식으로 넣습니다. 크기는 메뉴가 맞춥니다. 항목마다 아이콘을 하나씩 두면 글자가 한 줄로 맞습니다.
 
 ## 체크박스와 라디오
 
@@ -135,15 +156,27 @@ const [zoom, setZoom] = useState('100');
 
 ```tsx
 <Menu>
-  <Menu.Trigger>내보내기</Menu.Trigger>
+  <Menu.Trigger>
+    <ArrowDownTrayIcon />
+    내보내기
+  </Menu.Trigger>
   <Menu.Content>
     <Menu>
-      <Menu.Trigger>이미지</Menu.Trigger>
+      <Menu.Trigger>
+        <PhotoIcon />
+        이미지
+      </Menu.Trigger>
       <Menu.Content>
         <Menu>
-          <Menu.Trigger>JPEG</Menu.Trigger>
+          <Menu.Trigger>
+            <CameraIcon />
+            JPEG
+          </Menu.Trigger>
           <Menu.Content>
-            <Menu.Item>고화질</Menu.Item>
+            <Menu.Item>
+              <SparklesIcon />
+              고화질
+            </Menu.Item>
           </Menu.Content>
         </Menu>
       </Menu.Content>
@@ -170,13 +203,16 @@ const [zoom, setZoom] = useState('100');
     <Menu.Group>
       <Menu.Label>문서</Menu.Label>
       <Menu.Item onSelect={createDocument}>
-        새 문서 <Menu.Shortcut keys="Mod+N" />
+        <DocumentPlusIcon />
+        새 문서
+        <Menu.Shortcut keys="Mod+N" />
       </Menu.Item>
     </Menu.Group>
     <Menu.Separator />
     <Menu.Group>
       <Menu.Label>보기</Menu.Label>
       <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
+        <MoonIcon />
         어두운 화면
       </Menu.CheckboxItem>
     </Menu.Group>
@@ -203,7 +239,10 @@ const [zoom, setZoom] = useState('100');
 const route = await overlay.open<string>(({ close }) => (
   <Menu triggerType="command">
     <Menu.Content aria-label="이동">
-      <Menu.Item onSelect={() => close('/settings')}>설정</Menu.Item>
+      <Menu.Item onSelect={() => close('/settings')}>
+        <Cog6ToothIcon />
+        설정
+      </Menu.Item>
     </Menu.Content>
   </Menu>
 ));
@@ -219,6 +258,7 @@ const route = await overlay.open<string>(({ close }) => (
     const name = await overlay.open<string>(({ close }) => <RenameDialog onDone={close} />);
   }}
 >
+  <PencilIcon />
   이름 바꾸기…
 </Menu.Item>
 ```

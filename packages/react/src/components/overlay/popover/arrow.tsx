@@ -22,7 +22,7 @@ export function PopoverArrow(props: PopoverArrowProps) {
     <FloatingArrow
       width={14}
       height={7}
-      fill="var(--ids-color-bg-panel)"
+      fill="var(--ids-color-bg-surface)"
       stroke="var(--ids-color-border-neutral)"
       strokeWidth={1}
       {...props}

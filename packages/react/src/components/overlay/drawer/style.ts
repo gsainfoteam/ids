@@ -13,7 +13,7 @@ export const drawerStyle = tv({
     content: [
       'fixed z-50 m-0 flex flex-col outline-none',
       cornerOfThePaddedViewport,
-      'border border-neutral bg-panel text-neutral-bold shadow-lg',
+      'border border-neutral bg-surface text-neutral-strong shadow-lg',
       'transition-[translate,transform,scale] duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)]',
       'data-nested-open:scale-(--drawer-nested-scale)',
       'data-dragging:transition-none data-dragging:select-none motion-reduce:transition-none',
@@ -22,11 +22,11 @@ export const drawerStyle = tv({
     handle: [
       'relative shrink-0 cursor-grab touch-none rounded-full outline-none focus-ring',
       'before:absolute before:-inset-3',
-      'bg-neutral transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'bg-(--ids-color-border-neutral-strong) transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
       'hover:bg-(--ids-color-text-neutral) data-dragging:bg-(--ids-color-text-neutral)',
     ],
     header: 'flex flex-col gap-1.5 pe-8 text-start',
-    title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
+    title: 'text-body-b1-semibold [overflow-wrap:anywhere]',
     description: 'text-body-b3-regular text-neutral',
     footer: 'mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
     close: 'absolute end-4 top-4',

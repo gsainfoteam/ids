@@ -101,7 +101,7 @@ export const PC: Story = {
                       <Field.Hint>8자 이상, 영문과 숫자를 섞어 주세요.</Field.Hint>
                     </Field>
                   </Card.Content>
-                  <Card.Footer className="justify-end border-t">
+                  <Card.Footer className="justify-end">
                     <Button type="submit">다음</Button>
                   </Card.Footer>
                 </form>
@@ -152,7 +152,7 @@ export const PC: Story = {
                       <Field.Hint>1학년은 기초교육학부를 고르세요.</Field.Hint>
                     </Field>
                   </Card.Content>
-                  <Card.Footer className="justify-between border-t">
+                  <Card.Footer className="justify-between">
                     <Button variant="outline" onClick={() => setStep(0)}>
                       이전
                     </Button>
@@ -208,7 +208,7 @@ export const PC: Story = {
                       <Checkbox name="adult" required />만 14세 이상이에요
                     </Label>
                   </Card.Content>
-                  <Card.Footer className="justify-between border-t">
+                  <Card.Footer className="justify-between">
                     <Button variant="outline" onClick={() => setStep(1)}>
                       이전
                     </Button>

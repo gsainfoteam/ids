@@ -1,9 +1,12 @@
 import {
+  ArrowPathIcon,
   CheckCircleIcon,
+  ClockIcon,
   EllipsisHorizontalIcon,
   ExclamationTriangleIcon,
   PlusIcon,
   QueueListIcon,
+  StopIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -11,6 +14,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Alert } from '../../components/feedback/alert';
 import { Progress } from '../../components/feedback/progress';
 import { Spinner } from '../../components/feedback/spinner';
@@ -139,7 +143,7 @@ export const PC: Story = {
         {STATES.map((state) => (
           <Tabs.Content key={state.value} value={state.value}>
             <Card size="tiny">
-              <Item.Group aria-label={`${state.label} 작업`}>
+              <ItemGroup aria-label={`${state.label} 작업`}>
                 {JOBS.filter((job) => job.state === state.value).map((job) => (
                   <Item key={job.id}>
                     <Item.Media variant="soft">
@@ -185,18 +189,27 @@ export const PC: Story = {
                           />
                         </Menu.Trigger>
                         <Menu.Content>
-                          <Menu.Item>실행 기록 보기</Menu.Item>
+                          <Menu.Item>
+                            <ClockIcon />
+                            실행 기록 보기
+                          </Menu.Item>
                           {job.state === 'done' ? (
-                            <Menu.Item>다시 실행</Menu.Item>
+                            <Menu.Item>
+                              <ArrowPathIcon />
+                              다시 실행
+                            </Menu.Item>
                           ) : (
-                            <Menu.Item>멈추기</Menu.Item>
+                            <Menu.Item>
+                              <StopIcon />
+                              멈추기
+                            </Menu.Item>
                           )}
                         </Menu.Content>
                       </Menu>
                     </Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </Tabs.Content>
         ))}
