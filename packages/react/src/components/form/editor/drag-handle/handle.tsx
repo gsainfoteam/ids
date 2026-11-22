@@ -337,9 +337,9 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
             className={styles.blockHandle()}
             style={place}
             popover="manual"
-          onMouseDown={() => {
-            grabbedRef.current = block;
-          }}
+            onMouseDown={() => {
+              grabbedRef.current = block;
+            }}
           >
             <GripVertical aria-hidden="true" />
           </DraggableGrip>
@@ -377,7 +377,7 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
             {t('editor.blockDuplicate')}
           </Menu.Item>
           <Menu.Separator />
-          <Menu.Item onSelect={run(deleteBlock)}>
+          <Menu.Item onSelect={run(deleteBlock)} className={styles.destructiveItem()}>
             <TrashIcon aria-hidden="true" />
             {t('editor.blockDelete')}
           </Menu.Item>

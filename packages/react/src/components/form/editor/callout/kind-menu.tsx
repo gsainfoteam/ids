@@ -1,15 +1,25 @@
 'use client';
 
+import { cloneElement, type ReactElement } from 'react';
+
+import { CheckIcon, TrashIcon } from '@heroicons/react/16/solid';
+
 import { useTranslate } from '../../../../internal/translate';
 import { Menu } from '../../../overlay/menu';
 import { CALLOUT_ICON } from '../../../typography/rich-text/callout-icon';
-import { CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
+import { CALLOUT_SCHEME, CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
 import {
   CALLOUT_KINDS,
   calloutKindOf,
   type CalloutKind,
 } from '../../../typography/rich-text/schema/callout';
 import { EditorGlyphButton } from '../glyph-button';
+import { editorStyle } from '../style';
+
+const kindIcon = (kind: CalloutKind) =>
+  cloneElement(CALLOUT_ICON[kind] as ReactElement<{ className?: string }>, {
+    className: editorStyle({ calloutScheme: CALLOUT_SCHEME[kind] }).calloutKindIcon(),
+  });
 
 export function EditorCalloutKindMenu({
   kind,
@@ -35,13 +45,19 @@ export function EditorCalloutKindMenu({
         <Menu.RadioGroup value={kind} onValueChange={(next) => onKindChange(calloutKindOf(next))}>
           {CALLOUT_KINDS.map((option) => (
             <Menu.RadioItem key={option} value={option}>
-              {CALLOUT_ICON[option]}
+              {kindIcon(option)}
               {t(CALLOUT_TITLE[option])}
+              <Menu.ItemIndicator>
+                <CheckIcon />
+              </Menu.ItemIndicator>
             </Menu.RadioItem>
           ))}
         </Menu.RadioGroup>
         <Menu.Separator />
-        <Menu.Item onSelect={onRemove}>{t('editor.calloutRemove')}</Menu.Item>
+        <Menu.Item onSelect={onRemove} className={editorStyle().destructiveItem()}>
+          <TrashIcon aria-hidden="true" />
+          {t('editor.calloutRemove')}
+        </Menu.Item>
       </Menu.Content>
     </Menu>
   );

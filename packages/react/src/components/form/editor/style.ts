@@ -5,6 +5,8 @@ import { documentText } from '../../typography/rich-text/style';
 
 import type { EditorVariant } from './root';
 import type { IdsSize } from '../../../tokens/types';
+import type { CALLOUT_SCHEME } from '../../typography/rich-text/callout-kinds';
+import type { CalloutKind } from '../../typography/rich-text/schema/callout';
 
 const placeholder = cn(
   '[&_.is-editor-empty:first-child]:before:pointer-events-none',
@@ -100,6 +102,8 @@ export const editorStyle = tv({
     suggestionScroll: 'max-h-72 rounded-[inherit]',
     suggestionList: 'flex flex-col p-1 outline-none',
     suggestionOption: 'pe-2.5 [&_svg]:size-(--ids-size-icon-standard)',
+    calloutKindIcon: 'text-scheme',
+    destructiveItem: 'text-danger',
     mentionText: 'flex min-w-0 flex-col',
     mentionLabel: 'truncate',
     mentionDescription: 'truncate text-caption-c1-regular text-neutral',
@@ -160,6 +164,13 @@ export const editorStyle = tv({
       top: { bar: 'border-b' },
       bottom: { bar: 'border-t' },
     },
+    calloutScheme: {
+      info: { calloutKindIcon: 'scheme-info' },
+      success: { calloutKindIcon: 'scheme-success' },
+      primary: { calloutKindIcon: 'scheme-primary' },
+      warning: { calloutKindIcon: 'scheme-warning' },
+      danger: { calloutKindIcon: 'scheme-danger' },
+    } satisfies Record<(typeof CALLOUT_SCHEME)[CalloutKind], object>,
     editable: {
       true: {},
       false: { content: 'cursor-default' },
