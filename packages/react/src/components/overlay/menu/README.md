@@ -101,7 +101,7 @@ import { Menu } from '@gsainfoteam/ids-react';
 ```tsx
 <Menu.Item onSelect={(event) => event.preventDefault()}><StarIcon />즐겨찾기</Menu.Item>  // 고른 뒤에도 열려 있다
 <Menu.Item disabled><ClipboardIcon />붙여넣기</Menu.Item>                                  // 고를 수 없다
-<Menu.Item textValue="Settings"><Cog6ToothIcon />설정</Menu.Item>                          // 글자 검색에 쓸 글자
+<Menu.Item textValue="Settings"><Cog6ToothIcon />설정</Menu.Item>                          // 보이는 글자와 다른 글자(S)로 찾는다
 <Menu.Item asChild><a href="/help"><QuestionMarkCircleIcon />도움말</a></Menu.Item>        // Enter 도 링크를 연다
 ```
 
