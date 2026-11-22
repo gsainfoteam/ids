@@ -475,6 +475,7 @@ mode. No layer mixes two tokens with `color-mix`.
   | `bg-field-outline`, `border-field-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline fields |
   | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea bar seam |
   | `bg-field-code-outline` | `bg-neutral-soft` | `bg-surface` | code in an outline Editor |
+  | `bg-field-block-outline` | `bg-block` | `bg-surface` | a table header in an outline Editor |
   | `bg-switch-thumb` | `bg-base` | `bg-neutral-solid` | an off Switch thumb |
   | `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode |
   | `bg-qr-code-inverse`, `text-qr-code-inverse` | `bg-neutral-solid`, `text-on-neutral-solid` | `bg-base`, `text-neutral-strong` | an inverted QRCode |

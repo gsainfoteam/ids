@@ -24,6 +24,7 @@
 | `bg-field-outline`, `border-field-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline 입력 상자 |
 | `border-field-bar` | `border-neutral` | `border-neutral-strong` | TextArea 막대의 구분선 |
 | `bg-field-code-outline` | `bg-neutral-soft` | `bg-surface` | outline Editor 의 인라인 코드 |
+| `bg-field-block-outline` | `bg-block` | `bg-surface` | outline Editor 의 표 머리글 |
 | `bg-switch-thumb` | `bg-base` | `bg-neutral-solid` | 꺼진 Switch 의 thumb |
 | `bg-segment` | `bg-base` | `border-neutral-strong` | SegmentedControl 과 segmented Tabs 에서 `bg-neutral-soft` 트랙 위의 고른 칸 |
 | `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode `inverted={false}`: 밝은 바탕, 어두운 모듈 |

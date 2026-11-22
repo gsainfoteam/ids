@@ -143,7 +143,7 @@ export const editorStyle = tv({
     variant: {
       outline: {
         root: fieldSurface.variant.outline,
-        content: '[&_:not(pre)>code]:bg-field-code-outline',
+        content: '[&_:not(pre)>code]:bg-field-code-outline [&_th]:bg-field-block-outline',
       },
       soft: {
         root: fieldSurface.variant.soft,
