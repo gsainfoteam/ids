@@ -4,10 +4,6 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'rea
 
 import {
   DndContext,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
   type Announcements,
   type AutoScrollOptions,
   type DragStartEvent,
@@ -26,15 +22,13 @@ import {
   type SchedulerEventData,
   type SchedulerShift,
 } from './layout';
+import { useDragSensors } from '../../../internal/drag-sensors';
 import { swallowTheClickThatEndsADrag } from '../../../internal/drag-surface';
 import { useTranslate } from '../../../internal/translate';
 
 import type { SchedulerDragMeasure } from './drag-geometry';
 import type { SchedulerFormat } from './format';
 
-const POINTER_TRAVEL_BEFORE_DRAG = 4;
-const TOUCH_HOLD_BEFORE_DRAG = 250;
-const TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING = 5;
 const MINUTES_IN_HOUR = 60;
 const NOTHING_MOVED: SchedulerShift = { days: 0, minutes: 0 };
 
@@ -76,15 +70,7 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
   const [grab, setGrab] = useState<Grab | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: POINTER_TRAVEL_BEFORE_DRAG } }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: TOUCH_HOLD_BEFORE_DRAG,
-        tolerance: TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING,
-      },
-    }),
-  );
+  const sensors = useDragSensors();
 
   useEffect(() => {
     const id = pendingFocus.current;

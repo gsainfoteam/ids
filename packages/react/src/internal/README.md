@@ -15,6 +15,7 @@
 | [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer                                                                                                                                                                                       |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`drag-surface.ts`](#drag-surfacets)             | 끌어 옮기는 항목의 놓을 자리 선, 따라오는 복사본, 들어 올린 모양, 끌기를 끝낸 click 과 Space 삼키기 | Sidebar, Editor, Scheduler |
+| [`drag-sensors.ts`](#drag-sensorsts)             | 끌기를 시작하는 규칙: 마우스 4px, 터치 250ms 누르기 | Sidebar, Editor, Scheduler |
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`surfaces/field-surface.ts`](#surfacesfield-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
@@ -305,6 +306,36 @@ swallowTheSpaceKeyupThatWouldPress(); // 버튼 위에서 Space 로 집거나 �
 ### 알아둘 것
 
 - 선, 복사본, 들어 올린 모양을 바꾸면 이 모듈을 쓰는 모든 컴포넌트의 끌기가 함께 바뀝니다.
+
+## drag-sensors.ts
+
+dnd-kit 끌기를 시작하는 규칙을 한곳에 둔 hook 입니다. 끌어 옮기는 컴포넌트가 모두 같은 조건에서 끌기를 시작합니다.
+
+### 쓰는 곳
+
+- Sidebar: `sortable.tsx` 가 메뉴 항목을 끌 때 씁니다.
+- Scheduler: `drag.tsx` 가 일정을 옮기거나 빈 칸을 고를 때 씁니다.
+- Editor: `drag-handle/handle.tsx` 가 블록을 끌 때 `touch: false` 로 씁니다.
+
+### 쓰는 법
+
+```tsx
+const sensors = useDragSensors(); // 마우스와 터치
+const sensors = useDragSensors({ touch: false }); // 마우스만
+
+<DndContext sensors={sensors}>...</DndContext>
+```
+
+### 왜 이렇게
+
+- 마우스는 4px 를 움직여야 끌기가 시작됩니다. 그 전에 떼면 그냥 누른 것이라 `onClick` 이 그대로 불립니다.
+- 터치는 250ms 를 누르고 있어야 시작되고, 그동안 5px 까지는 움직여도 됩니다. 그 전에 움직이면 스크롤입니다.
+- Editor 의 블록 손잡이는 마우스를 블록 위에 올렸을 때만 보입니다. 터치에는 올려 두는 동작이 없어 손잡이를 잡을 수 없으므로 터치 sensor 를 넣지 않습니다.
+- 스타일 조각을 담은 `drag-surface.ts` 와 파일을 나눴습니다. 그 조각은 `style.ts` 가 가져가는데, hook 이 같은 파일에 있으면 `'use client'` 가 붙어 서버에서 `X.Style()` 을 부를 수 없습니다.
+
+### 알아둘 것
+
+- 값을 바꾸면 Sidebar, Editor, Scheduler 의 끌기 시작 조건이 함께 바뀝니다.
 
 ## decimal.ts
 
