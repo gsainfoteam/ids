@@ -1,6 +1,6 @@
 'use client';
 
-import { TableCellsIcon } from '@heroicons/react/16/solid';
+import { Table } from 'lucide-react';
 
 import { useTranslate } from '../../../../internal/translate';
 import { IconButton } from '../../../action/icon-button';
@@ -39,7 +39,7 @@ export function EditorTable({ icon, 'aria-label': ariaLabel, className }: Editor
       variant="ghost"
       colorScheme="neutral"
       size="tiny"
-      icon={icon ?? <TableCellsIcon />}
+      icon={icon ?? <Table />}
       aria-label={ariaLabel ?? t('editor.table')}
       className={className}
       disabled={!editable || !loaded || (!inTable && !insertable)}
