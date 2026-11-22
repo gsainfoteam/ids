@@ -128,7 +128,7 @@ export function useTooltip({
 
   const warnedAboutDisabledTrigger = useRef(false);
   useEffect(() => {
-    if (!isDevelopment || !trigger || warnedAboutDisabledTrigger.current) return;
+    if (!isDevelopment || disabled || !trigger || warnedAboutDisabledTrigger.current) return;
     if (!trigger.matches(':disabled')) return;
 
     warnedAboutDisabledTrigger.current = true;
