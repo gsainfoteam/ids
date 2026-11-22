@@ -65,7 +65,7 @@ export function SchedulerMonth<E extends SchedulerEventData>({
           slotMenu={slotMenu}
         >
           <div className={styles.monthCanvas()}>
-            <div aria-hidden="true" className={styles.monthHead()}>
+            <div aria-hidden="true" data-scroll-area-pinned="top" className={styles.monthHead()}>
               {weeks[0].map((day) => (
                 <div key={day.toString()} className={styles.monthWeekday()}>
                   {format.weekday(day)}

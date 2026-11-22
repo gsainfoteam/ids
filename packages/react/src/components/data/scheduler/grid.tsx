@@ -84,7 +84,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
 
   const body = (
     <div ref={bodyRef} className={styles.columns({ className: styles.body() })}>
-      <div aria-hidden="true" className={styles.gutter()}>
+      <div aria-hidden="true" data-scroll-area-pinned="start" className={styles.gutter()}>
         {HOURS.map((hour) => (
           <div key={hour} className={styles.hour()}>
             <span>{format.hour(hour)}</span>
@@ -171,7 +171,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
           slotMenu={slotMenu}
         >
           <div className={styles.canvas()}>
-            <div className={styles.sticky()}>
+            <div data-scroll-area-pinned="top" className={styles.sticky()}>
               <div className={styles.columns({ className: styles.header() })}>
                 <div aria-hidden="true" className={styles.corner()} />
                 {days.map((day) => {
