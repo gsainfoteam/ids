@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ids_flutter_example/components/provider_integration_preview.dart';
+import 'package:ids_flutter_example/components/utility/provider_integration_preview.dart';
 import 'package:ids_flutter_example/i18n/translations.g.dart';
 
 void main() {
