@@ -43,7 +43,10 @@ import {
   type SidebarTreeItem,
   type SidebarTreeMove,
 } from './tree';
-import { swallowTheClickThatEndsADrag } from '../../../internal/drag-surface';
+import {
+  swallowTheClickThatEndsADrag,
+  swallowTheSpaceKeyupThatWouldPress,
+} from '../../../internal/drag-surface';
 import { keyHandler } from '../../../internal/keys';
 import { useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
@@ -53,7 +56,6 @@ const ITEM_SELECTOR = '[data-sidebar-item]';
 const POINTER_TRAVEL_BEFORE_DRAG = 4;
 const TOUCH_HOLD_BEFORE_DRAG = 250;
 const TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING = 5;
-const SPACE = ' ';
 const REACH_BEYOND_THE_ROWS = 36;
 const SAME_HEIGHT = 2;
 const LINE_INSET = 4;
@@ -81,15 +83,6 @@ const rowAtThePointerHeight: CollisionDetection = ({
 
 const sameDrop = (a: SidebarDrop | null, b: SidebarDrop | null) =>
   a?.key === b?.key && a?.position === b?.position;
-
-function swallowTheSpaceKeyupThatWouldPressTheRow() {
-  const swallow = (event: KeyboardEvent) => {
-    if (event.key !== SPACE) return;
-    event.preventDefault();
-    window.removeEventListener('keyup', swallow, { capture: true });
-  };
-  window.addEventListener('keyup', swallow, { capture: true });
-}
 
 type Grab = { key: string; stops: SidebarKeyboardStop[]; at: number };
 
@@ -465,7 +458,7 @@ function SortableFrame({
   }, [register, dragKey, element, preview, folded]);
 
   const pressSpace = (action: () => void) => () => {
-    swallowTheSpaceKeyupThatWouldPressTheRow();
+    swallowTheSpaceKeyupThatWouldPress();
     action();
   };
 
