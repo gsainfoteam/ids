@@ -1,7 +1,9 @@
 import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { ReactNodeViewRenderer } from '@tiptap/react';
 
+import { EditorTableView } from './view';
 import { cn } from '../../../../utils';
 import { tableStyle } from '../../../data/table/style';
 
@@ -60,21 +62,21 @@ const TableClasses = Extension.create<{ size: IdsSize }>({
 });
 
 export function tableExtensions(
-  { Table, TableView, TableRow, TableHeader, TableCell }: TableModule,
+  { Table, TableRow, TableHeader, TableCell }: TableModule,
   size: IdsSize,
 ) {
-  const styles = tableStyle({ variant: 'outline', size, layout: 'fixed' });
+  const ScrollingTable = Table.extend<TiptapTable.TableOptions & { size: IdsSize }>({
+    addOptions() {
+      return { ...(this.parent?.() as TiptapTable.TableOptions), size };
+    },
 
-  class EditorTableView extends TableView {
-    constructor(...args: ConstructorParameters<typeof TableView>) {
-      super(...args);
-      this.dom.className = styles.root({ className: cn('overflow-hidden') });
-      this.table.className = styles.table();
-    }
-  }
+    addNodeView() {
+      return ReactNodeViewRenderer(EditorTableView, { contentDOMElementTag: 'tbody' });
+    },
+  });
 
   return [
-    Table.configure({ resizable: false, View: EditorTableView }),
+    ScrollingTable.configure({ resizable: false }),
     TableRow,
     TableHeader,
     TableCell,
