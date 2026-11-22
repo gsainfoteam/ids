@@ -551,3 +551,29 @@ test('the end handle sits inside its event, so an event starting right after it 
   for (const y of [handle.top - 4, handle.top + handle.height / 2, event.bottom - 0.5])
     expect(document.elementFromPoint(x, y)).toBe(edge.element());
 });
+
+test('hovering an event covered by a later one brings it and its end handle to the front', async () => {
+  const screen = await render(
+    inProvider({
+      onEventChange: vi.fn(),
+      events: [
+        { id: 'lunch', title: 'Lunch', start: at(17, 12), end: at(17, 13, 30) },
+        { id: 'graph', title: 'Graph theory', start: at(17, 12, 45), end: at(17, 14) },
+      ],
+    }),
+  );
+  const edge = screen.getByRole('separator', { name: 'Lunch 끝 시각' });
+  await expect.element(edge).toBeInTheDocument();
+  edge.element().scrollIntoView({ block: 'center' });
+  const handle = edge.element().getBoundingClientRect();
+  const x = handle.left + handle.width - 4;
+  const y = handle.top + handle.height / 2;
+  expect(document.elementFromPoint(x, y)?.closest('[data-scheduler-slot]')).toHaveAttribute(
+    'data-scheduler-slot',
+    'graph',
+  );
+
+  await userEvent.hover(screen.getByText('Lunch'));
+
+  await vi.waitFor(() => expect(document.elementFromPoint(x, y)).toBe(edge.element()));
+});

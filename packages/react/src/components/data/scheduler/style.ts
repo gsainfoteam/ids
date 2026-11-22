@@ -58,7 +58,7 @@ export const schedulerStyle = tv({
     ],
     dayEvents: 'absolute inset-0',
     slot: [
-      'absolute flex p-px has-focus-visible:z-4',
+      'absolute flex p-px hover:z-4 has-focus-visible:z-4',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-event-start))]',
       'h-[calc(var(--scheduler-hour)*var(--scheduler-event-hours))]',
       'start-[calc(100%*var(--scheduler-event-left))] w-[calc(100%*var(--scheduler-event-width))]',
