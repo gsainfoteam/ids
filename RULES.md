@@ -679,7 +679,8 @@ props an app has to remember stay few. A root takes only:
 
 - the state it owns, as a trio: `value` / `defaultValue` / `onValueChange`, or `checked`, `open`,
   `pressed`, `page` with their `default*` and `on*Change` (see Callbacks);
-- `variant`, `size` and the color prop (`colorScheme`; renaming it `color` is still open);
+- `variant` (or `appearance`, see Variants below), `size` and the color prop (`colorScheme`;
+  renaming it `color` is still open);
 - `className`, `style`, `children` and `asChild`;
 - native attributes of the element it renders (`disabled`, `name`, `required`, `min`, `step`,
   `id`, `aria-*`);
@@ -700,10 +701,9 @@ Every other prop is an option. The rules for options:
 - **Screen elements are parts.** A toolbar, caption, empty state or pager is a part
   (`DataTable.Toolbar`, `.Content`, `.Empty`, `.Pagination`), each optional with a default (see
   Parts), never a `ReactNode` prop such as `empty={…}` or `caption={…}`.
-- **`X.Part` is a piece of one X; a container of many X is `XGroup`.** `Select.Group` sits inside
-  one Select; `ButtonGroup`, `AvatarGroup` and `RadioGroup` hold many and are components of their
-  own. An X changes only through the context such a group gives it, never by detecting what
-  surrounds it.
+- **A container of many X is `XGroup`**, a component of its own (see "A group of several X" below).
+  An X changes only through the context such a group gives it, never by detecting what surrounds
+  it.
 - **More than three options, or a feature with props of its own, go into a hook.** Count the
   root's options. Up to three single-value options (`orientation`, `loop`, `side`) stay on the
   root. Past three, or as soon as one feature needs more than one prop (a switch, a mode and its
