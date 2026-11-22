@@ -660,7 +660,9 @@ height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regu
 utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which matches Pretendard GOV's
 x-height (0.53), so Geist Mono draws at full size level with the body text and any fallback font
 comes to the same x-height. Pretendard follows the monospace fonts in the stack, so Hangul in code
-falls back to it. Do not shrink it again with `text-[0.9em]`.
+falls back to it. Do not shrink it again with `text-[0.9em]`. The one exception is inline code in
+`document-text`, which sits at `0.875em` among 16px prose, where a full-size monospace word reads
+louder than the sentence around it.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
