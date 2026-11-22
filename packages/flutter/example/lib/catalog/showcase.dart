@@ -49,7 +49,7 @@ class ShowcaseSection extends StatelessWidget {
             Text(
               title,
               style: ids.textStyle(
-                IdsTypography.subtitleS2Semibold,
+                IdsTypography.bodyB2Semibold,
                 color: ids.colors.textNeutralStrong,
               ),
             ),
