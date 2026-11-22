@@ -121,7 +121,7 @@ export const PC: Story = {
                       <Card.Description>{stat.label}</Card.Description>
                     </dt>
                     <dd>
-                      <Card.Title asChild className="text-subtitle-s1-bold">
+                      <Card.Title asChild className="text-body-b1-bold">
                         <span>{stat.value}</span>
                       </Card.Title>
                     </dd>

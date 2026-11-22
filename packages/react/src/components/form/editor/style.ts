@@ -20,18 +20,6 @@ const proseMirrorBaseline = cn(
   '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary-strong',
 );
 
-const documentBlocks = cn(
-  '[&>*+*]:mt-2',
-  '[&_h1]:text-headline-h4-bold [&_h2]:text-headline-h5-bold [&_h3]:text-headline-h6-bold [&_h4]:text-body-b1-bold',
-  '[&_:is(h1,h2,h3,h4)+*]:mt-1',
-  '[&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-6 [&_li>*+*]:mt-1 [&_li+li]:mt-1',
-  '[&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
-  '[&_pre]:rounded-standard [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
-  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
-  '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
-  '[&_hr]:my-3 [&_hr]:border-neutral',
-);
-
 export const editorStyle = tv({
   slots: {
     root: [
@@ -55,7 +43,7 @@ export const editorStyle = tv({
       'min-h-24 outline-none text-neutral-strong',
       'selection:bg-primary-solid/30 selection:text-neutral-strong',
       proseMirrorBaseline,
-      documentBlocks,
+      'document-text',
       placeholder,
     ],
     count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-strong'],
@@ -70,25 +58,25 @@ export const editorStyle = tv({
       outline: {
         root: fieldSurface.variant.outline,
         bar: 'border-field-bar',
-        content: '[&_pre]:bg-field-code-outline [&_:not(pre)>code]:bg-field-code-outline',
+        content: '[&_:not(pre)>code]:bg-field-code-outline',
       },
       soft: {
         root: fieldSurface.variant.soft,
         bar: 'border-field-bar',
-        content: '[&_pre]:bg-block [&_:not(pre)>code]:bg-block',
+        content: '[&_:not(pre)>code]:bg-block',
       },
     } satisfies Record<EditorVariant, object>,
     size: {
       standard: {
         root: 'text-body-b3-regular',
         barItems: 'p-1',
-        content: 'px-3 py-2',
+        content: 'px-3 py-2 text-body-b2-regular leading-prose',
         count: 'px-2 text-caption-c1-regular',
       },
       tiny: {
         root: 'text-caption-c1-regular',
         barItems: 'p-0.5',
-        content: 'px-2 py-1.5',
+        content: 'px-2 py-1.5 text-body-b3-regular',
         count: 'px-1.5 text-caption-c2-regular',
       },
     } satisfies Record<IdsSize, object>,

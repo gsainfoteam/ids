@@ -18,7 +18,7 @@ export const dialogStyle = tv({
     body: 'relative flex min-h-0 flex-col',
     viewport: 'relative flex flex-col gap-4 p-6',
     header: 'flex flex-col gap-1.5 pe-8 text-start',
-    title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
+    title: 'text-body-b1-semibold [overflow-wrap:anywhere]',
     description: 'text-body-b3-regular text-neutral',
     footer: [
       'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',

@@ -6,7 +6,7 @@ export const chartStyle = tv({
   slots: {
     root: 'm-0 flex min-w-0 flex-col gap-4 text-neutral-strong',
     caption: 'flex flex-col gap-1',
-    title: 'text-subtitle-s2-semibold [overflow-wrap:anywhere]',
+    title: 'text-body-b2-semibold [overflow-wrap:anywhere]',
     description: 'text-body-b3-regular text-neutral',
     frame: [
       'text-caption-c1-regular',

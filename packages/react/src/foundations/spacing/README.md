@@ -7,7 +7,7 @@
 
 ```tsx
 <div className="flex flex-col gap-2 p-4">  {/* sm 간격, md 여백 */}
-  <h3 className="text-subtitle-s2-semibold">제목</h3>
+  <h3 className="text-body-b2-semibold">제목</h3>
   <p className="text-body-b3-regular">설명</p>
 </div>
 ```

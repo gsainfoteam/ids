@@ -131,7 +131,7 @@ export const Gallery: Story = {
               <Carousel.Content className="gap-3">
                 {products.map((product) => (
                   <Carousel.Slide key={product.id}>
-                    <div className="rounded-container text-subtitle-s2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
+                    <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
                       {product.name}
                     </div>
                   </Carousel.Slide>

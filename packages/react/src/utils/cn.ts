@@ -7,7 +7,7 @@ import type { CnFunction } from 'cn';
 
 const componentShadows = Object.keys(IDS_COMPONENT_SHADOWS).map((token) => token.replace(/^shadow-/, ''));
 
-const isTextStyle = (value: string) => /^(headline|subtitle|body|caption|button)-/.test(value);
+const isTextStyle = (value: string) => /^(headline|body|caption)-/.test(value);
 
 const paddingGroups: DefaultClassGroupIds[] = ['p', 'px', 'py', 'ps', 'pe', 'pt', 'pr', 'pb', 'pl'];
 const roundedGroups: DefaultClassGroupIds[] = [
