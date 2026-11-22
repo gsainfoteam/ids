@@ -4,37 +4,43 @@ import { use, useState, type ReactNode, type RefCallback } from 'react';
 
 import { useDraggable } from '@dnd-kit/core';
 
-import { SchedulerContext, SchedulerMonthDragContext } from './context';
+import { SchedulerContext, SchedulerDragContext, type SchedulerDragPiece } from './context';
 import { swallowTheSpaceKeyupThatWouldPress } from '../../../internal/drag-surface';
 import { keyHandler } from '../../../internal/keys';
 import { readingDirection } from '../../../internal/resize-handle';
 import { invariant, mergeRefs } from '../../../utils';
 
 import type { SchedulerEventData } from './layout';
-import type { CalendarDate } from '@internationalized/date';
 
 const DAYS_IN_WEEK = 7;
 
 export type SchedulerMonthMovableProps = {
   event: SchedulerEventData;
-  day: CalendarDate;
+  dayIndex: number;
+  dayCount: number;
   children: ReactNode;
 };
 
-export function SchedulerMonthMovable({ event, day, children }: SchedulerMonthMovableProps) {
+export function SchedulerMonthMovable({
+  event,
+  dayIndex,
+  dayCount,
+  children,
+}: SchedulerMonthMovableProps) {
   const scheduler = use(SchedulerContext);
-  const drag = use(SchedulerMonthDragContext);
+  const drag = use(SchedulerDragContext);
   invariant(
     scheduler && drag,
     'SchedulerMonthMovable must be rendered inside a Scheduler that moves events.',
   );
   const { styles } = scheduler;
-  const key = `${event.id}@${day.toString()}`;
+  const key = `${event.id}@${dayIndex}`;
   const [element, setElement] = useState<HTMLElement | null>(null);
-  const piece = { key, event, day, element: () => element };
+  const piece: SchedulerDragPiece = { key, event, dayIndex, dayCount, element: () => element };
   const draggable = useDraggable({ id: key, data: piece });
   const ref: RefCallback<HTMLDivElement> = mergeRefs(draggable.setNodeRef, setElement);
   const grabbed = drag.grabbed?.key === key ? drag.grabbed : null;
+  const offset = grabbed?.offset ?? draggable.transform;
   const dragging = draggable.isDragging || grabbed !== null;
 
   const pressSpace = (action: () => void) => () => {
@@ -42,7 +48,7 @@ export function SchedulerMonthMovable({ event, day, children }: SchedulerMonthMo
     action();
   };
 
-  const nudge = (days: number) => () => drag.nudge(days);
+  const nudge = (days: number) => () => drag.nudge({ days, minutes: 0 });
 
   return (
     <div
@@ -51,7 +57,7 @@ export function SchedulerMonthMovable({ event, day, children }: SchedulerMonthMo
       data-scheduler-movable=""
       data-dragging={dragging ? '' : undefined}
       className={styles.monthMovable({ dragging })}
-      style={{ translate: grabbed ? `${grabbed.offset.x}px ${grabbed.offset.y}px` : undefined }}
+      style={{ translate: offset ? `${offset.x}px ${offset.y}px` : undefined }}
       onDragStart={(dragStart) => dragStart.preventDefault()}
       onKeyDownCapture={(keyDown) => {
         keyHandler<HTMLDivElement>(
@@ -65,7 +71,7 @@ export function SchedulerMonthMovable({ event, day, children }: SchedulerMonthMo
                 Space: pressSpace(drag.drop),
                 Escape: () => drag.cancel(),
               }
-            : { Space: pressSpace(() => drag.grab(piece)) },
+            : { Space: pressSpace(() => drag.grab(piece, keyDown.currentTarget)) },
           readingDirection(keyDown.currentTarget),
         )(keyDown);
       }}

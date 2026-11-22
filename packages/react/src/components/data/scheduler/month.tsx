@@ -4,8 +4,14 @@ import { useRef, type CSSProperties, type ReactNode } from 'react';
 
 import { type CalendarDate } from '@internationalized/date';
 
-import { SchedulerEventContext, type SchedulerContextValue } from './context';
+import {
+  SchedulerEventContext,
+  type SchedulerContextValue,
+  type SchedulerDragPiece,
+} from './context';
 import { dayOfCell, SchedulerContextMenu } from './context-menu';
+import { SchedulerDrag, type SchedulerDragProps } from './drag';
+import { measureInTheMonth } from './drag-geometry';
 import {
   daysBetween,
   hiddenOn,
@@ -16,7 +22,6 @@ import {
   type SchedulerMonthBar,
   type SchedulerSlot,
 } from './layout';
-import { SchedulerMonthDrag, type SchedulerMonthDragProps } from './month-drag';
 import { SchedulerMonthMovable } from './month-movable';
 import { usePointerSelection } from './use-pointer-selection';
 import { useTranslate } from '../../../internal/translate';
@@ -26,6 +31,8 @@ import { compareDays, sameDay } from '../calendar/date';
 import { ItemGroup } from '../item-group';
 
 const SHOWN_ROWS = 3;
+const DAYS_IN_WEEK = 7;
+const MONTH_AUTO_SCROLL = { threshold: { x: 0, y: 0.08 } };
 const MONTH_DAY = '[data-scheduler-month-day]';
 
 const monthDayOf = (target: Element) => target.closest<HTMLElement>(MONTH_DAY);
@@ -84,9 +91,13 @@ export function SchedulerMonth<E extends SchedulerEventData>({
   const isSelected = (day: CalendarDate) =>
     selection !== null && compareDays(day, selection.from) * compareDays(day, selection.to) <= 0;
 
-  const movable = (bar: SchedulerMonthBar<E>, week: CalendarDate[], content: ReactNode) =>
+  const movable = (bar: SchedulerMonthBar<E>, weekIndex: number, content: ReactNode) =>
     onEventChange ? (
-      <SchedulerMonthMovable event={bar.event} day={week[bar.column]}>
+      <SchedulerMonthMovable
+        event={bar.event}
+        dayIndex={weekIndex * DAYS_IN_WEEK + bar.column}
+        dayCount={days.length}
+      >
         {content}
       </SchedulerMonthMovable>
     ) : (
@@ -104,12 +115,13 @@ export function SchedulerMonth<E extends SchedulerEventData>({
           ))}
         </div>
 
-        {weeks.map((week) => {
+        {weeks.map((week, weekIndex) => {
           const bars = monthBarsIn(events, week);
           return (
             <div
               key={week[0].toString()}
               role="group"
+              data-scheduler-month-week=""
               aria-label={format.dates(week[0], week[week.length - 1])}
               className={styles.monthWeek()}
             >
@@ -158,7 +170,7 @@ export function SchedulerMonth<E extends SchedulerEventData>({
                           pastEnd: bar.pastEnd,
                         }}
                       >
-                        {movable(bar, week, renderEvent(bar.event))}
+                        {movable(bar, weekIndex, renderEvent(bar.event))}
                       </SchedulerEventContext>
                     </li>
                   ))}
@@ -202,15 +214,18 @@ export function SchedulerMonth<E extends SchedulerEventData>({
     <ScrollArea className={styles.board()}>
       <ScrollArea.Viewport className={styles.viewport()}>
         {onEventChange ? (
-          <SchedulerMonthDrag
+          <SchedulerDrag
             events={events}
-            days={days}
             format={format}
-            canvasRef={canvasRef}
-            onEventChange={onEventChange as SchedulerMonthDragProps['onEventChange']}
+            hourHeight={undefined}
+            bodyRef={canvasRef}
+            measure={measureInTheMonth}
+            hint={t('scheduler.drag.monthHint')}
+            autoScroll={MONTH_AUTO_SCROLL}
+            onEventChange={onEventChange as SchedulerDragProps<SchedulerDragPiece>['onEventChange']}
           >
             {board}
-          </SchedulerMonthDrag>
+          </SchedulerDrag>
         ) : (
           board
         )}

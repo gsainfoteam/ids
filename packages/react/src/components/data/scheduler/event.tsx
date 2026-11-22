@@ -4,11 +4,7 @@ import { use, type ReactNode } from 'react';
 
 import { toCalendarDate } from '@internationalized/date';
 
-import {
-  SchedulerDragContext,
-  SchedulerMonthDragContext,
-  useSchedulerEventContext,
-} from './context';
+import { SchedulerDragContext, useSchedulerEventContext } from './context';
 import { Item } from '../item';
 
 import type { SchedulerColorScheme } from './layout';
@@ -40,9 +36,7 @@ export function SchedulerEvent({
   const oneLine = allDay || inMonth;
   const startsAt = inMonth && !allDay;
   const scheme = colorScheme ?? event.colorScheme ?? 'primary';
-  const movesInTheGrid = use(SchedulerDragContext) !== null && !oneLine;
-  const movesInTheMonth = use(SchedulerMonthDragContext) !== null && inMonth;
-  const movable = movesInTheGrid || movesInTheMonth;
+  const movable = use(SchedulerDragContext) !== null && (inMonth || !allDay);
   const focusableToMove = movable && props.onClick === undefined;
 
   return (

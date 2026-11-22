@@ -10,9 +10,14 @@ import {
 } from '@internationalized/date';
 import { clamp, range } from 'es-toolkit';
 
-import { SchedulerEventContext, type SchedulerContextValue } from './context';
+import {
+  SchedulerEventContext,
+  type SchedulerContextValue,
+  type SchedulerSlotData,
+} from './context';
 import { SchedulerContextMenu } from './context-menu';
 import { SchedulerDrag, type SchedulerDragProps } from './drag';
+import { measureInTheGrid } from './drag-geometry';
 import {
   allDayBarsIn,
   dateOf,
@@ -299,8 +304,14 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                 events={events}
                 format={format}
                 hourHeight={hourHeight}
+                measure={(slot: SchedulerSlotData, element) =>
+                  hourHeight === undefined ? null : measureInTheGrid(slot, element, hourHeight)
+                }
+                hint={t('scheduler.drag.hint')}
                 bodyRef={bodyRef}
-                onEventChange={onEventChange as SchedulerDragProps['onEventChange']}
+                onEventChange={
+                  onEventChange as SchedulerDragProps<SchedulerSlotData>['onEventChange']
+                }
               >
                 {body}
               </SchedulerDrag>

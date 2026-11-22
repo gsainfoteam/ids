@@ -40,19 +40,23 @@ export function useSchedulerEventContext(part: string) {
   return { ...scheduler, ...event };
 }
 
-export type SchedulerSlotData = {
+export type SchedulerDragPiece = {
   key: string;
-  segment: SchedulerSegment;
-  day: CalendarDate;
+  event: SchedulerEventData;
   dayIndex: number;
   dayCount: number;
   element: () => HTMLElement | null;
 };
 
+export type SchedulerSlotData = SchedulerDragPiece & {
+  segment: SchedulerSegment;
+  day: CalendarDate;
+};
+
 export type SchedulerDragValue = {
   hourHeight: number | undefined;
   grabbed: { key: string; offset: { x: number; y: number } } | null;
-  grab: (slot: SchedulerSlotData, element: HTMLElement) => void;
+  grab: (piece: SchedulerDragPiece, element: HTMLElement) => void;
   nudge: (by: SchedulerShift) => void;
   drop: () => void;
   cancel: () => void;
@@ -61,20 +65,3 @@ export type SchedulerDragValue = {
 };
 
 export const SchedulerDragContext = createContext<SchedulerDragValue | null>(null);
-
-export type SchedulerMonthPiece = {
-  key: string;
-  event: SchedulerEventData;
-  day: CalendarDate;
-  element: () => HTMLElement | null;
-};
-
-export type SchedulerMonthDragValue = {
-  grabbed: { key: string; offset: { x: number; y: number } } | null;
-  grab: (piece: SchedulerMonthPiece) => void;
-  nudge: (days: number) => void;
-  drop: () => void;
-  cancel: () => void;
-};
-
-export const SchedulerMonthDragContext = createContext<SchedulerMonthDragValue | null>(null);

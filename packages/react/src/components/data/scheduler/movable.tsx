@@ -45,7 +45,15 @@ export function SchedulerMovable({
   const { styles } = scheduler;
   const key = `${segment.event.id}@${day.toString()}`;
   const [element, setElement] = useState<HTMLElement | null>(null);
-  const slotData = { key, segment, day, dayIndex, dayCount, element: () => element };
+  const slotData = {
+    key,
+    event: segment.event,
+    segment,
+    day,
+    dayIndex,
+    dayCount,
+    element: () => element,
+  };
   const draggable = useDraggable({ id: key, data: slotData });
   const ref: RefCallback<HTMLDivElement> = mergeRefs(draggable.setNodeRef, setElement);
   const grabbed = drag.grabbed?.key === key ? drag.grabbed : null;
