@@ -11,7 +11,7 @@ import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
-import { FileField } from '../../components/form/file-field';
+import { FileDropzone } from '../../components/form/file-dropzone';
 import { Select } from '../../components/form/select';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -72,10 +72,9 @@ export const PC: Story = {
           </Card.Header>
 
           <Card.Content className="flex flex-col gap-5">
-            <FileField
+            <FileDropzone
               aria-label="올릴 파일"
               name="files"
-              appearance="dropzone"
               multiple
               maxSize={100 * 1024 * 1024}
             />

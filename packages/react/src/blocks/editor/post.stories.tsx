@@ -9,7 +9,7 @@ import { ChipField } from '../../components/form/chip-field';
 import { DateTimeField } from '../../components/form/date-time-field';
 import { Editor } from '../../components/form/editor';
 import { Field } from '../../components/form/field';
-import { FileField } from '../../components/form/file-field';
+import { FileDropzone } from '../../components/form/file-dropzone';
 import { RadioGroup } from '../../components/form/radio-group';
 import { Select } from '../../components/form/select';
 import { Switch } from '../../components/form/switch';
@@ -147,12 +147,7 @@ export const PC: Story = {
                 <Card.Description>목록과 공유 미리 보기에 보여요.</Card.Description>
               </Card.Header>
               <Card.Content>
-                <FileField
-                  aria-label="표지 그림"
-                  appearance="dropzone"
-                  accept="image/*"
-                  maxSize={10 * 1024 * 1024}
-                />
+                <FileDropzone aria-label="표지 그림" accept="image/*" maxSize={10 * 1024 * 1024} />
               </Card.Content>
             </Card>
 

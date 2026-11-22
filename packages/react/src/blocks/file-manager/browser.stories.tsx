@@ -29,7 +29,7 @@ import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
-import { FileField } from '../../components/form/file-field';
+import { FileDropzone } from '../../components/form/file-dropzone';
 import { TextField } from '../../components/form/text-field';
 import { Breadcrumb } from '../../components/navigation/breadcrumb';
 import { Dialog } from '../../components/overlay/dialog';
@@ -153,12 +153,7 @@ export const PC: Story = {
                     <Dialog.Title>2026 가을에 올리기</Dialog.Title>
                     <Dialog.Description>파일을 끌어다 놓거나 골라요.</Dialog.Description>
                   </Dialog.Header>
-                  <FileField
-                    aria-label="올릴 파일"
-                    appearance="dropzone"
-                    multiple
-                    maxSize={100 * 1024 * 1024}
-                  />
+                  <FileDropzone aria-label="올릴 파일" multiple maxSize={100 * 1024 * 1024} />
                   <Dialog.Footer>
                     <Dialog.Close asChild>
                       <Button variant="outline">취소</Button>

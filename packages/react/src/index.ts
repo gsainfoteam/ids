@@ -231,6 +231,8 @@ export type { ChipFieldProps } from './components/form/chip-field';
 
 export { FileField } from './components/form/file-field';
 export type { FileFieldProps, FileFieldRejection } from './components/form/file-field';
+export { FileDropzone } from './components/form/file-dropzone';
+export type { FileDropzoneProps } from './components/form/file-dropzone';
 
 export { Calendar } from './components/data/calendar';
 export type {

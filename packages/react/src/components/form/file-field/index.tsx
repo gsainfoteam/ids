@@ -6,7 +6,6 @@ import { FilePreview, type FilePreviewProps } from './preview';
 import { FileRemove, type FileRemoveProps } from './remove';
 import {
   FileFieldRoot,
-  type FileFieldAppearance,
   type FileFieldVariant,
   type FileFieldState,
   type FileFieldItemState,
@@ -24,7 +23,6 @@ export namespace FileField {
   export type Props = FileFieldProps;
   export type State = FileFieldState;
   export type ItemState = FileFieldItemState;
-  export type Appearance = FileFieldAppearance;
   export type Variant = FileFieldVariant;
   export type Rejection = FileFieldRejection;
 
@@ -47,11 +45,5 @@ export namespace FileField {
   export const Style = fileFieldStyle;
 }
 
-export type {
-  FileFieldAppearance,
-  FileFieldVariant,
-  FileFieldState,
-  FileFieldItemState,
-  FileFieldProps,
-} from './root';
+export type { FileFieldVariant, FileFieldState, FileFieldItemState, FileFieldProps } from './root';
 export type { FileFieldRejection } from './file-rules';

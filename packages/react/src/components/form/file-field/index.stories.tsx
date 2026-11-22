@@ -33,7 +33,6 @@ const meta = {
   component: FileField,
   tags: ['autodocs'],
   argTypes: {
-    appearance: { control: 'radio', options: ['field', 'dropzone'] },
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     multiple: { control: 'boolean' },
@@ -43,7 +42,6 @@ const meta = {
   },
   args: {
     'aria-label': '첨부 파일',
-    appearance: 'field',
     variant: 'outline',
     size: 'standard',
     onValueChange: fn(),
@@ -84,27 +82,6 @@ export const Gallery: Story = {
         />
       </Showcase.Section>
 
-      <Showcase.Section
-        title="Dropzone · Variant"
-        description="appearance 가 dropzone 이면 파일을 끌어다 놓는 큰 영역이 됩니다. 허용 형식과 크기 제한은 영역 안에 미리 보입니다."
-      >
-        <Showcase.Row className="items-start">
-          {variants.map((variant) => (
-            <div key={variant} className="w-64">
-              <FileField
-                appearance="dropzone"
-                variant={variant}
-                multiple
-                accept="image/*,.pdf"
-                maxSize={5 * 1024 * 1024}
-                maxCount={3}
-                aria-label={variant}
-              />
-            </div>
-          ))}
-        </Showcase.Row>
-      </Showcase.Section>
-
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
           <div className="w-80">
@@ -136,16 +113,6 @@ export const Gallery: Story = {
               size="tiny"
               multiple
               defaultValue={[photo('cover.svg', '#a855f7'), pdf('report.pdf')]}
-            />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="dropzone + list" className="items-start">
-          <div className="w-80">
-            <FileField
-              aria-label="끌어다 놓기"
-              appearance="dropzone"
-              multiple
-              defaultValue={[photo('cover.svg', '#22c55e'), pdf()]}
             />
           </div>
         </Showcase.Row>
@@ -185,7 +152,6 @@ export const MultipleAndLimits: Story = {
             maxSize={20}
             maxCount={2}
             name="attachments"
-            appearance="dropzone"
             data-testid="file-picker"
           />
           <Field.Hint>실제 업로드는 하지 않습니다.</Field.Hint>
@@ -219,38 +185,6 @@ export const MultipleAndLimits: Story = {
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByLabelText('파일 결과')).toBeEmptyDOMElement();
     await expect(canvas.getByRole('button', { name: '첨부 파일' })).toHaveFocus();
-  },
-};
-
-export const PasteAndDrop: Story = {
-  args: { appearance: 'dropzone', multiple: true, accept: 'image/*' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '필드에 포커스를 두고 붙여넣으면 클립보드의 파일(스크린샷 등)이 들어갑니다. 파일을 끌어 올리면 영역 색이 바뀌고, 놓으면 받습니다. 글자나 링크를 끌어 오는 것은 무시합니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement, userEvent, args }) => {
-    const trigger = canvas.getByRole('button', { name: '첨부 파일' });
-    trigger.focus();
-    const clipboard = new DataTransfer();
-    clipboard.items.add(photo('screenshot.svg'));
-    await userEvent.paste(clipboard);
-    await expect(args.onValueChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({ name: 'screenshot.svg' }),
-    ]);
-    const root = canvasElement.querySelector('[data-file-field]')!;
-    const dragged = new DataTransfer();
-    dragged.items.add(photo('dropped.svg', '#8b5cf6'));
-    root.dispatchEvent(new DragEvent('dragenter', { bubbles: true, dataTransfer: dragged }));
-    await waitFor(() => expect(trigger).toHaveAttribute('data-dragging'));
-    root.dispatchEvent(
-      new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dragged }),
-    );
-    await waitFor(() => expect(trigger).not.toHaveAttribute('data-dragging'));
-    await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
   },
 };
 

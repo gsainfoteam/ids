@@ -23,7 +23,7 @@ import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { ChipField } from '../../components/form/chip-field';
 import { Field } from '../../components/form/field';
-import { FileField } from '../../components/form/file-field';
+import { FileDropzone } from '../../components/form/file-dropzone';
 import { Select } from '../../components/form/select';
 import { Switch } from '../../components/form/switch';
 import { TextArea } from '../../components/form/text-area';
@@ -188,12 +188,7 @@ export const PC: Story = {
               <Field>
                 <Field.Label>지식</Field.Label>
                 <Field.Description>에이전트가 답할 때 먼저 찾아볼 문서예요.</Field.Description>
-                <FileField
-                  name="knowledge"
-                  appearance="dropzone"
-                  multiple
-                  accept=".pdf,.docx,.txt,.md"
-                />
+                <FileDropzone name="knowledge" multiple accept=".pdf,.docx,.txt,.md" />
               </Field>
               <ItemGroup variant="separated" size="tiny" aria-label="올린 문서">
                 {KNOWLEDGE.map((file) => (
