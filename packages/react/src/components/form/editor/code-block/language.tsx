@@ -7,6 +7,7 @@ import {
   listedLanguageName,
 } from '../../../data/code-block/highlight';
 import { Select } from '../../select';
+import { editorMessages } from '../messages-catalog';
 import { editorStyle } from '../style';
 
 const PLAIN_TEXT = 'text';
@@ -29,7 +30,7 @@ export function EditorCodeLanguage({
   disabled: boolean;
   onLanguageChange: (language: string | null) => void;
 }) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
 
   return (
     <Select

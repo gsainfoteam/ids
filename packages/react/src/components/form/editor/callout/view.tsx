@@ -7,9 +7,10 @@ import { useTranslate } from '../../../../internal/translate';
 import { alertStyle } from '../../../feedback/alert/style';
 import { CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
 import { calloutKindOf } from '../../../typography/rich-text/schema/callout';
+import { editorMessages } from '../messages-catalog';
 
 export function EditorCalloutView({ node, editor, getPos, updateAttributes }: ReactNodeViewProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const kind = calloutKindOf(node.attrs.kind);
   const styles = alertStyle({ colorScheme: kind, variant: 'soft', icon: true });
 

@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { TextAlignCenter, TextAlignEnd, TextAlignJustify, TextAlignStart } from 'lucide-react';
 
 import { useEditorContext } from './context';
+import { editorMessages } from './messages-catalog';
 import { EditorToolTip, extensionIsLoaded, hasExtension, useEditorToolProps } from './tool';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate } from '../../../internal/translate';
@@ -53,7 +54,7 @@ function AlignmentToggle({
   disabled: boolean;
   editor: TiptapEditor | null;
 }) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const tool = useEditorToolProps(`TextAlign-${alignment}`);
   const { label, icon, shortcut } = ALIGNMENT[alignment];
 
@@ -82,7 +83,7 @@ export function EditorTextAlign({
   'aria-label': ariaLabel,
   className,
 }: EditorTextAlignProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor.TextAlign');
   const loaded = extensionIsLoaded(editor, 'TextAlign', 'textAlign');
   const current = useEditorSelector(

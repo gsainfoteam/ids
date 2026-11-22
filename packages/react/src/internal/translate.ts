@@ -2,7 +2,12 @@
 
 import { createContext, use, useCallback } from 'react';
 
-import { formatDefaultMessage, type IdsMessageKey, type IdsMessageValues } from './messages';
+import {
+  formatDefaultMessage,
+  type IdsMessageKey,
+  type IdsMessageValues,
+  type MessageTree,
+} from './messages';
 
 export type IdsTranslate = (key: IdsMessageKey, values?: IdsMessageValues) => string | undefined;
 
@@ -12,17 +17,17 @@ export type LanguageContextValue = { translate?: IdsTranslate; locale?: string }
 
 export const LanguageContext = createContext<LanguageContextValue>({});
 
-export function useTranslate(): Translate {
+export function useTranslate(ownCatalog?: MessageTree): Translate {
   const { translate } = use(LanguageContext);
 
   return useCallback(
     (key, values) => {
       const translated = translate?.(key, values);
       return translated === undefined || translated === key
-        ? formatDefaultMessage(key, values)
+        ? formatDefaultMessage(key, values, ownCatalog)
         : translated;
     },
-    [translate],
+    [translate, ownCatalog],
   );
 }
 

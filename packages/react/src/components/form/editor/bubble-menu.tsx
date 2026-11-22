@@ -13,6 +13,7 @@ import { EditorBar } from './bar';
 import { useEditorContext } from './context';
 import { EditorLink } from './link';
 import { EditorBold, EditorCode, EditorItalic, EditorStrike } from './marks';
+import { editorMessages } from './messages-catalog';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate } from '../../../internal/translate';
 import { Popover } from '../../overlay/popover';
@@ -85,7 +86,7 @@ export function EditorBubbleMenu({
   className,
   children,
 }: EditorBubbleMenuProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor.BubbleMenu');
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [anchorBox, setAnchorBox] = useState<CSSProperties>({});

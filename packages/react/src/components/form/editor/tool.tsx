@@ -3,6 +3,7 @@
 import { use, type MouseEvent, type ReactElement } from 'react';
 
 import { EditorBarContext, useEditorContext } from './context';
+import { editorMessages } from './messages-catalog';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate } from '../../../internal/translate';
 import { isDevelopment } from '../../../utils/dev';
@@ -114,7 +115,7 @@ export function EditorToggleTool({
   'aria-label': ariaLabel,
   className,
 }: EditorToolProps & { spec: EditorToggleSpec }) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable } = useEditorContext(`Editor.${spec.name}`);
   const state = useToolState(spec);
   const tool = useEditorToolProps(spec.name);
