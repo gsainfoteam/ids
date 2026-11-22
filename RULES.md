@@ -679,8 +679,7 @@ props an app has to remember stay few. A root takes only:
 
 - the state it owns, as a trio: `value` / `defaultValue` / `onValueChange`, or `checked`, `open`,
   `pressed`, `page` with their `default*` and `on*Change` (see Callbacks);
-- `variant` (or `appearance`, see Variants below), `size` and the color prop (`colorScheme`;
-  renaming it `color` is still open);
+- `variant`, `size` and the color prop (`colorScheme`; renaming it `color` is still open);
 - `className`, `style`, `children` and `asChild`;
 - native attributes of the element it renders (`disabled`, `name`, `required`, `min`, `step`,
   `id`, `aria-*`);
@@ -694,6 +693,10 @@ Every other prop is an option. The rules for options:
   a part (`<Card.Title asChild><h2>…</h2></Card.Title>`), or derive it from a native attribute
   (`target="_blank"`, `aria-busy`, `aria-hidden`, `value={null}` for indeterminate). A second look
   axis is an enum named for what it sets (`shape`, `align`, `orientation`), never a boolean.
+- **One look prop, `variant`.** There is no `appearance`, `look` or `kind` beside or instead of it:
+  two vague names for one idea split the API. When two looks differ in structure, with other parts
+  and markup (FileField's field and dropzone), they are two components on one internal hook
+  (`FileField` and `FileDropzone` on `useFileFieldRoot`), never a second look prop.
 - **Shape, not role.** A prop names what the reader sees or where it sits (`shape="plain"`,
   `align="end"`), never who it is for (`from="user"`).
 - **Presence, not `show`/`hide`.** An element is drawn because its data or its part is given and
@@ -766,8 +769,8 @@ keys and that no Korean literal sits in component code; `tests/translate-<catego
 renders every story in English and `tests/translate.test.tsx` checks popups, live regions and
 fallbacks.
 
-**Variants are the looks an app cannot build from IDS parts.** A `variant` or `appearance` value is
-a component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
+**Variants are the looks an app cannot build from IDS parts.** A `variant` value is a
+component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
 and `ghost`, Tabs' `underline`, `pill`, `enclosed` and `segmented`. A look an app can compose from
 IDS components and props (a Card holding a Tabs, a Field around a SegmentedControl) stays a
 composition and never becomes a prop value. Two components that read alike share an internal
