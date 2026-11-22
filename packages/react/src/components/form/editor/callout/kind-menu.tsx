@@ -14,6 +14,7 @@ import {
   type CalloutKind,
 } from '../../../typography/rich-text/schema/callout';
 import { EditorGlyphButton } from '../glyph-button';
+import { editorMessages } from '../messages-catalog';
 import { editorStyle } from '../style';
 
 const kindIcon = (kind: CalloutKind) =>
@@ -32,7 +33,7 @@ export function EditorCalloutKindMenu({
   onKindChange: (kind: CalloutKind) => void;
   onRemove: () => void;
 }) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
 
   return (
     <Menu>

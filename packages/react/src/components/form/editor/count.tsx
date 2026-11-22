@@ -3,6 +3,7 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
 import { useEditorContext } from './context';
+import { editorMessages } from './messages-catalog';
 import { useEditorSelector } from './use-editor-selector';
 import { useTranslate, type Translate } from '../../../internal/translate';
 import { resolve, type StateValue } from '../text-area/state-value';
@@ -34,7 +35,7 @@ export function EditorCount({
   children,
   ...props
 }: EditorCountProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, contentId, countId, maxLength, styles } = useEditorContext('Editor.Count');
   const characters = useEditorSelector(
     editor,

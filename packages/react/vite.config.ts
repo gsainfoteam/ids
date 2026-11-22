@@ -7,7 +7,7 @@ import preserveDirectives from 'rollup-preserve-directives';
 import { defineConfig, type Plugin } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-import { messages } from './src/internal/messages';
+import { everyMessage } from './src/internal/every-message';
 
 const manifest = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   dependencies?: Record<string, string>;
@@ -27,7 +27,7 @@ const messageCatalogs = (): Plugin => ({
     this.emitFile({
       type: 'asset',
       fileName: 'messages/ko.json',
-      source: `${JSON.stringify(messages, null, 2)}\n`,
+      source: `${JSON.stringify(everyMessage, null, 2)}\n`,
     });
     this.emitFile({ type: 'asset', fileName: 'messages/en.json', source: english });
   },

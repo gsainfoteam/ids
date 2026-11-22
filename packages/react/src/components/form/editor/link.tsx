@@ -6,6 +6,7 @@ import { LinkIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useEditorContext } from './context';
+import { editorMessages } from './messages-catalog';
 import { isPlainEnter, withProtocol } from './popover-form';
 import { EditorToolTip, useEditorToolProps, useToolState, type EditorToolProps } from './tool';
 import { useTranslate } from '../../../internal/translate';
@@ -24,7 +25,7 @@ const LINK = {
 };
 
 export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorLinkProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor.Link');
   const state = useToolState(LINK);
   const tool = useEditorToolProps('Link');

@@ -52,6 +52,7 @@ import {
   EditorSuperscript,
   EditorUnderline,
 } from './marks';
+import { editorMessages } from './messages-catalog';
 import { EditorSeparator } from './separator';
 import { editorStyle } from './style';
 import { EditorTable } from './table/tool';
@@ -282,7 +283,7 @@ export function EditorRoot(props: Editor.Props) {
     style,
     children,
   } = props;
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const size = useFieldSize(sizeProp) ?? 'standard';
   const generatedId = useId();
   const contentId = id ?? `ids-editor-${generatedId}`;

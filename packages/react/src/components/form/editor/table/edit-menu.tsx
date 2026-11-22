@@ -16,6 +16,7 @@ import {
 import { useTranslate } from '../../../../internal/translate';
 import { Menu } from '../../../overlay/menu';
 import { useEditorContext } from '../context';
+import { editorMessages } from '../messages-catalog';
 import { EditorToolTip, type EditorToolTipProps } from '../tool';
 import { useEditorSelector } from '../use-editor-selector';
 
@@ -78,7 +79,7 @@ function cellState(editor: TiptapEditor) {
 }
 
 export function EditorTableMenuItems({ deletesTheTable = true }: { deletesTheTable?: boolean }) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, format, styles } = useEditorContext('Editor.Table');
   const { headerRow, mergeable, splittable } = useEditorSelector(editor, cellState, {
     headerRow: true,

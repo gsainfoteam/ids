@@ -7,6 +7,7 @@ import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from '@tipt
 
 import { useTranslate } from '../../../../internal/translate';
 import { EditorGlyphButton } from '../glyph-button';
+import { editorMessages } from '../messages-catalog';
 import { editorStyle } from '../style';
 
 import type { EditorDetailsOptions } from './node';
@@ -17,7 +18,7 @@ export function EditorDetailsView({
   extension,
   updateAttributes,
 }: ReactNodeViewProps) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const styles = editorStyle({ size: (extension.options as EditorDetailsOptions).size });
   const [openWhileReading, setOpenWhileReading] = useState<boolean | null>(null);
   const open = (editor.isEditable ? null : openWhileReading) ?? Boolean(node.attrs.open);

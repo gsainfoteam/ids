@@ -48,6 +48,7 @@ import { Menu } from '../../../overlay/menu';
 import { blocksAvailableIn, turnsIntoOtherBlocks } from '../blocks/catalog';
 import { useEditorContext } from '../context';
 import { EditorGlyphButton } from '../glyph-button';
+import { editorMessages } from '../messages-catalog';
 import { EditorTableMenuItems } from '../table/edit-menu';
 
 import type { BlockHoverStore, HoveredBlock } from './store';
@@ -242,7 +243,7 @@ function DraggableGrip({
 }
 
 export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
-  const t = useTranslate();
+  const t = useTranslate(editorMessages);
   const { editor, editable, styles } = useEditorContext('Editor');
   const hovered = useSyncExternalStore(store.subscribe, store.getSnapshot, () => null);
   const [menuBlock, setMenuBlock] = useState<HoveredBlock | null>(null);
