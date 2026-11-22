@@ -250,7 +250,8 @@ drawer/
 
 A component's `index.stories.tsx` holds three layers, in this order. The docs (the Docs page now,
 MDX pages with `<Canvas of={Stories.X}>` later) are built from the first two; the third is for
-tests and maintainers.
+tests and maintainers. ids_flutter's Widgetbook carries the same layers over to use cases
+(`packages/flutter/RULES.md`), so a change to a layer here changes it there in the same commit.
 
 1. **Basic**, first in the file and in exactly this order:
    - `Playground`: args wired to controls, nothing else.
