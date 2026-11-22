@@ -497,9 +497,21 @@ ${focusRingUtility("focus-ring-current", "current")}
 }
 
 @utility document-text {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--spacing) * 2);
+  & > :where(* + *) {
+    @apply mt-5;
+  }
+  & > :where(* + :is(h1, h2)) {
+    @apply mt-9;
+  }
+  & > :where(* + :is(h3, h4, h5, h6)) {
+    @apply mt-7;
+  }
+  & > :where(:is(h1, h2, h3, h4, h5, h6) + *) {
+    @apply mt-3;
+  }
+  & :where(li + li, li > * + *, blockquote > * + *) {
+    @apply mt-2;
+  }
 
   & :where(h1) {
     @apply text-headline-h5-semibold;
@@ -508,40 +520,38 @@ ${focusRingUtility("focus-ring-current", "current")}
     @apply text-headline-h6-semibold;
   }
   & :where(h3) {
-    @apply text-body-b1-semibold;
+    @apply text-body-b1-semibold tracking-snug;
   }
   & :where(h4, h5, h6) {
-    @apply text-body-b2-semibold;
+    @apply text-body-b2-semibold tracking-snug;
   }
-  & > :where(:is(h1, h2, h3, h4, h5, h6):not(:first-child)) {
-    @apply mt-4;
-  }
+
   & :where(ul, ol) {
     @apply ps-6;
   }
   & :where(ul) {
-    @apply list-disc;
+    @apply list-disc marker:text-(--ids-color-border-neutral-strong);
   }
   & :where(ul ul) {
     list-style-type: circle;
   }
   & :where(ol) {
-    @apply list-decimal;
+    @apply list-decimal marker:text-neutral;
   }
   & :where(blockquote) {
-    @apply flex flex-col gap-2 border-s-2 border-neutral ps-3 text-neutral;
+    @apply border-s-2 border-neutral ps-4 text-neutral;
   }
   & :where(pre) {
-    @apply rounded-standard bg-neutral-soft px-3 py-2 font-mono leading-b2 whitespace-pre-wrap;
+    @apply rounded-standard bg-neutral-soft px-4 py-3 font-mono leading-b2 whitespace-pre-wrap;
   }
   & :where(:not(pre) > code) {
-    @apply rounded-indicator bg-neutral-soft px-1 font-mono;
+    @apply rounded-indicator border border-neutral bg-neutral-soft px-1.5 py-px font-mono;
   }
   & :where(a) {
-    @apply text-primary underline underline-offset-2;
+    @apply font-medium underline decoration-(--ids-color-border-neutral-strong) underline-offset-4 hover:decoration-current;
   }
   & :where(hr) {
-    @apply my-2 border-neutral;
+    @apply border-neutral;
   }
 }
 `;

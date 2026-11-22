@@ -34,9 +34,10 @@
     "prose": { "$value": "28px", "$type": "dimension" }
   },
   "letter-spacing": {
-    "normal": { "$value": "0em",      "$type": "dimension" },
-    "snug":   { "$value": "-0.015em", "$type": "dimension" },
-    "tight":  { "$value": "-0.025em", "$type": "dimension" }
+    "normal":  { "$value": "0em",      "$type": "dimension" },
+    "snug":    { "$value": "-0.015em", "$type": "dimension" },
+    "tight":   { "$value": "-0.025em", "$type": "dimension" },
+    "tighter": { "$value": "-0.035em", "$type": "dimension" }
   },
   "font-family": {
     "sans": { "$value": ["Pretendard GOV Variable", "Pretendard GOV", "Pretendard Variable", "Pretendard", "sans-serif"], "$type": "fontFamily" },
