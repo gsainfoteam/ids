@@ -682,6 +682,43 @@ test('pointer: dragging over empty time selects quarter hours, and a plain press
   expect(document.querySelector('[data-scheduler-selection]')).toBeNull();
 });
 
+test('pointer: a selection dragged past the board edge follows the scroll and ends under the pointer', async (context) => {
+  skipWithoutCdp(context);
+  const onSlotSelect = vi.fn();
+  const screen = await render(inProvider({ onSlotSelect }));
+  await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
+  const column = document.querySelector('[data-scheduler-column="2026-11-18"]')!;
+  const viewport = column.closest<HTMLElement>('[data-scroll-area-viewport]')!;
+  const outside = viewport.getBoundingClientRect();
+  const before = column.getBoundingClientRect();
+  const hour = before.height / 24;
+  viewport.scrollBy({
+    left: before.left + before.width / 2 - (outside.left + outside.width / 2),
+    top: before.top + hour * 13 - (outside.top + outside.height / 2),
+    behavior: 'instant',
+  });
+  const x = column.getBoundingClientRect().left + 8;
+  const middle = outside.top + outside.height / 2;
+  const scrolledFrom = viewport.scrollTop;
+
+  await mouse('mousePressed', x, middle);
+  await mouse('mouseMoved', x, middle + hour);
+  await mouse('mouseMoved', x, outside.bottom - 4);
+  await expect.poll(() => viewport.scrollTop - scrolledFrom).toBeGreaterThan(hour * 2);
+  await mouse('mouseMoved', x, middle);
+  await mouse('mouseMoved', x, middle + hour);
+  const scrolledTo = viewport.scrollTop;
+  await mouse('mouseReleased', x, middle + hour);
+
+  expect(viewport.scrollTop).toBe(scrolledTo);
+  const pointerMinutes = ((middle + hour - column.getBoundingClientRect().top) / hour) * 60;
+  expect(onSlotSelect).toHaveBeenCalledTimes(1);
+  const [slot] = onSlotSelect.mock.calls[0]!;
+  const endMinutes = slot.end.hour * 60 + slot.end.minute;
+  expect(endMinutes - pointerMinutes).toBeGreaterThanOrEqual(0);
+  expect(endMinutes - pointerMinutes).toBeLessThan(15);
+});
+
 test('pointer: dragging across month days selects whole days, and Escape cancels', async (context) => {
   skipWithoutCdp(context);
   const onSlotSelect = vi.fn();
