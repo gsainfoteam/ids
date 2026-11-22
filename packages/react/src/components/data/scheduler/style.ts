@@ -67,11 +67,18 @@ export const schedulerStyle = tv({
       'min-h-0 overflow-hidden rounded-standard px-1.5 py-0.5 outline-1 outline-(--ids-bg-current)',
       'bg-scheme-soft text-on-scheme-soft state-scheme [&_[data-item-description]]:text-on-scheme-soft',
     ],
-    movable:
+    movable: [
       'group/slot relative isolate -my-px flex h-[calc(100%+2px)] w-full rounded-standard py-px',
+      'has-data-[color-scheme=neutral]:scheme-neutral has-data-[color-scheme=primary]:scheme-primary',
+      'has-data-[color-scheme=secondary]:scheme-secondary has-data-[color-scheme=tertiary]:scheme-tertiary',
+      'has-data-[color-scheme=success]:scheme-success has-data-[color-scheme=warning]:scheme-warning',
+      'has-data-[color-scheme=danger]:scheme-danger has-data-[color-scheme=info]:scheme-info',
+    ],
     resizeHandle: [
       'bottom-1 after:h-3 before:opacity-0 group-hover/slot:before:opacity-100',
       'focus-visible:before:opacity-100 data-dragging:before:opacity-100',
+      'before:bg-(--ids-color-border-scheme-strong) hover:before:bg-(--ids-color-text-scheme)',
+      'data-dragging:before:bg-(--ids-color-text-scheme)',
     ],
     eventContent: '',
     eventTitle: '',
