@@ -110,7 +110,7 @@ export function EditorColor({ icon, 'aria-label': ariaLabel, className }: Editor
           onPressedChange={noop}
         />
       </Popover.Trigger>
-      <Popover.Content aria-label={t('editor.color')} side="bottom" align="start">
+      <Popover.Content aria-label={t('editor.color')} side="bottom" align="start" className="w-max">
         <div className={styles.colorPanel()}>
           <div role="group" aria-labelledby={textTitleId} className={styles.colorSection()}>
             <p id={textTitleId} className={styles.colorTitle()}>

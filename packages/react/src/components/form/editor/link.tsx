@@ -85,6 +85,7 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
       </Popover.Trigger>
       <Popover.Content
         aria-label={t('editor.link')}
+        className="w-max"
         initialFocus="input"
         side="bottom"
         align="start"
