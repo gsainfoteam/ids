@@ -134,7 +134,7 @@ export const PC: Story = {
               <CubeTransparentIcon />
             </Avatar.Fallback>
           </Avatar>
-          <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+          <span className="text-body-b2-semibold">GIST 인포팀</span>
         </Sidebar.Header>
         {GROUPS.map((group) => (
           <Sidebar.Group key={group.label} label={group.label}>

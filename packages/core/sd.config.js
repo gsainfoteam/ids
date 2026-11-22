@@ -83,6 +83,14 @@ const readTypographyEntries = (palette) => {
   }));
 };
 
+const lineHeightAsMultiplier = (lineHeight, fontSize) => {
+  const raw = String(lineHeight);
+  if (raw.endsWith("px")) return parseFloat(raw) / parseFloat(fontSize);
+  return parseFloat(raw);
+};
+
+const isPixelLength = (value) => String(value).endsWith("px");
+
 const letterSpacingToPx = (letterSpacing, fontSize) => {
   const raw = String(letterSpacing);
   if (raw.endsWith("em")) return parseFloat(raw) * parseFloat(fontSize);
@@ -695,11 +703,14 @@ const radiusFromTheProvider = (dictionary) =>
     );
 
 const lengthsTheScaleMultiplies = (dictionary) => [
-  ...readTypographyEntries(buildPalette(dictionary)).map(({ name, fontSize }) => [
-    `--ids-text-${name}`,
-    fontSize,
+  ...readTypographyEntries(buildPalette(dictionary)).flatMap(({ name, fontSize, lineHeight }) => [
+    [`--ids-text-${name}`, fontSize],
+    ...(isPixelLength(lineHeight) ? [[`--ids-text-${name}--line-height`, lineHeight]] : []),
   ]),
   ...byPath(dictionary, "font-size").map((t) => [idsVar("font-size", t), toVal(t)]),
+  ...byPath(dictionary, "line-height")
+    .filter((t) => isPixelLength(toVal(t)))
+    .map((t) => [idsVar("line-height", t), toVal(t)]),
   ...byCategory(dictionary, "size").map((t) => [idsVar("size", t), toVal(t)]),
 ];
 
@@ -1128,8 +1139,8 @@ const dartTypographyFormatter = ({ dictionary }) => {
           FONT_PACKAGE: fontPackage,
           FONT_SIZE: parseFloat(fontSize),
           FONT_WEIGHT: parseInt(fontWeight),
-          LINE_HEIGHT: parseFloat(lineHeight),
-          LETTER_SPACING: letterSpacingToPx(letterSpacing, fontSize),
+          LINE_HEIGHT: lineHeightAsMultiplier(lineHeight, fontSize),
+          LETTER_SPACING: Number(letterSpacingToPx(letterSpacing, fontSize).toFixed(4)),
         })};`,
     ),
   ];

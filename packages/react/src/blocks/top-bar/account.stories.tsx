@@ -86,7 +86,7 @@ export const PC: Story = {
           href="#home"
           colorScheme="neutral"
           underline="none"
-          className="text-subtitle-s2-semibold flex items-center gap-2"
+          className="text-body-b2-semibold flex items-center gap-2"
         >
           <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
             <Avatar.Fallback>

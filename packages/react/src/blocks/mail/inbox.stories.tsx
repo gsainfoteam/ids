@@ -282,7 +282,7 @@ export const PC: Story = {
     return (
       <div className="flex h-dvh flex-col break-keep">
         <header className="flex items-center gap-3 px-4 py-3">
-          <h1 className="text-subtitle-s1-bold">메일</h1>
+          <h1 className="text-body-b1-bold">메일</h1>
           <Badge content={`안 읽은 메일 ${unread.length}`} variant="soft" colorScheme="primary" />
           <IconButton
             asChild
