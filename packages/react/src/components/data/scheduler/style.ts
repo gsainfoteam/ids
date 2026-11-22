@@ -15,6 +15,7 @@ export const schedulerStyle = tv({
     dayCount: 'w-28',
     datePopup: 'w-auto',
     board: 'min-h-0 flex-1 rounded-container border border-neutral',
+    viewport: 'isolate',
     canvas: [
       'flex min-h-full flex-col',
       'min-w-[calc(var(--scheduler-gutter)+var(--scheduler-days)*var(--scheduler-day-min))]',

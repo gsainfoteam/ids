@@ -163,7 +163,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
 
   return (
     <ScrollArea orientation="both" className={styles.board()} style={columns}>
-      <ScrollArea.Viewport ref={viewportRef}>
+      <ScrollArea.Viewport ref={viewportRef} className={styles.viewport()}>
         <SchedulerContextMenu
           events={events}
           format={format}

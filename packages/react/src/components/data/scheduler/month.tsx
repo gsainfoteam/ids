@@ -57,7 +57,7 @@ export function SchedulerMonth<E extends SchedulerEventData>({
 
   return (
     <ScrollArea className={styles.board()}>
-      <ScrollArea.Viewport>
+      <ScrollArea.Viewport className={styles.viewport()}>
         <SchedulerContextMenu
           events={events}
           format={format}
