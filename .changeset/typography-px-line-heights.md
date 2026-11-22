@@ -18,3 +18,7 @@ line-height primitives are replaced by the size-named ones.
 `leading-prose` (28px) is new for long text. Editor's body is `text-body-b2-regular
 leading-prose` (a tiny Editor `text-body-b3-regular`), and its headings are semibold and one step
 smaller: h1 24px, h2 20px, h3 18px, h4 16px.
+
+`@gsainfoteam/ids-css` adds `document-text`, a utility that sets tag-only long text (Markdown,
+Editor) in the IDS type scale: blocks stacked with an 8px gap, headings 16px further from the
+block above, lists, quotes, code, links and rules. Editor's document is drawn with it.

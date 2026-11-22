@@ -29,17 +29,22 @@
 
 ## 긴 글
 
-문서처럼 여러 문단을 읽는 글은 `leading-prose`(28px)를 b2 본문에 더합니다. Editor 의 본문이 이 조합입니다.
+문서처럼 여러 문단을 읽는 글은 `document-text` 로 감싸고 본문 크기는 `text-body-b2-regular leading-prose`(16px, 행간 28px)로 줍니다. 안쪽 태그에는 클래스를 붙이지 않습니다. Editor 의 본문이 이 조합입니다.
 
 ```tsx
-<article className="text-neutral-strong">
-  <h1 className="text-headline-h5-semibold">2학기 수강 신청 안내</h1>
-  <p className="text-body-b2-regular leading-prose">수강 신청은 9월 1일에 열립니다.</p>
+<article className="document-text text-body-b2-regular leading-prose text-neutral-strong">
+  <h1>2학기 수강 신청 안내</h1>
+  <p>수강 신청은 9월 1일에 열립니다.</p>
+  <ul>
+    <li>정정 기간: 9월 8일부터</li>
+  </ul>
 </article>
 ```
 
+- 블록 사이는 gap 8px 입니다. 제목은 위에만 16px 를 더 띄워 아래 문단과 묶입니다.
+- 문서 제목은 페이지 제목보다 한 단계 작고 semibold 입니다: h1 24px(`headline-h5`), h2 20px(`headline-h6`), h3 18px(`body-b1`), h4~h6 16px(`body-b2`).
+- 목록, 인용, 코드, 링크, 구분선도 그립니다. 안쪽 선택자는 `:where()` 라 안쪽 태그에 클래스를 주면 그 클래스가 이깁니다.
 - `leading-prose` 는 글자 스타일 뒤에 씁니다. `cn` 은 크기 클래스 앞에 놓인 `leading-*` 를 지웁니다.
-- 문서 제목은 페이지 제목보다 한 단계 작고 semibold 입니다: h1 `text-headline-h5-semibold`(24px), h2 `text-headline-h6-semibold`(20px), h3 `text-body-b1-semibold`(18px), h4 `text-body-b2-semibold`(16px).
 
 ## 글꼴
 
@@ -60,5 +65,5 @@
 - Storybook `Foundations/Typography` 의 수치는 렌더된 글자에서 재므로 토큰과 어긋나지 않습니다.
 - Scales 스토리는 `semantic/typography.json` 의 스타일이 모두 그려졌는지 검사합니다. 스타일을 더하면 스토리의 표에도 클래스를 더합니다. Tailwind 는 소스에 글자 그대로 적힌 클래스만 만듭니다.
 - Scales 스토리는 모든 스타일의 행간이 정수 px 인지도 검사합니다.
-- Prose 스토리는 긴 글의 본문과 문서 제목을 보여 줍니다.
+- Prose 스토리는 `document-text` 로 그린 긴 글을 보여 줍니다. 모든 마크다운 문법은 `Form/Editor` 의 Document 스토리에 있습니다.
 - Primitives 스토리는 `typography.json` 의 크기, 굵기, 행간, 자간, 글꼴 원시값을 `--ids-*` 변수에서 읽어 보여 줍니다. 행간 원시값은 크기 단계와 이름이 같습니다(`leading-b3` 는 20px).

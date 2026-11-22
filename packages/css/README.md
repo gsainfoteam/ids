@@ -161,6 +161,22 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 - 자간은 크기를 따른다: 20~24px 은 0, 28~32px 은 `tracking-snug`(-0.015em), 40~48px 은 `tracking-tight`(-0.025em).
 - 소제목은 body 의 semibold 를 쓴다. subtitle 스타일은 body 와 크기가 겹쳐서 없앴다.
 
+### document-text
+
+마크다운이나 Editor 처럼 태그만 있는 긴 글을 IDS 타입 스케일로 그린다.
+
+```html
+<article class="document-text text-body-b2-regular leading-prose text-neutral-strong">
+  <h1>제목</h1>
+  <p>본문</p>
+</article>
+```
+
+- 블록은 `flex` 세로 gap 8px 로 쌓고, 제목만 위를 16px 더 띄운다.
+- h1 24px, h2 20px, h3 18px, h4~h6 16px, 모두 semibold. 목록, 인용, 코드(`bg-neutral-soft`), 링크(`text-primary`), 구분선을 그린다.
+- 본문 크기와 행간은 넣지 않는다. 쓰는 쪽이 `text-body-*` 와 `leading-prose` 로 준다.
+- 안쪽 선택자는 `:where()` 라서 안쪽 태그에 준 클래스가 이긴다.
+
 ### focus-ring-visible
 
 `focus-ring` 이 ring 을 그리는 바로 그 조건에서 맞는 variant 입니다. ring 이 옆 요소에 가리지 않게 쌓을 때 씁니다.
