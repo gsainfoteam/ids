@@ -142,12 +142,21 @@ const [events, setEvents] = useState(initialEvents);
   events={events}
   eventMenu={(event) => (
     <>
-      <Menu.Item onSelect={() => open(event)}>열기</Menu.Item>
-      <Menu.Item onSelect={() => remove(event)}>삭제</Menu.Item>
+      <Menu.Item onSelect={() => open(event)}>
+        <ArrowTopRightOnSquareIcon />
+        열기
+      </Menu.Item>
+      <Menu.Item onSelect={() => remove(event)}>
+        <TrashIcon />
+        삭제
+      </Menu.Item>
     </>
   )}
   slotMenu={({ start, end }) => (
-    <Menu.Item onSelect={() => create({ start, end })}>여기에 일정 만들기</Menu.Item>
+    <Menu.Item onSelect={() => create({ start, end })}>
+      <PlusIcon />
+      여기에 일정 만들기
+    </Menu.Item>
   )}
 />
 ```

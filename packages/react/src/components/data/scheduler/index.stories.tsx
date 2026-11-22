@@ -1,5 +1,11 @@
 import { useState } from 'react';
 
+import {
+  ArrowTopRightOnSquareIcon,
+  DocumentDuplicateIcon,
+  PlusIcon,
+  TrashIcon,
+} from '@heroicons/react/16/solid';
 import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import { expect, fn, waitFor } from 'storybook/test';
 
@@ -558,7 +564,7 @@ export const ContextMenu: Story = {
     docs: {
       description: {
         story:
-          '`eventMenu` 는 일정을 우클릭했을 때, `slotMenu` 는 빈 시간 칸을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 빈 칸은 포인터 아래의 30분 `{ start, end }` 로 넘어옵니다. 메뉴를 주지 않은 곳은 브라우저 메뉴가 그대로 뜹니다.',
+          '`eventMenu` 는 일정을 우클릭했을 때, `slotMenu` 는 빈 시간 칸을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 빈 칸은 포인터 아래의 30분 `{ start, end }` 로 넘어옵니다. 메뉴를 주지 않은 곳은 브라우저 메뉴가 그대로 뜹니다. 이 스토리는 `onEventChange` 도 줘서, 메뉴와 함께 일정을 끌어 옮기고 길이를 바꿀 수 있습니다.',
       },
     },
   },
@@ -572,10 +578,21 @@ export const ContextMenu: Story = {
           events={events}
           defaultDate={TODAY}
           now={NOW}
+          onEventChange={(event, { start, end }) =>
+            setEvents((previous) =>
+              previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
+            )
+          }
           eventMenu={(event) => (
             <>
-              <Menu.Item onSelect={() => setDone(`${event.title} 열기`)}>열기</Menu.Item>
-              <Menu.Item onSelect={() => setDone(`${event.title} 복제`)}>복제</Menu.Item>
+              <Menu.Item onSelect={() => setDone(`${event.title} 열기`)}>
+                <ArrowTopRightOnSquareIcon />
+                열기
+              </Menu.Item>
+              <Menu.Item onSelect={() => setDone(`${event.title} 복제`)}>
+                <DocumentDuplicateIcon />
+                복제
+              </Menu.Item>
               <Menu.Separator />
               <Menu.Item
                 onSelect={() => {
@@ -583,6 +600,7 @@ export const ContextMenu: Story = {
                   setDone(`${event.title} 삭제`);
                 }}
               >
+                <TrashIcon />
                 삭제
               </Menu.Item>
             </>
@@ -597,6 +615,7 @@ export const ContextMenu: Story = {
                 setDone(`새 일정 ${start.toString()} – ${end.toString()}`);
               }}
             >
+              <PlusIcon />
               여기에 일정 만들기
             </Menu.Item>
           )}
@@ -612,9 +631,12 @@ export const ContextMenu: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const done = canvas.getByTestId('done');
 
+    const algo = canvas.getByRole('button', { name: '알고리즘 스터디' });
+    const { left: algoLeft, top: algoTop } = algo.getBoundingClientRect();
     await userEvent.pointer({
       keys: '[MouseRight]',
-      target: canvas.getByRole('button', { name: '알고리즘 스터디' }),
+      target: algo,
+      coords: { clientX: algoLeft + 8, clientY: algoTop + 8 },
     });
     const eventMenu = await canvas.findByRole('menu', { name: '알고리즘 스터디' });
     await expect(eventMenu).toBeVisible();
