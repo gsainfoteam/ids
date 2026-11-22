@@ -777,6 +777,8 @@ export const FullDocument: Story = {
       <Editor.Strike />
       <Editor.Code />
       <Editor.Highlight />
+      <Editor.Subscript />
+      <Editor.Superscript />
       <Editor.Link />
       <Editor.Separator />
       <Editor.BulletList />

@@ -77,6 +77,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | ------------------------------------------------------ | --------------------------------------------------------------- |
 | `Bold` `Italic` `Underline` `Strike` `Code`            | 글자 서식. 누른 상태가 커서 자리의 서식을 따릅니다               |
 | `Highlight`                                            | 형광펜. 색은 `bg-warning-soft` 와 `text-on-warning-soft` 입니다  |
+| `Subscript` `Superscript`                              | 아래 첨자와 위 첨자. 마크다운에는 `<sub>2</sub>`, `<sup>2</sup>` 로 남습니다 |
 | `BulletList` `OrderedList` `Blockquote`                | 블록 서식                                                       |
 | `CodeBlock`                                            | 코드 블록. 본문의 코드 블록에는 언어 Select 와 복사 버튼이 붙고, 고른 언어로 색을 칠합니다. 긴 줄은 접지 않고 가로로 스크롤합니다 |
 | `Callout`                                              | 콜아웃을 넣거나 종류(참고, 팁, 경고, 위험)를 바꾸는 Menu   |
@@ -93,7 +94,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `Count`                                                | `maxLength` 에 대한 글자 수. TextArea.Count 와 같습니다           |
 
 - 도구는 `icon` 과 `aria-label` 로 아이콘과 이름을 바꿀 수 있습니다.
-- `Highlight`, `TaskList`, `TextAlign`, `Table`, `Callout`, `Details` 는 Editor 의 자식(`BubbleMenu` 의 자식 포함)에 있을 때만 그 Tiptap 확장을 엔진과 함께 `import()` 로 불러옵니다. 쓰지 않는 앱은 그 코드를 받지 않고, 스키마와 플러그인도 돌리지 않습니다.
+- `Highlight`, `Subscript`, `Superscript`, `TaskList`, `TextAlign`, `Table`, `Callout`, `Details` 는 Editor 의 자식(`BubbleMenu` 의 자식 포함)에 있을 때만 그 Tiptap 확장을 엔진과 함께 `import()` 로 불러옵니다. 쓰지 않는 앱은 그 코드를 받지 않고, 스키마와 플러그인도 돌리지 않습니다.
 - 그래서 그 부품이 없으면 값에 있던 형광펜, 할 일, 정렬, 표, 콜아웃, 접는 블록도 읽지 않고 버립니다. 저장한 글에 쓰인 서식의 부품은 계속 둡니다.
 - 그림 노드는 저장된 그림을 지키려고 늘 엔진에 있습니다. 올리기, 자리표시, 파일 붙여넣기와 끌어 놓기는 `onImageUpload` 가 있을 때만 따로 불러옵니다.
 - 부품을 앱의 컴포넌트 안에 감싸 넣으면 Editor 가 찾지 못합니다. 개발 중에는 콘솔 경고가 뜨고 도구가 꺼집니다.
@@ -108,6 +109,8 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `Mod+Shift+S`         | 취소선                     |
 | `Mod+E`               | 코드                       |
 | `Mod+Shift+H`         | 형광펜(`Highlight` 가 있을 때) |
+| `Mod+,`               | 아래 첨자(`Subscript` 가 있을 때) |
+| `Mod+.`               | 위 첨자(`Superscript` 가 있을 때) |
 | `Mod+Shift+9`         | 할 일 목록(`TaskList` 가 있을 때). `Tab` 으로 들여 씀 |
 | `Mod+Shift+L` `E` `R` `J` | 왼쪽, 가운데, 오른쪽, 양쪽 정렬(`TextAlign` 이 있을 때) |
 | `Mod+Z` `Mod+Shift+Z` | 실행 취소, 다시 실행        |

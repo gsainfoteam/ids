@@ -163,6 +163,8 @@ export const messages = {
     "slashMenu": "블록 넣기",
     "slashMenuEmpty": "맞는 블록이 없습니다",
     "strike": "취소선",
+    "subscript": "아래 첨자",
+    "superscript": "위 첨자",
     "table": "표",
     "tableAddColumnAfter": "오른쪽에 열 추가",
     "tableAddColumnBefore": "왼쪽에 열 추가",

@@ -162,6 +162,8 @@
     "slashMenu": "Insert block",
     "slashMenuEmpty": "No matching blocks",
     "strike": "Strikethrough",
+    "subscript": "Subscript",
+    "superscript": "Superscript",
     "table": "Table",
     "tableAddColumnAfter": "Add column after",
     "tableAddColumnBefore": "Add column before",

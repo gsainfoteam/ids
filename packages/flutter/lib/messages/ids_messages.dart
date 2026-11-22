@@ -255,6 +255,10 @@ mixin IdsMessages {
 
   String? get editorStrike => null;
 
+  String? get editorSubscript => null;
+
+  String? get editorSuperscript => null;
+
   String? get editorTable => null;
 
   String? get editorTableAddColumnAfter => null;
@@ -1029,6 +1033,12 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorStrike => '취소선';
+
+  @override
+  String get editorSubscript => '아래 첨자';
+
+  @override
+  String get editorSuperscript => '위 첨자';
 
   @override
   String get editorTable => '표';

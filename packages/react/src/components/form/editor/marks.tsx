@@ -7,15 +7,21 @@ import {
   StrikethroughIcon,
   UnderlineIcon,
 } from '@heroicons/react/16/solid';
-import { Highlighter } from 'lucide-react';
+import { Highlighter, Subscript, Superscript } from 'lucide-react';
 
 import { EditorToggleTool, type EditorToggleSpec, type EditorToolProps } from './tool';
 
 export type EditorMarkProps = EditorToolProps;
 
+type LazyMark = 'highlight' | 'subscript' | 'superscript';
+
+const LAZY_MARKS = new Set<string>(['highlight', 'subscript', 'superscript']);
+
+const isLazyMark = (mark: string): mark is LazyMark => LAZY_MARKS.has(mark);
+
 function markSpec(
   name: string,
-  mark: 'bold' | 'italic' | 'underline' | 'strike' | 'code' | 'highlight',
+  mark: 'bold' | 'italic' | 'underline' | 'strike' | 'code' | LazyMark,
   label: EditorToggleSpec['label'],
   icon: EditorToggleSpec['icon'],
 ): EditorToggleSpec {
@@ -26,7 +32,7 @@ function markSpec(
     isActive: (editor) => editor.isActive(mark),
     can: (editor) => editor.can().toggleMark(mark),
     run: (editor) => editor.chain().toggleMark(mark).run(),
-    extension: mark === 'highlight' ? 'highlight' : undefined,
+    extension: isLazyMark(mark) ? mark : undefined,
   };
 }
 
@@ -36,6 +42,8 @@ const UNDERLINE = markSpec('Underline', 'underline', 'editor.underline', <Underl
 const STRIKE = markSpec('Strike', 'strike', 'editor.strike', <StrikethroughIcon />);
 const CODE = markSpec('Code', 'code', 'editor.code', <CodeBracketIcon />);
 const HIGHLIGHT = markSpec('Highlight', 'highlight', 'editor.highlight', <Highlighter />);
+const SUBSCRIPT = markSpec('Subscript', 'subscript', 'editor.subscript', <Subscript />);
+const SUPERSCRIPT = markSpec('Superscript', 'superscript', 'editor.superscript', <Superscript />);
 
 export function EditorBold(props: EditorMarkProps) {
   return <EditorToggleTool {...props} spec={BOLD} />;
@@ -72,3 +80,15 @@ export function EditorHighlight(props: EditorMarkProps) {
 }
 
 EditorHighlight.displayName = 'Editor.Highlight';
+
+export function EditorSubscript(props: EditorMarkProps) {
+  return <EditorToggleTool {...props} spec={SUBSCRIPT} />;
+}
+
+EditorSubscript.displayName = 'Editor.Subscript';
+
+export function EditorSuperscript(props: EditorMarkProps) {
+  return <EditorToggleTool {...props} spec={SUPERSCRIPT} />;
+}
+
+EditorSuperscript.displayName = 'Editor.Superscript';

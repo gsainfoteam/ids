@@ -808,6 +808,29 @@ test('Highlight marks the selection and writes == in markdown', async () => {
   expect(getComputedStyle(mark).backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
 });
 
+test('Subscript and Superscript mark the selection and write sub and sup tags in markdown', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor format="markdown" aria-label="본문" defaultValue="H2O" onValueChange={onValueChange}>
+      <Editor.Subscript />
+      <Editor.Superscript />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('{End}{ArrowLeft}{Shift>}{ArrowLeft}{/Shift}');
+  await userEvent.click(page.getByRole('button', { name: '아래 첨자' }));
+
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('H<sub>2</sub>O');
+  await expect.element(content).toContainHTML('H<sub>2</sub>O');
+
+  await userEvent.click(content);
+  await userEvent.keyboard('{End}{Shift>}{ArrowLeft}{/Shift}');
+  await userEvent.click(page.getByRole('button', { name: '위 첨자' }));
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('H<sub>2</sub><sup>O</sup>');
+});
+
 test('an extension loads only when its part is in the Editor', async () => {
   render(
     <>

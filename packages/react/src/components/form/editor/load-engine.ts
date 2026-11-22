@@ -7,6 +7,12 @@ import type { AnyExtension } from '@tiptap/core';
 
 const FEATURE_LOADERS = {
   highlight: once(() => import('@tiptap/extension-highlight').then((module) => module.Highlight)),
+  subscript: once(() =>
+    import('../../typography/rich-text/schema/script').then((module) => module.DocumentSubscript),
+  ),
+  superscript: once(() =>
+    import('../../typography/rich-text/schema/script').then((module) => module.DocumentSuperscript),
+  ),
   taskList: once(() => import('./task-list/node').then((module) => module.taskListExtensions)),
   textAlign: once(() => import('@tiptap/extension-text-align').then((module) => module.TextAlign)),
   table: once(() =>

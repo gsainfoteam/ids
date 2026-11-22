@@ -22,6 +22,8 @@ import {
   EditorHighlight,
   EditorItalic,
   EditorStrike,
+  EditorSubscript,
+  EditorSuperscript,
   EditorUnderline,
   type EditorMarkProps,
 } from './marks';
@@ -111,6 +113,8 @@ export namespace Editor {
   export const Strike = EditorStrike;
   export const Code = EditorCode;
   export const Highlight = EditorHighlight;
+  export const Subscript = EditorSubscript;
+  export const Superscript = EditorSuperscript;
   export const Link = EditorLink;
   export const Image = EditorImage;
   export const BulletList = EditorBulletList;

@@ -146,3 +146,11 @@ test('a callout kind named like an Object property falls back to a note', () => 
   expect(html.match(/role="note"/g)).toHaveLength(3);
   expect(html.match(/참고/g)).toHaveLength(3);
 });
+
+test('sub and sup tags in markdown become subscript and superscript', () => {
+  const html = render('H<sub>2</sub>O and E=mc<sup>2</sup>');
+
+  expect(html).toContain('H<sub>2</sub>O');
+  expect(html).toContain('mc<sup>2</sup>');
+  expect(html).not.toContain('&lt;sub&gt;');
+});

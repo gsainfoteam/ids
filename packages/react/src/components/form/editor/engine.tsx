@@ -86,6 +86,8 @@ export function extensionsFor({
     }),
     ...(features.imageUpload ? features.imageUpload.imageUploadExtensions(images.start) : []),
     ...(features.highlight ? [features.highlight] : []),
+    ...(features.subscript ? [features.subscript] : []),
+    ...(features.superscript ? [features.superscript] : []),
     ...(features.taskList ? features.taskList(taskLabel) : []),
     ...(features.textAlign
       ? [features.textAlign.configure({ types: ['heading', 'paragraph'] })]

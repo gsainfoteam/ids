@@ -126,6 +126,8 @@
     "editorSlashMenu": "블록 넣기",
     "editorSlashMenuEmpty": "맞는 블록이 없습니다",
     "editorStrike": "취소선",
+    "editorSubscript": "아래 첨자",
+    "editorSuperscript": "위 첨자",
     "editorTable": "표",
     "editorTableAddColumnAfter": "오른쪽에 열 추가",
     "editorTableAddColumnBefore": "왼쪽에 열 추가",

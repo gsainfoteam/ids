@@ -9,6 +9,7 @@ import { Marked, type marked } from 'marked';
 import { Callout } from './callout';
 import { DocumentImage } from './image';
 import { DocumentMention } from './mention';
+import { DocumentSubscript, DocumentSuperscript } from './script';
 import { documentStarterKit } from './starter-kit';
 
 import type { Extensions } from '@tiptap/core';
@@ -32,6 +33,8 @@ export const documentExtensions = (): Extensions => [
   documentStarterKit([1, 2, 3, 4, 5, 6]),
   DocumentImage,
   Highlight,
+  DocumentSubscript,
+  DocumentSuperscript,
   TaskList,
   TaskItem.configure({ nested: true }),
   alignedBlocks,

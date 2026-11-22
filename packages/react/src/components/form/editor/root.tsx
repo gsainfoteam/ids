@@ -47,6 +47,8 @@ import {
   EditorHighlight,
   EditorItalic,
   EditorStrike,
+  EditorSubscript,
+  EditorSuperscript,
   EditorUnderline,
 } from './marks';
 import { EditorSeparator } from './separator';
@@ -96,6 +98,8 @@ const TOOLS = new Set<unknown>([
   EditorStrike,
   EditorCode,
   EditorHighlight,
+  EditorSubscript,
+  EditorSuperscript,
   EditorLink,
   EditorImage,
   EditorBulletList,
@@ -200,6 +204,8 @@ type ToolFeature = Exclude<EditorFeature, 'imageUpload' | 'mention'>;
 
 const FEATURE_TOOLS: Record<ToolFeature, unknown> = {
   highlight: EditorHighlight,
+  subscript: EditorSubscript,
+  superscript: EditorSuperscript,
   taskList: EditorTaskList,
   textAlign: EditorTextAlign,
   table: EditorTable,

@@ -55,6 +55,8 @@ GitHub 마크다운에 아래를 더합니다. 모두 Editor 가 마크다운으
 [@ id="registrar" label="학사팀"]
 
 ==형광펜==
+
+H<sub>2</sub>O, E=mc<sup>2</sup>
 ```
 
 | 콜아웃 | `kind`, Alert `colorScheme` | 제목 |
@@ -66,6 +68,7 @@ GitHub 마크다운에 아래를 더합니다. 모두 Editor 가 마크다운으
 
 - 콜아웃 종류는 IDS 의 상태 네 가지와 같습니다. GitHub 의 `IMPORTANT` 는 `info` 로 읽고 `NOTE` 로 저장합니다.
 
+- 아래 첨자와 위 첨자는 마크다운에 따로 문법이 없어 `<sub>`, `<sup>` 태그로 씁니다. 다른 HTML 태그는 글자로 남습니다.
 - 콜아웃은 `role="note"` 이고, 종류 이름("참고", "경고" 등)을 제목으로 보여 줍니다. 제목은 `IdsProvider` 의 `translate` 를 따릅니다.
 - 접는 블록은 `Accordion` 한 항목입니다. 요약은 제목 태그로 감싸지 않으므로 글의 제목 구조를 흐트러뜨리지 않습니다.
 - 표의 첫 행이 머리글 칸이면 `<thead>` 로 그립니다.
