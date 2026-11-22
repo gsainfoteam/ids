@@ -3,10 +3,11 @@ import axe from 'axe-core';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, expect, test, vi } from 'vitest';
-import { page, server, userEvent } from 'vitest/browser';
+import { cdp, page, server, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Scheduler } from '../src';
+import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 import { allDayBarsIn, timedSegmentsOn } from '../src/components/data/scheduler/layout';
 
@@ -351,4 +352,100 @@ test('locale names the days and times, and picks the first weekday', () => {
       timeZone: WALL_CLOCK,
     }).format(on(17).toDate(WALL_CLOCK)),
   );
+});
+
+const frameOffset = (x: number, y: number) => {
+  const frame = window.frameElement?.getBoundingClientRect() ?? {
+    left: 0,
+    top: 0,
+    width: innerWidth,
+  };
+  const scale = frame.width / window.innerWidth;
+  return { x: frame.left + x * scale, y: frame.top + y * scale };
+};
+
+async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', x: number, y: number) {
+  await cdp().send('Input.dispatchMouseEvent', {
+    type,
+    ...frameOffset(x, y),
+    button: 'left',
+    buttons: type === 'mouseReleased' ? 0 : 1,
+    clickCount: 1,
+  });
+}
+
+async function dragBy(element: Element, x: number, y: number) {
+  const { left, top, width, height } = element.getBoundingClientRect();
+  const from = { x: left + width / 2, y: top + height / 2 };
+
+  await mouse('mousePressed', from.x, from.y);
+  for (let step = 1; step <= 8; step++)
+    await mouse('mouseMoved', from.x + (x * step) / 8, from.y + (y * step) / 8);
+  await new Promise(requestAnimationFrame);
+  await mouse('mouseReleased', from.x + x, from.y + y);
+}
+
+test('without `onEventChange` the events have no end handle and add no Tab stop', async () => {
+  const screen = await render(inProvider({}));
+  await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
+  expect(document.querySelector('[data-scheduler] [role="separator"]')).toBeNull();
+  expect(document.querySelector('[data-scheduler-event][tabindex]')).toBeNull();
+});
+
+test('pointer: dragging an event moves it by whole days and quarter hours, and the drop does not click it', async (context) => {
+  skipWithoutCdp(context);
+  const onEventChange = vi.fn();
+  const onClick = vi.fn();
+  const screen = await render(
+    inProvider({
+      onEventChange,
+      children: () => <Scheduler.Event onClick={onClick} />,
+    }),
+  );
+  const title = screen.getByRole('button', { name: 'Algorithms' });
+  await expect.element(title).toBeInTheDocument();
+  const column = title.element().closest('[data-scheduler-column]')!;
+  const hour = column.getBoundingClientRect().height / 24;
+
+  await dragBy(title.element(), -column.getBoundingClientRect().width, hour + 4);
+
+  await vi.waitFor(() => expect(onEventChange).toHaveBeenCalledTimes(1));
+  const [event, change] = onEventChange.mock.calls[0]!;
+  expect(event.id).toBe('algo');
+  expect(change.start.toString()).toBe('2026-11-16T10:00:00');
+  expect(change.end.toString()).toBe('2026-11-16T11:30:00');
+  expect(onClick).not.toHaveBeenCalled();
+});
+
+test('pointer: dragging the bottom edge changes only the end, in quarter hours', async (context) => {
+  skipWithoutCdp(context);
+  const onEventChange = vi.fn();
+  const screen = await render(inProvider({ onEventChange }));
+  const edge = screen.getByRole('separator', { name: 'Lunch 끝 시각' });
+  await expect.element(edge).toHaveAttribute('aria-valuetext', '오후 1:00');
+  const column = edge.element().closest('[data-scheduler-column]')!;
+  const hour = column.getBoundingClientRect().height / 24;
+
+  await dragBy(edge.element(), 0, hour / 2 + 2);
+
+  await vi.waitFor(() => expect(onEventChange).toHaveBeenCalledTimes(1));
+  const [, change] = onEventChange.mock.calls[0]!;
+  expect(change.start.toString()).toBe('2026-11-17T12:00:00');
+  expect(change.end.toString()).toBe('2026-11-17T13:30:00');
+});
+
+test('keyboard: an event without onClick takes focus, Space picks it up and Escape puts it back', async () => {
+  const onEventChange = vi.fn();
+  const screen = await render(inProvider({ onEventChange }));
+  const algo = document.querySelector<HTMLElement>('[data-scheduler-event="algo"]');
+  expect(algo).toHaveAttribute('tabindex', '0');
+  algo!.focus();
+  await userEvent.keyboard('[Space]{ArrowUp}');
+  await expect.element(screen.getByText(/오전 8:45 시작$/)).toBeInTheDocument();
+  await userEvent.keyboard('{Escape}');
+  await expect
+    .element(screen.getByText('Algorithms을(를) 제자리에 두었습니다.'))
+    .toBeInTheDocument();
+  expect(onEventChange).not.toHaveBeenCalled();
+  expect(algo!.closest<HTMLElement>('[data-scheduler-movable]')!.style.translate).toBe('');
 });

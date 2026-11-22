@@ -98,6 +98,43 @@ type EventData = {
 - `onClick` 이 있으면 제목이 버튼이 되어 Tab 순서에 들어갑니다. 칸 어디를 눌러도 됩니다.
 - `Scheduler.Event` 는 이 함수 밖에서 쓰면 오류입니다.
 
+## 옮기기와 길이 바꾸기
+
+```tsx
+const [events, setEvents] = useState(initialEvents);
+
+<Scheduler
+  events={events}
+  onEventChange={(event, { start, end }) =>
+    setEvents((all) => all.map((item) => (item.id === event.id ? { ...item, start, end } : item)))
+  }
+/>;
+```
+
+- `onEventChange` 를 주면 시각이 있는 일정을 끌어 옮기고, 아래 끝을 끌어 끝 시각을 바꿉니다. 종일 일정은 옮기지 않습니다.
+- 둘 다 15분 단위로 맞습니다. 옮기는 동안 일정은 15분 칸과 날짜 칸에 맞춰 움직이고, 놓을 때 한 번 `onEventChange(event, { start, end })` 를 부릅니다.
+- `start` 와 `end` 는 넘긴 값과 같은 타입(`CalendarDateTime`, `ZonedDateTime`)입니다. 옮기면 둘이 같은 만큼 움직이고, 길이를 바꾸면 `end` 만 바뀝니다.
+- 제어 컴포넌트입니다. 앱이 `events` 를 바꿔야 자리가 바뀌고, 바꾸지 않으면 원래 자리로 돌아갑니다.
+- 포인터는 4px 움직여야 끌기가 시작되므로 그냥 누르면 `onClick` 입니다. 끌기를 마친 click 은 삼킵니다. 터치는 250ms 눌러야 시작되어 그 전에는 스크롤됩니다.
+- 끄는 동안 일정은 Sidebar, Editor 의 끄는 항목과 같은 그림자와 투명도로 들려 보입니다(`internal/drag-surface.ts`).
+- 시작은 그날 0시에서 23:45 사이, 날짜는 보이는 기간 안에서만 옮깁니다. 끝은 그날 24시까지, 길이는 30분부터입니다.
+- 아래 끝은 일정의 끝이 든 날의 칸에만 있습니다. 자정을 넘는 일정은 둘째 날 칸에서 끝을 바꿉니다.
+- 겹쳐 그린 일정에 덮인 부분은 잡을 수 없습니다. 덮인 일정의 아래 끝은 드러난 부분이나 키보드로 바꿉니다.
+
+| 키보드                  | 동작                                                |
+| ----------------------- | --------------------------------------------------- |
+| 일정에서 `Space`        | 집는다. `onClick` 이 없는 일정도 Tab 순서에 들어온다 |
+| `↑` `↓`                 | 15분                                                |
+| `Shift` + `↑` `↓`       | 1시간                                               |
+| `←` `→`                 | 하루. RTL 에서는 맞바뀐다                           |
+| `Enter`, `Space`        | 놓는다                                              |
+| `Escape`, 포커스 떠남   | 제자리에 둔다                                       |
+| 아래 끝 separator `↑` `↓` | 끝 시각 15분. `Shift` 와 함께 1시간                |
+
+- 아래 끝은 Resizable(`direction="vertical"`, `step` 은 15분 높이)이라 separator "알고리즘 끝 시각"으로 읽히고, 값은 px 대신 끝 시각("오전 10:30")입니다.
+- 집고, 옮기고, 놓을 때마다 "알고리즘을(를) 집었습니다.", "11월 18일 수요일 오전 9:30 시작", "알고리즘을(를) 옮겼습니다."를 알립니다. 사용법은 root 의 `aria-describedby` 로 읽힙니다.
+- 놓은 일정이 다른 날 칸으로 가면 포커스가 그 일정을 따라갑니다.
+
 ## 보기와 날짜
 
 ```tsx
@@ -153,11 +190,12 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | `locale`                                | `string` (BCP 47)                     | Provider locale      |
 | `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |
 | `now`                                   | `CalendarDateTime`                    | 클라이언트 시계      |
+| `onEventChange`                         | `(event, { start, end }) => void`     | 없음(옮기지 않음)    |
 | `children`                              | `(event) => ReactNode`                | `<Scheduler.Event />` |
 
 나머지 `div` props 는 root 에 갑니다.
 
 ## 다음 판
 
-- 끌어 옮기기(`onEventChange(event, { start, end })`)와 끌어서 길이 바꾸기. 길이는 Resizable `direction="vertical"` 에 칸 단위 `step` 을 먼저 더합니다.
+- 종일 일정 옮기기, 시작 시각 끌기, 자정을 넘겨 늘이기.
 - 빈 칸을 눌러 일정 만들기, 보이는 시간 범위(`startHour`, `endHour`)와 숨길 요일.

@@ -11,4 +11,6 @@ header and time column stay in place, each day is a `<section>` named by its hea
 an Item in an ItemGroup with `<time dateTime>`. A Divider marks the current time, read from the
 client clock after hydration or fixed with `now`. `view`, `date` and their defaults are
 controllable, `locale` and `weekStartsOn` work as in Calendar, and the render-function child
-returns `<Scheduler.Event>` for each event.
+returns `<Scheduler.Event>` for each event. With
+`onEventChange(event, { start, end })` a timed event moves by dragging (or Space, the arrow keys and
+Enter) in 15-minute and one-day steps, and its bottom edge, a vertical Resizable, changes the end.

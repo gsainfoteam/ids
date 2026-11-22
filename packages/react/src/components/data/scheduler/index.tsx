@@ -1,5 +1,10 @@
 import { SchedulerEvent, type SchedulerEventPartProps } from './event';
-import { type SchedulerColorScheme, type SchedulerEventData, type SchedulerView } from './layout';
+import {
+  type SchedulerColorScheme,
+  type SchedulerEventChange,
+  type SchedulerEventData,
+  type SchedulerView,
+} from './layout';
 import { SchedulerRoot, type SchedulerProps } from './root';
 import { schedulerStyle } from './style';
 
@@ -13,6 +18,8 @@ export namespace Scheduler {
   export type Props<E extends SchedulerEventData = SchedulerEventData> = SchedulerProps<E>;
   export type View = SchedulerView;
   export type EventData = SchedulerEventData;
+  export type EventChange<E extends SchedulerEventData = SchedulerEventData> =
+    SchedulerEventChange<E>;
   export type ColorScheme = SchedulerColorScheme;
 
   export const Event = SchedulerEvent;
@@ -24,4 +31,9 @@ export namespace Scheduler {
 }
 
 export type { SchedulerProps } from './root';
-export type { SchedulerColorScheme, SchedulerEventData, SchedulerView } from './layout';
+export type {
+  SchedulerColorScheme,
+  SchedulerEventChange,
+  SchedulerEventData,
+  SchedulerView,
+} from './layout';

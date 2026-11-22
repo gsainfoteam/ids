@@ -1,4 +1,5 @@
-import { tv } from '../../../utils';
+import { dragSurface } from '../../../internal/drag-surface';
+import { cn, tv } from '../../../utils';
 
 import type { SchedulerColorScheme, SchedulerView } from './layout';
 
@@ -66,6 +67,11 @@ export const schedulerStyle = tv({
       'min-h-0 overflow-hidden rounded-standard px-1.5 py-0.5 outline-1 outline-(--ids-bg-current)',
       'bg-scheme-soft text-on-scheme-soft state-scheme [&_[data-item-description]]:text-on-scheme-soft',
     ],
+    movable: 'group/slot relative isolate flex size-full rounded-standard',
+    resizeHandle: [
+      'after:h-2 before:opacity-0 group-hover/slot:before:opacity-100',
+      'focus-visible:before:opacity-100 data-dragging:before:opacity-100',
+    ],
     eventContent: '',
     eventTitle: '',
     eventTime: '',
@@ -78,6 +84,10 @@ export const schedulerStyle = tv({
   variants: {
     today: {
       true: { dayHead: 'text-primary', dayNumber: 'bg-primary-solid text-on-primary-solid' },
+      false: {},
+    },
+    dragging: {
+      true: { movable: cn('z-5', dragSurface.lifted) },
       false: {},
     },
     view: {
@@ -112,5 +122,11 @@ export const schedulerStyle = tv({
       info: { event: 'scheme-info' },
     } satisfies Record<SchedulerColorScheme, object>,
   },
-  defaultVariants: { view: 'week', today: false, allDay: false, colorScheme: 'primary' },
+  defaultVariants: {
+    view: 'week',
+    today: false,
+    allDay: false,
+    dragging: false,
+    colorScheme: 'primary',
+  },
 });

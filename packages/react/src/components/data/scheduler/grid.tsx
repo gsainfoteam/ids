@@ -10,15 +10,19 @@ import {
 import { range } from 'es-toolkit';
 
 import { SchedulerEventContext, type SchedulerContextValue } from './context';
+import { SchedulerDrag, type SchedulerDragProps } from './drag';
 import {
   allDayBarsIn,
   dateOf,
   firstHourOf,
   hourOfDay,
   timedSegmentsOn,
+  type SchedulerEventChange,
   type SchedulerEventData,
 } from './layout';
+import { SchedulerMovable } from './movable';
 import { useFirstHourScroll } from './use-first-hour-scroll';
+import { useHourHeight } from './use-hour-height';
 import { useTranslate } from '../../../internal/translate';
 import { Divider } from '../../layout/divider';
 import { ScrollArea } from '../../layout/scroll-area';
@@ -34,6 +38,8 @@ type SchedulerGridProps<E extends SchedulerEventData> = SchedulerContextValue & 
   today: CalendarDate | undefined;
   now: CalendarDateTime | undefined;
   renderEvent: (event: E) => ReactNode;
+  onEventChange: ((event: E, change: SchedulerEventChange<E>) => void) | undefined;
+  hintId: string | undefined;
 };
 
 const allDayContext = (event: SchedulerEventData) => ({
@@ -51,6 +57,8 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   today,
   now,
   renderEvent,
+  onEventChange,
+  hintId,
 }: SchedulerGridProps<E>) {
   const t = useTranslate();
   const baseId = useId();
@@ -61,9 +69,91 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   const allDayBars = allDayBarsIn(events, days);
   const firstHour = Math.min(firstHourOf(events, days) ?? WORKDAY_START_HOUR, WORKDAY_START_HOUR);
 
+  const canMove = onEventChange !== undefined;
+  const hourHeight = useHourHeight(bodyRef, canMove);
+
   useFirstHourScroll(viewportRef, bodyRef, firstHour);
 
   const columns = { '--scheduler-days': days.length } as CSSProperties;
+
+  const body = (
+    <div ref={bodyRef} className={styles.columns({ className: styles.body() })}>
+      <div aria-hidden="true" className={styles.gutter()}>
+        {HOURS.map((hour) => (
+          <div key={hour} className={styles.hour()}>
+            <span>{format.hour(hour)}</span>
+          </div>
+        ))}
+      </div>
+      {days.map((day, dayIndex) => {
+        const segments = timedSegmentsOn(events, day);
+        const showsNow = now !== undefined && sameDay(day, dateOf(now));
+        return (
+          <section
+            key={day.toString()}
+            aria-labelledby={headId(day)}
+            className={styles.day()}
+            data-scheduler-column={day.toString()}
+          >
+            {showsNow && (
+              <Divider
+                decorative
+                data-scheduler-now=""
+                className={styles.now()}
+                style={{ '--scheduler-now': hourOfDay(now) } as CSSProperties}
+              />
+            )}
+            {segments.length > 0 && (
+              <ItemGroup variant="ghost" className={styles.dayEvents()}>
+                {segments.map((segment) => {
+                  const content = (
+                    <SchedulerEventContext
+                      value={{
+                        event: segment.event,
+                        start: segment.start,
+                        end: segment.end,
+                        allDay: false,
+                      }}
+                    >
+                      {renderEvent(segment.event)}
+                    </SchedulerEventContext>
+                  );
+                  return (
+                    <li
+                      key={segment.event.id}
+                      data-scheduler-slot={segment.event.id}
+                      className={styles.slot()}
+                      style={
+                        {
+                          '--scheduler-event-start': segment.startHour,
+                          '--scheduler-event-hours': segment.hours,
+                          '--scheduler-event-left': segment.left,
+                          '--scheduler-event-width': segment.width,
+                        } as CSSProperties
+                      }
+                    >
+                      {canMove ? (
+                        <SchedulerMovable
+                          segment={segment}
+                          day={day}
+                          dayIndex={dayIndex}
+                          dayCount={days.length}
+                        >
+                          {content}
+                        </SchedulerMovable>
+                      ) : (
+                        content
+                      )}
+                    </li>
+                  );
+                })}
+              </ItemGroup>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  );
 
   return (
     <ScrollArea orientation="both" className={styles.board()} style={columns}>
@@ -134,65 +224,24 @@ export function SchedulerGrid<E extends SchedulerEventData>({
             )}
           </div>
 
-          <div ref={bodyRef} className={styles.columns({ className: styles.body() })}>
-            <div aria-hidden="true" className={styles.gutter()}>
-              {HOURS.map((hour) => (
-                <div key={hour} className={styles.hour()}>
-                  <span>{format.hour(hour)}</span>
-                </div>
-              ))}
-            </div>
-            {days.map((day) => {
-              const segments = timedSegmentsOn(events, day);
-              const showsNow = now !== undefined && sameDay(day, dateOf(now));
-              return (
-                <section
-                  key={day.toString()}
-                  aria-labelledby={headId(day)}
-                  className={styles.day()}
-                  data-scheduler-column={day.toString()}
-                >
-                  {showsNow && (
-                    <Divider
-                      decorative
-                      data-scheduler-now=""
-                      className={styles.now()}
-                      style={{ '--scheduler-now': hourOfDay(now) } as CSSProperties}
-                    />
-                  )}
-                  {segments.length > 0 && (
-                    <ItemGroup variant="ghost" className={styles.dayEvents()}>
-                      {segments.map((segment) => (
-                        <li
-                          key={segment.event.id}
-                          className={styles.slot()}
-                          style={
-                            {
-                              '--scheduler-event-start': segment.startHour,
-                              '--scheduler-event-hours': segment.hours,
-                              '--scheduler-event-left': segment.left,
-                              '--scheduler-event-width': segment.width,
-                            } as CSSProperties
-                          }
-                        >
-                          <SchedulerEventContext
-                            value={{
-                              event: segment.event,
-                              start: segment.start,
-                              end: segment.end,
-                              allDay: false,
-                            }}
-                          >
-                            {renderEvent(segment.event)}
-                          </SchedulerEventContext>
-                        </li>
-                      ))}
-                    </ItemGroup>
-                  )}
-                </section>
-              );
-            })}
-          </div>
+          {onEventChange ? (
+            <SchedulerDrag
+              events={events}
+              format={format}
+              hourHeight={hourHeight}
+              bodyRef={bodyRef}
+              onEventChange={onEventChange as SchedulerDragProps['onEventChange']}
+            >
+              {body}
+            </SchedulerDrag>
+          ) : (
+            body
+          )}
+          {hintId && (
+            <span id={hintId} hidden>
+              {t('scheduler.drag.hint')}
+            </span>
+          )}
         </div>
       </ScrollArea.Viewport>
     </ScrollArea>

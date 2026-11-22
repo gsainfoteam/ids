@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ComponentProps, type ReactNode } from 'react';
+import { useId, useState, type ComponentProps, type ReactNode } from 'react';
 
 import {
   getLocalTimeZone,
@@ -13,7 +13,13 @@ import { SchedulerContext } from './context';
 import { SchedulerEvent } from './event';
 import { schedulerFormat } from './format';
 import { SchedulerGrid } from './grid';
-import { dateOf, daysOf, type SchedulerEventData, type SchedulerView } from './layout';
+import {
+  dateOf,
+  daysOf,
+  type SchedulerEventChange,
+  type SchedulerEventData,
+  type SchedulerView,
+} from './layout';
 import { schedulerStyle } from './style';
 import { SchedulerToolbar } from './toolbar';
 import { useNow } from './use-now';
@@ -36,6 +42,7 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
   locale?: string;
   weekStartsOn?: WeekDay;
   now?: CalendarDateTime;
+  onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
   children?: (event: E) => ReactNode;
 };
 
@@ -52,9 +59,11 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   locale,
   weekStartsOn,
   now: nowProp,
+  onEventChange,
   children = defaultEvent,
   className,
   'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedBy,
   ...props
 }: SchedulerProps<E>) {
   [dateProp, defaultDate].forEach((date) => validateDate(date, 'Scheduler'));
@@ -66,6 +75,9 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   const now = useNow(nowProp);
   const [firstShownDate] = useState(() => defaultDate ?? todayIn(getLocalTimeZone()));
   const today = now && dateOf(now);
+  const generatedHintId = useId();
+  const hintId = onEventChange ? `${generatedHintId}-drag-hint` : undefined;
+  const describedBy = [ariaDescribedBy, hintId].filter(Boolean).join(' ') || undefined;
 
   const [view, setView] = useControllableState({
     value: viewProp,
@@ -87,6 +99,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
       <div
         role="group"
         aria-label={ariaLabel ?? t('scheduler.label')}
+        aria-describedby={describedBy}
         lang={resolvedLocale}
         {...props}
         data-scheduler=""
@@ -113,6 +126,8 @@ export function SchedulerRoot<E extends SchedulerEventData>({
           today={today}
           now={now}
           renderEvent={children}
+          onEventChange={onEventChange}
+          hintId={hintId}
         />
       </div>
     </SchedulerContext>

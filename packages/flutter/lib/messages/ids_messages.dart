@@ -431,6 +431,16 @@ mixin IdsMessages {
 
   String? get schedulerDay => null;
 
+  String? schedulerDragAt({required Object time}) => null;
+
+  String? schedulerDragCancel({required Object event}) => null;
+
+  String? schedulerDragEnd({required Object event}) => null;
+
+  String? get schedulerDragHint => null;
+
+  String? schedulerDragStart({required Object event}) => null;
+
   String? get schedulerGoToDate => null;
 
   String? get schedulerLabel => null;
@@ -444,6 +454,8 @@ mixin IdsMessages {
   String? get schedulerPreviousDay => null;
 
   String? get schedulerPreviousWeek => null;
+
+  String? schedulerResize({required Object event}) => null;
 
   String? get schedulerToday => null;
 
@@ -1209,6 +1221,21 @@ final class IdsKoreanMessages with IdsMessages {
   String get schedulerDay => '일';
 
   @override
+  String schedulerDragAt({required Object time}) => '${_format(time)} 시작';
+
+  @override
+  String schedulerDragCancel({required Object event}) => '${_format(event)}을(를) 제자리에 두었습니다.';
+
+  @override
+  String schedulerDragEnd({required Object event}) => '${_format(event)}을(를) 옮겼습니다.';
+
+  @override
+  String get schedulerDragHint => '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.';
+
+  @override
+  String schedulerDragStart({required Object event}) => '${_format(event)}을(를) 집었습니다.';
+
+  @override
   String get schedulerGoToDate => '날짜로 이동';
 
   @override
@@ -1228,6 +1255,9 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get schedulerPreviousWeek => '이전 주';
+
+  @override
+  String schedulerResize({required Object event}) => '${_format(event)} 끝 시각';
 
   @override
   String get schedulerToday => '오늘';

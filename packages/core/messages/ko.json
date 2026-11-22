@@ -292,6 +292,13 @@
   "scheduler": {
     "allDay": "종일",
     "day": "일",
+    "drag": {
+      "at": "{time} 시작",
+      "cancel": "{event}을(를) 제자리에 두었습니다.",
+      "end": "{event}을(를) 옮겼습니다.",
+      "hint": "일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.",
+      "start": "{event}을(를) 집었습니다."
+    },
     "goToDate": "날짜로 이동",
     "label": "일정표",
     "navigation": "날짜 이동",
@@ -299,6 +306,7 @@
     "nextWeek": "다음 주",
     "previousDay": "이전 날",
     "previousWeek": "이전 주",
+    "resize": "{event} 끝 시각",
     "today": "오늘",
     "view": "보기",
     "week": "주"

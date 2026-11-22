@@ -5,9 +5,9 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { SchedulerFormat } from './format';
-import type { SchedulerEventData } from './layout';
+import type { SchedulerEventData, SchedulerSegment, SchedulerShift } from './layout';
 import type { schedulerStyle } from './style';
-import type { CalendarDateTime } from '@internationalized/date';
+import type { CalendarDate, CalendarDateTime } from '@internationalized/date';
 
 export type SchedulerContextValue = {
   styles: ReturnType<typeof schedulerStyle>;
@@ -35,3 +35,25 @@ export function useSchedulerEventContext(part: string) {
 
   return { ...scheduler, ...event };
 }
+
+export type SchedulerSlotData = {
+  key: string;
+  segment: SchedulerSegment;
+  day: CalendarDate;
+  dayIndex: number;
+  dayCount: number;
+  element: () => HTMLElement | null;
+};
+
+export type SchedulerDragValue = {
+  hourHeight: number | undefined;
+  grabbed: { key: string; offset: { x: number; y: number } } | null;
+  grab: (slot: SchedulerSlotData, element: HTMLElement) => void;
+  nudge: (by: SchedulerShift) => void;
+  drop: () => void;
+  cancel: () => void;
+  resize: (segment: SchedulerSegment, height: number) => void;
+  endLabel: (segment: SchedulerSegment, day: CalendarDate, height: number) => string;
+};
+
+export const SchedulerDragContext = createContext<SchedulerDragValue | null>(null);

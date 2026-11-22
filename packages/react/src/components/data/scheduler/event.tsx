@@ -1,10 +1,10 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { use, type ReactNode } from 'react';
 
 import { toCalendarDate } from '@internationalized/date';
 
-import { useSchedulerEventContext } from './context';
+import { SchedulerDragContext, useSchedulerEventContext } from './context';
 import { Item } from '../item';
 
 import type { SchedulerColorScheme } from './layout';
@@ -23,9 +23,12 @@ export function SchedulerEvent({
 }: SchedulerEventPartProps) {
   const { styles, format, event, start, end, allDay } = useSchedulerEventContext('Scheduler.Event');
   const scheme = colorScheme ?? event.colorScheme ?? 'primary';
+  const movable = use(SchedulerDragContext) !== null && !allDay;
+  const focusableToMove = movable && props.onClick === undefined;
 
   return (
     <Item
+      tabIndex={focusableToMove ? 0 : undefined}
       {...props}
       size="tiny"
       variant={variant}

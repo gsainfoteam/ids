@@ -37,9 +37,18 @@ export type SchedulerSegment<E extends SchedulerEventData = SchedulerEventData> 
   end: CalendarDateTime;
   startHour: number;
   hours: number;
+  endHour: number;
+  endsHere: boolean;
   left: number;
   width: number;
 };
+
+export type SchedulerEventChange<E extends SchedulerEventData = SchedulerEventData> = Pick<
+  E,
+  'start' | 'end'
+>;
+
+export type SchedulerShift = { days: number; minutes: number };
 
 export type SchedulerAllDayBar<E extends SchedulerEventData = SchedulerEventData> = {
   event: E;
@@ -50,8 +59,9 @@ export type SchedulerAllDayBar<E extends SchedulerEventData = SchedulerEventData
 
 const DAYS_IN_WEEK = 7;
 const MINUTES_IN_HOUR = 60;
-const HOURS_IN_DAY = 24;
-const SHORTEST_SHOWN_HOURS = 0.5;
+export const HOURS_IN_DAY = 24;
+export const SNAP_MINUTES = 15;
+export const SHORTEST_SHOWN_HOURS = 0.5;
 const SIDE_BY_SIDE_WITHIN_HOURS = 0.5;
 const STACK_INDENT = 0.15;
 const DEEPEST_STACK_INDENT = 0.45;
@@ -133,8 +143,17 @@ function segmentOn<E extends SchedulerEventData>(
     Math.max(endHour - startHour, SHORTEST_SHOWN_HOURS),
     HOURS_IN_DAY - startHour,
   );
-  return { event, start, end, startHour, hours };
+  const endsHere = instant || end.compare(dayEnd) <= 0;
+  return { event, start, end, startHour, hours, endHour, endsHere };
 }
+
+export const shiftedBy = (value: DateValue, { days, minutes }: SchedulerShift): DateValue =>
+  'hour' in value ? value.add({ days, minutes }) : value.add({ days });
+
+export const isShifted = ({ days, minutes }: SchedulerShift) => days !== 0 || minutes !== 0;
+
+export const snappedMinutes = (hours: number) =>
+  Math.round((hours * MINUTES_IN_HOUR) / SNAP_MINUTES) * SNAP_MINUTES;
 
 type SideBySide<E extends SchedulerEventData> = {
   indent: number;

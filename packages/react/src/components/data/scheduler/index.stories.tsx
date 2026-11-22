@@ -477,6 +477,81 @@ export const ClickableEvents: Story = {
   },
 };
 
+export const MoveAndResize: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`onEventChange` 를 주면 시각이 있는 일정을 끌어 옮기고 아래 끝을 끌어 길이를 바꿉니다. 둘 다 15분 단위로 맞고, 놓을 때 한 번 새 `start` 와 `end` 를 알립니다. 키보드로는 일정에서 Space 로 집고, 위아래 방향키로 15분(Shift 와 함께 1시간), 좌우 방향키로 하루씩 옮긴 뒤 Enter 로 놓습니다. 아래 끝은 Tab 으로 가는 separator "끝 시각"이라 위아래 방향키로 15분씩 바꿉니다. 앱이 `events` 를 바꿔야 자리가 바뀝니다.',
+      },
+    },
+  },
+  render: function Render() {
+    const [events, setEvents] = useState(EVENTS);
+    const [changed, setChanged] = useState('');
+
+    return (
+      <div className="flex w-full flex-col gap-3">
+        <Scheduler
+          events={events}
+          defaultDate={TODAY}
+          now={NOW}
+          onEventChange={(event, { start, end }) => {
+            setEvents((previous) =>
+              previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
+            );
+            setChanged(`${event.title} ${start.toString()} – ${end.toString()}`);
+          }}
+        >
+          {(event) => <Scheduler.Event onClick={() => setChanged(event.title)} />}
+        </Scheduler>
+        <p className="text-body-b3-regular" data-testid="changed">
+          {changed}
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const changed = canvas.getByTestId('changed');
+    const column = (id: string) =>
+      canvasElement
+        .querySelector(`[data-scheduler-slot="${id}"]`)
+        ?.closest('[data-scheduler-column]')
+        ?.getAttribute('data-scheduler-column');
+
+    canvas.getByRole('button', { name: '알고리즘 스터디' }).focus();
+    await userEvent.keyboard('[Space]');
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}{ArrowRight}');
+    await expect(canvas.getByText(/^11월 18일 수요일 오전 9:30/)).toBeInTheDocument();
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() =>
+      expect(changed).toHaveTextContent(
+        '알고리즘 스터디 2026-11-18T09:30:00 – 2026-11-18T11:00:00',
+      ),
+    );
+    await waitFor(() => expect(column('algo')).toBe('2026-11-18'));
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: '알고리즘 스터디' })).toHaveFocus(),
+    );
+
+    const end = canvas.getByRole('separator', { name: '알고리즘 스터디 끝 시각' });
+    await expect(end).toHaveAttribute('aria-valuetext', '오전 11:00');
+    end.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() =>
+      expect(changed).toHaveTextContent(
+        '알고리즘 스터디 2026-11-18T09:30:00 – 2026-11-18T11:15:00',
+      ),
+    );
+    await expect(end).toHaveAttribute('aria-valuetext', '오전 11:15');
+
+    canvas.getAllByRole('button', { name: '점심' })[0]!.focus();
+    await userEvent.keyboard('[Space]{ArrowDown}{Escape}');
+    await expect(changed).not.toHaveTextContent('점심');
+    await expect(canvas.getByText('점심을(를) 제자리에 두었습니다.')).toBeInTheDocument();
+  },
+};
+
 export const CustomContent: Story = {
   parameters: {
     docs: {
