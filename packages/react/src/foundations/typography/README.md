@@ -15,15 +15,37 @@
 
 클래스 이름은 `text-{역할}-{단계}-{굵기}` 입니다.
 
-| 역할       | 단계 (px)                                | 굵기                            | 행간                         | 자간  |
-| ---------- | ---------------------------------------- | ------------------------------- | ---------------------------- | ----- |
-| `headline` | h1 48, h2 40, h3 32, h4 28, h5 24, h6 20 | bold, semibold, medium          | 1.2                          | -2.5% |
-| `subtitle` | s1 18, s2 16                             | bold, semibold, medium          | 1.35                         | 0     |
-| `body`     | b1 18, b2 16, b3 14                      | bold, semibold, medium, regular | b1 1.333, b2 1.375, b3 1.429 | 0     |
-| `caption`  | c1 12, c2 10                             | semibold, medium, regular       | 1.35                         | 0     |
+| 역할       | 단계 (px)                                | 굵기                            | 행간 (px)                                  | 자간                                     |
+| ---------- | ---------------------------------------- | ------------------------------- | ------------------------------------------ | ---------------------------------------- |
+| `headline` | h1 48, h2 40, h3 32, h4 28, h5 24, h6 20 | bold, semibold, medium          | h1 56, h2 48, h3 40, h4 36, h5 32, h6 28   | h1·h2 -3.5%, h3·h4·h5 -2.5%, h6 -1.5%    |
+| `body`     | b1 18, b2 16, b3 14                      | bold, semibold, medium, regular | b1 28, b2 24, b3 20                        | 0                                        |
+| `caption`  | c1 12, c2 10                             | semibold, medium, regular       | c1 16, c2 14                               | 0                                        |
 
-- 작은 body일수록 행간이 넓어 읽기 편합니다.
+- 행간은 배율이 아니라 정수 px 값이고, c2(14px)를 빼면 4px 격자에 맞습니다. 한 줄 높이가 늘 정수 px 이라 컨트롤과 목록의 높이가 반 픽셀로 어긋나지 않습니다.
+- 행간은 `IdsProvider` 의 `scale` 을 따라 글자 크기와 함께 커집니다.
+- 자간은 제목에만 주고 큰 글자일수록 좁힙니다. body 와 caption 은 0 입니다.
 - 컨트롤 안의 글자(버튼 라벨, 필드 값)는 `text-body-b3-*`, 작은 크기에서는 `text-caption-c1-*` 입니다. 버튼 전용 스타일은 따로 두지 않습니다.
+- 카드, 목록, 대화상자의 소제목은 `text-body-b1-semibold`, `text-body-b2-semibold` 입니다. body 와 크기가 같은 subtitle 스타일은 따로 두지 않습니다.
+
+## 긴 글
+
+문서처럼 여러 문단을 읽는 글은 `document-text` 로 감싸고 본문 크기는 `text-body-b2-regular leading-prose`(16px, 행간 28px)로 줍니다. 안쪽 태그에는 클래스를 붙이지 않습니다. Editor 의 본문이 이 조합입니다.
+
+```tsx
+<article className="document-text text-body-b2-regular leading-prose text-neutral-strong">
+  <h1>2학기 수강 신청 안내</h1>
+  <p>수강 신청은 9월 1일에 열립니다.</p>
+  <ul>
+    <li>정정 기간: 9월 8일부터</li>
+  </ul>
+</article>
+```
+
+- 블록 사이는 20px, 제목 바로 아래는 12px, h1·h2 위는 36px, h3~h6 위는 28px 입니다. 목록 항목과 인용 안 문단 사이는 8px 입니다. 제목이 아래 내용과 묶이고 문단은 한 덩어리씩 읽힙니다.
+- 문서 제목은 semibold 입니다: h1 28px(`headline-h4`), h2 24px(`headline-h5`), h3 20px(`headline-h6`), h4 18px(`body-b1`), h5·h6 16px(`body-b2`). body 크기의 제목에는 `tracking-snug` 를 더합니다.
+- 링크는 본문색에 옅은 밑줄(`border-neutral-strong` 색)이고 hover 에서 밑줄이 진해집니다. 글머리표는 `border-neutral-strong`, 번호는 `text-neutral` 색입니다.
+- 목록, 인용, 코드, 링크, 구분선도 그립니다. 안쪽 선택자는 `:where()` 라 안쪽 태그에 클래스를 주면 그 클래스가 이깁니다.
+- `leading-prose` 는 글자 스타일 뒤에 씁니다. `cn` 은 크기 클래스 앞에 놓인 `leading-*` 를 지웁니다.
 
 ## 글꼴
 
@@ -43,4 +65,6 @@
 - 크기를 조금 바꾸려고 `text-[17px]` 같은 값을 섞지 않습니다. 표의 단계에서 고릅니다.
 - Storybook `Foundations/Typography` 의 수치는 렌더된 글자에서 재므로 토큰과 어긋나지 않습니다.
 - Scales 스토리는 `semantic/typography.json` 의 스타일이 모두 그려졌는지 검사합니다. 스타일을 더하면 스토리의 표에도 클래스를 더합니다. Tailwind 는 소스에 글자 그대로 적힌 클래스만 만듭니다.
-- Primitives 스토리는 `typography.json` 의 크기, 굵기, 행간, 자간, 글꼴 원시값을 `--ids-*` 변수에서 읽어 보여 줍니다.
+- Scales 스토리는 모든 스타일의 행간이 정수 px 인지도 검사합니다.
+- Prose 스토리는 `document-text` 로 그린 긴 글을 보여 줍니다. 모든 마크다운 문법은 `Form/Editor` 의 Document 스토리에 있습니다.
+- Primitives 스토리는 `typography.json` 의 크기, 굵기, 행간, 자간, 글꼴 원시값을 `--ids-*` 변수에서 읽어 보여 줍니다. 행간 원시값은 크기 단계와 이름이 같습니다(`leading-b3` 는 20px).

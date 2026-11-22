@@ -82,7 +82,7 @@ const meta = {
       <Sidebar {...args}>
         <Sidebar.Header>
           <CubeTransparentIcon className="size-6 shrink-0" />
-          <span className="text-subtitle-s2-semibold truncate in-data-collapsed:hidden">
+          <span className="text-body-b2-semibold truncate in-data-collapsed:hidden">
             GIST 인포팀
           </span>
         </Sidebar.Header>
@@ -278,7 +278,7 @@ export const Gallery: Story = {
             >
               <Sidebar.Header>
                 <CubeTransparentIcon className="size-6 shrink-0" />
-                <span className="text-subtitle-s2-semibold truncate">GIST 인포팀</span>
+                <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
               </Sidebar.Header>
               <Sidebar.Group label="둘러보기">
                 <Sidebar.Item href="#home">
@@ -382,7 +382,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
         <CubeTransparentIcon />
       </Avatar.Fallback>
     </Avatar>
-    <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+    <span className="text-body-b2-semibold">GIST 인포팀</span>
   </Sidebar.Header>
 
   <Sidebar.Item href="#search">
@@ -515,7 +515,7 @@ export const Tree: Story = {
               <CubeTransparentIcon />
             </Avatar.Fallback>
           </Avatar>
-          <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+          <span className="text-body-b2-semibold">GIST 인포팀</span>
         </Sidebar.Header>
 
         <Sidebar.Item href="#search">

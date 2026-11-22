@@ -229,7 +229,7 @@ export const PC: Story = {
                 배송비<span>{fee === 0 ? '무료' : `${won.format(fee)}원`}</span>
               </p>
               <Divider />
-              <p className="text-subtitle-s2-semibold flex justify-between">
+              <p className="text-body-b2-semibold flex justify-between">
                 결제 금액<span>{won.format(total)}원</span>
               </p>
               <Label>

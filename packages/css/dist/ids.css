@@ -433,6 +433,68 @@
   }
 }
 
+@utility document-text {
+  & > :where(* + *) {
+    @apply mt-5;
+  }
+  & > :where(* + :is(h1, h2)) {
+    @apply mt-9;
+  }
+  & > :where(* + :is(h3, h4, h5, h6)) {
+    @apply mt-7;
+  }
+  & > :where(:is(h1, h2, h3, h4, h5, h6) + *) {
+    @apply mt-3;
+  }
+  & :where(li + li, li > * + *, blockquote > * + *) {
+    @apply mt-2;
+  }
+
+  & :where(h1) {
+    @apply text-headline-h4-semibold;
+  }
+  & :where(h2) {
+    @apply text-headline-h5-semibold;
+  }
+  & :where(h3) {
+    @apply text-headline-h6-semibold;
+  }
+  & :where(h4) {
+    @apply text-body-b1-semibold tracking-snug;
+  }
+  & :where(h5, h6) {
+    @apply text-body-b2-semibold tracking-snug;
+  }
+
+  & :where(ul, ol) {
+    @apply ps-6;
+  }
+  & :where(ul) {
+    @apply list-disc marker:text-(--ids-color-border-neutral-strong);
+  }
+  & :where(ul ul) {
+    list-style-type: circle;
+  }
+  & :where(ol) {
+    @apply list-decimal marker:text-neutral;
+  }
+  & :where(blockquote) {
+    @apply border-s-2 border-neutral ps-4 text-neutral;
+  }
+  & :where(pre) {
+    @apply rounded-standard border border-neutral px-4 py-3 font-mono leading-b2 whitespace-pre-wrap;
+  }
+  & :where(:not(pre) > code) {
+    @apply rounded-indicator border border-neutral bg-neutral-soft px-1.5 py-px font-mono;
+  }
+  & :where(a) {
+    @apply font-medium underline decoration-(--ids-color-border-neutral-strong) underline-offset-4 hover:decoration-current;
+  }
+  & :where(hr) {
+    @apply border-neutral;
+  }
+}
+
 @utility scheme-neutral {
   --ids-color-bg-scheme-soft: var(--ids-color-bg-neutral-soft);
   --ids-color-bg-scheme-solid: var(--ids-color-bg-neutral-solid);
@@ -1215,171 +1277,147 @@
 :root {
   --ids-text-headline-h1-bold: 48px;
   --ids-text-headline-h1-bold--font-weight: 700;
-  --ids-text-headline-h1-bold--line-height: 1.2;
-  --ids-text-headline-h1-bold--letter-spacing: -0.025em;
+  --ids-text-headline-h1-bold--line-height: 56px;
+  --ids-text-headline-h1-bold--letter-spacing: -0.035em;
   --ids-text-headline-h1-semibold: 48px;
   --ids-text-headline-h1-semibold--font-weight: 600;
-  --ids-text-headline-h1-semibold--line-height: 1.2;
-  --ids-text-headline-h1-semibold--letter-spacing: -0.025em;
+  --ids-text-headline-h1-semibold--line-height: 56px;
+  --ids-text-headline-h1-semibold--letter-spacing: -0.035em;
   --ids-text-headline-h1-medium: 48px;
   --ids-text-headline-h1-medium--font-weight: 500;
-  --ids-text-headline-h1-medium--line-height: 1.2;
-  --ids-text-headline-h1-medium--letter-spacing: -0.025em;
+  --ids-text-headline-h1-medium--line-height: 56px;
+  --ids-text-headline-h1-medium--letter-spacing: -0.035em;
   --ids-text-headline-h2-bold: 40px;
   --ids-text-headline-h2-bold--font-weight: 700;
-  --ids-text-headline-h2-bold--line-height: 1.2;
-  --ids-text-headline-h2-bold--letter-spacing: -0.025em;
+  --ids-text-headline-h2-bold--line-height: 48px;
+  --ids-text-headline-h2-bold--letter-spacing: -0.035em;
   --ids-text-headline-h2-semibold: 40px;
   --ids-text-headline-h2-semibold--font-weight: 600;
-  --ids-text-headline-h2-semibold--line-height: 1.2;
-  --ids-text-headline-h2-semibold--letter-spacing: -0.025em;
+  --ids-text-headline-h2-semibold--line-height: 48px;
+  --ids-text-headline-h2-semibold--letter-spacing: -0.035em;
   --ids-text-headline-h2-medium: 40px;
   --ids-text-headline-h2-medium--font-weight: 500;
-  --ids-text-headline-h2-medium--line-height: 1.2;
-  --ids-text-headline-h2-medium--letter-spacing: -0.025em;
+  --ids-text-headline-h2-medium--line-height: 48px;
+  --ids-text-headline-h2-medium--letter-spacing: -0.035em;
   --ids-text-headline-h3-bold: 32px;
   --ids-text-headline-h3-bold--font-weight: 700;
-  --ids-text-headline-h3-bold--line-height: 1.2;
+  --ids-text-headline-h3-bold--line-height: 40px;
   --ids-text-headline-h3-bold--letter-spacing: -0.025em;
   --ids-text-headline-h3-semibold: 32px;
   --ids-text-headline-h3-semibold--font-weight: 600;
-  --ids-text-headline-h3-semibold--line-height: 1.2;
+  --ids-text-headline-h3-semibold--line-height: 40px;
   --ids-text-headline-h3-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h3-medium: 32px;
   --ids-text-headline-h3-medium--font-weight: 500;
-  --ids-text-headline-h3-medium--line-height: 1.2;
+  --ids-text-headline-h3-medium--line-height: 40px;
   --ids-text-headline-h3-medium--letter-spacing: -0.025em;
   --ids-text-headline-h4-bold: 28px;
   --ids-text-headline-h4-bold--font-weight: 700;
-  --ids-text-headline-h4-bold--line-height: 1.2;
+  --ids-text-headline-h4-bold--line-height: 36px;
   --ids-text-headline-h4-bold--letter-spacing: -0.025em;
   --ids-text-headline-h4-semibold: 28px;
   --ids-text-headline-h4-semibold--font-weight: 600;
-  --ids-text-headline-h4-semibold--line-height: 1.2;
+  --ids-text-headline-h4-semibold--line-height: 36px;
   --ids-text-headline-h4-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h4-medium: 28px;
   --ids-text-headline-h4-medium--font-weight: 500;
-  --ids-text-headline-h4-medium--line-height: 1.2;
+  --ids-text-headline-h4-medium--line-height: 36px;
   --ids-text-headline-h4-medium--letter-spacing: -0.025em;
   --ids-text-headline-h5-bold: 24px;
   --ids-text-headline-h5-bold--font-weight: 700;
-  --ids-text-headline-h5-bold--line-height: 1.2;
+  --ids-text-headline-h5-bold--line-height: 32px;
   --ids-text-headline-h5-bold--letter-spacing: -0.025em;
   --ids-text-headline-h5-semibold: 24px;
   --ids-text-headline-h5-semibold--font-weight: 600;
-  --ids-text-headline-h5-semibold--line-height: 1.2;
+  --ids-text-headline-h5-semibold--line-height: 32px;
   --ids-text-headline-h5-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h5-medium: 24px;
   --ids-text-headline-h5-medium--font-weight: 500;
-  --ids-text-headline-h5-medium--line-height: 1.2;
+  --ids-text-headline-h5-medium--line-height: 32px;
   --ids-text-headline-h5-medium--letter-spacing: -0.025em;
   --ids-text-headline-h6-bold: 20px;
   --ids-text-headline-h6-bold--font-weight: 700;
-  --ids-text-headline-h6-bold--line-height: 1.2;
-  --ids-text-headline-h6-bold--letter-spacing: -0.025em;
+  --ids-text-headline-h6-bold--line-height: 28px;
+  --ids-text-headline-h6-bold--letter-spacing: -0.015em;
   --ids-text-headline-h6-semibold: 20px;
   --ids-text-headline-h6-semibold--font-weight: 600;
-  --ids-text-headline-h6-semibold--line-height: 1.2;
-  --ids-text-headline-h6-semibold--letter-spacing: -0.025em;
+  --ids-text-headline-h6-semibold--line-height: 28px;
+  --ids-text-headline-h6-semibold--letter-spacing: -0.015em;
   --ids-text-headline-h6-medium: 20px;
   --ids-text-headline-h6-medium--font-weight: 500;
-  --ids-text-headline-h6-medium--line-height: 1.2;
-  --ids-text-headline-h6-medium--letter-spacing: -0.025em;
-  --ids-text-subtitle-s1-bold: 18px;
-  --ids-text-subtitle-s1-bold--font-weight: 700;
-  --ids-text-subtitle-s1-bold--line-height: 1.35;
-  --ids-text-subtitle-s1-bold--letter-spacing: 0em;
-  --ids-text-subtitle-s1-semibold: 18px;
-  --ids-text-subtitle-s1-semibold--font-weight: 600;
-  --ids-text-subtitle-s1-semibold--line-height: 1.35;
-  --ids-text-subtitle-s1-semibold--letter-spacing: 0em;
-  --ids-text-subtitle-s1-medium: 18px;
-  --ids-text-subtitle-s1-medium--font-weight: 500;
-  --ids-text-subtitle-s1-medium--line-height: 1.35;
-  --ids-text-subtitle-s1-medium--letter-spacing: 0em;
-  --ids-text-subtitle-s2-bold: 16px;
-  --ids-text-subtitle-s2-bold--font-weight: 700;
-  --ids-text-subtitle-s2-bold--line-height: 1.35;
-  --ids-text-subtitle-s2-bold--letter-spacing: 0em;
-  --ids-text-subtitle-s2-semibold: 16px;
-  --ids-text-subtitle-s2-semibold--font-weight: 600;
-  --ids-text-subtitle-s2-semibold--line-height: 1.35;
-  --ids-text-subtitle-s2-semibold--letter-spacing: 0em;
-  --ids-text-subtitle-s2-medium: 16px;
-  --ids-text-subtitle-s2-medium--font-weight: 500;
-  --ids-text-subtitle-s2-medium--line-height: 1.35;
-  --ids-text-subtitle-s2-medium--letter-spacing: 0em;
+  --ids-text-headline-h6-medium--line-height: 28px;
+  --ids-text-headline-h6-medium--letter-spacing: -0.015em;
   --ids-text-body-b1-bold: 18px;
   --ids-text-body-b1-bold--font-weight: 700;
-  --ids-text-body-b1-bold--line-height: 1.333;
+  --ids-text-body-b1-bold--line-height: 28px;
   --ids-text-body-b1-bold--letter-spacing: 0em;
   --ids-text-body-b1-semibold: 18px;
   --ids-text-body-b1-semibold--font-weight: 600;
-  --ids-text-body-b1-semibold--line-height: 1.333;
+  --ids-text-body-b1-semibold--line-height: 28px;
   --ids-text-body-b1-semibold--letter-spacing: 0em;
   --ids-text-body-b1-medium: 18px;
   --ids-text-body-b1-medium--font-weight: 500;
-  --ids-text-body-b1-medium--line-height: 1.333;
+  --ids-text-body-b1-medium--line-height: 28px;
   --ids-text-body-b1-medium--letter-spacing: 0em;
   --ids-text-body-b1-regular: 18px;
   --ids-text-body-b1-regular--font-weight: 400;
-  --ids-text-body-b1-regular--line-height: 1.333;
+  --ids-text-body-b1-regular--line-height: 28px;
   --ids-text-body-b1-regular--letter-spacing: 0em;
   --ids-text-body-b2-bold: 16px;
   --ids-text-body-b2-bold--font-weight: 700;
-  --ids-text-body-b2-bold--line-height: 1.375;
+  --ids-text-body-b2-bold--line-height: 24px;
   --ids-text-body-b2-bold--letter-spacing: 0em;
   --ids-text-body-b2-semibold: 16px;
   --ids-text-body-b2-semibold--font-weight: 600;
-  --ids-text-body-b2-semibold--line-height: 1.375;
+  --ids-text-body-b2-semibold--line-height: 24px;
   --ids-text-body-b2-semibold--letter-spacing: 0em;
   --ids-text-body-b2-medium: 16px;
   --ids-text-body-b2-medium--font-weight: 500;
-  --ids-text-body-b2-medium--line-height: 1.375;
+  --ids-text-body-b2-medium--line-height: 24px;
   --ids-text-body-b2-medium--letter-spacing: 0em;
   --ids-text-body-b2-regular: 16px;
   --ids-text-body-b2-regular--font-weight: 400;
-  --ids-text-body-b2-regular--line-height: 1.375;
+  --ids-text-body-b2-regular--line-height: 24px;
   --ids-text-body-b2-regular--letter-spacing: 0em;
   --ids-text-body-b3-bold: 14px;
   --ids-text-body-b3-bold--font-weight: 700;
-  --ids-text-body-b3-bold--line-height: 1.429;
+  --ids-text-body-b3-bold--line-height: 20px;
   --ids-text-body-b3-bold--letter-spacing: 0em;
   --ids-text-body-b3-semibold: 14px;
   --ids-text-body-b3-semibold--font-weight: 600;
-  --ids-text-body-b3-semibold--line-height: 1.429;
+  --ids-text-body-b3-semibold--line-height: 20px;
   --ids-text-body-b3-semibold--letter-spacing: 0em;
   --ids-text-body-b3-medium: 14px;
   --ids-text-body-b3-medium--font-weight: 500;
-  --ids-text-body-b3-medium--line-height: 1.429;
+  --ids-text-body-b3-medium--line-height: 20px;
   --ids-text-body-b3-medium--letter-spacing: 0em;
   --ids-text-body-b3-regular: 14px;
   --ids-text-body-b3-regular--font-weight: 400;
-  --ids-text-body-b3-regular--line-height: 1.429;
+  --ids-text-body-b3-regular--line-height: 20px;
   --ids-text-body-b3-regular--letter-spacing: 0em;
   --ids-text-caption-c1-semibold: 12px;
   --ids-text-caption-c1-semibold--font-weight: 600;
-  --ids-text-caption-c1-semibold--line-height: 1.35;
+  --ids-text-caption-c1-semibold--line-height: 16px;
   --ids-text-caption-c1-semibold--letter-spacing: 0em;
   --ids-text-caption-c1-medium: 12px;
   --ids-text-caption-c1-medium--font-weight: 500;
-  --ids-text-caption-c1-medium--line-height: 1.35;
+  --ids-text-caption-c1-medium--line-height: 16px;
   --ids-text-caption-c1-medium--letter-spacing: 0em;
   --ids-text-caption-c1-regular: 12px;
   --ids-text-caption-c1-regular--font-weight: 400;
-  --ids-text-caption-c1-regular--line-height: 1.35;
+  --ids-text-caption-c1-regular--line-height: 16px;
   --ids-text-caption-c1-regular--letter-spacing: 0em;
   --ids-text-caption-c2-semibold: 10px;
   --ids-text-caption-c2-semibold--font-weight: 600;
-  --ids-text-caption-c2-semibold--line-height: 1.35;
+  --ids-text-caption-c2-semibold--line-height: 14px;
   --ids-text-caption-c2-semibold--letter-spacing: 0em;
   --ids-text-caption-c2-medium: 10px;
   --ids-text-caption-c2-medium--font-weight: 500;
-  --ids-text-caption-c2-medium--line-height: 1.35;
+  --ids-text-caption-c2-medium--line-height: 14px;
   --ids-text-caption-c2-medium--letter-spacing: 0em;
   --ids-text-caption-c2-regular: 10px;
   --ids-text-caption-c2-regular--font-weight: 400;
-  --ids-text-caption-c2-regular--line-height: 1.35;
+  --ids-text-caption-c2-regular--line-height: 14px;
   --ids-text-caption-c2-regular--letter-spacing: 0em;
   --ids-font-size-c2: 10px;
   --ids-font-size-c1: 12px;
@@ -1399,13 +1437,22 @@
   --ids-font-weight-semibold: 600;
   --ids-font-weight-bold: 700;
   --ids-letter-spacing-normal: 0em;
+  --ids-letter-spacing-snug: -0.015em;
   --ids-letter-spacing-tight: -0.025em;
+  --ids-letter-spacing-tighter: -0.035em;
   --ids-line-height-none: 1;
-  --ids-line-height-tight: 1.2;
-  --ids-line-height-snug: 1.35;
-  --ids-line-height-body-b1: 1.333;
-  --ids-line-height-body-b2: 1.375;
-  --ids-line-height-body-b3: 1.429;
+  --ids-line-height-c2: 14px;
+  --ids-line-height-c1: 16px;
+  --ids-line-height-b3: 20px;
+  --ids-line-height-b2: 24px;
+  --ids-line-height-b1: 28px;
+  --ids-line-height-h6: 28px;
+  --ids-line-height-h5: 32px;
+  --ids-line-height-h4: 36px;
+  --ids-line-height-h3: 40px;
+  --ids-line-height-h2: 48px;
+  --ids-line-height-h1: 56px;
+  --ids-line-height-prose: 28px;
   --ids-font-size-adjust-mono: 0.53;
 }
 
@@ -1482,30 +1529,6 @@
   --text-headline-h6-medium--font-weight: var(--ids-text-headline-h6-medium--font-weight);
   --text-headline-h6-medium--line-height: var(--ids-text-headline-h6-medium--line-height);
   --text-headline-h6-medium--letter-spacing: var(--ids-text-headline-h6-medium--letter-spacing);
-  --text-subtitle-s1-bold: var(--ids-text-subtitle-s1-bold);
-  --text-subtitle-s1-bold--font-weight: var(--ids-text-subtitle-s1-bold--font-weight);
-  --text-subtitle-s1-bold--line-height: var(--ids-text-subtitle-s1-bold--line-height);
-  --text-subtitle-s1-bold--letter-spacing: var(--ids-text-subtitle-s1-bold--letter-spacing);
-  --text-subtitle-s1-semibold: var(--ids-text-subtitle-s1-semibold);
-  --text-subtitle-s1-semibold--font-weight: var(--ids-text-subtitle-s1-semibold--font-weight);
-  --text-subtitle-s1-semibold--line-height: var(--ids-text-subtitle-s1-semibold--line-height);
-  --text-subtitle-s1-semibold--letter-spacing: var(--ids-text-subtitle-s1-semibold--letter-spacing);
-  --text-subtitle-s1-medium: var(--ids-text-subtitle-s1-medium);
-  --text-subtitle-s1-medium--font-weight: var(--ids-text-subtitle-s1-medium--font-weight);
-  --text-subtitle-s1-medium--line-height: var(--ids-text-subtitle-s1-medium--line-height);
-  --text-subtitle-s1-medium--letter-spacing: var(--ids-text-subtitle-s1-medium--letter-spacing);
-  --text-subtitle-s2-bold: var(--ids-text-subtitle-s2-bold);
-  --text-subtitle-s2-bold--font-weight: var(--ids-text-subtitle-s2-bold--font-weight);
-  --text-subtitle-s2-bold--line-height: var(--ids-text-subtitle-s2-bold--line-height);
-  --text-subtitle-s2-bold--letter-spacing: var(--ids-text-subtitle-s2-bold--letter-spacing);
-  --text-subtitle-s2-semibold: var(--ids-text-subtitle-s2-semibold);
-  --text-subtitle-s2-semibold--font-weight: var(--ids-text-subtitle-s2-semibold--font-weight);
-  --text-subtitle-s2-semibold--line-height: var(--ids-text-subtitle-s2-semibold--line-height);
-  --text-subtitle-s2-semibold--letter-spacing: var(--ids-text-subtitle-s2-semibold--letter-spacing);
-  --text-subtitle-s2-medium: var(--ids-text-subtitle-s2-medium);
-  --text-subtitle-s2-medium--font-weight: var(--ids-text-subtitle-s2-medium--font-weight);
-  --text-subtitle-s2-medium--line-height: var(--ids-text-subtitle-s2-medium--line-height);
-  --text-subtitle-s2-medium--letter-spacing: var(--ids-text-subtitle-s2-medium--letter-spacing);
   --text-body-b1-bold: var(--ids-text-body-b1-bold);
   --text-body-b1-bold--font-weight: var(--ids-text-body-b1-bold--font-weight);
   --text-body-b1-bold--line-height: var(--ids-text-body-b1-bold--line-height);
@@ -1596,13 +1619,22 @@
   --font-weight-semibold: var(--ids-font-weight-semibold);
   --font-weight-bold: var(--ids-font-weight-bold);
   --tracking-normal: var(--ids-letter-spacing-normal);
+  --tracking-snug: var(--ids-letter-spacing-snug);
   --tracking-tight: var(--ids-letter-spacing-tight);
+  --tracking-tighter: var(--ids-letter-spacing-tighter);
   --leading-none: var(--ids-line-height-none);
-  --leading-tight: var(--ids-line-height-tight);
-  --leading-snug: var(--ids-line-height-snug);
-  --leading-body-b1: var(--ids-line-height-body-b1);
-  --leading-body-b2: var(--ids-line-height-body-b2);
-  --leading-body-b3: var(--ids-line-height-body-b3);
+  --leading-c2: var(--ids-line-height-c2);
+  --leading-c1: var(--ids-line-height-c1);
+  --leading-b3: var(--ids-line-height-b3);
+  --leading-b2: var(--ids-line-height-b2);
+  --leading-b1: var(--ids-line-height-b1);
+  --leading-h6: var(--ids-line-height-h6);
+  --leading-h5: var(--ids-line-height-h5);
+  --leading-h4: var(--ids-line-height-h4);
+  --leading-h3: var(--ids-line-height-h3);
+  --leading-h2: var(--ids-line-height-h2);
+  --leading-h1: var(--ids-line-height-h1);
+  --leading-prose: var(--ids-line-height-prose);
 }
 
 @layer base {
@@ -1653,47 +1685,77 @@
 [data-scale] {
   --spacing: calc(0.25rem * var(--ids-scale, 1));
   --ids-text-headline-h1-bold: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h1-bold--line-height: round(calc(56px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h1-semibold: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h1-semibold--line-height: round(calc(56px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h1-medium: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h1-medium--line-height: round(calc(56px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h2-bold: round(calc(40px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h2-bold--line-height: round(calc(48px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h2-semibold: round(calc(40px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h2-semibold--line-height: round(calc(48px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h2-medium: round(calc(40px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h2-medium--line-height: round(calc(48px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h3-bold: round(calc(32px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h3-bold--line-height: round(calc(40px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h3-semibold: round(calc(32px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h3-semibold--line-height: round(calc(40px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h3-medium: round(calc(32px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h3-medium--line-height: round(calc(40px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h4-bold: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h4-bold--line-height: round(calc(36px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h4-semibold: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h4-semibold--line-height: round(calc(36px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h4-medium: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h4-medium--line-height: round(calc(36px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h5-bold: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h5-bold--line-height: round(calc(32px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h5-semibold: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h5-semibold--line-height: round(calc(32px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h5-medium: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h5-medium--line-height: round(calc(32px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h6-bold: round(calc(20px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h6-bold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h6-semibold: round(calc(20px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h6-semibold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-text-headline-h6-medium: round(calc(20px * var(--ids-scale, 1)), 1px);
-  --ids-text-subtitle-s1-bold: round(calc(18px * var(--ids-scale, 1)), 1px);
-  --ids-text-subtitle-s1-semibold: round(calc(18px * var(--ids-scale, 1)), 1px);
-  --ids-text-subtitle-s1-medium: round(calc(18px * var(--ids-scale, 1)), 1px);
-  --ids-text-subtitle-s2-bold: round(calc(16px * var(--ids-scale, 1)), 1px);
-  --ids-text-subtitle-s2-semibold: round(calc(16px * var(--ids-scale, 1)), 1px);
-  --ids-text-subtitle-s2-medium: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h6-medium--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b1-bold: round(calc(18px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-bold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b1-semibold: round(calc(18px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-semibold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b1-medium: round(calc(18px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-medium--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b1-regular: round(calc(18px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-regular--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b2-bold: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-bold--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b2-semibold: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-semibold--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b2-medium: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-medium--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b2-regular: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-regular--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b3-bold: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-bold--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b3-semibold: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-semibold--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b3-medium: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-medium--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
   --ids-text-body-b3-regular: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-regular--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
   --ids-text-caption-c1-semibold: round(calc(12px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c1-semibold--line-height: round(calc(16px * var(--ids-scale, 1)), 1px);
   --ids-text-caption-c1-medium: round(calc(12px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c1-medium--line-height: round(calc(16px * var(--ids-scale, 1)), 1px);
   --ids-text-caption-c1-regular: round(calc(12px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c1-regular--line-height: round(calc(16px * var(--ids-scale, 1)), 1px);
   --ids-text-caption-c2-semibold: round(calc(10px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c2-semibold--line-height: round(calc(14px * var(--ids-scale, 1)), 1px);
   --ids-text-caption-c2-medium: round(calc(10px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c2-medium--line-height: round(calc(14px * var(--ids-scale, 1)), 1px);
   --ids-text-caption-c2-regular: round(calc(10px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c2-regular--line-height: round(calc(14px * var(--ids-scale, 1)), 1px);
   --ids-font-size-c2: round(calc(10px * var(--ids-scale, 1)), 1px);
   --ids-font-size-c1: round(calc(12px * var(--ids-scale, 1)), 1px);
   --ids-font-size-b3: round(calc(14px * var(--ids-scale, 1)), 1px);
@@ -1705,6 +1767,18 @@
   --ids-font-size-h3: round(calc(32px * var(--ids-scale, 1)), 1px);
   --ids-font-size-h2: round(calc(40px * var(--ids-scale, 1)), 1px);
   --ids-font-size-h1: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-c2: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-c1: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-b3: round(calc(20px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-b2: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-b1: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-h6: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-h5: round(calc(32px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-h4: round(calc(36px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-h3: round(calc(40px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-h2: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-h1: round(calc(56px * var(--ids-scale, 1)), 1px);
+  --ids-line-height-prose: round(calc(28px * var(--ids-scale, 1)), 1px);
   --ids-size-control-standard: round(calc(36px * var(--ids-scale, 1)), 1px);
   --ids-size-control-tiny: round(calc(32px * var(--ids-scale, 1)), 1px);
   --ids-size-icon-standard: round(calc(16px * var(--ids-scale, 1)), 1px);

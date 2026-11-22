@@ -41,8 +41,8 @@ export const itemStyle = tv({
         root: [
           'min-h-14 gap-3 concentric-p-3 [--item-padding:calc(var(--spacing)*3)]',
           '[--item-media-ratio:calc(8/14)] [--item-row-height:calc(var(--spacing)*14)]',
-          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-body-b3-medium)*var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular)*var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
-          '[--item-row-largest:calc(var(--ids-text-body-b3-medium)*var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular)*var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
+          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
+          '[--item-row-largest:calc(var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
         ],
         title: 'text-body-b3-medium',
         description: 'text-body-b3-regular',
@@ -51,8 +51,8 @@ export const itemStyle = tv({
         root: [
           'min-h-10 gap-2 concentric-p-2 [--item-padding:calc(var(--spacing)*2)]',
           '[--item-media-ratio:calc(7/11)] [--item-row-height:calc(var(--spacing)*11)]',
-          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-caption-c1-medium)*var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular)*var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
-          '[--item-row-largest:calc(var(--ids-text-caption-c1-medium)*var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular)*var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
+          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
+          '[--item-row-largest:calc(var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
         ],
         title: 'text-caption-c1-medium',
         description: 'text-caption-c1-regular',

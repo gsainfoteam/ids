@@ -18,6 +18,40 @@ const sizes = ['standard', 'tiny'] as const;
 const NOTICE =
   '<h2>동아리 박람회</h2><p>3월 12일 학생회관 앞에서 <strong>동아리 박람회</strong>가 열립니다. 자세한 일정은 <a href="https://gistory.me">공지</a>를 보세요.</p><ul><li>부스 신청: 3월 5일까지</li><li>장소 배정: 3월 8일</li></ul>';
 
+const DOCUMENT = `# 동아리 박람회 안내
+
+3월 12일 학생회관 앞에서 **동아리 박람회**가 열립니다. 부스는 *선착순*으로 배정하고, ~~3월 10일~~ 3월 5일까지 신청을 받습니다. 신청서 양식은 \`booth-form.pdf\` 이고 자세한 일정은 [공지](https://gistory.me)를 보세요.
+
+부스마다 테이블 두 개와 의자 네 개를 드립니다. 전기가 필요한 동아리는 신청서에 적어 주세요.
+
+## 일정
+
+- 부스 신청: 3월 5일까지
+- 장소 배정: 3월 8일
+  - 1차: 학생회관 앞
+  - 2차: 잔디광장
+- 박람회: 3월 12일 오전 10시부터
+
+### 준비물
+
+1. 동아리 소개 포스터
+2. 신입 회원 신청서
+3. 연락처를 적을 태블릿이나 종이
+
+#### 참고
+
+> 작년에는 40개 동아리가 참가했습니다.
+>
+> 올해는 부스를 50개로 늘렸습니다.
+
+\`\`\`
+const booth = { size: '2m × 2m', power: true };
+\`\`\`
+
+---
+
+문의는 동아리연합회로 해 주세요.`;
+
 const meta = {
   title: 'Form/Editor',
   component: Editor,
@@ -306,6 +340,55 @@ export const Formats: Story = {
     await waitFor(() =>
       expect(canvas.getByTestId('json')).toHaveTextContent('JSON 으로 저장합니다!'),
     );
+  },
+};
+
+export const Document: Story = {
+  render: () => (
+    <div className="grid w-full max-w-5xl gap-6 lg:grid-cols-2">
+      {variants.map((variant) => (
+        <Editor
+          key={variant}
+          variant={variant}
+          format="markdown"
+          aria-label={`문서 ${variant}`}
+          defaultValue={DOCUMENT}
+        />
+      ))}
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '본문은 `document-text` 유틸리티로 그립니다. 블록 사이는 20px, 제목 아래는 12px, 제목 위는 28~36px이고, 본문은 16px에 행간 28px, 제목은 semibold로 h1 28px, h2 24px, h3 20px입니다. 코드 블록은 바탕 없이 테두리만 그립니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const content = await editableContent(canvas, '문서 outline');
+    const size = (selector: string) => getComputedStyle(content.querySelector(selector)!).fontSize;
+
+    for (const selector of [
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'ul ul',
+      'ol',
+      'blockquote',
+      'pre',
+      'code',
+      'a',
+      'hr',
+      's',
+      'em',
+    ])
+      await expect(content.querySelector(selector)).not.toBeNull();
+    await expect(size('h1')).toBe('28px');
+    await expect(size('h2')).toBe('24px');
+    await expect(size('h3')).toBe('20px');
+    await expect(getComputedStyle(content.querySelector('p')!).lineHeight).toBe('28px');
   },
 };
 

@@ -57,7 +57,7 @@ export const Scale: Story = {
         description="컨트롤 사이는 sm, 카드 안 여백은 md, 영역 사이는 lg 이상입니다."
       >
         <div className="concentric-p-4 inset-ring-neutral flex flex-col gap-2 inset-ring-1">
-          <span className="text-subtitle-s2-semibold">md 여백의 카드</span>
+          <span className="text-body-b2-semibold">md 여백의 카드</span>
           <span className="text-body-b3-regular text-neutral">
             제목과 설명 사이는 sm(8px)입니다.
           </span>

@@ -292,6 +292,14 @@ IDS elements appear, the hook code does not. The exceptions, which stay componen
 
 Plain helpers (play queries, data factories, formatters) stay at module level.
 
+**Menu rows should start with one icon.** In stories, blocks and README examples, prefer giving
+each `Menu.Item` and each submenu `Menu.Trigger` one leading heroicon (or an `Avatar` for a
+person), so the labels line up. It is a recommendation, not a hard rule: a row may stay a label
+alone when no icon fits it. The icon comes from the set the file already imports:
+`@heroicons/react/16/solid` in component stories and READMEs, `24/outline` in blocks. A
+`Menu.CheckboxItem` in a group of such items takes an icon too; a menu of only checkbox and radio
+items stays bare, since their check or dot sits at the end and marks them already.
+
 ## Blocks
 
 `src/blocks/<category>/` holds blocks: screens built only from IDS components, with several takes
@@ -663,8 +671,9 @@ by group and key, as ICU strings with plain `{name}` arguments; a new key also g
 Developer warnings stay English and out of the catalog. A default that has to be a function
 (`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
-keys and that no Korean literal sits in component code; `tests/translate.test.tsx` renders every
-story in English.
+keys and that no Korean literal sits in component code; `tests/translate-<category>.test.tsx`
+renders every story in English and `tests/translate.test.tsx` checks popups, live regions and
+fallbacks.
 
 **Variants are the looks an app cannot build from IDS parts.** A `variant` or `appearance` value is
 a component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
@@ -799,8 +808,15 @@ projects:
   axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA tags and fail with one line per
   rule, node and fix (`color-contrast` excepted, see APCA above); a story tagged `'!test'` is skipped. The stories are split by category so
   no single page renders all of them.
-  `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
-  `hydrateRoot` and fails on a recoverable error or any `console.error`.
+  `tests/hydration-<category>.test.tsx` (`checkEveryStoryHydrates` in `tests/hydration-checks.tsx`)
+  renders every story with `renderToString`, hydrates that HTML with `hydrateRoot` and fails on a
+  recoverable error or any `console.error`. `tests/translate-<category>.test.tsx`
+  (`checkEveryStoryInEnglish` in `tests/translation-checks.tsx`) renders every story under an
+  English `translate` and fails on a Korean default that the story did not write itself. Both are
+  split by category like the story checks: WebKit's page crashed out of memory inside the files that
+  rendered every story in one frame. WebKit keeps every finished file's frame alive until its shard
+  ends (about 20 MB for an empty file, 55 MB for one that imports IDS, and a forced GC frees none of
+  it), so a shard's memory also grows with the number of files.
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
   `navigator.clipboard`, one file at a time, in Chromium. Every browser context shares
   one system clipboard, so two such files in parallel paste each other's text. The config finds them

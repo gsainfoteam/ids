@@ -35,7 +35,7 @@ export const emptyStyle = tv({
       standard: {
         root: 'concentric-p-8',
         media: 'mb-4',
-        title: 'text-subtitle-s2-semibold',
+        title: 'text-body-b2-semibold',
         description: 'mt-1 text-body-b3-regular',
         actions: 'mt-5',
       },

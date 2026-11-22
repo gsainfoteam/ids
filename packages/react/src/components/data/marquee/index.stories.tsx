@@ -72,7 +72,7 @@ const meta = {
   render: (args) => (
     <Marquee {...args} className={args.orientation === 'vertical' ? 'h-48 w-80' : undefined}>
       {PARTNERS.map((name) => (
-        <Marquee.Item key={name} className="text-subtitle-s1-semibold text-neutral">
+        <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
           {name}
         </Marquee.Item>
       ))}
@@ -320,7 +320,7 @@ export const Controlled: Story = {
           reducedMotion={false}
         >
           {PARTNERS.map((name) => (
-            <Marquee.Item key={name} className="text-subtitle-s1-semibold text-neutral">
+            <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
               {name}
             </Marquee.Item>
           ))}
@@ -401,7 +401,7 @@ export const Vertical: Story = {
       className="h-40 w-72 gap-4 text-center"
     >
       {STATS.map((stat) => (
-        <Marquee.Item key={stat} className="text-subtitle-s1-semibold">
+        <Marquee.Item key={stat} className="text-body-b1-semibold">
           {stat}
         </Marquee.Item>
       ))}
@@ -465,7 +465,7 @@ export const ReducedMotion: Story = {
   render: () => (
     <Marquee aria-label="함께하는 단체" reducedMotion className="w-72">
       {PARTNERS.map((name) => (
-        <Marquee.Item key={name} className="text-subtitle-s1-semibold text-neutral">
+        <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
           {name}
         </Marquee.Item>
       ))}

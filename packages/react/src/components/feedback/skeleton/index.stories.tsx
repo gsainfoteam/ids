@@ -75,9 +75,9 @@ export const Gallery: Story = {
         title="Text"
         description="줄마다 그 글자 스타일의 줄 높이 한 칸에 1em 막대를 그립니다. 여러 줄이면 마지막 줄은 60% 입니다."
       >
-        <Showcase.Row label="subtitle-s2" className="items-start">
-          <Skeleton shape="text" className="text-subtitle-s2-semibold w-48" />
-          <p className="text-subtitle-s2-semibold w-48">학기 공지</p>
+        <Showcase.Row label="body-b2 semibold" className="items-start">
+          <Skeleton shape="text" className="text-body-b2-semibold w-48" />
+          <p className="text-body-b2-semibold w-48">학기 공지</p>
         </Showcase.Row>
         <Showcase.Row label="body-b3 × 3" className="items-start">
           <Skeleton shape="text" lines={3} className="text-body-b3-regular w-48" />
@@ -298,9 +298,9 @@ export const TextHeight: Story = {
         <Skeleton
           data-testid="title-skeleton"
           shape="text"
-          className="text-subtitle-s2-semibold w-40"
+          className="text-body-b2-semibold w-40"
         />
-        <p data-testid="title-text" className="text-subtitle-s2-semibold">
+        <p data-testid="title-text" className="text-body-b2-semibold">
           학기 공지
         </p>
       </div>

@@ -80,7 +80,7 @@ import { PromptInput } from '@gsainfoteam/ids-react';
   <PromptInput.Input />
   <PromptInput.ActionMenu>                          {/* + 버튼과 메뉴. 생략하면 AddAttachments 하나 */}
     <PromptInput.AddAttachments />                  {/* 파일 고르기를 연다 */}
-    <Menu.Item onSelect={capture}>사진 찍기</Menu.Item>
+    <Menu.Item onSelect={capture}><CameraIcon />사진 찍기</Menu.Item>
   </PromptInput.ActionMenu>
   <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>웹 검색</PromptInput.Tool>
 </PromptInput>

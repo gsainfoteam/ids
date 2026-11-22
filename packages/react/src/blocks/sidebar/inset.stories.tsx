@@ -152,7 +152,7 @@ export const PC: Story = {
             </Item.Media>
             <Item.Content>
               <Item.Title asChild>
-                <h1 className="text-subtitle-s2-semibold">받은 소식</h1>
+                <h1 className="text-body-b2-semibold">받은 소식</h1>
               </Item.Title>
               <Item.Description>{active.name}에서 나에게 온 멘션과 댓글이에요.</Item.Description>
             </Item.Content>
