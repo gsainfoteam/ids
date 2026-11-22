@@ -31,6 +31,7 @@ const proseMirrorBaseline = cn(
 
 const editorBlocks = cn(
   '[&_.suggestion]:text-primary',
+  '[&_a]:cursor-pointer',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard',
   '[&_table]:w-full! [&_:is(td,th)]:break-words [&_.selectedCell]:bg-primary-soft',
 );
