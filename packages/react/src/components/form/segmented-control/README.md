@@ -2,7 +2,7 @@
 
 트랙 위에 칸을 나란히 놓고 그중 하나를 고르는 값 입력입니다. 보기 방식(목록, 격자), 차트 단위(일, 주, 월)처럼 선택지가 두세 개이고 바로 보여야 할 때 씁니다.
 
-- **패널을 오가면 `Tabs appearance="segmented"`.** 같은 트랙과 칸으로 그리면서 `tablist`, `tab`, `tabpanel` 과 `aria-controls` 를 이어 줍니다. 로그인 방법처럼 고른 모드마다 다른 내용을 보여 줄 때 씁니다. SegmentedControl 은 값(차트 단위, 보기 방식)을 고르는 `radiogroup` 입니다.
+- **패널을 오가면 `Tabs variant="segmented"`.** 같은 트랙과 칸으로 그리면서 `tablist`, `tab`, `tabpanel` 과 `aria-controls` 를 이어 줍니다. 로그인 방법처럼 고른 모드마다 다른 내용을 보여 줄 때 씁니다. SegmentedControl 은 값(차트 단위, 보기 방식)을 고르는 `radiogroup` 입니다.
 - **선택지가 많거나 길면** `RadioGroup` 이나 `Select` 가 낫습니다. 여러 개를 고르면 `ToggleGroup selectionMode="multiple"` 입니다.
 - **native 라디오 그대로.** 칸마다 같은 `name` 의 `<input type="radio">` 가 있어 키보드, `required`, 폼 초기화, react-hook-form 이 RadioGroup 과 같습니다.
 - **타입이 좁혀진 항목.** 렌더 함수의 `Item` 은 `value` 가 컨트롤의 타입으로 좁혀집니다.

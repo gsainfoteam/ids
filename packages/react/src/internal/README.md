@@ -436,7 +436,7 @@ size: {
 - padding 을 가진 상자에는 `padded`, trigger 가 채우는 상자에는 `unpadded` 를 씁니다. 바꿔 쓰면 `padded` 는 테두리 너머로 밀리고, `unpadded` 는 padding 만큼 안쪽에 떠 보입니다.
 - `size-7`, `size-6` 과 음수 margin 은 control 높이 토큰(36px, 32px)과 상자 padding 에 맞춘 값입니다. 둘 중 하나를 바꾸면 이 값도 다시 계산합니다.
 - disabled 필드는 루트에서 이미 흐려집니다(`data-disabled:opacity-50`). ColorField 와 FileField 는 disabled Clear 가 한 번 더 흐려지지 않도록 `alreadyDimmedByField`(`data-disabled:opacity-100`)를 더합니다.
-- `FieldSurfaceVariant` 에 값을 더하면 가져가는 컴포넌트의 `variants` 에도 각각 더해야 적용됩니다. Select, ChipField, ColorField 는 variant 타입이 `FieldTriggerVariant` 라서, 빠뜨리면 `satisfies Record<..., object>` 가 타입 오류를 냅니다. FileField 는 자기 `FileFieldVariant` 와 `compoundVariants` 를 따로 고칩니다.
+- `FieldSurfaceVariant` 에 값을 더하면 가져가는 컴포넌트의 `variants` 에도 각각 더해야 적용됩니다. Select, ChipField, ColorField 는 variant 타입이 `FieldTriggerVariant` 라서, 빠뜨리면 `satisfies Record<..., object>` 가 타입 오류를 냅니다. FileField 는 자기 `FileFieldVariant` 의 `variants` 를 따로 고칩니다.
 
 ## surfaces/footer-band.ts
 
@@ -980,7 +980,7 @@ searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
 ### 쓰는 곳
 
 - SegmentedControl: 루트(`<fieldset>`)에 `track`, 칸(`<label>`)에 `segment` 와 `height`
-- Tabs: `appearance="segmented"` 일 때 `Tabs.List` 에 `track`, `Tabs.Trigger` 에 `segment` 와 `height`
+- Tabs: `variant="segmented"` 일 때 `Tabs.List` 에 `track`, `Tabs.Trigger` 에 `segment` 와 `height`
 
 ### 쓰는 법
 
@@ -990,7 +990,7 @@ segmented: {
   list: segmentSurface.track,
   trigger: [segmentSurface.segment, 'not-aria-selected:data-hovered:text-neutral'],
 },
-{ appearance: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
+{ variant: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
 ```
 
 ### 왜 이렇게

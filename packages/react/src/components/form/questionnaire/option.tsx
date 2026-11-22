@@ -24,12 +24,11 @@ export function QuestionnaireOption({
   className,
   children,
 }: QuestionnaireOptionProps) {
-  const { selectionMode, orientation, appearance, size } =
-    useQuestionContext('Questionnaire.Option');
+  const { selectionMode, orientation, variant, size } = useQuestionContext('Questionnaire.Option');
   const styles = questionnaireStyle({ orientation, size });
   const Control = selectionMode === 'single' ? Radio : Checkbox;
 
-  if (appearance === 'toggle')
+  if (variant === 'toggle')
     return (
       <Toggle
         value={value}

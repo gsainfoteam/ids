@@ -19,7 +19,7 @@ import { QuestionnaireOption } from './option';
 import { QuestionnaireOther } from './other';
 import {
   questionnaireStyle,
-  type QuestionnaireAppearance,
+  type QuestionnaireVariant,
   type QuestionnaireOrientation,
 } from './style';
 import { keyHandler } from '../../../internal/keys';
@@ -37,7 +37,7 @@ export type QuestionnaireQuestionProps = Omit<
   selectionMode?: QuestionnaireSelectionMode;
   optional?: boolean;
   orientation?: QuestionnaireOrientation;
-  appearance?: QuestionnaireAppearance;
+  variant?: QuestionnaireVariant;
   className?: string;
   style?: CSSProperties;
   children: ReactNode;
@@ -77,7 +77,7 @@ export function QuestionnaireQuestion({
   selectionMode = 'single',
   optional: _readByTheRoot,
   orientation = 'vertical',
-  appearance = 'card',
+  variant = 'card',
   hidden,
   className,
   style,
@@ -218,14 +218,14 @@ export function QuestionnaireQuestion({
         name,
         selectionMode,
         orientation,
-        appearance,
+        variant,
         draft,
         descriptionId,
         size: questionnaire.size,
         setOther,
       }}
     >
-      {appearance === 'toggle' ? (
+      {variant === 'toggle' ? (
         <fieldset {...questionProps}>
           <legend id={legendId} className={styles.legend()}>
             {text}

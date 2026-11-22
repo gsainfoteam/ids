@@ -2,7 +2,7 @@
 
 AI 가 사용자에게 고를 거리를 내미는 질문지입니다. 질문 여러 개를 한 번에 하나씩 묻고, 끝나면 답을 모아 `onComplete` 로 넘깁니다. 채팅 시작 화면의 추천 질문도 한 단계짜리 Questionnaire 로 그립니다.
 
-- **IDS 부품으로 짓습니다.** 루트는 `<form>`, 질문은 `RadioGroup` 이나 `CheckboxGroup`(`<fieldset>` + `<legend>`), 보기는 `Item` 카드 안의 `Radio` 나 `Checkbox`(`appearance="toggle"` 이면 `ToggleGroup` 의 `Toggle`), 직접 입력은 `TextField`, 진행은 `Progress`, 이동 버튼은 `ButtonGroup` 과 `Button` 입니다.
+- **IDS 부품으로 짓습니다.** 루트는 `<form>`, 질문은 `RadioGroup` 이나 `CheckboxGroup`(`<fieldset>` + `<legend>`), 보기는 `Item` 카드 안의 `Radio` 나 `Checkbox`(`variant="toggle"` 이면 `ToggleGroup` 의 `Toggle`), 직접 입력은 `TextField`, 진행은 `Progress`, 이동 버튼은 `ButtonGroup` 과 `Button` 입니다.
 - **한 번에 한 질문.** 모든 질문이 그려지고, 지금 질문 말고는 `hidden` 입니다. 서버 HTML 에도 질문이 다 들어 있고, 숨은 질문의 답도 FormData 에 남습니다.
 - **필수와 건너뛰기.** 질문은 기본으로 필수라 답하기 전에는 다음 버튼이 꺼져 있습니다. `optional` 이면 건너뛰기 버튼이 붙습니다.
 - **포커스가 따라갑니다.** 다음이나 이전으로 넘어가면 새 질문의 고른 보기, 없으면 첫 보기로 포커스가 갑니다.
@@ -60,7 +60,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 <Questionnaire.Question
   name="goods"
   selectionMode="multiple"
-  appearance="toggle"
+  variant="toggle"
   orientation="horizontal"
 >
   어떤 굿즈를 팔까요?
@@ -69,7 +69,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 </Questionnaire.Question>
 ```
 
-| `appearance`  | 보기                                                              |
+| `variant`  | 보기                                                              |
 | ------------- | ----------------------------------------------------------------- |
 | `card` (기본) | `Item` 카드 안의 `Radio` / `Checkbox`. `description` 을 보인다    |
 | `toggle`      | `ToggleGroup` 안의 `Toggle`. 라디오도 체크박스도 없고 글자 폭만큼 |
@@ -119,7 +119,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Questionnaire advanceOnSelect size="tiny" onComplete={({ prompt }) => send(prompt)}>
-  <Questionnaire.Question name="prompt" appearance="toggle" orientation="horizontal">
+  <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
     이런 걸 물어볼 수 있어요
     <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
     <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
@@ -169,7 +169,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 | Question `selectionMode` | `single`(기본) / `multiple`                                             |
 | Question `optional`      | `false`. 켜면 건너뛰기 버튼                                             |
 | Question `orientation`   | `vertical`(기본) / `horizontal`                                         |
-| Question `appearance`    | `card`(기본) / `toggle`                                                 |
+| Question `variant`    | `card`(기본) / `toggle`                                                 |
 | Option `value`           | 답이 되는 값                                                            |
 | Option `description`     | 보기 둘째 줄                                                            |
 | Option `disabled`        | 그 보기만 끈다                                                          |

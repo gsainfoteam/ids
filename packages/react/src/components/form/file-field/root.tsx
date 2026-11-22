@@ -7,23 +7,26 @@ import {
   type ReactNode,
 } from 'react';
 
+import { PaperClipIcon } from '@heroicons/react/16/solid';
+
 import { FileClear } from './clear';
 import { FileContext } from './context';
 import { type FileFieldRejection } from './file-rules';
 import { isType } from './is-type';
 import { FileList } from './list';
+import { FilePreview } from './preview';
+import { fileFieldStyle } from './style';
 import { FileTrigger } from './trigger';
 import { useFileFieldRoot } from './use-file-field-root';
+import { FileValue } from './value';
 import { resolveState } from '../../../internal/state-props';
 import { flattenFragments, invariant } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type FileFieldAppearance = 'field' | 'dropzone';
 export type FileFieldVariant = 'outline' | 'soft' | 'ghost';
 
 export type FileFieldState = {
-  appearance: FileFieldAppearance;
   dragging: boolean;
   disabled: boolean;
   readOnly: boolean;
@@ -56,7 +59,6 @@ type BaseProps = Omit<
   | ButtonProps
 > &
   Pick<ComponentProps<'button'>, ButtonProps> & {
-    appearance?: FileFieldAppearance;
     variant?: FileFieldVariant;
     size?: IdsSize;
     invalid?: boolean;
@@ -88,47 +90,53 @@ export type FileFieldProps = BaseProps &
   );
 
 export function FileFieldRoot(props: FileFieldProps) {
-  const { appearance = 'field', multiple = false, children, className, style } = props;
-  const { context, rootProps, picker, messages } = useFileFieldRoot(props, 'standalone');
-  const { state, styles } = context;
+  const { variant = 'outline', multiple = false, children, className, style } = props;
+  const { context, rootProps, picker, messages } = useFileFieldRoot(props, 'field');
+  const { state } = context;
+  const styles = fileFieldStyle({ variant, size: context.size });
+  const [first] = context.field.state.files;
 
   const nodes = flattenFragments(children);
-  const triggers = nodes.filter(isType(FileTrigger));
   invariant(
-    !nodes.length || triggers.length === 1,
+    !nodes.length || nodes.filter(isType(FileTrigger)).length === 1,
     'FileField: explicit children require exactly one Trigger.',
   );
   const controls = nodes.filter((node) => isType(FileTrigger)(node) || isType(FileClear)(node));
   const others = nodes.filter((node) => !controls.includes(node));
   const composed = nodes.length
     ? { controls, others }
-    : appearance === 'dropzone'
-      ? { controls: [<FileTrigger key="trigger" />], others: [<FileList key="list" />] }
-      : {
-          controls: [<FileTrigger key="trigger" />, <FileClear key="clear" />],
-          others: multiple ? [<FileList key="list" />] : [],
-        };
+    : {
+        controls: [<FileTrigger key="trigger" />, <FileClear key="clear" />],
+        others: multiple ? [<FileList key="list" />] : [],
+      };
+
+  const triggerContent = (
+    <>
+      {!multiple && first ? (
+        <FilePreview file={first} />
+      ) : (
+        <PaperClipIcon aria-hidden="true" className={styles.icon()} />
+      )}
+      <FileValue />
+    </>
+  );
 
   return (
-    <FileContext value={context}>
+    <FileContext value={{ ...context, styles, triggerContent }}>
       <div
         {...rootProps}
         className={styles.root({ className: resolveState(className, state) })}
         style={style}
       >
         {picker}
-        {appearance === 'field' ? (
-          <div
-            data-file-field-control=""
-            data-invalid={state.invalid ? '' : undefined}
-            data-disabled={state.disabled ? '' : undefined}
-            className={styles.control()}
-          >
-            {composed.controls}
-          </div>
-        ) : (
-          composed.controls
-        )}
+        <div
+          data-file-field-control=""
+          data-invalid={state.invalid ? '' : undefined}
+          data-disabled={state.disabled ? '' : undefined}
+          className={styles.control()}
+        >
+          {composed.controls}
+        </div>
         {composed.others}
         {messages}
       </div>

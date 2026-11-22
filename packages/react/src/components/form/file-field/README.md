@@ -4,9 +4,9 @@
 
 - **세 가지 입력.** 버튼으로 고르고, 필드에 끌어다 놓고, 포커스를 둔 채 붙여넣습니다. 스크린샷도 붙여넣기로 바로 들어갑니다.
 - **미리보기.** 이미지는 썸네일로 보입니다. 파일을 지우거나 필드가 사라지면 썸네일 주소를 바로 해제합니다.
-- **제한과 거부 사유.** `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받은 뒤, 파일마다 이유를 알립니다. dropzone 에는 허용 형식과 크기가 미리 보입니다.
+- **제한과 거부 사유.** `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받은 뒤, 파일마다 이유를 알립니다.
 - **폼.** 지금 고른 `File` 이 그대로 FormData 에 들어갑니다. `required` 는 브라우저 검증이 막고, `<button type="reset">` 은 처음 값으로 되돌립니다.
-- **dropzone.** `appearance="dropzone"` 은 파일을 끌어다 놓는 넓은 영역입니다. 파일을 끌어 올리면 색이 바뀝니다.
+- **끌어 놓는 영역이 필요하면 [FileDropzone](../file-dropzone/README.md).** 같은 값, 제한, part 를 받고, 필드 대신 넓은 영역을 그립니다.
 
 ```tsx
 import { Field, FileField } from '@gsainfoteam/ids-react';
@@ -31,7 +31,7 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 ## 끌어다 놓기와 붙여넣기
 
 ```tsx
-<FileField multiple appearance="dropzone" accept="image/*" />
+<FileField multiple accept="image/*" />
 ```
 
 - 파일을 끌어 올리는 동안 루트와 트리거에 `data-dragging` 이 붙습니다. 안쪽 요소 위를 지나가도 끊기지 않습니다.
@@ -53,7 +53,6 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 
 - 걸린 파일만 빼고 나머지는 받습니다. 모두 걸리면 이전 값을 그대로 둡니다.
 - 사유는 필드 아래 `role="alert"` 로 `big.pdf: 5 MB보다 큽니다.` 처럼 보이고, 트리거가 `aria-invalid` 가 됩니다. 다음에 제대로 고르거나 지우거나 초기화하면 사라집니다.
-- dropzone 은 `PDF, 이미지 · 파일당 최대 5 MB · 최대 5개` 처럼 규칙을 먼저 보여 주고, 트리거의 `aria-describedby` 로 읽힙니다.
 - 크기는 `512 B`, `1.5 KB`, `23 MB` 처럼 읽기 쉬운 단위로 적습니다.
 
 ## 구성
@@ -61,7 +60,7 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 ```tsx
 <FileField multiple>
   <FileField.Trigger>
-    {/* 생략하면 아이콘 + Value, dropzone 이면 안내 문구 */}
+    {/* 생략하면 아이콘 + Value */}
     <PaperClipIcon />
     <FileField.Value placeholder="첨부" />
   </FileField.Trigger>
@@ -89,8 +88,8 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 ```
 
 - `Trigger` 는 꼭 하나 둡니다. `Clear`, `List`, `Item` 은 `Trigger` 안이 아니라 옆에 둡니다.
-- `field` 모양에서는 `Trigger` 와 `Clear` 가 필드 테두리 안에 함께 들어갑니다.
-- 기본 목록은 여러 개를 받거나 dropzone 일 때 나옵니다. 파일마다 미리보기, 이름, 크기, 삭제 버튼이 있고, 긴 이름은 한 줄에서 줄입니다.
+- `Trigger` 와 `Clear` 는 필드 테두리 안에 함께 들어갑니다.
+- 기본 목록은 여러 개를 받을 때 나옵니다. 파일마다 미리보기, 이름, 크기, 삭제 버튼이 있고, 긴 이름은 한 줄에서 줄입니다.
 - 목록은 `ItemGroup`, 파일 한 줄은 outline `Item` 입니다. `FileField.Item` 안에서 `Item.Content`, `Item.Title`, `Item.Description`, `Item.Actions` 를 그대로 씁니다.
 - `Preview` 는 행 안에서는 `Item.Media` 타일이고, 하나만 받는 필드의 트리거 안에서는 글자 크기의 썸네일입니다.
 - `Clear` 와 `Remove` 는 ghost `IconButton` 입니다. children 은 아이콘이고, `asChild` 면 넘긴 버튼이 같은 모양과 동작을 받습니다.
@@ -101,7 +100,7 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 
 | 요소   | 속성                                                                                                                |
 | ------ | ------------------------------------------------------------------------------------------------------------------- |
-| 루트   | `data-appearance`, `data-dragging`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-empty` |
+| 루트   | `data-file-field`, `data-dragging`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-empty` |
 | 트리거 | `data-dragging`, `data-placeholder`                                                                                 |
 
 - 루트와 `Trigger` 의 `className` 은 `FileField.State` 를 받는 함수도 됩니다.
@@ -134,11 +133,10 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
 - 오류가 나면 트리거로 포커스가 갑니다. TanStack Form 은 `value` 와 `onValueChange={field.handleChange}` 로 잇습니다.
 
-## 모양, 크기, variant
+## 크기, variant
 
 ```tsx
-<FileField appearance="dropzone" />   // field(기본) / dropzone
-<FileField variant="soft" />          // outline(기본) / soft / ghost. 두 모양 모두
+<FileField variant="soft" />          // outline(기본) / soft / ghost
 <FileField size="tiny" />             // standard / tiny. 생략하면 Field 를 따른다
 <FileField invalid />                 // danger 색
 ```
@@ -153,10 +151,9 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `accept`                 | 쉼표로 구분한 MIME 또는 `.확장자`. 형식이 틀리면 오류                                   |
 | `maxSize` / `maxCount`   | 파일당 bytes / 여러 개일 때 개수                                                        |
 | `onReject`               | 거부 목록                                                                               |
-| `appearance`             | `field`(기본) / `dropzone`                                                              |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                                      |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                                              |
-| `placeholder`            | `파일 선택 또는 드래그`. dropzone 은 `파일을 끌어다 놓거나 눌러서 고르세요`             |
+| `placeholder`            | `파일 선택 또는 드래그`                                                                 |
 | `invalid`                | danger 색. 명시한 `aria-invalid` 가 우선하고, 거부가 있으면 늘 오류                     |
 | `disabled` / `readOnly`  | 고르기, 놓기, 붙여넣기, 지우기를 막는다                                                 |
 | `name` / `form`          | 지금 파일을 같은 이름으로 제출                                                          |

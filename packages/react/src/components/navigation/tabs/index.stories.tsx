@@ -13,7 +13,7 @@ import { Tabs } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const appearances = ['underline', 'pill', 'enclosed', 'segmented'] as const;
+const variants = ['underline', 'pill', 'enclosed', 'segmented'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {
@@ -21,7 +21,7 @@ const meta = {
   component: Tabs,
   tags: ['autodocs'],
   argTypes: {
-    appearance: { control: 'radio', options: appearances },
+    variant: { control: 'radio', options: variants },
     orientation: { control: 'radio', options: ['horizontal', 'vertical'] },
     activationMode: { control: 'radio', options: ['automatic', 'manual'] },
     size: { control: 'radio', options: sizes },
@@ -29,7 +29,7 @@ const meta = {
   },
   args: {
     defaultValue: 'overview',
-    appearance: 'underline',
+    variant: 'underline',
     orientation: 'horizontal',
     activationMode: 'automatic',
     size: 'standard',
@@ -61,14 +61,14 @@ export const Gallery: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
-        title="Appearance × Size"
+        title="Variant × Size"
         description="underline 은 고른 탭의 글자와 아래 선을 primary 로, pill 은 고른 탭을 primary 의 옅은 채움으로, enclosed 는 고른 탭을 내용 쪽으로 열린 상자로 그리고 글자를 primary 로 칠합니다. segmented 는 SegmentedControl 과 같은 트랙 위에 고른 탭을 칸으로 띄웁니다."
       >
         <Showcase.Matrix
           rows={sizes}
-          columns={appearances}
-          render={(size, appearance) => (
-            <Tabs defaultValue="overview" appearance={appearance} size={size}>
+          columns={variants}
+          render={(size, variant) => (
+            <Tabs defaultValue="overview" variant={variant} size={size}>
               <Tabs.List aria-label="상품 정보">
                 <Tabs.Trigger value="overview">개요</Tabs.Trigger>
                 <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
@@ -96,7 +96,7 @@ export const Gallery: Story = {
           </Tabs>
         </Showcase.Row>
         <Showcase.Row label="pill">
-          <Tabs defaultValue="profile" orientation="vertical" appearance="pill">
+          <Tabs defaultValue="profile" orientation="vertical" variant="pill">
             <Tabs.List aria-label="설정">
               <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
               <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -108,7 +108,7 @@ export const Gallery: Story = {
           </Tabs>
         </Showcase.Row>
         <Showcase.Row label="enclosed">
-          <Tabs defaultValue="profile" orientation="vertical" appearance="enclosed">
+          <Tabs defaultValue="profile" orientation="vertical" variant="enclosed">
             <Tabs.List aria-label="설정">
               <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
               <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -120,7 +120,7 @@ export const Gallery: Story = {
           </Tabs>
         </Showcase.Row>
         <Showcase.Row label="segmented">
-          <Tabs defaultValue="profile" orientation="vertical" appearance="segmented">
+          <Tabs defaultValue="profile" orientation="vertical" variant="segmented">
             <Tabs.List aria-label="설정">
               <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
               <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -170,7 +170,7 @@ export const Gallery: Story = {
           </Tabs>
         </Showcase.Row>
         <Showcase.Row label="pill stretch" className="w-full max-w-md">
-          <Tabs defaultValue="new" appearance="pill" className="w-full">
+          <Tabs defaultValue="new" variant="pill" className="w-full">
             <Tabs.List aria-label="정렬" stretch>
               <Tabs.Trigger value="new">최신</Tabs.Trigger>
               <Tabs.Trigger value="popular">인기</Tabs.Trigger>
@@ -182,7 +182,7 @@ export const Gallery: Story = {
           </Tabs>
         </Showcase.Row>
         <Showcase.Row label="segmented stretch" className="w-full max-w-md">
-          <Tabs defaultValue="qr" appearance="segmented" className="w-full">
+          <Tabs defaultValue="qr" variant="segmented" className="w-full">
             <Tabs.List aria-label="로그인 방법" stretch>
               <Tabs.Trigger value="qr">QR 코드</Tabs.Trigger>
               <Tabs.Trigger value="password">비밀번호</Tabs.Trigger>
@@ -397,7 +397,7 @@ export const Controlled: Story = {
 
 export const ForceMount: Story = {
   render: () => (
-    <Tabs defaultValue="write" appearance="enclosed">
+    <Tabs defaultValue="write" variant="enclosed">
       <Tabs.List aria-label="댓글">
         <Tabs.Trigger value="write">쓰기</Tabs.Trigger>
         <Tabs.Trigger value="preview">미리보기</Tabs.Trigger>

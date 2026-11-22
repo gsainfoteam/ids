@@ -3,7 +3,7 @@
 import { useCallback, useId, type DragEvent, type MouseEvent } from 'react';
 
 import { describeLimits, fileKey, formatBytes, isFile, isValidAccept } from './file-rules';
-import { fileFieldStyle } from './style';
+import { filePartsStyle } from './style';
 import { useFileField, type FileFieldValue } from './use-file-field';
 import { FormValue } from '../../../internal/form-value';
 import { useTranslate } from '../../../internal/translate';
@@ -12,12 +12,15 @@ import { useFieldSize } from '../field/context';
 
 import type { FileFieldProps, FileFieldState } from './root';
 
-export type FileFieldPlacement = 'standalone' | 'embedded';
+export type FileFieldLook = 'field' | 'dropzone' | 'embedded';
+
+const componentNameOf = (look: FileFieldLook): 'FileField' | 'FileDropzone' =>
+  look === 'dropzone' ? 'FileDropzone' : 'FileField';
 
 const joinIds = (...ids: Array<string | undefined | false>) =>
   ids.filter(Boolean).join(' ') || undefined;
 
-export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlacement) {
+export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
   const t = useTranslate();
 
   const {
@@ -25,8 +28,7 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
     value,
     defaultValue,
     onValueChange,
-    appearance = 'field',
-    variant = 'outline',
+    variant: _variant,
     size,
     invalid,
     maxSize,
@@ -58,13 +60,14 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
     'aria-required': ariaRequired,
     ...native
   } = props;
+  const owner = componentNameOf(look);
   invariant(
     maxSize === undefined || (Number.isFinite(maxSize) && maxSize >= 0),
-    'FileField: maxSize must be non-negative bytes.',
+    `${owner}: maxSize must be non-negative bytes.`,
   );
   invariant(
     maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
-    'FileField: maxCount must be a non-negative integer.',
+    `${owner}: maxCount must be a non-negative integer.`,
   );
 
   const { rootRef, pickerRef, triggerRef, ...field } = useFileField({
@@ -86,9 +89,9 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
     multiple
       ? Array.isArray(s.value) && s.value.every(isFile)
       : s.value === null || isFile(s.value),
-    'FileField: single requires File | null; multiple requires File[].',
+    `${owner}: single requires File | null; multiple requires File[].`,
   );
-  invariant(isValidAccept(s.tokens), 'FileField: accept must contain MIME types or extensions.');
+  invariant(isValidAccept(s.tokens), `${owner}: accept must contain MIME types or extensions.`);
 
   const setRoot = useCallback(
     (node: HTMLElement | null) => {
@@ -115,7 +118,6 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
   const showsInvalid =
     s.rejections.length > 0 ? true : (ariaInvalid ?? invalid) === true || ariaInvalid === 'true';
   const state: FileFieldState = {
-    appearance,
     dragging: s.dragging,
     disabled,
     readOnly,
@@ -125,13 +127,7 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
     multiple,
   };
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const embedded = placement === 'embedded';
-  const styles = fileFieldStyle({
-    appearance: embedded ? 'embedded' : appearance,
-    variant,
-    size: resolvedSize,
-  });
-  const triggerIsTheField = appearance === 'field' && !embedded;
+  const styles = filePartsStyle({ size: resolvedSize });
 
   const triggerProps = {
     ref: mergeRefs(triggerRef, forwardedRef),
@@ -145,13 +141,13 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': joinIds(
       ariaDescribedby,
-      appearance === 'dropzone' && !!limits && limitsId,
+      look === 'dropzone' && !!limits && limitsId,
       s.rejections.length > 0 && errorId,
       announcesRequired && requiredId,
     ),
     'aria-invalid': s.rejections.length ? true : (ariaInvalid ?? (invalid || undefined)),
     'aria-disabled': readOnly || undefined,
-    'data-field-input': triggerIsTheField ? '' : undefined,
+    'data-field-input': look === 'field' ? '' : undefined,
     'data-dragging': s.dragging ? '' : undefined,
     'data-placeholder': state.empty ? '' : undefined,
     onClick: (event: MouseEvent<HTMLButtonElement>) => {
@@ -166,9 +162,9 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
   const rootProps = {
     ref: setRoot,
     'data-dragging': s.dragging ? '' : undefined,
-    ...(!embedded && {
-      'data-file-field': '',
-      'data-appearance': appearance,
+    ...(look !== 'embedded' && {
+      'data-file-field': look === 'field' ? '' : undefined,
+      'data-file-dropzone': look === 'dropzone' ? '' : undefined,
       'data-disabled': disabled ? '' : undefined,
       'data-readonly': readOnly ? '' : undefined,
       'data-invalid': showsInvalid ? '' : undefined,
@@ -239,12 +235,12 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
 
   return {
     context: {
+      owner,
       field,
       state,
       size: resolvedSize,
       placeholder:
-        placeholder ??
-        (appearance === 'dropzone' ? t('fileField.dropzone') : t('fileField.placeholder')),
+        placeholder ?? (look === 'dropzone' ? t('fileField.dropzone') : t('fileField.placeholder')),
       limits,
       limitsId,
       triggerProps,

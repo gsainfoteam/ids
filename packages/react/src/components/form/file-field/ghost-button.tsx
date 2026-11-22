@@ -13,16 +13,17 @@ type GhostButtonProps = Omit<ComponentProps<'button'>, 'children' | 'onClick'> &
   asChild?: boolean;
   children?: ReactElement;
   size: IdsSize;
+  owner: string;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
-export function GhostButton({ asChild, children, ...props }: GhostButtonProps) {
+export function GhostButton({ asChild, children, owner, ...props }: GhostButtonProps) {
   if (!asChild)
     return (
       <IconButton {...props} variant="ghost" icon={children ?? <XMarkIcon aria-hidden="true" />} />
     );
 
-  invariant(isValidElement(children), 'FileField: asChild requires one button element.');
+  invariant(isValidElement(children), `${owner}: asChild requires one button element.`);
 
   return (
     <IconButton {...props} variant="ghost" asChild>
