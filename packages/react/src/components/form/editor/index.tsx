@@ -66,6 +66,7 @@ export namespace Editor {
     onImageUpload?: (file: File) => Promise<string>;
     mentions?: FindMentions;
     type?: EditorType;
+    spellCheck?: boolean;
     variant?: EditorVariant;
     size?: IdsSize;
     id?: string;

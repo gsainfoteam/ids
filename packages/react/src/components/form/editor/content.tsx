@@ -10,8 +10,12 @@ export type EditorContentProps = {
   className?: string;
 };
 
-function asReactProps({ class: className, ...attributes }: Record<string, string>) {
-  return { ...attributes, className };
+function asReactProps({
+  class: className,
+  spellcheck: spellCheck,
+  ...attributes
+}: Record<string, string>) {
+  return { ...attributes, className, spellCheck: spellCheck === 'true' };
 }
 
 export function EditorContentPart(_: EditorContentProps) {

@@ -248,6 +248,7 @@ export function EditorRoot(props: Editor.Props) {
   const {
     format = 'html',
     type = 'toolbar',
+    spellCheck = false,
     onImageUpload,
     mentions,
     value,
@@ -353,6 +354,7 @@ export function EditorRoot(props: Editor.Props) {
     id: contentId,
     role: 'textbox',
     'aria-multiline': 'true',
+    spellcheck: spellCheck ? 'true' : 'false',
     'aria-label': ariaLabel ?? (ariaLabelledby ? undefined : t('editor.content')),
     'aria-placeholder': content.props.placeholder || undefined,
     'aria-labelledby': ariaLabelledby,
