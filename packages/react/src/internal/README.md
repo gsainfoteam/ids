@@ -14,7 +14,7 @@
 | [`surfaces/control-surface.ts`](#surfacescontrol-surfacets)       | 버튼류 컨트롤의 클래스 조각, scheme 클래스, compound variant                          | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
 | [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer                                                                                                                                                                                       |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
-| [`drag-surface.ts`](#drag-surfacets)             | 끌어 옮기는 항목의 놓을 자리 선, 따라오는 복사본, 들어 올린 모양, 끌기를 끝낸 click 과 Space 삼키기 | Sidebar, Editor, Scheduler |
+| [`drag-surface.ts`](#drag-surfacets)             | 끌어 옮기는 항목의 놓을 자리 선, 따라오는 복사본, 들어 올린 모양, 끌기를 끝낸 click 과 Space 삼키기 | Sidebar, Scheduler |
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`surfaces/field-surface.ts`](#surfacesfield-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
@@ -282,7 +282,6 @@ const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE
 ### 쓰는 곳
 
 - Sidebar: `sortable.tsx` 가 메뉴 항목을 끌 때 씁니다. `style.ts` 의 `dropLine`, `dragPreview` 슬롯이 이 조각을 가져갑니다.
-- Editor: `drag-handle/handle.tsx` 가 블록을 끌 때 씁니다. 같은 선을 ProseMirror dropcursor(`dropCursor` 슬롯)에도 입혀서, 파일을 끌어 놓을 때도 선이 같습니다.
 - Scheduler: `drag.tsx`, `movable.tsx` 가 일정을 끌 때 씁니다. 일정은 복사본 대신 자기 자신이 15분 칸에 맞춰 움직이므로, `style.ts` 의 `movable` 슬롯이 끄는 동안 `lifted` 를 씁니다.
 
 ### 쓰는 법
@@ -299,7 +298,7 @@ swallowTheSpaceKeyupThatWouldPress(); // 버튼 위에서 Space 로 집거나 �
 ### 왜 이렇게
 
 - 선의 점은 `--ids-bg-current` 로 속을 칠합니다. 페이지, 카드, 팝업 어디 위에서도 점이 뚫린 모양으로 보입니다.
-- 끌기를 마치면 브라우저가 포인터 아래 요소에 `click` 을 한 번 보냅니다. 그대로 두면 놓은 자리의 링크, Editor 의 블록 메뉴, 일정의 제목 버튼이 눌립니다. 그래서 다음 `click` 하나를 capture 단계에서 막고, 곧바로 이어지는 task 에서 그 막음을 풉니다.
+- 끌기를 마치면 브라우저가 포인터 아래 요소에 `click` 을 한 번 보냅니다. 그대로 두면 놓은 자리의 링크나 일정의 제목 버튼이 눌립니다. 그래서 다음 `click` 하나를 capture 단계에서 막고, 곧바로 이어지는 task 에서 그 막음을 풉니다.
 - 버튼은 Space 를 뗄 때 눌립니다. Space 로 항목을 집거나 놓으면 이어지는 `keyup` 이 그 버튼을 누르므로, 다음 Space `keyup` 하나의 기본 동작을 막습니다.
 
 ### 알아둘 것
