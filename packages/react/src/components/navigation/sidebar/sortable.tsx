@@ -6,12 +6,8 @@ import {
   DndContext,
   DragOverlay,
   MeasuringStrategy,
-  MouseSensor,
-  TouchSensor,
   useDraggable,
   useDroppable,
-  useSensor,
-  useSensors,
   type Announcements,
   type CollisionDetection,
   type DragMoveEvent,
@@ -43,6 +39,7 @@ import {
   type SidebarTreeItem,
   type SidebarTreeMove,
 } from './tree';
+import { useDragSensors } from '../../../internal/drag-sensors';
 import {
   swallowTheClickThatEndsADrag,
   swallowTheSpaceKeyupThatWouldPress,
@@ -53,9 +50,6 @@ import { mergeRefs } from '../../../utils';
 import { Item } from '../../data/item';
 
 const ITEM_SELECTOR = '[data-sidebar-item]';
-const POINTER_TRAVEL_BEFORE_DRAG = 4;
-const TOUCH_HOLD_BEFORE_DRAG = 250;
-const TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING = 5;
 const REACH_BEYOND_THE_ROWS = 36;
 const SAME_HEIGHT = 2;
 const LINE_INSET = 4;
@@ -120,15 +114,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
     null,
   );
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: POINTER_TRAVEL_BEFORE_DRAG } }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: TOUCH_HOLD_BEFORE_DRAG,
-        tolerance: TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING,
-      },
-    }),
-  );
+  const sensors = useDragSensors();
 
   useEffect(() => {
     const move = pending.current;

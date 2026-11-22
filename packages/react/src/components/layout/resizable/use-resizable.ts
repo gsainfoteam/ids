@@ -24,6 +24,8 @@ type SizeOptions = {
 export type UseResizableOptions = {
   width: SizeOptions;
   height: SizeOptions;
+  step: number | undefined;
+  getValueLabel: ((size: number, dimension: ResizeDimension) => string) | undefined;
   controls: string;
 };
 
@@ -47,7 +49,13 @@ function useWarnWhenBoundsCross(dimension: ResizeDimension, min: number, max: nu
   }, [dimension, min, max]);
 }
 
-export function useResizable({ width, height, controls }: UseResizableOptions) {
+export function useResizable({
+  width,
+  height,
+  step,
+  getValueLabel,
+  controls,
+}: UseResizableOptions) {
   const [element, setElement] = useState<HTMLElement | null>(null);
   const sizes = { width: useSize(width), height: useSize(height) };
   const measured = useMeasuredAxes({ width: element, height: element });
@@ -66,6 +74,8 @@ export function useResizable({ width, height, controls }: UseResizableOptions) {
       min: Math.max(options.min, drawn?.min ?? 0),
       max: Math.min(options.max, drawn?.max ?? Infinity),
       controls,
+      step,
+      valueLabel: getValueLabel && ((value) => getValueLabel(value, dimension)),
       resize: (next) => setSize(next),
       reset: () => {
         if (resetTo !== undefined) return setSize(resetTo);

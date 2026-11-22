@@ -9,6 +9,7 @@ import {
   axisSeparatorProps,
   resizeKeyMap,
   separatorOrientation,
+  snapToStep,
   type ResizeAxis,
   type ResizeDimension,
   type ResizeRange,
@@ -28,6 +29,7 @@ import { useTranslate } from '../translate';
 
 type Started = {
   dimension: ResizeDimension;
+  step: number | undefined;
   element: HTMLElement;
   before: string;
   written: string;
@@ -63,7 +65,9 @@ export function axisKeyMap<E extends Element>(
   resizeTo: (size: number) => void = axis.resize,
 ): KeyMap<E> {
   const range = currentRange(axis);
-  return range ? resizeKeyMap<E>(separatorOrientation(axis.dimension), range, resizeTo) : {};
+  return range
+    ? resizeKeyMap<E>(separatorOrientation(axis.dimension), range, resizeTo, undefined, axis.step)
+    : {};
 }
 
 export function useMeasuredAxes(targets: Partial<Record<ResizeDimension, HTMLElement | null>>) {
@@ -139,8 +143,8 @@ export function useAxesDrag(
 ) {
   const started = useRef<Started[]>([]);
 
-  const sizeAt = ({ dimension, range }: Started, delta: ResizeDelta) =>
-    clamp(Math.round(range.value + along(dimension, delta)), range.min, range.max);
+  const sizeAt = ({ dimension, step, range }: Started, delta: ResizeDelta) =>
+    clamp(snapToStep(range.value + along(dimension, delta), step), range.min, range.max);
 
   const write = (entry: Started, value: string) => {
     if (entry.written === value) return;
@@ -173,7 +177,14 @@ export function useAxesDrag(
 
         const before = axis.target.style.getPropertyValue(axis.dimension);
         return [
-          { dimension: axis.dimension, element: axis.target, before, written: before, range },
+          {
+            dimension: axis.dimension,
+            step: axis.step,
+            element: axis.target,
+            before,
+            written: before,
+            range,
+          },
         ];
       });
       markDragged(

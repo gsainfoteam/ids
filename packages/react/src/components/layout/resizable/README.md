@@ -73,6 +73,21 @@ import { Resizable } from '@gsainfoteam/ids-react';
 - 요소의 CSS `min-width` `max-width` `min-height` `max-height` 가 px 이면 props 한계와 함께 지킵니다. `%` 나 `min-content` 는 읽지 못하므로 props 로 줍니다.
 - `max*` 가 없으면 `End` 키는 동작하지 않고 `aria-valuemax` 도 붙지 않습니다.
 
+## 칸 단위와 값 글자
+
+```tsx
+<Resizable direction="vertical" step={12} />              // 높이가 12px 의 배수에 맞는다
+<Resizable
+  direction="vertical"
+  step={12}
+  getValueLabel={(size) => `${size / 48}시간`}            // aria-valuetext 를 "1.5시간"으로
+/>
+```
+
+- `step` 을 주면 끄는 크기가 가장 가까운 `step` 의 배수에 맞춰집니다. 방향키는 다음 배수로, `Shift` 와 함께면 네 칸을 옮깁니다. 없으면 1px 단위로 끌고 방향키는 16px, 64px 입니다.
+- `min*` `max*` 가 배수가 아니면 한계가 이깁니다. 한계 바로 앞의 배수에서 한계로 갑니다.
+- `getValueLabel(size, dimension)` 이 separator 의 `aria-valuetext` 가 됩니다. 없으면 "416px" 입니다. `aria-valuenow` 는 늘 px 입니다.
+
 ## 손잡이 바꾸기
 
 ```tsx
@@ -128,6 +143,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 | `←` `→`                | 너비 16px(horizontal)  | 너비 16px, 포커스를 너비 separator 로               |
 | `↑` `↓`                | 높이 16px(vertical)    | 높이 16px, 포커스를 높이 separator 로               |
 | `Shift` + 방향키       | 64px                   | 64px                                                |
+| `step` 이 있으면        | 방향키 한 칸, `Shift` 네 칸 | 같음                                            |
 | `Home` / `End`         | 최솟값 / 최댓값        | 포커스한 축의 최솟값 / 최댓값                       |
 | `Enter`                | 처음 크기              | 두 축 모두 처음 크기                                |
 
@@ -176,6 +192,8 @@ import { Resizable } from '@gsainfoteam/ids-react';
 | `height` / `defaultHeight`            | px. 없으면 CSS 높이                                   |
 | `onWidthChange` / `onHeightChange`    | `(size: number) => void`                              |
 | `minWidth` `maxWidth` `minHeight` `maxHeight` | px. 기본 0 과 없음                            |
+| `step`                                | px. 끌기와 방향키가 이 배수에 맞는다                  |
+| `getValueLabel`                       | `(size, dimension) => string`. `aria-valuetext`       |
 | `disabled`                            | 손잡이가 흐려지고 Tab 과 포인터에서 빠진다            |
 | `asChild`                             | 자식 요소 하나의 크기를 바꾼다                        |
 | `className` / `style`                 | 상태를 받는 함수도 된다                               |
