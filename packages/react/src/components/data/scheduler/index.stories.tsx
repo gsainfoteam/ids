@@ -694,7 +694,7 @@ export const Overlap: Story = {
     docs: {
       description: {
         story:
-          '30분 안에 함께 시작하는 일정은 칸을 나눠 나란히 섭니다. 더 늦게 시작하는 일정은 앞 일정 위에 들여 겹쳐 그려서, 긴 일정이 칸 폭을 지킵니다. 여러 날 종일 일정은 막대 하나로 잇고, 자정을 넘는 일정은 두 날에 나눠 그립니다.',
+          '시간이 겹치는 일정은 칸을 세로로 나눠 나란히 섭니다. 옆 칸이 그 시간에 비어 있으면 그만큼 넓게 그려서, 서로 덮는 일정이 없습니다. 여러 날 종일 일정은 막대 하나로 잇고, 자정을 넘는 일정은 두 날에 나눠 그립니다.',
       },
     },
   },
@@ -702,9 +702,9 @@ export const Overlap: Story = {
     const algo = eventBox(canvasElement, 'algo');
     const room = eventBox(canvasElement, 'room');
     const lunch = eventBox(canvasElement, 'lunch');
-    await expect(Math.abs(algo.width - lunch.width)).toBeLessThan(1);
-    await expect(room.left).toBeGreaterThan(algo.left);
-    await expect(Math.abs(room.right - algo.right)).toBeLessThan(1);
+    await expect(Math.abs(algo.width - room.width)).toBeLessThan(1);
+    await expect(room.left).toBeGreaterThanOrEqual(algo.right - 1);
+    await expect(lunch.width).toBeGreaterThan(algo.width * 1.5);
 
     const pairing = eventBox(canvasElement, 'pairing');
     const oneOnOne = eventBox(canvasElement, 'one-on-one');

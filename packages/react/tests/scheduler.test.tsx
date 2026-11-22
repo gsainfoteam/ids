@@ -150,25 +150,27 @@ test('a server on another date marks no day as today, and hydration marks the cl
   logged.mockRestore();
 });
 
-test('a later overlapping event stacks indented over the earlier one, and near starts sit side by side', () => {
+test('overlapping events share the column side by side, and each widens into the columns free beside it', () => {
   const place = (segments: ReturnType<typeof timedSegmentsOn>) =>
     segments.map(({ event, left, width }) => [event.id, left, width]);
 
   expect(place(timedSegmentsOn(EVENTS, on(17)))).toEqual([
-    ['algo', 0, 1],
-    ['room', 0.15, 0.85],
+    ['algo', 0, 0.5],
+    ['room', 0.5, 0.5],
     ['lunch', 0, 1],
   ]);
 
   const together = [
-    { id: 'a', title: 'A', start: at(18, 13), end: at(18, 14) },
-    { id: 'b', title: 'B', start: at(18, 13, 15), end: at(18, 14) },
-    { id: 'c', title: 'C', start: at(18, 13, 45), end: at(18, 15) },
+    { id: 'a', title: 'A', start: at(18, 9), end: at(18, 11) },
+    { id: 'b', title: 'B', start: at(18, 9), end: at(18, 10) },
+    { id: 'c', title: 'C', start: at(18, 9, 30), end: at(18, 10) },
+    { id: 'd', title: 'D', start: at(18, 10), end: at(18, 11) },
   ];
   expect(place(timedSegmentsOn(together, on(18)))).toEqual([
-    ['a', 0, 0.5],
-    ['b', 0.5, 0.5],
-    ['c', 0.15, 0.85],
+    ['a', 0, 1 / 3],
+    ['b', 1 / 3, 1 / 3],
+    ['c', 2 / 3, 1 / 3],
+    ['d', 1 / 3, 2 / 3],
   ]);
 
   const thursday = timedSegmentsOn(EVENTS, on(19))[0];
@@ -552,34 +554,23 @@ test('the end handle sits inside its event, so an event starting right after it 
     expect(document.elementFromPoint(x, y)).toBe(edge.element());
 });
 
-test('pressing an event covered by a later one brings it and its end handle to the front, and hovering does not', async () => {
+test('no event box covers another, so every end handle can be grabbed', async () => {
   const screen = await render(
     inProvider({
       onEventChange: vi.fn(),
       events: [
+        { id: 'long', title: 'Long', start: at(17, 18), end: at(17, 21) },
+        { id: 'inside', title: 'Inside', start: at(17, 19), end: at(17, 19, 30) },
         { id: 'lunch', title: 'Lunch', start: at(17, 12), end: at(17, 13, 30) },
         { id: 'graph', title: 'Graph theory', start: at(17, 12, 45), end: at(17, 14) },
       ],
     }),
   );
-  const edge = screen.getByRole('separator', { name: 'Lunch 끝 시각' });
-  await expect.element(edge).toBeInTheDocument();
-  edge.element().scrollIntoView({ block: 'center' });
-  const handle = edge.element().getBoundingClientRect();
-  const x = handle.left + handle.width - 4;
-  const y = handle.top + handle.height / 2;
-  expect(document.elementFromPoint(x, y)?.closest('[data-scheduler-slot]')).toHaveAttribute(
-    'data-scheduler-slot',
-    'graph',
-  );
-
-  await userEvent.hover(screen.getByText('Lunch'));
-  expect(document.elementFromPoint(x, y)?.closest('[data-scheduler-slot]')).toHaveAttribute(
-    'data-scheduler-slot',
-    'graph',
-  );
-
-  await userEvent.click(screen.getByText('Lunch'));
-
-  await vi.waitFor(() => expect(document.elementFromPoint(x, y)).toBe(edge.element()));
+  await expect.element(screen.getByText('Inside')).toBeInTheDocument();
+  for (const name of ['Long', 'Inside', 'Lunch', 'Graph theory']) {
+    const edge = screen.getByRole('separator', { name: `${name} 끝 시각` }).element();
+    edge.scrollIntoView({ block: 'center' });
+    const { left, width, top, height } = edge.getBoundingClientRect();
+    expect(document.elementFromPoint(left + width / 2, top + height / 2)).toBe(edge);
+  }
 });

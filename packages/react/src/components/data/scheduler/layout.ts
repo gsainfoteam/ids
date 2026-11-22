@@ -64,9 +64,6 @@ const MINUTES_IN_HOUR = 60;
 export const HOURS_IN_DAY = 24;
 export const SNAP_MINUTES = 15;
 export const SHORTEST_SHOWN_HOURS = 0.5;
-const SIDE_BY_SIDE_WITHIN_HOURS = 0.5;
-const STACK_INDENT = 0.15;
-const DEEPEST_STACK_INDENT = 0.45;
 
 const wallTime = (value: DateValue) => {
   const time = toCalendarDateTime(value);
@@ -157,18 +154,39 @@ export const isShifted = ({ days, minutes }: SchedulerShift) => days !== 0 || mi
 export const snappedMinutes = (hours: number) =>
   Math.round((hours * MINUTES_IN_HOUR) / SNAP_MINUTES) * SNAP_MINUTES;
 
-type SideBySide<E extends SchedulerEventData> = {
-  indent: number;
-  members: UnplacedSegment<E>[];
-};
+type Columned<E extends SchedulerEventData> = UnplacedSegment<E> & { column: number };
 
 const byStartThenLongest = (
   a: UnplacedSegment<SchedulerEventData>,
   b: UnplacedSegment<SchedulerEventData>,
 ) => a.startHour - b.startHour || b.hours - a.hours;
 
+const endHourOf = (segment: UnplacedSegment<SchedulerEventData>) =>
+  segment.startHour + segment.hours;
+
 const overlap = (a: UnplacedSegment<SchedulerEventData>, b: UnplacedSegment<SchedulerEventData>) =>
-  a.startHour < b.startHour + b.hours && b.startHour < a.startHour + a.hours;
+  a.startHour < endHourOf(b) && b.startHour < endHourOf(a);
+
+function firstFreeColumn<E extends SchedulerEventData>(
+  cluster: Columned<E>[],
+  segment: UnplacedSegment<E>,
+) {
+  let column = 0;
+  while (cluster.some((member) => member.column === column && overlap(member, segment))) column++;
+  return column;
+}
+
+function spreadAcross<E extends SchedulerEventData>(cluster: Columned<E>[]): SchedulerSegment<E>[] {
+  const columns = Math.max(...cluster.map((member) => member.column)) + 1;
+  const freeIn = (column: number, member: Columned<E>) =>
+    !cluster.some((other) => other.column === column && overlap(other, member));
+
+  return cluster.map(({ column, ...segment }) => {
+    let reach = column + 1;
+    while (reach < columns && freeIn(reach, { column, ...segment })) reach++;
+    return { ...segment, left: column / columns, width: (reach - column) / columns };
+  });
+}
 
 export function timedSegmentsOn<E extends SchedulerEventData>(
   events: readonly E[],
@@ -179,32 +197,18 @@ export function timedSegmentsOn<E extends SchedulerEventData>(
     .flatMap((event) => segmentOn(event, day) ?? [])
     .sort(byStartThenLongest);
 
-  const sideBySideOf = new Map<UnplacedSegment<E>, SideBySide<E>>();
+  const placed: SchedulerSegment<E>[] = [];
+  let cluster: Columned<E>[] = [];
+  let clusterEnd = -Infinity;
   for (const segment of segments) {
-    const earlier = [...sideBySideOf.keys()].filter((placed) => overlap(placed, segment));
-    const startsWith = earlier
-      .filter((placed) => segment.startHour - placed.startHour < SIDE_BY_SIDE_WITHIN_HOURS)
-      .at(-1);
-    if (startsWith) {
-      const sideBySide = sideBySideOf.get(startsWith)!;
-      sideBySide.members.push(segment);
-      sideBySideOf.set(segment, sideBySide);
-      continue;
+    if (segment.startHour >= clusterEnd) {
+      placed.push(...spreadAcross(cluster));
+      cluster = [];
     }
-
-    const coveredIndent = Math.max(
-      -1,
-      ...earlier.map((placed) => sideBySideOf.get(placed)!.indent),
-    );
-    sideBySideOf.set(segment, { indent: coveredIndent + 1, members: [segment] });
+    cluster.push({ ...segment, column: firstFreeColumn(cluster, segment) });
+    clusterEnd = Math.max(clusterEnd, endHourOf(segment));
   }
-
-  return segments.map((segment) => {
-    const { indent, members } = sideBySideOf.get(segment)!;
-    const inset = Math.min(indent * STACK_INDENT, DEEPEST_STACK_INDENT);
-    const width = (1 - inset) / members.length;
-    return { ...segment, left: inset + members.indexOf(segment) * width, width };
-  });
+  return [...placed, ...spreadAcross(cluster)];
 }
 
 export function firstHourOf(events: readonly SchedulerEventData[], days: CalendarDate[]) {

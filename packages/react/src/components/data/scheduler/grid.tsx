@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useId, useRef, type CSSProperties, type ReactNode } from 'react';
 
 import {
   toCalendarDateTime,
@@ -75,7 +75,6 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   const allDayBars = allDayBarsIn(events, days);
   const firstHour = Math.min(firstHourOf(events, days) ?? WORKDAY_START_HOUR, WORKDAY_START_HOUR);
 
-  const [frontId, setFrontId] = useState<string | null>(null);
   const canMove = onEventChange !== undefined;
   const hourHeight = useHourHeight(bodyRef, canMove);
 
@@ -84,14 +83,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   const columns = { '--scheduler-days': days.length } as CSSProperties;
 
   const body = (
-    <div
-      ref={bodyRef}
-      className={styles.columns({ className: styles.body() })}
-      onPointerDown={(event) => {
-        const slot = (event.target as Element).closest('[data-scheduler-slot]');
-        setFrontId(slot?.getAttribute('data-scheduler-slot') ?? null);
-      }}
-    >
+    <div ref={bodyRef} className={styles.columns({ className: styles.body() })}>
       <div aria-hidden="true" className={styles.gutter()}>
         {HOURS.map((hour) => (
           <div key={hour} className={styles.hour()}>
@@ -136,7 +128,6 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                     <li
                       key={segment.event.id}
                       data-scheduler-slot={segment.event.id}
-                      data-front={frontId === segment.event.id ? '' : undefined}
                       className={styles.slot()}
                       style={
                         {
