@@ -56,6 +56,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <SegmentedControl defaultValue="week" aria-label="기간">
+      <SegmentedControl.Item value="day">일</SegmentedControl.Item>
+      <SegmentedControl.Item value="week">주</SegmentedControl.Item>
+      <SegmentedControl.Item value="month">월</SegmentedControl.Item>
+    </SegmentedControl>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -206,42 +216,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '항목마다 같은 `name` 의 native 라디오라서 Tab 은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. Home 과 End 는 처음과 끝 항목을 고르고, 비활성 항목은 건너뜁니다.',
-      },
-    },
-  },
-  render: (args) => (
-    <SegmentedControl<Period> aria-label="기간" onValueChange={args.onValueChange}>
-      {({ Item }) =>
-        periods.map((period) => (
-          <Item key={period.value} value={period.value} disabled={period.value === 'week'}>
-            {period.label}
-          </Item>
-        ))
-      }
-    </SegmentedControl>
-  ),
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.tab();
-    await expect(canvas.getByRole('radio', { name: '일' })).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(canvas.getByRole('radio', { name: '월' })).toBeChecked();
-    await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('month');
-    await userEvent.keyboard('{Home}');
-    await expect(canvas.getByRole('radio', { name: '일' })).toBeChecked();
-    await userEvent.keyboard('{End}');
-    await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('month');
-  },
-};
-
-export const Controlled: Story = {
+export const SwitchTheViewFromState: Story = {
   parameters: {
     docs: {
       description: {
@@ -275,7 +250,7 @@ export const Controlled: Story = {
   },
 };
 
-export const Form: Story = {
+export const SubmitTheChoiceWithAForm: Story = {
   parameters: {
     docs: {
       description: {
@@ -326,7 +301,44 @@ export const Form: Story = {
   },
 };
 
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '항목마다 같은 `name` 의 native 라디오라서 Tab 은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. Home 과 End 는 처음과 끝 항목을 고르고, 비활성 항목은 건너뜁니다.',
+      },
+    },
+  },
+  render: (args) => (
+    <SegmentedControl<Period> aria-label="기간" onValueChange={args.onValueChange}>
+      {({ Item }) =>
+        periods.map((period) => (
+          <Item key={period.value} value={period.value} disabled={period.value === 'week'}>
+            {period.label}
+          </Item>
+        ))
+      }
+    </SegmentedControl>
+  ),
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole('radio', { name: '일' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('radio', { name: '월' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('month');
+    await userEvent.keyboard('{Home}');
+    await expect(canvas.getByRole('radio', { name: '일' })).toBeChecked();
+    await userEvent.keyboard('{End}');
+    await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('month');
+  },
+};
+
 export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
   render: function Render() {
     const [shown, setShown] = useState(false);
 

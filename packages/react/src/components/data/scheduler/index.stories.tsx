@@ -271,6 +271,10 @@ const eventBox = (canvasElement: HTMLElement, id: string) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} className="h-120" />,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -386,7 +390,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Navigation: Story = {
+export const MoveBetweenPeriods: Story = {
   parameters: {
     docs: {
       description: {
@@ -425,7 +429,7 @@ export const Navigation: Story = {
   },
 };
 
-export const MonthView: Story = {
+export const ShowAWholeMonth: Story = {
   args: { defaultView: 'month' },
   parameters: {
     docs: {
@@ -457,7 +461,7 @@ export const MonthView: Story = {
   },
 };
 
-export const DaysView: Story = {
+export const ShowAChosenNumberOfDays: Story = {
   args: { defaultView: 'days' },
   parameters: {
     docs: {
@@ -499,7 +503,7 @@ export const DaysView: Story = {
   },
 };
 
-export const GoToDate: Story = {
+export const JumpToADate: Story = {
   parameters: {
     docs: {
       description: {
@@ -520,39 +524,7 @@ export const GoToDate: Story = {
   },
 };
 
-export const ViewByKeyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Tab은 이전, 오늘, 다음, 기간, 보기 순서로 멈춥니다. 보기는 라디오 그룹이라 화살표가 포커스와 보기를 함께 바꿉니다.',
-      },
-    },
-  },
-  play: async ({ canvas, args, userEvent }) => {
-    const stops = ['이전 주', '오늘', '다음 주'];
-    for (const name of stops) {
-      await userEvent.tab();
-      await expect(canvas.getByRole('button', { name })).toHaveFocus();
-    }
-    await userEvent.tab();
-    await expect(document.activeElement).toHaveAttribute('data-scheduler-range');
-    await userEvent.tab();
-    await expect(canvas.getByRole('radio', { name: '주' })).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(canvas.getByRole('radio', { name: '3일' })).toHaveFocus();
-    await expect(args.onViewChange).toHaveBeenLastCalledWith('days');
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(canvas.getByRole('radio', { name: '일' })).toHaveFocus();
-    await expect(args.onViewChange).toHaveBeenLastCalledWith('day');
-    await expect(canvas.getByRole('button', { name: '이전 날' })).toBeVisible();
-    await userEvent.keyboard('{Home}');
-    await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
-    await expect(args.onViewChange).toHaveBeenLastCalledWith('month');
-  },
-};
-
-export const ClickableEvents: Story = {
+export const OpenAnEventOnClick: Story = {
   parameters: {
     docs: {
       description: {
@@ -595,7 +567,7 @@ export const ClickableEvents: Story = {
   },
 };
 
-export const MoveAndResize: Story = {
+export const DragAnEventToANewTime: Story = {
   parameters: {
     docs: {
       description: {
@@ -670,7 +642,7 @@ export const MoveAndResize: Story = {
   },
 };
 
-export const ContextMenu: Story = {
+export const AddRightClickMenus: Story = {
   parameters: {
     docs: {
       description: {
@@ -774,7 +746,7 @@ export const ContextMenu: Story = {
   },
 };
 
-export const CreateBySelecting: Story = {
+export const CreateAnEventBySelectingTime: Story = {
   parameters: {
     docs: {
       description: {
@@ -843,7 +815,7 @@ export const CreateBySelecting: Story = {
   },
 };
 
-export const MonthMoveAndSelect: Story = {
+export const MoveEventsInTheMonthView: Story = {
   parameters: {
     docs: {
       description: {
@@ -918,7 +890,7 @@ export const MonthMoveAndSelect: Story = {
   },
 };
 
-export const CustomContent: Story = {
+export const DrawYourOwnEventContent: Story = {
   parameters: {
     docs: {
       description: {
@@ -944,38 +916,15 @@ export const CustomContent: Story = {
   },
 };
 
-export const Overlap: Story = {
+export const ControlTheDateAndView: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          '시간이 겹치는 일정은 칸을 세로로 나눠 나란히 섭니다. 옆 칸이 그 시간에 비어 있으면 그만큼 넓게 그려서, 서로 덮는 일정이 없습니다. 여러 날 종일 일정은 막대 하나로 잇고, 자정을 넘는 일정은 두 날에 나눠 그립니다.',
+          '`view` 와 `onViewChange`, `date` 와 `onDateChange` 로 보기와 날짜를 앱의 state 에 둡니다. 툴바로 옮기거나 보기를 바꾸면 두 콜백이 새 값을 알립니다.',
       },
     },
   },
-  play: async ({ canvasElement }) => {
-    const algo = eventBox(canvasElement, 'algo');
-    const room = eventBox(canvasElement, 'room');
-    const lunch = eventBox(canvasElement, 'lunch');
-    await expect(Math.abs(algo.width - room.width)).toBeLessThan(1);
-    await expect(room.left).toBeGreaterThanOrEqual(algo.right - 1);
-    await expect(lunch.width).toBeGreaterThan(algo.width * 1.5);
-
-    const pairing = eventBox(canvasElement, 'pairing');
-    const oneOnOne = eventBox(canvasElement, 'one-on-one');
-    await expect(Math.abs(pairing.width - oneOnOne.width)).toBeLessThan(1);
-    await expect(oneOnOne.left).toBeGreaterThanOrEqual(pairing.right - 1);
-
-    const festival = canvasElement.querySelectorAll('[data-scheduler-event="festival"]');
-    await expect(festival).toHaveLength(1);
-    await expect(festival[0].getBoundingClientRect().width).toBeGreaterThan(algo.width * 1.5);
-    await expect(canvasElement.querySelectorAll('[data-scheduler-event="deadline"]')).toHaveLength(
-      2,
-    );
-  },
-};
-
-export const Controlled: Story = {
   render: function Render() {
     const [view, setView] = useState<Scheduler.View>('day');
     const [date, setDate] = useState(on(18));
@@ -1004,7 +953,7 @@ export const Controlled: Story = {
   },
 };
 
-export const Locale: Story = {
+export const ShowDatesInAnotherLocale: Story = {
   args: { locale: 'en-US' },
   parameters: {
     docs: {
@@ -1019,5 +968,70 @@ export const Locale: Story = {
     await expect(
       canvas.getByRole('region', { name: /Tuesday, November 17, 2026/ }),
     ).toHaveAttribute('data-scheduler-column', '2026-11-17');
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Tab은 이전, 오늘, 다음, 기간, 보기 순서로 멈춥니다. 보기는 라디오 그룹이라 화살표가 포커스와 보기를 함께 바꿉니다.',
+      },
+    },
+  },
+  play: async ({ canvas, args, userEvent }) => {
+    const stops = ['이전 주', '오늘', '다음 주'];
+    for (const name of stops) {
+      await userEvent.tab();
+      await expect(canvas.getByRole('button', { name })).toHaveFocus();
+    }
+    await userEvent.tab();
+    await expect(document.activeElement).toHaveAttribute('data-scheduler-range');
+    await userEvent.tab();
+    await expect(canvas.getByRole('radio', { name: '주' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('radio', { name: '3일' })).toHaveFocus();
+    await expect(args.onViewChange).toHaveBeenLastCalledWith('days');
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('radio', { name: '일' })).toHaveFocus();
+    await expect(args.onViewChange).toHaveBeenLastCalledWith('day');
+    await expect(canvas.getByRole('button', { name: '이전 날' })).toBeVisible();
+    await userEvent.keyboard('{Home}');
+    await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
+    await expect(args.onViewChange).toHaveBeenLastCalledWith('month');
+  },
+};
+
+export const Overlap: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '시간이 겹치는 일정은 칸을 세로로 나눠 나란히 섭니다. 옆 칸이 그 시간에 비어 있으면 그만큼 넓게 그려서, 서로 덮는 일정이 없습니다. 여러 날 종일 일정은 막대 하나로 잇고, 자정을 넘는 일정은 두 날에 나눠 그립니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const algo = eventBox(canvasElement, 'algo');
+    const room = eventBox(canvasElement, 'room');
+    const lunch = eventBox(canvasElement, 'lunch');
+    await expect(Math.abs(algo.width - room.width)).toBeLessThan(1);
+    await expect(room.left).toBeGreaterThanOrEqual(algo.right - 1);
+    await expect(lunch.width).toBeGreaterThan(algo.width * 1.5);
+
+    const pairing = eventBox(canvasElement, 'pairing');
+    const oneOnOne = eventBox(canvasElement, 'one-on-one');
+    await expect(Math.abs(pairing.width - oneOnOne.width)).toBeLessThan(1);
+    await expect(oneOnOne.left).toBeGreaterThanOrEqual(pairing.right - 1);
+
+    const festival = canvasElement.querySelectorAll('[data-scheduler-event="festival"]');
+    await expect(festival).toHaveLength(1);
+    await expect(festival[0].getBoundingClientRect().width).toBeGreaterThan(algo.width * 1.5);
+    await expect(canvasElement.querySelectorAll('[data-scheduler-event="deadline"]')).toHaveLength(
+      2,
+    );
   },
 };

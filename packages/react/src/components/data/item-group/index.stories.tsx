@@ -46,6 +46,23 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <ItemGroup className="w-80" aria-label="멤버">
+      {['김철수', '이영희', '박민수'].map((name) => (
+        <Item key={name}>
+          <Item.Media>
+            <Avatar name={name} />
+          </Item.Media>
+          <Item.Content>
+            <Item.Title>{name}</Item.Title>
+          </Item.Content>
+        </Item>
+      ))}
+    </ItemGroup>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -105,7 +122,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Variant: Story = {
+export const ChooseHowRowsAreSeparated: Story = {
   render: () => (
     <div className="flex w-80 flex-col gap-6">
       <ItemGroup variant="bordered" aria-label="멤버">
@@ -160,7 +177,7 @@ export const Variant: Story = {
   },
 };
 
-export const Ordered: Story = {
+export const ReadTheItemsInOrder: Story = {
   render: () => (
     <ItemGroup ordered variant="separated" className="w-80" aria-label="가입 절차">
       {['이메일 인증', '이름 정하기', '약관 동의'].map((step, index) => (

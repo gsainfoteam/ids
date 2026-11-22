@@ -39,6 +39,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <FieldGroup className="w-96">
+      <Field>
+        <Field.Label>이름</Field.Label>
+        <TextField defaultValue="김지수" />
+      </Field>
+      <Field>
+        <Field.Label>GIST 메일</Field.Label>
+        <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
+      </Field>
+    </FieldGroup>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -84,7 +99,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const SharedLabelColumn: Story = {
+export const LineUpInputsBesideTheirLabels: Story = {
   render: () => (
     <FieldGroup orientation="horizontal" className="w-96">
       <Field>
