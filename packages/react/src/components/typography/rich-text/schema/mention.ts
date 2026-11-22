@@ -8,7 +8,9 @@ const ATTRIBUTE = /(?:^|\s)(\w+)=(?:"([^"]*)"|'([^']*)')/g;
 function attributesIn(source: string) {
   const attributes: Record<string, string> = {};
   for (const [, key, doubleQuoted, singleQuoted] of source.matchAll(ATTRIBUTE))
-    if (key) attributes[key === 'char' ? 'mentionSuggestionChar' : key] = doubleQuoted ?? singleQuoted ?? '';
+    if (key)
+      attributes[key === 'char' ? 'mentionSuggestionChar' : key] =
+        doubleQuoted ?? singleQuoted ?? '';
   return attributes;
 }
 
@@ -42,7 +44,12 @@ export const DocumentMention = Mention.extend({
     nodeName: 'mention',
     name: '@',
     selfClosing: true,
-    allowedAttributes: ['id', 'label', 'avatar', { name: 'mentionSuggestionChar', skipIfDefault: '@' }],
+    allowedAttributes: [
+      'id',
+      'label',
+      'avatar',
+      { name: 'mentionSuggestionChar', skipIfDefault: '@' },
+    ],
     parseAttributes: (source: string) => {
       const attributes = attributesIn(source);
       return { ...attributes, avatar: safeAvatar(attributes.avatar) };
