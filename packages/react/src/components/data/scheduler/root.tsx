@@ -17,6 +17,7 @@ import {
   dateOf,
   daysOf,
   DEFAULT_DAY_COUNT,
+  shownDayCount,
   type SchedulerEventChange,
   type SchedulerEventData,
   type SchedulerSlot,
@@ -40,6 +41,8 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
   defaultView?: SchedulerView;
   onViewChange?: (view: SchedulerView) => void;
   dayCount?: number;
+  defaultDayCount?: number;
+  onDayCountChange?: (count: number) => void;
   date?: CalendarDate;
   defaultDate?: CalendarDate;
   onDateChange?: (date: CalendarDate) => void;
@@ -59,7 +62,9 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   view: viewProp,
   defaultView = 'week',
   onViewChange,
-  dayCount = DEFAULT_DAY_COUNT,
+  dayCount: dayCountProp,
+  defaultDayCount = DEFAULT_DAY_COUNT,
+  onDayCountChange,
   date: dateProp,
   defaultDate,
   onDateChange,
@@ -93,6 +98,12 @@ export function SchedulerRoot<E extends SchedulerEventData>({
     defaultValue: defaultView,
     onValueChange: onViewChange,
   });
+  const [dayCountValue, setDayCount] = useControllableState({
+    value: dayCountProp,
+    defaultValue: defaultDayCount,
+    onValueChange: onDayCountChange,
+  });
+  const dayCount = shownDayCount(dayCountValue);
   const [date, setDate] = useControllableState({
     value: dateProp,
     defaultValue: firstShownDate,
@@ -120,6 +131,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
           format={format}
           view={view}
           dayCount={dayCount}
+          onDayCountChange={setDayCount}
           onViewChange={setView}
           date={date}
           onDateChange={setDate}

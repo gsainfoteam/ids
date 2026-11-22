@@ -7,6 +7,7 @@ import {
   toCalendarDateTime,
   type DateValue,
 } from '@internationalized/date';
+import { clamp } from 'es-toolkit';
 
 import { compareDays, ownDate, weekdayOf } from '../calendar/date';
 
@@ -84,6 +85,11 @@ export const dateOf = (value: DateValue) => ownDate(toCalendarDate(value));
 export const isAllDay = (event: SchedulerEventData) => event.allDay ?? !('hour' in event.start);
 
 export const DEFAULT_DAY_COUNT = 3;
+export const FEWEST_DAYS = 2;
+export const MOST_DAYS = 14;
+
+export const shownDayCount = (count: number) =>
+  Number.isFinite(count) ? clamp(Math.round(count), FEWEST_DAYS, MOST_DAYS) : DEFAULT_DAY_COUNT;
 
 const daysFrom = (first: CalendarDate, count: number) =>
   Array.from({ length: count }, (_, index) => first.add({ days: index }));

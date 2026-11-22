@@ -235,7 +235,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     defaultView: { control: 'radio', options: ['month', 'week', 'days', 'day'] },
-    dayCount: { control: { type: 'number', min: 2, max: 7 } },
+    defaultDayCount: { control: { type: 'number', min: 2, max: 14 } },
     locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP'] },
     weekStartsOn: { control: { type: 'number', min: 0, max: 6 } },
   },
@@ -245,6 +245,7 @@ const meta = {
     now: NOW,
     onViewChange: fn(),
     onDateChange: fn(),
+    onDayCountChange: fn(),
   },
 } satisfies Meta<typeof Scheduler>;
 
@@ -292,7 +293,7 @@ export const Gallery: Story = {
           <Scheduler
             events={EVENTS}
             defaultView="days"
-            dayCount={3}
+            defaultDayCount={3}
             defaultDate={TODAY}
             now={NOW}
             aria-label="3일 보기"
@@ -449,12 +450,12 @@ export const MonthView: Story = {
 };
 
 export const DaysView: Story = {
-  args: { defaultView: 'days', dayCount: 3 },
+  args: { defaultView: 'days' },
   parameters: {
     docs: {
       description: {
         story:
-          '`view="days"` 는 고른 날부터 `dayCount` 일(기본 3일)을 주 보기와 같은 시간 격자로 보여 줍니다. 이전과 다음은 `dayCount` 일씩 옮깁니다.',
+          '`view="days"` 는 고른 날부터 `dayCount` 일(기본 3일)을 주 보기와 같은 시간 격자로 보여 줍니다. 툴바의 날 수 칸에 2일부터 14일까지 직접 입력하거나 위아래 버튼과 방향키로 바꿉니다. 이전과 다음은 `dayCount` 일씩 옮깁니다.',
       },
     },
   },
@@ -465,6 +466,28 @@ export const DaysView: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '다음 3일' }));
     await expect(args.onDateChange).toHaveBeenLastCalledWith(on(20));
     await expect(shownDays(canvasElement)).toEqual(['2026-11-20', '2026-11-21', '2026-11-22']);
+
+    const count = canvas.getByRole('spinbutton', { name: '보여 줄 날 수' });
+    await userEvent.tripleClick(count);
+    await userEvent.keyboard('{Backspace}10');
+    await expect(args.onDayCountChange).toHaveBeenLastCalledWith(10);
+    await expect(shownDays(canvasElement)).toHaveLength(10);
+
+    await userEvent.tripleClick(count);
+    await userEvent.keyboard('{Backspace}');
+    await userEvent.click(canvasElement.querySelector('[data-scheduler-range]')!);
+    await userEvent.keyboard('{Escape}');
+    await expect(count).toHaveValue('10일');
+
+    await userEvent.tripleClick(count);
+    await userEvent.keyboard('5');
+    await expect(args.onDayCountChange).toHaveBeenLastCalledWith(5);
+    await expect(shownDays(canvasElement)).toHaveLength(5);
+    await expect(canvas.getByRole('radio', { name: '5일' })).toBeChecked();
+
+    await userEvent.type(count, '{ArrowUp}');
+    await expect(args.onDayCountChange).toHaveBeenLastCalledWith(6);
+    await expect(canvas.getByRole('button', { name: '다음 6일' })).toBeVisible();
   },
 };
 

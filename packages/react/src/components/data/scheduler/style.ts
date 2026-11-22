@@ -11,7 +11,8 @@ export const schedulerStyle = tv({
     ],
     toolbar: 'flex flex-wrap items-center gap-2',
     rangeIcon: 'text-neutral',
-    views: 'ms-auto',
+    views: 'ms-auto flex items-center gap-2',
+    dayCount: 'w-28',
     datePopup: 'w-auto',
     board: 'min-h-0 flex-1 rounded-container border border-neutral',
     canvas: [

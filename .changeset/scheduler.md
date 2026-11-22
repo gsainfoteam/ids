@@ -2,7 +2,7 @@
 "@gsainfoteam/ids-react": minor
 ---
 
-Add `Scheduler`, a month calendar and a week (default), N-day (`dayCount`, 3 by default) and day time grid for events. Each event is `{ id, title, start,
+Add `Scheduler`, a month calendar and a week (default), N-day (`dayCount` from 2 to 14, 3 by default, typed into a NumberField in the toolbar) and day time grid for events. Each event is `{ id, title, start,
 end, allDay?, colorScheme? }` with `@internationalized/date` values; overlapping events share the
 column side by side, events past midnight are drawn on both days and all-day events sit in a row
 under the weekday header. Previous, today and next are a ButtonGroup, the range button opens a

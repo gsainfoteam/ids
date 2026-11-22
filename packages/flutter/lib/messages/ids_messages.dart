@@ -427,9 +427,13 @@ mixin IdsMessages {
 
   String? get resizableWidth => null;
 
+  String? get schedulerAddDay => null;
+
   String? get schedulerAllDay => null;
 
   String? get schedulerDay => null;
+
+  String? get schedulerDayCount => null;
 
   String? schedulerDays({required Object count}) => null;
 
@@ -470,6 +474,8 @@ mixin IdsMessages {
   String? get schedulerPreviousMonth => null;
 
   String? get schedulerPreviousWeek => null;
+
+  String? get schedulerRemoveDay => null;
 
   String? schedulerResize({required Object event}) => null;
 
@@ -1231,10 +1237,16 @@ final class IdsKoreanMessages with IdsMessages {
   String get resizableWidth => '너비';
 
   @override
+  String get schedulerAddDay => '하루 늘리기';
+
+  @override
   String get schedulerAllDay => '종일';
 
   @override
   String get schedulerDay => '일';
+
+  @override
+  String get schedulerDayCount => '보여 줄 날 수';
 
   @override
   String schedulerDays({required Object count}) => '${_format(count)}일';
@@ -1295,6 +1307,9 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get schedulerPreviousWeek => '이전 주';
+
+  @override
+  String get schedulerRemoveDay => '하루 줄이기';
 
   @override
   String schedulerResize({required Object event}) => '${_format(event)} 끝 시각';

@@ -172,7 +172,7 @@ const [events, setEvents] = useState(initialEvents);
 
 ```tsx
 <Scheduler events={events} defaultView="day" defaultDate={new CalendarDate(2026, 11, 17)} />
-<Scheduler events={events} defaultView="days" dayCount={4} />
+<Scheduler events={events} defaultView="days" defaultDayCount={4} />
 
 const [view, setView] = useState<Scheduler.View>('week');
 const [date, setDate] = useState(today(getLocalTimeZone()));
@@ -181,7 +181,9 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 
 - `date` 는 보이는 기간 안의 아무 날입니다. 월 보기는 그날이 든 달, 주 보기는 그날이 든 주, `days` 는 그날부터 `dayCount` 일을 그립니다.
 - 이전, 다음은 보기만큼(한 달, 한 주, `dayCount` 일, 하루) 옮깁니다. 오늘은 오늘로 갑니다.
+- `days` 보기에서는 보기 전환 앞에 날 수 칸(NumberField)이 나옵니다. 2일부터 14일까지 직접 입력하거나 위아래 버튼, 방향키로 바꿉니다. 범위 밖이나 빈 값은 칸을 떠날 때 마지막 값으로 돌아갑니다.
 - 보기 전환의 N일 버튼 이름은 `dayCount` 를 따릅니다("3일").
+- `dayCount` 도 `view`, `date` 처럼 제어하거나(`dayCount` / `onDayCountChange`) 처음 값만 줄 수 있습니다(`defaultDayCount`). 2보다 작거나 14보다 큰 값은 범위 안으로 맞춥니다.
 - 기간 버튼은 Calendar 를 엽니다. 포커스가 `date` 로 들어가고, 날을 고르면 그날로 옮기며 닫힙니다. Escape 는 닫고 포커스를 기간 버튼에 돌려줍니다.
 - 보기 전환은 라디오 그룹이라 다시 눌러도 풀리지 않습니다.
 - `date` 의 기본은 오늘입니다. 서버와 클라이언트가 다른 날이면 hydration 이 어긋나므로, 서버에서 그리는 앱은 `defaultDate` 를 넘깁니다.
@@ -234,7 +236,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | --------------------------------------- | ------------------------------------- | -------------------- |
 | `events`                                | `Scheduler.EventData[]` 를 넓힌 배열   | -                    |
 | `view` / `defaultView` / `onViewChange` | `'month' \| 'week' \| 'days' \| 'day'` | `'week'`             |
-| `dayCount`                              | `number` (`days` 보기의 날 수)         | `3`                  |
+| `dayCount` / `defaultDayCount` / `onDayCountChange` | `number` (`days` 보기의 날 수, 2 ~ 14) | `3`  |
 | `date` / `defaultDate` / `onDateChange` | `CalendarDate`                        | 오늘                 |
 | `locale`                                | `string` (BCP 47)                     | Provider locale      |
 | `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |

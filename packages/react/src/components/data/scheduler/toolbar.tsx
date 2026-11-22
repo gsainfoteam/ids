@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
 import { getLocalTimeZone, today as todayIn } from '@internationalized/date';
 
+import { SchedulerDayCountField } from './day-count-field';
 import { stepOf, type SchedulerView } from './layout';
 import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
@@ -24,6 +25,7 @@ const THE_FOCUSABLE_DAY = '[data-calendar-day][tabindex="0"]';
 type SchedulerToolbarProps = SchedulerContextValue & {
   view: SchedulerView;
   dayCount: number;
+  onDayCountChange: (count: number) => void;
   onViewChange: (view: SchedulerView) => void;
   date: CalendarDate;
   onDateChange: (date: CalendarDate) => void;
@@ -38,6 +40,7 @@ export function SchedulerToolbar({
   format,
   view,
   dayCount,
+  onDayCountChange,
   onViewChange,
   date,
   onDateChange,
@@ -112,18 +115,27 @@ export function SchedulerToolbar({
         {range}
       </span>
 
-      <ToggleGroup
-        variant="outline"
-        aria-label={t('scheduler.view')}
-        value={view}
-        onValueChange={(next) => next && onViewChange(next as SchedulerView)}
-        className={styles.views()}
-      >
-        <Toggle value="month">{t('scheduler.month')}</Toggle>
-        <Toggle value="week">{t('scheduler.week')}</Toggle>
-        <Toggle value="days">{t('scheduler.days', { count: dayCount })}</Toggle>
-        <Toggle value="day">{t('scheduler.day')}</Toggle>
-      </ToggleGroup>
+      <div className={styles.views()}>
+        {view === 'days' && (
+          <SchedulerDayCountField
+            styles={styles}
+            dayCount={dayCount}
+            onDayCountChange={onDayCountChange}
+            locale={locale}
+          />
+        )}
+        <ToggleGroup
+          variant="outline"
+          aria-label={t('scheduler.view')}
+          value={view}
+          onValueChange={(next) => next && onViewChange(next as SchedulerView)}
+        >
+          <Toggle value="month">{t('scheduler.month')}</Toggle>
+          <Toggle value="week">{t('scheduler.week')}</Toggle>
+          <Toggle value="days">{t('scheduler.days', { count: dayCount })}</Toggle>
+          <Toggle value="day">{t('scheduler.day')}</Toggle>
+        </ToggleGroup>
+      </div>
     </div>
   );
 }

@@ -291,8 +291,10 @@ export const messages = {
     "width": "너비"
   },
   "scheduler": {
+    "addDay": "하루 늘리기",
     "allDay": "종일",
     "day": "일",
+    "dayCount": "보여 줄 날 수",
     "days": "{count}일",
     "drag": {
       "at": "{time} 시작",
@@ -315,6 +317,7 @@ export const messages = {
     "previousDays": "이전 {count}일",
     "previousMonth": "이전 달",
     "previousWeek": "이전 주",
+    "removeDay": "하루 줄이기",
     "resize": "{event} 끝 시각",
     "today": "오늘",
     "view": "보기",

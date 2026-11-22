@@ -14,6 +14,7 @@ import {
   daysOf,
   hiddenOn,
   monthBarsIn,
+  shownDayCount,
   stepOf,
   timedSegmentsOn,
 } from '../src/components/data/scheduler/layout';
@@ -354,6 +355,7 @@ test('days shows dayCount days from the date and steps by them', () => {
     '2026-11-20',
   ]);
   expect(stepOf('days', 4)).toEqual({ days: 4 });
+  expect([0, 2.4, 9, 30, Number.NaN].map(shownDayCount)).toEqual([2, 2, 9, 14, 3]);
   expect(stepOf('month')).toEqual({ months: 1 });
 });
 

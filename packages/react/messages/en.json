@@ -290,8 +290,10 @@
     "width": "Width"
   },
   "scheduler": {
+    "addDay": "Add a day",
     "allDay": "All day",
     "day": "Day",
+    "dayCount": "Number of days",
     "days": "{count, plural, one {# day} other {# days}}",
     "drag": {
       "at": "Starts {time}",
@@ -314,6 +316,7 @@
     "previousDays": "{count, plural, one {Previous day} other {Previous # days}}",
     "previousMonth": "Previous month",
     "previousWeek": "Previous week",
+    "removeDay": "Remove a day",
     "resize": "End of {event}",
     "today": "Today",
     "view": "View",
