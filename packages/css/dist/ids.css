@@ -433,6 +433,55 @@
   }
 }
 
+@utility document-text {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 2);
+
+  & :where(h1) {
+    @apply text-headline-h5-semibold;
+  }
+  & :where(h2) {
+    @apply text-headline-h6-semibold;
+  }
+  & :where(h3) {
+    @apply text-body-b1-semibold;
+  }
+  & :where(h4, h5, h6) {
+    @apply text-body-b2-semibold;
+  }
+  & > :where(:is(h1, h2, h3, h4, h5, h6):not(:first-child)) {
+    @apply mt-4;
+  }
+  & :where(ul, ol) {
+    @apply ps-6;
+  }
+  & :where(ul) {
+    @apply list-disc;
+  }
+  & :where(ul ul) {
+    list-style-type: circle;
+  }
+  & :where(ol) {
+    @apply list-decimal;
+  }
+  & :where(blockquote) {
+    @apply flex flex-col gap-2 border-s-2 border-neutral ps-3 text-neutral;
+  }
+  & :where(pre) {
+    @apply rounded-standard bg-neutral-soft px-3 py-2 font-mono leading-b2 whitespace-pre-wrap;
+  }
+  & :where(:not(pre) > code) {
+    @apply rounded-indicator bg-neutral-soft px-1 font-mono;
+  }
+  & :where(a) {
+    @apply text-primary underline underline-offset-2;
+  }
+  & :where(hr) {
+    @apply my-2 border-neutral;
+  }
+}
+
 @utility scheme-neutral {
   --ids-color-bg-scheme-soft: var(--ids-color-bg-neutral-soft);
   --ids-color-bg-scheme-solid: var(--ids-color-bg-neutral-solid);

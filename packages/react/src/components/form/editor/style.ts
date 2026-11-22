@@ -20,17 +20,6 @@ const proseMirrorBaseline = cn(
   '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary-strong',
 );
 
-const documentBlocks = cn(
-  'flex flex-col gap-2',
-  '[&_h1]:text-headline-h5-semibold [&_h2]:text-headline-h6-semibold [&_h3]:text-body-b1-semibold [&_h4]:text-body-b2-semibold',
-  '[&_:is(ul,ol)]:ps-6 [&_ul]:list-disc [&_ol]:list-decimal',
-  '[&_blockquote]:flex [&_blockquote]:flex-col [&_blockquote]:gap-2 [&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
-  '[&_pre]:rounded-standard [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:leading-b2 [&_pre]:whitespace-pre-wrap',
-  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
-  '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
-  '[&_hr]:border-neutral',
-);
-
 export const editorStyle = tv({
   slots: {
     root: [
@@ -54,7 +43,7 @@ export const editorStyle = tv({
       'min-h-24 outline-none text-neutral-strong',
       'selection:bg-primary-solid/30 selection:text-neutral-strong',
       proseMirrorBaseline,
-      documentBlocks,
+      'document-text',
       placeholder,
     ],
     count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-strong'],

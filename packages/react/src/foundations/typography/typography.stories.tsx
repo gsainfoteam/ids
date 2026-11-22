@@ -210,30 +210,43 @@ export const Prose: Story = {
     <Showcase>
       <Showcase.Section
         title="긴 글"
-        description="문서와 Editor 본문은 text-body-b2-regular leading-prose(16px, 행간 28px)입니다. 문서 제목은 semibold로 h1 24px, h2 20px, h3 18px, h4 16px입니다."
+        description="document-text 는 블록 사이를 8px 띄우고, 제목을 semibold로 h1 24px, h2 20px, h3 18px, h4 16px로 그리며 제목 위를 16px 더 띄웁니다. 본문 크기는 text-body-b2-regular leading-prose(16px, 행간 28px)로 따로 줍니다."
       >
-        <article className="text-neutral-strong flex max-w-prose flex-col gap-3">
-          <h1 className="text-headline-h5-semibold">2학기 수강 신청 안내</h1>
-          <p data-prose="" className="text-body-b2-regular leading-prose">
-            수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
-            장바구니에 담은 과목의 시간이 겹치지 않는지 살펴 주세요. 정원이 찬 과목은 대기 순번을
-            받을 수 있습니다.
+        <article className="document-text text-body-b2-regular leading-prose text-neutral-strong max-w-prose">
+          <h1>2학기 수강 신청 안내</h1>
+          <p data-prose="">
+            수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과{' '}
+            <strong>선수 과목</strong>을 확인하고, 장바구니에 담은 과목의 시간이 겹치지 않는지 살펴
+            주세요.
           </p>
-          <h2 className="text-headline-h6-semibold">변경 기간</h2>
-          <p className="text-body-b2-regular leading-prose">
-            정정 기간에는 과목을 더하거나 뺄 수 있습니다. 학점 상한은 신청 기간과 같습니다.
-          </p>
-          <h3 className="text-body-b1-semibold">문의</h3>
-          <p className="text-body-b2-regular leading-prose">학사팀으로 연락해 주세요.</p>
+          <h2>변경 기간</h2>
+          <ul>
+            <li>정정 기간: 9월 8일부터 12일까지</li>
+            <li>
+              학점 상한은 신청 기간과 같습니다.
+              <ul>
+                <li>재수강 과목도 포함합니다.</li>
+              </ul>
+            </li>
+          </ul>
+          <h3>문의</h3>
+          <blockquote>
+            <p>
+              자세한 내용은 <a href="https://gistory.me">학사 공지</a>를 보세요.
+            </p>
+          </blockquote>
         </article>
       </Showcase.Section>
     </Showcase>
   ),
   play: async ({ canvasElement }) => {
     const prose = canvasElement.querySelector<HTMLElement>('[data-prose]')!;
+    const h1 = canvasElement.querySelector('article h1')!;
 
     await expect(getComputedStyle(prose).fontSize).toBe('16px');
     await expect(getComputedStyle(prose).lineHeight).toBe('28px');
+    await expect(getComputedStyle(h1).fontSize).toBe('24px');
+    await expect(getComputedStyle(h1).fontWeight).toBe('600');
   },
 };
 
