@@ -17,8 +17,8 @@ Breaking: the `subtitle-s1-*` and `subtitle-s2-*` styles are gone, since they ma
 line-height primitives are replaced by the size-named ones.
 
 `leading-prose` (28px) is new for long text. Editor's body is `text-body-b2-regular
-leading-prose` (a tiny Editor `text-body-b3-regular`), and its headings are semibold and one step
-smaller: h1 24px, h2 20px, h3 18px, h4 16px.
+leading-prose` (a tiny Editor `text-body-b3-regular`), its headings are semibold at h1 28px, h2
+24px, h3 20px and h4 18px, and a code block is outlined instead of filled.
 
 `@gsainfoteam/ids-css` adds `document-text`, a utility that sets tag-only long text (Markdown,
 Editor) in the IDS type scale: 20px between blocks, 12px under a heading and 28 to 36px above

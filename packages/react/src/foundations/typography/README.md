@@ -42,7 +42,7 @@
 ```
 
 - 블록 사이는 20px, 제목 바로 아래는 12px, h1·h2 위는 36px, h3~h6 위는 28px 입니다. 목록 항목과 인용 안 문단 사이는 8px 입니다. 제목이 아래 내용과 묶이고 문단은 한 덩어리씩 읽힙니다.
-- 문서 제목은 페이지 제목보다 한 단계 작고 semibold 입니다: h1 24px(`headline-h5`), h2 20px(`headline-h6`), h3 18px(`body-b1`), h4~h6 16px(`body-b2`). body 크기의 제목에는 `tracking-snug` 를 더합니다.
+- 문서 제목은 semibold 입니다: h1 28px(`headline-h4`), h2 24px(`headline-h5`), h3 20px(`headline-h6`), h4 18px(`body-b1`), h5·h6 16px(`body-b2`). body 크기의 제목에는 `tracking-snug` 를 더합니다.
 - 링크는 본문색에 옅은 밑줄(`border-neutral-strong` 색)이고 hover 에서 밑줄이 진해집니다. 글머리표는 `border-neutral-strong`, 번호는 `text-neutral` 색입니다.
 - 목록, 인용, 코드, 링크, 구분선도 그립니다. 안쪽 선택자는 `:where()` 라 안쪽 태그에 클래스를 주면 그 클래스가 이깁니다.
 - `leading-prose` 는 글자 스타일 뒤에 씁니다. `cn` 은 크기 클래스 앞에 놓인 `leading-*` 를 지웁니다.

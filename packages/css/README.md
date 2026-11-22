@@ -173,7 +173,7 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 ```
 
 - 블록 사이 20px, 제목 바로 아래 12px, h1·h2 위 36px, h3~h6 위 28px, 목록 항목과 인용 안 문단 사이 8px.
-- h1 24px, h2 20px, h3 18px, h4~h6 16px, 모두 semibold. body 크기 제목은 `tracking-snug`. 목록(옅은 글머리표), 인용, 코드(`bg-neutral-soft`, 인라인은 테두리까지), 링크(본문색에 옅은 밑줄), 구분선을 그린다.
+- h1 28px, h2 24px, h3 20px, h4 18px, h5·h6 16px, 모두 semibold. body 크기 제목은 `tracking-snug`. 목록(옅은 글머리표), 인용, 코드(블록은 테두리만, 인라인은 `bg-neutral-soft` 에 테두리), 링크(본문색에 옅은 밑줄), 구분선을 그린다.
 - 본문 크기와 행간은 넣지 않는다. 쓰는 쪽이 `text-body-*` 와 `leading-prose` 로 준다.
 - 안쪽 선택자는 `:where()` 라서 안쪽 태그에 준 클래스가 이긴다.
 
