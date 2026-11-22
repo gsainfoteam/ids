@@ -6,6 +6,7 @@ import {
   Cog6ToothIcon,
   MagnifyingGlassIcon,
   MegaphoneIcon,
+  MoonIcon,
   PencilSquareIcon,
   TruckIcon,
 } from '@heroicons/react/24/outline';
@@ -48,7 +49,7 @@ export const PC: Story = {
     return (
       <div className="flex min-h-dvh flex-col break-keep">
         <header className="flex items-center gap-4 px-4 py-3 sm:px-6">
-          <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+          <span className="text-body-b2-semibold">GIST 인포팀</span>
           <Menu triggerType="command" hotkey="Mod+K" defaultOpen>
             <Menu.Trigger asChild>
               <Button variant="outline" className="ms-auto">
@@ -98,6 +99,7 @@ export const PC: Story = {
                   <Menu.Shortcut keys="Mod+N" />
                 </Menu.Item>
                 <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
+                  <MoonIcon />
                   어두운 화면
                 </Menu.CheckboxItem>
                 <Menu.Item onSelect={() => toast('설정을 열어요')}>

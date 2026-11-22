@@ -47,7 +47,7 @@ className={cn('origin-center -rotate-90', indicatorClassName)}
 
 | 설정                                                               | 없으면                                                                                 |
 | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
-| `theme.radius: ['standard', 'indicator']`                          | `rounded-standard` 와 `rounded-full` 이 충돌로 잡히지 않아 둘 다 남는다                |
+| `theme.radius: ['standard', 'indicator', 'container']`             | `rounded-container` 위에 `rounded-standard` 를 덮어도 충돌로 잡히지 않아 둘 다 남는다  |
 | `font-size` 에 IDS 글자 스타일(`text-body-*`, `text-caption-*` 등) | `text-body-b3-regular` 를 글자색으로 읽어 앞의 `text-neutral` 를 지운다 |
 | `concentric-p` 가 `p-*`, `rounded-*` 와 충돌                       | `p-4 concentric-p-3` 이 둘 다 남는다                                                   |
 

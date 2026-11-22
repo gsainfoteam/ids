@@ -323,8 +323,8 @@ test('text lines are as tall as the text they stand for, with a bar one em high'
           <br />
           Three
         </p>
-        <Skeleton data-testid="s2" shape="text" className="text-subtitle-s2-semibold" />
-        <p data-testid="s2-text" className="text-subtitle-s2-semibold">
+        <Skeleton data-testid="s2" shape="text" className="text-body-b2-semibold" />
+        <p data-testid="s2-text" className="text-body-b2-semibold">
           Title
         </p>
         <Skeleton data-testid="c1" shape="text" lines={2} className="text-caption-c1-regular" />

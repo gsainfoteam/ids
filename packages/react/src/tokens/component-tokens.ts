@@ -13,6 +13,7 @@ export const IDS_COMPONENT_COLORS = {
   'border-field-outline': { light: 'border-neutral', dark: 'border-neutral-strong' },
   'border-field-bar': { light: 'border-neutral', dark: 'border-neutral-strong' },
   'bg-field-code-outline': { light: 'bg-neutral-soft', dark: 'bg-surface' },
+  'bg-field-block-outline': { light: 'bg-block', dark: 'bg-surface' },
   'bg-switch-thumb': { light: 'bg-base', dark: 'bg-neutral-solid' },
   'bg-segment': { light: 'bg-base', dark: 'border-neutral-strong' },
   'bg-qr-code': { light: 'bg-base', dark: 'bg-neutral-solid' },

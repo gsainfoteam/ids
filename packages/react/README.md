@@ -641,6 +641,11 @@ Tiptap 3 위의 서식 편집기입니다. 툴바, 버블 메뉴, 링크 Popover
 `@gsainfoteam/ids-react/editor` 에서 가져오고, Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다. Tiptap 은 Editor 가 마운트될 때 `import()` 로 불러옵니다.
 [Editor API](./src/components/form/editor/README.md).
 
+## RichText
+
+저장해 둔 마크다운이나 Editor 의 JSON 을 IDS 컴포넌트로 그리는 렌더러입니다. Server Component 에서 그리면 Tiptap 은 서버에서만 돌고 브라우저로 가지 않습니다.
+`@gsainfoteam/ids-react/rich-text` 에서 가져옵니다. [RichText API](./src/components/typography/rich-text/README.md).
+
 ## Interaction feedback
 
 Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. IdsProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.

@@ -46,33 +46,36 @@ import { Table } from '@gsainfoteam/ids-react';
 ## variant와 크기
 
 ```tsx
-<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행에 `bg-neutral-soft` 배경
+<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행은 `bg-block`
 <Table variant="ghost" />    // 상자 없이 행 구분선만
-<Table size="standard" />    // 기본. 셀 패딩 16px × 12px, 머리글 44px, body b3
-<Table size="tiny" />        // 셀 패딩 12px × 8px, 머리글 36px, caption c1
+<Table size="standard" />    // 기본. 셀 패딩 16px × 10px, 머리글 40px, body b3
+<Table size="tiny" />        // 셀 패딩 12px × 6px, 머리글 32px, caption c1
 ```
 
-- 상자 모서리는 `rounded-container`(16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
+- 상자 모서리는 `--table-radius`(기본 `rounded-container`, 16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
+- 스크롤 영역은 테두리 1px 를 뺀 `--table-radius - 1px` 로 깎습니다. 같은 값이면 채운 머리글 모서리와 테두리 사이로 바탕색이 비칩니다. 모서리를 바꾸려면 `rounded-*` 가 아니라 `[--table-radius:...]` 를 줍니다.
 - 선은 모두 `--ids-color-border-neutral` 입니다. 마지막 행은 아래 선이 없고, `Table.Footer` 는 위 선으로 몸통과 나뉩니다.
+- `outline` 의 머리글 행은 `bg-block` 으로 채우고 글자는 `text-neutral` 입니다. `ghost` 의 머리글은 채우지 않지만, 붙는 머리글(`stickyHeader`)이 아래 행을 가리도록 배경은 밑에 깔린 면의 색(`--ids-bg-current`)입니다.
 
 ## 행 상태
 
 ```tsx
 <Table striped />              // 짝수 행에 `bg-neutral-soft`
 <Table highlightOnHover />     // 몸통 행에 올리면 `state-hover` 층
-<Table.Row selected />         // 선택된 행은 `state-press` 층
+<Table.Row selected />         // 선택된 행은 `bg-primary-soft`, 글자 `text-on-primary-soft`
 <Table.Row onClick={open} />   // 올리면 층이 깔리고 어디를 눌러도 된다(cursor-pointer)
 ```
 
-| 행           | 평소                  | 올렸을 때                           |
-| ------------ | --------------------- | ----------------------------------- |
-| 기본         | 투명                  | `state-hover`                       |
-| 줄무늬(짝수) | `bg-neutral-soft`   | `bg-neutral-soft` 위 `state-hover` |
-| 선택         | `state-press`         | `state-press` 그대로                |
+| 행           | 평소              | 올렸을 때                           |
+| ------------ | ----------------- | ----------------------------------- |
+| 기본         | 투명              | `state-hover`                       |
+| 줄무늬(짝수) | `bg-block`        | `bg-block` 위 `state-hover`         |
+| 선택         | `bg-primary-soft` | `bg-primary-soft` 위 primary 층(8%) |
 
-- 층은 글자색(`text-neutral-strong`)을 6%, 10% 얹은 것이라 줄무늬, 머리글 띠 어느 바탕에서나 보입니다.
-
+- 층은 글자색(`text-neutral-strong`)을 6% 얹은 것이라 줄무늬, 머리글 띠 어느 바탕에서나 보입니다.
+- 선택된 행은 `scheme-primary` 와 `state-scheme` 를 얹어, 올렸을 때 층이 primary 채움색으로 짙어집니다.
 - 올렸을 때 층은 `highlightOnHover` 나 `onClick` 이 있는 몸통 행에만 붙습니다. 머리글과 바닥글 행은 바뀌지 않습니다.
+- 선택은 줄무늬보다 앞섭니다. 짝수 행을 골라도 `bg-primary-soft` 입니다.
 - `selected` 는 모양과 `data-selected` 만 바꿉니다. `aria-selected` 는 `grid` 역할에서만 뜻이 있어 붙이지 않습니다. 선택은 행 안의 체크박스나 `aria-pressed` 버튼이 알립니다.
 
 ## 누를 수 있는 행

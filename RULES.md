@@ -92,6 +92,10 @@ A root that recognises another component also accepts that component's root
 root (`docsReadFromTheRoot` in `.storybook/main.ts`), because the wrapper has no destructured
 defaults to read. `tests/use-client.test.ts` checks both directions, and
 `tests/server-components.test.ts` renders components, parts and `Style` from a Server Component.
+`RichText` (`typography/rich-text`) is the one component rendered only on the server: its
+`index.tsx` and `render.tsx` parse and draw the document with no client root, so a Server Component
+sends IDS components and no Tiptap. `tests/use-client.test.ts` lists them in
+`RENDERED_ONLY_ON_THE_SERVER`.
 
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 
@@ -121,6 +125,9 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     `editor/engine.tsx` imports it at runtime, and `load-engine.ts` loads that with `import()`
     when an Editor mounts; Markdown goes through `@tiptap/markdown`, loaded the same way only for
     `format="markdown"`. The shell, toolbar and parts are IDS's code and use Tiptap's types only.
+    The document schema (nodes, markdown rules, image and link checks) and the text styles live in
+    `typography/rich-text`, which the `@gsainfoteam/ids-react/rich-text` entry renders on the
+    server with `@tiptap/static-renderer`, mapping each block to an IDS component.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a
@@ -292,6 +299,14 @@ IDS elements appear, the hook code does not. The exceptions, which stay componen
 
 Plain helpers (play queries, data factories, formatters) stay at module level.
 
+**Menu rows should start with one icon.** In stories, blocks and README examples, prefer giving
+each `Menu.Item` and each submenu `Menu.Trigger` one leading heroicon (or an `Avatar` for a
+person), so the labels line up. It is a recommendation, not a hard rule: a row may stay a label
+alone when no icon fits it. The icon comes from the set the file already imports:
+`@heroicons/react/16/solid` in component stories and READMEs, `24/outline` in blocks. A
+`Menu.CheckboxItem` in a group of such items takes an icon too; a menu of only checkbox and radio
+items stays bare, since their check or dot sits at the end and marks them already.
+
 ## Blocks
 
 `src/blocks/<category>/` holds blocks: screens built only from IDS components, with several takes
@@ -458,8 +473,9 @@ mode. No layer mixes two tokens with `color-mix`.
   | `shadow-surface` | `shadow-1` | `shadow-0` | an outline Card |
   | `bg-control-outline`, `border-control-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline buttons, Checkbox, Radio, pill Tabs |
   | `bg-field-outline`, `border-field-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline fields |
-  | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea and Editor bar seam |
+  | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea bar seam |
   | `bg-field-code-outline` | `bg-neutral-soft` | `bg-surface` | code in an outline Editor |
+  | `bg-field-block-outline` | `bg-block` | `bg-surface` | a table header in an outline Editor |
   | `bg-switch-thumb` | `bg-base` | `bg-neutral-solid` | an off Switch thumb |
   | `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode |
   | `bg-qr-code-inverse`, `text-qr-code-inverse` | `bg-neutral-solid`, `text-on-neutral-solid` | `bg-base`, `text-neutral-strong` | an inverted QRCode |
@@ -618,7 +634,7 @@ layer, soft and accent text under the text-color layer and the family-fill layer
 - Translucent layers over a background IDS does not know stay as they are: Image's hover scrim,
   Chip lines, the ScrollArea track, the DataTable loading veil, disabled opacity and backdrops,
   the hairline round an image, a color swatch or a slider track (`inset-ring-(--ids-color-text-neutral-strong)/N`),
-  with the focus halo and text selection. They are the only opacity modifiers on an IDS color;
+  with the focus halo and text and block selection. They are the only opacity modifiers on an IDS color;
   `tests/color-rules.test.ts` lists them and fails on any other, on `dark:`, on `color-mix` and on
   an `--ids-*` variable `ids.css` does not have.
 
@@ -645,7 +661,9 @@ height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regu
 utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which matches Pretendard GOV's
 x-height (0.53), so Geist Mono draws at full size level with the body text and any fallback font
 comes to the same x-height. Pretendard follows the monospace fonts in the stack, so Hangul in code
-falls back to it. Do not shrink it again with `text-[0.9em]`.
+falls back to it. Do not shrink it again with `text-[0.9em]`. The one exception is inline code in
+`document-text`, which sits at `0.875em` among 16px prose, where a full-size monospace word reads
+louder than the sentence around it.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
@@ -663,8 +681,9 @@ by group and key, as ICU strings with plain `{name}` arguments; a new key also g
 Developer warnings stay English and out of the catalog. A default that has to be a function
 (`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
-keys and that no Korean literal sits in component code; `tests/translate.test.tsx` renders every
-story in English.
+keys and that no Korean literal sits in component code; `tests/translate-<category>.test.tsx`
+renders every story in English and `tests/translate.test.tsx` checks popups, live regions and
+fallbacks.
 
 **Variants are the looks an app cannot build from IDS parts.** A `variant` or `appearance` value is
 a component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
@@ -799,8 +818,15 @@ projects:
   axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA tags and fail with one line per
   rule, node and fix (`color-contrast` excepted, see APCA above); a story tagged `'!test'` is skipped. The stories are split by category so
   no single page renders all of them.
-  `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
-  `hydrateRoot` and fails on a recoverable error or any `console.error`.
+  `tests/hydration-<category>.test.tsx` (`checkEveryStoryHydrates` in `tests/hydration-checks.tsx`)
+  renders every story with `renderToString`, hydrates that HTML with `hydrateRoot` and fails on a
+  recoverable error or any `console.error`. `tests/translate-<category>.test.tsx`
+  (`checkEveryStoryInEnglish` in `tests/translation-checks.tsx`) renders every story under an
+  English `translate` and fails on a Korean default that the story did not write itself. Both are
+  split by category like the story checks: WebKit's page crashed out of memory inside the files that
+  rendered every story in one frame. WebKit keeps every finished file's frame alive until its shard
+  ends (about 20 MB for an empty file, 55 MB for one that imports IDS, and a forced GC frees none of
+  it), so a shard's memory also grows with the number of files.
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
   `navigator.clipboard`, one file at a time, in Chromium. Every browser context shares
   one system clipboard, so two such files in parallel paste each other's text. The config finds them

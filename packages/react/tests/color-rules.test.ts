@@ -39,7 +39,7 @@ const FOCUS_HALO = [
   'stroke-primary-strong/40',
   'inset-ring-(--ids-color-text-on-primary-solid)/60',
 ];
-const TEXT_SELECTION = ['bg-primary-solid/30'];
+const TEXT_SELECTION = ['bg-primary-solid/30', 'bg-primary-solid/15'];
 const VEIL_OVER_UNKNOWN_CONTENT = ['bg-base/60', 'bg-base/95'];
 const SCROLL_AREA_TRACK = ['bg-neutral-soft/50', 'bg-(--ids-color-border-neutral-strong)/60'];
 const EDGE_OVER_UNKNOWN_CONTENT = [

@@ -43,7 +43,7 @@ export const cardStyle = tv({
     size: {
       standard: {
         root: 'gap-4 concentric-p-4 text-body-b3-regular [--card-gap:--spacing(4)]',
-        title: 'text-subtitle-s2-semibold',
+        title: 'text-body-b2-semibold',
         description: 'text-body-b3-regular',
         footer: 'py-3',
       },

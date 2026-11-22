@@ -6,18 +6,21 @@ import {
   MusicalNoteIcon as MusicalNoteSolid,
 } from '@heroicons/react/16/solid';
 import {
+  ArrowRightStartOnRectangleIcon,
   BellIcon,
   BookmarkIcon,
   CakeIcon,
   CalendarDaysIcon,
   ChatBubbleLeftRightIcon,
   ChevronUpDownIcon,
+  Cog6ToothIcon,
   CubeTransparentIcon,
   DocumentTextIcon,
   HomeIcon,
   MegaphoneIcon,
   NewspaperIcon,
   TruckIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
@@ -131,7 +134,7 @@ export const PC: Story = {
               <CubeTransparentIcon />
             </Avatar.Fallback>
           </Avatar>
-          <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+          <span className="text-body-b2-semibold">GIST 인포팀</span>
         </Sidebar.Header>
         {GROUPS.map((group) => (
           <Sidebar.Group key={group.label} label={group.label}>
@@ -160,10 +163,18 @@ export const PC: Story = {
               </Button>
             </Menu.Trigger>
             <Menu.Content>
-              <Menu.Item>내 프로필</Menu.Item>
-              <Menu.Item>설정</Menu.Item>
+              <Menu.Item>
+                <UserIcon />내 프로필
+              </Menu.Item>
+              <Menu.Item>
+                <Cog6ToothIcon />
+                설정
+              </Menu.Item>
               <Menu.Separator />
-              <Menu.Item>로그아웃</Menu.Item>
+              <Menu.Item>
+                <ArrowRightStartOnRectangleIcon />
+                로그아웃
+              </Menu.Item>
             </Menu.Content>
           </Menu>
         </Sidebar.Footer>

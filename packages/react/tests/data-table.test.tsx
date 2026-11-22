@@ -59,6 +59,15 @@ const namesInOrder = (container: HTMLElement) =>
       .find((text) => /\D/.test(text!)),
   );
 
+function colorOf(variable: string) {
+  const probe = document.createElement('div');
+  probe.style.backgroundColor = `var(${variable})`;
+  document.querySelector('[data-mode]')!.append(probe);
+  const color = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return color;
+}
+
 async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', x: number, y: number) {
   const frame = window.frameElement!.getBoundingClientRect();
   const scale = frame.width / window.innerWidth;
@@ -132,6 +141,47 @@ test('controlled sorting only moves when the app writes it back', async () => {
     .not.toHaveAttribute('aria-sort');
 });
 
+test('the sort icon hides until hover or focus, and a sorted column shows it in primary', async () => {
+  const screen = await render(table({ defaultSorting: [{ id: 'age', desc: true }] }));
+  const icon = (name: string) =>
+    screen.getByRole('button', { name }).element().querySelector('svg:last-child')!;
+
+  await userEvent.hover(screen.getByRole('cell', { name: 'Barbara' }));
+  await expect.poll(() => getComputedStyle(icon('Name')).opacity).toBe('0');
+  expect(getComputedStyle(icon('Age')).opacity).toBe('1');
+  expect(getComputedStyle(icon('Age')).color).toBe(colorOf('--ids-color-text-primary'));
+
+  await userEvent.hover(screen.getByRole('button', { name: 'Name' }));
+  await expect.poll(() => getComputedStyle(icon('Name')).opacity).toBe('1');
+});
+
+test('outline sets the table on a neutral tray and divides the columns', async () => {
+  const screen = await render(table({ enablePagination: true }));
+  const root = screen.container.querySelector<HTMLElement>('[data-data-table]')!;
+  const footer = root.querySelector('[data-data-table-footer]')!;
+  const firstCell = root.querySelector('tbody td')!;
+
+  await expect.element(screen.getByRole('table')).toBeVisible();
+  expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  expect(getComputedStyle(root.querySelector('thead')!).backgroundColor).toBe(
+    colorOf('--ids-color-bg-block'),
+  );
+  expect(root.contains(footer)).toBe(true);
+  expect(getComputedStyle(firstCell).borderInlineEndWidth).toBe('1px');
+  expect(getComputedStyle(root.querySelector('tbody td:last-child')!).borderInlineEndWidth).toBe(
+    '0px',
+  );
+});
+
+test('ghost keeps the plain table with no tray', async () => {
+  const screen = await render(table({ variant: 'ghost' }));
+  const root = screen.container.querySelector<HTMLElement>('[data-data-table]')!;
+
+  await expect.element(screen.getByRole('table')).toBeVisible();
+  expect(getComputedStyle(root).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+  expect(getComputedStyle(root.querySelector('tbody td')!).borderInlineEndWidth).toBe('0px');
+});
+
 test('enableSorting={false} and a column without sorting render plain headers', async () => {
   const screen = await render(table({ enableSorting: false }));
   await expect.element(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
@@ -161,6 +211,26 @@ test('row selection: named checkboxes, a mixed select-all, Shift ranges and the 
   await userEvent.click(all);
   await expect.element(all).not.toBeChecked();
   expect(onRowSelectionChange).toHaveBeenLastCalledWith({});
+});
+
+test('a selection checkbox sits on the same center line as the text beside it', async () => {
+  const screen = await render(table({ enableRowSelection: true, enableSorting: false }));
+  const centerOf = (rect: DOMRect) => rect.top + rect.height / 2;
+  const textCenter = (cell: Element) => {
+    const range = document.createRange();
+    range.selectNodeContents(cell.querySelector('span') ?? cell);
+    return centerOf(range.getBoundingClientRect());
+  };
+
+  await expect.element(screen.getByRole('row', { name: /Ada/ })).toBeInTheDocument();
+  for (const row of [
+    screen.getByRole('row').first().element(),
+    screen.getByRole('row', { name: /Ada/ }).element(),
+  ]) {
+    const [selectCell, nameCell] = row.children;
+    const checkbox = selectCell.querySelector('[data-checkbox]')!;
+    expect(centerOf(checkbox.getBoundingClientRect())).toBeCloseTo(textCenter(nameCell), 0);
+  }
 });
 
 test('a row that cannot be selected keeps a disabled checkbox; without a label rows are numbered', async () => {

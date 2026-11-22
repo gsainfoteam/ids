@@ -59,7 +59,7 @@ export const PC: Story = {
       <div className="hidden p-3 lg:flex">
         <Card variant="soft" className="flex-1">
           <div className="flex flex-1 flex-col justify-between gap-10 p-6">
-            <div className="text-subtitle-s2-semibold flex items-center gap-2">
+            <div className="text-body-b2-semibold flex items-center gap-2">
               <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
                 <Avatar.Fallback>
                   <CubeTransparentIcon />

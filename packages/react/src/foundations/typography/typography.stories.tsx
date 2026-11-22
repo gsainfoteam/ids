@@ -52,19 +52,6 @@ const headline = {
   },
 };
 
-const subtitle = {
-  s1: {
-    bold: cn('text-subtitle-s1-bold'),
-    semibold: cn('text-subtitle-s1-semibold'),
-    medium: cn('text-subtitle-s1-medium'),
-  },
-  s2: {
-    bold: cn('text-subtitle-s2-bold'),
-    semibold: cn('text-subtitle-s2-semibold'),
-    medium: cn('text-subtitle-s2-medium'),
-  },
-};
-
 const body = {
   b1: {
     bold: cn('text-body-b1-bold'),
@@ -141,7 +128,7 @@ function measure(element: HTMLElement | null) {
   const output = element?.querySelector('[data-spec]');
   if (!sample || !output) return;
   const style = getComputedStyle(sample);
-  output.textContent = `${px(style.fontSize)}px · 행간 ${px(style.lineHeight)} · 자간 ${px(
+  output.textContent = `${px(style.fontSize)}px · 행간 ${px(style.lineHeight)}px · 자간 ${px(
     String(parseFloat(style.letterSpacing) || 0),
   )} · ${style.fontWeight}`;
 }
@@ -183,25 +170,19 @@ export const Scales: Story = {
     <Showcase>
       <Showcase.Section
         title="Headline"
-        description="text-headline-{h1~h6}-{굵기}. 자간 -2.5%, 행간 1.2. 페이지와 영역의 제목입니다."
+        description="text-headline-{h1~h6}-{굵기}. 행간은 크기 + 8px. 자간은 h6 -1.5%, h3~h5 -2.5%, h1·h2 -3.5%. 페이지와 영역의 제목입니다."
       >
         <Scale styles={headline} sample="제목 Aa" />
       </Showcase.Section>
       <Showcase.Section
-        title="Subtitle"
-        description="text-subtitle-{s1, s2}-{굵기}. 행간 1.35. 카드와 목록의 제목입니다."
-      >
-        <Scale styles={subtitle} sample="최근 활동 Aa" />
-      </Showcase.Section>
-      <Showcase.Section
         title="Body"
-        description="text-body-{b1~b3}-{굵기}. 작을수록 행간이 넓습니다. 컨트롤 안 글자는 b3입니다."
+        description="text-body-{b1~b3}-{굵기}. 행간 b1 28px, b2 24px, b3 20px. 컨트롤 안 글자는 b3, 카드와 목록의 제목은 b1·b2 semibold입니다."
       >
         <Scale styles={body} sample="본문 가나다 Aa" />
       </Showcase.Section>
       <Showcase.Section
         title="Caption"
-        description="text-caption-{c1, c2}-{굵기}. 행간 1.35. 설명, 힌트, 메타 정보입니다."
+        description="text-caption-{c1, c2}-{굵기}. 행간 c1 16px, c2 14px. 설명, 힌트, 메타 정보입니다."
       >
         <Scale styles={caption} sample="3분 전 · 보조 Aa" />
       </Showcase.Section>
@@ -212,12 +193,60 @@ export const Scales: Story = {
     await expect(specimens.map((specimen) => specimen.dataset.style).sort()).toEqual(
       [...compositeClasses].sort(),
     );
-    for (const specimen of specimens)
+    for (const specimen of specimens) {
       await expect(specimen.querySelector('[data-spec]')?.textContent).toMatch(/^\d+(\.\d)?px/);
+      const sample = specimen.querySelector<HTMLElement>('[data-sample]')!;
+      await expect(Number.isInteger(parseFloat(getComputedStyle(sample).lineHeight))).toBe(true);
+    }
     const h1 = canvasElement.querySelector('[data-style="text-headline-h1-bold"] [data-sample]')!;
     await expect(getComputedStyle(h1).fontSize).toBe('48px');
     const b3 = canvasElement.querySelector('[data-style="text-body-b3-regular"] [data-sample]')!;
     await expect(getComputedStyle(b3).fontSize).toBe('14px');
+  },
+};
+
+export const Prose: Story = {
+  render: () => (
+    <Showcase>
+      <Showcase.Section
+        title="긴 글"
+        description="document-text 는 블록 사이를 20px, 제목 아래를 12px, 제목 위를 28~36px 띄우고 제목을 semibold로 h1 28px, h2 24px, h3 20px, h4 18px로 그립니다. 본문 크기는 text-body-b2-regular leading-prose(16px, 행간 28px)로 따로 줍니다."
+      >
+        <article className="document-text text-body-b2-regular leading-prose text-neutral-strong max-w-prose">
+          <h1>2학기 수강 신청 안내</h1>
+          <p data-prose="">
+            수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과{' '}
+            <strong>선수 과목</strong>을 확인하고, 장바구니에 담은 과목의 시간이 겹치지 않는지 살펴
+            주세요.
+          </p>
+          <h2>변경 기간</h2>
+          <ul>
+            <li>정정 기간: 9월 8일부터 12일까지</li>
+            <li>
+              학점 상한은 신청 기간과 같습니다.
+              <ul>
+                <li>재수강 과목도 포함합니다.</li>
+              </ul>
+            </li>
+          </ul>
+          <h3>문의</h3>
+          <blockquote>
+            <p>
+              자세한 내용은 <a href="https://gistory.me">학사 공지</a>를 보세요.
+            </p>
+          </blockquote>
+        </article>
+      </Showcase.Section>
+    </Showcase>
+  ),
+  play: async ({ canvasElement }) => {
+    const prose = canvasElement.querySelector<HTMLElement>('[data-prose]')!;
+    const h1 = canvasElement.querySelector('article h1')!;
+
+    await expect(getComputedStyle(prose).fontSize).toBe('16px');
+    await expect(getComputedStyle(prose).lineHeight).toBe('28px');
+    await expect(getComputedStyle(h1).fontSize).toBe('28px');
+    await expect(getComputedStyle(h1).fontWeight).toBe('600');
   },
 };
 
