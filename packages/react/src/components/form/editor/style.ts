@@ -51,10 +51,7 @@ export const editorStyle = tv({
       'transition-[color,background-color,box-shadow,--ids-state-opacity]',
       'state-layer hover:state-hover active:state-press ring-0! inset-ring-transparent!',
     ],
-    scrollArea: [
-      'min-h-0 grow rounded-[inherit]',
-      '[:not(:empty)+&]:rounded-t-none [&:has(+:not(:empty))]:rounded-b-none',
-    ],
+    scrollArea: 'min-h-0 grow',
     document: 'relative',
     content: [
       'min-h-24 outline-none text-neutral-strong',
@@ -131,12 +128,10 @@ export const editorStyle = tv({
     variant: {
       outline: {
         root: fieldSurface.variant.outline,
-        bar: 'border-field-bar',
         content: '[&_:not(pre)>code]:bg-field-code-outline',
       },
       soft: {
         root: fieldSurface.variant.soft,
-        bar: 'border-field-bar',
         content: '[&_:not(pre)>code]:bg-block',
       },
     } satisfies Record<EditorVariant, object>,
@@ -160,9 +155,9 @@ export const editorStyle = tv({
         count: 'px-1.5 text-caption-c2-regular',
       },
     } satisfies Record<IdsSize, object>,
-    position: {
-      top: { bar: 'border-b' },
-      bottom: { bar: 'border-t' },
+    framed: {
+      true: { root: 'concentric-p-1', scrollArea: 'rounded-standard' },
+      false: { scrollArea: 'rounded-[inherit]' },
     },
     calloutScheme: {
       info: { calloutKindIcon: 'scheme-info' },
@@ -176,9 +171,25 @@ export const editorStyle = tv({
       false: { content: 'cursor-default' },
     },
   },
+  compoundVariants: [
+    {
+      framed: true,
+      variant: 'outline',
+      class: {
+        root: 'bg-neutral-soft shadow-none inset-ring-transparent',
+        scrollArea: 'bg-field-outline shadow-xs inset-ring-1 inset-ring-field-outline',
+      },
+    },
+    {
+      framed: true,
+      variant: 'soft',
+      class: { scrollArea: 'bg-surface' },
+    },
+  ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',
     editable: true,
+    framed: false,
   },
 });

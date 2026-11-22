@@ -465,7 +465,7 @@ mode. No layer mixes two tokens with `color-mix`.
   | `shadow-surface` | `shadow-1` | `shadow-0` | an outline Card |
   | `bg-control-outline`, `border-control-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline buttons, Checkbox, Radio, pill Tabs |
   | `bg-field-outline`, `border-field-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline fields |
-  | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea and Editor bar seam |
+  | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea bar seam |
   | `bg-field-code-outline` | `bg-neutral-soft` | `bg-surface` | code in an outline Editor |
   | `bg-switch-thumb` | `bg-base` | `bg-neutral-solid` | an off Switch thumb |
   | `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode |

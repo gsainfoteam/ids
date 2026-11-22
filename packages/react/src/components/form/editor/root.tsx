@@ -307,7 +307,12 @@ export function EditorRoot(props: Editor.Props) {
   });
   const reportedSinceTheLastRender = useRef<EditorValue[]>([]);
 
-  const styles = editorStyle({ variant, size, editable });
+  const styles = editorStyle({
+    variant,
+    size,
+    editable,
+    framed: top.length > 0 || bottom.length > 0,
+  });
   const contentAttributes = definedOnly({
     id: contentId,
     role: 'textbox',
@@ -482,17 +487,13 @@ export function EditorRoot(props: Editor.Props) {
           <loaded.engine.EditorEngine options={engineOptions} onEditor={setEditor} />
         )}
         {top.length > 0 && (
-          <EditorBar toolbar scrolls className={styles.bar({ position: 'top' })}>
+          <EditorBar toolbar scrolls className={styles.bar()}>
             {top}
           </EditorBar>
         )}
         {content}
         {bottom.length > 0 && (
-          <EditorBar
-            toolbar={bottom.some(isTool)}
-            scrolls
-            className={styles.bar({ position: 'bottom' })}
-          >
+          <EditorBar toolbar={bottom.some(isTool)} scrolls className={styles.bar()}>
             {bottom}
           </EditorBar>
         )}
