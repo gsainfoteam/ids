@@ -90,10 +90,11 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
         side="bottom"
         align="start"
       >
-        <div className={styles.linkForm()}>
+        <div className={styles.linkRow()}>
           <TextField
             type="url"
             size="tiny"
+            className={styles.linkUrl()}
             aria-label={t('editor.linkUrl')}
             placeholder="https://"
             value={href}
@@ -106,16 +107,14 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
             data-1p-ignore=""
             data-lpignore="true"
           />
-          <div className={styles.linkActions()}>
-            {state.active && (
-              <Button variant="outline" size="tiny" onClick={removeLink}>
-                {t('editor.linkRemove')}
-              </Button>
-            )}
-            <Button size="tiny" onClick={applyLink}>
-              {t('editor.linkApply')}
+          {state.active && (
+            <Button variant="outline" size="tiny" onClick={removeLink}>
+              {t('editor.linkRemove')}
             </Button>
-          </div>
+          )}
+          <Button size="tiny" onClick={applyLink}>
+            {t('editor.linkApply')}
+          </Button>
         </div>
       </Popover.Content>
     </Popover>

@@ -65,6 +65,8 @@ export const editorStyle = tv({
     bubbleBar: 'flex items-center gap-0.5 p-1',
     bubbleAnchor: 'pointer-events-none absolute',
     linkForm: 'flex w-60 flex-col gap-2',
+    linkRow: 'flex items-center gap-2',
+    linkUrl: 'w-60',
     linkActions: 'grid auto-cols-fr grid-flow-col gap-2',
     imageInput: 'hidden',
     imageFrame: [
