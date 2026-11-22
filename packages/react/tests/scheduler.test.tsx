@@ -650,8 +650,16 @@ test('pointer: dragging over empty time selects quarter hours, and a plain press
   const screen = await render(inProvider({ onSlotSelect }));
   await expect.element(screen.getByText('Algorithms')).toBeInTheDocument();
   const column = document.querySelector('[data-scheduler-column="2026-11-18"]')!;
-  const { left, top, height } = column.getBoundingClientRect();
-  const hour = height / 24;
+  const viewport = column.closest<HTMLElement>('[data-scroll-area-viewport]')!;
+  const outside = viewport.getBoundingClientRect();
+  const before = column.getBoundingClientRect();
+  const hour = before.height / 24;
+  viewport.scrollBy({
+    left: before.left + before.width / 2 - (outside.left + outside.width / 2),
+    top: before.top + hour * 14.85 - (outside.top + outside.height / 2),
+    behavior: 'instant',
+  });
+  const { left, top } = column.getBoundingClientRect();
   const x = left + 8;
 
   await mouse('mousePressed', x, top + hour * 14.1);
@@ -662,8 +670,8 @@ test('pointer: dragging over empty time selects quarter hours, and a plain press
   await mouse('mouseMoved', x, top + hour * 15);
   await mouse('mouseMoved', x, top + hour * 15.6);
   await expect
-    .element(page.elementLocator(document.querySelector('[data-scheduler-selection]')!))
-    .toHaveTextContent('오후 2:00 – 오후 3:45');
+    .poll(() => document.querySelector('[data-scheduler-selection]')?.textContent)
+    .toBe('오후 2:00 – 오후 3:45');
   await mouse('mouseReleased', x, top + hour * 15.6);
 
   expect(onSlotSelect).toHaveBeenCalledTimes(1);
@@ -706,12 +714,48 @@ test('pointer: dragging across month days selects whole days, and Escape cancels
   expect(slot.allDay).toBe(true);
 
   await mouse('mousePressed', start.x, start.y);
+  await mouse('mouseMoved', (start.x + pointIn('2026-11-27').x) / 2, start.y);
   await mouse('mouseMoved', pointIn('2026-11-27').x, start.y);
   await vi.waitFor(() => expect(selectedDays()).toHaveLength(2));
   await userEvent.keyboard('{Escape}');
   await vi.waitFor(() => expect(selectedDays()).toEqual([]));
   await mouse('mouseReleased', pointIn('2026-11-27').x, start.y);
   expect(onSlotSelect).toHaveBeenCalledTimes(1);
+});
+
+async function touch(type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) {
+  await cdp().send('Input.dispatchTouchEvent', {
+    type,
+    touchPoints: type === 'touchEnd' ? [] : [frameOffset(x, y)],
+  });
+}
+
+const TOUCH_HOLD_PAST_THE_DELAY = 400;
+
+test('touch: holding an empty day and then dragging selects days, the same as a mouse', async (context) => {
+  skipWithoutCdp(context);
+  const onSlotSelect = vi.fn();
+  const screen = await render(inProvider({ defaultView: 'month', onSlotSelect }));
+  await expect.element(screen.getByText('Algorithms')).toBeVisible();
+  const pointIn = (day: string) => {
+    const { left, bottom, width } = document
+      .querySelector(`[data-scheduler-month-day="${day}"]`)!
+      .getBoundingClientRect();
+    return { x: left + width / 2, y: bottom - 6 };
+  };
+  const start = pointIn('2026-11-24');
+  const end = pointIn('2026-11-26');
+
+  await touch('touchStart', start.x, start.y);
+  await new Promise((resolve) => setTimeout(resolve, TOUCH_HOLD_PAST_THE_DELAY));
+  await touch('touchMove', (start.x + end.x) / 2, start.y);
+  await touch('touchMove', end.x, end.y);
+  await touch('touchEnd', end.x, end.y);
+
+  await vi.waitFor(() => expect(onSlotSelect).toHaveBeenCalledTimes(1));
+  const [slot] = onSlotSelect.mock.calls[0]!;
+  expect(slot.start.toString()).toBe('2026-11-24T00:00:00');
+  expect(slot.end.toString()).toBe('2026-11-27T00:00:00');
 });
 
 test('pointer: dragging the bottom edge changes only the end, in quarter hours', async (context) => {

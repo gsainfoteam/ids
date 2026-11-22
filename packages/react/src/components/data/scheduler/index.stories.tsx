@@ -779,7 +779,7 @@ export const CreateBySelecting: Story = {
     docs: {
       description: {
         story:
-          '`onSlotSelect` 를 주면 빈 시간 칸을 마우스로 끌어 시간을 고릅니다. 15분 단위로 맞고, 끄는 동안 고른 시간이 칸 위에 보이며, 놓을 때 한 번 `{ start, end, allDay: false }` 를 넘깁니다. 그냥 누르면 고르지 않고, Escape 는 취소합니다. 터치는 스크롤이라 고르지 않습니다. 앱은 넘어온 시간으로 일정을 만들거나 만들기 창을 엽니다.',
+          '`onSlotSelect` 를 주면 빈 시간 칸을 끌어 시간을 고릅니다. 15분 단위로 맞고, 끄는 동안 고른 시간이 칸 위에 보이며, 놓을 때 한 번 `{ start, end, allDay: false }` 를 넘깁니다. 그냥 누르면 고르지 않고, Escape 는 취소합니다. 터치는 250ms 를 누르고 있어야 시작합니다. 앱은 넘어온 시간으로 일정을 만들거나 만들기 창을 엽니다.',
       },
     },
   },

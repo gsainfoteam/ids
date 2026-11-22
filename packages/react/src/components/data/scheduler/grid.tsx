@@ -33,9 +33,9 @@ import {
   type SchedulerSlot,
 } from './layout';
 import { SchedulerMovable } from './movable';
+import { SchedulerSelectable, type SchedulerPoint, type SchedulerSelection } from './selectable';
 import { useFirstHourScroll } from './use-first-hour-scroll';
 import { useHourHeight } from './use-hour-height';
-import { usePointerSelection } from './use-pointer-selection';
 import { useTranslate } from '../../../internal/translate';
 import { Divider } from '../../layout/divider';
 import { ScrollArea } from '../../layout/scroll-area';
@@ -49,14 +49,16 @@ const MINUTES_IN_DAY = HOURS_IN_DAY * MINUTES_IN_HOUR;
 
 type PressedTime = { day: CalendarDate; minutes: number };
 
-const columnOf = (target: Element) => target.closest<HTMLElement>('[data-scheduler-column]');
-
-function timeAt(column: HTMLElement, _x: number, y: number): PressedTime {
+function timeFrom(target: Element, pressed: SchedulerPoint) {
+  const column = target.closest<HTMLElement>('[data-scheduler-column]');
+  if (!column) return null;
   const { top, height } = column.getBoundingClientRect();
-  return {
-    day: parseDate(column.getAttribute('data-scheduler-column')!),
+  const day = parseDate(column.getAttribute('data-scheduler-column')!);
+  const at = ({ y }: SchedulerPoint): PressedTime => ({
+    day,
     minutes: clamp(((y - top) / height) * MINUTES_IN_DAY, 0, MINUTES_IN_DAY),
-  };
+  });
+  return { from: at(pressed), at };
 }
 
 type SchedulerGridProps<E extends SchedulerEventData> = SchedulerContextValue & {
@@ -109,15 +111,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
 
   useFirstHourScroll(viewportRef, bodyRef, firstHour);
 
-  const { selection, handlers } = usePointerSelection<PressedTime>({
-    areaOf: columnOf,
-    valueAt: timeAt,
-    onSelect:
-      onSlotSelect &&
-      (({ from, to }) => onSlotSelect(timesBetween(from.day, from.minutes, to.minutes))),
-  });
-
-  const selectionOn = (day: CalendarDate) => {
+  const selectionOn = (selection: SchedulerSelection<PressedTime> | null, day: CalendarDate) => {
     if (!selection || !sameDay(selection.from.day, day)) return null;
     const { first, last } = snappedRange(selection.from.minutes, selection.to.minutes);
     const slot = timesBetween(day, selection.from.minutes, selection.to.minutes);
@@ -140,8 +134,8 @@ export function SchedulerGrid<E extends SchedulerEventData>({
 
   const columns = { '--scheduler-days': days.length } as CSSProperties;
 
-  const body = (
-    <div ref={bodyRef} {...handlers} className={styles.columns({ className: styles.body() })}>
+  const columnsWith = (selection: SchedulerSelection<PressedTime> | null) => (
+    <>
       <div aria-hidden="true" data-scroll-area-pinned="start" className={styles.gutter()}>
         {HOURS.map((hour) => (
           <div key={hour} className={styles.hour()}>
@@ -167,7 +161,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                 style={{ '--scheduler-now': hourOfDay(now) } as CSSProperties}
               />
             )}
-            {selectionOn(day)}
+            {selectionOn(selection, day)}
             {segments.length > 0 && (
               <ItemGroup variant="ghost" className={styles.dayEvents()}>
                 {segments.map((segment) => {
@@ -217,6 +211,27 @@ export function SchedulerGrid<E extends SchedulerEventData>({
           </section>
         );
       })}
+    </>
+  );
+
+  const bodyClassName = styles.columns({ className: styles.body() });
+  const drags = onEventChange !== undefined || onSlotSelect !== undefined;
+
+  const body = drags ? (
+    <SchedulerSelectable<PressedTime>
+      ref={bodyRef}
+      className={bodyClassName}
+      startAt={timeFrom}
+      onSelect={
+        onSlotSelect &&
+        (({ from, to }) => onSlotSelect(timesBetween(from.day, from.minutes, to.minutes)))
+      }
+    >
+      {columnsWith}
+    </SchedulerSelectable>
+  ) : (
+    <div ref={bodyRef} className={bodyClassName}>
+      {columnsWith(null)}
     </div>
   );
 
@@ -299,7 +314,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
               )}
             </div>
 
-            {onEventChange ? (
+            {drags ? (
               <SchedulerDrag
                 events={events}
                 format={format}

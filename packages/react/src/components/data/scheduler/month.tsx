@@ -23,7 +23,7 @@ import {
   type SchedulerSlot,
 } from './layout';
 import { SchedulerMonthMovable } from './month-movable';
-import { usePointerSelection } from './use-pointer-selection';
+import { SchedulerSelectable, type SchedulerPoint, type SchedulerSelection } from './selectable';
 import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 import { ScrollArea } from '../../layout/scroll-area';
@@ -35,11 +35,23 @@ const DAYS_IN_WEEK = 7;
 const MONTH_AUTO_SCROLL = { threshold: { x: 0, y: 0.08 } };
 const MONTH_DAY = '[data-scheduler-month-day]';
 
-const monthDayOf = (target: Element) => target.closest<HTMLElement>(MONTH_DAY);
+const nearest = <T,>(places: T[], reaches: (place: T) => boolean) =>
+  places.find(reaches) ?? places[places.length - 1];
 
-function dayAt(_area: HTMLElement, x: number, y: number) {
-  const cell = document.elementsFromPoint(x, y).find((element) => element.matches(MONTH_DAY));
-  return cell ? dayOfCell(cell) : null;
+function dayFrom(target: Element, pressed: SchedulerPoint) {
+  const canvas = target.closest('[data-scheduler-month-canvas]');
+  if (!target.closest(MONTH_DAY) || !canvas) return null;
+  const weeks = [...canvas.querySelectorAll('[data-scheduler-month-week]')].map((week) => ({
+    bottom: week.getBoundingClientRect().bottom,
+    cells: [...week.querySelectorAll(MONTH_DAY)]
+      .map((cell) => ({ day: dayOfCell(cell), rect: cell.getBoundingClientRect() }))
+      .sort((a, b) => a.rect.left - b.rect.left),
+  }));
+  const at = ({ x, y }: SchedulerPoint) => {
+    const { cells } = nearest(weeks, (week) => y < week.bottom);
+    return nearest(cells, (cell) => x < cell.rect.right).day;
+  };
+  return { from: at(pressed), at };
 }
 
 type SchedulerMonthProps<E extends SchedulerEventData> = SchedulerContextValue & {
@@ -82,13 +94,7 @@ export function SchedulerMonth<E extends SchedulerEventData>({
   const canvasRef = useRef<HTMLDivElement>(null);
   const weeks = weeksIn(days);
 
-  const { selection, handlers } = usePointerSelection<CalendarDate>({
-    areaOf: monthDayOf,
-    valueAt: dayAt,
-    onSelect: onSlotSelect && (({ from, to }) => onSlotSelect(daysBetween(from, to))),
-  });
-
-  const isSelected = (day: CalendarDate) =>
+  const isSelected = (selection: SchedulerSelection<CalendarDate> | null, day: CalendarDate) =>
     selection !== null && compareDays(day, selection.from) * compareDays(day, selection.to) <= 0;
 
   const movable = (bar: SchedulerMonthBar<E>, weekIndex: number, content: ReactNode) =>
@@ -104,116 +110,136 @@ export function SchedulerMonth<E extends SchedulerEventData>({
       content
     );
 
-  const board = (
-    <SchedulerContextMenu events={events} format={format} eventMenu={eventMenu} slotMenu={slotMenu}>
-      <div ref={canvasRef} {...handlers} className={styles.monthCanvas()}>
-        <div aria-hidden="true" data-scroll-area-pinned="top" className={styles.monthHead()}>
-          {weeks[0].map((day) => (
-            <div key={day.toString()} className={styles.monthWeekday()}>
-              {format.weekday(day)}
-            </div>
-          ))}
-        </div>
+  const weeksWith = (selection: SchedulerSelection<CalendarDate> | null) => (
+    <>
+      <div aria-hidden="true" data-scroll-area-pinned="top" className={styles.monthHead()}>
+        {weeks[0].map((day) => (
+          <div key={day.toString()} className={styles.monthWeekday()}>
+            {format.weekday(day)}
+          </div>
+        ))}
+      </div>
 
-        {weeks.map((week, weekIndex) => {
-          const bars = monthBarsIn(events, week);
-          return (
-            <div
-              key={week[0].toString()}
-              role="group"
-              data-scheduler-month-week=""
-              aria-label={format.dates(week[0], week[week.length - 1])}
-              className={styles.monthWeek()}
-            >
-              {week.map((day, column) => {
-                const isToday = today !== undefined && sameDay(day, today);
-                const outside = day.month !== month.month;
-                return (
-                  <div
-                    key={day.toString()}
-                    aria-hidden="true"
-                    data-scheduler-month-day={day.toString()}
-                    aria-current={isToday ? 'date' : undefined}
-                    data-selected={isSelected(day) ? '' : undefined}
-                    className={styles.monthDay({ outside, selected: isSelected(day) })}
-                    style={{ '--scheduler-cell-column': column + 1 } as CSSProperties}
+      {weeks.map((week, weekIndex) => {
+        const bars = monthBarsIn(events, week);
+        return (
+          <div
+            key={week[0].toString()}
+            role="group"
+            data-scheduler-month-week=""
+            aria-label={format.dates(week[0], week[week.length - 1])}
+            className={styles.monthWeek()}
+          >
+            {week.map((day, column) => {
+              const isToday = today !== undefined && sameDay(day, today);
+              const outside = day.month !== month.month;
+              return (
+                <div
+                  key={day.toString()}
+                  aria-hidden="true"
+                  data-scheduler-month-day={day.toString()}
+                  aria-current={isToday ? 'date' : undefined}
+                  data-selected={isSelected(selection, day) ? '' : undefined}
+                  className={styles.monthDay({ outside, selected: isSelected(selection, day) })}
+                  style={{ '--scheduler-cell-column': column + 1 } as CSSProperties}
+                >
+                  <span className={styles.monthDate({ outside, today: isToday })}>
+                    {format.dayNumber(day)}
+                  </span>
+                </div>
+              );
+            })}
+
+            <ItemGroup variant="ghost" className={styles.monthList()}>
+              {bars
+                .filter((bar) => bar.row < SHOWN_ROWS)
+                .map((bar) => (
+                  <li
+                    key={bar.event.id}
+                    data-scheduler-slot={bar.event.id}
+                    className={styles.allDayBar({
+                      fromBefore: bar.fromBefore,
+                      pastEnd: bar.pastEnd,
+                    })}
+                    style={barPlace(bar)}
                   >
-                    <span className={styles.monthDate({ outside, today: isToday })}>
-                      {format.dayNumber(day)}
-                    </span>
-                  </div>
-                );
-              })}
-
-              <ItemGroup variant="ghost" className={styles.monthList()}>
-                {bars
-                  .filter((bar) => bar.row < SHOWN_ROWS)
-                  .map((bar) => (
-                    <li
-                      key={bar.event.id}
-                      data-scheduler-slot={bar.event.id}
-                      className={styles.allDayBar({
+                    <SchedulerEventContext
+                      value={{
+                        event: bar.event,
+                        start: bar.start,
+                        end: bar.end,
+                        allDay: bar.allDay,
+                        inMonth: true,
+                        line: !bar.allDay && !bar.multiDay,
                         fromBefore: bar.fromBefore,
                         pastEnd: bar.pastEnd,
+                      }}
+                    >
+                      {movable(bar, weekIndex, renderEvent(bar.event))}
+                    </SchedulerEventContext>
+                  </li>
+                ))}
+              {week.map((day, column) => {
+                const hidden = hiddenOn(bars, column, SHOWN_ROWS);
+                if (hidden === 0) return null;
+                return (
+                  <li
+                    key={`more-${day.toString()}`}
+                    className={styles.monthMore()}
+                    style={
+                      {
+                        '--scheduler-bar-column': column + 1,
+                        '--scheduler-bar-row': SHOWN_ROWS + 1,
+                      } as CSSProperties
+                    }
+                  >
+                    <Button
+                      variant="ghost"
+                      size="tiny"
+                      aria-label={t('scheduler.moreLabel', {
+                        count: hidden,
+                        date: format.fullDate(day),
                       })}
-                      style={barPlace(bar)}
+                      onClick={() => onShowDay(day)}
                     >
-                      <SchedulerEventContext
-                        value={{
-                          event: bar.event,
-                          start: bar.start,
-                          end: bar.end,
-                          allDay: bar.allDay,
-                          inMonth: true,
-                          line: !bar.allDay && !bar.multiDay,
-                          fromBefore: bar.fromBefore,
-                          pastEnd: bar.pastEnd,
-                        }}
-                      >
-                        {movable(bar, weekIndex, renderEvent(bar.event))}
-                      </SchedulerEventContext>
-                    </li>
-                  ))}
-                {week.map((day, column) => {
-                  const hidden = hiddenOn(bars, column, SHOWN_ROWS);
-                  if (hidden === 0) return null;
-                  return (
-                    <li
-                      key={`more-${day.toString()}`}
-                      className={styles.monthMore()}
-                      style={
-                        {
-                          '--scheduler-bar-column': column + 1,
-                          '--scheduler-bar-row': SHOWN_ROWS + 1,
-                        } as CSSProperties
-                      }
-                    >
-                      <Button
-                        variant="ghost"
-                        size="tiny"
-                        aria-label={t('scheduler.moreLabel', {
-                          count: hidden,
-                          date: format.fullDate(day),
-                        })}
-                        onClick={() => onShowDay(day)}
-                      >
-                        {t('scheduler.more', { count: hidden })}
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ItemGroup>
-            </div>
-          );
-        })}
-      </div>
+                      {t('scheduler.more', { count: hidden })}
+                    </Button>
+                  </li>
+                );
+              })}
+            </ItemGroup>
+          </div>
+        );
+      })}
+    </>
+  );
+
+  const drags = onEventChange !== undefined || onSlotSelect !== undefined;
+
+  const board = (
+    <SchedulerContextMenu events={events} format={format} eventMenu={eventMenu} slotMenu={slotMenu}>
+      {drags ? (
+        <SchedulerSelectable<CalendarDate>
+          ref={canvasRef}
+          data-scheduler-month-canvas=""
+          className={styles.monthCanvas()}
+          startAt={dayFrom}
+          onSelect={onSlotSelect && (({ from, to }) => onSlotSelect(daysBetween(from, to)))}
+        >
+          {weeksWith}
+        </SchedulerSelectable>
+      ) : (
+        <div ref={canvasRef} data-scheduler-month-canvas="" className={styles.monthCanvas()}>
+          {weeksWith(null)}
+        </div>
+      )}
     </SchedulerContextMenu>
   );
 
   return (
     <ScrollArea className={styles.board()}>
       <ScrollArea.Viewport className={styles.viewport()}>
-        {onEventChange ? (
+        {drags ? (
           <SchedulerDrag
             events={events}
             format={format}

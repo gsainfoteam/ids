@@ -55,7 +55,7 @@ export type SchedulerDragProps<P extends SchedulerDragPiece> = {
   measure: (piece: P, element: HTMLElement) => SchedulerDragMeasure | null;
   hint: string;
   autoScroll?: AutoScrollOptions;
-  onEventChange: (event: SchedulerEventData, change: SchedulerEventChange) => void;
+  onEventChange: ((event: SchedulerEventData, change: SchedulerEventChange) => void) | undefined;
   children: ReactNode;
 };
 
@@ -95,7 +95,7 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
 
   const move = ({ event }: SchedulerDragPiece, shift: SchedulerShift) => {
     pendingFocus.current = event.id;
-    onEventChange(event, {
+    onEventChange?.(event, {
       start: shiftedBy(event.start, shift),
       end: shiftedBy(event.end, shift),
     });
@@ -108,10 +108,17 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
       : format.moment(toCalendarDateTime(start));
   };
 
-  const titleOf = (piece: SchedulerDragPiece | undefined) => piece?.event.title ?? '';
+  const titleOf = (piece: SchedulerDragPiece) => piece.event.title;
 
   const pieceOf = ({ active }: Pick<DragStartEvent, 'active'>) =>
     active.data.current as P | undefined;
+
+  const announced =
+    (key: 'scheduler.drag.start' | 'scheduler.drag.end' | 'scheduler.drag.cancel') =>
+    (event: Pick<DragStartEvent, 'active'>) => {
+      const piece = pieceOf(event);
+      return piece && t(key, { event: titleOf(piece) });
+    };
 
   const snapToTheGrid: Modifier = ({ transform }) => {
     const measured = pointer.current;
@@ -120,10 +127,10 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
   };
 
   const announcements: Announcements = {
-    onDragStart: (event) => t('scheduler.drag.start', { event: titleOf(pieceOf(event)) }),
+    onDragStart: announced('scheduler.drag.start'),
     onDragOver: () => undefined,
-    onDragEnd: (event) => t('scheduler.drag.end', { event: titleOf(pieceOf(event)) }),
-    onDragCancel: (event) => t('scheduler.drag.cancel', { event: titleOf(pieceOf(event)) }),
+    onDragEnd: announced('scheduler.drag.end'),
+    onDragCancel: announced('scheduler.drag.cancel'),
   };
 
   const endGrab = (message: string) => {
@@ -131,53 +138,61 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
     setAnnouncement(message);
   };
 
-  const value: SchedulerDragValue = {
-    hourHeight,
-    grabbed: grab && {
-      key: grab.measure.piece.key,
-      offset: grab.measure.offsetOf(grab.shift),
-    },
-    grab: (piece, element) => {
-      const measured = measure(piece as P, element);
-      if (!measured) return;
-      setGrab({ measure: measured, shift: NOTHING_MOVED });
-      setAnnouncement(t('scheduler.drag.start', { event: titleOf(piece) }));
-    },
-    nudge: (by) => {
-      if (!grab) return;
-      const shift = grab.measure.within({
-        days: grab.shift.days + by.days,
-        minutes: grab.shift.minutes + by.minutes,
-      });
-      setGrab({ ...grab, shift });
-      setAnnouncement(t('scheduler.drag.at', { time: startsAt(grab.measure.piece, shift) }));
-    },
-    drop: () => {
-      if (!grab) return;
-      const { piece } = grab.measure;
-      const moved = isShifted(grab.shift);
-      endGrab(t(moved ? 'scheduler.drag.end' : 'scheduler.drag.cancel', { event: titleOf(piece) }));
-      if (moved) move(piece, grab.shift);
-    },
-    cancel: () => {
-      if (grab) endGrab(t('scheduler.drag.cancel', { event: titleOf(grab.measure.piece) }));
-    },
-    resize: (segment, height) => {
-      if (hourHeight === undefined || Math.abs(height - segment.hours * hourHeight) < 0.5) return;
-      const minutes =
-        snappedMinutes(segment.startHour + height / hourHeight) -
-        Math.round(segment.endHour * MINUTES_IN_HOUR);
-      if (minutes === 0) return;
-      const { event } = segment;
-      onEventChange(event, { start: event.start, end: shiftedBy(event.end, { days: 0, minutes }) });
-    },
-    endLabel: (segment, day, height) =>
-      format.time(
-        toCalendarDateTime(day).add({
-          minutes: snappedMinutes(segment.startHour + height / (hourHeight ?? 1)),
-        }),
-      ),
-  };
+  const value: SchedulerDragValue | null = onEventChange
+    ? {
+        hourHeight,
+        grabbed: grab && {
+          key: grab.measure.piece.key,
+          offset: grab.measure.offsetOf(grab.shift),
+        },
+        grab: (piece, element) => {
+          const measured = measure(piece as P, element);
+          if (!measured) return;
+          setGrab({ measure: measured, shift: NOTHING_MOVED });
+          setAnnouncement(t('scheduler.drag.start', { event: titleOf(piece) }));
+        },
+        nudge: (by) => {
+          if (!grab) return;
+          const shift = grab.measure.within({
+            days: grab.shift.days + by.days,
+            minutes: grab.shift.minutes + by.minutes,
+          });
+          setGrab({ ...grab, shift });
+          setAnnouncement(t('scheduler.drag.at', { time: startsAt(grab.measure.piece, shift) }));
+        },
+        drop: () => {
+          if (!grab) return;
+          const { piece } = grab.measure;
+          const moved = isShifted(grab.shift);
+          endGrab(
+            t(moved ? 'scheduler.drag.end' : 'scheduler.drag.cancel', { event: titleOf(piece) }),
+          );
+          if (moved) move(piece, grab.shift);
+        },
+        cancel: () => {
+          if (grab) endGrab(t('scheduler.drag.cancel', { event: titleOf(grab.measure.piece) }));
+        },
+        resize: (segment, height) => {
+          if (hourHeight === undefined || Math.abs(height - segment.hours * hourHeight) < 0.5)
+            return;
+          const minutes =
+            snappedMinutes(segment.startHour + height / hourHeight) -
+            Math.round(segment.endHour * MINUTES_IN_HOUR);
+          if (minutes === 0) return;
+          const { event } = segment;
+          onEventChange?.(event, {
+            start: event.start,
+            end: shiftedBy(event.end, { days: 0, minutes }),
+          });
+        },
+        endLabel: (segment, day, height) =>
+          format.time(
+            toCalendarDateTime(day).add({
+              minutes: snappedMinutes(segment.startHour + height / (hourHeight ?? 1)),
+            }),
+          ),
+      }
+    : null;
 
   return (
     <SchedulerDragContext value={value}>
@@ -189,7 +204,7 @@ export function SchedulerDrag<P extends SchedulerDragPiece>({
         onDragStart={(event) => {
           const piece = pieceOf(event);
           const element = piece?.element();
-          value.cancel();
+          value?.cancel();
           pointer.current = piece && element ? measure(piece, element) : null;
         }}
         onDragEnd={({ delta }) => {
