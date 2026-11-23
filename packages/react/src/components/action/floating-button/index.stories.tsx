@@ -33,6 +33,10 @@ const sizes = ['standard', 'tiny'] as const;
 const placements = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;
 const functionNamesSurviveBuild = isDevelopment;
 
+function Spot({ children }: { children: ReactNode }) {
+  return <div className="relative h-24 w-56 transform-[translateZ(0)]">{children}</div>;
+}
+
 function ContainingBlock({
   children,
   dir,
@@ -94,6 +98,15 @@ const inContainingBlock: NonNullable<Story['decorators']> = [
 
 export const Playground: Story = { decorators: inContainingBlock };
 
+export const Usage: Story = {
+  decorators: inContainingBlock,
+  render: () => (
+    <FloatingButton aria-label="새 글 작성">
+      <PlusIcon />
+    </FloatingButton>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -105,14 +118,11 @@ export const Gallery: Story = {
           rows={colorSchemes}
           columns={variants}
           render={(colorScheme, variant) => (
-            <FloatingButton
-              className="static"
-              colorScheme={colorScheme}
-              variant={variant}
-              aria-label={colorScheme}
-            >
-              <PlusIcon />
-            </FloatingButton>
+            <Spot>
+              <FloatingButton colorScheme={colorScheme} variant={variant} aria-label={colorScheme}>
+                <PlusIcon />
+              </FloatingButton>
+            </Spot>
           )}
         />
       </Showcase.Section>
@@ -123,37 +133,51 @@ export const Gallery: Story = {
       >
         {sizes.map((size) => (
           <Showcase.Row key={size} label={size}>
-            <FloatingButton className="static" size={size} aria-label="새 글 작성">
-              <PlusIcon />
-            </FloatingButton>
-            <FloatingButton className="static" size={size}>
-              <PlusIcon />새 글 작성
-            </FloatingButton>
-            <FloatingButton className="static" size={size} variant="outline">
-              <ChatBubbleLeftIcon />
-              문의
-            </FloatingButton>
+            <Spot>
+              <FloatingButton size={size} aria-label="새 글 작성">
+                <PlusIcon />
+              </FloatingButton>
+            </Spot>
+            <Spot>
+              <FloatingButton size={size}>
+                <PlusIcon />새 글 작성
+              </FloatingButton>
+            </Spot>
+            <Spot>
+              <FloatingButton size={size} variant="outline">
+                <ChatBubbleLeftIcon />
+                문의
+              </FloatingButton>
+            </Spot>
           </Showcase.Row>
         ))}
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="disabled">
-          <FloatingButton className="static" disabled aria-label="새 글 작성">
-            <PlusIcon />
-          </FloatingButton>
-          <FloatingButton className="static" variant="soft" disabled>
-            <PlusIcon />새 글 작성
-          </FloatingButton>
+          <Spot>
+            <FloatingButton disabled aria-label="새 글 작성">
+              <PlusIcon />
+            </FloatingButton>
+          </Spot>
+          <Spot>
+            <FloatingButton variant="soft" disabled>
+              <PlusIcon />새 글 작성
+            </FloatingButton>
+          </Spot>
         </Showcase.Row>
         <Showcase.Row label="loading">
-          <FloatingButton className="static" disabled aria-busy aria-label="업로드 중">
-            <Spinner decorative />
-          </FloatingButton>
-          <FloatingButton className="static" disabled aria-busy>
-            <Spinner decorative />
-            업로드 중
-          </FloatingButton>
+          <Spot>
+            <FloatingButton disabled aria-busy aria-label="업로드 중">
+              <Spinner aria-hidden />
+            </FloatingButton>
+          </Spot>
+          <Spot>
+            <FloatingButton disabled aria-busy>
+              <Spinner aria-hidden />
+              업로드 중
+            </FloatingButton>
+          </Spot>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -175,7 +199,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Placement: Story = {
+export const PlaceInACorner: Story = {
   render: () => (
     <ContainingBlock label="네 모서리">
       {placements.map((placement) => (
@@ -208,32 +232,7 @@ export const Placement: Story = {
   },
 };
 
-export const RightToLeft: Story = {
-  render: () => (
-    <ContainingBlock dir="rtl" label="오른쪽에서 왼쪽">
-      <FloatingButton aria-label="작성">
-        <PlusIcon />
-      </FloatingButton>
-    </ContainingBlock>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'left와 right는 읽는 방향을 따릅니다. 오른쪽에서 왼쪽으로 쓰는 화면에서 bottom-right는 왼쪽 아래, 곧 끝쪽에 놓입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement }) => {
-    const frame = canvasElement.querySelector<HTMLElement>('[data-frame]')!.getBoundingClientRect();
-    const button = canvas.getByRole('button', { name: '작성' });
-    await expect(getComputedStyle(button).left).toBe('24px');
-    const box = button.getBoundingClientRect();
-    await expect(box.left - frame.left).toBeLessThan(frame.right - box.right);
-  },
-};
-
-export const Shape: Story = {
+export const ExtendWithALabel: Story = {
   decorators: inContainingBlock,
   render: () => (
     <>
@@ -267,7 +266,7 @@ export const Shape: Story = {
   },
 };
 
-export const AutomaticLabel: Story = {
+export const NameTheButtonFromItsIcon: Story = {
   decorators: inContainingBlock,
   render: () => (
     <>
@@ -296,7 +295,7 @@ export const AutomaticLabel: Story = {
 
 const AN_UPLOAD_TAKES = 800;
 
-export const Loading: Story = {
+export const ShowProgressWhileUploading: Story = {
   decorators: inContainingBlock,
   args: { onClick: fn(() => new Promise((resolve) => setTimeout(resolve, AN_UPLOAD_TAKES))) },
   render: function Render(args) {
@@ -313,7 +312,7 @@ export const Loading: Story = {
           setUploading(false);
         }}
       >
-        {uploading ? <Spinner decorative /> : <CheckIcon />}
+        {uploading ? <Spinner aria-hidden /> : <CheckIcon />}
         {uploading ? '업로드 중' : '업로드'}
       </FloatingButton>
     );
@@ -344,7 +343,7 @@ export const Loading: Story = {
   },
 };
 
-export const DisabledLink: Story = {
+export const RenderALink: Story = {
   decorators: inContainingBlock,
   render: () => (
     <FloatingButton asChild disabled>
@@ -369,7 +368,34 @@ export const DisabledLink: Story = {
   },
 };
 
+export const RightToLeft: Story = {
+  tags: ['verification'],
+  render: () => (
+    <ContainingBlock dir="rtl" label="오른쪽에서 왼쪽">
+      <FloatingButton aria-label="작성">
+        <PlusIcon />
+      </FloatingButton>
+    </ContainingBlock>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'left와 right는 읽는 방향을 따릅니다. 오른쪽에서 왼쪽으로 쓰는 화면에서 bottom-right는 왼쪽 아래, 곧 끝쪽에 놓입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const frame = canvasElement.querySelector<HTMLElement>('[data-frame]')!.getBoundingClientRect();
+    const button = canvas.getByRole('button', { name: '작성' });
+    await expect(getComputedStyle(button).left).toBe('24px');
+    const box = button.getBoundingClientRect();
+    await expect(box.left - frame.left).toBeLessThan(frame.right - box.right);
+  },
+};
+
 export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
   decorators: inContainingBlock,
   render: function Render() {
     const [shown, setShown] = useState(false);

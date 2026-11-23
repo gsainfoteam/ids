@@ -225,27 +225,28 @@ export function QuestionnaireRoot({
         {parts.filter((node) => !isSubmit(node))}
         {(showsPrevious || showsSkip || showsForward) && (
           <ButtonGroup
-            attached={false}
             size="tiny"
             aria-label={t('questionnaire.navigation')}
             className={styles.navigation()}
           >
-            {showsPrevious && (
-              <Button
-                type="button"
-                variant="outline"
-                className={styles.previous()}
-                onClick={() => goTo(index - 1)}
-              >
-                {t('questionnaire.previous')}
-              </Button>
-            )}
-            {showsSkip && (
-              <Button type="button" variant="outline" onClick={skip}>
-                {t('questionnaire.skip')}
-              </Button>
-            )}
-            {showsForward && submit}
+            <div className={styles.navigationItems()}>
+              {showsPrevious && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={styles.previous()}
+                  onClick={() => goTo(index - 1)}
+                >
+                  {t('questionnaire.previous')}
+                </Button>
+              )}
+              {showsSkip && (
+                <Button type="button" variant="outline" onClick={skip}>
+                  {t('questionnaire.skip')}
+                </Button>
+              )}
+              {showsForward && submit}
+            </div>
           </ButtonGroup>
         )}
       </form>

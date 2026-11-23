@@ -42,7 +42,6 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 
 - `solid`, `soft` 처럼 테두리가 없는 버튼 사이를 나눌 때 씁니다. `outline` 은 테두리가 이미 선 역할을 합니다.
 - 선은 이웃과 1px 씩 겹쳐서 outline 버튼 옆에 두어도 두 줄이 되지 않습니다.
-- `attached={false}` 로 띄운 그룹에서는 버튼보다 짧은 선(standard 20px, tiny 16px)이 가운데에 섭니다.
 - 스크린 리더에는 `role="separator"` 로 읽힙니다.
 
 ## 합성
@@ -74,35 +73,42 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
   <Button>아래</Button>
 </ButtonGroup>
 
-<ButtonGroup attached={false} aria-label="필터">       {/* 붙이지 않고 간격만 둔다 */}
-  <Button>전체</Button>
-  <Button>읽지 않음</Button>
+<ButtonGroup aria-label="필터">
+  <div className="flex gap-2">                        {/* 띄우려면 앱의 레이아웃 div 로 감싼다 */}
+    <Button>전체</Button>
+    <Button>읽지 않음</Button>
+  </div>
 </ButtonGroup>
 ```
 
 ## 툴바
 
 ```tsx
-<Card className="w-fit flex-row gap-0 concentric-p-1">  {/* 막대는 Card 로 그린다 */}
-  <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+<ButtonGroup variant="outline" aria-label="사진 보기">
+  <div className="flex gap-1">                        {/* 버튼을 띄우는 앱의 레이아웃 div */}
     <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
     <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-    <ButtonGroup.Separator className="mx-1" />  {/* 띄운 그룹의 선은 짧다 */}
+    <ButtonGroup.Separator />                         {/* 버튼 높이만큼 선을 긋는다 */}
     <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-  </ButtonGroup>
-</Card>
+  </div>
+</ButtonGroup>
 ```
 
-- 테두리 막대 안에 버튼이 떠 있는 툴바는 `Card` 로 막대를 그리고, 그 안에 띄운 그룹을 넣습니다.
-- 막대가 면을 그리므로 안의 버튼은 `ghost` 로 둡니다.
-- 버튼 묶음끼리 띄우려면 그룹 안에 그룹을 넣습니다. [합성](#합성)을 봅니다.
+- 버튼 사이를 띄운 툴바는 그룹 안에 레이아웃 div 를 둡니다. `variant`, `size` 는 div 를 건너 버튼에 닿습니다.
+- `Separator` 는 같은 줄의 버튼 높이만큼 늘어납니다.
+
+## 붙이기와 띄우기
+
+- 그룹은 늘 직계 자식을 이어 붙입니다. 붙일지 말지를 정하는 prop 은 없습니다.
+- 크기는 내용 너비(hug)입니다. `grid` 나 `flex-col` 부모 안에서는 부모 너비로 늘어나고, 그 안의 필드가 남은 폭을 채웁니다(`<div className="grid w-80"><ButtonGroup>…</ButtonGroup></div>`).
+- 버튼을 띄우려면 그룹 안에 앱의 레이아웃 div 를 두고 간격을 줍니다. div 안의 버튼은 그룹의 직계 자식이 아니라서 각자 모서리와 그림자를 지킵니다.
+- `size`, `variant`, 이름(`aria-label`)은 div 를 건너 그대로 안의 버튼에 닿습니다.
 
 ## 속성
 
 | 속성                    | 기본 / 동작                                            |
 | ----------------------- | ------------------------------------------------------ |
 | `orientation`           | `horizontal`(기본) / `vertical`                        |
-| `attached`              | `true`. `false` 면 버튼마다 모서리를 두고 8px 떨어진다 |
 | `size`                  | 안의 컨트롤이 따르는 크기. 생략하면 각자 크기          |
 | `variant`               | 안의 컨트롤이 따르는 variant. 생략하면 각자 기본값     |
 | `aria-label`            | 그룹의 이름                                            |
@@ -114,6 +120,6 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 - `aria-label` 도 `aria-labelledby` 도 없으면 개발 모드에서 콘솔에 경고합니다. 그룹 안의 그룹은 경고하지 않습니다.
 - 버튼 하나하나가 Tab 순서에 들어갑니다. 화살표 키로 옮겨 다니며 하나를 고르는 묶음은 `ToggleGroup` 을 씁니다.
 - 이어 붙인 칸이 겹치므로 hover, press, focus ring 이 있는 칸을 순서대로 위로 올립니다. focus ring 이 가장 위라 안쪽 입력에 포커스가 있는 TextField 의 ring 도 옆 버튼에 가리지 않습니다.
-- 테두리를 겹치는 기준은 `data-variant="outline"` 과 `data-variant="glossy"` 입니다. 직접 만든 컨트롤도 이 속성을 붙이면 이어 붙습니다.
-- 이어 붙인 `glossy` 버튼은 각자의 그림자를 빼고, 그룹이 그림자 하나를 둘레에 그립니다. 켜질 때만 채워지는 `glossy` 토글(`aria-pressed`, `aria-checked`)은 그룹 그림자를 만들지 않고 켜진 토글이 제 그림자를 갖습니다. `attached={false}` 면 버튼마다 그림자를 갖습니다.
+- 테두리는 outline 과 glossy 컨트롤끼리 한 줄로 겹칩니다.
+- 이어 붙인 `glossy` 버튼은 각자의 그림자를 빼고, 그룹이 그림자 하나를 둘레에 그립니다. 켜질 때만 채워지는 `glossy` 토글(`aria-pressed`, `aria-checked`)은 그룹 그림자를 만들지 않고 켜진 토글이 제 그림자를 갖습니다. 레이아웃 div 로 띄운 버튼은 각자 그림자를 갖습니다.
 - 그룹 안에 제자리로 렌더된 팝오버(`[popover]`)와 그 focus guard 는 이어 붙이는 칸에서 빠집니다. 팝오버를 여는 마지막 버튼도 바깥 모서리를 지키고, 팝오버 양옆의 outline 테두리도 한 줄로 겹칩니다.

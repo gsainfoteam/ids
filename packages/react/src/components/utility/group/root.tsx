@@ -15,7 +15,6 @@ export type GroupOrientation = 'horizontal' | 'vertical';
 
 export type GroupContextValue = {
   orientation: GroupOrientation;
-  attached: boolean;
   size?: IdsSize;
   variant?: SurfaceVariant;
   separator: 'semantic' | 'decorative';
@@ -45,7 +44,6 @@ export function useGroupNameWarning(
 
 export function GroupRoot({
   orientation = 'horizontal',
-  attached = true,
   size,
   variant,
   separator = 'semantic',
@@ -56,7 +54,6 @@ export function GroupRoot({
   const parent = useGroupContext();
   const context: GroupContextValue = {
     orientation,
-    attached,
     size: size ?? parent?.size,
     variant: variant ?? parent?.variant,
     separator,
@@ -69,7 +66,7 @@ export function GroupRoot({
         data-orientation={orientation}
         data-size={context.size}
         {...rest}
-        className={groupStyle({ orientation, attached }).root({ className })}
+        className={groupStyle({ orientation }).root({ className })}
       >
         {children}
       </div>
@@ -86,11 +83,7 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
       orientation={group.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
       aria-hidden={group.separator === 'decorative'}
       data-group-separator=""
-      className={groupStyle({
-        orientation: group.orientation,
-        attached: group.attached,
-        size: group.size,
-      }).separator({ className })}
+      className={groupStyle({ orientation: group.orientation }).separator({ className })}
     />
   );
 }

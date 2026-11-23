@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 
 import { detectPlatform } from '@tanstack/react-hotkeys';
 import { renderToString } from 'react-dom/server';
@@ -28,11 +28,13 @@ afterEach(() => {
   toast.dismissAll();
 });
 
-async function mount(props: Toaster.Props = {}) {
+async function mount(props: Toaster.Props = {}, around?: CSSProperties) {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <button type="button">page</button>
-      <Toaster {...props} />
+      <div style={around}>
+        <Toaster {...props} />
+      </div>
     </IdsProvider>,
   );
   await userEvent.hover(screen.getByRole('button', { name: 'page' }));
@@ -210,6 +212,22 @@ test('toast.promise goes from loading to the settled message', async () => {
   await expect.element(screen.getByText('Quiet')).not.toBeInTheDocument();
 });
 
+test('variant="expanded" keeps the stack open while the clock runs', async () => {
+  await mount({ variant: 'expanded' });
+  toast('First', { duration: Infinity });
+  toast('Second', { duration: Infinity });
+  await expect.poll(() => toastsIn().length).toBe(2);
+  const region = regionOf();
+  expect(region.dataset.variant).toBe('expanded');
+  expect(region).toHaveAttribute('data-expanded');
+  const [front, behind] = toastsIn() as [HTMLElement, HTMLElement];
+  await expect.poll(() => getComputedStyle(behind).scale).toBe('1');
+  expect(behind.getBoundingClientRect().bottom).toBeCloseTo(
+    front.getBoundingClientRect().top - 14,
+    0,
+  );
+});
+
 test('hovering pauses the clock and expands the stack', async () => {
   const screen = await mount();
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
@@ -327,7 +345,7 @@ test('a hidden tab pauses the clock', async () => {
 });
 
 test('the stack: newest in front, the rest peek behind, smaller, until hovered', async () => {
-  await mount({ gap: 10 });
+  await mount({}, { '--toaster-gap': '10px' } as CSSProperties);
   toast('First', { duration: Infinity });
   toast('Second', { duration: Infinity, description: 'with a second line' });
   toast('Third', { duration: Infinity });
@@ -348,8 +366,8 @@ test('the stack: newest in front, the rest peek behind, smaller, until hovered',
     parseFloat(variable(node, '--initial-height')),
   );
   expect(heights[1]).toBeGreaterThan(heights[0]!);
-  expect(variable(second, '--offset')).toBe(`${heights[0]! + 10}px`);
-  expect(variable(first, '--offset')).toBe(`${heights[0]! + heights[1]! + 20}px`);
+  expect(variable(second, '--heights-before')).toBe(`${heights[0]}px`);
+  expect(variable(first, '--heights-before')).toBe(`${heights[0]! + heights[1]!}px`);
   expect(variable(regionOf(), '--front-toast-height')).toBe(`${heights[0]}px`);
   expect(getComputedStyle(second).scale).toBe('0.95');
   expect(getComputedStyle(first).scale).toBe('0.9');

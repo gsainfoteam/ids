@@ -23,7 +23,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     size: { control: 'radio', options: [undefined, ...sizes] },
-    decorative: { control: 'radio', options: [undefined, true, false] },
+    'aria-hidden': { control: 'radio', options: [undefined, true, false] },
     'aria-label': { control: 'text' },
   },
   args: {},
@@ -37,6 +37,10 @@ const token = (name: string) =>
   parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => <Spinner />,
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -62,8 +66,10 @@ export const Gallery: Story = {
         <Showcase.Row label="tiny">
           <Spinner size="tiny" />
         </Showcase.Row>
-        <Showcase.Row label="className">
-          <Spinner className="size-8" />
+        <Showcase.Row label="in larger text">
+          <span className="text-[2rem]">
+            <Spinner />
+          </span>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -95,22 +101,29 @@ export const Gallery: Story = {
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section title="Color" description="색은 currentColor입니다.">
+      <Showcase.Section
+        title="Color"
+        description="색은 currentColor라 감싼 요소의 글자색을 따릅니다."
+      >
         <Showcase.Row label="text-neutral-strong">
           <Spinner size="standard" />
         </Showcase.Row>
         <Showcase.Row label="primary">
-          <Spinner size="standard" className="text-primary" />
+          <span className="text-primary">
+            <Spinner size="standard" />
+          </span>
         </Showcase.Row>
         <Showcase.Row label="on-muted">
-          <Spinner size="standard" className="text-neutral" />
+          <span className="text-neutral">
+            <Spinner size="standard" />
+          </span>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const FollowsControl: Story = {
+export const ShowLoadingInAButton: Story = {
   render: () => (
     <div className="flex items-center gap-3">
       <Button disabled>
@@ -141,7 +154,7 @@ export const FollowsControl: Story = {
   },
 };
 
-export const FollowsField: Story = {
+export const ShowLoadingInAFieldHint: Story = {
   render: () => (
     <Field size="tiny">
       <Field.Label>아이디</Field.Label>
@@ -167,7 +180,7 @@ export const FollowsField: Story = {
   },
 };
 
-export const Announcement: Story = {
+export const AnnounceWhatIsLoading: Story = {
   render: function Render() {
     const [loading, setLoading] = useState(false);
 
@@ -203,7 +216,7 @@ export const Announcement: Story = {
   },
 };
 
-export const SilentInsideControls: Story = {
+export const KeepItQuietInsideAControl: Story = {
   render: () => (
     <div className="flex items-center gap-3">
       <Button disabled aria-busy="true">
@@ -229,17 +242,17 @@ export const SilentInsideControls: Story = {
   },
 };
 
-export const Decorative: Story = {
+export const LetTheTextBesideItSpeak: Story = {
   render: () => (
     <p className="flex items-center gap-2">
-      <Spinner decorative />
+      <Spinner aria-hidden />
       파일을 올리는 중입니다
     </p>
   ),
   parameters: {
     docs: {
       description: {
-        story: '옆 문장이 이미 로딩을 설명하면 decorative로 접근성 트리에서 뺍니다.',
+        story: '옆 문장이 이미 로딩을 설명하면 `aria-hidden`으로 알림을 뺍니다.',
       },
     },
   },

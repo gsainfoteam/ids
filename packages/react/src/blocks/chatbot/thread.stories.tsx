@@ -169,7 +169,7 @@ export const PC: Story = {
 
     const thinking = (label: string) => (
       <p role="status" className="text-body-b3-regular flex items-center gap-2">
-        <Spinner size="tiny" decorative />
+        <Spinner size="tiny" aria-hidden />
         {label}
       </p>
     );

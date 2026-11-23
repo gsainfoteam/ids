@@ -17,7 +17,7 @@ export const questionnaireStyle = tv({
     legend: 'p-0 text-neutral-strong',
     description: 'text-neutral',
     options: 'flex gap-2',
-    toggles: 'flex-wrap [&>[data-toggle-group-item]]:flex-initial',
+    toggles: 'flex flex-wrap gap-2',
     option: [
       fieldSurface.variant.outline,
       'cursor-pointer items-start rounded-standard',
@@ -31,12 +31,13 @@ export const questionnaireStyle = tv({
       'data-pressed:bg-primary-soft data-pressed:text-on-primary-soft data-pressed:inset-ring-primary-strong',
     ],
     other: 'w-full',
-    navigation: 'w-full flex-wrap justify-end',
+    navigation: 'w-full',
+    navigationItems: 'flex w-full flex-wrap justify-end gap-2',
     previous: 'me-auto',
   },
   variants: {
     orientation: {
-      vertical: { options: 'flex-col' },
+      vertical: { options: 'flex-col', toggles: 'flex-col' },
       horizontal: { options: 'w-full flex-row flex-wrap', option: 'w-auto', other: 'basis-full' },
     } satisfies Record<QuestionnaireOrientation, object>,
     size: {

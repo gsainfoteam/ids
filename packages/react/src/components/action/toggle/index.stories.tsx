@@ -50,6 +50,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Toggle variant="outline">
+      <BoldIcon />
+      굵게
+    </Toggle>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -120,32 +129,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  args: { children: '굵게' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '누를 때마다 aria-pressed와 data-pressed가 바뀝니다. 실제 button이라 Space와 Enter로도 켜고 끕니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    const toggle = canvas.getByRole('button', { name: '굵게' });
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    await userEvent.click(toggle);
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    await expect(toggle).toHaveAttribute('data-pressed');
-    await expect(args.onPressedChange).toHaveBeenLastCalledWith(true);
-    await userEvent.keyboard(' ');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    await userEvent.keyboard('{Enter}');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    await expect(args.onPressedChange).toHaveBeenCalledTimes(3);
-  },
-};
-
-export const Controlled: Story = {
+export const ShowAPassword: Story = {
   render: function Render() {
     const [visible, setVisible] = useState(false);
 
@@ -166,7 +150,8 @@ export const Controlled: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'pressed와 onPressedChange로 제어합니다. 누른 상태에 따라 아이콘도 바꿉니다.',
+        story:
+          'pressed와 onPressedChange로 켜짐을 앱 상태에 묶습니다. 누른 상태에 따라 아이콘과 옆의 글자를 바꿉니다.',
       },
     },
   },
@@ -178,7 +163,7 @@ export const Controlled: Story = {
   },
 };
 
-export const CancelFromOnClick: Story = {
+export const ConfirmBeforeTurningOff: Story = {
   render: function Render() {
     const [muted, setMuted] = useState(true);
     const [asked, setAsked] = useState(0);
@@ -217,7 +202,7 @@ export const CancelFromOnClick: Story = {
   },
 };
 
-export const StateChildren: Story = {
+export const LabelEachState: Story = {
   render: () => <Toggle variant="outline">{(state) => (state.pressed ? '켜짐' : '꺼짐')}</Toggle>,
   parameters: {
     docs: {
@@ -234,7 +219,34 @@ export const StateChildren: Story = {
   },
 };
 
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { children: '굵게' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '누를 때마다 aria-pressed와 data-pressed가 바뀝니다. 실제 button이라 Space와 Enter로도 켜고 끕니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    const toggle = canvas.getByRole('button', { name: '굵게' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('data-pressed');
+    await expect(args.onPressedChange).toHaveBeenLastCalledWith(true);
+    await userEvent.keyboard(' ');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.keyboard('{Enter}');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(args.onPressedChange).toHaveBeenCalledTimes(3);
+  },
+};
+
 export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
   render: function Render() {
     const [shown, setShown] = useState(false);
 

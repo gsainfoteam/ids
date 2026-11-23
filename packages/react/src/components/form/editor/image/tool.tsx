@@ -111,7 +111,7 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
               {...tool}
               variant="soft"
               size="tiny"
-              icon={uploading ? <Spinner decorative /> : (icon ?? <PhotoIcon />)}
+              icon={uploading ? <Spinner aria-hidden /> : (icon ?? <PhotoIcon />)}
               aria-label={label}
               aria-busy={uploading || undefined}
               className={className}

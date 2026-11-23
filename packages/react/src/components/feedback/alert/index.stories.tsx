@@ -40,17 +40,19 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
   render: (args) => (
-    <Alert {...args} className="max-w-md">
-      <Alert.Title>업데이트 가능</Alert.Title>
-      <Alert.Description>v2.5.0이 출시되었습니다. 지금 설치하면 5분 걸립니다.</Alert.Description>
-      <Alert.Actions>
-        <Button size="tiny">설치</Button>
-        <Button size="tiny" variant="ghost">
-          나중에
-        </Button>
-      </Alert.Actions>
-      <Alert.Close />
-    </Alert>
+    <div className="max-w-md">
+      <Alert {...args}>
+        <Alert.Title>업데이트 가능</Alert.Title>
+        <Alert.Description>v2.5.0이 출시되었습니다. 지금 설치하면 5분 걸립니다.</Alert.Description>
+        <Alert.Actions>
+          <Button size="tiny">설치</Button>
+          <Button size="tiny" variant="ghost">
+            나중에
+          </Button>
+        </Alert.Actions>
+        <Alert.Close />
+      </Alert>
+    </div>
   ),
 };
 
@@ -65,6 +67,17 @@ const copy = {
   danger: ['저장 실패', '네트워크 오류입니다. 다시 시도해 주세요.'],
 } satisfies Record<Alert.ColorScheme, [string, string]>;
 
+export const Usage: Story = {
+  render: () => (
+    <div className="max-w-md">
+      <Alert colorScheme="info">
+        <Alert.Title>업데이트 가능</Alert.Title>
+        <Alert.Description>v2.5.0이 출시되었습니다.</Alert.Description>
+      </Alert>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -76,70 +89,84 @@ export const Gallery: Story = {
           rows={schemes}
           columns={variants}
           render={(colorScheme, variant) => (
-            <Alert colorScheme={colorScheme} variant={variant} className="w-72">
-              <Alert.Title>{copy[colorScheme][0]}</Alert.Title>
-              <Alert.Description>{copy[colorScheme][1]}</Alert.Description>
-              <Alert.Close />
-            </Alert>
+            <div className="w-72">
+              <Alert colorScheme={colorScheme} variant={variant}>
+                <Alert.Title>{copy[colorScheme][0]}</Alert.Title>
+                <Alert.Description>{copy[colorScheme][1]}</Alert.Description>
+                <Alert.Close />
+              </Alert>
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="Anatomy" description="모든 파트는 생략할 수 있습니다.">
         <Showcase.Row label="title">
-          <Alert colorScheme="success" className="w-80">
-            <Alert.Title>저장했습니다</Alert.Title>
-          </Alert>
+          <div className="w-80">
+            <Alert colorScheme="success">
+              <Alert.Title>저장했습니다</Alert.Title>
+            </Alert>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="description">
-          <Alert className="w-80">
-            <Alert.Description>본문만 있는 알림입니다.</Alert.Description>
-          </Alert>
+          <div className="w-80">
+            <Alert>
+              <Alert.Description>본문만 있는 알림입니다.</Alert.Description>
+            </Alert>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="actions, close">
-          <Alert colorScheme="warning" variant="outline" className="w-80">
-            <Alert.Title>세션 만료 임박</Alert.Title>
-            <Alert.Description>5분 뒤 자동으로 로그아웃됩니다.</Alert.Description>
-            <Alert.Actions>
-              <Button size="tiny" variant="outline">
-                세션 연장
-              </Button>
-            </Alert.Actions>
-            <Alert.Close />
-          </Alert>
+          <div className="w-80">
+            <Alert colorScheme="warning" variant="outline">
+              <Alert.Title>세션 만료 임박</Alert.Title>
+              <Alert.Description>5분 뒤 자동으로 로그아웃됩니다.</Alert.Description>
+              <Alert.Actions>
+                <Button size="tiny" variant="outline">
+                  세션 연장
+                </Button>
+              </Alert.Actions>
+              <Alert.Close />
+            </Alert>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="custom icon">
-          <Alert colorScheme="neutral" variant="outline" className="w-80">
-            <Alert.Icon>
-              <SparklesIcon />
-            </Alert.Icon>
-            <Alert.Title>새 기능</Alert.Title>
-            <Alert.Description>AI 어시스턴트가 추가되었습니다.</Alert.Description>
-          </Alert>
+          <div className="w-80">
+            <Alert colorScheme="neutral" variant="outline">
+              <Alert.Icon>
+                <SparklesIcon />
+              </Alert.Icon>
+              <Alert.Title>새 기능</Alert.Title>
+              <Alert.Description>AI 어시스턴트가 추가되었습니다.</Alert.Description>
+            </Alert>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="no icon">
-          <Alert colorScheme="info" className="w-80">
-            <Alert.Icon hidden />
-            <Alert.Title>아이콘 없이</Alert.Title>
-          </Alert>
+          <div className="w-80">
+            <Alert colorScheme="info">
+              <Alert.Icon hidden />
+              <Alert.Title>아이콘 없이</Alert.Title>
+            </Alert>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="list">
-          <Alert colorScheme="danger" variant="outline" className="w-80">
-            <Alert.Title>다음 항목을 고쳐 주세요</Alert.Title>
-            <Alert.Description asChild>
-              <ul>
-                <li>이메일 형식이 올바르지 않습니다.</li>
-                <li>비밀번호는 8자 이상이어야 합니다.</li>
-              </ul>
-            </Alert.Description>
-          </Alert>
+          <div className="w-80">
+            <Alert colorScheme="danger" variant="outline">
+              <Alert.Title>다음 항목을 고쳐 주세요</Alert.Title>
+              <Alert.Description asChild>
+                <ul>
+                  <li>이메일 형식이 올바르지 않습니다.</li>
+                  <li>비밀번호는 8자 이상이어야 합니다.</li>
+                </ul>
+              </Alert.Description>
+            </Alert>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Roles: Story = {
+export const ChooseHowItIsAnnounced: Story = {
   render: () => (
     <div className="flex max-w-md flex-col gap-3">
       <Alert colorScheme="info">
@@ -171,15 +198,17 @@ export const Roles: Story = {
   },
 };
 
-export const Dismiss: Story = {
+export const LetTheReaderDismissIt: Story = {
   render: () => (
-    <div className="flex max-w-md flex-col items-start gap-3">
+    <div className="flex max-w-md flex-col gap-3">
       <Alert colorScheme="warning" variant="outline">
         <Alert.Title>세션 만료 임박</Alert.Title>
         <Alert.Description>5분 뒤 자동으로 로그아웃됩니다.</Alert.Description>
         <Alert.Close />
       </Alert>
-      <Button variant="outline">다음 버튼</Button>
+      <div>
+        <Button variant="outline">다음 버튼</Button>
+      </div>
     </div>
   ),
   parameters: {
@@ -197,15 +226,52 @@ export const Dismiss: Story = {
   },
 };
 
-export const EscapeCloses: Story = {
+export const ShowItAgainAfterClosing: Story = {
+  render: function Render() {
+    const [open, setOpen] = useState(true);
+
+    return (
+      <div className="flex max-w-md flex-col gap-3">
+        <Alert colorScheme="success" open={open} onOpenChange={setOpen}>
+          <Alert.Title>업로드 완료</Alert.Title>
+          <Alert.Close />
+        </Alert>
+        <div>
+          <Button variant="outline" onClick={() => setOpen(true)} disabled={open}>
+            다시 보이기
+          </Button>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'open과 onOpenChange로 부모가 열림 상태를 가집니다. 닫힐 때는 짧게 사라지는 전환이 끝난 뒤에 빠집니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '닫기' }));
+    await waitFor(() => expect(canvas.queryByRole('status')).not.toBeInTheDocument());
+    await userEvent.click(canvas.getByRole('button', { name: '다시 보이기' }));
+    await expect(canvas.getByRole('status')).toHaveTextContent('업로드 완료');
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
   render: () => (
-    <Alert colorScheme="danger" className="max-w-md">
-      <Alert.Title>저장 실패</Alert.Title>
-      <Alert.Actions>
-        <Button size="tiny">다시 시도</Button>
-      </Alert.Actions>
-      <Alert.Close />
-    </Alert>
+    <div className="max-w-md">
+      <Alert colorScheme="danger">
+        <Alert.Title>저장 실패</Alert.Title>
+        <Alert.Actions>
+          <Button size="tiny">다시 시도</Button>
+        </Alert.Actions>
+        <Alert.Close />
+      </Alert>
+    </div>
   ),
   parameters: {
     docs: {
@@ -224,37 +290,5 @@ export const EscapeCloses: Story = {
     await expect(canvas.getByRole('alert')).toBeInTheDocument();
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.queryByRole('alert')).not.toBeInTheDocument());
-  },
-};
-
-export const Controlled: Story = {
-  render: function Render() {
-    const [open, setOpen] = useState(true);
-
-    return (
-      <div className="flex max-w-md flex-col items-start gap-3">
-        <Alert colorScheme="success" open={open} onOpenChange={setOpen}>
-          <Alert.Title>업로드 완료</Alert.Title>
-          <Alert.Close />
-        </Alert>
-        <Button variant="outline" onClick={() => setOpen(true)} disabled={open}>
-          다시 보이기
-        </Button>
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'open과 onOpenChange로 부모가 열림 상태를 가집니다. 닫힐 때는 짧게 사라지는 전환이 끝난 뒤에 빠집니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '닫기' }));
-    await waitFor(() => expect(canvas.queryByRole('status')).not.toBeInTheDocument());
-    await userEvent.click(canvas.getByRole('button', { name: '다시 보이기' }));
-    await expect(canvas.getByRole('status')).toHaveTextContent('업로드 완료');
   },
 };

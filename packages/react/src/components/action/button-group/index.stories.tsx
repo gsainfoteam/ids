@@ -19,7 +19,6 @@ import { expect, spyOn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
-import { Card } from '../../data/card';
 import { TextField } from '../../form/text-field';
 import { Button } from '../button';
 import { IconButton } from '../icon-button';
@@ -40,14 +39,12 @@ const meta = {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
     variant: { control: 'radio', options: variants },
-    attached: { control: 'boolean' },
   },
   args: {
     'aria-label': '보관함 동작',
     orientation: 'horizontal',
     size: 'standard',
     variant: 'outline',
-    attached: true,
   },
   render: (args) => (
     <ButtonGroup {...args}>
@@ -173,41 +170,39 @@ export const Gallery: Story = {
           </ButtonGroup>
         </Showcase.Row>
         <Showcase.Row label="text + field">
-          <ButtonGroup aria-label="주소">
-            <TextField aria-label="도메인" placeholder="example.com" className="w-64">
-              <span>https://</span>
-            </TextField>
-            <Button variant="outline">이동</Button>
-          </ButtonGroup>
-        </Showcase.Row>
-        <Showcase.Row label="attached=false">
-          <ButtonGroup attached={false} variant="outline" aria-label="필터">
-            <Button>전체</Button>
-            <Button>읽지 않음</Button>
-            <Button>
-              <ArchiveBoxIcon />
-              보관함
-            </Button>
-          </ButtonGroup>
-        </Showcase.Row>
-        <Showcase.Row label="attached=false + Separator">
-          <ButtonGroup attached={false} variant="outline" aria-label="사진 넘기기">
-            <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-            <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-            <ButtonGroup.Separator />
-            <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-          </ButtonGroup>
-        </Showcase.Row>
-        <Showcase.Row label="in a tray">
-          <Card className="concentric-p-1 w-fit flex-row gap-0">
-            <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
-              <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-              <Button className="tabular-nums">3 / 12</Button>
-              <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-              <ButtonGroup.Separator className="mx-1" />
-              <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+          <div className="grid w-80">
+            <ButtonGroup aria-label="주소">
+              <TextField aria-label="도메인" placeholder="example.com">
+                <span>https://</span>
+              </TextField>
+              <Button variant="outline">이동</Button>
             </ButtonGroup>
-          </Card>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="spaced in a div">
+          <ButtonGroup variant="outline" aria-label="필터">
+            <div className="flex gap-2">
+              <Button>전체</Button>
+              <Button>읽지 않음</Button>
+              <Button>
+                <ArchiveBoxIcon />
+                보관함
+              </Button>
+            </div>
+          </ButtonGroup>
+        </Showcase.Row>
+        <Showcase.Row label="toolbar">
+          <ButtonGroup variant="outline" aria-label="사진 보기">
+            <div className="flex gap-1">
+              <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+              <Button>
+                <span className="tabular-nums">3 / 12</span>
+              </Button>
+              <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+              <ButtonGroup.Separator />
+              <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+            </div>
+          </ButtonGroup>
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl">
@@ -290,29 +285,28 @@ export const BuildASplitButton: Story = {
 
 export const BuildAToolbar: Story = {
   render: () => (
-    <Card className="concentric-p-1 w-fit flex-row gap-0">
-      <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+    <ButtonGroup variant="outline" aria-label="사진 보기">
+      <div className="flex gap-1">
         <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
         <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-        <ButtonGroup.Separator className="mx-1" />
+        <ButtonGroup.Separator />
         <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-      </ButtonGroup>
-    </Card>
+      </div>
+    </ButtonGroup>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '띄운 그룹의 Separator는 버튼보다 짧게 가운데에 섭니다. 테두리 막대는 앱이 그리고, 그 안에 띄운 그룹을 넣으면 툴바가 됩니다.',
+          '버튼을 띄우려면 그룹 안에 앱의 레이아웃 div 를 두고 간격을 줍니다. 그룹은 직계 자식만 이어 붙이므로 div 안의 버튼은 각자 모서리를 지킵니다. Separator 는 버튼 높이만큼 선을 긋습니다.',
       },
     },
   },
   play: async ({ canvas }) => {
     const line = canvas.getByRole('separator').getBoundingClientRect();
     const close = canvas.getByRole('button', { name: '닫기' }).getBoundingClientRect();
-    await expect(line.height).toBe(20);
-    await expect(line.top + line.height / 2).toBeCloseTo(close.top + close.height / 2);
-    await expect(close.left - line.right).toBe(8);
+    await expect(line.width).toBe(1);
+    await expect(line.height).toBe(close.height);
   },
 };
 

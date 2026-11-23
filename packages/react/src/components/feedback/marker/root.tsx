@@ -47,7 +47,7 @@ export function MarkerRoot({
 
   const body = (
     <span className={content()}>
-      {pending && <Spinner size={size} decorative />}
+      {pending && <Spinner size={size} aria-hidden />}
       {child ? child.props.children : children}
     </span>
   );

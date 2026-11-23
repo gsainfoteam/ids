@@ -97,7 +97,7 @@ export const PC: Story = {
                   </ItemGroup>
                 </Card>
                 <p role="status" className="flex items-center gap-2">
-                  <Spinner size="tiny" decorative />
+                  <Spinner size="tiny" aria-hidden />
                   답을 바탕으로 계획을 세우는 중이에요
                 </p>
               </>

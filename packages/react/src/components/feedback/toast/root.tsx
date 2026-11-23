@@ -40,10 +40,8 @@ function ToasterShortcuts({ hotkey, enabled, onPress }: ToasterShortcutsProps) {
 function ToasterRegion({
   explicit,
   placement = 'bottom-right',
+  variant = 'stacked',
   max = 3,
-  gap = 14,
-  offset = 24,
-  expand = false,
   hotkey = DEFAULT_HOTKEY,
   className,
   style,
@@ -52,7 +50,7 @@ function ToasterRegion({
   const t = useTranslate();
   const ariaLabel = ariaLabelProp ?? t('toast.region');
 
-  const toaster = useToaster({ explicit, max, gap, expand });
+  const toaster = useToaster({ explicit, max, expanded: variant === 'expanded' });
   const platform = usePlatform(undefined);
 
   if (!toaster.elected) return null;
@@ -77,12 +75,11 @@ function ToasterRegion({
         }
         data-toaster-region=""
         data-placement={placement}
+        data-variant={variant}
         data-expanded={toaster.expanded ? '' : undefined}
         className={styles.region({ className })}
         style={
           {
-            '--gap': `${gap}px`,
-            '--toaster-offset': `${offset}px`,
             '--front-toast-height':
               toaster.frontHeight === undefined ? undefined : `${toaster.frontHeight}px`,
             ...style,

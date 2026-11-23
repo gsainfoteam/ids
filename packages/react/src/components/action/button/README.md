@@ -68,7 +68,7 @@ import { Button } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Button disabled={saving} focusableWhenDisabled aria-busy={saving} onClick={save}>
-  {saving && <Spinner decorative />} {/* 아이콘 자리에 아이콘 크기로 들어간다 */}
+  {saving && <Spinner aria-hidden />} {/* 아이콘 자리에 아이콘 크기로 들어간다 */}
   {saving ? '저장 중' : '저장'}
 </Button>
 ```
@@ -76,7 +76,7 @@ import { Button } from '@gsainfoteam/ids-react';
 - `loading` prop 은 없습니다. 문구와 스피너 위치를 직접 고릅니다.
 - `focusableWhenDisabled` 를 켜면 `disabled` 속성 대신 `aria-disabled` 가 붙습니다. 포커스와 탭 순서는 그대로 두고 클릭, Enter, Space, 폼 제출만 막습니다.
 - `aria-busy` 가 참이면 커서가 금지 표시 대신 진행 중 표시가 됩니다.
-- 문구가 이미 "저장 중" 이라고 말하므로 Spinner 는 `decorative` 로 둡니다.
+- 문구가 이미 "저장 중" 이라고 말하므로 Spinner 는 `aria-hidden` 으로 둡니다.
 - 문구가 바뀌면서 너비가 흔들리면 `className="min-w-24"` 처럼 최소 너비를 줍니다.
 
 ## asChild

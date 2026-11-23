@@ -147,7 +147,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
   },
   render: ({ leadingIcon, trailingIcon, children, asChild, href, ...args }) => {
     const busy = args['aria-busy'] === true;
-    const icon = busy ? <Spinner decorative /> : leadingIcon;
+    const icon = busy ? <Spinner aria-hidden /> : leadingIcon;
     const label = children as ReactNode;
     const props = { ...args, 'aria-busy': busy || undefined, disabled: args.disabled || busy };
 
@@ -242,12 +242,12 @@ export const Gallery: Story = {
         <Showcase.Row label="loading">
           {variants.map((variant) => (
             <Button key={variant} variant={variant} disabled aria-busy>
-              <Spinner decorative />
+              <Spinner aria-hidden />
               저장 중
             </Button>
           ))}
           <Button size="tiny" disabled aria-busy>
-            <Spinner decorative />
+            <Spinner aria-hidden />
             저장 중
           </Button>
         </Showcase.Row>
@@ -259,11 +259,13 @@ export const Gallery: Story = {
             <a href="#gallery">비활성 링크</a>
           </Button>
         </Showcase.Row>
-        <Showcase.Row label="full width" className="max-w-sm">
-          <Button className="w-full">
-            <CheckIcon />
-            확인
-          </Button>
+        <Showcase.Row label="full width">
+          <div className="grid w-full max-w-sm">
+            <Button>
+              <CheckIcon />
+              확인
+            </Button>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -316,7 +318,7 @@ export const ShowProgressWhileSaving: Story = {
           setSaving(false);
         }}
       >
-        {saving && <Spinner decorative />}
+        {saving && <Spinner aria-hidden />}
         {saving ? '저장 중' : '저장'}
       </Button>
     );
@@ -450,6 +452,7 @@ export const SubmitAForm: Story = {
 };
 
 export const ChangeTheLookOnHoverAndFocus: Story = {
+  tags: ['custom-design'],
   render: () => (
     <Button
       variant={(state) => (state.hovered ? 'solid' : 'outline')}
