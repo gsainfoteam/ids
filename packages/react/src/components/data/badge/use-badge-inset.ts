@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, type ReactNode, type RefObject } from 'react';
+import { useLayoutEffect, useRef, type RefObject } from 'react';
 
 import { cornerRadii, diagonalInset } from '../../../internal/corner-geometry';
 import { cornerExponent, type PhysicalCorner } from '../../../internal/corner-shape';
@@ -41,29 +41,54 @@ export function insetOnTheCurve(root: HTMLElement, wrapped: Element, placement: 
   return { x: diagonalInset(radius.x, exponent), y: diagonalInset(radius.y, exponent) };
 }
 
-export function useBadgeInset(
-  rootRef: RefObject<HTMLElement | null>,
-  placement: BadgePlacement,
-  anchor: ReactNode,
-) {
+function placeOn(root: HTMLElement, wrapped: Element, placement: BadgePlacement) {
+  const inset = insetOnTheCurve(root, wrapped, placement);
+  root.style.setProperty(INSET_X, `${inset.x}px`);
+  root.style.setProperty(INSET_Y, `${inset.y}px`);
+}
+
+function clearInset(root: HTMLElement) {
+  root.style.removeProperty(INSET_X);
+  root.style.removeProperty(INSET_Y);
+}
+
+type Watch = { root: HTMLElement; wrapped: Element; observer: ResizeObserver };
+
+export function useBadgeInset(rootRef: RefObject<HTMLElement | null>, placement: BadgePlacement) {
+  const watch = useRef<Watch | null>(null);
+  const currentPlacement = useRef(placement);
+
   useLayoutEffect(() => {
+    currentPlacement.current = placement;
     const root = rootRef.current;
     const wrapped = root && wrappedElementOf(root);
-    if (!root || !wrapped) return;
 
-    const place = () => {
-      const inset = insetOnTheCurve(root, wrapped, placement);
-      root.style.setProperty(INSET_X, `${inset.x}px`);
-      root.style.setProperty(INSET_Y, `${inset.y}px`);
-    };
-    const resize = new ResizeObserver(place);
-    resize.observe(wrapped);
-    place();
+    if (watch.current && watch.current.wrapped !== wrapped) {
+      watch.current.observer.disconnect();
+      watch.current = null;
+    }
 
-    return () => {
-      resize.disconnect();
-      root.style.removeProperty(INSET_X);
-      root.style.removeProperty(INSET_Y);
-    };
-  }, [rootRef, placement, anchor]);
+    if (!root || !wrapped) {
+      if (root) clearInset(root);
+      return;
+    }
+
+    if (!watch.current) {
+      const observer = new ResizeObserver(() => placeOn(root, wrapped, currentPlacement.current));
+      observer.observe(wrapped);
+      watch.current = { root, wrapped, observer };
+    }
+
+    placeOn(root, wrapped, placement);
+  });
+
+  useLayoutEffect(
+    () => () => {
+      if (!watch.current) return;
+      watch.current.observer.disconnect();
+      clearInset(watch.current.root);
+      watch.current = null;
+    },
+    [],
+  );
 }

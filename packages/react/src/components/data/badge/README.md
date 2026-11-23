@@ -82,7 +82,7 @@ import { Badge } from '@gsainfoteam/ids-react';
 - 반지름은 CSS 가 그리는 값을 따릅니다. 이웃 모서리 반지름의 합이 변보다 길면 모든 반지름을 같은 비율로 줄입니다. 그래서 `rounded-tl-full` 은 한 변 전체를 반지름으로 씁니다.
 - 오른쪽에서 왼쪽으로 쓰는 문서에서는 `end` 가 왼쪽이므로 왼쪽 모서리를 읽습니다.
 - 각진 요소에서는 꼭짓점에 붙습니다.
-- 퍼센트 반지름처럼 크기에 따라 바뀌는 모서리는 `ResizeObserver` 로 다시 잽니다.
+- 퍼센트 반지름처럼 크기에 따라 바뀌는 모서리는 `ResizeObserver` 로 다시 잽니다. observer 는 감싼 요소가 바뀔 때만 새로 만들고, 렌더마다 하는 일은 모서리를 한 번 다시 재는 것뿐입니다.
 - 서버 HTML 과 hydration 전의 첫 그림에서는 꼭짓점에 있다가, hydration 뒤 곡선 위로 옮겨 갑니다.
 
 ## 접근성
@@ -143,4 +143,4 @@ import { Badge } from '@gsainfoteam/ids-react';
 
 - 배지는 `pointer-events: none` 이라 아래 버튼의 클릭을 가로채지 않습니다.
 - 배지 둘레에는 표면색 링이 있어 대상과 겹쳐도 경계가 보입니다.
-- 크기는 그대로인 채 모서리만 바뀌면(테마의 `radius` 나 `cornerShape` 를 바꾸는 경우) Badge가 다시 렌더될 때 다시 잽니다.
+- 크기는 그대로인 채 모서리만 바뀌면(테마의 `radius` 나 `cornerShape` 를 바꾸는 경우) Badge가 다시 렌더될 때 다시 잽니다. Badge 가 다시 렌더되지 않으면 이전 값이 남습니다.

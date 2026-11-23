@@ -44,7 +44,7 @@ export function BadgeRoot({
     label,
     children,
   });
-  useBadgeInset(rootRef, placement, anchor);
+  useBadgeInset(rootRef, placement);
 
   const styles = badgeStyle({ variant, colorScheme, size, dot, placement });
   const state: Badge.State = {
