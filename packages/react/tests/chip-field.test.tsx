@@ -1,3 +1,4 @@
+import { noop } from 'es-toolkit';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { beforeEach, expect, test, vi } from 'vitest';
@@ -38,10 +39,10 @@ const layout = (container: HTMLElement) =>
       element.hasAttribute('data-chip-field-sizer')
         ? element.firstElementChild!.tagName.toUpperCase()
         : element.hasAttribute('data-chip-field-adornment')
-        ? element.textContent
-        : element.hasAttribute('data-chip-field-chip')
-          ? 'CHIP'
-          : element.tagName.toUpperCase(),
+          ? element.textContent
+          : element.hasAttribute('data-chip-field-chip')
+            ? 'CHIP'
+            : element.tagName.toUpperCase(),
     );
 
 const settle = () => new Promise((resolve) => setTimeout(resolve));
@@ -243,13 +244,12 @@ test('paste splits on commas and new lines, dedupes, and leaves what it cannot a
   expect(onValueChange).toHaveBeenCalledTimes(1);
 });
 
-test('creatable: trims, dedupes, ignores IME, validates, and commits on comma or Enter', async () => {
+test('onCreate: trims, dedupes, ignores IME, validates, and commits on comma or Enter', async () => {
   const onValueChange = vi.fn();
   const onCreate = vi.fn();
   const screen = await render(
     <ChipField
       aria-label="Skills"
-      creatable
       maxCount={3}
       validate={(text) => text.length >= 2 || 'Too short'}
       onValueChange={onValueChange}
@@ -292,7 +292,7 @@ test('creatable: trims, dedupes, ignores IME, validates, and commits on comma or
   expect(createRow()).toBeNull();
   await screen.rerender(
     <div key="false">
-      <ChipField aria-label="Skills" creatable validate={() => false}>
+      <ChipField aria-label="Skills" onCreate={noop} validate={() => false}>
         {items}
       </ChipField>
     </div>,
@@ -524,7 +524,7 @@ test('Input inside a Fragment splits leading and trailing adornments', async () 
 });
 
 test('a field that only creates values has no chevron', async () => {
-  const screen = await render(<ChipField aria-label="Emails" creatable />);
+  const screen = await render(<ChipField aria-label="Emails" onCreate={noop} />);
   expect(layout(screen.container)).toEqual(['INPUT']);
 });
 
@@ -630,7 +630,7 @@ test('the placeholder shows only while no chip is chosen', async () => {
 test('the input takes the width of its text, so it wraps only when the text does not fit', async () => {
   const screen = await render(
     <div className="w-64">
-      <ChipField aria-label="Stack" defaultValue={['react', 'vue']} creatable>
+      <ChipField aria-label="Stack" defaultValue={['react', 'vue']} onCreate={noop}>
         <ChipField.Item value="react">react</ChipField.Item>
         <ChipField.Item value="vue">vue</ChipField.Item>
       </ChipField>

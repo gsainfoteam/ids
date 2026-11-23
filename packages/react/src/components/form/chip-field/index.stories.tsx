@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { TagIcon } from '@heroicons/react/16/solid';
+import { noop } from 'es-toolkit';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, fn, waitFor } from 'storybook/test';
 
@@ -24,8 +25,6 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    mobileVariant: { control: 'radio', options: ['popover', 'drawer'] },
-    creatable: { control: 'boolean' },
     defaultOpen: { control: 'boolean' },
     maxCount: { control: { type: 'number', min: 0 } },
     invalid: { control: 'boolean' },
@@ -72,6 +71,20 @@ const chips = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-80">
+      <Field.Label>기술</Field.Label>
+      <ChipField name="skills" placeholder="기술 검색">
+        <ChipField.Item value="react">React</ChipField.Item>
+        <ChipField.Item value="vue">Vue</ChipField.Item>
+        <ChipField.Item value="flutter">Flutter</ChipField.Item>
+        <ChipField.Item value="swift">Swift</ChipField.Item>
+      </ChipField>
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -79,9 +92,9 @@ export const Gallery: Story = {
         title="Open"
         description="고른 옵션에는 primary 체크가 붙습니다. 찾는 옵션이 없으면 새 값을 만드는 행이 나옵니다."
       >
-        <Showcase.Row label="creatable" className="h-72 items-start">
+        <Showcase.Row label="onCreate" className="h-72 items-start">
           <div className="w-80">
-            <ChipField aria-label="열림" defaultValue={['react']} creatable defaultOpen>
+            <ChipField aria-label="열림" defaultValue={['react']} onCreate={noop} defaultOpen>
               <ChipField.Group heading="프론트엔드">
                 <ChipField.Item value="react">React</ChipField.Item>
                 <ChipField.Item value="vue">Vue</ChipField.Item>
@@ -270,64 +283,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const KeyboardAndChips: Story = {
-  args: { defaultValue: ['react', 'vue'] },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '입력 맨 앞에서 ← 를 누르면 마지막 칩으로 갑니다. 칩 사이는 ← → 로 오가고, 가리킨 칩은 테마 색으로 칠합니다. Backspace 와 Delete 는 칩을 지운 뒤 옆 칩으로 포커스를 옮깁니다. → 로 마지막 칩을 지나면 입력으로 돌아옵니다. 마지막 칩을 × 로 지우면 입력으로 돌아옵니다. Tab 은 칩을 거치지 않고 필드를 떠납니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, canvas, userEvent, args }) => {
-    const field = input(canvasElement);
-    await userEvent.click(field);
-    await userEvent.keyboard('sv');
-    await waitFor(() => expect(canvas.getByRole('listbox')).toBeVisible());
-    await userEvent.keyboard('{Enter}');
-    await expect(chips(canvasElement)).toEqual(['React', 'Vue', 'Svelte']);
-    await expect(field).toHaveValue('');
-    await userEvent.keyboard('{Escape}{ArrowLeft}');
-    const svelte = canvas.getByRole('button', { name: 'Svelte 삭제' });
-    await expect(svelte).toHaveFocus();
-    await expect(svelte.closest('[data-chip]')).toHaveAttribute('data-focus-visible');
-    await userEvent.keyboard('{ArrowLeft}');
-    await expect(canvas.getByRole('button', { name: 'Vue 삭제' })).toHaveFocus();
-    await userEvent.keyboard('{Backspace}');
-    await expect(chips(canvasElement)).toEqual(['React', 'Svelte']);
-    await expect(canvas.getByRole('button', { name: 'React 삭제' })).toHaveFocus();
-    await userEvent.keyboard('{Delete}');
-    await expect(canvas.getByRole('button', { name: 'Svelte 삭제' })).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(field).toHaveFocus();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(['svelte']);
-    await userEvent.click(canvas.getByRole('button', { name: 'Svelte 삭제' }));
-    await expect(chips(canvasElement)).toEqual([]);
-    await expect(input(canvasElement)).toHaveFocus();
-  },
-};
-
-export const Paste: Story = {
-  args: { defaultValue: [] },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '쉼표, 탭, 줄바꿈이 섞인 글을 붙여넣으면 옵션 이름마다 칩이 됩니다. 이미 있는 값은 건너뛰고, 칩으로 만들 수 없는 글자는 입력에 남겨 고칠 수 있게 합니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, userEvent }) => {
-    const field = input(canvasElement);
-    await userEvent.click(field);
-    await userEvent.paste('React, vue\nREACT, Elm');
-    await expect(chips(canvasElement)).toEqual(['React', 'Vue']);
-    await expect(field).toHaveValue('Elm');
-  },
-};
-
-export const CreateAndValidate: Story = {
+export const CreateValuesNotInTheList: Story = {
   render: function Render() {
     const [emails, setEmails] = useState<string[]>([]);
 
@@ -338,7 +294,7 @@ export const CreateAndValidate: Story = {
           <ChipField
             value={emails}
             onValueChange={setEmails}
-            creatable
+            onCreate={noop}
             validate={(text) => /^[^\s@]+@[^\s@]+$/.test(text) || '이메일 주소가 아닙니다.'}
             placeholder="이메일 입력"
           />
@@ -352,7 +308,7 @@ export const CreateAndValidate: Story = {
     docs: {
       description: {
         story:
-          'creatable 이면 목록에 없는 값도 칩이 됩니다. validate 가 거부한 값은 만들기 행에 이유가 뜨고 추가되지 않습니다. 쉼표를 치면 지금까지 쓴 값을 칩으로 만듭니다.',
+          'onCreate 를 주면 목록에 없는 값도 칩이 됩니다. 새 값을 따로 저장할 곳이 없으면 noop 을 줍니다. validate 가 거부한 값은 만들기 행에 이유가 뜨고 추가되지 않습니다. 쉼표를 치면 지금까지 쓴 값을 칩으로 만듭니다.',
       },
     },
   },
@@ -377,8 +333,25 @@ export const CreateAndValidate: Story = {
   },
 };
 
-export const MaxCount: Story = {
-  args: { maxCount: 2, defaultValue: ['react'] },
+export const LimitHowManyCanBePicked: Story = {
+  render: () => (
+    <div className="w-80">
+      <ChipField aria-label="기술" maxCount={2} defaultValue={['react']}>
+        <ChipField.Group heading="프론트엔드">
+          <ChipField.Item value="react">React</ChipField.Item>
+          <ChipField.Item value="vue">Vue</ChipField.Item>
+          <ChipField.Item value="svelte">Svelte</ChipField.Item>
+        </ChipField.Group>
+        <ChipField.Group heading="모바일">
+          <ChipField.Item value="flutter">Flutter</ChipField.Item>
+          <ChipField.Item value="swift">Swift</ChipField.Item>
+          <ChipField.Item value="kotlin" disabled>
+            Kotlin (준비 중)
+          </ChipField.Item>
+        </ChipField.Group>
+      </ChipField>
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
@@ -398,7 +371,43 @@ export const MaxCount: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const PasteSeveralValuesAtOnce: Story = {
+  render: () => (
+    <div className="w-80">
+      <ChipField aria-label="기술">
+        <ChipField.Group heading="프론트엔드">
+          <ChipField.Item value="react">React</ChipField.Item>
+          <ChipField.Item value="vue">Vue</ChipField.Item>
+          <ChipField.Item value="svelte">Svelte</ChipField.Item>
+        </ChipField.Group>
+        <ChipField.Group heading="모바일">
+          <ChipField.Item value="flutter">Flutter</ChipField.Item>
+          <ChipField.Item value="swift">Swift</ChipField.Item>
+          <ChipField.Item value="kotlin" disabled>
+            Kotlin (준비 중)
+          </ChipField.Item>
+        </ChipField.Group>
+      </ChipField>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '쉼표, 탭, 줄바꿈이 섞인 글을 붙여넣으면 옵션 이름마다 칩이 됩니다. 이미 있는 값은 건너뛰고, 칩으로 만들 수 없는 글자는 입력에 남겨 고칠 수 있게 합니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const field = input(canvasElement);
+    await userEvent.click(field);
+    await userEvent.paste('React, vue\nREACT, Elm');
+    await expect(chips(canvasElement)).toEqual(['React', 'Vue']);
+    await expect(field).toHaveValue('Elm');
+  },
+};
+
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -460,7 +469,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ConnectReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ tags: string[] }>({ defaultValues: { tags: [] } });
     const [result, setResult] = useState('');
@@ -519,14 +528,101 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const Drawer: Story = {
-  args: { mobileVariant: 'drawer', defaultValue: ['react'] },
+export const SearchInABottomSheetOnMobile: Story = {
+  render: () => (
+    <div className="w-80">
+      <ChipField aria-label="기술" defaultValue={['react']}>
+        <ChipField.Group heading="프론트엔드">
+          <ChipField.Item value="react">React</ChipField.Item>
+          <ChipField.Item value="vue">Vue</ChipField.Item>
+          <ChipField.Item value="svelte">Svelte</ChipField.Item>
+        </ChipField.Group>
+        <ChipField.Group heading="모바일">
+          <ChipField.Item value="flutter">Flutter</ChipField.Item>
+          <ChipField.Item value="swift">Swift</ChipField.Item>
+          <ChipField.Item value="kotlin" disabled>
+            Kotlin (준비 중)
+          </ChipField.Item>
+        </ChipField.Group>
+      </ChipField>
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          '640px 보다 좁은 화면에서는 모달 하단 시트로 엽니다. 필드의 입력이 시트 뒤로 가려지므로 시트 위에 같은 검색어를 쓰는 검색창이 있고, 닫으면 필드의 입력으로 포커스가 돌아옵니다.',
+          '640px 보다 좁은 화면에서는 기본으로 모달 하단 시트로 엽니다. 필드의 입력이 시트 뒤로 가려지므로 시트 위에 같은 검색어를 쓰는 검색창이 있고, 닫으면 필드의 입력으로 포커스가 돌아옵니다.',
       },
     },
+  },
+};
+
+export const KeepAPopoverOnMobile: Story = {
+  render: () => (
+    <div className="w-80">
+      <ChipField aria-label="기술" defaultValue={['react']}>
+        <ChipField.Content mobileVariant="popover">
+          <ChipField.Group heading="프론트엔드">
+            <ChipField.Item value="react">React</ChipField.Item>
+            <ChipField.Item value="vue">Vue</ChipField.Item>
+            <ChipField.Item value="svelte">Svelte</ChipField.Item>
+          </ChipField.Group>
+          <ChipField.Group heading="모바일">
+            <ChipField.Item value="flutter">Flutter</ChipField.Item>
+            <ChipField.Item value="swift">Swift</ChipField.Item>
+            <ChipField.Item value="kotlin" disabled>
+              Kotlin (준비 중)
+            </ChipField.Item>
+          </ChipField.Group>
+        </ChipField.Content>
+      </ChipField>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'ChipField.Content 에 mobileVariant="popover" 를 주면 좁은 화면에서도 하단 시트 대신 필드 아래 팝오버로 엽니다. Content 를 쓰면 옵션은 모두 그 안에 둡니다.',
+      },
+    },
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { defaultValue: ['react', 'vue'] },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '입력 맨 앞에서 ← 를 누르면 마지막 칩으로 갑니다. 칩 사이는 ← → 로 오가고, 가리킨 칩은 테마 색으로 칠합니다. Backspace 와 Delete 는 칩을 지운 뒤 옆 칩으로 포커스를 옮깁니다. → 로 마지막 칩을 지나면 입력으로 돌아옵니다. 마지막 칩을 × 로 지우면 입력으로 돌아옵니다. Tab 은 칩을 거치지 않고 필드를 떠납니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, canvas, userEvent, args }) => {
+    const field = input(canvasElement);
+    await userEvent.click(field);
+    await userEvent.keyboard('sv');
+    await waitFor(() => expect(canvas.getByRole('listbox')).toBeVisible());
+    await userEvent.keyboard('{Enter}');
+    await expect(chips(canvasElement)).toEqual(['React', 'Vue', 'Svelte']);
+    await expect(field).toHaveValue('');
+    await userEvent.keyboard('{Escape}{ArrowLeft}');
+    const svelte = canvas.getByRole('button', { name: 'Svelte 삭제' });
+    await expect(svelte).toHaveFocus();
+    await expect(svelte.closest('[data-chip]')).toHaveAttribute('data-focus-visible');
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(canvas.getByRole('button', { name: 'Vue 삭제' })).toHaveFocus();
+    await userEvent.keyboard('{Backspace}');
+    await expect(chips(canvasElement)).toEqual(['React', 'Svelte']);
+    await expect(canvas.getByRole('button', { name: 'React 삭제' })).toHaveFocus();
+    await userEvent.keyboard('{Delete}');
+    await expect(canvas.getByRole('button', { name: 'Svelte 삭제' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(field).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(['svelte']);
+    await userEvent.click(canvas.getByRole('button', { name: 'Svelte 삭제' }));
+    await expect(chips(canvasElement)).toEqual([]);
+    await expect(input(canvasElement)).toHaveFocus();
   },
 };

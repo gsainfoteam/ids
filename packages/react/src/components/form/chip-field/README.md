@@ -4,7 +4,7 @@
 
 - **칩 사이를 키보드로.** 입력 맨 앞에서 `←` 를 누르면 마지막 칩으로 가고, 칩 사이는 방향키로 오갑니다. `Backspace` 와 `Delete` 는 칩을 지운 뒤 옆 칩에 포커스를 둡니다. `Tab` 은 칩을 거치지 않고 필드를 떠납니다.
 - **붙여넣기.** 쉼표, 탭, 줄바꿈이 섞인 글을 붙여넣으면 칩 여러 개가 됩니다. 이미 있는 값은 건너뛰고, 칩으로 만들 수 없는 글자는 입력에 남겨 둡니다.
-- **새 값 만들기.** `creatable` 이면 목록에 없는 값도 칩이 됩니다. `validate` 로 거를 수 있고, 쉼표나 `Enter` 로 확정합니다.
+- **새 값 만들기.** `onCreate` 를 주면 목록에 없는 값도 칩이 됩니다. `validate` 로 거를 수 있고, 쉼표나 `Enter` 로 확정합니다.
 - **고른 옵션.** 목록에 남아 `text-primary` 체크로 보입니다. 다시 고르면 칩이 빠집니다.
 - **중복 없음.** 대소문자, 전각, 악센트만 다른 값은 같은 값으로 봅니다.
 - **개수 제한.** `maxCount` 에 닿으면 나머지 옵션이 비활성이 되고 목록 위에 안내가 나옵니다.
@@ -62,23 +62,24 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 ```
 
 - 쉼표, 탭, 줄바꿈으로 나눕니다. 표 한 줄이나 목록 한 열을 그대로 붙여넣을 수 있습니다.
-- 옵션은 라벨이나 값으로 찾습니다. `creatable` 이면 목록에 없는 값도 칩이 됩니다.
+- 옵션은 라벨이나 값으로 찾습니다. `onCreate` 를 주면 목록에 없는 값도 칩이 됩니다.
 - 구분자가 없는 글은 평소처럼 입력에 붙습니다.
 
 ## 새 값 만들기
 
 ```tsx
 <ChipField
-  creatable
   validate={(text) => isEmail(text) || '이메일 주소가 아닙니다.'}
-  onCreate={(text) => saveTag(text)} // 만들 때마다, 선택에 넣기 전에
+  onCreate={(text) => saveTag(text)} // 주면 새 값을 만든다. 만들 때마다, 선택에 넣기 전에 불린다
   placeholder="이메일 입력"
 />
+
+<ChipField value={tags} onValueChange={setTags} onCreate={noop} /> // 따로 저장할 곳이 없으면 noop 을 준다
 ```
 
 - 검색어가 옵션이나 이미 고른 값과 같으면 만들기 행이 나오지 않습니다.
 - `validate` 는 `true`(또는 아무것도 반환하지 않음)면 통과, `false` 면 기본 문구, 문자열이면 그 문구로 거부합니다. 거부된 값은 만들기 행에 이유가 뜨고 칩이 되지 않습니다.
-- 옵션 없이 `creatable` 만 쓰면 아래 화살표가 없는 입력이 됩니다.
+- 옵션 없이 `onCreate` 만 쓰면 아래 화살표가 없는 입력이 됩니다.
 
 ## 개수 제한
 
@@ -167,7 +168,13 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 
 - 입력을 클릭하거나 글자를 치면 열리고, 옵션을 골라도 열린 채로 남습니다.
 - 목록은 위나 아래에 옵션이 더 남으면 그 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)). 방향키로 옮긴 옵션은 흐린 띠 밖에 멈춥니다.
-- 640px 보다 좁은 화면에서 `mobileVariant="drawer"`(기본) 는 모달 하단 시트로 엽니다. 필드의 입력이 시트 뒤로 가려지므로 시트 위에 같은 검색어를 쓰는 검색창이 있고, 닫으면 필드의 입력으로 포커스가 돌아옵니다.
+- 640px 보다 좁은 화면에서 목록은 모달 하단 시트로 열립니다(`ChipField.Content` 의 `mobileVariant="drawer"`, 기본). `mobileVariant="popover"` 면 좁은 화면에서도 팝오버입니다. 필드의 입력이 시트 뒤로 가려지므로 시트 위에 같은 검색어를 쓰는 검색창이 있고, 닫으면 필드의 입력으로 포커스가 돌아옵니다.
+```tsx
+<ChipField>
+  <ChipField.Content mobileVariant="popover">{items}</ChipField.Content>
+</ChipField>
+```
+
 - 시트의 검색창은 `Select.SearchField` 와 같은 `TextField` 입니다. 테두리와 링 없이 아래 선만 그립니다.
 
 ## 폼
@@ -231,14 +238,12 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `value` / `defaultValue`                | 중복 없는 `string[]` / `[]`                                |
 | `onValueChange`                         | 칩이 바뀔 때                                               |
 | `open` / `defaultOpen` / `onOpenChange` | 목록의 열림 상태                                           |
-| `creatable`                             | 목록에 없는 값을 만든다                                    |
 | `validate`                              | 만들 값을 검사한다                                         |
-| `onCreate`                              | 값을 만들 때마다                                           |
+| `onCreate`                              | 주면 목록에 없는 값을 만든다. 값을 만들 때마다 불린다      |
 | `maxCount`                              | 0 이상 정수. 새로 고르기와 만들기를 막는다                 |
 | `removeLabel`                           | 칩 지우기 버튼 이름. 기본 `${label} 삭제`                  |
 | `variant`                               | `outline`(기본) / `soft` / `ghost`                         |
 | `size`                                  | `standard` / `tiny`. 생략하면 `Field` 크기                 |
-| `mobileVariant`                         | `drawer`(기본): 640px 미만에서 모달 하단 시트 / `popover`  |
 | `invalid`                               | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선 |
 | `disabled` / `readOnly`                 | 고르기, 만들기, 지우기를 막는다                            |
 | `name` / `form`                         | 칩마다 hidden input                                        |

@@ -6,6 +6,7 @@ import {
   PaperAirplaneIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
+import { noop } from 'es-toolkit';
 
 import { Button } from '../../components/action/button';
 import { ButtonGroup } from '../../components/action/button-group';
@@ -76,7 +77,7 @@ export const PC: Story = {
                   name="to"
                   value={to}
                   onValueChange={setTo}
-                  creatable
+                  onCreate={noop}
                   placeholder="이름이나 메일 주소"
                   required
                 >
