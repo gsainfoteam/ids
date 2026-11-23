@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import {
   ArrowRightIcon,
   ArrowUpTrayIcon,
   CheckIcon,
+  ArrowTopRightOnSquareIcon,
   ChevronDownIcon,
   PlusIcon,
   TrashIcon,
@@ -56,7 +57,119 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+const leadingIcons = {
+  none: undefined,
+  PlusIcon: <PlusIcon />,
+  ArrowUpTrayIcon: <ArrowUpTrayIcon />,
+  CheckIcon: <CheckIcon />,
+  TrashIcon: <TrashIcon />,
+};
+
+const trailingIcons = {
+  none: undefined,
+  ArrowRightIcon: <ArrowRightIcon />,
+  ChevronDownIcon: <ChevronDownIcon />,
+  ArrowTopRightOnSquareIcon: <ArrowTopRightOnSquareIcon />,
+};
+
+type PlaygroundArgs = Button.Props & {
+  leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
+  href?: string;
+};
+
+export const Playground: StoryObj<PlaygroundArgs> = {
+  args: {
+    leadingIcon: 'none',
+    trailingIcon: 'none',
+    asChild: false,
+    href: '#docs',
+    disabled: false,
+    'aria-busy': false,
+  },
+  argTypes: {
+    children: { control: 'text', table: { category: 'Content' } },
+    leadingIcon: {
+      control: 'select',
+      options: Object.keys(leadingIcons),
+      mapping: leadingIcons,
+      description: '글자 앞에 둘 heroicon (16/solid). 크기는 버튼이 정합니다.',
+      table: { category: 'Content' },
+    },
+    trailingIcon: {
+      control: 'select',
+      options: Object.keys(trailingIcons),
+      mapping: trailingIcons,
+      description: '글자 뒤에 둘 heroicon (16/solid).',
+      table: { category: 'Content' },
+    },
+    variant: { table: { category: 'Look' } },
+    colorScheme: { table: { category: 'Look' } },
+    size: { table: { category: 'Look' } },
+    disabled: { table: { category: 'State' } },
+    focusableWhenDisabled: { if: { arg: 'disabled' }, table: { category: 'State' } },
+    'aria-busy': {
+      control: 'boolean',
+      description:
+        '저장 중처럼 기다리는 동안. 앞 아이콘 대신 Spinner 를 그리고 누를 수 없게 합니다.',
+      table: { category: 'State' },
+    },
+    asChild: {
+      control: 'boolean',
+      description: '자식 <a> 를 버튼 모양으로 그립니다.',
+      table: { disable: false, category: 'Link' },
+    },
+    href: {
+      control: 'text',
+      if: { arg: 'asChild' },
+      description: 'asChild 로 그린 <a> 의 href.',
+      table: { category: 'Link' },
+    },
+    onClick: { table: { category: 'Events' } },
+  },
+  parameters: {
+    controls: {
+      include: [
+        'children',
+        'leadingIcon',
+        'trailingIcon',
+        'variant',
+        'colorScheme',
+        'size',
+        'disabled',
+        'focusableWhenDisabled',
+        'aria-busy',
+        'asChild',
+        'href',
+        'onClick',
+      ],
+    },
+  },
+  render: ({ leadingIcon, trailingIcon, children, asChild, href, ...args }) => {
+    const busy = args['aria-busy'] === true;
+    const icon = busy ? <Spinner decorative /> : leadingIcon;
+    const label = children as ReactNode;
+    const props = { ...args, 'aria-busy': busy || undefined, disabled: args.disabled || busy };
+
+    if (asChild)
+      return (
+        <Button {...props} asChild>
+          <a href={href}>
+            {icon}
+            {label}
+            {trailingIcon}
+          </a>
+        </Button>
+      );
+    return (
+      <Button {...props}>
+        {icon}
+        {label}
+        {trailingIcon}
+      </Button>
+    );
+  },
+};
 
 export const Usage: Story = {
   render: () => <Button>저장</Button>,
