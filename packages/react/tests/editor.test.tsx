@@ -1554,6 +1554,57 @@ test('Image inserts a picture from an address, adding https:// when it has no sc
   await expect.element(content).toHaveFocus();
 });
 
+const SAFARIS_KEY_THAT_ENDS_A_COMPOSITION = { keyCode: 229, isComposing: false };
+
+function pressAsSafariEndsAComposition(target: Element, key: string) {
+  target.dispatchEvent(
+    new KeyboardEvent('keydown', {
+      key,
+      bubbles: true,
+      cancelable: true,
+      ...SAFARIS_KEY_THAT_ENDS_A_COMPOSITION,
+    }),
+  );
+}
+
+test.each([
+  { tool: '링크', field: '링크 주소' },
+  { tool: '그림', field: '그림 주소' },
+])(
+  'the $tool form ignores the Enter and Escape that end a Safari IME composition',
+  async ({ tool, field }) => {
+    const onValueChange = vi.fn();
+    render(
+      <Editor
+        aria-label="본문"
+        defaultValue="<p>지도</p>"
+        onImageUpload={async () => PICTURE}
+        onValueChange={onValueChange}
+      >
+        <Editor.Link />
+        <Editor.Image />
+        <Editor.Content />
+      </Editor>,
+    );
+    const content = await editable('본문');
+    await userEvent.click(content);
+    await userEvent.click(page.getByRole('button', { name: tool }));
+
+    const address = page.getByRole('textbox', { name: field });
+    await expect.element(address).toHaveFocus();
+    await userEvent.keyboard('gistory.me');
+    pressAsSafariEndsAComposition(address.element(), 'Enter');
+    pressAsSafariEndsAComposition(address.element(), 'Escape');
+
+    await expect.element(address).toHaveFocus();
+    expect(onValueChange).not.toHaveBeenCalled();
+
+    await userEvent.keyboard('{Enter}');
+    await expect.poll(() => onValueChange.mock.calls.length).toBeGreaterThan(0);
+    await expect.element(page.getByRole('textbox', { name: field })).not.toBeInTheDocument();
+  },
+);
+
 test('Image hands Choose files to the file picker', async () => {
   render(
     <Editor aria-label="본문" onImageUpload={async () => PICTURE}>
