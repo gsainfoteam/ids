@@ -1022,3 +1022,21 @@ test('on iOS a field that accepts negatives asks for the full keyboard', async (
     for (const spy of iPhone) spy.mockRestore();
   }
 });
+
+test('the input is centred between Decrement and Increment, and starts at the edge otherwise', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <NumberField aria-label="between" defaultValue={2}>
+        <NumberField.Decrement />
+        <NumberField.Input />
+        <NumberField.Increment />
+      </NumberField>
+      <NumberField aria-label="stacked" defaultValue={2} />
+    </IdsProvider>,
+  );
+
+  const between = screen.getByLabelText('between').element() as HTMLInputElement;
+  const stacked = screen.getByLabelText('stacked').element() as HTMLInputElement;
+  expect(getComputedStyle(between).textAlign).toBe('center');
+  expect(getComputedStyle(stacked).textAlign).not.toBe('center');
+});
