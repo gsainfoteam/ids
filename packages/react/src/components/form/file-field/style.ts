@@ -12,7 +12,7 @@ export const ownTriggerLook = cn(
 
 export const filePartsStyle = tv({
   slots: {
-    root: 'relative grid min-w-0 gap-2',
+    root: 'relative grid w-full min-w-0 gap-2',
     trigger: 'touch-manipulation disabled:cursor-not-allowed aria-disabled:cursor-default',
     icon: 'shrink-0 text-neutral',
     thumb: [
