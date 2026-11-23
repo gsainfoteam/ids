@@ -383,3 +383,21 @@ test('the Calendar and TimePicker parts take their own options, and Content open
     await page.viewport(414, 896);
   }
 });
+
+test('a Calendar placed inside Content still gives the field its today', async () => {
+  let value = undefined as CalendarDateTime | null | undefined;
+  const screen = await render(
+    <DateTimeField hourCycle="24h" onValueChange={(next) => (value = next)}>
+      <DateTimeField.Content>
+        <DateTimeField.Calendar today={t(20)} />
+        <DateTimeField.TimePicker />
+      </DateTimeField.Content>
+    </DateTimeField>,
+  );
+  await userEvent.click(screen.getByRole('combobox'));
+  await expect
+    .element(document.querySelector<HTMLElement>('[role=dialog] [data-calendar-day="2026-09-20"]'))
+    .toHaveAttribute('data-today');
+  await userEvent.click(option('hour', 14));
+  expect([value?.month, value?.day, value?.hour]).toEqual([9, 20, 14]);
+});

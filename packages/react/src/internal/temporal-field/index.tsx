@@ -144,10 +144,16 @@ function useTemporal(part: string) {
   return context;
 }
 
-export function pickerPart<P>(children: ReactNode, type: unknown) {
-  return flattenFragments(children).find(
-    (child) => isValidElement(child) && elementTypeOf(child) === type,
-  ) as ReactElement<P> | undefined;
+export function pickerPart<P>(children: ReactNode, type: unknown): ReactElement<P> | undefined {
+  for (const child of flattenFragments(children)) {
+    if (!isValidElement<{ children?: ReactNode }>(child)) continue;
+    if (elementTypeOf(child) === type) return child as ReactElement<P>;
+    if (elementTypeOf(child) === TemporalContent) {
+      const inContent = pickerPart<P>(child.props.children, type);
+      if (inContent) return inContent;
+    }
+  }
+  return undefined;
 }
 
 export function useTemporalPicker<V>(part: string) {
