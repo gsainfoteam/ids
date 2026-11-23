@@ -1,6 +1,17 @@
 import type { ScrollArea } from '..';
 import type { Axis } from './geometry';
 
+export const AXES: Record<ScrollArea.Orientation, Axis[]> = {
+  vertical: ['y'],
+  horizontal: ['x'],
+  both: ['y', 'x'],
+};
+
+export const scrollsAlong = (axes: Record<Axis, boolean>): ScrollArea.Orientation => {
+  if (axes.x && axes.y) return 'both';
+  return axes.x ? 'horizontal' : 'vertical';
+};
+
 export const axisOf = (orientation: ScrollArea.ScrollbarOrientation | undefined): Axis =>
   orientation === 'horizontal' ? 'x' : 'y';
 
