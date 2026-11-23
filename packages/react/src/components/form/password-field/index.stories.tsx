@@ -20,8 +20,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-const noPasswordManager = { 'data-1p-ignore': '', 'data-lpignore': 'true' } as const;
-
 const NO_FILL = 'rgba(0, 0, 0, 0)';
 
 const meta = {
@@ -34,8 +32,6 @@ const meta = {
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     invalid: { control: 'boolean' },
-    hideVisibilityToggle: { control: 'boolean' },
-    hideCapsLock: { control: 'boolean' },
   },
   args: {
     name: 'password',
@@ -52,6 +48,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>비밀번호</Field.Label>
+      <PasswordField name="password" autoComplete="current-password" />
+    </Field>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -122,7 +127,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Composition"
-        description="자식을 두지 않으면 Caps Lock 표시와 보기 버튼이 뒤에 붙습니다. 직접 두면 그 자리에 놓입니다."
+        description="부품을 하나도 쓰지 않으면 Caps Lock 표시와 보기 버튼이 뒤에 붙습니다. Input, CapsLock, VisibilityToggle, Clear 중 하나라도 쓰면 쓴 부품만, 쓴 자리에 그립니다. 아이콘은 부품이 아닙니다."
       >
         <Showcase.Row label="leading icon">
           <PasswordField name="password" aria-label="아이콘" className="w-72">
@@ -159,17 +164,19 @@ export const Gallery: Story = {
           <PasswordField
             name="password"
             defaultValue="infoteam"
-            hideVisibilityToggle
             aria-label="토글 없음"
             className="w-72"
-          />
+          >
+            <PasswordField.Input />
+            <PasswordField.CapsLock />
+          </PasswordField>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Visibility: Story = {
+export const ShowWhatWasTyped: Story = {
   render: function Render() {
     const [value, setValue] = useState('demo-password');
 
@@ -181,7 +188,8 @@ export const Visibility: Story = {
             name="password"
             value={value}
             onValueChange={setValue}
-            {...noPasswordManager}
+            data-1p-ignore=""
+            data-lpignore="true"
           >
             <LockClosedIcon />
             <PasswordField.Input />
@@ -197,7 +205,7 @@ export const Visibility: Story = {
     docs: {
       description: {
         story:
-          '보기 버튼은 같은 input의 type만 바꿉니다. 값, 선택 범위, 자동 완성이 유지되고 onChange는 불리지 않습니다. 이름은 그대로이고 aria-pressed가 상태를 알립니다.',
+          '`PasswordField.VisibilityToggle` 은 같은 input 의 type 만 바꿉니다. 값, 선택 범위, 자동 완성이 유지되고 onChange 는 불리지 않습니다. 이름은 그대로이고 aria-pressed 가 상태를 알립니다. 앞에 둔 아이콘은 부품이 아니라서 입력 앞에 그대로 놓입니다.',
       },
     },
   },
@@ -230,15 +238,20 @@ export const Visibility: Story = {
   },
 };
 
-export const CapsLock: Story = {
+export const WarnWhenCapsLockIsOn: Story = {
   render: (args) => (
-    <PasswordField {...args} {...noPasswordManager} placeholder="Caps Lock을 켜 보세요" />
+    <PasswordField
+      {...args}
+      placeholder="Caps Lock을 켜 보세요"
+      data-1p-ignore=""
+      data-lpignore="true"
+    />
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '입력에 포커스가 있는 동안 Caps Lock이 켜지면 ⇪ 표시가 나타나고, 스크린 리더에는 "Caps Lock이 켜져 있습니다."라고 알립니다.',
+          '입력에 포커스가 있는 동안 Caps Lock이 켜지면 ⇪ 표시가 나타나고, 스크린 리더에는 "Caps Lock이 켜져 있습니다."라고 알립니다. 부품을 쓰지 않은 PasswordField 는 이 표시를 기본으로 그립니다.',
       },
     },
   },
@@ -254,7 +267,65 @@ export const CapsLock: Story = {
   },
 };
 
-export const ControlledVisibility: Story = {
+export const LeaveOutTheVisibilityToggle: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>결제 비밀번호</Field.Label>
+      <PasswordField name="pin" inputMode="numeric" data-1p-ignore="" data-lpignore="true">
+        <PasswordField.Input />
+        <PasswordField.CapsLock />
+      </PasswordField>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '보기 버튼 없이 가려 두기만 하려면 `PasswordField.Input` 과 `PasswordField.CapsLock` 만 씁니다. 부품을 하나라도 쓰면 쓴 부품만 그리므로 VisibilityToggle 은 빠지고 Caps Lock 표시는 남습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const input = canvas.getByLabelText('결제 비밀번호', { selector: 'input' });
+    await expect(canvas.queryByRole('button')).toBeNull();
+    await userEvent.click(input);
+    await userEvent.keyboard('{CapsLock}a');
+    await expect(canvasElement.querySelector('[data-password-field-caps-lock]')).toBeVisible();
+    await userEvent.keyboard('{CapsLock}b');
+    await expect(canvasElement.querySelector('[data-password-field-caps-lock]')).toBeNull();
+  },
+};
+
+export const LeaveOutTheCapsLockSign: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>비밀번호</Field.Label>
+      <PasswordField name="password" data-1p-ignore="" data-lpignore="true">
+        <PasswordField.Input />
+        <PasswordField.VisibilityToggle />
+      </PasswordField>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Caps Lock 표시를 빼려면 `PasswordField.Input` 과 `PasswordField.VisibilityToggle` 만 씁니다. 화면의 ⇪ 표시와 스크린 리더 알림이 함께 빠집니다. 둘 다 빼려면 `<PasswordField.Input />` 하나만 씁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const input = canvas.getByLabelText('비밀번호', { selector: 'input' });
+    await userEvent.click(input);
+    await userEvent.keyboard('{CapsLock}a');
+    await expect(canvasElement.querySelector('[data-password-field-caps-lock]')).toBeNull();
+    await expect(canvas.queryByRole('status')).toBeNull();
+    await userEvent.keyboard('{CapsLock}b');
+    await expect(canvas.getByRole('button', { name: '비밀번호 표시' })).toBeVisible();
+  },
+};
+
+export const ControlVisibilityFromOutside: Story = {
   render: function Render() {
     const [visible, setVisible] = useState(false);
 
@@ -272,9 +343,12 @@ export const ControlledVisibility: Story = {
             defaultValue="infoteam"
             visible={visible}
             onVisibleChange={setVisible}
-            hideVisibilityToggle
-            {...noPasswordManager}
-          />
+            data-1p-ignore=""
+            data-lpignore="true"
+          >
+            <PasswordField.Input />
+            <PasswordField.CapsLock />
+          </PasswordField>
         </Field>
         <label className="text-body-b3-regular flex items-center gap-2">
           <input
@@ -292,7 +366,7 @@ export const ControlledVisibility: Story = {
     docs: {
       description: {
         story:
-          'visible과 onVisibleChange로 바깥에서 보기 상태를 정합니다. 폼을 제출하면 비밀번호 관리자가 알아보도록 다시 가립니다.',
+          '`visible` 과 `onVisibleChange` 로 바깥에서 보기 상태를 정합니다. 여기서는 체크박스가 보기 버튼을 대신하므로 부품은 Input 과 CapsLock 만 씁니다. 폼을 제출하면 비밀번호 관리자가 알아보도록 다시 가립니다.',
       },
     },
   },
@@ -313,7 +387,7 @@ const schema = z
     message: '비밀번호가 일치하지 않습니다.',
   });
 
-export const ZodForm: Story = {
+export const ConfirmANewPassword: Story = {
   render: function Render() {
     const methods = useForm({
       resolver: zodResolver(schema),
@@ -330,13 +404,13 @@ export const ZodForm: Story = {
         >
           <FormField name="password" required>
             <FormField.Label>새 비밀번호</FormField.Label>
-            <PasswordField autoComplete="new-password" {...noPasswordManager} />
+            <PasswordField autoComplete="new-password" data-1p-ignore="" data-lpignore="true" />
             <FormField.Hint>8자 이상 입력하세요.</FormField.Hint>
             <FormField.Error />
           </FormField>
           <FormField name="confirmation" required>
             <FormField.Label>비밀번호 확인</FormField.Label>
-            <PasswordField autoComplete="new-password" {...noPasswordManager} />
+            <PasswordField autoComplete="new-password" data-1p-ignore="" data-lpignore="true" />
             <FormField.Error />
           </FormField>
           <Button type="submit">검증</Button>
@@ -354,6 +428,14 @@ export const ZodForm: Story = {
         </form>
       </FormProvider>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '새 비밀번호와 확인 칸을 react-hook-form 의 `Field` 로 묶고 zod 스키마로 검증합니다. `autoComplete="new-password"` 는 비밀번호 관리자에게 새 비밀번호를 만들 자리라고 알립니다. 제출이 막히면 오류가 난 첫 칸으로 포커스가 가고, 오류 문구가 입력의 설명에 들어갑니다.',
+      },
+    },
   },
   play: async ({ canvas, userEvent }) => {
     const password = canvas.getByLabelText('새 비밀번호', { selector: 'input', exact: false });

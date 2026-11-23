@@ -14,6 +14,7 @@ import {
   countOf,
   splitAroundInput,
   stateAttributes,
+  writesNoneOf,
   type TextControlState,
 } from '../../../internal/text-control';
 import { invariant } from '../../../utils';
@@ -39,8 +40,6 @@ export function PasswordFieldRoot({
   visible,
   defaultVisible = false,
   onVisibleChange,
-  hideVisibilityToggle = false,
-  hideCapsLock = false,
   className,
   style,
   children,
@@ -53,13 +52,16 @@ export function PasswordFieldRoot({
     () => <PasswordFieldInput />,
     'PasswordField',
   );
-  const toggles = countOf(items, PasswordFieldVisibilityToggle);
-  const capsLocks = countOf(items, PasswordFieldCapsLock);
   invariant(
-    toggles <= 1,
+    countOf(items, PasswordFieldVisibilityToggle) <= 1,
     '`<PasswordField>` accepts at most one `<PasswordFieldVisibilityToggle />`.',
   );
-  invariant(capsLocks <= 1, '`<PasswordField>` accepts at most one `<PasswordFieldCapsLock />`.');
+  invariant(
+    countOf(items, PasswordFieldCapsLock) <= 1,
+    '`<PasswordField>` accepts at most one `<PasswordFieldCapsLock />`.',
+  );
+  const own = [PasswordFieldVisibilityToggle, PasswordFieldCapsLock, TextControlClear];
+  const drawsDefaultParts = writesNoneOf(items, [PasswordFieldInput, ...own]);
 
   const field = usePasswordField({
     rootProps,
@@ -74,7 +76,6 @@ export function PasswordFieldRoot({
   });
   const state: PasswordFieldState = { size: resolvedSize, variant, ...field.state };
   const styles = passwordFieldStyle({ variant, size: resolvedSize });
-  const own = [PasswordFieldVisibilityToggle, PasswordFieldCapsLock, TextControlClear];
 
   return (
     <PasswordFieldContext
@@ -110,8 +111,12 @@ export function PasswordFieldRoot({
             marker="password-field"
             className={styles.adornment()}
           />
-          {!hideCapsLock && capsLocks === 0 && <PasswordFieldCapsLock />}
-          {!hideVisibilityToggle && toggles === 0 && <PasswordFieldVisibilityToggle />}
+          {drawsDefaultParts && (
+            <>
+              <PasswordFieldCapsLock />
+              <PasswordFieldVisibilityToggle />
+            </>
+          )}
         </div>
       </TextControlContext>
     </PasswordFieldContext>

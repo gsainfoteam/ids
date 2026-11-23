@@ -30,8 +30,12 @@ import { Field, PasswordField } from '@gsainfoteam/ids-react';
 ## 보기 전환
 
 ```tsx
-<PasswordField name="password" />                       // 뒤에 보기 버튼이 붙는다
-<PasswordField name="password" hideVisibilityToggle />  // 버튼 없이
+<PasswordField name="password" />                       // 파트를 쓰지 않으면 Caps Lock 표시와 보기 버튼이 붙는다
+
+<PasswordField name="password">
+  <PasswordField.Input />                               {/* 파트를 하나라도 쓰면 쓴 것만 그린다: 버튼 없이 */}
+  <PasswordField.CapsLock />
+</PasswordField>
 
 <PasswordField name="password" visible={visible} onVisibleChange={setVisible} /> // 바깥에서 제어
 <PasswordField name="password" defaultVisible />        // 보이는 상태로 시작
@@ -52,11 +56,16 @@ import { Field, PasswordField } from '@gsainfoteam/ids-react';
 
 ```tsx
 <PasswordField name="password" />                       // 뒤에 자동으로 붙는다
-<PasswordField name="password" hideCapsLock />          // 붙이지 않는다
+
+<PasswordField name="password">
+  <PasswordField.Input />                               {/* Caps Lock 표시 없이 */}
+  <PasswordField.VisibilityToggle />
+</PasswordField>
 
 <PasswordField name="password">
   <PasswordField.CapsLock label="Caps Lock is on" />    {/* 자리와 문구를 정한다 */}
   <PasswordField.Input />
+  <PasswordField.VisibilityToggle />
 </PasswordField>
 ```
 
@@ -81,8 +90,13 @@ import { Field, PasswordField } from '@gsainfoteam/ids-react';
   <LockClosedIcon />                      {/* Input 앞 = 앞쪽 */}
   <PasswordField.Input />
   <PasswordField.Clear />                 {/* 값이 있을 때만. Escape도 지운다 */}
-  <PasswordField.VisibilityToggle />      {/* 직접 두면 자동 버튼을 대신한다 */}
+  <PasswordField.VisibilityToggle />      {/* 파트를 썼으니 보기 버튼도 직접 둔다 */}
 </PasswordField>
+```
+
+- 파트는 `Input`, `VisibilityToggle`, `CapsLock`, `Clear` 입니다. 아이콘이나 글자 같은 장식은 파트가 아니라서, 장식만 넣으면 기본 파트가 그대로 붙습니다.
+
+```tsx
 
 <PasswordField.VisibilityToggle asChild>
   <Button variant="ghost">보기</Button>    {/* 직접 그린 버튼은 자기 글자로 이름을 갖는다 */}
@@ -142,7 +156,6 @@ const schema = z
 | `value` / `defaultValue`                 | native 그대로                                                 |
 | `onValueChange`                          | `(value: string) => void`                                     |
 | `visible` / `defaultVisible` / `onVisibleChange` | 보기 상태. 기본 `false`                               |
-| `hideVisibilityToggle` / `hideCapsLock`  | 자동 파트를 숨긴다                                            |
 | `variant`                                | `outline`(기본) / `soft` / `ghost`                            |
 | `size`                                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                                | `aria-invalid` 와 danger 테두리. 명시한 `aria-invalid` 가 우선 |
