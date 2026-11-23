@@ -53,7 +53,9 @@ beforeEach(async () => {
 test('SSR: figure named by its caption, built-in languages highlighted, lines joined by newlines', () => {
   const doc = new DOMParser().parseFromString(
     renderToString(
-      <CodeBlock language="tsx" title="save.tsx" lineNumbers highlight={[2]}>
+      <CodeBlock language="tsx" highlight={[2]}>
+        <CodeBlock.Title>save.tsx</CodeBlock.Title>
+        <CodeBlock.LineNumbers />
         {`\n${SAVE}\n`}
       </CodeBlock>,
     ),
@@ -64,6 +66,7 @@ test('SSR: figure named by its caption, built-in languages highlighted, lines jo
   expect(figure.firstElementChild!.tagName).toBe('FIGCAPTION');
   expect(figure.querySelector('figcaption')!.textContent).toBe('save.tsxtsx');
   expect(figure.querySelector('figcaption button')).toBeNull();
+  expect(figure).toHaveAttribute('data-line-numbers');
   expect(doc.querySelector('code')!.textContent).toBe(SAVE);
   expect(tokensIn(doc, 'keyword')).toEqual(
     expect.arrayContaining(['export', 'function', 'return']),
@@ -80,7 +83,8 @@ test('the copy button writes the code, without line numbers, to the clipboard', 
   const revokeClipboardWrite = await acceptClipboardWritePrompt();
   onTestFinished(revokeClipboardWrite);
   const screen = await render(
-    <CodeBlock language="tsx" lineNumbers>
+    <CodeBlock language="tsx">
+      <CodeBlock.LineNumbers />
       {SAVE}
     </CodeBlock>,
   );
@@ -95,7 +99,8 @@ test('the copy button writes the code, without line numbers, to the clipboard', 
 
 test('selecting the code and copying it leaves the line numbers out', async () => {
   const screen = await render(
-    <CodeBlock language="tsx" lineNumbers>
+    <CodeBlock language="tsx">
+      <CodeBlock.LineNumbers />
       {SAVE}
     </CodeBlock>,
   );
@@ -112,7 +117,7 @@ test('selecting the code and copying it leaves the line numbers out', async () =
 test('without a caption, the first line wraps before the copy button', async () => {
   const screen = await render(
     <div className="w-72">
-      <CodeBlock wrap>{'x'.repeat(200)}</CodeBlock>
+      <CodeBlock className="whitespace-pre-wrap">{'x'.repeat(200)}</CodeBlock>
     </div>,
   );
   const firstLineText = document.createRange();
@@ -145,10 +150,10 @@ test('a long line scrolls sideways from the keyboard once Tab reaches the code',
   await expect.poll(() => pre.scrollLeft).toBeGreaterThan(0);
 });
 
-test('wrap keeps the code inside the block', async () => {
+test('whitespace-pre-wrap on the root keeps the code inside the block', async () => {
   const screen = await render(
     <div className="w-72">
-      <CodeBlock language="ts" wrap>
+      <CodeBlock language="ts" className="whitespace-pre-wrap">
         {LONG_LINE}
       </CodeBlock>
     </div>,

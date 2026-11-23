@@ -15,7 +15,7 @@ export const codeTokens = cn(
 
 export const codeBlockStyle = tv({
   slots: {
-    root: 'relative flex min-w-0 flex-col rounded-container text-neutral-strong',
+    root: 'relative flex min-w-0 flex-col rounded-container whitespace-pre text-neutral-strong',
     caption: [
       'flex min-h-[calc(var(--ids-size-control-tiny)+--spacing(3))] min-w-0 items-center gap-2',
       'ps-4 pe-[calc(var(--ids-size-control-tiny)+--spacing(3))]',
@@ -26,8 +26,8 @@ export const codeBlockStyle = tv({
     copy: 'absolute end-1.5 top-1.5',
     status: 'sr-only',
     scroller: 'min-w-0 rounded-[inherit]',
-    pre: 'rounded-[inherit] py-3 font-mono text-body-b3-regular',
-    code: ['block [--code-block-gutter:0px]', codeTokens],
+    pre: 'rounded-[inherit] py-3 font-mono text-body-b3-regular [white-space:inherit]',
+    code: ['block w-fit min-w-full wrap-anywhere [--code-block-gutter:0px]', codeTokens],
     line: [
       'inline-block min-h-lh w-full pe-4 align-top',
       'ps-[calc(--spacing(4)+var(--code-block-gutter))]',
@@ -46,10 +46,6 @@ export const codeBlockStyle = tv({
         divider: 'bg-base',
         line: 'data-highlighted:bg-base',
       },
-    },
-    wrap: {
-      true: { code: 'w-full wrap-break-word whitespace-pre-wrap' },
-      false: { code: 'w-max min-w-full whitespace-pre' },
     },
     lineNumbers: {
       true: {
@@ -79,7 +75,6 @@ export const codeBlockStyle = tv({
   },
   defaultVariants: {
     variant: 'outline',
-    wrap: false,
     lineNumbers: false,
     captioned: true,
     collapsed: false,
