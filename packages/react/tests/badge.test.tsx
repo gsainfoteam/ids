@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 import { renderToString } from 'react-dom/server';
-import { expect, test, vi } from 'vitest';
+import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 
 import { Avatar, Badge, Button, IdsProvider } from '../src';
@@ -86,13 +86,13 @@ test('placement is logical and starts at the corner until the client measures it
   expect(onAvatar.getAttribute('style'), 'the server writes no measured inset').toBeNull();
 });
 
-test('a Badge that wraps no element warns in development', async () => {
-  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-  await render(<Badge content={3}>{'Inbox' as unknown as ReactElement}</Badge>);
-  expect(warn).toHaveBeenCalledWith(
-    '[IDS] Badge: wrap exactly one element. A badge on its own is a Chip.',
-  );
-  warn.mockRestore();
+test('a Badge that does not wrap exactly one element throws', () => {
+  const wraps = (children: unknown) => () =>
+    renderToString(<Badge content={3}>{children as ReactElement}</Badge>);
+  expect(wraps('Inbox')).toThrow();
+  expect(wraps([<span key="a" />, <span key="b" />])).toThrow();
+  expect(wraps(false)).toThrow();
+  expect(wraps(<span />)).not.toThrow();
 });
 
 test('className takes the badge state', () => {
