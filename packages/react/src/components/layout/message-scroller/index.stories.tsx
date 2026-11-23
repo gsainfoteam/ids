@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ArrowDownCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowDownCircleIcon } from '@heroicons/react/16/solid';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase, holdTheNextCall } from '~story-kit';
@@ -20,9 +20,9 @@ const meta = {
   argTypes: {
     stickToBottom: { control: 'boolean' },
     scrollOnAppend: { control: 'radio', options: ['end', 'start'] },
-    loading: { control: 'boolean' },
+    'aria-busy': { control: 'boolean' },
   },
-  args: { stickToBottom: true, scrollOnAppend: 'end', loading: false },
+  args: { stickToBottom: true, scrollOnAppend: 'end', 'aria-busy': false },
 } satisfies Meta<typeof MessageScroller>;
 
 export default meta;
@@ -99,6 +99,37 @@ export const Playground: Story = {
   ),
 };
 
+export const Usage: Story = {
+  render: () => (
+    <MessageScroller className="rounded-container border-neutral h-80 w-full max-w-md border">
+      <Bubble align="start" variant="soft" className="self-start">
+        내일 동아리 회의 몇 시였지?
+      </Bubble>
+      <Bubble align="end" variant="solid" className="self-end">
+        저녁 7시, 학생회관 2층이야.
+      </Bubble>
+      <Bubble align="start" variant="soft" className="self-start">
+        발표 자료는 누가 가져와?
+      </Bubble>
+      <Bubble align="end" variant="solid" className="self-end">
+        내가 노트북에 담아 갈게.
+      </Bubble>
+      <Bubble align="start" variant="soft" className="self-start">
+        좋아. 간식은 내가 사 갈게.
+      </Bubble>
+      <Bubble align="end" variant="solid" className="self-end">
+        고마워. 음료도 부탁해.
+      </Bubble>
+      <Bubble align="start" variant="soft" className="self-start">
+        몇 명 오는지 알아?
+      </Bubble>
+      <Bubble align="end" variant="solid" className="self-end">
+        지금까지 열두 명이 온다고 했어.
+      </Bubble>
+    </MessageScroller>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -138,10 +169,10 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Loading"
-        description="loading 이면 위쪽 가운데에 Spinner 가 내용 위로 뜹니다. 목록을 밀지 않습니다."
+        description="aria-busy 면 위쪽 가운데에 Spinner 가 내용 위로 뜹니다. 목록을 밀지 않습니다."
       >
-        <Showcase.Row label="loading">
-          <MessageScroller loading className={frame}>
+        <Showcase.Row label="aria-busy">
+          <MessageScroller aria-busy className={frame}>
             {CONVERSATION.map((line) => (
               <Bubble
                 key={line.id}
@@ -182,7 +213,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const StickToBottom: Story = {
+export const FollowNewMessages: Story = {
   render: function Render() {
     const [lines, setLines] = useState(CONVERSATION);
 
@@ -223,7 +254,7 @@ export const StickToBottom: Story = {
     docs: {
       description: {
         story:
-          '맨 아래에 있으면 새 메시지를 따라갑니다. 위로 올려 읽는 중에는 따라가지 않고, 아래로 가기 버튼에 새 메시지 수를 셉니다. 버튼을 누르거나 맨 아래로 내리면 다시 따라갑니다.',
+          '채팅 목록을 MessageScroller 로 감싸면 따로 설정하지 않아도 맨 아래에 있을 때 새 메시지를 따라갑니다(`stickToBottom`). 위로 올려 읽는 중에는 따라가지 않고, 아래로 가기 버튼에 새 메시지 수를 셉니다. 버튼을 누르거나 맨 아래로 내리면 다시 따라갑니다.',
       },
     },
   },
@@ -252,7 +283,7 @@ export const StickToBottom: Story = {
   },
 };
 
-export const ScrollOnAppendStart: Story = {
+export const KeepTheQuestionInViewInAnAiChat: Story = {
   render: function Render() {
     const [turns, setTurns] = useState([{ id: 0, question: '남은 전공 필수가 뭐야?', answer: 2 }]);
 
@@ -333,7 +364,7 @@ export const ScrollOnAppendStart: Story = {
   },
 };
 
-export const OnReachStart: Story = {
+export const LoadEarlierMessages: Story = {
   args: { onReachStart: fn() },
   render: function Render(args) {
     const [lines, setLines] = useState(CONVERSATION);
@@ -342,7 +373,7 @@ export const OnReachStart: Story = {
 
     return (
       <MessageScroller
-        loading={loading}
+        aria-busy={loading}
         className={frame}
         onReachStart={async () => {
           if (!more) return;
@@ -370,7 +401,7 @@ export const OnReachStart: Story = {
     docs: {
       description: {
         story:
-          '맨 위에 닿으면 onReachStart 를 부릅니다. 불러오는 동안 loading 으로 Spinner 를 띄우고, 앞 기록이 붙어도 읽던 메시지는 제자리에 있습니다.',
+          '맨 위에 닿으면 `onReachStart` 를 부릅니다. 불러오는 동안 `aria-busy` 로 Spinner 를 띄우고 스크롤 영역을 바쁨으로 표시하며, 앞 기록이 붙어도 읽던 메시지는 제자리에 있습니다.',
       },
     },
   },
@@ -398,7 +429,7 @@ export const OnReachStart: Story = {
   },
 };
 
-export const CustomJump: Story = {
+export const ReplaceTheJumpButton: Story = {
   render: () => (
     <MessageScroller className={frame}>
       {CONVERSATION.map((line) => (

@@ -56,7 +56,6 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/form/text-field/index.stories.tsx',
   'components/form/time-field/index.stories.tsx',
   'components/layout/aspect-ratio/index.stories.tsx',
-  'components/layout/message-scroller/index.stories.tsx',
   'components/layout/resizable/index.stories.tsx',
   'components/layout/scroll-area/index.stories.tsx',
   'components/layout/spacer/index.stories.tsx',

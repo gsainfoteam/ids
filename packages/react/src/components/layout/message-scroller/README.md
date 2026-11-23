@@ -59,15 +59,15 @@ import { Bubble, MessageScroller } from '@gsainfoteam/ids-react';
 ## 앞 기록 불러오기
 
 ```tsx
-<MessageScroller onReachStart={loadOlder} loading={loadingOlder}>
+<MessageScroller onReachStart={loadOlder} aria-busy={loadingOlder}>
   {messages.map(...)}
 </MessageScroller>
 ```
 
 - 위로 스크롤해 맨 위에서 48px 안에 들어오면 `onReachStart` 를 한 번 부릅니다. 48px 밖으로 나갔다가 다시 들어오거나 앞에 메시지가 붙으면 다시 부를 수 있습니다.
-- `loading` 인 동안은 부르지 않습니다. 더 불러올 기록이 없으면 `onReachStart` 를 넘기지 않거나 함수 안에서 그냥 돌아옵니다.
+- `aria-busy` 인 동안은 부르지 않습니다. 더 불러올 기록이 없으면 `onReachStart` 를 넘기지 않거나 함수 안에서 그냥 돌아옵니다.
 - 처음부터 넘치지 않는 짧은 목록은 스크롤이 없어 부르지 않습니다. 첫 화면을 채울 만큼은 앱이 먼저 불러옵니다.
-- `loading` 이면 위쪽 가운데에 Spinner 가 내용 위로 뜨고, 스크롤 영역에 `aria-busy` 가 붙습니다. 목록을 밀지 않습니다.
+- `aria-busy` 면 위쪽 가운데에 Spinner 가 내용 위로 뜨고, `aria-busy` 는 root 가 아니라 스크롤 영역(`role="log"`)에 붙습니다. 목록을 밀지 않습니다.
 - 앞에 붙은 메시지는 화면 위쪽 밖에 생깁니다. 화면에 보이던 첫 메시지가 같은 자리에 남도록 스크롤을 옮깁니다.
 
 ## 아래로 가기 버튼
@@ -165,7 +165,7 @@ export function Chat() {
 | 속성                                      | 붙는 곳         | 뜻                     |
 | ----------------------------------------- | --------------- | ---------------------- |
 | `data-at-end`                             | root            | 맨 아래에 있다         |
-| `data-loading`                            | root            | `loading`              |
+| `data-loading`                            | root            | `aria-busy`            |
 | `data-hidden`                             | Jump            | 맨 아래라 숨었다       |
 | `data-message-scroller`                   | root            |                        |
 | `data-message-scroller-list` / `-item`    | `<ol>` / `<li>` |                        |
@@ -179,7 +179,7 @@ export function Chat() {
 | `stickToBottom`  | `true`. 맨 아래에 있으면 새 메시지와 자라는 메시지를 따라간다       |
 | `scrollOnAppend` | `'end'`(기본) / `'start'`. 새로 붙은 첫 자식을 위쪽에 맞출지        |
 | `onReachStart`   | 위로 스크롤해 맨 위에 닿으면 부른다                                 |
-| `loading`        | `false`. 위쪽에 Spinner, 스크롤 영역에 `aria-busy`                  |
+| `aria-busy`      | 위쪽에 Spinner. root 가 아니라 스크롤 영역에 붙는다                 |
 | `aria-label`     | 스크롤 영역(`role="log"`)의 이름. 기본 "메시지"                     |
 | 그 외            | root `<div>` 로 간다                                               |
 
