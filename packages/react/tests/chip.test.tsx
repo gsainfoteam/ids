@@ -254,6 +254,18 @@ test('a custom close label replaces the joined name; asChild keeps the child as 
   expect(link.textContent).toBe('react');
 });
 
+test('a chip never grows past its parent and truncates its label there', async () => {
+  const screen = await render(
+    <div style={{ width: 80 }}>
+      <Chip>아주 긴 태그 이름은 말줄임표로 줄어듭니다</Chip>
+    </div>,
+  );
+  const chip = screen.container.querySelector<HTMLElement>('[data-chip]')!;
+  const label = chip.querySelector<HTMLElement>('[data-chip-label]')!;
+  expect(chip.getBoundingClientRect().width).toBeLessThanOrEqual(80);
+  expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+});
+
 test('className takes the chip state', () => {
   const root = html(
     <Chip defaultSelected className={(state) => (state.selected ? 'on' : 'off')}>
