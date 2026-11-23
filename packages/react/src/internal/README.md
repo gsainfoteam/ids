@@ -229,14 +229,17 @@ insetClipPath({ width, height }, { top, right, bottom, left }, radius, exponent)
 ### 쓰는 곳
 
 - ScrollArea: `geometry.ts` 의 `readShape` 가 네 모서리 반지름을 읽어 테두리 두께를 빼고, `cornerSquareFits` 가 두 막대가 만나는 모서리에 corner 칸이 들어가는지 봅니다.
-- Badge: `use-badge-inset.ts` 가 감싼 요소의 모서리 반지름을 읽어 `--badge-inset` 으로 배지 중심을 곡선 위에 둡니다.
+- Badge: `use-badge-inset.ts` 가 `cornerRadii` 로 감싼 요소의 모서리 반지름을 읽고, `--badge-inset-x` 와 `--badge-inset-y` 로 배지 중심을 곡선 위에 둡니다.
 
 ### 쓰는 법
 
 ```ts
 const style = getComputedStyle(element);
 const radius = cornerRadius(style, 'top-right', Math.min(width, height));
-// '50%' 는 짧은 변 기준으로 풀고, rounded-full 의 아주 큰 값은 짧은 변의 절반에서 멈춘다
+// ScrollArea: '50%' 는 짧은 변 기준으로 풀고, 아주 큰 값은 짧은 변의 절반에서 멈춘다
+
+const { x, y } = cornerRadii(style, width, height)['top-right'];
+// Badge: 가로는 너비, 세로는 높이로 풀고, CSS 처럼 넘치는 반지름을 모두 같은 비율로 줄인다
 
 diagonalInset(radius, cornerExponent(style, 'top-right'));
 // radius × (1 − 2^(−1/n)). 원(n = 2) 은 0.293r, squircle(n = 4) 은 0.159r
@@ -245,13 +248,13 @@ diagonalInset(radius, cornerExponent(style, 'top-right'));
 ### 왜 이렇게
 
 - `|x|ⁿ + |y|ⁿ = 1` 위에서 x = y 인 점은 `2^(−1/n)` 이라, 모서리에서 두 변 쪽으로 똑같이 `r(1 − 2^(−1/n))` 들어와 있습니다.
-- CSS 는 이웃 모서리 반지름의 합이 변보다 길면 줄여서 그립니다. 정사각형과 알약 모양에서는 짧은 변의 절반에서 멈추는 것과 같아서 그 값으로 자릅니다.
-- 퍼센트 반지름은 가로는 너비, 세로는 높이 기준이지만 짧은 변 하나로 풉니다. 두 축이 다른 타원 모서리는 IDS 가 쓰지 않습니다.
+- CSS 는 이웃 모서리 반지름의 합이 변보다 길면 모든 모서리 반지름에 같은 비율을 곱해 줄입니다. `cornerRadii` 는 그 계산을 그대로 따라서 `rounded-tl-full` 처럼 한 모서리만 큰 요소와 타원 모서리에서도 그려진 곡선과 맞습니다.
+- `cornerRadius` 는 짧은 변의 절반에서 자르는 간단한 근사입니다. 네 모서리가 같은 정사각형과 알약 모양에서는 `cornerRadii` 와 같고, ScrollArea 가 씁니다.
 
 ### 알아둘 것
 
 - `cornerRadius` 는 테두리 바깥 곡선의 반지름입니다. 테두리 안쪽 곡선이 필요하면 ScrollArea 처럼 테두리 두께를 뺍니다.
-- 식을 바꾸면 ScrollArea 막대 끝과 corner 칸, Badge 위치가 함께 바뀝니다.
+- `diagonalInset` 을 바꾸면 ScrollArea 막대 끝과 corner 칸, Badge 위치가 함께 바뀝니다.
 
 ## date-locale.ts
 

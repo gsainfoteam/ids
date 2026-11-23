@@ -16,7 +16,7 @@ import {
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
+import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -176,7 +176,7 @@ export const PC: Story = {
                 </Item.Content>
                 {item.count && (
                   <Item.Actions>
-                    <Badge content={item.count} variant="soft" />
+                    <Chip variant="soft">{item.count}</Chip>
                   </Item.Actions>
                 )}
               </a>
@@ -195,7 +195,7 @@ export const PC: Story = {
                 <Item.Title>
                   {mail.from}
                   {unread.includes(mail.id) && (
-                    <Badge dot colorScheme="primary" aria-label="읽지 않음" />
+                    <Chip variant="solid" colorScheme="primary" aria-label="읽지 않음" />
                   )}
                 </Item.Title>
                 <Item.Description>
@@ -238,7 +238,11 @@ export const PC: Story = {
           </div>
 
           <div className="flex flex-col gap-3">
-            {opened.label && <Badge content={opened.label} variant="soft" className="self-start" />}
+            {opened.label && (
+              <Chip variant="soft" className="self-start">
+                {opened.label}
+              </Chip>
+            )}
             <h2 className="text-headline-h4-bold">{opened.subject}</h2>
             <Item variant="soft" size="tiny">
               <Item.Media>
@@ -283,7 +287,7 @@ export const PC: Story = {
       <div className="flex h-dvh flex-col break-keep">
         <header className="flex items-center gap-3 px-4 py-3">
           <h1 className="text-body-b1-bold">메일</h1>
-          <Badge content={`안 읽은 메일 ${unread.length}`} variant="soft" colorScheme="primary" />
+          <Chip variant="soft" colorScheme="primary">{`안 읽은 메일 ${unread.length}`}</Chip>
           <IconButton
             asChild
             variant="outline"

@@ -25,7 +25,6 @@ import { IconToggle } from '../../components/action/icon-toggle';
 import { Toggle } from '../../components/action/toggle';
 import { Accordion } from '../../components/data/accordion';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Bubble } from '../../components/data/bubble';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
@@ -275,7 +274,9 @@ export const PC: Story = {
                         <h2>
                           <Accordion.Trigger>
                             학사 시스템에서 개설 과목을 찾았어요{' '}
-                            <Badge content="38과목" variant="soft" colorScheme="success" />
+                            <Chip variant="soft" colorScheme="success">
+                              38과목
+                            </Chip>
                           </Accordion.Trigger>
                         </h2>
                       </Accordion.Header>

@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
 import { renderToString } from 'react-dom/server';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 
 import { Avatar, Badge, Button, IdsProvider } from '../src';
@@ -10,8 +10,8 @@ import { testTheme } from './theme';
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
 function renderBadge(
-  props: Badge.Props,
-  children: ReactNode = <button type="button">Inbox</button>,
+  props: Omit<Badge.Props, 'children'>,
+  children: ReactElement = <button type="button">Inbox</button>,
 ) {
   const doc = parse(renderToString(<Badge {...props}>{children}</Badge>));
   return {
@@ -50,7 +50,7 @@ test('an unlabelled count describes the element it is attached to', () => {
   );
   expect(merged.anchor.getAttribute('aria-describedby')).toBe(`hint ${merged.indicator.id}`);
   expect(renderBadge({ content: 0 }).anchor.hasAttribute('aria-describedby')).toBe(false);
-  expect(renderBadge({ dot: true }).anchor.hasAttribute('aria-describedby')).toBe(false);
+  expect(renderBadge({}).anchor.hasAttribute('aria-describedby')).toBe(false);
 });
 
 test('a labelled badge is a live region that reads its sentence, even while invisible', () => {
@@ -65,12 +65,12 @@ test('a labelled badge is a live region that reads its sentence, even while invi
   expect(hidden.hasAttribute('data-invisible')).toBe(true);
 });
 
-test('dot draws no text; invisible hides without unmounting', () => {
-  const dot = renderBadge({ dot: true, colorScheme: 'success' }).indicator;
+test('no content draws a dot; invisible hides without unmounting', () => {
+  const dot = renderBadge({ colorScheme: 'success' }).indicator;
   expect(dot.hasAttribute('data-dot')).toBe(true);
   expect(dot.textContent).toBe('');
   expect(dot.getAttribute('aria-hidden')).toBe('true');
-  const off = renderBadge({ dot: true, invisible: true, 'aria-label': 'Offline' }).indicator;
+  const off = renderBadge({ invisible: true, 'aria-label': 'Offline' }).indicator;
   expect(off.hasAttribute('data-invisible')).toBe(true);
   expect(off.textContent).toBe('Offline');
 });
@@ -79,27 +79,20 @@ test('placement is logical and starts at the corner until the client measures it
   const { root, indicator } = renderBadge({ content: 1, placement: 'bottom-start' });
   expect(root.dataset.placement).toBe('bottom-start');
   expect(indicator.classList.contains('pointer-events-none'), 'clicks reach the anchor').toBe(true);
-  expect(indicator.className).toContain('start-(--badge-inset)');
+  expect(indicator.className).toContain('start-(--badge-inset-x)');
   expect(indicator.className).toContain('rtl:translate-x-1/2');
   const onAvatar = renderBadge({ content: 1 }, <Avatar name="Alice Kim" />).root;
-  expect(onAvatar.className).toContain('[--badge-inset:0px]');
+  expect(onAvatar.className).toContain('[--badge-inset-x:0px]');
   expect(onAvatar.getAttribute('style'), 'the server writes no measured inset').toBeNull();
 });
 
-test('without children the badge renders in place', () => {
-  const doc = parse(renderToString(<Badge content={12} variant="soft" className="x" />));
-  const badge = doc.querySelector<HTMLElement>('[data-badge]')!;
-  expect(badge.hasAttribute('data-badge-indicator')).toBe(true);
-  expect(badge.textContent).toBe('12');
-  expect(badge.classList.contains('x')).toBe(true);
-  expect(badge.className).not.toContain('absolute');
-});
-
-test('children left as false by a condition count as no anchor', () => {
-  const doc = parse(renderToString(<Badge content={3}>{false}</Badge>));
-  const badge = doc.querySelector<HTMLElement>('[data-badge]')!;
-  expect(badge.hasAttribute('data-badge-indicator')).toBe(true);
-  expect(badge.className).not.toContain('absolute');
+test('a Badge that wraps no element warns in development', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  await render(<Badge content={3}>{'Inbox' as unknown as ReactElement}</Badge>);
+  expect(warn).toHaveBeenCalledWith(
+    '[IDS] Badge: wrap exactly one element. A badge on its own is a Chip.',
+  );
+  warn.mockRestore();
 });
 
 test('className takes the badge state', () => {
@@ -120,8 +113,12 @@ test('an icon in the content takes the text size, labelled or not', async () => 
   );
   const screen = await render(
     <>
-      <Badge content={content} />
-      <Badge content={content} aria-label="Done" size="tiny" />
+      <Badge content={content}>
+        <span />
+      </Badge>
+      <Badge content={content} aria-label="Done" size="tiny">
+        <span />
+      </Badge>
     </>,
   );
   const [standard, tiny] = Array.from(screen.container.querySelectorAll('svg'), (icon) =>
@@ -139,7 +136,7 @@ function centerOf(element: Element) {
   return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
 }
 
-async function renderOnTarget(target: ReactNode, placement: Badge.Placement = 'top-end') {
+async function renderOnTarget(target: ReactElement, placement: Badge.Placement = 'top-end') {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <Badge content={3} placement={placement}>
@@ -171,7 +168,7 @@ test('on a round Avatar the badge sits on the circle, 14.6% in from the corner',
   expect(box.width).toBe(40);
 
   await expectCenterAt(indicator, box.right - 40 * 0.146, box.top + 40 * 0.146);
-  expect(Number.parseFloat(root.style.getPropertyValue('--badge-inset'))).toBeCloseTo(
+  expect(Number.parseFloat(root.style.getPropertyValue('--badge-inset-x'))).toBeCloseTo(
     20 * CIRCLE_DIAGONAL,
     2,
   );
@@ -207,7 +204,7 @@ test('on a square element the badge sits on the corner point', async () => {
   await expectCenterAt(indicator, box.left, box.bottom);
 });
 
-test('right to left, top-end reads the top-left corner', async () => {
+test('right to left, top-end reads the top-left corner, scaled down the way CSS draws it', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <div dir="rtl">
@@ -221,7 +218,14 @@ test('right to left, top-end reads the top-left corner', async () => {
   const indicator = screen.container.querySelector('[data-badge-indicator]')!;
   const box = target.getBoundingClientRect();
 
-  await expectCenterAt(indicator, box.left + 20 * CIRCLE_DIAGONAL, box.top + 20 * CIRCLE_DIAGONAL);
+  await expectCenterAt(indicator, box.left + 40 * CIRCLE_DIAGONAL, box.top + 40 * CIRCLE_DIAGONAL);
+});
+
+test('an elliptical corner insets each axis by its own radius', async () => {
+  const { target, indicator } = await renderOnTarget(<div className="h-10 w-20 rounded-[50%]" />);
+  const box = target.getBoundingClientRect();
+
+  await expectCenterAt(indicator, box.right - 40 * CIRCLE_DIAGONAL, box.top + 20 * CIRCLE_DIAGONAL);
 });
 
 test('a percentage radius is measured again when the element resizes', async () => {

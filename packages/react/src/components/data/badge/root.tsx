@@ -21,13 +21,12 @@ function flag(on: boolean) {
 
 export function BadgeRoot({
   content,
-  dot = false,
   max = 99,
   showZero = false,
   invisible = false,
   placement = 'top-end',
   variant = 'solid',
-  colorScheme,
+  colorScheme = 'danger',
   size = 'standard',
   className,
   style,
@@ -37,25 +36,17 @@ export function BadgeRoot({
   ...rest
 }: Badge.Props) {
   const rootRef = useRef<HTMLSpanElement>(null);
-  const { indicatorId, display, hidden, anchor } = useBadge({
+  const { indicatorId, dot, display, hidden, anchor } = useBadge({
     content,
-    dot,
     max,
     showZero,
     invisible,
     label,
     children,
   });
-  const standalone = children == null || typeof children === 'boolean';
-  useBadgeInset(rootRef, standalone ? null : placement, anchor);
+  useBadgeInset(rootRef, placement, anchor);
 
-  const styles = badgeStyle({
-    variant,
-    colorScheme: colorScheme ?? (standalone ? 'neutral' : 'danger'),
-    size,
-    dot,
-    placement: standalone ? 'none' : placement,
-  });
+  const styles = badgeStyle({ variant, colorScheme, size, dot, placement });
   const state: Badge.State = {
     count: display.count,
     dot,
@@ -82,18 +73,6 @@ export function BadgeRoot({
           ),
         }),
   };
-
-  if (standalone)
-    return (
-      <span
-        {...rest}
-        {...indicator}
-        ref={ref}
-        data-badge=""
-        className={styles.indicator({ className: resolveState(className, state) })}
-        style={resolveState(style, state)}
-      />
-    );
 
   return (
     <span

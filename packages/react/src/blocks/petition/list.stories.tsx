@@ -1,8 +1,8 @@
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Progress } from '../../components/feedback/progress';
 import { Tabs } from '../../components/navigation/tabs';
@@ -132,11 +132,12 @@ export const PC: Story = {
                               <h2>{petition.title}</h2>
                             </Card.Title>
                             <Card.Action>
-                              <Badge
-                                content={`${count.format(petition.signed)}명`}
+                              <Chip
                                 variant="soft"
                                 colorScheme={petition.signed >= GOAL ? 'success' : 'primary'}
-                              />
+                              >
+                                {`${count.format(petition.signed)}명`}
+                              </Chip>
                             </Card.Action>
                           </Card.Header>
                           {petition.state === 'open' && (

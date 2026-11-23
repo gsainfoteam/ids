@@ -4,8 +4,8 @@ import { AcademicCapIcon, CubeTransparentIcon, MegaphoneIcon } from '@heroicons/
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Progress } from '../../components/feedback/progress';
 import { Spinner } from '../../components/feedback/spinner';
@@ -108,7 +108,9 @@ export const PC: Story = {
                     <Card.Description>다음 셔틀 · 학생회관</Card.Description>
                     <Card.Title>8분 뒤 광주송정역행</Card.Title>
                     <Card.Action>
-                      <Badge content="12:20" variant="soft" colorScheme="primary" />
+                      <Chip variant="soft" colorScheme="primary">
+                        12:20
+                      </Chip>
                     </Card.Action>
                   </Card.Header>
                   <Card.Content>
@@ -126,7 +128,9 @@ export const PC: Story = {
                       <Item.Description>총학생회 · 오늘 18:00까지</Item.Description>
                     </Item.Content>
                     <Item.Actions>
-                      <Badge content="새 글" variant="soft" colorScheme="danger" />
+                      <Chip variant="soft" colorScheme="danger">
+                        새 글
+                      </Chip>
                     </Item.Actions>
                   </Item>
                 </Card>

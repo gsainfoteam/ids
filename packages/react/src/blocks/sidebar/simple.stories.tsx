@@ -26,7 +26,7 @@ import {
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
+import { Chip } from '../../components/data/chip';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
 import { Spacer } from '../../components/layout/spacer';
@@ -64,19 +64,31 @@ const GROUPS: { label: string; items: Entry[] }[] = [
         id: 'board',
         label: '게시판',
         icon: <NewspaperIcon />,
-        badge: <Badge content={12} variant="soft" colorScheme="primary" />,
+        badge: (
+          <Chip variant="soft" colorScheme="primary">
+            {12}
+          </Chip>
+        ),
       },
       {
         id: 'notice',
         label: '공지',
         icon: <MegaphoneIcon />,
-        badge: <Badge content="새 글" variant="soft" colorScheme="danger" />,
+        badge: (
+          <Chip variant="soft" colorScheme="danger">
+            새 글
+          </Chip>
+        ),
       },
       {
         id: 'shuttle',
         label: '셔틀',
         icon: <TruckIcon />,
-        badge: <Badge content="운행 중" variant="outline" colorScheme="success" />,
+        badge: (
+          <Chip variant="outline" colorScheme="success">
+            운행 중
+          </Chip>
+        ),
       },
       { id: 'meal', label: '오늘의 식단', icon: <CakeIcon /> },
     ],
@@ -89,14 +101,22 @@ const GROUPS: { label: string; items: Entry[] }[] = [
         id: 'comments',
         label: '받은 댓글',
         icon: <ChatBubbleLeftRightIcon />,
-        badge: <Badge content={4} variant="soft" colorScheme="info" />,
+        badge: (
+          <Chip variant="soft" colorScheme="info">
+            {4}
+          </Chip>
+        ),
       },
       { id: 'bookmarks', label: '북마크', icon: <BookmarkIcon /> },
       {
         id: 'reservations',
         label: '예약',
         icon: <CalendarDaysIcon />,
-        badge: <Badge content="D-2" variant="soft" colorScheme="warning" />,
+        badge: (
+          <Chip variant="soft" colorScheme="warning">
+            D-2
+          </Chip>
+        ),
       },
     ],
   },
@@ -108,7 +128,7 @@ const GROUPS: { label: string; items: Entry[] }[] = [
         label: '사진부',
         icon: <CameraSolid />,
         colorScheme: 'warning',
-        badge: <Badge dot colorScheme="success" />,
+        badge: <Chip variant="solid" colorScheme="success" />,
       },
       { id: 'band', label: '밴드부 소리샘', icon: <MusicalNoteSolid />, colorScheme: 'danger' },
       {
@@ -116,7 +136,7 @@ const GROUPS: { label: string; items: Entry[] }[] = [
         label: '로봇 연구회',
         icon: <CpuChipSolid />,
         colorScheme: 'info',
-        badge: <Badge dot colorScheme="warning" />,
+        badge: <Chip variant="solid" colorScheme="warning" />,
       },
     ],
   },

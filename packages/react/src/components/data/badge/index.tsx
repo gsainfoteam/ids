@@ -1,4 +1,4 @@
-import type { ComponentProps, CSSProperties, ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, ReactElement, ReactNode } from 'react';
 
 import { BadgeRoot, type BadgePlacement, type BadgeVariant, type BadgeColorScheme } from './root';
 import { badgeStyle } from './style';
@@ -24,7 +24,6 @@ export namespace Badge {
 
   export type Props = Omit<ComponentProps<'span'>, 'className' | 'style' | 'content'> & {
     content?: ReactNode;
-    dot?: boolean;
     max?: number;
     showZero?: boolean;
     invisible?: boolean;
@@ -34,7 +33,7 @@ export namespace Badge {
     size?: IdsSize;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;
-    children?: ReactNode;
+    children: ReactElement;
   };
 
   export const Style = badgeStyle;

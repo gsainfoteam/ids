@@ -13,7 +13,6 @@ import {
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
@@ -227,7 +226,9 @@ export const PC: Story = {
                       <Item.Title>
                         {club.name}
                         {club.lead && (
-                          <Badge content="운영진" variant="soft" colorScheme="primary" />
+                          <Chip variant="soft" colorScheme="primary">
+                            운영진
+                          </Chip>
                         )}
                       </Item.Title>
                       <Item.Description>{club.role}</Item.Description>

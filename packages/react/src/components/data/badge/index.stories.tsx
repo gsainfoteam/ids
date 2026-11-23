@@ -1,15 +1,17 @@
 import { useState } from 'react';
 
-import { BellIcon, CheckIcon, EnvelopeIcon, InboxIcon } from '@heroicons/react/24/outline';
+import { BellIcon, EnvelopeIcon, InboxIcon } from '@heroicons/react/24/outline';
 import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { Toggle } from '../../action/toggle';
 import { IdsProvider } from '../../utility/ids-provider';
 import { Avatar } from '../avatar';
 import { Card } from '../card';
+import { Item } from '../item';
 
 import { Badge } from '.';
 
@@ -41,7 +43,6 @@ const meta = {
     size: { control: 'radio', options: ['standard', 'tiny'] },
     content: { control: 'number' },
     max: { control: 'number' },
-    dot: { control: 'boolean' },
     showZero: { control: 'boolean' },
     invisible: { control: 'boolean' },
   },
@@ -51,12 +52,8 @@ const meta = {
     colorScheme: 'danger',
     size: 'standard',
     placement: 'top-end',
+    children: <BellIcon className="size-7" />,
   },
-  render: (args) => (
-    <Badge {...args}>
-      <BellIcon className="size-7" />
-    </Badge>
-  ),
 } satisfies Meta<typeof Badge>;
 
 export default meta;
@@ -81,12 +78,16 @@ export const Gallery: Story = {
           columns={variants}
           render={(colorScheme, variant) => (
             <div className="flex items-center gap-6">
-              <Badge content={5} variant={variant} colorScheme={colorScheme} />
-              <Badge content={128} variant={variant} colorScheme={colorScheme} />
+              <Badge content={5} variant={variant} colorScheme={colorScheme}>
+                <Box />
+              </Badge>
+              <Badge content={128} variant={variant} colorScheme={colorScheme}>
+                <Box />
+              </Badge>
               <Badge content={7} variant={variant} colorScheme={colorScheme}>
                 <Box />
               </Badge>
-              <Badge dot variant={variant} colorScheme={colorScheme}>
+              <Badge variant={variant} colorScheme={colorScheme}>
                 <Box />
               </Badge>
             </div>
@@ -124,7 +125,7 @@ export const Gallery: Story = {
           <Badge content={3}>
             <Avatar name="Alice Kim" />
           </Badge>
-          <Badge dot colorScheme="success" placement="bottom-end" aria-label="온라인">
+          <Badge colorScheme="success" placement="bottom-end" aria-label="온라인">
             <Avatar name="Bob Lee" />
           </Badge>
         </Showcase.Row>
@@ -132,7 +133,7 @@ export const Gallery: Story = {
           <Badge content={3}>
             <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
           </Badge>
-          <Badge dot>
+          <Badge>
             <IconButton aria-label="받은 편지함" variant="soft" icon={<InboxIcon />} />
           </Badge>
         </Showcase.Row>
@@ -178,7 +179,7 @@ export const Gallery: Story = {
           <Badge content={3}>
             <BellIcon className="size-7" />
           </Badge>
-          <Badge dot>
+          <Badge>
             <BellIcon className="size-7" />
           </Badge>
         </Showcase.Row>
@@ -186,42 +187,9 @@ export const Gallery: Story = {
           <Badge content={3} size="tiny">
             <BellIcon className="size-5" />
           </Badge>
-          <Badge dot size="tiny">
+          <Badge size="tiny">
             <BellIcon className="size-5" />
           </Badge>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section title="Standalone" description="children 없이 쓰면 제자리에 그립니다.">
-        <Showcase.Row label="inline">
-          <span className="text-body-b3-medium inline-flex items-center gap-2">
-            <InboxIcon className="size-5" />
-            받은 편지함
-            <Badge content={12} variant="soft" colorScheme="primary" size="tiny" />
-          </span>
-        </Showcase.Row>
-        <Showcase.Row label="icon">
-          <Badge
-            content={
-              <>
-                <CheckIcon />
-                완료
-              </>
-            }
-            variant="soft"
-            colorScheme="success"
-          />
-          <Badge
-            content={
-              <>
-                <CheckIcon />
-                완료
-              </>
-            }
-            variant="soft"
-            colorScheme="success"
-            size="tiny"
-          />
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -356,7 +324,6 @@ export const ShowOnlineStatus: Story = {
     return (
       <div className="flex items-center gap-4">
         <Badge
-          dot
           invisible={!online}
           colorScheme="success"
           placement="bottom-end"
@@ -385,5 +352,176 @@ export const ShowOnlineStatus: Story = {
     await expect(status).toHaveTextContent('오프라인');
     await userEvent.click(canvas.getByRole('button', { name: '온라인으로' }));
     await waitFor(() => expect(status).not.toHaveAttribute('data-invisible'));
+  },
+};
+
+const targets = [
+  'avatar',
+  'circle',
+  'button',
+  'icon button',
+  'toggle',
+  'card',
+  'item',
+  'popup corner',
+  'square',
+  'pill',
+  'mixed corners',
+  'ellipse',
+  'percent',
+  'thick border',
+  'squircle',
+  'rtl',
+] as const;
+
+const CIRCLE_DIAGONAL = 1 - Math.SQRT1_2;
+
+const KNOWN_CORNERS: Partial<
+  Record<(typeof targets)[number], Record<(typeof placements)[number], [number, number]>>
+> = {
+  avatar: {
+    'top-end': [20, 20],
+    'top-start': [20, 20],
+    'bottom-end': [20, 20],
+    'bottom-start': [20, 20],
+  },
+  pill: {
+    'top-end': [16, 16],
+    'top-start': [16, 16],
+    'bottom-end': [16, 16],
+    'bottom-start': [16, 16],
+  },
+  square: { 'top-end': [0, 0], 'top-start': [0, 0], 'bottom-end': [0, 0], 'bottom-start': [0, 0] },
+  'mixed corners': {
+    'top-end': [6, 6],
+    'top-start': [0, 0],
+    'bottom-end': [24, 24],
+    'bottom-start': [12, 12],
+  },
+  ellipse: {
+    'top-end': [40, 20],
+    'top-start': [40, 20],
+    'bottom-end': [40, 20],
+    'bottom-start': [40, 20],
+  },
+  rtl: { 'top-end': [24, 24], 'top-start': [0, 0], 'bottom-end': [0, 0], 'bottom-start': [0, 0] },
+};
+
+function expectedCenter(root: Element, [rx, ry]: [number, number]) {
+  const box = root.firstElementChild!.getBoundingClientRect();
+  const placement = root.getAttribute('data-placement')!;
+  const rtl = getComputedStyle(root).direction === 'rtl';
+  const right = placement.endsWith('end') !== rtl;
+  const top = placement.startsWith('top');
+
+  return {
+    x: right ? box.right - rx * CIRCLE_DIAGONAL : box.left + rx * CIRCLE_DIAGONAL,
+    y: top ? box.top + ry * CIRCLE_DIAGONAL : box.bottom - ry * CIRCLE_DIAGONAL,
+  };
+}
+
+function centerOf(element: Element) {
+  const box = element.getBoundingClientRect();
+  return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+}
+
+export const EveryCorner: Story = {
+  tags: ['verification'],
+  render: () => (
+    <Showcase>
+      <Showcase.Section
+        title="Target × Placement"
+        description="대상마다 네 모서리에 숫자 배지와 점을 붙입니다. 배지 중심은 그 모서리 곡선의 45도 지점에 옵니다."
+      >
+        <Showcase.Matrix
+          rows={targets}
+          columns={placements}
+          render={(target, placement) => {
+            const badges = [3, undefined].map((content) => (
+              <Badge
+                key={content ?? 'dot'}
+                content={content}
+                placement={placement}
+                data-target={target}
+              >
+                {
+                  {
+                    avatar: <Avatar name="Alice Kim" />,
+                    circle: <div className="bg-neutral-soft size-10 rounded-full" />,
+                    button: <Button variant="outline">저장</Button>,
+                    'icon button': (
+                      <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+                    ),
+                    toggle: <Toggle variant="outline">굵게</Toggle>,
+                    card: (
+                      <Card variant="outline" className="w-32">
+                        <Card.Header>
+                          <Card.Title>공지</Card.Title>
+                        </Card.Header>
+                      </Card>
+                    ),
+                    item: (
+                      <Item variant="outline" className="w-32">
+                        <Item.Content>
+                          <Item.Title>받은 편지함</Item.Title>
+                        </Item.Content>
+                      </Item>
+                    ),
+                    'popup corner': (
+                      <div className="concentric-p-1 bg-neutral-soft">
+                        <div className="h-8 w-20" />
+                      </div>
+                    ),
+                    square: <div className="bg-neutral-soft size-10 rounded-none" />,
+                    pill: <div className="bg-neutral-soft h-8 w-24 rounded-full" />,
+                    'mixed corners': (
+                      <div className="bg-neutral-soft size-12 rounded-tl-none rounded-tr-[6px] rounded-br-[24px] rounded-bl-[12px]" />
+                    ),
+                    ellipse: <div className="bg-neutral-soft h-10 w-20 rounded-[50%]" />,
+                    percent: <div className="bg-neutral-soft size-12 rounded-[30%]" />,
+                    'thick border': (
+                      <div className="border-neutral-strong bg-neutral-soft size-12 rounded-[16px] border-4" />
+                    ),
+                    squircle: <Button variant="outline">저장</Button>,
+                    rtl: <div className="bg-neutral-soft size-12 rounded-tl-[24px]" />,
+                  }[target]
+                }
+              </Badge>
+            ));
+
+            if (target === 'squircle')
+              return (
+                <IdsProvider.Scope theme={{ cornerShape: 'squircle', radius: 14 }}>
+                  <div className="flex gap-6 p-3">{badges}</div>
+                </IdsProvider.Scope>
+              );
+            return (
+              <div dir={target === 'rtl' ? 'rtl' : undefined} className="flex gap-6 p-3">
+                {badges}
+              </div>
+            );
+          }}
+        />
+      </Showcase.Section>
+    </Showcase>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const [target, corners] of Object.entries(KNOWN_CORNERS)) {
+      for (const root of canvasElement.querySelectorAll(`[data-target="${target}"]`)) {
+        const placement = root.getAttribute('data-placement') as (typeof placements)[number];
+        const indicator = root.querySelector('[data-badge-indicator]')!;
+
+        await waitFor(() => {
+          const expected = expectedCenter(root, corners[placement]);
+          const actual = centerOf(indicator);
+          expect(Math.abs(actual.x - expected.x), `${target} ${placement} x`).toBeLessThanOrEqual(
+            1,
+          );
+          expect(Math.abs(actual.y - expected.y), `${target} ${placement} y`).toBeLessThanOrEqual(
+            1,
+          );
+        });
+      }
+    }
   },
 };

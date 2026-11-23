@@ -266,3 +266,23 @@ test('className takes the chip state', () => {
 test('parts outside Chip throw', () => {
   expect(() => renderToString(<Chip.Close />)).toThrow(/inside `<Chip>`/);
 });
+
+test('a Chip with no children is a dot, and a labelled dot is an image', () => {
+  const doc = new DOMParser().parseFromString(
+    renderToString(
+      <>
+        <Chip variant="solid" colorScheme="primary" aria-label="읽지 않음" />
+        <Chip variant="solid" aria-hidden />
+        <Chip>New</Chip>
+      </>,
+    ),
+    'text/html',
+  );
+  const [labelled, hidden, text] = doc.querySelectorAll<HTMLElement>('[data-chip]');
+  expect(labelled!.hasAttribute('data-dot')).toBe(true);
+  expect(labelled!.getAttribute('role')).toBe('img');
+  expect(labelled!.className).toContain('size-2.5');
+  expect(hidden!.hasAttribute('data-dot')).toBe(true);
+  expect(hidden!.hasAttribute('role')).toBe(false);
+  expect(text!.hasAttribute('data-dot')).toBe(false);
+});

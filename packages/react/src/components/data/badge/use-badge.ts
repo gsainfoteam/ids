@@ -17,7 +17,6 @@ type Describable = ReactElement<{ 'aria-describedby'?: string }>;
 
 export function useBadge({
   content,
-  dot,
   max,
   showZero,
   invisible,
@@ -25,19 +24,20 @@ export function useBadge({
   children,
 }: {
   content: ReactNode;
-  dot: boolean;
   max: number;
   showZero: boolean;
   invisible: boolean;
   label: string | undefined;
-  children: ReactNode;
+  children: ReactElement;
 }) {
   const indicatorId = `${useId()}-badge`;
+  const wrapsOneElement = isValidElement(children);
   useEffect(() => {
-    if (isDevelopment && content === undefined && !dot)
-      console.warn('[IDS] Badge: pass content, or dot for an indicator without text.');
-  }, [content, dot]);
+    if (isDevelopment && !wrapsOneElement)
+      console.warn('[IDS] Badge: wrap exactly one element. A badge on its own is a Chip.');
+  }, [wrapsOneElement]);
 
+  const dot = content === undefined;
   const display = badgeDisplay(content, max, showZero);
   const hidden = invisible || (!dot && display.empty);
 
@@ -51,5 +51,5 @@ export function useBadge({
         })
       : children;
 
-  return { indicatorId, display, hidden, anchor };
+  return { indicatorId, dot, display, hidden, anchor };
 }

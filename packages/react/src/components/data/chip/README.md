@@ -16,6 +16,19 @@ import { Chip } from '@gsainfoteam/ids-react';
 <Chip onRemove={() => removeTag('react')}>react</Chip>
 ```
 
+## 점
+
+```tsx
+<Chip variant="solid" colorScheme="primary" aria-label="읽지 않음" />  // 읽는 점: role="img"
+<Chip variant="solid" colorScheme="success" aria-hidden />          // 장식 점
+<Chip variant="solid" size="tiny" aria-hidden />                    // 8px
+```
+
+- children 이 없으면 글자 없는 점(standard 10px, tiny 8px)으로 그립니다. `data-dot` 이 붙습니다.
+- `aria-label` 을 주면 `role="img"` 가 되어 그 이름을 읽습니다.
+- 점은 `variant` 의 배경색을 씁니다. 눈에 띄는 점은 `solid` 입니다.
+- 무언가의 모서리에 붙는 점은 `Badge` 입니다.
+
 ## 켜고 끄기
 
 ```tsx

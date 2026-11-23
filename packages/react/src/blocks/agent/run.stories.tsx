@@ -13,8 +13,8 @@ import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Accordion } from '../../components/data/accordion';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -92,7 +92,9 @@ export const PC: Story = {
             </Breadcrumb.Item>
           </Breadcrumb>
           <Spacer />
-          <Badge content="실행 중" variant="soft" colorScheme="info" />
+          <Chip variant="soft" colorScheme="info">
+            실행 중
+          </Chip>
           <Button variant="outline" size="tiny" onClick={() => toast('실행을 멈췄어요')}>
             <StopIcon />
             멈추기
@@ -132,7 +134,9 @@ export const PC: Story = {
                   <Accordion.Item value="course-search">
                     <Accordion.Trigger>
                       학사 시스템에서 2학기 개설 과목을 찾았어요{' '}
-                      <Badge content="38과목" variant="soft" colorScheme="success" />
+                      <Chip variant="soft" colorScheme="success">
+                        38과목
+                      </Chip>
                     </Accordion.Trigger>
                     <Accordion.Content>
                       <Table aria-label="학사 시스템 찾기에 넘긴 값" size="tiny">
@@ -329,11 +333,9 @@ export const PC: Story = {
                       <Item.Title>{tool.name}</Item.Title>
                     </Item.Content>
                     <Item.Actions>
-                      <Badge
-                        content={tool.approval ? '물어보고 써요' : '바로 써요'}
-                        variant="soft"
-                        colorScheme={tool.approval ? 'warning' : 'neutral'}
-                      />
+                      <Chip variant="soft" colorScheme={tool.approval ? 'warning' : 'neutral'}>
+                        {tool.approval ? '물어보고 써요' : '바로 써요'}
+                      </Chip>
                     </Item.Actions>
                   </Item>
                 ))}

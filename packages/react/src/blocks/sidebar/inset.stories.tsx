@@ -13,7 +13,7 @@ import {
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
@@ -102,7 +102,9 @@ export const PC: Story = {
           <Sidebar.Item value="inbox" href="#inbox">
             <InboxIcon />
             받은 소식
-            <Badge content={7} variant="soft" colorScheme="primary" />
+            <Chip variant="soft" colorScheme="primary">
+              {7}
+            </Chip>
           </Sidebar.Item>
 
           <Sidebar.Group label="즐겨찾기" collapsible>
@@ -119,7 +121,7 @@ export const PC: Story = {
               <Sidebar.Item key={channel.id} value={channel.id} href={`#${channel.id}`}>
                 <HashtagIcon />
                 {channel.label}
-                {channel.unread > 0 && <Badge content={channel.unread} variant="soft" />}
+                {channel.unread > 0 && <Chip variant="soft">{channel.unread}</Chip>}
               </Sidebar.Item>
             ))}
           </Sidebar.Group>

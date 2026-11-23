@@ -6,8 +6,8 @@ import { Showcase, paletteHues, palettes } from '~story-kit';
 
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
-import { Badge } from '../../data/badge';
 import { Card } from '../../data/card';
+import { Chip } from '../../data/chip';
 import { Checkbox } from '../../form/checkbox';
 import { TextField } from '../../form/text-field';
 
@@ -110,7 +110,7 @@ export const Playground: Story = {
           <Button>저장</Button>
           <Button variant="soft">임시 저장</Button>
           <Button variant="outline">취소</Button>
-          <Badge variant="outline">초안</Badge>
+          <Chip variant="outline">초안</Chip>
         </div>
         <TextField aria-label="제목" placeholder="제목" />
         <Checkbox defaultChecked aria-label="알림 받기" />
@@ -136,7 +136,7 @@ export const Gallery: Story = {
                 <Button>저장</Button>
                 <Button variant="soft">임시 저장</Button>
                 <Button variant="outline">취소</Button>
-                <Badge variant="outline">초안</Badge>
+                <Chip variant="outline">초안</Chip>
               </div>
             </IdsProvider.Scope>
           )}
@@ -154,7 +154,7 @@ export const Gallery: Story = {
               <div className="flex flex-wrap items-center gap-2">
                 <Button>저장</Button>
                 <Button variant="soft">임시 저장</Button>
-                <Badge variant="outline">초안</Badge>
+                <Chip variant="outline">초안</Chip>
               </div>
             </IdsProvider.Scope>
           )}
@@ -173,12 +173,12 @@ export const Gallery: Story = {
                 <Button>primary</Button>
                 <Button colorScheme="secondary">secondary</Button>
                 <Button colorScheme="tertiary">tertiary</Button>
-                <Badge variant="soft" colorScheme="secondary">
+                <Chip variant="soft" colorScheme="secondary">
                   soft
-                </Badge>
-                <Badge variant="outline" colorScheme="tertiary">
+                </Chip>
+                <Chip variant="outline" colorScheme="tertiary">
                   outline
-                </Badge>
+                </Chip>
               </div>
             </IdsProvider.Scope>
           )}
@@ -210,9 +210,9 @@ export const Gallery: Story = {
                         <Button variant="soft" colorScheme="neutral">
                           취소
                         </Button>
-                        <Badge variant="soft" colorScheme="neutral">
+                        <Chip variant="soft" colorScheme="neutral">
                           초안
-                        </Badge>
+                        </Chip>
                       </Card.Content>
                     </Card>
                   </IdsProvider.Scope>
@@ -233,14 +233,14 @@ export const Gallery: Story = {
             <IdsProvider.Scope theme={{ primary: palettes[hue], status }} className={region}>
               <div className="flex flex-wrap items-center gap-2">
                 {statusFamilies.map((family) => (
-                  <Badge key={family} colorScheme={family}>
+                  <Chip variant="solid" key={family} colorScheme={family}>
                     {family}
-                  </Badge>
+                  </Chip>
                 ))}
                 {statusFamilies.map((family) => (
-                  <Badge key={family} variant="soft" colorScheme={family}>
+                  <Chip key={family} variant="soft" colorScheme={family}>
                     {family}
-                  </Badge>
+                  </Chip>
                 ))}
               </div>
             </IdsProvider.Scope>
@@ -257,7 +257,7 @@ export const Gallery: Story = {
               <Button>저장</Button>
               <TextField aria-label={`제목 ${scale}`} placeholder="제목" className="w-40" />
               <Checkbox defaultChecked aria-label={`선택 ${scale}`} />
-              <Badge>새 글</Badge>
+              <Chip variant="solid">새 글</Chip>
             </IdsProvider.Scope>
           </Showcase.Row>
         ))}
@@ -291,7 +291,7 @@ export const Gallery: Story = {
             >
               <Button>저장</Button>
               <Button variant="soft">임시 저장</Button>
-              <Badge>새 글</Badge>
+              <Chip variant="solid">새 글</Chip>
               <Card size="tiny" className="w-40">
                 <Card.Title>카드</Card.Title>
               </Card>

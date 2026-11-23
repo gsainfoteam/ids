@@ -19,7 +19,7 @@ import { IconButton } from '../../action/icon-button';
 import { Kbd } from '../../typography/kbd';
 import { Avatar } from '../avatar';
 import { AvatarGroup } from '../avatar-group';
-import { Badge } from '../badge';
+import { Chip } from '../chip';
 import { ItemGroup } from '../item-group';
 
 import { Item } from '.';
@@ -167,7 +167,7 @@ export const Gallery: Story = {
               <Item.Description>토큰 정리 끝났습니다</Item.Description>
             </Item.Content>
             <Item.Actions>
-              <Badge content={3} />
+              <Chip variant="solid">{3}</Chip>
             </Item.Actions>
           </Item>
         </Showcase.Row>
@@ -403,7 +403,9 @@ export const Navigation: Story = {
             <Item.Title>받은 편지함</Item.Title>
           </Item.Content>
           <Item.Actions>
-            <Badge content={12} size="tiny" variant="soft" colorScheme="primary" />
+            <Chip size="tiny" variant="soft" colorScheme="primary">
+              {12}
+            </Chip>
           </Item.Actions>
         </a>
       </Item>
