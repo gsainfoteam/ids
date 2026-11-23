@@ -16,14 +16,7 @@ import type { Chip } from '.';
 
 export type ChipVariant = 'solid' | 'soft' | 'outline';
 export type ChipColorScheme =
-  | 'neutral'
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info';
+  'neutral' | 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'info';
 
 function flag(on: boolean) {
   return on ? '' : undefined;
@@ -124,8 +117,9 @@ export function ChipRoot({
     removable: chip.removable,
     interactive: chip.interactive,
   };
-  const styles = chipStyle({ variant, colorScheme, size, interactive: chip.interactive });
   const content = resolveState(children, state);
+  const dot = !asChild && !chip.removable && flattenFragments(content).length === 0;
+  const styles = chipStyle({ variant, colorScheme, size, dot, interactive: chip.interactive });
   const Root = asChild ? Slot : rootIsButton ? 'button' : 'span';
 
   return (
@@ -146,6 +140,7 @@ export function ChipRoot({
         {...(rootIsButton ? { type: 'button' as const, disabled } : {})}
         {...(chip.selectable ? { 'aria-pressed': chip.selected } : {})}
         {...(!rootIsButton && disabled ? { 'aria-disabled': true } : {})}
+        {...(dot && !rootIsButton && rest['aria-label'] !== undefined ? { role: 'img' } : {})}
         {...rest}
         {...handlers}
         ref={mergedRef}
@@ -158,6 +153,7 @@ export function ChipRoot({
         data-variant={variant}
         data-color-scheme={colorScheme}
         data-size={size}
+        data-dot={flag(dot)}
         data-selected={flag(chip.selected)}
         data-removable={flag(chip.removable)}
         data-interactive={flag(chip.interactive)}

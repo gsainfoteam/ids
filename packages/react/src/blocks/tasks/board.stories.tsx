@@ -5,8 +5,8 @@ import { EllipsisHorizontalIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Spacer } from '../../components/layout/spacer';
 import { Menu } from '../../components/overlay/menu';
 
@@ -199,11 +199,9 @@ export const PC: Story = {
                       <h2 id={`column-${status}`}>{STATUS[status].label}</h2>
                     </Card.Title>
                     <Card.Action>
-                      <Badge
-                        content={`${inColumn.length}개`}
-                        variant="soft"
-                        colorScheme={STATUS[status].colorScheme}
-                      />
+                      <Chip variant="soft" colorScheme={STATUS[status].colorScheme}>
+                        {`${inColumn.length}개`}
+                      </Chip>
                     </Card.Action>
                   </Card.Header>
                   <ul className="flex flex-col gap-2">
@@ -247,11 +245,12 @@ export const PC: Story = {
                             <Avatar name={task.assignee} size="tiny" />
                             {task.assignee}
                             <Spacer />
-                            <Badge
-                              content={PRIORITY[task.priority]}
+                            <Chip
                               variant="soft"
                               colorScheme={task.priority === 'high' ? 'danger' : 'neutral'}
-                            />
+                            >
+                              {PRIORITY[task.priority]}
+                            </Chip>
                             {dayOf(task.due)}
                           </Card.Footer>
                         </Card>

@@ -31,16 +31,11 @@ export namespace NumberField {
     step?: number;
     smallStep?: number;
     largeStep?: number;
-    locale?: string;
     formatOptions?: NumberFieldFormatOptions;
-    allowWheelScrub?: boolean;
-    hideStepper?: boolean;
     invalid?: boolean;
     disabled?: boolean;
     size?: IdsSize;
     variant?: NumberFieldVariant;
-    incrementLabel?: string;
-    decrementLabel?: string;
     children?: ReactNode;
     className?: StateValue<string | undefined>;
     style?: StateValue<CSSProperties | undefined>;

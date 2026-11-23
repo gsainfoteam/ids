@@ -43,8 +43,6 @@ import type { IdsSize } from '../../../tokens/types';
 export type FieldProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> & {
   children: ReactNode;
   orientation?: FieldOrientation;
-  /** @deprecated Use `orientation`. */
-  variant?: FieldOrientation;
   size?: IdsSize;
   invalid?: boolean;
   disabled?: boolean;
@@ -87,7 +85,6 @@ export function FieldRoot({
   name,
   size = 'standard',
   orientation: orientationProp,
-  variant: deprecatedOrientation,
   invalid: invalidProp,
   disabled: disabledProp,
   required: requiredProp,
@@ -103,7 +100,7 @@ export function FieldRoot({
   ...rest
 }: FieldProps & FormLibraryBridge) {
   const groupOrientation = use(FieldGroupContext);
-  const orientation = orientationProp ?? deprecatedOrientation ?? groupOrientation ?? 'vertical';
+  const orientation = orientationProp ?? groupOrientation ?? 'vertical';
   const generatedId = useId();
   const field = useField({ dirty, touched });
   const nodes = flatten(children);

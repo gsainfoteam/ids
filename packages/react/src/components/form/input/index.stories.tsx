@@ -2,7 +2,6 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Field } from '../field';
 
 import { Input } from '.';
@@ -31,13 +30,32 @@ const meta = {
     disabled: { control: 'boolean' },
     invalid: { control: 'boolean' },
   },
-  args: { type: 'text', 'aria-label': '입력', className: cn('w-72') },
+  args: { type: 'text', 'aria-label': '입력' },
 } satisfies Meta<typeof Input>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-72">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="w-72">
+      <Field>
+        <Field.Label>이메일</Field.Label>
+        <Input type="email" name="email" placeholder="name@example.com" />
+      </Field>
+    </div>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -48,13 +66,9 @@ export const Gallery: Story = {
       >
         {types.map((type) => (
           <Showcase.Row key={type} label={type}>
-            <Input
-              type={type}
-              name={type}
-              placeholder={placeholders[type]}
-              aria-label={type}
-              className="w-72"
-            />
+            <div className="w-72">
+              <Input type={type} name={type} placeholder={placeholders[type]} aria-label={type} />
+            </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>
@@ -63,7 +77,9 @@ export const Gallery: Story = {
           rows={sizes}
           columns={['search', 'password', 'number'] as const}
           render={(size, type) => (
-            <Input type={type} size={size} aria-label={`${type} ${size}`} className="w-56" />
+            <div className="w-56">
+              <Input type={type} size={size} aria-label={`${type} ${size}`} />
+            </div>
           )}
         />
       </Showcase.Section>
@@ -71,15 +87,37 @@ export const Gallery: Story = {
   ),
 };
 
-export const TypeRouting: Story = {
+export const PickTheFieldByType: Story = {
   render: () => (
     <div className="grid w-72 gap-4">
-      {types.map((type) => (
-        <Field key={type}>
-          <Field.Label>{type}</Field.Label>
-          <Input type={type} name={type} />
-        </Field>
-      ))}
+      <Field>
+        <Field.Label>text</Field.Label>
+        <Input type="text" name="text" />
+      </Field>
+      <Field>
+        <Field.Label>email</Field.Label>
+        <Input type="email" name="email" />
+      </Field>
+      <Field>
+        <Field.Label>url</Field.Label>
+        <Input type="url" name="url" />
+      </Field>
+      <Field>
+        <Field.Label>search</Field.Label>
+        <Input type="search" name="search" />
+      </Field>
+      <Field>
+        <Field.Label>password</Field.Label>
+        <Input type="password" name="password" />
+      </Field>
+      <Field>
+        <Field.Label>number</Field.Label>
+        <Input type="number" name="number" />
+      </Field>
+      <Field>
+        <Field.Label>tel</Field.Label>
+        <Input type="tel" name="tel" />
+      </Field>
     </div>
   ),
   parameters: {
@@ -105,12 +143,14 @@ export const TypeRouting: Story = {
   },
 };
 
-export const SearchClear: Story = {
+export const ClearASearch: Story = {
   render: () => (
-    <Field className="w-72">
-      <Field.Label>검색</Field.Label>
-      <Input type="search" name="query" defaultValue="IDS" />
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>검색</Field.Label>
+        <Input type="search" name="query" defaultValue="IDS" />
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {

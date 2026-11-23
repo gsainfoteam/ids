@@ -7,6 +7,8 @@
 - **바.** Input 위의 자식은 위 바, 아래의 자식은 아래 바가 됩니다. 바 안의 버튼은 필드 안쪽 크기로 줄고, 아이콘이 입력한 글자와 줄을 맞춥니다.
 - **상태는 테두리에.** 오류면 바깥 테두리만 danger 색이 되고, 바 구분선과 글자 수는 중립색을 유지합니다.
 - **native 그대로.** 실제 `<textarea>` 하나라 IME, 실행 취소, 폼 제출, `register()` 가 그대로 됩니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><TextArea /></div>`.
+- **높이.** `rows`, `minRows`, `maxRows` 로 정합니다. 높이를 정한 grid 부모 안에 두면 그 높이를 채웁니다: `<div className="grid h-20 w-72"><TextArea resize="none" /></div>`.
 
 ```tsx
 import { Field, TextArea } from '@gsainfoteam/ids-react';
@@ -33,26 +35,26 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 ## 높이
 
 ```tsx
-<TextArea />                              // autoResize(기본): 내용에 맞춰 늘고 준다. 최소 높이는 rows(기본 3)
+<TextArea />                              // resize="auto"(기본): 내용에 맞춰 늘고 준다. 최소 높이는 rows(기본 3)
 <TextArea rows={1} maxRows={6} />         // 한 줄에서 시작해 6줄을 넘으면 스크롤
 <TextArea minRows={2} maxRows={8} />      // 최소 2줄
-<TextArea autoResize={false} rows={5} />  // rows가 높이를 정하고 사용자가 손잡이로 세로를 바꿀 수 있다
-<TextArea autoResize={false} resize="none" maxRows={10} /> // resize: none / vertical(기본) / horizontal / both
+<TextArea resize="vertical" rows={5} />   // rows가 높이를 정하고 사용자가 손잡이로 세로를 바꿀 수 있다
+<TextArea resize="none" maxRows={10} />   // 높이가 rows 로 고정되고 손잡이도 없다
 ```
 
 - 자동 높이는 `react-textarea-autosize` 가 JS로 잽니다. Safari와 Firefox가 `field-sizing: content` 를 지원하지 않기 때문입니다.
-- 비어 있으면 placeholder 길이에 맞춥니다. 자동 높이에서는 `style` 의 `height`, `minHeight`, `maxHeight` 를 쓰지 않습니다. `minRows`, `maxRows` 로 정합니다.
+- 비어 있으면 placeholder 길이에 맞춥니다. 자동 높이의 범위는 `minRows`, `maxRows` 로 정합니다.
 
 ## 크기 조절 손잡이
 
 ```tsx
-<TextArea autoResize={false} />                     // vertical(기본): 아래 테두리의 막대. 높이
-<TextArea autoResize={false} resize="horizontal" /> // 끝 테두리의 막대. 너비
-<TextArea autoResize={false} resize="both" />       // 끝 아래 모서리의 호. 너비와 높이
-<TextArea autoResize={false} resize="none" />       // 손잡이 없음
+<TextArea resize="vertical" />   // 아래 테두리의 막대. 높이
+<TextArea resize="horizontal" /> // 끝 테두리의 막대. 너비
+<TextArea resize="both" />       // 끝 아래 모서리의 호. 너비와 높이
+<TextArea resize="none" />       // 손잡이 없음
 ```
 
-- `autoResize={false}` 면 필드의 테두리 위에 [Resizable](../../layout/resizable/README.md) 과 같은 손잡이가 생깁니다. 모양과 자리가 Resizable 의 같은 방향과 같습니다.
+- `resize` 가 `vertical`, `horizontal`, `both` 면 필드의 테두리 위에 [Resizable](../../layout/resizable/README.md) 과 같은 손잡이가 생깁니다. 모양과 자리가 Resizable 의 같은 방향과 같습니다.
 
 | `resize`     | 손잡이                                                                    |
 | ------------ | ------------------------------------------------------------------------- |
@@ -71,7 +73,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 - 포커스는 막대면 막대 둘레의 링, 호면 호를 따라 그립니다. 손잡이에 포커스가 있을 때 필드는 포커스 링을 그리지 않습니다.
 - 높이는 textarea 에, 너비는 테두리 컨테이너 전체에 들어갑니다. 위아래 바의 높이는 그대로입니다.
 - 높이는 한 줄 이상, `maxRows` 가 있으면 그 이하입니다. 너비는 96px 이상입니다.
-- `Enter` 나 손잡이 두 번 누르기는 `rows` 와 `className` 으로 정한 크기로 돌아갑니다. 끄는 동안 `Escape` 는 끌기를 취소합니다.
+- `Enter` 나 손잡이 두 번 누르기는 `rows` 와 부모가 정한 크기로 돌아갑니다. 끄는 동안 `Escape` 는 끌기를 취소합니다.
 - 손잡이를 눌러 끌어도 포커스는 textarea 에 남습니다.
 - 비활성이면 손잡이도 흐려지고 Tab 과 포인터에서 빠집니다. 읽기 전용은 크기를 바꿀 수 있습니다.
 
@@ -94,7 +96,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
     <IconButton aria-label="굵게" icon={<BoldIcon />} />
     <IconButton aria-label="기울임" icon={<ItalicIcon />} />
   </div>
-  <TextArea.Input className="font-mono" />
+  <TextArea.Input />
   <TextArea.Count />                     {/* Input 아래 = 아래 바. 오른쪽으로 붙는다 */}
   <Button size="tiny">저장</Button>
 </TextArea>
@@ -105,7 +107,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 </TextArea>
 ```
 
-- 바는 구분선으로 입력과 나뉘고, 비어 있으면 구분선까지 접힙니다. `divided={false}` 면 구분선 없이 입력과 한 면으로 이어집니다.
+- 바는 구분선으로 입력과 나뉘고, 비어 있으면 구분선까지 접힙니다.
 - 바 안의 버튼은 높이 28px(tiny 24px)로 줄어듭니다. 아이콘 버튼은 정사각형입니다.
 - 양 끝의 버튼 묶음은 버튼 여백만큼 바깥으로 당겨져서, 아이콘이 입력한 글자와 같은 선에 섭니다.
 
@@ -133,26 +135,14 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 - `maxLength` 가 없으면 글자 수만 보입니다.
 - 글자 수는 입력의 `aria-describedby` 에 들어가서 포커스할 때 함께 읽힙니다. Field의 설명과 합쳐집니다.
 - `threshold` 기본값은 한도의 10%와 10자 중 큰 쪽입니다. 그 아래로 내려가면 입력이 0.6초 멈춘 뒤 `role="status"` 로 "6자 남았습니다." 처럼 알립니다. 한도에 닿으면 "글자 수 제한에 도달했습니다." 입니다.
-- 글자 수 요소에 `data-near-limit`, `data-at-limit` 이 붙습니다.
 - 브라우저의 `maxLength` 와 같은 단위(UTF-16 코드 단위)로 셉니다. 이모지 하나가 2로 셀 수 있습니다.
 - react-hook-form `setValue` 처럼 이벤트 없이 바뀐 값도 따라갑니다.
 
 ## 상태
 
-```tsx
-<TextArea className={(state) => (state.focused ? 'shadow-md' : undefined)} />
-```
-
-| 속성                        | 뜻                                           |
-| --------------------------- | -------------------------------------------- |
-| `data-focused`              | 포커스가 필드 안에 있다                      |
-| `data-filled`               | 값이 있다                                    |
-| `data-invalid`              | `invalid`, `aria-invalid`, 또는 Field의 오류 |
-| `data-disabled`             | 비활성                                       |
-| `data-readonly`             | 읽기 전용                                    |
-| `data-size`, `data-variant` | 크기와 variant                               |
-
-- 테두리 컨테이너(`data-text-area`)에 붙습니다. 실제 textarea에는 `data-field-input` 이 붙어 포커스 링이 컨테이너에 그려집니다.
+- 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 씁니다.
+- 글자 수와 한도는 `TextArea.Count` 의 children 함수가 받습니다(`count`, `remaining`, `nearLimit`, `atLimit`).
+- `className` 과 `style` 에 상태(`focused`, `filled`, `invalid`, `disabled`, `readOnly`, `size`, `variant`)를 받는 함수를 줄 수 있습니다. 새 디자인을 만들 때만 씁니다.
 
 ## 속성 우선순위
 
@@ -185,21 +175,16 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                    |
 | `size`                   | 생략하면 `Field` 크기, 없으면 `standard`. 글자, 패딩만 정하고 높이는 정하지 않는다 |
 | `invalid`                | danger 테두리와 `aria-invalid`. 명시한 `aria-invalid`(Field 포함)가 우선 |
-| `autoResize`             | `true`. 내용에 맞춰 높이 조절                                         |
 | `rows`                   | `3`. `minRows` 를 생략하면 최소 높이                                  |
 | `minRows` / `maxRows`    | 양의 정수. `maxRows` 를 넘으면 스크롤                                 |
-| `divided`                | `true`. `false` 면 바와 입력 사이의 구분선을 그리지 않는다            |
-| `resize`                 | `autoResize={false}` 일 때만. `vertical`(기본). Resizable 과 같은 손잡이로 바꾼다 |
-| `className` / `style`    | 컨테이너로 간다. 상태를 받는 함수도 된다. Input에 주면 textarea로 간다 |
+| `resize`                 | `auto`(기본, 내용에 맞춰 높이 조절) / `none` / `vertical` / `horizontal` / `both`. 뒤의 셋은 Resizable 과 같은 손잡이 |
 | 그 외 native 속성, ref    | 실제 textarea로 간다                                                  |
-| `TextArea.Count`         | `threshold`, `announce`, 상태를 받는 `children` · `className`          |
+| `TextArea.Count`         | `threshold`, `announce`, 상태를 받는 `children`                        |
 
 ## 알아둘 것
 
-- `autoResize` 와 `resize` 를 함께 주면 에러가 납니다. `resize="none"` 은 허용합니다.
 - `minRows` 가 `maxRows` 보다 크거나 양의 정수가 아니면 에러가 납니다.
-- `autoResize={false}` 에서 세로 패딩을 바꾸려면 `--text-area-pad-y` 를 씁니다. `maxRows` 높이 계산에 이 값이 들어갑니다.
-- 손잡이로 바꾼 크기는 컴포넌트 안에만 있습니다. 새로 마운트하면(`key` 가 바뀌거나 `autoResize` 를 켜고 끄면) 처음 크기로 돌아갑니다.
+- 손잡이로 바꾼 크기는 컴포넌트 안에만 있습니다. 새로 마운트하면(`key` 가 바뀌거나 `resize` 가 `auto` 와 다른 값 사이를 오가면) 처음 크기로 돌아갑니다.
 - 손잡이의 누를 영역은 필드 밖 22px 까지입니다. 그 안에 둔 요소는 손잡이가 받습니다. `Field` 의 설명과 오류는 필드 8px 아래라서 첫 줄의 위쪽이 여기에 듭니다.
 - `overflow: hidden` 인 부모 안에 두면 손잡이의 바깥 부분(선의 2px 과 누를 영역)이 잘립니다.
 - `value` 를 주고 `onChange`, `onValueChange`, `readOnly` 가 모두 없으면 에러가 납니다.

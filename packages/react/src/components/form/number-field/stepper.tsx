@@ -2,8 +2,9 @@
 
 import { cloneElement, Fragment, isValidElement, type ComponentProps } from 'react';
 
-import { useNumberContext } from './context';
-import { StepButton } from './step-button';
+import { InsideStepperContext, useNumberContext } from './context';
+import { NumberFieldDecrement } from './decrement';
+import { NumberFieldIncrement } from './increment';
 import { invariant, mergeProps } from '../../../utils';
 
 export type NumberFieldStepperProps = ComponentProps<'div'> & { asChild?: boolean };
@@ -15,10 +16,10 @@ export function NumberFieldStepper({
   ...props
 }: NumberFieldStepperProps) {
   const { styles } = useNumberContext('Stepper');
-  const buttons = (
+  const defaultButtons = (
     <>
-      <StepButton direction={1} stacked />
-      <StepButton direction={-1} stacked />
+      <NumberFieldIncrement />
+      <NumberFieldDecrement />
     </>
   );
   const merged = mergeProps(
@@ -32,10 +33,17 @@ export function NumberFieldStepper({
         (typeof children.type !== 'string' || !['button', 'input', 'a'].includes(children.type)),
       'NumberField.Stepper asChild requires one non-interactive wrapper.',
     );
-    return cloneElement(children, mergeProps({ ...children.props }, merged), buttons);
+    return (
+      <InsideStepperContext value>
+        {cloneElement(children, mergeProps({ ...children.props }, merged), defaultButtons)}
+      </InsideStepperContext>
+    );
   }
-  invariant(children == null, 'NumberField.Stepper supplies its own buttons.');
-  return <div {...merged}>{buttons}</div>;
+  return (
+    <InsideStepperContext value>
+      <div {...merged}>{children ?? defaultButtons}</div>
+    </InsideStepperContext>
+  );
 }
 
 NumberFieldStepper.displayName = 'NumberField.Stepper';

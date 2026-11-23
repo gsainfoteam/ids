@@ -9,8 +9,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { TextField } from '../../components/form/text-field';
@@ -50,7 +50,7 @@ export const PC: Story = {
     <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
       <div className="flex w-full max-w-md flex-col gap-8">
         <div className="flex flex-col items-center gap-4 text-center">
-          <Badge content="404" variant="outline" />
+          <Chip variant="outline">404</Chip>
           <h1 className="text-headline-h2-bold">페이지를 찾을 수 없어요</h1>
           <p className="text-body-b2-regular">
             주소가 바뀌었거나 지워진 페이지예요. 찾던 것을 검색하거나 아래에서 골라 보세요.

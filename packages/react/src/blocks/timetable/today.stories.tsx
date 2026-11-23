@@ -1,8 +1,8 @@
 import { MapPinIcon } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Progress } from '../../components/feedback/progress';
 import { Stepper } from '../../components/navigation/stepper';
 
@@ -42,7 +42,9 @@ export const PC: Story = {
             <h2>{CLASSES[NOW_INDEX].name}</h2>
           </Card.Title>
           <Card.Action>
-            <Badge content="14:30" variant="soft" colorScheme="primary" />
+            <Chip variant="soft" colorScheme="primary">
+              14:30
+            </Chip>
           </Card.Action>
         </Card.Header>
         <Card.Content className="flex flex-col gap-4">

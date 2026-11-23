@@ -3,9 +3,10 @@
 입력 하나에 라벨, 설명, 도움말, 오류를 붙이고 그 입력의 상태를 한곳에 모으는 래퍼입니다.
 
 - **자동 연결.** `Field.Label` 은 `htmlFor` 와 `aria-labelledby` 로, `Description` · `Hint` · `Error` 는 `aria-describedby` 로 입력에 붙습니다. SSR 첫 HTML부터 들어갑니다.
-- **입력 상태.** 포커스, 값 유무, 변경 여부, 한 번 떠났는지를 루트와 모든 파트에 `data-*` 로 붙입니다. `className` · `style` · `children` 은 이 상태를 받는 함수도 됩니다.
+- **입력 상태.** 포커스, 값 유무, 변경 여부, 한 번 떠났는지를 모읍니다. 파트의 `children` 과 `useFieldState()` 로 읽습니다.
 - **브라우저 검증 메시지.** `Field.Error` 에 내용이 없으면 입력의 `validationMessage` 를 보여 줍니다. 제출하려 할 때나 값을 바꾸고 떠날 때 나타나고, 고치는 즉시 사라집니다.
 - **상태 상속.** `size`, `disabled`, `required`, `invalid` 가 안의 입력으로 내려갑니다.
+- **너비.** Field 도 안의 입력처럼 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><Field>…</Field></div>`.
 - **react-hook-form, TanStack Form.** `/react-hook-form` 의 `Field` 는 `name` 하나로 등록까지 합니다. `/tanstack-form` 의 `Field` 는 TanStack Form 필드 하나로 값, 검증, 상태를 모두 연결합니다.
 
 ```tsx
@@ -44,25 +45,16 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 ## 상태
 
 ```tsx
-<Field className={(state) => (state.focused ? 'bg-muted' : undefined)}>
+<Field>
   <Field.Label>닉네임</Field.Label>
   <TextField />
   <Field.Description>{(state) => (state.dirty ? '저장하지 않은 변경' : '')}</Field.Description>
 </Field>
 ```
 
-| 속성                            | 뜻                                                                   |
-| ------------------------------- | -------------------------------------------------------------------- |
-| `data-focused`                  | 포커스가 입력 안에 있다                                              |
-| `data-filled`                   | 값이 있다. 체크박스와 라디오는 체크, 커스텀 컨트롤은 hidden input 값 |
-| `data-dirty`                    | 처음 렌더된 값에서 바뀌었다                                          |
-| `data-touched`                  | 포커스가 입력을 한 번 떠났다                                         |
-| `data-invalid`                  | 오류 상태                                                            |
-| `data-disabled`                 | 비활성                                                               |
-| `data-required`                 | 필수                                                                 |
-| `data-orientation`, `data-size` | 배치와 크기                                                          |
-
-- 루트(`data-field`)와 모든 파트(`data-field-part`)에 같은 속성이 붙습니다.
+- 파트의 `children` 은 Field 상태(`focused`, `filled`, `dirty`, `touched`, `invalid`, `disabled`, `required`, `size`, `orientation`)를 받는 함수도 됩니다.
+- `filled` 는 값이 있다는 뜻입니다. 체크박스와 라디오는 체크, 커스텀 컨트롤은 hidden input 값을 봅니다. `dirty` 는 처음 렌더된 값에서 바뀌었다, `touched` 는 포커스가 입력을 한 번 떠났다는 뜻입니다.
+- 루트와 파트의 `className` · `style` 도 이 상태를 받는 함수가 됩니다. IDS 위에 새 디자인을 입힐 때만 씁니다.
 - `dirty`, `touched` 를 props로 주면 그 값을 씁니다. react-hook-form Field는 RHF의 `isDirty`, `isTouched` 를 넘깁니다.
 - 폼의 native reset은 `dirty`, `touched`, 표시 중인 브라우저 오류를 지웁니다.
 - 커스텀 컨트롤은 `useFieldState()` 로 같은 상태를 읽습니다. Field 밖에서는 `null` 입니다.
@@ -263,7 +255,7 @@ const { useAppForm } = createFormHook({
 - 값은 `value` 와 `onValueChange`(기본), 또는 `checked` 와 `onCheckedChange`(`controlMode="checked"`)로 연결됩니다. `onBlur` 는 `field.handleBlur` 로 갑니다.
 - native `input` 은 change 이벤트에서 값을 읽어 넘깁니다. 컴포넌트가 넘기는 change 이벤트는 값으로 쓰지 않습니다.
 - 오류는 한 번 떠났거나 제출을 시도한 뒤에 보입니다. 문자열 오류는 그대로, Standard Schema(Zod 등)의 오류 객체는 `message` 를 씁니다.
-- `data-dirty` 는 값이 기본값과 다를 때, `data-touched` 는 한 번 떠난 뒤에 붙습니다.
+- `dirty` 는 값이 기본값과 다를 때, `touched` 는 한 번 떠난 뒤에 참이 됩니다.
 - 자식 핸들러가 먼저 실행되고 TanStack Form 핸들러도 항상 실행됩니다.
 
 ## 속성
@@ -279,7 +271,6 @@ const { useAppForm } = createFormHook({
 | `id`                                                | 입력 id 기본값. 루트는 `${id}-root`                                  |
 | `name`                                              | 입력의 `name`. RHF Field에서는 등록 경로                             |
 | `aria-label`, `aria-labelledby`, `aria-describedby` | 입력으로 간다. 기존 id 목록과 중복 없이 합친다                       |
-| `className` / `style`                               | 루트로 간다. 상태를 받는 함수도 된다                                 |
 | 그 외 div 속성, ref                                 | 루트 div로 간다                                                      |
 | `Field.Error` `match`                               | 이 `ValidityState` 항목이 참일 때만 보인다                           |
 | 파트 `asChild`                                      | 파트 대신 자식 요소에 속성을 합친다                                  |
@@ -292,7 +283,6 @@ const { useAppForm } = createFormHook({
 
 - 입력이 하나가 아니거나, 라벨이 없거나, Label · Description · Hint가 중복되면 개발 빌드에서 경고합니다.
 - 일반 Field는 `value` 나 `onChange` 를 건드리지 않습니다. 다른 폼 라이브러리의 props를 그대로 연결할 수 있습니다.
-- `variant="horizontal"` 은 `orientation` 의 예전 이름입니다. 다음 버전에서 빠집니다.
 - `react-hook-form@^7.62.0` 은 optional peer입니다. `/react-hook-form` 경로를 쓸 때만 설치하고, 기본 import는 RHF를 불러오지 않습니다.
 - RHF Field는 `FormProvider` 와 `name` 이 모두 있을 때만 등록합니다. `name` 만 있으면 개발 빌드에서 경고하고 일반 Field로 동작합니다.
 - `value` / `checked` 모드에서는 RHF가 값의 주인입니다. 자식의 `value`, `defaultValue` 보다 `defaultValues` 와 RHF 상태가 우선합니다.

@@ -238,8 +238,9 @@ describe('logo', () => {
 });
 
 describe('colors', () => {
-  test('follows the theme: dark modules on light in light mode, inverted in dark mode', async () => {
+  test('variant theme follows the mode: dark modules on light in light mode, inverted in dark mode', async () => {
     const light = await renderInTheme(<QRCode value={PROFILE} />);
+    expect(codeIn(light.container)).toHaveAttribute('data-variant', 'theme');
     const lightPlate = plate(codeIn(light.container));
     expect(lightPlate.background).toBeGreaterThan(lightPlate.foreground);
     expect(decode(await rasterize(codeIn(light.container)))).toBe(PROFILE);
@@ -254,8 +255,8 @@ describe('colors', () => {
     expect(decode(context, 'invertFirst')).toBe(PROFILE);
   });
 
-  test('inverted={false} keeps dark modules on a light plate in dark mode', async () => {
-    const screen = await renderInTheme(<QRCode value={PROFILE} inverted={false} />, 'dark');
+  test('variant light keeps dark modules on a light plate in dark mode', async () => {
+    const screen = await renderInTheme(<QRCode value={PROFILE} variant="light" />, 'dark');
     const colors = plate(codeIn(screen.container));
 
     expect(colors.background).toBeGreaterThan(colors.foreground);
@@ -263,9 +264,10 @@ describe('colors', () => {
     expect(decode(await rasterize(codeIn(screen.container)))).toBe(PROFILE);
   });
 
-  test('inverted draws light modules on a dark plate in either mode', async () => {
+  test('variant dark draws light modules on a dark plate in either mode', async () => {
     for (const mode of ['light', 'dark'] as const) {
-      const screen = await renderInTheme(<QRCode value={PROFILE} inverted />, mode);
+      const screen = await renderInTheme(<QRCode value={PROFILE} variant="dark" />, mode);
+      expect(codeIn(screen.container)).toHaveAttribute('data-variant', 'dark');
       const colors = plate(codeIn(screen.container));
 
       expect(colors.foreground).toBeGreaterThan(colors.background);
@@ -274,12 +276,11 @@ describe('colors', () => {
     }
   });
 
-  test('takes other colors through the two custom properties', async () => {
+  test('takes other colors through the two custom properties set on a parent', async () => {
     const screen = await renderInTheme(
-      <QRCode
-        value={PROFILE}
-        className="[--qr-code-background:rgb(255,255,255)] [--qr-code-foreground:rgb(0,0,128)]"
-      />,
+      <div className="[--qr-code-background:rgb(255,255,255)] [--qr-code-foreground:rgb(0,0,128)]">
+        <QRCode value={PROFILE} />
+      </div>,
     );
     const code = codeIn(screen.container);
 
@@ -299,6 +300,20 @@ describe('size and quiet zone', () => {
 
     expect(box.width).toBe(pixels);
     expect(box.height).toBe(pixels);
+  });
+
+  test('a parent narrower than the size shrinks the code and keeps it square', async () => {
+    const screen = await renderInTheme(
+      <div style={{ width: 100 }}>
+        <QRCode value={PROFILE} size={200} />
+      </div>,
+    );
+    const code = codeIn(screen.container);
+    const box = code.getBoundingClientRect();
+
+    expect(box.width).toBe(100);
+    expect(box.height).toBe(100);
+    expect(code.querySelector('svg')!.getBoundingClientRect().height).toBe(100);
   });
 
   test('quietZone adds that many modules around the code and 0 drops the rounded corner', async () => {

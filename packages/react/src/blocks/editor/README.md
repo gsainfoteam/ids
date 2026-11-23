@@ -7,7 +7,7 @@ Storybook `Blocks/Editor/*`. 무언가를 만드는 입력 화면 두 가지입�
 | `Post`  | 게시글 쓰기. 제목, 게시판, 태그, 쓰기와 미리 보기 탭, 표지, 공개 범위, 예약 올리기.              |
 | `Event` | 행사 만들기. 이름, 소개, 기간, 시작 시간, 장소, 정원, 참가 신청. 오른쪽 미리 보기가 바로 바뀐다. |
 
-- **쓰인 컴포넌트.** TextField, Editor, Select, ChipField, Tabs, Card, FileDropzone, RadioGroup, Switch, Label, DateTimeField, DateField, TimeField, NumberField, Field, Item, Badge, Button, toast
+- **쓰인 컴포넌트.** TextField, Editor, Select, ChipField, Tabs, Card, FileDropzone, RadioGroup, Switch, Label, DateTimeField, DateField, TimeField, NumberField, Field, Item, Chip, Button, toast
 - **알아둘 것.**
   - 본문과 소개는 `Editor` 이고 값은 마크다운입니다. 미리 보기는 같은 값을 `readOnly` Editor 로 보여 줍니다.
   - 쓰기 탭은 `forceMount` 라 미리 보기로 갔다 와도 입력 칸이 그대로 남습니다.

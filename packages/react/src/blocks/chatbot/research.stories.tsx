@@ -11,8 +11,8 @@ import {
 
 import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Alert } from '../../components/feedback/alert';
@@ -100,23 +100,21 @@ export const PC: Story = {
 
             <p>
               외박은 나가기 전날 밤 10시까지 포털에서 신청해요{' '}
-              <Badge
-                content={
+              <Chip variant="outline">
+                {
                   <>
                     <span className="sr-only">출처 </span>1
                   </>
                 }
-                variant="outline"
-              />
+              </Chip>
               . 신청하지 않고 외박하면 벌점 3점이 쌓여요{' '}
-              <Badge
-                content={
+              <Chip variant="outline">
+                {
                   <>
                     <span className="sr-only">출처 </span>2
                   </>
                 }
-                variant="outline"
-              />
+              </Chip>
               .
             </p>
 

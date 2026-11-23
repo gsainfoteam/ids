@@ -5,8 +5,8 @@ import { CheckIcon, ClockIcon, HandRaisedIcon, LinkIcon } from '@heroicons/react
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -71,8 +71,10 @@ export const PC: Story = {
           <article className="flex flex-col gap-8">
             <header className="flex flex-col gap-4">
               <div className="flex flex-wrap gap-1.5">
-                <Badge content="교통" variant="soft" />
-                <Badge content="진행 중" variant="soft" colorScheme="primary" />
+                <Chip variant="soft">교통</Chip>
+                <Chip variant="soft" colorScheme="primary">
+                  진행 중
+                </Chip>
               </div>
               <h1 className="text-headline-h2-bold">
                 평일 셔틀 막차를 밤 11시 30분으로 늦춰 주세요
@@ -197,11 +199,12 @@ export const PC: Story = {
                         <Item.Description>{count.format(petition.signed)}명 동의</Item.Description>
                       </Item.Content>
                       <Item.Actions>
-                        <Badge
-                          content={petition.answered ? '답변 완료' : '진행 중'}
+                        <Chip
                           variant="soft"
                           colorScheme={petition.answered ? 'success' : 'primary'}
-                        />
+                        >
+                          {petition.answered ? '답변 완료' : '진행 중'}
+                        </Chip>
                       </Item.Actions>
                     </a>
                   </Item>

@@ -109,7 +109,6 @@ test('native form data, composition events, readOnly/disabled and the resize gri
       <TextArea
         name="message"
         defaultValue="안녕"
-        autoResize={false}
         resize="both"
         readOnly
         onCompositionStart={() => events.push('start')}
@@ -149,6 +148,34 @@ test('native form data, composition events, readOnly/disabled and the resize gri
   await expect.element(shell()).toHaveAttribute('data-invalid', '');
 });
 
+test('fills the width of its parent, and the height of a sized grid parent', async () => {
+  const screen = await render(
+    <div className="flex flex-col items-start gap-4">
+      <div className="w-72">
+        <TextArea aria-label="auto" />
+      </div>
+      <div className="grid h-60 w-72">
+        <TextArea resize="none" aria-label="none">
+          <span>위</span>
+          <TextArea.Input />
+          <span>아래</span>
+        </TextArea>
+      </div>
+    </div>,
+  );
+  const shell = (name: string) => shellOf(screen.getByRole('textbox', { name }).element());
+
+  expect(shell('auto').offsetWidth).toBe(288);
+  expect(shell('none').offsetWidth).toBe(288);
+  expect(shell('none').offsetHeight).toBe(240);
+  const textarea = screen.getByRole('textbox', { name: 'none' }).element() as HTMLElement;
+  const bottomBar = shell('none').querySelector('[data-text-area-bottom]')!;
+  expect(bottomBar.getBoundingClientRect().bottom).toBe(
+    shell('none').getBoundingClientRect().bottom,
+  );
+  expect(textarea.getBoundingClientRect().bottom).toBe(bottomBar.getBoundingClientRect().top);
+});
+
 test('invalid structures and row bounds fail clearly', () => {
   for (const node of [
     <TextArea>
@@ -157,7 +184,6 @@ test('invalid structures and row bounds fail clearly', () => {
     </TextArea>,
     <TextArea minRows={0} />,
     <TextArea minRows={5} maxRows={2} />,
-    <TextArea resize="both" />,
     <TextArea>
       <TextArea.Input asChild>
         <input />
@@ -167,9 +193,9 @@ test('invalid structures and row bounds fail clearly', () => {
     expect(() => renderToString(node)).toThrow(/\[IDS\] `<TextArea/);
 });
 
-test('autoResize grows, caps at maxRows, shrinks, follows controlled changes and hands style back', async () => {
-  const view = (value: string, autoResize = true) => (
-    <TextArea autoResize={autoResize} minRows={2} maxRows={4} value={value} onChange={() => {}}>
+test('resize="auto" grows, caps at maxRows, shrinks, follows controlled changes and hands style back', async () => {
+  const view = (value: string, resize: TextArea.Resize = 'auto') => (
+    <TextArea resize={resize} minRows={2} maxRows={4} value={value} onChange={() => {}}>
       <TextArea.Input ref={pinRowMetrics} style={{ height: '99px', overflowY: 'scroll' }} />
     </TextArea>
   );
@@ -182,7 +208,7 @@ test('autoResize grows, caps at maxRows, shrinks, follows controlled changes and
   await expect.poll(() => textarea().style.height).toBe('98px');
   await screen.rerender(view('a'));
   await expect.poll(() => textarea().style.height).toBe('58px');
-  await screen.rerender(view('a', false));
+  await screen.rerender(view('a', 'vertical'));
   expect(textarea().style.height).toBe('99px');
   expect(textarea().style.overflowY).toBe('scroll');
   await expect.element(screen.getByRole('separator', { name: '높이' })).toBeInTheDocument();
@@ -191,7 +217,7 @@ test('autoResize grows, caps at maxRows, shrinks, follows controlled changes and
 test('native form reset resizes after defaultValue is restored', async () => {
   const screen = await render(
     <form>
-      <TextArea autoResize minRows={1} maxRows={5} defaultValue="initial">
+      <TextArea minRows={1} maxRows={5} defaultValue="initial">
         <TextArea.Input ref={pinRowMetrics} />
       </TextArea>
       <button type="reset">Reset</button>
@@ -241,7 +267,7 @@ test('RHF native registration: required error/focus, value, disabled, reset resi
       <FormProvider {...form}>
         <RhfField name="bio" registerOptions={{ required: 'Bio required' }}>
           <RhfField.Label>Bio</RhfField.Label>
-          <TextArea autoResize minRows={1} maxRows={5}>
+          <TextArea minRows={1} maxRows={5}>
             <TextArea.Input ref={pinRowMetrics} />
           </TextArea>
           <RhfField.Error />
@@ -412,9 +438,11 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', poin
 }
 
 const resizable = (resize: TextArea.Resize) => (
-  <TextArea autoResize={false} resize={resize} rows={3} aria-label="메모" className="w-72">
-    <TextArea.Input ref={pinRowMetrics} />
-  </TextArea>
+  <div className="w-72">
+    <TextArea resize={resize} rows={3} aria-label="메모">
+      <TextArea.Input ref={pinRowMetrics} />
+    </TextArea>
+  </div>
 );
 
 const twelveLines = Array.from({ length: 12 }, (_, line) => `줄 ${line + 1}`).join('\n');
@@ -469,9 +497,11 @@ test.each(['ltr', 'rtl'] as const)(
       <div dir={dir} className="flex flex-col items-start gap-12 p-8">
         {MODES.map((mode) => (
           <Fragment key={mode}>
-            <TextArea autoResize={false} resize={mode} aria-label={mode} className="w-72">
-              <TextArea.Input style={{ height: 80 }} />
-            </TextArea>
+            <div className="w-72">
+              <TextArea resize={mode} aria-label={mode}>
+                <TextArea.Input style={{ height: 80 }} />
+              </TextArea>
+            </div>
             <Resizable
               direction={mode}
               data-testid={mode}
@@ -546,9 +576,11 @@ test.each(['ltr', 'rtl'] as const)(
     const screen = await render(
       <div dir={dir} className="flex flex-col items-start gap-16 p-8">
         {MODES.map((mode) => (
-          <TextArea key={mode} autoResize={false} resize={mode} aria-label={mode} className="w-72">
-            <TextArea.Input style={{ height: 80 }} />
-          </TextArea>
+          <div key={mode} className="w-72">
+            <TextArea resize={mode} aria-label={mode}>
+              <TextArea.Input style={{ height: 80 }} />
+            </TextArea>
+          </div>
         ))}
       </div>,
     );
@@ -604,30 +636,19 @@ test('the bar controls and the count next to the handle stay pressable in every 
   const onSend = vi.fn();
   const field = (resize: TextArea.Resize, size: (typeof SIZES)[number]) => (
     <div key={`${resize}-${size}`} className="flex flex-col items-start gap-16 p-8">
-      <TextArea
-        autoResize={false}
-        resize={resize}
-        size={size}
-        rows={2}
-        aria-label="보낼 글"
-        className="w-72"
-      >
-        <TextArea.Input />
-        <TextArea.Count />
-        <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} onClick={onSend} />
-      </TextArea>
-      <TextArea
-        autoResize={false}
-        resize={resize}
-        size={size}
-        rows={2}
-        maxLength={100}
-        aria-label="센 글"
-        className="w-72"
-      >
-        <TextArea.Input />
-        <TextArea.Count />
-      </TextArea>
+      <div className="w-72">
+        <TextArea resize={resize} size={size} rows={2} aria-label="보낼 글">
+          <TextArea.Input />
+          <TextArea.Count />
+          <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} onClick={onSend} />
+        </TextArea>
+      </div>
+      <div className="w-72">
+        <TextArea resize={resize} size={size} rows={2} maxLength={100} aria-label="센 글">
+          <TextArea.Input />
+          <TextArea.Count />
+        </TextArea>
+      </div>
     </div>
   );
   const screen = await render(field('vertical', 'standard'));
@@ -659,17 +680,17 @@ test('the scrollbar runs to the rounded corner and stays pressable next to the h
   const field = (resize: TextArea.Resize) => (
     <div className="flex flex-col items-start gap-8 p-8">
       <button type="button">밖</button>
-      <TextArea
-        key={resize}
-        autoResize={false}
-        resize={resize}
-        rows={3}
-        aria-label="메모"
-        className="w-72"
-        defaultValue={twelveLines}
-      >
-        <TextArea.Input ref={pinRowMetrics} />
-      </TextArea>
+      <div className="w-72">
+        <TextArea
+          key={resize}
+          resize={resize}
+          rows={3}
+          aria-label="메모"
+          defaultValue={twelveLines}
+        >
+          <TextArea.Input ref={pinRowMetrics} />
+        </TextArea>
+      </div>
     </div>
   );
   const screen = await render(field('vertical'));
@@ -707,14 +728,18 @@ test('the scrollbar runs to the rounded corner and stays pressable next to the h
 test('focus: the edge handle rings like Resizable edge handle, the field keeps its ring off, the corner grip draws along its arc; the handle is the last tab stop', async () => {
   const screen = await render(
     <div className="flex flex-col items-start gap-12 p-8">
-      <TextArea autoResize={false} resize="vertical" aria-label="세로" className="w-72">
-        <TextArea.Input />
-        <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
-      </TextArea>
+      <div className="w-72">
+        <TextArea resize="vertical" aria-label="세로">
+          <TextArea.Input />
+          <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
+        </TextArea>
+      </div>
       <Resizable direction="vertical" data-testid="box" className="h-20 w-72">
         내용
       </Resizable>
-      <TextArea autoResize={false} resize="both" aria-label="양쪽" className="w-72" />
+      <div className="w-72">
+        <TextArea resize="both" aria-label="양쪽" />
+      </div>
     </div>,
   );
   const vertical = shellOf(screen.getByRole('textbox', { name: '세로' }).element());
@@ -780,7 +805,7 @@ test('keys resize the height on the textarea and the width on the whole field; E
 
 test('the height floor is one line and maxRows caps it', async () => {
   const screen = await render(
-    <TextArea autoResize={false} resize="vertical" rows={3} maxRows={4} aria-label="메모">
+    <TextArea resize="vertical" rows={3} maxRows={4} aria-label="메모">
       <TextArea.Input ref={pinRowMetrics} />
     </TextArea>,
   );
@@ -845,15 +870,13 @@ test('dragging a handle resizes the field; Escape during a drag restores it and 
 });
 
 test('a disabled TextArea keeps its handle out of the tab order', async () => {
-  const screen = await render(
-    <TextArea autoResize={false} resize="vertical" disabled aria-label="메모" />,
-  );
+  const screen = await render(<TextArea resize="vertical" disabled aria-label="메모" />);
   const handle = screen.getByRole('separator', { name: '높이' });
   await expect.element(handle).toHaveAttribute('aria-disabled', 'true');
   await expect.element(handle).not.toHaveAttribute('tabindex');
 });
 
-test('bars sit behind a line unless divided is off', async () => {
+test('bars sit behind a line that className can take away', async () => {
   const bars = (shell: Element) =>
     [
       getComputedStyle(shell.querySelector('[data-text-area-top]')!).borderBottomWidth,
@@ -866,7 +889,10 @@ test('bars sit behind a line unless divided is off', async () => {
         <TextArea.Input />
         <span>Bottom</span>
       </TextArea>
-      <TextArea aria-label="joined" divided={false}>
+      <TextArea
+        aria-label="joined"
+        className="[&>[data-text-area-bottom]]:border-t-0 [&>[data-text-area-top]]:border-b-0"
+      >
         <span>Top</span>
         <TextArea.Input />
         <span>Bottom</span>

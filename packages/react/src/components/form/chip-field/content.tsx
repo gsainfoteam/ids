@@ -7,6 +7,7 @@ import { ChipCreate } from './create';
 import { ChipEmpty } from './empty';
 import { isType } from './is-type';
 import { ChipLimit } from './limit';
+import { type PopupPresentation } from '../../../internal/field-popup';
 import { FieldPopupSearch } from '../../../internal/field-popup/search';
 import { useTranslate } from '../../../internal/translate';
 import { flattenFragments, mergeProps, part } from '../../../utils';
@@ -15,7 +16,7 @@ import { slotChildren } from '../select/select-options';
 
 import type { BoxProps } from './box-props';
 
-export type ChipContentProps = BoxProps;
+export type ChipContentProps = BoxProps & { mobileVariant?: PopupPresentation };
 
 function DrawerSearch() {
   const t = useTranslate();
@@ -42,7 +43,13 @@ function DrawerSearch() {
   );
 }
 
-export function ChipContent({ asChild, children, className, ...props }: ChipContentProps) {
+export function ChipContent({
+  asChild,
+  children,
+  className,
+  mobileVariant: _readByTheRoot,
+  ...props
+}: ChipContentProps) {
   const c = useChip('Content');
 
   const nodes = flattenFragments(slotChildren(children, asChild));

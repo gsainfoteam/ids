@@ -7,7 +7,7 @@ import type { IdsSize } from '../../../tokens/types';
 export const cardStyle = tv({
   slots: {
     root: [
-      'relative isolate flex flex-col text-neutral-strong',
+      'relative isolate flex w-full min-w-0 flex-col text-neutral-strong',
       '[--card-pad:var(--ids-concentric-pad)]',
     ],
     header: [
@@ -20,7 +20,7 @@ export const cardStyle = tv({
     action: 'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
     content: 'flex-1 border-neutral',
     footer: [
-      'flex items-center gap-2',
+      'flex items-center justify-end gap-2',
       footerBand,
       '-mx-[calc(var(--card-pad)_-_var(--card-ring))] px-[calc(var(--card-pad)_-_var(--card-ring))]',
       'last:-mb-[calc(var(--card-pad)_-_var(--card-ring))] last:rounded-b-[inherit]',

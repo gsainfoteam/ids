@@ -3,8 +3,8 @@ import { ArrowRightIcon, MegaphoneIcon } from '@heroicons/react/24/outline';
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { AvatarGroup } from '../../components/data/avatar-group';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
@@ -71,7 +71,9 @@ export const PC: Story = {
             <Card.Header>
               <Card.Title>새 공지</Card.Title>
               <Card.Action>
-                <Badge content="3" variant="soft" colorScheme="primary" />
+                <Chip variant="soft" colorScheme="primary">
+                  3
+                </Chip>
               </Card.Action>
             </Card.Header>
             <ItemGroup size="tiny">
@@ -96,7 +98,9 @@ export const PC: Story = {
                 <Card.Description>다음 셔틀 · 학생회관</Card.Description>
                 <Card.Title>8분 뒤 광주송정역행</Card.Title>
                 <Card.Action>
-                  <Badge content="12:20" variant="soft" colorScheme="primary" />
+                  <Chip variant="soft" colorScheme="primary">
+                    12:20
+                  </Chip>
                 </Card.Action>
               </Card.Header>
               <Card.Content>
@@ -108,7 +112,7 @@ export const PC: Story = {
                 <Card.Description>오늘 점심 · 학생식당</Card.Description>
                 <Card.Title>제육볶음, 된장찌개</Card.Title>
                 <Card.Action>
-                  <Badge content="5,000원" variant="outline" />
+                  <Chip variant="outline">5,000원</Chip>
                 </Card.Action>
               </Card.Header>
             </Card>

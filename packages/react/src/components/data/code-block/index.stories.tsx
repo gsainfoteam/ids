@@ -89,20 +89,12 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     language: { control: 'text' },
-    title: { control: 'text' },
-    lineNumbers: { control: 'boolean' },
-    wrap: { control: 'boolean' },
     highlight: { control: 'object' },
     collapsedLines: { control: 'number' },
-    children: { control: 'text' },
   },
   args: {
     language: 'tsx',
-    title: 'save.tsx',
     variant: 'outline',
-    lineNumbers: false,
-    wrap: false,
-    children: BUTTON,
   },
   decorators: [
     (Story) => (
@@ -116,7 +108,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  render: (args) => (
+    <CodeBlock {...args}>
+      <CodeBlock.Title>save.tsx</CodeBlock.Title>
+      {BUTTON}
+    </CodeBlock>
+  ),
+};
+
+export const Usage: Story = {
+  render: () => (
+    <CodeBlock language="bash">
+      <CodeBlock.Title>설치</CodeBlock.Title>
+      {'pnpm add @gsainfoteam/ids-react @gsainfoteam/ids-css'}
+    </CodeBlock>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('figcaption')).toHaveTextContent('설치bash');
+    await expect(codeOf(canvasElement).textContent).toBe(INSTALL);
+  },
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -127,7 +139,8 @@ export const Gallery: Story = {
       >
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
-            <CodeBlock variant={variant} language="tsx" title="save.tsx" className="w-full">
+            <CodeBlock variant={variant} language="tsx">
+              <CodeBlock.Title>save.tsx</CodeBlock.Title>
               {BUTTON}
             </CodeBlock>
           </Showcase.Row>
@@ -140,14 +153,9 @@ export const Gallery: Story = {
       >
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
-            <CodeBlock
-              variant={variant}
-              language="tsx"
-              title="save.tsx"
-              lineNumbers
-              highlight={[4, 6]}
-              className="w-full"
-            >
+            <CodeBlock variant={variant} language="tsx" highlight={[4, 6]}>
+              <CodeBlock.Title>save.tsx</CodeBlock.Title>
+              <CodeBlock.LineNumbers />
               {BUTTON}
             </CodeBlock>
           </Showcase.Row>
@@ -156,31 +164,26 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Caption"
-        description="title 과 language 가 figcaption 이 됩니다. 둘 다 없으면 복사 버튼만 코드 위에 뜹니다."
+        description="Title 과 language 가 figcaption 이 됩니다. 둘 다 없으면 복사 버튼만 코드 위에 뜹니다."
       >
-        <Showcase.Row label="title + language">
-          <CodeBlock language="bash" title="터미널" className="w-full">
+        <Showcase.Row label="Title + language">
+          <CodeBlock language="bash">
+            <CodeBlock.Title>터미널</CodeBlock.Title>
             {INSTALL}
           </CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="language">
-          <CodeBlock language="bash" className="w-full">
-            {INSTALL}
-          </CodeBlock>
+          <CodeBlock language="bash">{INSTALL}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="none">
-          <CodeBlock className="w-full">{INSTALL}</CodeBlock>
+          <CodeBlock>{INSTALL}</CodeBlock>
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section
-        title="Overflow"
-        description="긴 줄은 가로로 스크롤합니다. wrap 이면 줄을 바꿉니다."
-      >
-        <CodeBlock language="ts" title="scroll" lineNumbers>
-          {LONG_LINE}
-        </CodeBlock>
-        <CodeBlock language="ts" title="wrap" lineNumbers wrap>
+      <Showcase.Section title="Overflow" description="긴 줄은 가로로 스크롤합니다.">
+        <CodeBlock language="ts">
+          <CodeBlock.Title>scroll</CodeBlock.Title>
+          <CodeBlock.LineNumbers />
           {LONG_LINE}
         </CodeBlock>
       </Showcase.Section>
@@ -190,25 +193,16 @@ export const Gallery: Story = {
         description="collapsedLines 보다 긴 코드는 그만큼만 보이고 아래가 흐려집니다. 버튼으로 펼치고 접습니다."
       >
         <Showcase.Row label="collapsed">
-          <CodeBlock
-            language="tsx"
-            title="profile-form.tsx"
-            lineNumbers
-            collapsedLines={8}
-            className="w-full"
-          >
+          <CodeBlock language="tsx" collapsedLines={8}>
+            <CodeBlock.Title>profile-form.tsx</CodeBlock.Title>
+            <CodeBlock.LineNumbers />
             {FORM}
           </CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="expanded">
-          <CodeBlock
-            language="tsx"
-            title="profile-form.tsx"
-            lineNumbers
-            collapsedLines={8}
-            defaultExpanded
-            className="w-full"
-          >
+          <CodeBlock language="tsx" collapsedLines={8} defaultExpanded>
+            <CodeBlock.Title>profile-form.tsx</CodeBlock.Title>
+            <CodeBlock.LineNumbers />
             {FORM}
           </CodeBlock>
         </Showcase.Row>
@@ -219,38 +213,51 @@ export const Gallery: Story = {
         description="기본으로 담긴 언어는 서버 HTML 에서 이미 강조됩니다."
       >
         <Showcase.Row label="bash">
-          <CodeBlock language="bash" className="w-full">
-            {SAMPLES.bash}
-          </CodeBlock>
+          <CodeBlock language="bash">{SAMPLES.bash}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="python">
-          <CodeBlock language="python" className="w-full">
-            {SAMPLES.python}
-          </CodeBlock>
+          <CodeBlock language="python">{SAMPLES.python}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="json">
-          <CodeBlock language="json" className="w-full">
-            {SAMPLES.json}
-          </CodeBlock>
+          <CodeBlock language="json">{SAMPLES.json}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="css">
-          <CodeBlock language="css" className="w-full">
-            {SAMPLES.css}
-          </CodeBlock>
+          <CodeBlock language="css">{SAMPLES.css}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="diff">
-          <CodeBlock language="diff" className="w-full">
-            {SAMPLES.diff}
-          </CodeBlock>
+          <CodeBlock language="diff">{SAMPLES.diff}</CodeBlock>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Copy: Story = {
+export const NameTheFile: Story = {
   render: () => (
-    <CodeBlock language="bash" title="설치">
+    <CodeBlock language="tsx">
+      <CodeBlock.Title>save.tsx</CodeBlock.Title>
+      {BUTTON}
+    </CodeBlock>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`CodeBlock.Title` 은 파일 이름이나 설명을 figcaption 에 적고, 그 옆에 `language` 가 붙습니다. figcaption 이 figure 의 이름이 됩니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, canvas }) => {
+    await expect(canvasElement.querySelector('figcaption')).toHaveTextContent('save.tsxtsx');
+    await expect(canvas.getByText('save.tsx').parentElement?.tagName).toBe('FIGCAPTION');
+    await expect(codeOf(canvasElement).textContent).toBe(BUTTON);
+  },
+};
+
+export const CopyTheCode: Story = {
+  render: () => (
+    <CodeBlock language="bash">
+      <CodeBlock.Title>설치</CodeBlock.Title>
       {INSTALL}
     </CodeBlock>
   ),
@@ -277,7 +284,7 @@ export const Copy: Story = {
   },
 };
 
-export const CustomCopyLabel: Story = {
+export const RenameTheCopyButton: Story = {
   render: () => (
     <CodeBlock language="bash">
       {INSTALL}
@@ -302,9 +309,11 @@ export const CustomCopyLabel: Story = {
   },
 };
 
-export const LineNumbers: Story = {
+export const ShowLineNumbers: Story = {
   render: () => (
-    <CodeBlock language="tsx" title="save.tsx" lineNumbers>
+    <CodeBlock language="tsx">
+      <CodeBlock.Title>save.tsx</CodeBlock.Title>
+      <CodeBlock.LineNumbers />
       {BUTTON}
     </CodeBlock>
   ),
@@ -312,27 +321,32 @@ export const LineNumbers: Story = {
     docs: {
       description: {
         story:
-          '줄 번호는 `::before` 의 CSS counter 입니다. 글자를 골라 복사해도, 스크린 리더로 읽어도 번호가 섞이지 않습니다.',
+          '`CodeBlock.LineNumbers` 를 두면 줄 번호가 붙습니다. 번호는 `::before` 의 CSS counter 라 글자를 골라 복사해도, 스크린 리더로 읽어도 섞이지 않습니다.',
       },
     },
   },
   play: async ({ canvasElement }) => {
     const code = codeOf(canvasElement);
     await expect(code.textContent).toBe(BUTTON);
+    await expect(canvasElement.querySelector('figure')).toHaveAttribute('data-line-numbers');
     const firstLine = code.querySelector('[data-line="1"]')!;
     await expect(getComputedStyle(firstLine, '::before').content).toMatch(/^counter\(line\)/);
   },
 };
 
-export const HighlightLines: Story = {
+export const HighlightChangedLines: Story = {
   render: () => (
-    <CodeBlock language="tsx" title="save.tsx" lineNumbers highlight={[4, 6]}>
+    <CodeBlock language="tsx" highlight={[4, 6]}>
+      <CodeBlock.Title>save.tsx</CodeBlock.Title>
+      <CodeBlock.LineNumbers />
       {BUTTON}
     </CodeBlock>
   ),
   parameters: {
     docs: {
-      description: { story: '`highlight` 는 1부터 세는 줄 번호입니다.' },
+      description: {
+        story: '`highlight` 에 1부터 세는 줄 번호를 넘기면 그 줄에 바탕과 막대가 깔립니다.',
+      },
     },
   },
   play: async ({ canvasElement }) => {
@@ -343,7 +357,7 @@ export const HighlightLines: Story = {
   },
 };
 
-export const HorizontalScroll: Story = {
+export const ScrollALongLine: Story = {
   render: () => (
     <div className="w-80">
       <CodeBlock language="ts">{LONG_LINE}</CodeBlock>
@@ -365,34 +379,11 @@ export const HorizontalScroll: Story = {
   },
 };
 
-export const Wrap: Story = {
+export const CollapseALongFile: Story = {
   render: () => (
-    <div className="w-80">
-      <CodeBlock language="ts" lineNumbers wrap>
-        {LONG_LINE}
-      </CodeBlock>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '`wrap` 이면 긴 줄을 바꿔 씁니다. 바뀐 줄은 줄 번호 뒤에서 이어집니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const pre = canvasElement.querySelector('pre')!;
-    await expect(pre.scrollWidth).toBe(pre.clientWidth);
-    const line = pre.querySelector('[data-line="1"]')!;
-    await expect(line.getBoundingClientRect().height).toBeGreaterThan(
-      parseFloat(getComputedStyle(line).lineHeight) * 1.5,
-    );
-  },
-};
-
-export const Collapse: Story = {
-  render: () => (
-    <CodeBlock language="tsx" title="profile-form.tsx" lineNumbers collapsedLines={8}>
+    <CodeBlock language="tsx" collapsedLines={8}>
+      <CodeBlock.Title>profile-form.tsx</CodeBlock.Title>
+      <CodeBlock.LineNumbers />
       {FORM}
     </CodeBlock>
   ),
@@ -422,13 +413,13 @@ export const Collapse: Story = {
   },
 };
 
-export const Tokens: Story = {
+export const ColorTheSyntax: Story = {
   render: () => <CodeBlock language="tsx">{`const answer = 42; // 답`}</CodeBlock>,
   parameters: {
     docs: {
       description: {
         story:
-          '강조한 조각은 `data-token` 을 받고, 색은 IDS 토큰입니다. keyword 는 primary, 함수는 tertiary, 속성과 태그는 secondary, 문자열은 success, 숫자는 warning 입니다.',
+          '`language` 를 주면 조각마다 `data-token` 이 붙고, 색은 IDS 토큰입니다. keyword 는 primary, 함수는 tertiary, 속성과 태그는 secondary, 문자열은 success, 숫자는 warning 입니다.',
       },
     },
   },
@@ -443,9 +434,10 @@ export const Tokens: Story = {
   },
 };
 
-export const MoreLanguages: Story = {
+export const LoadMoreLanguages: Story = {
   render: () => (
-    <CodeBlock language="rust" title="main.rs">
+    <CodeBlock language="rust">
+      <CodeBlock.Title>main.rs</CodeBlock.Title>
       {RUST}
     </CodeBlock>
   ),
@@ -467,7 +459,7 @@ export const MoreLanguages: Story = {
   },
 };
 
-export const PlainText: Story = {
+export const ShowPlainText: Story = {
   render: () => <CodeBlock>{'로그를 그대로 보입니다.\n  들여쓰기도 그대로입니다.'}</CodeBlock>,
   parameters: {
     docs: {

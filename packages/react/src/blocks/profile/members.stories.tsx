@@ -4,7 +4,6 @@ import { MagnifyingGlassIcon, UserGroupIcon } from '@heroicons/react/24/outline'
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
@@ -171,7 +170,9 @@ export const PC: Story = {
                     </Card.Description>
                     {member.lead && (
                       <Card.Action>
-                        <Badge content="팀장" variant="soft" colorScheme="primary" />
+                        <Chip variant="soft" colorScheme="primary">
+                          팀장
+                        </Chip>
                       </Card.Action>
                     )}
                   </Card.Header>

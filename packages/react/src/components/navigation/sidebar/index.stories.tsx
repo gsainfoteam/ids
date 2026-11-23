@@ -47,8 +47,8 @@ import { Showcase } from '~story-kit';
 import { overlay } from '../../../internal/overlay';
 import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
-import { Badge } from '../../data/badge';
 import { Card } from '../../data/card';
+import { Chip } from '../../data/chip';
 import { Item } from '../../data/item';
 import { Skeleton } from '../../feedback/skeleton';
 import { ScrollArea } from '../../layout/scroll-area';
@@ -93,7 +93,7 @@ const meta = {
           <Sidebar.Item value="/board" href="#board">
             <MegaphoneIcon />
             게시판
-            <Badge content={12} variant="soft" />
+            <Chip variant="soft">{12}</Chip>
           </Sidebar.Item>
           <Sidebar.Item value="/shuttle" href="#shuttle">
             <TruckIcon />
@@ -190,7 +190,7 @@ export const Gallery: Story = {
               <Sidebar.Item href="#inbox">
                 <InboxIcon />
                 받은 소식
-                <Badge content={3} variant="soft" />
+                <Chip variant="soft">{3}</Chip>
               </Sidebar.Item>
               <Sidebar.Item href="#bookmarks">
                 <BookmarkIcon />
@@ -221,7 +221,7 @@ export const Gallery: Story = {
               <Sidebar.Item href="#inbox">
                 <InboxIcon />
                 받은 소식
-                <Badge content={3} variant="soft" />
+                <Chip variant="soft">{3}</Chip>
               </Sidebar.Item>
               <Sidebar.Item href="#bookmarks">
                 <BookmarkIcon />
@@ -252,7 +252,7 @@ export const Gallery: Story = {
               <Sidebar.Item href="#inbox">
                 <InboxIcon />
                 받은 소식
-                <Badge content={3} variant="soft" />
+                <Chip variant="soft">{3}</Chip>
               </Sidebar.Item>
               <Sidebar.Item href="#bookmarks">
                 <BookmarkIcon />
@@ -292,7 +292,7 @@ export const Gallery: Story = {
                 <Sidebar.Item href="#inbox">
                   <InboxIcon />
                   받은 소식
-                  <Badge content={3} variant="soft" />
+                  <Chip variant="soft">{3}</Chip>
                 </Sidebar.Item>
                 <Sidebar.Item>
                   <Cog6ToothIcon />
@@ -400,7 +400,7 @@ export const UseRouterLinks: Story = {
               >
                 <InboxIcon />
                 받은 소식
-                <Badge content={3} variant="soft" />
+                <Chip variant="soft">{3}</Chip>
               </a>
             </Sidebar.Item>
             <Sidebar.Item value="/bookmarks" asChild>
@@ -459,24 +459,24 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
   <Sidebar.Item value="inbox" href="#inbox">
     <InboxIcon />
     받은 소식
-    <Badge content={12} variant="soft" colorScheme="primary" />
+    <Chip variant="soft" colorScheme="primary">{12}</Chip>
   </Sidebar.Item>
   <Sidebar.Item value="my-issues" href="#my-issues">
     <UserCircleIcon />
     내 이슈
-    <Badge content={4} variant="soft" colorScheme="warning" />
+    <Chip variant="soft" colorScheme="warning">{4}</Chip>
   </Sidebar.Item>
   <Sidebar.Item value="reviews" href="#reviews">
     <CheckCircleIcon />
     리뷰 요청
-    <Badge content={2} variant="soft" colorScheme="danger" />
+    <Chip variant="soft" colorScheme="danger">{2}</Chip>
   </Sidebar.Item>
 
   <Sidebar.Group label="즐겨찾기" collapsible>
     <Sidebar.Item value="ziggle-v3" href="#ziggle-v3" colorScheme="primary">
       <RocketLaunchSolid />
       Ziggle v3 출시
-      <Badge dot colorScheme="success" />
+      <Chip variant="solid" colorScheme="success" />
     </Sidebar.Item>
     <Sidebar.Item value="ids-tokens" href="#ids-tokens" colorScheme="danger">
       <SwatchSolid />
@@ -485,7 +485,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
     <Sidebar.Item value="shuttle-api" href="#shuttle-api" colorScheme="warning">
       <TruckSolid />
       셔틀 API 개편
-      <Badge dot colorScheme="warning" />
+      <Chip variant="solid" colorScheme="warning" />
     </Sidebar.Item>
   </Sidebar.Group>
 
@@ -496,7 +496,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
       <Sidebar.Item value="info-issues" href="#info-issues">
         <InboxIcon />
         이슈
-        <Badge content={38} variant="soft" />
+        <Chip variant="soft">{38}</Chip>
       </Sidebar.Item>
       <Sidebar.Item value="info-projects" href="#info-projects">
         <RectangleStackIcon />
@@ -508,7 +508,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
         <Sidebar.Item value="frontend-active" href="#frontend-active">
           <PlayCircleIcon />
           진행 중
-          <Badge content={7} variant="soft" colorScheme="info" />
+          <Chip variant="soft" colorScheme="info">{7}</Chip>
         </Sidebar.Item>
         <Sidebar.Item value="frontend-backlog" href="#frontend-backlog">
           <ArchiveBoxIcon />
@@ -517,7 +517,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
         <Sidebar.Item value="frontend-cycles" href="#frontend-cycles">
           <ArrowPathIcon />
           사이클
-          <Badge content="12주차" variant="outline" colorScheme="success" />
+          <Chip variant="outline" colorScheme="success">12주차</Chip>
         </Sidebar.Item>
       </Sidebar.Item>
       <Sidebar.Item value="backend" colorScheme="success">
@@ -526,7 +526,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
         <Sidebar.Item value="backend-active" href="#backend-active">
           <PlayCircleIcon />
           진행 중
-          <Badge content={3} variant="soft" colorScheme="info" />
+          <Chip variant="soft" colorScheme="info">{3}</Chip>
         </Sidebar.Item>
         <Sidebar.Item value="backend-backlog" href="#backend-backlog">
           <ArchiveBoxIcon />
@@ -540,7 +540,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
       <Sidebar.Item value="design-issues" href="#design-issues">
         <InboxIcon />
         이슈
-        <Badge content={9} variant="soft" />
+        <Chip variant="soft">{9}</Chip>
       </Sidebar.Item>
       <Sidebar.Item value="design-projects" href="#design-projects">
         <RectangleStackIcon />
@@ -565,7 +565,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
     <Sidebar.Item href="#profile">
       <Avatar name="김지수" size="tiny" />
       김지수
-      <Badge content="관리자" variant="soft" colorScheme="primary" />
+      <Chip variant="soft" colorScheme="primary">관리자</Chip>
     </Sidebar.Item>
   </Sidebar.Footer>
 </Sidebar>`;
@@ -592,24 +592,29 @@ export const BuildAWorkspaceTree: Story = {
         <Sidebar.Item value="inbox" href="#inbox">
           <InboxIcon />
           받은 소식
-          <Badge content={12} variant="soft" colorScheme="primary" />
+          <Chip variant="soft" colorScheme="primary">
+            {12}
+          </Chip>
         </Sidebar.Item>
         <Sidebar.Item value="my-issues" href="#my-issues">
-          <UserCircleIcon />
-          내 이슈
-          <Badge content={4} variant="soft" colorScheme="warning" />
+          <UserCircleIcon />내 이슈
+          <Chip variant="soft" colorScheme="warning">
+            {4}
+          </Chip>
         </Sidebar.Item>
         <Sidebar.Item value="reviews" href="#reviews">
           <CheckCircleIcon />
           리뷰 요청
-          <Badge content={2} variant="soft" colorScheme="danger" />
+          <Chip variant="soft" colorScheme="danger">
+            {2}
+          </Chip>
         </Sidebar.Item>
 
         <Sidebar.Group label="즐겨찾기" collapsible>
           <Sidebar.Item value="ziggle-v3" href="#ziggle-v3" colorScheme="primary">
             <RocketLaunchSolid />
             Ziggle v3 출시
-            <Badge dot colorScheme="success" />
+            <Chip variant="solid" colorScheme="success" />
           </Sidebar.Item>
           <Sidebar.Item value="ids-tokens" href="#ids-tokens" colorScheme="danger">
             <SwatchSolid />
@@ -618,7 +623,7 @@ export const BuildAWorkspaceTree: Story = {
           <Sidebar.Item value="shuttle-api" href="#shuttle-api" colorScheme="warning">
             <TruckSolid />
             셔틀 API 개편
-            <Badge dot colorScheme="warning" />
+            <Chip variant="solid" colorScheme="warning" />
           </Sidebar.Item>
         </Sidebar.Group>
 
@@ -629,7 +634,7 @@ export const BuildAWorkspaceTree: Story = {
             <Sidebar.Item value="info-issues" href="#info-issues">
               <InboxIcon />
               이슈
-              <Badge content={38} variant="soft" />
+              <Chip variant="soft">{38}</Chip>
             </Sidebar.Item>
             <Sidebar.Item value="info-projects" href="#info-projects">
               <RectangleStackIcon />
@@ -641,7 +646,9 @@ export const BuildAWorkspaceTree: Story = {
               <Sidebar.Item value="frontend-active" href="#frontend-active">
                 <PlayCircleIcon />
                 진행 중
-                <Badge content={7} variant="soft" colorScheme="info" />
+                <Chip variant="soft" colorScheme="info">
+                  {7}
+                </Chip>
               </Sidebar.Item>
               <Sidebar.Item value="frontend-backlog" href="#frontend-backlog">
                 <ArchiveBoxIcon />
@@ -650,7 +657,9 @@ export const BuildAWorkspaceTree: Story = {
               <Sidebar.Item value="frontend-cycles" href="#frontend-cycles">
                 <ArrowPathIcon />
                 사이클
-                <Badge content="12주차" variant="outline" colorScheme="success" />
+                <Chip variant="outline" colorScheme="success">
+                  12주차
+                </Chip>
               </Sidebar.Item>
             </Sidebar.Item>
             <Sidebar.Item value="backend" colorScheme="success">
@@ -659,7 +668,9 @@ export const BuildAWorkspaceTree: Story = {
               <Sidebar.Item value="backend-active" href="#backend-active">
                 <PlayCircleIcon />
                 진행 중
-                <Badge content={3} variant="soft" colorScheme="info" />
+                <Chip variant="soft" colorScheme="info">
+                  {3}
+                </Chip>
               </Sidebar.Item>
               <Sidebar.Item value="backend-backlog" href="#backend-backlog">
                 <ArchiveBoxIcon />
@@ -673,7 +684,7 @@ export const BuildAWorkspaceTree: Story = {
             <Sidebar.Item value="design-issues" href="#design-issues">
               <InboxIcon />
               이슈
-              <Badge content={9} variant="soft" />
+              <Chip variant="soft">{9}</Chip>
             </Sidebar.Item>
             <Sidebar.Item value="design-projects" href="#design-projects">
               <RectangleStackIcon />
@@ -698,7 +709,9 @@ export const BuildAWorkspaceTree: Story = {
           <Sidebar.Item href="#profile">
             <Avatar name="김지수" size="tiny" />
             김지수
-            <Badge content="관리자" variant="soft" colorScheme="primary" />
+            <Chip variant="soft" colorScheme="primary">
+              관리자
+            </Chip>
           </Sidebar.Item>
         </Sidebar.Footer>
       </Sidebar>
@@ -717,7 +730,7 @@ export const BuildAWorkspaceTree: Story = {
     docs: {
       description: {
         story:
-          '`Sidebar.Item` 안에 `Sidebar.Item` 을 넣으면 하위 메뉴가 됩니다. `Sidebar.Group` 의 `collapsible` 은 묶음을 접고, 항목 끝의 Badge 와 Kbd 는 끝 칸에 놓입니다.',
+          '`Sidebar.Item` 안에 `Sidebar.Item` 을 넣으면 하위 메뉴가 됩니다. `Sidebar.Group` 의 `collapsible` 은 묶음을 접고, 항목 끝의 Chip 과 Kbd 는 끝 칸에 놓입니다.',
       },
     },
   },
@@ -858,7 +871,7 @@ const CHANNELS_CODE = `<Sidebar aria-label="워크스페이스">
           <HashtagIcon />
           {channel.label}
           {channel.unread && (
-            <Badge content={channel.unread} variant="soft" colorScheme="primary" />
+            <Chip variant="soft" colorScheme="primary">{channel.unread}</Chip>
           )}
         </Sidebar.Item>
       )
@@ -893,7 +906,9 @@ export const MoveChannelsBetweenCategories: Story = {
                   <HashtagIcon />
                   {channel.label}
                   {channel.unread && (
-                    <Badge content={channel.unread} variant="soft" colorScheme="primary" />
+                    <Chip variant="soft" colorScheme="primary">
+                      {channel.unread}
+                    </Chip>
                   )}
                 </Sidebar.Item>
               )
@@ -946,7 +961,11 @@ const PAGES: Page[] = [
         label: '컴포넌트 리뷰',
         icon: <EyeSolid />,
         colorScheme: 'success',
-        badge: <Badge content={3} variant="soft" colorScheme="danger" />,
+        badge: (
+          <Chip variant="soft" colorScheme="danger">
+            {3}
+          </Chip>
+        ),
       },
     ],
   },
@@ -955,7 +974,11 @@ const PAGES: Page[] = [
     label: '셔틀 시간표',
     icon: <TruckSolid />,
     colorScheme: 'warning',
-    badge: <Badge content="새 학기" variant="outline" colorScheme="success" />,
+    badge: (
+      <Chip variant="outline" colorScheme="success">
+        새 학기
+      </Chip>
+    ),
   },
   {
     id: 'projects',

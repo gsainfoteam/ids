@@ -1,5 +1,5 @@
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -229,7 +229,9 @@ export const PC: Story = {
                       {course && (
                         <div className="flex flex-col items-start gap-1">
                           <IdsProvider.Scope theme={COURSE_THEMES[course.color]} asChild>
-                            <Badge content={course.name} variant="soft" colorScheme="primary" />
+                            <Chip variant="soft" colorScheme="primary">
+                              {course.name}
+                            </Chip>
                           </IdsProvider.Scope>
                           <span className="text-caption-c1-regular">{course.room}</span>
                         </div>
@@ -254,7 +256,7 @@ export const PC: Story = {
                 <Item.Content>
                   <Item.Title>
                     <IdsProvider.Scope theme={COURSE_THEMES[course.color]} asChild>
-                      <Badge dot colorScheme="primary" aria-hidden />
+                      <Chip variant="solid" colorScheme="primary" aria-hidden />
                     </IdsProvider.Scope>
                     {course.name}
                   </Item.Title>
@@ -263,7 +265,7 @@ export const PC: Story = {
                   </Item.Description>
                 </Item.Content>
                 <Item.Actions>
-                  <Badge content={`${course.credits}학점`} variant="outline" />
+                  <Chip variant="outline">{`${course.credits}학점`}</Chip>
                 </Item.Actions>
               </Item>
             ))}

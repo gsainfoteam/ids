@@ -4,7 +4,7 @@ import { useLayoutEffect, useState, type FocusEvent, type PointerEvent } from 'r
 
 import { clamp } from 'es-toolkit';
 
-import type { MarqueeOrientation } from '.';
+import type { MarqueeOrientation } from './style';
 
 const MARQUEE_KEYFRAMES = 'ids-marquee';
 const SWAPPED = 'data-swapped';

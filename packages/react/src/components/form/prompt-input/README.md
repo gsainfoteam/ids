@@ -6,6 +6,7 @@
 - **Enter 로 보냅니다.** Enter 는 보내고 Shift+Enter 는 줄을 바꿉니다. 한글처럼 조합 중인 글자를 확정하는 Enter 는 보내지 않습니다. 모바일 키보드의 Enter 키에는 `보내기` 가 보입니다(`enterkeyhint="send"`).
 - **보내는 중.** `status` 가 `idle` 이 아니면 보내지 않고, 보내기 버튼이 멈추기 버튼으로 바뀝니다. 그동안에도 다음 메시지를 적어 둘 수 있습니다.
 - **`<form>` 입니다.** 보내기는 `submit` 이라 `onSubmit` 이 먼저 불리고, `onSend` 가 없으면 브라우저나 React 의 form `action` 이 그대로 제출합니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-96"><PromptInput /></div>`.
 
 ```tsx
 import { PromptInput } from '@gsainfoteam/ids-react';
@@ -44,7 +45,6 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 - 보내는 중에 입력창에서 Escape 를 누르면 `onStop` 이 불립니다. `onStop` 이 없거나 `idle` 이면 Escape 는 감싼 Dialog 같은 바깥으로 갑니다.
 - `status` 는 앱이 정합니다. `onSend` 에서 `streaming` 으로 바꾸고, 답이 끝나거나 `onStop` 에서 `idle` 로 되돌립니다.
 - 보내기와 멈추기는 같은 `<button>` 이라 바뀌어도 포커스가 그대로입니다.
-- 루트 `<form>` 과 보내기 버튼에 `data-status` 가 붙습니다.
 
 ## 값
 
@@ -68,7 +68,7 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ```
 
 - `PromptInput.Attach` 는 파일을 고르는 outline `IconButton` 입니다. 넣지 않아도 입력창에 파일을 끌어다 놓거나 붙여넣으면 첨부됩니다.
-- 파일을 끌어 올리는 동안 테두리가 primary 색이 되고, 루트에 `data-dragging` 이 붙습니다. 글을 붙여넣는 것은 그대로 입력됩니다.
+- 파일을 끌어 올리는 동안 테두리가 primary 색이 됩니다. 글을 붙여넣는 것은 그대로 입력됩니다.
 - 첨부한 파일은 위 바에 `FileField.List` 로 보입니다. 파일마다 미리보기, 이름, 크기, 삭제 버튼이 있습니다.
 - `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받고, 입력창 아래 `role="alert"` 로 이유를 알립니다. 규칙은 FileField 와 같습니다.
 - 첨부 파일은 `onSend` 의 `files` 로 옵니다. native 제출의 FormData 에는 들어가지 않습니다.
@@ -101,7 +101,9 @@ import { PromptInput } from '@gsainfoteam/ids-react';
   <PromptInput.Attachments />          {/* Input 앞 = 위 바. 생략하면 위 바 맨 앞 */}
   <PromptInput.Input placeholder="무엇이든 물어보세요" maxRows={8} />
   <PromptInput.Attach />               {/* Input 뒤 = 아래 바. 앞에서부터 */}
-  <Select size="tiny" variant="soft" aria-label="모델" className="w-auto">…</Select>
+  <div>
+    <Select size="tiny" variant="soft" aria-label="모델">…</Select>
+  </div>
   <PromptInput.Submit />               {/* 생략하면 아래 바 끝 */}
 </PromptInput>
 ```
@@ -116,10 +118,11 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 | `PromptInput.ActionMenu`  | + 버튼과 메뉴 (`IconButton` + `Menu`). 자식은 `Menu.Item` 들                              |
 | `PromptInput.AddAttachments` | 파일 고르기를 여는 메뉴 항목 (`Menu.Item`)                                            |
 
-- 입력과 바 사이에는 구분선이 없습니다 (`TextArea divided={false}`).
+- 입력과 바 사이에는 구분선이 없습니다.
 - 넉넉한 입력창입니다. 여백은 `concentric-p-1.5`(tiny `concentric-p-1`)라 모서리가 컨테이너 최대인 16px 이고, 글자는 `body-b2`, 아래 바의 버튼은 36px, 버튼 사이는 8px 입니다(tiny 는 TextArea 바와 같은 버튼에 6px).
 - 모든 파트는 `PromptInput` 의 바로 아래 자식으로 둡니다. 다른 요소로 감싸면 찾지 못해 기본 파트가 하나 더 생깁니다.
 - 모델 고르기처럼 켜고 끄는 것이 아닌 도구는 앱이 `Select` 같은 IDS 컴포넌트로 넣습니다. 아래 바의 버튼은 TextArea 바 안쪽 크기로 줄어듭니다.
+- `Select` 는 부모 너비를 채우므로 `<div>` 로 감싸면 내용 너비가 됩니다.
 - 입력의 이름은 기본 `aria-label="메시지"` 이고, placeholder 는 기본 `메시지를 입력하세요` 입니다. `aria-label` 이나 `aria-labelledby` 를 주면 그 값을 씁니다.
 - 다른 `<form>` 안에 두지 않습니다. form 은 중첩할 수 없습니다.
 

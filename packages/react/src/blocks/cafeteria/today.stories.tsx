@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { Toggle } from '../../components/action/toggle';
 import { ToggleGroup } from '../../components/action/toggle-group';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { toast } from '../../components/feedback/toast';
@@ -223,18 +222,15 @@ export const PC: Story = {
                             <h2>{menu.main}</h2>
                           </Card.Title>
                           <Card.Action>
-                            <Badge content={`${won.format(menu.price)}원`} variant="outline" />
+                            <Chip variant="outline">{`${won.format(menu.price)}원`}</Chip>
                           </Card.Action>
                         </Card.Header>
                         <Card.Content className="flex flex-col gap-3">
                           <p>{menu.sides}</p>
                           {warned.length > 0 && (
-                            <Badge
-                              content={`${warned.join(', ')} 들어 있어요`}
-                              variant="soft"
-                              colorScheme="danger"
-                              className="self-start"
-                            />
+                            <Chip variant="soft" colorScheme="danger" className="self-start">
+                              {`${warned.join(', ')} 들어 있어요`}
+                            </Chip>
                           )}
                         </Card.Content>
                         <Card.Footer className="justify-between">

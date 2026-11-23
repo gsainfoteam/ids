@@ -4,9 +4,10 @@
 
 - **조립.** `TextField.Input` 앞에 둔 자식은 앞쪽, 뒤에 둔 자식은 뒤쪽에 놓입니다. 아이콘과 글자는 흐린 색과 아이콘 크기를 받고, 버튼은 테두리 안쪽 크기로 줄어듭니다.
 - **지우기.** `TextField.Clear` 는 값이 있을 때만 보입니다. 실제 입력 이벤트로 지워서 `onChange` 와 react-hook-form이 알고, 포커스는 입력에 남습니다. Escape도 같은 일을 합니다.
-- **상태는 테두리에.** 입력이 잘못되면 테두리 컨테이너에 `data-invalid` 가 붙어 danger 테두리와 포커스 링이 그려집니다. 포커스, 값 유무, 읽기 전용도 `data-*` 로 붙습니다.
-- **값을 놓치지 않음.** react-hook-form의 `setValue` 나 폼 reset처럼 입력 이벤트 없이 바뀐 값도 따라가서 `data-filled` 와 Clear가 맞게 보입니다.
+- **상태는 테두리에.** 입력이 잘못되면 테두리 전체에 danger 테두리와 포커스 링이 그려집니다.
+- **값을 놓치지 않음.** react-hook-form의 `setValue` 나 폼 reset처럼 입력 이벤트 없이 바뀐 값도 따라가서 Clear가 맞게 보입니다.
 - **native 그대로.** 실제 `<input>` 하나라 자동 완성, IME, 폼 제출, `register()` 가 그대로 됩니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><TextField /></div>`.
 
 ```tsx
 import { Field, TextField } from '@gsainfoteam/ids-react';
@@ -76,21 +77,8 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-```tsx
-<TextField className={(state) => (state.focused ? 'shadow-md' : undefined)} />
-```
-
-| 속성                        | 뜻                                             |
-| --------------------------- | ---------------------------------------------- |
-| `data-focused`              | 포커스가 필드 안에 있다                        |
-| `data-filled`               | 값이 있다                                      |
-| `data-invalid`              | `invalid`, `aria-invalid`, 또는 Field의 오류   |
-| `data-disabled`             | 비활성                                         |
-| `data-readonly`             | 읽기 전용                                      |
-| `data-size`, `data-variant` | 크기와 variant                                 |
-
-- 테두리 컨테이너(`data-text-field`)에 붙습니다. 실제 input에는 `data-field-input` 이 붙어 포커스 링이 컨테이너에 그려집니다.
-- `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+- 값은 `value` / `defaultValue` / `onValueChange` 로 읽습니다. 포커스는 native `onFocus` / `onBlur` 가 그대로 옵니다.
+- `className` · `style` 은 상태(`focused`, `filled`, `invalid`, `disabled`, `readOnly`, `size`, `variant`)를 받는 함수도 됩니다. IDS 위에 새 디자인을 입힐 때만 씁니다.
 
 ## 속성 우선순위
 
@@ -136,13 +124,12 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                | `aria-invalid` 와 danger 테두리. 명시한 `aria-invalid` 가 우선 |
 | `disabled`               | 컨테이너와 input에 함께 적용. Input의 값이 우선                |
-| `className` / `style`    | 컨테이너로 간다. 상태를 받는 함수도 된다. Input에 주면 input으로 간다 |
 | 그 외 native 속성, ref    | 실제 input으로 간다                                           |
 | `TextField.Clear`        | `aria-label`, `children`(아이콘), `asChild`                    |
 
 ## 알아둘 것
 
-- HTML `size` 속성은 IDS `size` 가 차지하므로 쓸 수 없습니다. 폭은 `className` 으로 정합니다.
+- HTML `size` 속성은 IDS `size` 가 차지하므로 쓸 수 없습니다. 폭은 감싸는 요소가 정합니다.
 - `value` 를 주고 `onChange`, `onValueChange`, `readOnly` 가 모두 없으면 에러가 납니다.
 - `TextField.Input` 을 둘 이상 두거나, Input에 children을 주거나, `asChild` 자식이 input이 아니면 에러가 납니다.
 - `id` 가 없으면 만들어 붙입니다. Clear의 `aria-controls` 가 이 id를 가리킵니다.

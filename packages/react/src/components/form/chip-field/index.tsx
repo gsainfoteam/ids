@@ -32,14 +32,12 @@ export namespace ChipField {
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
-    creatable?: boolean;
     onCreate?: (value: string) => void;
     validate?: (value: string) => ChipValidateResult;
     maxCount?: number;
     variant?: ChipFieldVariant;
     size?: IdsSize;
     invalid?: boolean;
-    mobileVariant?: 'popover' | 'drawer';
     name?: string;
     form?: string;
     required?: boolean;

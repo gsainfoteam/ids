@@ -17,16 +17,13 @@ const meta = {
   argTypes: {
     format: { control: 'radio', options: ['hex', 'rgb', 'hsl', 'oklch'] },
     size: { control: 'radio', options: ['standard', 'tiny'] },
-    alpha: { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
   args: {
     defaultValue: '#3B82F6',
     format: 'hex',
-    alpha: false,
     size: 'standard',
-    swatches: palette,
     onValueChange: fn(),
   },
   render: (args) => (
@@ -44,24 +41,24 @@ const areaInput = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-72">
+      <ColorPicker defaultValue="#3B82F6" />
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
         title="Default"
-        description="채도와 밝기 영역, 색조, (alpha 면) 투명도, 값 입력, 복사, 팔레트가 기본 구성입니다. 스포이트는 EyeDropper API 가 있는 브라우저에서만 보입니다."
+        description="자식이 없으면 채도와 밝기 영역, 스포이트와 색조, 값 입력과 복사를 그립니다. 스포이트는 EyeDropper API 가 있는 브라우저에서만 보입니다."
       >
         <Showcase.Row className="items-start">
           <div className="w-64">
-            <ColorPicker defaultValue="#3B82F6" swatches={palette} aria-label="기본" />
-          </div>
-          <div className="w-64">
-            <ColorPicker
-              defaultValue="#F97316CC"
-              alpha
-              swatches={['#F9731680', '#22C55E', 'rgba(59, 130, 246, 0.4)']}
-              aria-label="투명도"
-            />
+            <ColorPicker defaultValue="#3B82F6" aria-label="기본" />
           </div>
           <div className="w-56">
             <ColorPicker
@@ -74,7 +71,25 @@ export const Gallery: Story = {
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section title="Composition" description="part 를 골라 두면 그것만 그립니다.">
+      <Showcase.Section
+        title="Composition"
+        description="part 를 골라 두면 그것만 그립니다. AlphaSlider 가 있으면 값에 투명도가 들어갑니다."
+      >
+        <Showcase.Row label="alpha" className="items-start">
+          <div className="w-64">
+            <ColorPicker defaultValue="#F97316CC" aria-label="투명도">
+              <ColorPicker.Area />
+              <ColorPicker.HueSlider />
+              <ColorPicker.AlphaSlider />
+              <ColorPicker.Input />
+              <ColorPicker.Swatches>
+                <ColorPicker.Swatch value="#F9731680" />
+                <ColorPicker.Swatch value="#22C55E" />
+                <ColorPicker.Swatch value="rgba(59, 130, 246, 0.4)" />
+              </ColorPicker.Swatches>
+            </ColorPicker>
+          </div>
+        </Showcase.Row>
         <Showcase.Row label="compact" className="items-start">
           <div className="w-64">
             <ColorPicker defaultValue="#22C55E" aria-label="간단히">
@@ -85,8 +100,12 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="swatches">
           <div className="w-64">
-            <ColorPicker defaultValue="#8B5CF6" swatches={palette} aria-label="팔레트만">
-              <ColorPicker.Swatches />
+            <ColorPicker defaultValue="#8B5CF6" aria-label="팔레트만">
+              <ColorPicker.Swatches>
+                {palette.map((color) => (
+                  <ColorPicker.Swatch key={color} value={color} />
+                ))}
+              </ColorPicker.Swatches>
             </ColorPicker>
           </div>
         </Showcase.Row>
@@ -113,12 +132,16 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="readOnly" className="items-start">
           <div className="w-64">
-            <ColorPicker
-              defaultValue="#EF4444"
-              readOnly
-              swatches={palette}
-              aria-label="읽기 전용"
-            />
+            <ColorPicker defaultValue="#EF4444" readOnly aria-label="읽기 전용">
+              <ColorPicker.Area />
+              <ColorPicker.HueSlider />
+              <ColorPicker.Input />
+              <ColorPicker.Swatches>
+                {palette.map((color) => (
+                  <ColorPicker.Swatch key={color} value={color} />
+                ))}
+              </ColorPicker.Swatches>
+            </ColorPicker>
           </div>
         </Showcase.Row>
       </Showcase.Section>
@@ -126,31 +149,71 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  args: { defaultValue: '#FF0000' },
+export const PickATranslucentColor: Story = {
+  render: (args) => (
+    <div className="w-72">
+      <ColorPicker defaultValue="#3B82F6CC" onValueChange={args.onValueChange}>
+        <ColorPicker.Area />
+        <ColorPicker.HueSlider />
+        <ColorPicker.AlphaSlider />
+        <ColorPicker.Input />
+      </ColorPicker>
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          '영역에 포커스를 두면 ← → 가 채도를, ↑ ↓ 가 밝기를 1% 씩 바꿉니다. Shift 를 누르면 10% 씩입니다. 색조와 투명도 슬라이더는 ← → ↑ ↓ PageUp PageDown Home End 를 받습니다. 스크린 리더에는 두 축이 각각 슬라이더로 읽힙니다.',
+          '`ColorPicker.AlphaSlider` 를 자식에 두면 값에 투명도가 들어갑니다. HEX 는 8자리, `rgb` 와 `hsl` 은 `rgba()` `hsla()` 로 적습니다. 슬라이더가 없으면 투명도는 늘 100% 입니다.',
       },
     },
   },
-  play: async ({ canvasElement, canvas, userEvent, args }) => {
-    areaInput(canvasElement).focus();
-    await userEvent.keyboard('{Shift>}{ArrowDown}{/Shift}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('#E60000');
-    await expect(areaInput(canvasElement)).toHaveAttribute('aria-valuetext', '채도 100%, 밝기 90%');
-    const hue = canvas.getByRole('slider', { name: '색조' });
-    hue.focus();
-    await userEvent.keyboard('{PageUp}');
-    await expect(hue).toHaveAttribute('aria-valuetext', '10도');
-    await userEvent.keyboard('{End}');
-    await expect(hue).toHaveAttribute('aria-valuetext', '360도');
+  play: async ({ canvas, userEvent, args }) => {
+    const alpha = canvas.getByRole('slider', { name: '투명도' });
+    await expect(alpha).toHaveAttribute('aria-valuetext', '80%');
+    alpha.focus();
+    await userEvent.keyboard('{Home}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('#3B82F600');
+    await expect(canvas.getByRole('textbox', { name: '색상 값' })).toHaveValue('#3B82F600');
   },
 };
 
-export const TextInput: Story = {
+export const OfferAPalette: Story = {
+  render: (args) => (
+    <div className="w-72">
+      <ColorPicker defaultValue="#F97316" onValueChange={args.onValueChange}>
+        <ColorPicker.Area />
+        <ColorPicker.HueSlider />
+        <ColorPicker.Input />
+        <ColorPicker.Swatches>
+          {palette.map((color) => (
+            <ColorPicker.Swatch key={color} value={color} />
+          ))}
+        </ColorPicker.Swatches>
+      </ColorPicker>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`ColorPicker.Swatches` 안에 `ColorPicker.Swatch` 를 색마다 하나씩 둡니다. 팔레트는 native 라디오의 RadioGroup 이라 Tab 한 번으로 들어가고 나옵니다. ← → 로 옆 색을 고르고, 끝에서는 반대편으로 돕니다. Home 과 End 는 처음과 끝 색입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    const orange = canvas.getByRole('radio', { name: '#F97316' });
+    await expect(orange).toBeChecked();
+    orange.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('#EAB308');
+    await expect(canvas.getByRole('radio', { name: '#EAB308' })).toHaveFocus();
+    await userEvent.keyboard('{Home}{ArrowLeft}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('#EC4899');
+  },
+};
+
+export const TypeAColorValue: Story = {
   args: { defaultValue: '#3B82F6' },
   parameters: {
     docs: {
@@ -176,29 +239,7 @@ export const TextInput: Story = {
   },
 };
 
-export const Swatches: Story = {
-  args: { defaultValue: '#F97316' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '팔레트는 native 라디오의 RadioGroup 이라 Tab 한 번으로 들어가고 나옵니다. ← → 로 옆 색을 고르고, 끝에서는 반대편으로 돕니다. Home 과 End 는 처음과 끝 색입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    const orange = canvas.getByRole('radio', { name: '#F97316' });
-    await expect(orange).toBeChecked();
-    orange.focus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('#EAB308');
-    await expect(canvas.getByRole('radio', { name: '#EAB308' })).toHaveFocus();
-    await userEvent.keyboard('{Home}{ArrowLeft}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('#EC4899');
-  },
-};
-
-export const Copy: Story = {
+export const CopyTheValue: Story = {
   render: function Render() {
     const [value, setValue] = useState('#8B5CF6');
 
@@ -225,5 +266,30 @@ export const Copy: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '색상 값 복사' }));
     await waitFor(() => expect(copied).toEqual(['#8B5CF6']));
     await expect(canvas.getByRole('status')).toHaveTextContent('복사했습니다');
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { defaultValue: '#FF0000' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '영역에 포커스를 두면 ← → 가 채도를, ↑ ↓ 가 밝기를 1% 씩 바꿉니다. Shift 를 누르면 10% 씩입니다. 색조와 투명도 슬라이더는 ← → ↑ ↓ PageUp PageDown Home End 를 받습니다. 스크린 리더에는 두 축이 각각 슬라이더로 읽힙니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, canvas, userEvent, args }) => {
+    areaInput(canvasElement).focus();
+    await userEvent.keyboard('{Shift>}{ArrowDown}{/Shift}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('#E60000');
+    await expect(areaInput(canvasElement)).toHaveAttribute('aria-valuetext', '채도 100%, 밝기 90%');
+    const hue = canvas.getByRole('slider', { name: '색조' });
+    hue.focus();
+    await userEvent.keyboard('{PageUp}');
+    await expect(hue).toHaveAttribute('aria-valuetext', '10도');
+    await userEvent.keyboard('{End}');
+    await expect(hue).toHaveAttribute('aria-valuetext', '360도');
   },
 };
