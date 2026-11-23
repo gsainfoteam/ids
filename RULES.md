@@ -32,7 +32,8 @@ These files are written by `pnpm codegen` (Style Dictionary, message generation 
 - `packages/react/src/internal/messages-catalog.ts` and
   `packages/react/src/components/form/editor/messages-catalog.ts` (the `editor` group, kept out of the
   shared catalog every component loads)
-- `packages/react/messages/en.json`
+- `packages/react/src/internal/message-arguments.ts` (each message's argument types) and
+  `packages/react/src/locales/*.ts` (the `ko` and `en` locale objects)
 - `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
   `packages/core/color-roles.json`)
 - `packages/flutter/lib/messages/ids_messages.dart`
@@ -935,10 +936,11 @@ flag ban, shape over role, presence over `show`/`hide` and `XGroup` apply unchan
 
 **Strings.** User-facing strings go through `useTranslate()` with a stable dotted key
 (`t('dialog.close')`, `t('textArea.remaining', { remaining })`), never a Korean literal and never
-a module-level read of `messages`, so the nearest `IdsProvider translate` decides the language on
-the server and the client alike. The Korean defaults live in `packages/core/messages/ko.json`, sorted
-by group and key, as ICU strings with plain `{name}` arguments; a new key also goes into
-`packages/core/messages/en.json` at the same place. Run `pnpm codegen` to refresh the catalogs. `IdsMessageKey` is the union of their dotted leaf paths.
+a module-level read of `messages`, so the nearest `IdsProvider locale` decides the language on
+the server and the client alike. Each language is `packages/core/messages/<language>.json`,
+`{ language, tag, messages }`, with the messages sorted by group and key. A message takes `{name}`
+for a string argument and `{name, number}` for a number, and every language has the keys and
+arguments of `ko.json`, or codegen fails. Run `pnpm codegen` to refresh the catalogs and locales. `IdsMessageKey` is the union of their dotted leaf paths.
 Developer warnings stay English and out of the catalog. A default that has to be a function
 (`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
@@ -1083,8 +1085,8 @@ projects:
   `tests/hydration-<category>.test.tsx` (`checkEveryStoryHydrates` in `tests/hydration-checks.tsx`)
   renders every story with `renderToString`, hydrates that HTML with `hydrateRoot` and fails on a
   recoverable error or any `console.error`. `tests/translate-<category>.test.tsx`
-  (`checkEveryStoryInEnglish` in `tests/translation-checks.tsx`) renders every story under an
-  English `translate` and fails on a Korean default that the story did not write itself. Both are
+  (`checkEveryStoryInEnglish` in `tests/translation-checks.tsx`) renders every story under
+  `locale={en}` and fails on a Korean default that the story did not write itself. Both are
   split by category like the story checks: WebKit's page crashed out of memory inside the files that
   rendered every story in one frame. WebKit keeps every finished file's frame alive until its shard
   ends (about 20 MB for an empty file, 55 MB for one that imports IDS, and a forced GC frees none of

@@ -958,17 +958,17 @@ formatDefaultMessage('common.removeItem', { label: '사과' }); // '사과 삭�
 - core 의 원본은 숫자 인자를 `{count, number}` 로 적습니다. codegen 은 런타임 문자열에서 `, number` 를 지우고 인자 타입을 `message-arguments.ts` 로 씁니다. `IdsMessages` 는 그 표로 인자 타입을 정합니다.
 - 숫자 인자는 채울 때 locale 의 태그로 씁니다(`numbersIn(tag)`). 인자가 숫자인지는 값의 타입으로 압니다.
 - 문구 값이 함수면 인자를 그대로 넘기고 그 결과를 씁니다. 숫자는 앱이 씁니다.
-- 값은 `{name}` 자리만 쓰는 문자열입니다. 영어도 복수형 없이 읽히게 썼습니다(`'{count} selected'`). 한국어 조사가 붙는 자리는 문장을 바꿔 조사가 필요 없게 썼습니다(`'옮겼습니다: {item}'`).
+- 런타임 값은 `{name}` 자리만 쓰는 문자열입니다. 영어도 복수형 없이 읽히게 썼습니다(`'{count} selected'`). 한국어 조사가 붙는 자리는 문장을 바꿔 조사가 필요 없게 썼습니다(`'옮겼습니다: {item}'`).
 - 여러 컴포넌트가 같은 말을 쓰면 `common.*` 하나를 씁니다(`common.close`, `common.clear`, `common.drag.start`). 컴포넌트 이름이 붙은 그룹은 그 컴포넌트만 쓰는 말입니다.
 - 화면에 보이는 글(placeholder, 빈 결과, 검증 문구, 버튼 글)은 카탈로그에 없습니다. 앱이 part 의 children 이나 `placeholder` 로 씁니다. 카탈로그에는 IDS 가 스스로 그리는 컨트롤의 이름과 스크린 리더 안내만 있습니다.
 - Intl 이 만드는 낱말(오늘, 다음 달, 시, 분, `42%`)은 카탈로그에 없고 [intl-words.ts](#intl-wordsts) 가 만듭니다.
 - Editor 의 문구(`editor.*`)는 공용 `messages-catalog.ts` 에 없고 `components/form/editor/messages-catalog.ts` 의 `editorMessages` 에 있습니다. 공용 카탈로그는 문구를 쓰는 모든 컴포넌트가 싣기 때문에, Editor 만 쓰는 문구 3 kB 가 Button, Dialog 의 import 에도 실리지 않게 나눴습니다. Editor 의 컴포넌트는 `useTranslate(editorMessages)` 로 읽습니다. `IdsMessageKey` 는 두 카탈로그의 키를 모두 담습니다.
-- 한국어 기본값은 복수형이 필요 없어서 `{name}` 자리만 씁니다. 그래서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). 이 약속은 `tests/messages.test.ts` 가 ICU 파서로 확인합니다.
+- 복수형과 select 를 쓰지 않아서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). codegen 이 원본의 인자를 `{name}` 과 `{name, number}` 로만 받고, `tests/messages.test.ts` 가 모든 locale 의 인자가 타입과 같은지 확인합니다.
 
 ### 알아둘 것
 
-- 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`와 `messages/en.json`을 생성합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
-- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 쓰고, `every-message.ts` 가 다시 합칩니다. 카탈로그를 넘기지 않은 `useTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
+- 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`, `message-arguments.ts`, `src/locales/<language>.ts`를 생성합니다. 언어 사이에 키나 인자가 다르면 codegen 이 실패합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
+- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 씁니다. `IdsMessageCatalog` 타입과 `src/locales/<language>.ts` 는 두 카탈로그를 모두 담습니다. 카탈로그를 넘기지 않은 `useTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 
