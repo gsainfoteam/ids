@@ -1,19 +1,17 @@
 'use client';
 
-import { useLayoutEffect, type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 import { Slot } from '../../../utility/slot';
 import { useInternalDialogContext } from '../context';
+import { useInternalDialogPartPresence } from '../hooks/use-dialog-part-presence';
 
 export type DialogTitleProps = ComponentProps<'h2'> & { asChild?: boolean };
 
 export function DialogTitle({ asChild, className, ...props }: DialogTitleProps) {
   const { styles, dialog, setTitled } = useInternalDialogContext('Dialog.Title');
 
-  useLayoutEffect(() => {
-    setTitled(true);
-    return () => setTitled(false);
-  }, [setTitled]);
+  useInternalDialogPartPresence(setTitled);
 
   const Root = asChild ? Slot : 'h2';
 
