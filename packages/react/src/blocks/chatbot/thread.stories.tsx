@@ -201,6 +201,7 @@ export const PC: Story = {
                   <Drawer.Title>대화 기록</Drawer.Title>
                 </Drawer.Header>
                 {history}
+                <Drawer.Close />
               </Drawer.Content>
             </Drawer>
             <Item className="min-w-0 flex-1">

@@ -20,6 +20,7 @@ import {
   translateAlong,
   velocityOf,
 } from '../src/components/overlay/drawer/drawer-gesture';
+import { useDrawer } from '../src/components/overlay/drawer/use-drawer';
 
 type Point = { x: number; y: number };
 
@@ -217,9 +218,19 @@ function Sheet({ children, ...props }: Partial<Drawer.Props> & { children?: Reac
         <Drawer.Footer>
           <Drawer.Close>Cancel</Drawer.Close>
         </Drawer.Footer>
+        <Drawer.Close />
       </Drawer.Content>
     </Drawer>
   );
+}
+
+function SnapSheet({
+  points,
+  onValueChange,
+  ...props
+}: Partial<Drawer.Props> & Pick<Drawer.SnapOptions, 'points' | 'onValueChange'>) {
+  const drawer = useDrawer({ snap: { points, onValueChange } });
+  return <Sheet {...props} drawer={drawer} />;
 }
 
 const TallBody = () => <div className="h-[400px] shrink-0" data-testid="body" />;
@@ -622,11 +633,11 @@ describe('snap points', () => {
     const onActiveSnapPointChange = vi.fn();
     await render(
       <IdsProvider theme={testTheme}>
-        <Sheet
+        <SnapSheet
           side="bottom"
           defaultOpen
-          snapPoints={snapPoints}
-          onActiveSnapPointChange={onActiveSnapPointChange}
+          points={snapPoints}
+          onValueChange={onActiveSnapPointChange}
         />
       </IdsProvider>,
     );
@@ -657,11 +668,11 @@ describe('snap points', () => {
     const onActiveSnapPointChange = vi.fn();
     const screen = await render(
       <IdsProvider theme={testTheme}>
-        <Sheet
+        <SnapSheet
           side="bottom"
           defaultOpen
-          snapPoints={snapPoints}
-          onActiveSnapPointChange={onActiveSnapPointChange}
+          points={snapPoints}
+          onValueChange={onActiveSnapPointChange}
         />
       </IdsProvider>,
     );
@@ -727,18 +738,15 @@ describe('background scale', () => {
     expect(document.body.style.background).toBe('');
   });
 
-  test('scaleBackground={false} and a non-modal drawer leave the page alone', async () => {
-    for (const props of [{ scaleBackground: false }, { modal: false }]) {
-      const screen = await render(
-        <IdsProvider theme={testTheme}>
-          <Sheet defaultOpen {...props} />
-        </IdsProvider>,
-      );
-      await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeVisible();
-      expect(rootOf(screen).style.transform).toBe('');
-      expect(document.body.style.background).toBe('');
-      await screen.unmount();
-    }
+  test('a non-modal drawer leaves the page alone', async () => {
+    const screen = await render(
+      <IdsProvider theme={testTheme}>
+        <Sheet defaultOpen modal={false} />
+      </IdsProvider>,
+    );
+    await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeVisible();
+    expect(rootOf(screen).style.transform).toBe('');
+    expect(document.body.style.background).toBe('');
   });
 
   test('fixed elements of the page stay where they were on screen and scale with it', async () => {
