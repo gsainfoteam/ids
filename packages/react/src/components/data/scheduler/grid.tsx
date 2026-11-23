@@ -155,7 +155,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
           >
             {showsNow && (
               <Divider
-                decorative
+                aria-hidden
                 data-scheduler-now=""
                 className={styles.now()}
                 style={{ '--scheduler-now': hourOfDay(now) } as CSSProperties}

@@ -11,7 +11,7 @@ export type StepperSeparatorState = StepperItemState;
 
 export type StepperSeparatorProps = Omit<
   Divider.Props,
-  'children' | 'className' | 'style' | 'orientation' | 'align' | 'decorative' | 'asChild'
+  'children' | 'className' | 'style' | 'orientation' | 'align' | 'aria-hidden' | 'asChild'
 > &
   Omit<StateRenderProps<StepperSeparatorState>, 'children'>;
 
@@ -22,7 +22,7 @@ export function StepperSeparator({ className, style, ...rest }: StepperSeparator
   return (
     <Divider
       {...rest}
-      decorative
+      aria-hidden
       orientation={root.orientation}
       data-stepper-separator=""
       {...statusAttributes(state.status)}

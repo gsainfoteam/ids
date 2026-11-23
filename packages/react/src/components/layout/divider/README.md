@@ -43,17 +43,17 @@ import { Divider } from '@gsainfoteam/ids-react';
 ## 장식용 선
 
 ```tsx
-<Divider orientation="vertical" decorative />
+<Divider orientation="vertical" aria-hidden />
 ```
 
-- 의미 없이 모양만 나누는 선은 `decorative` 로 접근성 트리에서 뺍니다. 버튼 묶음 사이의 선처럼 앞뒤 요소가 이미 구분될 때 씁니다.
+- 의미 없이 모양만 나누는 선은 `aria-hidden` 으로 접근성 트리에서 뺍니다. 이때는 `role` 과 이름을 두지 않고, 주지 않으면 `role="separator"` 와 이름을 둡니다. 버튼 묶음 사이의 선처럼 앞뒤 요소가 이미 구분될 때 씁니다.
 
 ## 다른 요소로 그리기
 
 ```tsx
 <ul>
   <li>…</li>
-  <Divider asChild decorative>
+  <Divider asChild aria-hidden>
     <li />
   </Divider>
   <li>…</li>
@@ -70,7 +70,7 @@ import { Divider } from '@gsainfoteam/ids-react';
 | `orientation` | 넘긴 방향          |
 | `labelled`    | 가운데 글자가 있다 |
 | `align`       | 넘긴 정렬          |
-| `decorative`  | 장식용이다         |
+| `decorative`  | `aria-hidden` 이다 |
 
 - 요소에는 `data-divider`, `data-orientation`, 글자가 있으면 `data-labelled` 와 `data-align` 이 붙습니다.
 
@@ -81,7 +81,7 @@ import { Divider } from '@gsainfoteam/ids-react';
 | `orientation`         | `horizontal`(기본) / `vertical`                  |
 | `children`            | 가운데 글자                                      |
 | `align`               | `center`(기본) / `start` / `end`. 글자가 있을 때 |
-| `decorative`          | `false`. `true` 면 접근성 트리에서 뺀다          |
+| `aria-hidden`         | 주면 장식용 선. `role` 과 이름 없이 접근성 트리에서 뺀다 |
 | `asChild`             | 자식 요소 하나를 선으로 그린다. 글자는 넣지 않는다 |
 | `className` / `style` | 상태를 받는 함수도 된다                          |
 | 그 외 속성            | 선(`hr`)으로 간다. 글자가 있으면 `div`           |

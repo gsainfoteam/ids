@@ -15,10 +15,10 @@ const meta = {
   argTypes: {
     orientation: { control: 'radio', options: ['horizontal', 'vertical'] },
     align: { control: 'radio', options: ['start', 'center', 'end'] },
-    decorative: { control: 'boolean' },
+    'aria-hidden': { control: 'boolean' },
     children: { control: 'text' },
   },
-  args: { orientation: 'horizontal', align: 'center', decorative: false, children: '또는' },
+  args: { orientation: 'horizontal', align: 'center', children: '또는' },
 } satisfies Meta<typeof Divider>;
 
 export default meta;
@@ -28,6 +28,16 @@ export const Playground: Story = {
   render: (args) => (
     <div className="flex h-32 w-80 items-center justify-center">
       <Divider {...args} />
+    </div>
+  ),
+};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="flex w-72 flex-col gap-4">
+      <Button>이메일로 계속</Button>
+      <Divider>또는</Divider>
+      <Button variant="outline">Google로 계속</Button>
     </div>
   ),
 };
@@ -89,7 +99,7 @@ export const Gallery: Story = {
             <Button size="tiny" variant="ghost">
               복사
             </Button>
-            <Divider orientation="vertical" decorative className="h-4 self-center" />
+            <Divider orientation="vertical" aria-hidden className="h-4 self-center" />
             <Button size="tiny" variant="ghost">
               붙여넣기
             </Button>
@@ -100,7 +110,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Labelled: Story = {
+export const NameASeparatorWithItsLabel: Story = {
   render: () => (
     <div className="w-72">
       <Divider>또는</Divider>
@@ -110,7 +120,7 @@ export const Labelled: Story = {
     docs: {
       description: {
         story:
-          '가운데 글자는 separator의 이름이 됩니다. separator 안의 글자는 스크린 리더가 내용으로 읽지 않기 때문입니다.',
+          '`children` 으로 선 가운데에 글자를 둡니다. 그 글자는 separator 의 이름이 됩니다. separator 안의 글자는 스크린 리더가 내용으로 읽지 않기 때문입니다. `align` 으로 글자를 처음이나 끝으로 옮깁니다.',
       },
     },
   },
@@ -121,7 +131,7 @@ export const Labelled: Story = {
   },
 };
 
-export const Vertical: Story = {
+export const SeparateItemsInARow: Story = {
   render: () => (
     <div className="flex h-10 items-center gap-3" data-testid="row">
       <span>왼쪽</span>
@@ -132,7 +142,8 @@ export const Vertical: Story = {
   parameters: {
     docs: {
       description: {
-        story: '세로 구분선은 flex 행의 높이까지 늘어납니다. 행 밖에서도 한 줄 높이는 지킵니다.',
+        story:
+          '`orientation="vertical"` 은 flex 행 안의 항목 사이에 세로 선을 긋습니다. 선은 행의 높이까지 늘어나고, 행 밖에서도 한 줄 높이는 지킵니다.',
       },
     },
   },
@@ -146,18 +157,19 @@ export const Vertical: Story = {
   },
 };
 
-export const Decorative: Story = {
+export const HideADecorativeLine: Story = {
   render: () => (
     <div className="flex h-8 items-center gap-3">
       <a href="#account">계정</a>
-      <Divider orientation="vertical" decorative />
+      <Divider orientation="vertical" aria-hidden />
       <a href="#settings">설정</a>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: '의미 없는 선은 decorative로 접근성 트리에서 뺍니다.',
+        story:
+          '꾸미기만 하는 선은 `aria-hidden` 을 주어 접근성 트리에서 뺍니다. 그러면 separator 역할도 붙지 않습니다.',
       },
     },
   },
@@ -171,6 +183,7 @@ export const Decorative: Story = {
 };
 
 export const RightToLeft: Story = {
+  tags: ['verification'],
   render: () => (
     <div dir="rtl" className="w-72">
       <Divider align="start">الأحدث</Divider>

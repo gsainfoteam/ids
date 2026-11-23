@@ -15,7 +15,7 @@ export function ImageViewerSeparator({ className, ...rest }: ImageViewerSeparato
     <Divider
       {...rest}
       orientation="vertical"
-      decorative
+      aria-hidden
       data-image-viewer-separator=""
       className={viewer.styles.separator({ className })}
     />

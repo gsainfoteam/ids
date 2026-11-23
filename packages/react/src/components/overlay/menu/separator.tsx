@@ -18,7 +18,7 @@ export function MenuSeparator({ className, ...props }: Menu.SeparatorProps) {
   return (
     <Divider
       {...mergeProps(props, { ref: palette ? setElement : undefined })}
-      decorative={!!palette}
+      aria-hidden={!!palette}
       hidden={hidden || undefined}
       data-menu-separator=""
       className={menuStyle().separator({ className })}
