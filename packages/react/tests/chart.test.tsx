@@ -83,11 +83,28 @@ test('the graph follows the width of its parent', async () => {
   await expect.element(graph).toHaveAttribute('width', '240');
 });
 
-test('a Chart given a height lets the graph fill what the caption leaves', async () => {
+test('a Chart fills the width of a flex row it sits in', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <div style={{ width: 400 }}>
-        <Chart config={CONFIG} className="h-72">
+      <div style={{ display: 'flex', width: 400 }}>
+        <Chart config={CONFIG}>
+          <Chart.Title>방문</Chart.Title>
+          <BarChart data={ROWS}>
+            <Bar dataKey="web" />
+          </BarChart>
+        </Chart>
+      </div>
+    </IdsProvider>,
+  );
+
+  await expect.element(screen.getByRole('img', { name: '방문' })).toHaveAttribute('width', '400');
+});
+
+test('a Chart in a parent with a height lets the graph fill what the caption leaves', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ width: 400, height: 288 }}>
+        <Chart config={CONFIG}>
           <Chart.Title>방문</Chart.Title>
           <BarChart data={ROWS}>
             <Bar dataKey="web" />

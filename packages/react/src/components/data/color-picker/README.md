@@ -15,6 +15,18 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 <ColorPicker defaultValue="#3B82F6" />;
 ```
 
+## 크기
+
+- **fill.** ColorPicker 는 부모의 폭을 채우고(`w-full min-w-0`), 높이는 그리는 part 만큼입니다. 폭은 ColorPicker 를 감싼 요소가 정합니다.
+
+```tsx
+<div className="w-72">
+  <ColorPicker defaultValue="#3B82F6" />
+</div>
+```
+
+- 영역의 높이는 `size` 로 정합니다(`standard` 160px, `tiny` 128px). 팔레트는 폭이 모자라면 다음 줄로 넘어갑니다.
+
 ## 값과 형식
 
 ```tsx
@@ -102,18 +114,11 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 - `Swatch` 의 `value` 는 색 문자열, `label` 은 스크린 리더와 툴팁의 이름입니다. 읽을 수 없는 색은 그리지 않고, 이름이 없으면 값이 이름이 됩니다. `Swatch` 가 하나도 없는 `Swatches` 는 그리지 않습니다.
 - 반투명 색은 체크무늬 위에 그려서 투명도가 보입니다. 체크무늬는 `bg-base` 와 `bg-neutral-soft` 색이라 다크 모드에서도 튀지 않습니다.
 
-## 상태와 data 속성
+## 상태
 
-| 요소     | 속성                                                        |
-| -------- | ----------------------------------------------------------- |
-| 루트     | `data-disabled`, `data-readonly`, `data-empty`, `data-size` |
-| 영역     | `data-color-picker-area`, `data-disabled`                   |
-| 슬라이더 | `data-color-picker-hue`, `data-color-picker-alpha`          |
-| 팔레트   | `role="radiogroup"`, 고른 색은 `data-state="checked"`       |
-| 복사     | 복사한 뒤 잠깐 `data-copied`                                |
-
-- 루트의 `className` 은 `ColorPicker.State` 를 받는 함수도 됩니다.
-- 슬라이더 속성은 Slider 루트에 붙고, 끄는 중이나 비활성 같은 나머지는 [Slider](../../form/slider/README.md) 의 `data-*` 그대로입니다.
+- 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 바꿉니다. 빈 값은 빈 문자열입니다.
+- `disabled`, `readOnly` 는 앱이 넘긴 값 그대로입니다.
+- 루트의 `className` 은 `ColorPicker.State`(`{ disabled, readOnly, empty, alpha }`)를 받는 함수도 됩니다. 새 디자인을 얹을 때만 씁니다.
 
 ## 속성
 

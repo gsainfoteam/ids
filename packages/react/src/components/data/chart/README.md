@@ -71,12 +71,14 @@ const config = {
 ```tsx
 const shares = rows.map((row) => ({ ...row, fill: `var(--chart-${row.service})` }));
 
-<Chart config={servicesConfig} className="aspect-square">
-  <PieChart>
-    <Pie data={shares} dataKey="visits" nameKey="service" />
-    <Chart.Tooltip />
-  </PieChart>
-</Chart>;
+<AspectRatio ratio={1}>
+  <Chart config={servicesConfig}>
+    <PieChart>
+      <Pie data={shares} dataKey="visits" nameKey="service" />
+      <Chart.Tooltip />
+    </PieChart>
+  </Chart>
+</AspectRatio>;
 ```
 
 ### 기본 순서
@@ -145,19 +147,24 @@ const config = {
 
 ## 크기
 
-```tsx
-<Chart config={config}>…</Chart>                          {/* 그래프는 16:9 */}
-<Chart config={config} className="h-72">…</Chart>         {/* 제목을 뺀 나머지를 그래프가 채운다 */}
-<Chart config={config} className="aspect-square">…</Chart>
+- **fill.** Chart 는 부모의 폭을 채우고(`w-full min-w-0`), 부모가 높이를 주면 그 높이도 채웁니다(`h-full`). 크기와 비율은 Chart 를 감싼 요소가 정합니다.
 
-<AspectRatio ratio={2}>
-  <Chart config={config}>…</Chart>                        {/* AspectRatio 를 채운다 */}
+```tsx
+<div className="w-full max-w-xl">
+  <Chart config={config}>…</Chart>            {/* 그래프는 16:9 */}
+</div>
+
+<div className="h-72">
+  <Chart config={config}>…</Chart>            {/* 제목을 뺀 나머지를 그래프가 채운다 */}
+</div>
+
+<AspectRatio ratio={1}>
+  <Chart config={config}>…</Chart>            {/* AspectRatio 를 채운다 */}
 </AspectRatio>
 ```
 
-- 폭은 부모를 채웁니다.
-- Chart(`<figure>`)에 높이를 주지 않으면 그래프 상자는 16:9 입니다.
-- Chart 에 높이(`h-72`, `aspect-square`)를 주거나 AspectRatio 안에 두면, 그래프 상자가 제목과 설명을 뺀 나머지를 채웁니다. 이때 비율은 제목까지 포함한 `<figure>` 의 비율입니다.
+- 부모가 높이를 주지 않으면 그래프 상자는 16:9 입니다.
+- 높이가 있는 부모나 AspectRatio 안에서는 그래프 상자가 제목과 설명을 뺀 나머지를 채웁니다. 이때 비율은 제목까지 포함한 Chart 전체의 비율입니다.
 - 높이가 제목보다 작으면 그래프 상자가 0 이 되어 그래프를 그리지 않습니다.
 - Chart 가 상자를 재서 차트에 `width`, `height` 를 넘깁니다. 차트에 `ResponsiveContainer` 나 `responsive` 를 두지 않습니다.
 - 서버 HTML 과 첫 렌더는 같은 크기의 빈 상자입니다. 폭이 0 인 svg 를 그리지 않으므로 하이드레이션이 어긋나지 않고 레이아웃도 밀리지 않습니다.
@@ -177,14 +184,9 @@ const config = {
 | `Chart.Legend`      | Recharts `Legend` 속성, `indicator`, `formatter`               |
 | `Chart.Table`       | Table 속성                                                     |
 
-| 데이터 속성                  | 붙는 곳                    |
-| ---------------------------- | -------------------------- |
-| `data-chart`                 | `<figure>`                 |
-| `data-chart-frame`           | 그래프 상자                |
-| `data-chart-tooltip`         | 툴팁 내용                  |
-| `data-chart-legend`          | 범례 `<ul>`                |
-| `data-chart-indicator`       | 표시 기호. 값은 모양       |
-| `data-chart-table`           | 표                         |
+## 상태
+
+- Chart 는 앱이 읽을 상태를 갖지 않습니다. 가리킨 항목은 Recharts 차트의 `onMouseMove`, `onClick` 같은 이벤트로 읽습니다.
 
 ## 알아둘 것
 

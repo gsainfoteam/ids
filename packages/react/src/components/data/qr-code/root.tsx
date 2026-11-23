@@ -99,7 +99,7 @@ export function QRCodeRoot({
     flush: quietZone <= 0,
   });
   const customSize: CSSProperties | undefined =
-    typeof size === 'number' ? { width: size, height: size } : undefined;
+    typeof size === 'number' ? { width: size } : undefined;
   const viewBox = geometry?.viewBox ?? EMPTY_PLATE;
 
   return (

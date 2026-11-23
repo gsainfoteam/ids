@@ -6,7 +6,10 @@ export type QRCodeVariant = 'theme' | 'light' | 'dark';
 
 export const qrCodeStyle = tv({
   slots: {
-    root: 'relative inline-block shrink-0 overflow-hidden rounded-standard align-middle',
+    root: [
+      'relative inline-block aspect-square h-auto max-w-full shrink-0 overflow-hidden',
+      'rounded-standard align-middle',
+    ],
     svg: 'block size-full',
     background: '',
     modules: 'fill-current',
@@ -18,8 +21,8 @@ export const qrCodeStyle = tv({
   },
   variants: {
     size: {
-      standard: { root: 'size-32' },
-      tiny: { root: 'size-24' },
+      standard: { root: 'w-32' },
+      tiny: { root: 'w-24' },
     } satisfies Record<IdsSize, object>,
     variant: {
       theme: {

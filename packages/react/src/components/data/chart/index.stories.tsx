@@ -20,6 +20,7 @@ import { expect, waitFor, type userEvent as storyUserEvent } from 'storybook/tes
 
 import { Showcase, palettes } from '~story-kit';
 
+import { AspectRatio } from '../../layout/aspect-ratio';
 import { IdsProvider } from '../../utility/ids-provider';
 
 import { Chart } from '.';
@@ -115,16 +116,26 @@ export const Playground: Story = {
 
 export const Usage: Story = {
   render: () => (
-    <Chart config={{ web: { label: '웹' }, app: { label: '앱' } }} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Bar dataKey="app" radius={4} />
-        <Chart.Tooltip />
-        <Chart.Legend />
-      </BarChart>
-    </Chart>
+    <div className="w-full max-w-xl">
+      <Chart config={{ web: { label: '웹' }, app: { label: '앱' } }}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart
+          data={[
+            { day: '월', web: 1240, app: 860 },
+            { day: '화', web: 1380, app: 920 },
+            { day: '수', web: 1120, app: 1040 },
+            { day: '목', web: 1460, app: 980 },
+            { day: '금', web: 1590, app: 1210 },
+          ]}
+        >
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+          <Chart.Tooltip />
+          <Chart.Legend />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
     await waitFor(() => {
@@ -148,7 +159,7 @@ export const Gallery: Story = {
         description="막대, 선, 면, 원, 방사형 모두 같은 config 로 색과 이름을 받습니다."
       >
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <Chart config={VISITS_CONFIG} className="w-80">
+          <Chart config={VISITS_CONFIG}>
             <Chart.Title>Bar</Chart.Title>
             <BarChart data={VISITS}>
               <CartesianGrid vertical={false} />
@@ -159,7 +170,7 @@ export const Gallery: Story = {
               <Chart.Legend />
             </BarChart>
           </Chart>
-          <Chart config={VISITS_CONFIG} className="w-80">
+          <Chart config={VISITS_CONFIG}>
             <Chart.Title>Line</Chart.Title>
             <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
               <CartesianGrid vertical={false} />
@@ -170,7 +181,7 @@ export const Gallery: Story = {
               <Chart.Legend />
             </LineChart>
           </Chart>
-          <Chart config={VISITS_CONFIG} className="w-80">
+          <Chart config={VISITS_CONFIG}>
             <Chart.Title>Area</Chart.Title>
             <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
               <CartesianGrid vertical={false} />
@@ -181,7 +192,7 @@ export const Gallery: Story = {
               <Chart.Legend />
             </AreaChart>
           </Chart>
-          <Chart config={SERVICES_CONFIG} className="w-80">
+          <Chart config={SERVICES_CONFIG}>
             <Chart.Title>Pie</Chart.Title>
             <PieChart>
               <Pie data={SHARES} dataKey="visits" nameKey="service" innerRadius="45%" />
@@ -189,7 +200,7 @@ export const Gallery: Story = {
               <Chart.Legend />
             </PieChart>
           </Chart>
-          <Chart config={SURVEY_CONFIG} className="w-80">
+          <Chart config={SURVEY_CONFIG}>
             <Chart.Title>Radar</Chart.Title>
             <RadarChart data={SURVEY}>
               <PolarGrid />
@@ -198,7 +209,7 @@ export const Gallery: Story = {
               <Chart.Tooltip />
             </RadarChart>
           </Chart>
-          <Chart config={SERVICE_VISITS_CONFIG} className="w-80">
+          <Chart config={SERVICE_VISITS_CONFIG}>
             <Chart.Title>Vertical bar</Chart.Title>
             <BarChart data={SERVICES} layout="vertical">
               <XAxis type="number" hide />
@@ -213,20 +224,9 @@ export const Gallery: Story = {
         title="Series colors"
         description="color 를 생략한 계열은 차례로 primary, secondary, tertiary 채움을 씁니다. 테마가 primary 만 주면 secondary 와 tertiary 는 primary 에서 만든 색입니다. 네 번째 계열(학식)부터는 config 에서 color 를 고릅니다."
       >
-        <Chart config={SERVICES_CONFIG} className="w-full max-w-xl">
-          <Chart.Title>primary 만</Chart.Title>
-          <BarChart data={SERVICE_TOTALS}>
-            <XAxis dataKey="week" tickLine={false} axisLine={false} />
-            <Bar dataKey="ziggle" radius={4} />
-            <Bar dataKey="gistory" radius={4} />
-            <Bar dataKey="shuttle" radius={4} />
-            <Bar dataKey="cafeteria" radius={4} />
-            <Chart.Legend />
-          </BarChart>
-        </Chart>
-        <IdsProvider.Scope theme={{ secondary: palettes.violet, tertiary: palettes.amber }}>
-          <Chart config={SERVICES_CONFIG} className="w-full max-w-xl">
-            <Chart.Title>primary, secondary violet, tertiary amber</Chart.Title>
+        <div className="w-full max-w-xl">
+          <Chart config={SERVICES_CONFIG}>
+            <Chart.Title>primary 만</Chart.Title>
             <BarChart data={SERVICE_TOTALS}>
               <XAxis dataKey="week" tickLine={false} axisLine={false} />
               <Bar dataKey="ziggle" radius={4} />
@@ -236,6 +236,21 @@ export const Gallery: Story = {
               <Chart.Legend />
             </BarChart>
           </Chart>
+        </div>
+        <IdsProvider.Scope theme={{ secondary: palettes.violet, tertiary: palettes.amber }}>
+          <div className="w-full max-w-xl">
+            <Chart config={SERVICES_CONFIG}>
+              <Chart.Title>primary, secondary violet, tertiary amber</Chart.Title>
+              <BarChart data={SERVICE_TOTALS}>
+                <XAxis dataKey="week" tickLine={false} axisLine={false} />
+                <Bar dataKey="ziggle" radius={4} />
+                <Bar dataKey="gistory" radius={4} />
+                <Bar dataKey="shuttle" radius={4} />
+                <Bar dataKey="cafeteria" radius={4} />
+                <Chart.Legend />
+              </BarChart>
+            </Chart>
+          </div>
         </IdsProvider.Scope>
       </Showcase.Section>
       <Showcase.Section
@@ -244,7 +259,7 @@ export const Gallery: Story = {
       >
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {(['dot', 'line', 'dashed'] as const).map((indicator) => (
-            <Chart key={indicator} config={VISITS_CONFIG} className="w-72">
+            <Chart key={indicator} config={VISITS_CONFIG}>
               <Chart.Title>{indicator}</Chart.Title>
               <BarChart data={VISITS}>
                 <XAxis dataKey="day" tickLine={false} axisLine={false} />
@@ -259,38 +274,51 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Size"
-        description="높이를 주지 않으면 그래프는 16:9 입니다. Chart 에 높이를 주면 그래프가 제목을 뺀 나머지를 채웁니다."
+        description="Chart 는 부모의 폭을 채웁니다. 부모가 높이를 주지 않으면 그래프는 16:9 이고, AspectRatio 나 높이가 있는 부모 안에서는 제목을 뺀 나머지를 그래프가 채웁니다."
       >
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          <Chart config={VISITS_CONFIG} className="w-80">
+        <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-3">
+          <Chart config={VISITS_CONFIG}>
             <Chart.Title>기본 16:9</Chart.Title>
             <BarChart data={VISITS}>
               <XAxis dataKey="day" tickLine={false} axisLine={false} />
               <Bar dataKey="web" radius={4} />
             </BarChart>
           </Chart>
-          <Chart config={VISITS_CONFIG} className="aspect-square w-80">
-            <Chart.Title>aspect-square</Chart.Title>
-            <BarChart data={VISITS}>
-              <XAxis dataKey="day" tickLine={false} axisLine={false} />
-              <Bar dataKey="web" radius={4} />
-            </BarChart>
-          </Chart>
+          <AspectRatio ratio={1}>
+            <Chart config={VISITS_CONFIG}>
+              <Chart.Title>AspectRatio 1</Chart.Title>
+              <BarChart data={VISITS}>
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <Bar dataKey="web" radius={4} />
+              </BarChart>
+            </Chart>
+          </AspectRatio>
+          <div className="h-48">
+            <Chart config={VISITS_CONFIG}>
+              <Chart.Title>부모 h-48</Chart.Title>
+              <BarChart data={VISITS}>
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <Bar dataKey="web" radius={4} />
+              </BarChart>
+            </Chart>
+          </div>
         </div>
       </Showcase.Section>
       <Showcase.Section
         title="Table"
         description="Chart.Table 을 두면 같은 데이터를 표로 보여 줍니다."
       >
-        <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-          <Chart.Title>주간 방문</Chart.Title>
-          <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
-            <XAxis dataKey="day" tickLine={false} axisLine={false} />
-            <Line dataKey="web" strokeWidth={2} />
-            <Line dataKey="app" strokeWidth={2} />
-          </LineChart>
-          <Chart.Table size="tiny" />
-        </Chart>
+        <div className="w-full max-w-xl">
+          <Chart config={VISITS_CONFIG}>
+            <Chart.Title>주간 방문</Chart.Title>
+            <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
+              <XAxis dataKey="day" tickLine={false} axisLine={false} />
+              <Line dataKey="web" strokeWidth={2} />
+              <Line dataKey="app" strokeWidth={2} />
+            </LineChart>
+            <Chart.Table size="tiny" />
+          </Chart>
+        </div>
       </Showcase.Section>
     </Showcase>
   ),
@@ -298,21 +326,23 @@ export const Gallery: Story = {
 
 export const FormatTheTooltipAndLegend: Story = {
   render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Area dataKey="web" type="monotone" />
-        <Area dataKey="app" type="monotone" />
-        <Chart.Tooltip
-          indicator="line"
-          labelFormatter={(label) => `${label}요일`}
-          formatter={(value) => `${Number(value).toLocaleString('ko-KR')}회`}
-        />
-        <Chart.Legend indicator="line" formatter={(label) => <span>{label} 방문</span>} />
-      </AreaChart>
-    </Chart>
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Area dataKey="web" type="monotone" />
+          <Area dataKey="app" type="monotone" />
+          <Chart.Tooltip
+            indicator="line"
+            labelFormatter={(label) => `${label}요일`}
+            formatter={(value) => `${Number(value).toLocaleString('ko-KR')}회`}
+          />
+          <Chart.Legend indicator="line" formatter={(label) => <span>{label} 방문</span>} />
+        </AreaChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
@@ -339,21 +369,23 @@ export const FormatTheTooltipAndLegend: Story = {
 
 export const UseTheRechartsTooltip: Story = {
   render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Tooltip
-          cursor={false}
-          contentStyle={{
-            background: 'var(--ids-color-bg-base)',
-            borderColor: 'var(--ids-color-border-neutral)',
-          }}
-          itemStyle={{ color: 'var(--ids-color-text-neutral-strong)' }}
-        />
-      </BarChart>
-    </Chart>
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Tooltip
+            cursor={false}
+            contentStyle={{
+              background: 'var(--ids-color-bg-base)',
+              borderColor: 'var(--ids-color-border-neutral)',
+            }}
+            itemStyle={{ color: 'var(--ids-color-text-neutral-strong)' }}
+          />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
@@ -375,28 +407,29 @@ export const UseTheRechartsTooltip: Story = {
 
 export const PickSeriesColors: Story = {
   render: () => (
-    <Chart
-      config={{
-        income: { label: '수입', color: 'success' },
-        spending: { label: '지출', color: 'danger' },
-      }}
-      className="w-full max-w-xl"
-    >
-      <Chart.Title>월별 회비</Chart.Title>
-      <BarChart
-        data={[
-          { month: '3월', income: 420000, spending: 310000 },
-          { month: '4월', income: 380000, spending: 450000 },
-          { month: '5월', income: 510000, spending: 290000 },
-        ]}
+    <div className="w-full max-w-xl">
+      <Chart
+        config={{
+          income: { label: '수입', color: 'success' },
+          spending: { label: '지출', color: 'danger' },
+        }}
       >
-        <XAxis dataKey="month" tickLine={false} axisLine={false} />
-        <Bar dataKey="income" radius={4} />
-        <Bar dataKey="spending" radius={4} />
-        <Chart.Tooltip />
-        <Chart.Legend />
-      </BarChart>
-    </Chart>
+        <Chart.Title>월별 회비</Chart.Title>
+        <BarChart
+          data={[
+            { month: '3월', income: 420000, spending: 310000 },
+            { month: '4월', income: 380000, spending: 450000 },
+            { month: '5월', income: 510000, spending: 290000 },
+          ]}
+        >
+          <XAxis dataKey="month" tickLine={false} axisLine={false} />
+          <Bar dataKey="income" radius={4} />
+          <Bar dataKey="spending" radius={4} />
+          <Chart.Tooltip />
+          <Chart.Legend />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
@@ -421,16 +454,18 @@ export const PickSeriesColors: Story = {
 
 export const ShowTheDataAsATable: Story = {
   render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Line dataKey="web" strokeWidth={2} />
-        <Line dataKey="app" strokeWidth={2} />
-      </LineChart>
-      <Chart.Table size="tiny" />
-    </Chart>
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Line dataKey="web" strokeWidth={2} />
+          <Line dataKey="app" strokeWidth={2} />
+        </LineChart>
+        <Chart.Table size="tiny" />
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
@@ -450,22 +485,24 @@ export const ShowTheDataAsATable: Story = {
 
 export const SetTheHeight: Story = {
   render: () => (
-    <Chart config={VISITS_CONFIG} className="h-72 w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Bar dataKey="app" radius={4} />
-        <Chart.Tooltip />
-      </BarChart>
-    </Chart>
+    <div className="h-72 w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+          <Chart.Tooltip />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'Chart 는 `<figure>` 에 준 높이(`h-72`, `aspect-square`)를 따르고, 그래프는 제목을 뺀 나머지를 채웁니다. 높이를 주지 않으면 그래프는 16:9 입니다. AspectRatio 안에 두어도 같습니다.',
+          '높이는 Chart 를 감싼 요소가 정합니다. Chart 는 부모의 높이(`h-72`)를 채우고, 그래프는 제목을 뺀 나머지를 채웁니다. 부모가 높이를 주지 않으면 그래프는 16:9 입니다.',
       },
     },
   },
@@ -484,18 +521,52 @@ export const SetTheHeight: Story = {
   },
 };
 
+export const KeepARatio: Story = {
+  render: () => (
+    <div className="w-full max-w-sm">
+      <AspectRatio ratio={1}>
+        <Chart config={SERVICES_CONFIG}>
+          <Chart.Title>서비스별 방문</Chart.Title>
+          <PieChart>
+            <Pie data={SHARES} dataKey="visits" nameKey="service" innerRadius="45%" />
+            <Chart.Tooltip />
+            <Chart.Legend />
+          </PieChart>
+        </Chart>
+      </AspectRatio>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '비율은 Chart 를 `AspectRatio` 로 감싸서 정합니다. Chart 가 AspectRatio 를 채우고, 비율은 제목까지 포함한 Chart 전체의 비율입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await canvas.findByRole('img', { name: '서비스별 방문' });
+    const figure = canvasElement
+      .querySelector<HTMLElement>('[data-chart]')!
+      .getBoundingClientRect();
+    await expect(figure.width).toBeCloseTo(figure.height, 0);
+  },
+};
+
 export const Keyboard: Story = {
   tags: ['verification'],
   render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Bar dataKey="app" radius={4} />
-        <Chart.Tooltip />
-      </BarChart>
-    </Chart>
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+          <Chart.Tooltip />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
@@ -520,14 +591,16 @@ export const Keyboard: Story = {
 export const ScreenReaderTable: Story = {
   tags: ['verification'],
   render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" name="요일" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Bar dataKey="app" radius={4} />
-      </BarChart>
-    </Chart>
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <XAxis dataKey="day" name="요일" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {

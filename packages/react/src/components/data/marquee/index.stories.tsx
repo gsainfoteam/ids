@@ -71,14 +71,16 @@ const meta = {
     onPlayingChange: fn(),
   },
   render: (args) => (
-    <Marquee {...args} className={isVertical(args.direction) ? 'h-48 w-80' : undefined}>
-      {PARTNERS.map((name) => (
-        <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-          {name}
-        </Marquee.Item>
-      ))}
-      <Marquee.Pause />
-    </Marquee>
+    <div className={isVertical(args.direction) ? 'grid min-h-48 w-80' : 'w-full'}>
+      <Marquee {...args}>
+        {PARTNERS.map((name) => (
+          <Marquee.Item key={name}>
+            <span className="text-body-b1-semibold text-neutral">{name}</span>
+          </Marquee.Item>
+        ))}
+        <Marquee.Pause />
+      </Marquee>
+    </div>
   ),
   parameters: {
     docs: {
@@ -97,22 +99,25 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Marquee aria-label="함께하는 단체" className="gap-12">
-      {LOGOS.map((partner) => (
-        <img key={partner.name} src={partner.src} alt={partner.name} className="h-8" />
-      ))}
-      <Marquee.Pause />
-    </Marquee>
+    <div className="w-full">
+      <Marquee aria-label="함께하는 단체">
+        <Marquee.Item>Acme</Marquee.Item>
+        <Marquee.Item>Globex</Marquee.Item>
+        <Marquee.Item>Initech</Marquee.Item>
+        <Marquee.Item>Umbrella</Marquee.Item>
+        <Marquee.Pause />
+      </Marquee>
+    </div>
   ),
   play: async ({ canvas, canvasElement }) => {
-    await expect(canvas.getAllByRole('img')).toHaveLength(LOGOS.length);
+    await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
 
     const root = canvasElement.querySelector('[data-marquee]')!;
     if (prefersReducedMotion()) {
       await waitFor(() => expect(copy(root)).toBeNull());
       return;
     }
-    await expect(copy(root)?.querySelectorAll('img')).toHaveLength(LOGOS.length);
+    await expect(copy(root)?.querySelectorAll('[data-marquee-item]')).toHaveLength(4);
     await expect(copy(root)).toHaveAttribute('aria-hidden', 'true');
     await expect(copy(root)).toHaveAttribute('inert');
   },
@@ -127,18 +132,15 @@ export const Gallery: Story = {
       >
         {directions.map((direction) => (
           <Showcase.Row key={direction} label={direction}>
-            <Marquee
-              aria-label={direction}
-              direction={direction}
-              defaultPlaying={false}
-              className={isVertical(direction) ? 'h-40 w-80 gap-3' : 'w-80'}
-            >
-              {PARTNERS.map((name) => (
-                <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-                  {name}
-                </Marquee.Item>
-              ))}
-            </Marquee>
+            <div className={isVertical(direction) ? 'grid min-h-40 w-80' : 'w-80'}>
+              <Marquee aria-label={direction} direction={direction} defaultPlaying={false}>
+                {PARTNERS.map((name) => (
+                  <Marquee.Item key={name}>
+                    <span className="text-body-b1-semibold text-neutral">{name}</span>
+                  </Marquee.Item>
+                ))}
+              </Marquee>
+            </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>
@@ -151,8 +153,8 @@ export const Gallery: Story = {
           <Showcase.Row key={variant} label={variant}>
             <Marquee aria-label={variant} variant={variant} defaultPlaying={false}>
               {PARTNERS.map((name) => (
-                <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-                  {name}
+                <Marquee.Item key={name}>
+                  <span className="text-body-b1-semibold text-neutral">{name}</span>
                 </Marquee.Item>
               ))}
             </Marquee>
@@ -168,8 +170,8 @@ export const Gallery: Story = {
           <Showcase.Row key={size} label={size}>
             <Marquee aria-label={size} size={size} defaultPlaying={false}>
               {NOTICES.map((notice) => (
-                <Marquee.Item key={notice.id} className="text-body-b3-regular">
-                  {notice.title}
+                <Marquee.Item key={notice.id}>
+                  <span className="text-body-b3-regular">{notice.title}</span>
                 </Marquee.Item>
               ))}
               <Marquee.Pause />
@@ -185,8 +187,8 @@ export const Gallery: Story = {
         <Showcase.Row label="Marquee.Pause outline">
           <Marquee aria-label="outline pause" defaultPlaying={false}>
             {PARTNERS.map((name) => (
-              <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-                {name}
+              <Marquee.Item key={name}>
+                <span className="text-body-b1-semibold text-neutral">{name}</span>
               </Marquee.Item>
             ))}
             <Marquee.Pause variant="outline" />
@@ -195,8 +197,8 @@ export const Gallery: Story = {
         <Showcase.Row label="no Marquee.Pause">
           <Marquee aria-label="no pause" defaultPlaying={false}>
             {PARTNERS.map((name) => (
-              <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-                {name}
+              <Marquee.Item key={name}>
+                <span className="text-body-b1-semibold text-neutral">{name}</span>
               </Marquee.Item>
             ))}
           </Marquee>
@@ -208,10 +210,10 @@ export const Gallery: Story = {
 
 export const LetReadersPauseTheFlow: Story = {
   render: () => (
-    <Marquee aria-label="공지" className="gap-10">
+    <Marquee aria-label="공지">
       {NOTICES.map((notice) => (
-        <Marquee.Item key={notice.id} className="text-body-b2-medium">
-          {notice.title}
+        <Marquee.Item key={notice.id}>
+          <span className="text-body-b2-medium">{notice.title}</span>
         </Marquee.Item>
       ))}
       <Marquee.Pause />
@@ -251,7 +253,7 @@ export const LetReadersPauseTheFlow: Story = {
 
 export const RunATickerOfLinks: Story = {
   render: () => (
-    <Marquee aria-label="공지" className="gap-10">
+    <Marquee aria-label="공지">
       {NOTICES.map((notice) => (
         <Marquee.Item key={notice.id} asChild>
           <a
@@ -297,8 +299,8 @@ export const ControlPlayingFromOutside: Story = {
       <div className="flex w-full flex-col gap-3">
         <Marquee aria-label="고객사" playing={playing} onPlayingChange={setPlaying}>
           {PARTNERS.map((name) => (
-            <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-              {name}
+            <Marquee.Item key={name}>
+              <span className="text-body-b1-semibold text-neutral">{name}</span>
             </Marquee.Item>
           ))}
           <Marquee.Pause />
@@ -346,8 +348,8 @@ export const ChooseASpeed: Story = {
       {speeds.map((speed) => (
         <Marquee key={speed} aria-label={`speed ${speed}`} speed={speed}>
           {PARTNERS.map((name) => (
-            <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-              {name}
+            <Marquee.Item key={name}>
+              <span className="text-body-b1-semibold text-neutral">{name}</span>
             </Marquee.Item>
           ))}
         </Marquee>
@@ -373,19 +375,21 @@ export const ChooseASpeed: Story = {
 
 export const FlowNumbersDownAColumn: Story = {
   render: () => (
-    <Marquee aria-label="숫자로 보는 학교" direction="down" className="h-40 w-72 gap-4 text-center">
-      {STATS.map((stat) => (
-        <Marquee.Item key={stat} className="text-body-b1-semibold">
-          {stat}
-        </Marquee.Item>
-      ))}
-    </Marquee>
+    <div className="grid min-h-40 w-72 text-center">
+      <Marquee aria-label="숫자로 보는 학교" direction="down">
+        {STATS.map((stat) => (
+          <Marquee.Item key={stat}>
+            <span className="text-body-b1-semibold">{stat}</span>
+          </Marquee.Item>
+        ))}
+      </Marquee>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '`direction="up"` 이나 `"down"` 은 세로 띠입니다. 높이를 정해 주고(`h-40`), 페이드도 위아래 끝에 걸립니다. 이 띠는 아래로 흐릅니다.',
+          '`direction="up"` 이나 `"down"` 은 세로 띠입니다. 감싼 `grid` 가 높이를 주면(`min-h-40`) 띠가 그 높이를 채우고, 페이드도 위아래 끝에 걸립니다. 이 띠는 아래로 흐릅니다.',
       },
     },
   },
@@ -405,13 +409,13 @@ export const FlowNumbersDownAColumn: Story = {
 export const RunTwoRowsInOppositeDirections: Story = {
   render: () => (
     <div className="flex w-full flex-col gap-4">
-      <Marquee aria-label="함께하는 단체" className="gap-12">
+      <Marquee aria-label="함께하는 단체">
         {LOGOS.slice(0, 3).map((partner) => (
           <img key={partner.name} src={partner.src} alt={partner.name} className="h-8" />
         ))}
         <Marquee.Pause />
       </Marquee>
-      <Marquee aria-label="후원하는 단체" direction="end" className="gap-12">
+      <Marquee aria-label="후원하는 단체" direction="end">
         {LOGOS.slice(3).map((partner) => (
           <img key={partner.name} src={partner.src} alt={partner.name} className="h-8" />
         ))}
@@ -446,14 +450,16 @@ export const RunTwoRowsInOppositeDirections: Story = {
 export const ReducedMotion: Story = {
   tags: ['verification'],
   render: () => (
-    <Marquee aria-label="함께하는 단체" className="w-72">
-      {PARTNERS.map((name) => (
-        <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
-          {name}
-        </Marquee.Item>
-      ))}
-      <Marquee.Pause />
-    </Marquee>
+    <div className="w-72">
+      <Marquee aria-label="함께하는 단체">
+        {PARTNERS.map((name) => (
+          <Marquee.Item key={name}>
+            <span className="text-body-b1-semibold text-neutral">{name}</span>
+          </Marquee.Item>
+        ))}
+        <Marquee.Pause />
+      </Marquee>
+    </div>
   ),
   parameters: {
     docs: {

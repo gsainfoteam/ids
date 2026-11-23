@@ -276,12 +276,11 @@ describe('colors', () => {
     }
   });
 
-  test('takes other colors through the two custom properties', async () => {
+  test('takes other colors through the two custom properties set on a parent', async () => {
     const screen = await renderInTheme(
-      <QRCode
-        value={PROFILE}
-        className="[--qr-code-background:rgb(255,255,255)] [--qr-code-foreground:rgb(0,0,128)]"
-      />,
+      <div className="[--qr-code-background:rgb(255,255,255)] [--qr-code-foreground:rgb(0,0,128)]">
+        <QRCode value={PROFILE} />
+      </div>,
     );
     const code = codeIn(screen.container);
 
@@ -301,6 +300,20 @@ describe('size and quiet zone', () => {
 
     expect(box.width).toBe(pixels);
     expect(box.height).toBe(pixels);
+  });
+
+  test('a parent narrower than the size shrinks the code and keeps it square', async () => {
+    const screen = await renderInTheme(
+      <div style={{ width: 100 }}>
+        <QRCode value={PROFILE} size={200} />
+      </div>,
+    );
+    const code = codeIn(screen.container);
+    const box = code.getBoundingClientRect();
+
+    expect(box.width).toBe(100);
+    expect(box.height).toBe(100);
+    expect(code.querySelector('svg')!.getBoundingClientRect().height).toBe(100);
   });
 
   test('quietZone adds that many modules around the code and 0 drops the rounded corner', async () => {

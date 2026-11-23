@@ -114,12 +114,16 @@ test('selecting the code and copying it leaves the line numbers out', async () =
   expect(await pastedText()).toBe(SAVE);
 });
 
-test('without a caption, the first line wraps before the copy button', async () => {
+test('without a caption, the first line ends before the copy button when scrolled to its end', async () => {
   const screen = await render(
     <div className="w-72">
-      <CodeBlock className="whitespace-pre-wrap">{'x'.repeat(200)}</CodeBlock>
+      <CodeBlock>{'x'.repeat(200)}</CodeBlock>
     </div>,
   );
+  const pre = screen.container.querySelector('pre')!;
+  pre.scrollLeft = pre.scrollWidth;
+  await expect.poll(() => pre.scrollLeft).toBeGreaterThan(0);
+
   const firstLineText = document.createRange();
   firstLineText.selectNodeContents(screen.container.querySelector('[data-line="1"]')!);
   const firstRow = firstLineText.getClientRects()[0]!;
@@ -148,20 +152,6 @@ test('a long line scrolls sideways from the keyboard once Tab reaches the code',
 
   for (let step = 0; step < 5; step++) await userEvent.keyboard('{ArrowRight}');
   await expect.poll(() => pre.scrollLeft).toBeGreaterThan(0);
-});
-
-test('whitespace-pre-wrap on the root keeps the code inside the block', async () => {
-  const screen = await render(
-    <div className="w-72">
-      <CodeBlock language="ts" className="whitespace-pre-wrap">
-        {LONG_LINE}
-      </CodeBlock>
-    </div>,
-  );
-  const pre = screen.container.querySelector('pre')!;
-
-  expect(pre.scrollWidth).toBe(pre.clientWidth);
-  expect(pre.hasAttribute('tabindex')).toBe(false);
 });
 
 test('a lazily loaded language hydrates as plain text, then highlights', async () => {

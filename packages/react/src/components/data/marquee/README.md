@@ -11,13 +11,18 @@
 ```tsx
 import { Marquee } from '@gsainfoteam/ids-react';
 
-<Marquee aria-label="함께하는 단체" className="gap-12">
+<Marquee aria-label="함께하는 단체">
   {partners.map((partner) => (
     <img key={partner.id} src={partner.logo} alt={partner.name} className="h-8" />
   ))}
   <Marquee.Pause />
 </Marquee>;
 ```
+
+## 크기
+
+- **fill.** 가로 띠는 부모의 폭을 모두 채웁니다(`w-full min-w-0`). 폭은 감싼 요소가 정합니다: `<div className="w-80"><Marquee /></div>`.
+- 세로 띠(`up`, `down`)는 `grid` 부모가 준 높이를 채웁니다. 높이는 띠의 내용이 정하지 않습니다.
 
 ## 항목
 
@@ -31,7 +36,8 @@ import { Marquee } from '@gsainfoteam/ids-react';
 ```
 
 - `Marquee.Item` 은 선택입니다. 없으면 자식을 그대로 흘립니다.
-- 간격은 루트의 `gap-*` 입니다. 기본은 `gap-8`(32px)이고, 항목 사이와 마지막 항목과 복제본의 첫 항목 사이가 같습니다.
+- 항목의 모양은 내용입니다. 글자 크기나 색은 `Marquee.Item` 안의 요소에 줍니다: `<Marquee.Item><span className="text-body-b1-semibold">Acme</span></Marquee.Item>`.
+- 간격은 32px 입니다. 항목 사이와 마지막 항목과 복제본의 첫 항목 사이가 같습니다.
 - 내용이 띠보다 짧으면 항목 사이를 벌려 띠를 채웁니다. 복제본과 이어 붙여도 빈자리가 보이지 않습니다.
 
 ## 방향과 속도
@@ -39,8 +45,12 @@ import { Marquee } from '@gsainfoteam/ids-react';
 ```tsx
 <Marquee aria-label="고객사" />                                // start(기본). 글이 시작하는 쪽으로 흐른다
 <Marquee aria-label="고객사" direction="end" />                // 글이 끝나는 쪽으로
-<Marquee aria-label="통계" direction="up" className="h-40" />   // 위로. 세로는 높이를 준다
-<Marquee aria-label="통계" direction="down" className="h-40" /> // 아래로
+<Marquee aria-label="통계" direction="up" />    // 위로. 세로는 부모가 높이를 준다
+<Marquee aria-label="통계" direction="down" />  // 아래로
+
+<div className="grid min-h-40">
+  <Marquee aria-label="통계" direction="up">...</Marquee>
+</div>
 
 <Marquee aria-label="고객사" speed="slow" />              // 초당 25px
 <Marquee aria-label="고객사" />                           // normal, 초당 50px
@@ -51,14 +61,13 @@ import { Marquee } from '@gsainfoteam/ids-react';
 - `start` 와 `end` 는 글 방향을 따릅니다. `start` 는 LTR 에서 왼쪽으로, `dir="rtl"` 에서 오른쪽으로 흐르고, `end` 는 그 반대입니다. `up` 과 `down` 은 세로 띠입니다.
 - 속도는 초당 px 이라 항목 수와 상관없이 같은 빠르기로 읽힙니다. 한 바퀴 시간은 ResizeObserver 로 잰 길이를 속도로 나눈 값이고, 루트의 `--marquee-duration` 에 들어갑니다.
 - 재기 전(서버 HTML, 첫 그림)에는 1000px 을 한 바퀴로 보고 흐릅니다. `normal` 이면 20초입니다.
-- 세로 띠는 높이가 있어야 보입니다. 가로 띠는 부모의 폭을 채웁니다.
+- 세로 띠는 부모가 높이를 주어야 보입니다. `grid` 부모의 `min-h-*` 를 쓰면 띠가 그 높이를 채우고, 동작 줄이기에서는 줄바꿈한 항목만큼 부모가 늘어납니다. 가로 띠는 부모의 폭을 채웁니다.
 
 ## 페이드
 
 ```tsx
-<Marquee aria-label="고객사" />                                   // variant="fade"(기본). 양 끝을 흐리게
-<Marquee aria-label="고객사" variant="plain" />                   // 흐리지 않고 잘라 낸다
-<Marquee aria-label="고객사" className="[--marquee-fade:3rem]" /> // 흐린 폭
+<Marquee aria-label="고객사" />                 // variant="fade"(기본). 양 끝을 흐리게
+<Marquee aria-label="고객사" variant="plain" /> // 흐리지 않고 잘라 낸다
 ```
 
 - `mask-image` 그라디언트라 배경색을 몰라도 어느 표면 위에서나 맞습니다.
@@ -88,7 +97,7 @@ import { Marquee } from '@gsainfoteam/ids-react';
 ## 동작 줄이기
 
 - 운영체제의 동작 줄이기(`prefers-reduced-motion`)를 따릅니다. 속성으로 바꿀 수 없습니다.
-- 동작 줄이기면 흐르지 않고 항목을 줄바꿈해 모두 보여 줍니다. 복제본과 멈춤 버튼은 그리지 않고, 루트에 준 높이도 풀어 줄바꿈한 항목이 모두 보입니다.
+- 동작 줄이기면 흐르지 않고 항목을 줄바꿈해 모두 보여 줍니다. 복제본과 멈춤 버튼은 그리지 않고, 세로 띠의 높이도 풀어 줄바꿈한 항목이 모두 보입니다.
 - 서버는 설정을 모르므로 CSS(`motion-reduce:`)가 첫 그림부터 멈춘 모습을 그리고, hydration 뒤에 복제본과 멈춤 버튼을 지웁니다.
 
 ## 접근성
@@ -106,18 +115,10 @@ import { Marquee } from '@gsainfoteam/ids-react';
 - 키보드 포커스를 받은 항목은 띠 가운데로 옮겨집니다. 띠 밖에 가려지거나 페이드에 걸린 항목도 포커스 링까지 또렷이 보입니다. 띠는 `overflow: clip` 이라 브라우저가 대신 스크롤하지 않습니다.
 - 포인터가 복제본 위에 오면 원본과 복제본의 자리를 바꿔 원본이 포인터 아래에 옵니다. 보이는 모습은 그대로이고, 보이는 링크는 어느 것이든 누를 수 있습니다.
 
-## 상태와 data 속성
+## 상태
 
-| 속성                                      | 뜻                                                                   |
-| ----------------------------------------- | -------------------------------------------------------------------- |
-| `data-playing` / `data-paused`            | 흐르는지. 멈춤 버튼과 `playing` 이 정하고, 잠시 멈춤은 바꾸지 않는다 |
-| `data-direction`                          | `start` / `end` / `up` / `down`                                      |
-| `data-orientation`                        | `horizontal`(`start`, `end`) / `vertical`(`up`, `down`)              |
-| `data-reduced-motion`                     | 운영체제의 동작 줄이기로 멈춘 모습일 때                              |
-| `data-marquee-viewport`                   | 보이는 창. 잘라 내고 페이드를 입힌다                                 |
-| `data-marquee-track`                      | 움직이는 띠. `data-swapped` 면 원본과 복제본의 자리가 바뀌어 있다    |
-| `data-marquee-content`                    | 원본과 복제본. 복제본에는 `data-marquee-copy` 가 더 붙는다           |
-| `data-marquee-item`, `data-marquee-pause` | 항목, 멈춤 버튼                                                      |
+- 흐르는지는 `playing` / `defaultPlaying` / `onPlayingChange` 로 읽고 씁니다. 멈춤 버튼과 `playing` 이 정하고, 포인터와 포커스의 잠시 멈춤은 바꾸지 않습니다.
+- 방향은 앱이 준 `direction` 그대로입니다.
 
 ## 속성
 

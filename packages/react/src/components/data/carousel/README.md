@@ -21,6 +21,11 @@ import { Carousel } from '@gsainfoteam/ids-react';
 </Carousel>;
 ```
 
+## 크기
+
+- **fill.** 부모의 폭을 모두 채웁니다(`w-full min-w-0`). 폭은 감싼 요소가 정합니다: `<div className="max-w-md"><Carousel /></div>`.
+- 세로(`orientation="vertical"`)는 부모의 높이도 채우고 줄어들 수 있습니다(`h-full min-h-0`).
+
 ## 값
 
 ```tsx
@@ -60,20 +65,20 @@ const carousel = useCarousel({
 const carousel = useCarousel({ slides: { perView: 3, toScroll: 'auto' } });
 
 <Carousel aria-label="추천 상품" carousel={carousel}>
-  <Carousel.Content className="gap-4">
-    {products.map((product) => (
-      <Carousel.Slide key={product.id}>
+  {products.map((product) => (
+    <Carousel.Slide key={product.id}>
+      <div className="px-2">
         <Card>...</Card>
-      </Carousel.Slide>
-    ))}
-  </Carousel.Content>
+      </div>
+    </Carousel.Slide>
+  ))}
 </Carousel>
 ```
 
 - `slides.perView`(기본 1)는 한 번에 보이는 장 수입니다. `1.5` 처럼 소수를 주면 다음 장이 조금 보입니다.
 - `slides.toScroll`(기본 1)은 한 번에 넘기는 장 수입니다. `'auto'` 면 보이는 만큼 넘깁니다.
 - 점은 멈추는 자리마다 하나입니다. 세 장씩 넘기면 점 하나가 세 장을 맡고, 이름은 그 첫 장("4번째 슬라이드로")입니다.
-- 간격은 `Carousel.Content` 의 `gap-*` 으로 줍니다. 장의 폭은 간격을 빼고 나눕니다.
+- 장 사이의 간격은 슬라이드 안에서 내용을 감싼 요소의 padding 으로 둡니다(`px-2` 면 장 사이 16px, 양 끝 8px).
 - `slides.align` 은 멈춘 장을 어디에 맞출지입니다. `start`(기본), `center`, `end`.
 - `slides.dragFree` 면 끈 만큼 미끄러지고 스냅에 맞추지 않습니다.
 - `slides.loop` 면 끝과 처음이 이어지고 이전, 다음 버튼이 비활성이 되지 않습니다. 슬라이드가 너무 적어 이어 붙일 수 없으면 엔진이 `loop` 없이 동작합니다.
@@ -114,8 +119,8 @@ useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
       <Carousel.Next />
     </div>
   </div>
-  <Carousel.Content className="gap-4">...</Carousel.Content>
-  <Carousel.Indicators className="justify-center" />
+  <Carousel.Content>...</Carousel.Content>
+  <Carousel.Indicators />
 </Carousel>
 ```
 
@@ -141,7 +146,7 @@ useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
 
 ```tsx
 <Carousel.Content asChild>
-  <section className="rounded-container">{slides}</section>
+  <section>{slides}</section>
 </Carousel.Content>
 <Carousel.Slide asChild>
   <article>...</article>
@@ -154,16 +159,16 @@ useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
 ## 방향
 
 ```tsx
-<Carousel aria-label="공지" orientation="vertical">
-  <Carousel.Content className="h-40">...</Carousel.Content>
-</Carousel>
+<div className="h-52">
+  <Carousel aria-label="공지" orientation="vertical">...</Carousel>
+</div>
 
 <div dir="rtl">
   <Carousel aria-label="사진">...</Carousel>
 </div>
 ```
 
-- 세로는 `Carousel.Content` 에 높이를 줍니다. 높이가 없으면 모든 장이 늘어서 보입니다.
+- 세로는 부모가 높이를 줍니다. 캐러셀이 그 높이를 채우고, 점의 줄을 뺀 나머지가 Content 의 높이입니다. 높이가 없으면 모든 장이 늘어서 보입니다.
 - 오른쪽에서 왼쪽으로 쓰는 화면에서는 첫 장이 오른쪽이고 `←` 가 다음 장입니다. 버튼의 화살표도 뒤집힙니다. 방향은 캐러셀이 놓인 곳의 CSS `direction` 에서 읽습니다.
 
 ## 키보드
@@ -185,26 +190,17 @@ useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
 
 ```tsx
 <Carousel aria-label="사진" size="tiny" />          // 버튼과 점의 크기. standard(기본) / tiny
-<Carousel.Slide className="basis-2/3" />           // 장마다 폭을 따로 줄 때
 ```
 
-- `size` 는 이전, 다음, 멈춤 버튼과 점의 크기입니다. 슬라이드 크기는 `slides.perView` 나 슬라이드의 `className` 이 정합니다.
+- `size` 는 이전, 다음, 멈춤 버튼과 점의 크기입니다. 슬라이드의 폭은 `slides.perView` 가, 높이는 슬라이드 안의 내용이 정합니다.
 - 점은 8px(tiny 6px)이고 누르는 영역은 24px 입니다. 현재 점은 `primary` 색으로 길어지고, 나머지는 `bg-(--ids-color-border-neutral-strong)` 이고 올리거나 누르면 `text-neutral` 색(`bg-(--ids-color-text-neutral)`)으로 진해집니다. 6px 점에서는 글자색 층이 보이지 않아 색을 바꿉니다.
 - 기본 버튼은 Content 위에 겹쳐 그립니다. `outline` 이라 사진 위에서도 보입니다.
 
 ## 상태
 
-| 속성            | 붙는 곳            | 뜻                                        |
-| --------------- | ------------------ | ----------------------------------------- |
-| `data-carousel` | 루트               |                                           |
-| `data-orientation` | 루트            | `horizontal` / `vertical`                 |
-| `data-playing`  | 루트               | 지금 자동으로 넘기는 중(잠깐 멈추면 빠짐) |
-| `data-dragging` | 루트               | 누르거나 끄는 중                          |
-| `data-selected` | 슬라이드           | 지금 자리의 장                            |
-| `data-in-view`  | 슬라이드           | 화면에 보이는 장. 없으면 `inert`          |
-| `data-current`  | 점(버튼과 안의 점) | 지금 자리의 점. `aria-current="true"`     |
-
-- 루트의 `className`, `style` 은 `{ value, orientation, playing, dragging }` 을 받는 함수일 수 있습니다. `Carousel.Slide` 는 `{ index, selected, inView }`, `Carousel.Indicator` 는 `{ index, current }` 와 hover 같은 상호작용 상태를 받습니다.
+- 지금 자리는 `value` / `defaultValue` / `onValueChange` 로 읽고 씁니다.
+- 자동 넘김을 멈췄는지는 `useCarousel` 의 `autoplay`(또는 `autoScroll`) 안 `value` / `defaultValue` / `onValueChange` 로 읽고 씁니다.
+- 새 디자인을 그릴 때만, `className` 과 `style` 을 상태를 받는 함수로 줄 수 있습니다. 루트는 `Carousel.State`(`{ value, orientation, playing, dragging }`), `Carousel.Slide` 는 `Carousel.Slide.State`(`{ index, selected, inView }`), `Carousel.Indicator` 는 `Carousel.Indicator.State`(`{ index, current }` 와 hover 같은 상호작용 상태)를 받습니다.
 
 ## 속성
 
@@ -227,7 +223,7 @@ useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
 | `autoScroll`                          | 없음. `{}` 면 속도 2, `{ speed, direction }`                |
 | `autoplay.value` / `.defaultValue`    | 넘기는 중인지. 기본 `true`, 줄인 동작이면 `false`. `autoScroll` 도 같다 |
 | `autoplay.onValueChange`              | `(playing: boolean) => void`. 멈춤 버튼을 누를 때           |
-| `Carousel.Content`                    | 잘라 보이는 영역과 트랙. `asChild`, `gap-*`                 |
+| `Carousel.Content`                    | 잘라 보이는 영역과 트랙. `asChild`                          |
 | `Carousel.Slide`                      | 한 장. `asChild`, `aria-label` 로 이름을 바꿀 수 있다       |
 | `Carousel.Prev` / `Carousel.Next`     | `IconButton` 속성. 이름 "이전 슬라이드" / "다음 슬라이드"   |
 | `Carousel.Indicators`                 | 점의 줄. 자식은 노드 또는 `(index) => ReactNode`            |

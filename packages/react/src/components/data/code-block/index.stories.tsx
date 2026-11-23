@@ -121,7 +121,7 @@ export const Usage: Story = {
   render: () => (
     <CodeBlock language="bash">
       <CodeBlock.Title>설치</CodeBlock.Title>
-      {INSTALL}
+      {'pnpm add @gsainfoteam/ids-react @gsainfoteam/ids-css'}
     </CodeBlock>
   ),
   play: async ({ canvasElement }) => {
@@ -139,7 +139,7 @@ export const Gallery: Story = {
       >
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
-            <CodeBlock variant={variant} language="tsx" className="w-full">
+            <CodeBlock variant={variant} language="tsx">
               <CodeBlock.Title>save.tsx</CodeBlock.Title>
               {BUTTON}
             </CodeBlock>
@@ -153,7 +153,7 @@ export const Gallery: Story = {
       >
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
-            <CodeBlock variant={variant} language="tsx" highlight={[4, 6]} className="w-full">
+            <CodeBlock variant={variant} language="tsx" highlight={[4, 6]}>
               <CodeBlock.Title>save.tsx</CodeBlock.Title>
               <CodeBlock.LineNumbers />
               {BUTTON}
@@ -167,32 +167,22 @@ export const Gallery: Story = {
         description="Title 과 language 가 figcaption 이 됩니다. 둘 다 없으면 복사 버튼만 코드 위에 뜹니다."
       >
         <Showcase.Row label="Title + language">
-          <CodeBlock language="bash" className="w-full">
+          <CodeBlock language="bash">
             <CodeBlock.Title>터미널</CodeBlock.Title>
             {INSTALL}
           </CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="language">
-          <CodeBlock language="bash" className="w-full">
-            {INSTALL}
-          </CodeBlock>
+          <CodeBlock language="bash">{INSTALL}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="none">
-          <CodeBlock className="w-full">{INSTALL}</CodeBlock>
+          <CodeBlock>{INSTALL}</CodeBlock>
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section
-        title="Overflow"
-        description="긴 줄은 가로로 스크롤합니다. 루트에 whitespace-pre-wrap 을 주면 줄을 바꿉니다."
-      >
+      <Showcase.Section title="Overflow" description="긴 줄은 가로로 스크롤합니다.">
         <CodeBlock language="ts">
           <CodeBlock.Title>scroll</CodeBlock.Title>
-          <CodeBlock.LineNumbers />
-          {LONG_LINE}
-        </CodeBlock>
-        <CodeBlock language="ts" className="whitespace-pre-wrap">
-          <CodeBlock.Title>whitespace-pre-wrap</CodeBlock.Title>
           <CodeBlock.LineNumbers />
           {LONG_LINE}
         </CodeBlock>
@@ -203,14 +193,14 @@ export const Gallery: Story = {
         description="collapsedLines 보다 긴 코드는 그만큼만 보이고 아래가 흐려집니다. 버튼으로 펼치고 접습니다."
       >
         <Showcase.Row label="collapsed">
-          <CodeBlock language="tsx" collapsedLines={8} className="w-full">
+          <CodeBlock language="tsx" collapsedLines={8}>
             <CodeBlock.Title>profile-form.tsx</CodeBlock.Title>
             <CodeBlock.LineNumbers />
             {FORM}
           </CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="expanded">
-          <CodeBlock language="tsx" collapsedLines={8} defaultExpanded className="w-full">
+          <CodeBlock language="tsx" collapsedLines={8} defaultExpanded>
             <CodeBlock.Title>profile-form.tsx</CodeBlock.Title>
             <CodeBlock.LineNumbers />
             {FORM}
@@ -223,29 +213,19 @@ export const Gallery: Story = {
         description="기본으로 담긴 언어는 서버 HTML 에서 이미 강조됩니다."
       >
         <Showcase.Row label="bash">
-          <CodeBlock language="bash" className="w-full">
-            {SAMPLES.bash}
-          </CodeBlock>
+          <CodeBlock language="bash">{SAMPLES.bash}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="python">
-          <CodeBlock language="python" className="w-full">
-            {SAMPLES.python}
-          </CodeBlock>
+          <CodeBlock language="python">{SAMPLES.python}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="json">
-          <CodeBlock language="json" className="w-full">
-            {SAMPLES.json}
-          </CodeBlock>
+          <CodeBlock language="json">{SAMPLES.json}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="css">
-          <CodeBlock language="css" className="w-full">
-            {SAMPLES.css}
-          </CodeBlock>
+          <CodeBlock language="css">{SAMPLES.css}</CodeBlock>
         </Showcase.Row>
         <Showcase.Row label="diff">
-          <CodeBlock language="diff" className="w-full">
-            {SAMPLES.diff}
-          </CodeBlock>
+          <CodeBlock language="diff">{SAMPLES.diff}</CodeBlock>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -396,33 +376,6 @@ export const ScrollALongLine: Story = {
     await waitFor(() => expect(pre()).toHaveAttribute('tabindex', '0'));
     pre().focus();
     await expect(pre()).toHaveFocus();
-  },
-};
-
-export const WrapLongLines: Story = {
-  render: () => (
-    <div className="w-80">
-      <CodeBlock language="ts" className="whitespace-pre-wrap">
-        <CodeBlock.LineNumbers />
-        {LONG_LINE}
-      </CodeBlock>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '루트에 `className="whitespace-pre-wrap"` 을 주면 긴 줄을 바꿔 씁니다. 바뀐 줄은 줄 번호 뒤에서 이어집니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const pre = canvasElement.querySelector('pre')!;
-    await expect(pre.scrollWidth).toBe(pre.clientWidth);
-    const line = pre.querySelector('[data-line="1"]')!;
-    await expect(line.getBoundingClientRect().height).toBeGreaterThan(
-      parseFloat(getComputedStyle(line).lineHeight) * 1.5,
-    );
   },
 };
 

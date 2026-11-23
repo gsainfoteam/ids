@@ -74,16 +74,18 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Accordion type="single" defaultValue="shipping" className="w-full max-w-md">
-      <Accordion.Item value="shipping">
-        <Accordion.Trigger>배송은 얼마나 걸리나요?</Accordion.Trigger>
-        <Accordion.Content>일반 배송 2~3일, 빠른 배송 1일.</Accordion.Content>
-      </Accordion.Item>
-      <Accordion.Item value="returns">
-        <Accordion.Trigger>반품이 가능한가요?</Accordion.Trigger>
-        <Accordion.Content>구매 후 14일 안에 반품할 수 있습니다.</Accordion.Content>
-      </Accordion.Item>
-    </Accordion>
+    <div className="w-full max-w-md">
+      <Accordion type="single" defaultValue="shipping">
+        <Accordion.Item value="shipping">
+          <Accordion.Trigger>배송은 얼마나 걸리나요?</Accordion.Trigger>
+          <Accordion.Content>일반 배송 2~3일, 빠른 배송 1일.</Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="returns">
+          <Accordion.Trigger>반품이 가능한가요?</Accordion.Trigger>
+          <Accordion.Content>구매 후 14일 안에 반품할 수 있습니다.</Accordion.Content>
+        </Accordion.Item>
+      </Accordion>
+    </div>
   ),
 };
 
@@ -183,14 +185,14 @@ export const Gallery: Story = {
             <Accordion type="multiple" variant="ghost" defaultValue={['src']}>
               <Accordion.Item value="src">
                 <Accordion.Trigger>
-                  <Accordion.Indicator className="-rotate-90 data-open:rotate-0" />
+                  <Accordion.Indicator />
                   src
                 </Accordion.Trigger>
                 <Accordion.Content>components, hooks, utils</Accordion.Content>
               </Accordion.Item>
               <Accordion.Item value="tests">
                 <Accordion.Trigger>
-                  <Accordion.Indicator className="-rotate-90 data-open:rotate-0" />
+                  <Accordion.Indicator />
                   tests
                 </Accordion.Trigger>
                 <Accordion.Content>accordion.test.mjs</Accordion.Content>
@@ -205,7 +207,7 @@ export const Gallery: Story = {
                 <Accordion.Item key={value} value={value}>
                   <Accordion.Trigger>
                     {value === 'a' ? '회원 혜택' : '포인트 적립'}
-                    <Accordion.Indicator className="rotate-0! transition-none">
+                    <Accordion.Indicator>
                       {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
                     </Accordion.Indicator>
                   </Accordion.Trigger>
@@ -338,7 +340,7 @@ export const DrawPlusAndMinusInsteadOfAChevron: Story = {
           <Accordion.Item key={value} value={value}>
             <Accordion.Trigger>
               {value === 'a' ? '회원 혜택' : '포인트 적립'}
-              <Accordion.Indicator className="rotate-0! transition-none">
+              <Accordion.Indicator>
                 {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
               </Accordion.Indicator>
             </Accordion.Trigger>
@@ -352,7 +354,7 @@ export const DrawPlusAndMinusInsteadOfAChevron: Story = {
     docs: {
       description: {
         story:
-          'Indicator를 넣으면 기본 chevron 대신 그것을 씁니다. children, className, style은 섹션 상태를 받는 함수가 될 수 있습니다.',
+          'Indicator에 children을 주면 기본 chevron 대신 그것을 그립니다. children은 섹션 상태를 받는 함수가 될 수 있어, 열림에 따라 아이콘을 바꿉니다.',
       },
     },
   },

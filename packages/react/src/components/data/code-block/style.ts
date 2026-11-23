@@ -15,7 +15,7 @@ export const codeTokens = cn(
 
 export const codeBlockStyle = tv({
   slots: {
-    root: 'relative flex min-w-0 flex-col rounded-container whitespace-pre text-neutral-strong',
+    root: 'relative flex w-full min-w-0 flex-col rounded-container whitespace-pre text-neutral-strong',
     caption: [
       'flex min-h-[calc(var(--ids-size-control-tiny)+--spacing(3))] min-w-0 items-center gap-2',
       'ps-4 pe-[calc(var(--ids-size-control-tiny)+--spacing(3))]',

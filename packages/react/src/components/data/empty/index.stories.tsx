@@ -43,20 +43,22 @@ const meta = {
   },
   args: { variant: 'ghost', size: 'standard', align: 'center' },
   render: (args) => (
-    <Empty {...args} className="max-w-md">
-      <Empty.Media>
-        <FolderOpenIcon />
-      </Empty.Media>
-      <Empty.Title>아직 프로젝트가 없습니다</Empty.Title>
-      <Empty.Description>첫 프로젝트를 만들어 팀원과 함께 시작해 보세요.</Empty.Description>
-      <Empty.Actions>
-        <Button>
-          <PlusIcon />
-          프로젝트 만들기
-        </Button>
-        <Button variant="outline">가져오기</Button>
-      </Empty.Actions>
-    </Empty>
+    <div className="w-full max-w-md">
+      <Empty {...args}>
+        <Empty.Media>
+          <FolderOpenIcon />
+        </Empty.Media>
+        <Empty.Title>아직 프로젝트가 없습니다</Empty.Title>
+        <Empty.Description>첫 프로젝트를 만들어 팀원과 함께 시작해 보세요.</Empty.Description>
+        <Empty.Actions>
+          <Button>
+            <PlusIcon />
+            프로젝트 만들기
+          </Button>
+          <Button variant="outline">가져오기</Button>
+        </Empty.Actions>
+      </Empty>
+    </div>
   ),
 } satisfies Meta<typeof Empty>;
 
@@ -67,16 +69,18 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Empty className="max-w-md">
-      <Empty.Media>
-        <FolderOpenIcon />
-      </Empty.Media>
-      <Empty.Title>아직 프로젝트가 없습니다</Empty.Title>
-      <Empty.Description>첫 프로젝트를 만들어 팀원과 함께 시작해 보세요.</Empty.Description>
-      <Empty.Actions>
-        <Button>프로젝트 만들기</Button>
-      </Empty.Actions>
-    </Empty>
+    <div className="w-full max-w-md">
+      <Empty>
+        <Empty.Media>
+          <FolderOpenIcon />
+        </Empty.Media>
+        <Empty.Title>아직 프로젝트가 없습니다</Empty.Title>
+        <Empty.Description>첫 프로젝트를 만들어 팀원과 함께 시작해 보세요.</Empty.Description>
+        <Empty.Actions>
+          <Button>프로젝트 만들기</Button>
+        </Empty.Actions>
+      </Empty>
+    </div>
   ),
 };
 
@@ -88,13 +92,15 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <Empty variant={variant} size={size} className="w-72">
-              <Empty.Title>{variant}</Empty.Title>
-              <Empty.Description>size {size}</Empty.Description>
-              <Empty.Actions>
-                <Button size={size}>만들기</Button>
-              </Empty.Actions>
-            </Empty>
+            <div className="w-72">
+              <Empty variant={variant} size={size}>
+                <Empty.Title>{variant}</Empty.Title>
+                <Empty.Description>size {size}</Empty.Description>
+                <Empty.Actions>
+                  <Button size={size}>만들기</Button>
+                </Empty.Actions>
+              </Empty>
+            </div>
           )}
         />
       </Showcase.Section>
@@ -107,58 +113,70 @@ export const Gallery: Story = {
           rows={sizes}
           columns={mediaVariants}
           render={(size, variant) => (
-            <Empty size={size} className="w-56">
-              <Empty.Media variant={variant}>
-                <MagnifyingGlassIcon />
-              </Empty.Media>
-              <Empty.Title>검색 결과 없음</Empty.Title>
-            </Empty>
+            <div className="w-56">
+              <Empty size={size}>
+                <Empty.Media variant={variant}>
+                  <MagnifyingGlassIcon />
+                </Empty.Media>
+                <Empty.Title>검색 결과 없음</Empty.Title>
+              </Empty>
+            </div>
           )}
         />
         <Showcase.Row label="default">
-          <Empty className="w-56">
-            <Empty.Title>받은 메시지가 없습니다</Empty.Title>
-          </Empty>
-          <Empty variant="soft" className="w-56">
-            <Empty.Title>받은 메시지가 없습니다</Empty.Title>
-          </Empty>
+          <div className="w-56">
+            <Empty>
+              <Empty.Title>받은 메시지가 없습니다</Empty.Title>
+            </Empty>
+          </div>
+          <div className="w-56">
+            <Empty variant="soft">
+              <Empty.Title>받은 메시지가 없습니다</Empty.Title>
+            </Empty>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="illustration">
-          <Empty variant="outline" className="w-72">
-            <Empty.Media variant="ghost">
-              <img src={ILLUSTRATION} alt="" width={160} height={112} />
-            </Empty.Media>
-            <Empty.Title>이 폴더는 비어 있습니다</Empty.Title>
-            <Empty.Description>파일을 끌어다 놓거나 업로드 버튼을 누르세요.</Empty.Description>
-            <Empty.Actions>
-              <Button>
-                <ArrowUpTrayIcon />
-                파일 업로드
-              </Button>
-            </Empty.Actions>
-          </Empty>
+          <div className="w-72">
+            <Empty variant="outline">
+              <Empty.Media variant="ghost">
+                <img src={ILLUSTRATION} alt="" width={160} height={112} />
+              </Empty.Media>
+              <Empty.Title>이 폴더는 비어 있습니다</Empty.Title>
+              <Empty.Description>파일을 끌어다 놓거나 업로드 버튼을 누르세요.</Empty.Description>
+              <Empty.Actions>
+                <Button>
+                  <ArrowUpTrayIcon />
+                  파일 업로드
+                </Button>
+              </Empty.Actions>
+            </Empty>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="hidden">
-          <Empty variant="outline" size="tiny" className="w-56">
-            <Empty.Media hidden />
-            <Empty.Title>표시할 항목이 없습니다</Empty.Title>
-          </Empty>
+          <div className="w-56">
+            <Empty variant="outline" size="tiny">
+              <Empty.Media hidden />
+              <Empty.Title>표시할 항목이 없습니다</Empty.Title>
+            </Empty>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Align">
         <Showcase.Row>
           {aligns.map((align) => (
-            <Empty key={align} align={align} variant="outline" className="w-72">
-              <Empty.Media>
-                <UserGroupIcon />
-              </Empty.Media>
-              <Empty.Title>align {align}</Empty.Title>
-              <Empty.Description>팀원을 초대하면 여기에 표시됩니다.</Empty.Description>
-              <Empty.Actions>
-                <Button>초대하기</Button>
-              </Empty.Actions>
-            </Empty>
+            <div key={align} className="w-72">
+              <Empty align={align} variant="outline">
+                <Empty.Media>
+                  <UserGroupIcon />
+                </Empty.Media>
+                <Empty.Title>align {align}</Empty.Title>
+                <Empty.Description>팀원을 초대하면 여기에 표시됩니다.</Empty.Description>
+                <Empty.Actions>
+                  <Button>초대하기</Button>
+                </Empty.Actions>
+              </Empty>
+            </div>
           ))}
         </Showcase.Row>
       </Showcase.Section>
@@ -168,25 +186,27 @@ export const Gallery: Story = {
 
 export const ShowAnEmptyCard: Story = {
   render: () => (
-    <Card className="w-96">
-      <Card.Header>
-        <Card.Title asChild>
-          <h2>최근 활동</h2>
-        </Card.Title>
-        <Card.Description>팀원이 남긴 기록을 모아 봅니다.</Card.Description>
-      </Card.Header>
-      <Card.Content>
-        <Empty variant="soft" size="tiny">
-          <Empty.Title asChild>
-            <h3>아직 활동이 없습니다</h3>
-          </Empty.Title>
-          <Empty.Description>문서를 만들거나 댓글을 남기면 여기에 쌓입니다.</Empty.Description>
-          <Empty.Actions>
-            <Button size="tiny">문서 만들기</Button>
-          </Empty.Actions>
-        </Empty>
-      </Card.Content>
-    </Card>
+    <div className="w-96">
+      <Card>
+        <Card.Header>
+          <Card.Title asChild>
+            <h2>최근 활동</h2>
+          </Card.Title>
+          <Card.Description>팀원이 남긴 기록을 모아 봅니다.</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <Empty variant="soft" size="tiny">
+            <Empty.Title asChild>
+              <h3>아직 활동이 없습니다</h3>
+            </Empty.Title>
+            <Empty.Description>문서를 만들거나 댓글을 남기면 여기에 쌓입니다.</Empty.Description>
+            <Empty.Actions>
+              <Button size="tiny">문서 만들기</Button>
+            </Empty.Actions>
+          </Empty>
+        </Card.Content>
+      </Card>
+    </div>
   ),
   parameters: {
     docs: {

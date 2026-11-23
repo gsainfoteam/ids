@@ -259,7 +259,7 @@ function withFooter(props: Card.Props = {}, mode: 'light' | 'dark' = 'light') {
           </Card.Action>
         </Card.Header>
         <Card.Content>Agenda</Card.Content>
-        <Card.Footer className="justify-end">
+        <Card.Footer>
           <Button variant="outline">Cancel</Button>
           <Button>Save</Button>
         </Card.Footer>
@@ -279,6 +279,7 @@ test.each(['light', 'dark'] as const)(
     const style = getComputedStyle(footer);
     expect(style.backgroundColor).toBe(colorOf('--ids-color-bg-block', root));
     expect(style.color).toBe(textColorOf('--ids-color-text-neutral-strong', root));
+    expect(style.justifyContent).toBe('flex-end');
     expect(style.borderTopWidth).toBe('1px');
     expect(style.borderTopColor).toBe(colorOf('--ids-color-border-neutral', root));
     expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-surface', root));

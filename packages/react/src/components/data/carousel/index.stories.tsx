@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
+import { AspectRatio } from '../../layout/aspect-ratio';
 import { Card } from '../card';
 
 import { Carousel, useCarousel } from '.';
@@ -58,15 +59,17 @@ const meta = {
     onValueChange: fn(),
   },
   render: (args) => (
-    <Carousel {...args} className="w-full max-w-md">
-      <Carousel.Content className={args.orientation === 'vertical' ? 'h-64' : undefined}>
-        {photos.map((photo) => (
-          <Carousel.Slide key={photo.id}>
-            <img src={photo.src} alt={photo.alt} className="aspect-video w-full object-cover" />
-          </Carousel.Slide>
-        ))}
-      </Carousel.Content>
-    </Carousel>
+    <div className={args.orientation === 'vertical' ? 'h-80 w-full max-w-md' : 'w-full max-w-md'}>
+      <Carousel {...args}>
+        <Carousel.Content>
+          {photos.map((photo) => (
+            <Carousel.Slide key={photo.id}>
+              <img src={photo.src} alt={photo.alt} className="aspect-video w-full object-cover" />
+            </Carousel.Slide>
+          ))}
+        </Carousel.Content>
+      </Carousel>
+    </div>
   ),
 } satisfies Meta<typeof Carousel>;
 
@@ -88,13 +91,25 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Carousel aria-label="행사 사진" className="w-full max-w-md">
-      {photos.map((photo) => (
-        <Carousel.Slide key={photo.id}>
-          <img src={photo.src} alt={photo.alt} className="aspect-video w-full object-cover" />
+    <div className="w-full max-w-md">
+      <Carousel aria-label="행사 사진">
+        <Carousel.Slide>
+          <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-video items-center justify-center">
+            봄 축제
+          </div>
         </Carousel.Slide>
-      ))}
-    </Carousel>
+        <Carousel.Slide>
+          <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-video items-center justify-center">
+            여름 캠프
+          </div>
+        </Carousel.Slide>
+        <Carousel.Slide>
+          <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-video items-center justify-center">
+            가을 체육대회
+          </div>
+        </Carousel.Slide>
+      </Carousel>
+    </div>
   ),
 };
 
@@ -113,11 +128,147 @@ export const Gallery: Story = {
       <Showcase>
         <Showcase.Section
           title="Size"
-          description="size 는 이전, 다음 버튼과 점의 크기입니다. 슬라이드의 크기는 slides.perView 와 슬라이드의 className 이 정합니다."
+          description="size 는 이전, 다음 버튼과 점의 크기입니다. 슬라이드의 폭은 slides.perView 가, 높이는 슬라이드 안의 내용이 정합니다."
         >
           {sizes.map((size) => (
             <Showcase.Row key={size} label={size}>
-              <Carousel aria-label={`${size} 크기`} size={size} className="w-96">
+              <div className="w-96">
+                <Carousel aria-label={`${size} 크기`} size={size}>
+                  {photos.map((photo) => (
+                    <Carousel.Slide key={photo.id}>
+                      <img
+                        src={photo.src}
+                        alt={photo.alt}
+                        className="aspect-video w-full object-cover"
+                      />
+                    </Carousel.Slide>
+                  ))}
+                </Carousel>
+              </div>
+            </Showcase.Row>
+          ))}
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Slides per view"
+          description="useCarousel 의 slides.perView 는 한 번에 보이는 장 수입니다. 장 사이의 간격은 슬라이드 안에서 내용을 감싼 요소의 padding 으로 둡니다."
+        >
+          <Showcase.Row label="1">
+            <div className="w-md">
+              <Carousel aria-label="1장씩 보기">
+                {products.map((product) => (
+                  <Carousel.Slide key={product.id}>
+                    <div className="px-1.5">
+                      <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
+                        {product.name}
+                      </div>
+                    </div>
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="2">
+            <div className="w-md">
+              <Carousel aria-label="2장씩 보기" carousel={twoAtOnce}>
+                {products.map((product) => (
+                  <Carousel.Slide key={product.id}>
+                    <div className="px-1.5">
+                      <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
+                        {product.name}
+                      </div>
+                    </div>
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="3">
+            <div className="w-md">
+              <Carousel aria-label="3장씩 보기" carousel={threeAtOnce}>
+                {products.map((product) => (
+                  <Carousel.Slide key={product.id}>
+                    <div className="px-1.5">
+                      <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
+                        {product.name}
+                      </div>
+                    </div>
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Orientation"
+          description="세로는 부모가 높이를 줍니다. 캐러셀이 그 높이를 채우고, 점의 줄을 뺀 만큼이 슬라이드의 높이입니다. 버튼의 화살표는 방향을 따릅니다."
+        >
+          <Showcase.Row label="horizontal">
+            <div className="w-96">
+              <Carousel aria-label="가로 공지">
+                {notices.map((notice) => (
+                  <Carousel.Slide key={notice}>
+                    <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-28 items-center justify-center px-16 text-center">
+                      {notice}
+                    </p>
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="vertical">
+            <div className="h-52 w-96">
+              <Carousel aria-label="세로 공지" orientation="vertical">
+                {notices.map((notice) => (
+                  <Carousel.Slide key={notice}>
+                    <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-full items-center justify-center px-6 text-center">
+                      {notice}
+                    </p>
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Control variant"
+          description="Carousel.Prev 와 Carousel.Next 는 IconButton 의 variant 를 받습니다. 기본은 outline 입니다."
+        >
+          {variants.map((variant) => (
+            <Showcase.Row key={variant} label={variant}>
+              <div className="w-80">
+                <Carousel aria-label={`${variant} 버튼`}>
+                  <Carousel.Content>
+                    {photos.map((photo) => (
+                      <Carousel.Slide key={photo.id}>
+                        <img
+                          src={photo.src}
+                          alt={photo.alt}
+                          className="aspect-video w-full object-cover"
+                        />
+                      </Carousel.Slide>
+                    ))}
+                  </Carousel.Content>
+                  <div className="flex items-center justify-between">
+                    <Carousel.Prev variant={variant} />
+                    <Carousel.Indicators />
+                    <Carousel.Next variant={variant} />
+                  </div>
+                </Carousel>
+              </div>
+            </Showcase.Row>
+          ))}
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Motion"
+          description="autoplay 는 한 장씩 넘기고 autoScroll 은 멈추지 않고 흐릅니다. 둘 다 Carousel.Pause 가 함께 그려집니다. 여기서는 멈춘 모습입니다."
+        >
+          <Showcase.Row label="autoplay">
+            <div className="w-96">
+              <Carousel aria-label="자동 넘김" carousel={rotating}>
                 {photos.map((photo) => (
                   <Carousel.Slide key={photo.id}>
                     <img
@@ -128,182 +279,68 @@ export const Gallery: Story = {
                   </Carousel.Slide>
                 ))}
               </Carousel>
-            </Showcase.Row>
-          ))}
-        </Showcase.Section>
-
-        <Showcase.Section
-          title="Slides per view"
-          description="useCarousel 의 slides.perView 는 한 번에 보이는 장 수입니다. 간격은 Carousel.Content 의 gap 으로 줍니다."
-        >
-          <Showcase.Row label="1">
-            <Carousel aria-label="1장씩 보기" className="w-md">
-              <Carousel.Content className="gap-3">
-                {products.map((product) => (
-                  <Carousel.Slide key={product.id}>
-                    <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
-                      {product.name}
-                    </div>
-                  </Carousel.Slide>
-                ))}
-              </Carousel.Content>
-            </Carousel>
-          </Showcase.Row>
-          <Showcase.Row label="2">
-            <Carousel aria-label="2장씩 보기" carousel={twoAtOnce} className="w-md">
-              <Carousel.Content className="gap-3">
-                {products.map((product) => (
-                  <Carousel.Slide key={product.id}>
-                    <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
-                      {product.name}
-                    </div>
-                  </Carousel.Slide>
-                ))}
-              </Carousel.Content>
-            </Carousel>
-          </Showcase.Row>
-          <Showcase.Row label="3">
-            <Carousel aria-label="3장씩 보기" carousel={threeAtOnce} className="w-md">
-              <Carousel.Content className="gap-3">
-                {products.map((product) => (
-                  <Carousel.Slide key={product.id}>
-                    <div className="rounded-container text-body-b2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
-                      {product.name}
-                    </div>
-                  </Carousel.Slide>
-                ))}
-              </Carousel.Content>
-            </Carousel>
-          </Showcase.Row>
-        </Showcase.Section>
-
-        <Showcase.Section
-          title="Orientation"
-          description="세로는 Carousel.Content 에 높이를 줍니다. 버튼의 화살표는 방향을 따릅니다."
-        >
-          <Showcase.Row label="horizontal">
-            <Carousel aria-label="가로 공지" className="w-96">
-              {notices.map((notice) => (
-                <Carousel.Slide key={notice}>
-                  <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-28 items-center justify-center px-16 text-center">
-                    {notice}
-                  </p>
-                </Carousel.Slide>
-              ))}
-            </Carousel>
-          </Showcase.Row>
-          <Showcase.Row label="vertical">
-            <Carousel aria-label="세로 공지" orientation="vertical" className="w-96">
-              <Carousel.Content className="h-40">
-                {notices.map((notice) => (
-                  <Carousel.Slide key={notice}>
-                    <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-full items-center justify-center px-6 text-center">
-                      {notice}
-                    </p>
-                  </Carousel.Slide>
-                ))}
-              </Carousel.Content>
-            </Carousel>
-          </Showcase.Row>
-        </Showcase.Section>
-
-        <Showcase.Section
-          title="Control variant"
-          description="Carousel.Prev 와 Carousel.Next 는 IconButton 의 variant 를 받습니다. 기본은 outline 입니다."
-        >
-          {variants.map((variant) => (
-            <Showcase.Row key={variant} label={variant}>
-              <Carousel aria-label={`${variant} 버튼`} className="w-80">
-                <Carousel.Content>
-                  {photos.map((photo) => (
-                    <Carousel.Slide key={photo.id}>
-                      <img
-                        src={photo.src}
-                        alt={photo.alt}
-                        className="aspect-video w-full object-cover"
-                      />
-                    </Carousel.Slide>
-                  ))}
-                </Carousel.Content>
-                <div className="flex items-center justify-between">
-                  <Carousel.Prev variant={variant} />
-                  <Carousel.Indicators />
-                  <Carousel.Next variant={variant} />
-                </div>
-              </Carousel>
-            </Showcase.Row>
-          ))}
-        </Showcase.Section>
-
-        <Showcase.Section
-          title="Motion"
-          description="autoplay 는 한 장씩 넘기고 autoScroll 은 멈추지 않고 흐릅니다. 둘 다 Carousel.Pause 가 함께 그려집니다. 여기서는 멈춘 모습입니다."
-        >
-          <Showcase.Row label="autoplay">
-            <Carousel aria-label="자동 넘김" carousel={rotating} className="w-96">
-              {photos.map((photo) => (
-                <Carousel.Slide key={photo.id}>
-                  <img
-                    src={photo.src}
-                    alt={photo.alt}
-                    className="aspect-video w-full object-cover"
-                  />
-                </Carousel.Slide>
-              ))}
-            </Carousel>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="autoScroll">
-            <Carousel aria-label="흐르는 상품" carousel={flowing} className="w-96">
-              <Carousel.Content className="gap-3">
+            <div className="w-96">
+              <Carousel aria-label="흐르는 상품" carousel={flowing}>
                 {products.map((product) => (
                   <Carousel.Slide key={product.id}>
-                    <div className="rounded-container text-body-b3-medium bg-neutral-soft flex aspect-square items-center justify-center">
-                      {product.name}
+                    <div className="px-1.5">
+                      <div className="rounded-container text-body-b3-medium bg-neutral-soft flex aspect-square items-center justify-center">
+                        {product.name}
+                      </div>
                     </div>
                   </Carousel.Slide>
                 ))}
-              </Carousel.Content>
-            </Carousel>
+              </Carousel>
+            </div>
           </Showcase.Row>
         </Showcase.Section>
 
         <Showcase.Section title="States">
           <Showcase.Row label="last slide">
-            <Carousel aria-label="마지막 장" defaultValue={photos.length - 1} className="w-80">
-              {photos.map((photo) => (
-                <Carousel.Slide key={photo.id}>
-                  <img
-                    src={photo.src}
-                    alt={photo.alt}
-                    className="aspect-video w-full object-cover"
-                  />
-                </Carousel.Slide>
-              ))}
-            </Carousel>
+            <div className="w-80">
+              <Carousel aria-label="마지막 장" defaultValue={photos.length - 1}>
+                {photos.map((photo) => (
+                  <Carousel.Slide key={photo.id}>
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      className="aspect-video w-full object-cover"
+                    />
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="loop">
-            <Carousel aria-label="처음과 끝이 이어진 사진" carousel={looping} className="w-80">
-              {photos.map((photo) => (
-                <Carousel.Slide key={photo.id}>
+            <div className="w-80">
+              <Carousel aria-label="처음과 끝이 이어진 사진" carousel={looping}>
+                {photos.map((photo) => (
+                  <Carousel.Slide key={photo.id}>
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      className="aspect-video w-full object-cover"
+                    />
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="one slide">
+            <div className="w-80">
+              <Carousel aria-label="한 장">
+                <Carousel.Slide>
                   <img
-                    src={photo.src}
-                    alt={photo.alt}
+                    src={photos[0].src}
+                    alt={photos[0].alt}
                     className="aspect-video w-full object-cover"
                   />
                 </Carousel.Slide>
-              ))}
-            </Carousel>
-          </Showcase.Row>
-          <Showcase.Row label="one slide">
-            <Carousel aria-label="한 장" className="w-80">
-              <Carousel.Slide>
-                <img
-                  src={photos[0].src}
-                  alt={photos[0].alt}
-                  className="aspect-video w-full object-cover"
-                />
-              </Carousel.Slide>
-            </Carousel>
+              </Carousel>
+            </div>
           </Showcase.Row>
         </Showcase.Section>
       </Showcase>
@@ -361,30 +398,34 @@ export const ShowSeveralCardsAtOnce: Story = {
     const carousel = useCarousel({ slides: { perView: 3, toScroll: 'auto' } });
 
     return (
-      <Carousel aria-label="추천 상품" carousel={carousel} className="w-full max-w-2xl">
-        <Carousel.Content className="gap-4">
+      <div className="w-full max-w-2xl">
+        <Carousel aria-label="추천 상품" carousel={carousel}>
           {products.map((product) => (
             <Carousel.Slide key={product.id}>
-              <Card>
-                <Card.Media className="aspect-square">
-                  <img src={landscape(product.hue)} alt="" />
-                </Card.Media>
-                <Card.Header>
-                  <Card.Title>{product.name}</Card.Title>
-                  <Card.Description>{product.price}</Card.Description>
-                </Card.Header>
-              </Card>
+              <div className="px-2">
+                <Card>
+                  <Card.Media>
+                    <AspectRatio ratio={1}>
+                      <img src={landscape(product.hue)} alt="" />
+                    </AspectRatio>
+                  </Card.Media>
+                  <Card.Header>
+                    <Card.Title>{product.name}</Card.Title>
+                    <Card.Description>{product.price}</Card.Description>
+                  </Card.Header>
+                </Card>
+              </div>
             </Carousel.Slide>
           ))}
-        </Carousel.Content>
-      </Carousel>
+        </Carousel>
+      </div>
     );
   },
   parameters: {
     docs: {
       description: {
         story:
-          "`useCarousel` 의 `slides.perView` 는 한 번에 보이는 장 수, `slides.toScroll` 은 한 번에 넘기는 장 수입니다. `toScroll: 'auto'` 면 보이는 만큼 넘기고, 점은 넘기는 묶음마다 하나입니다. 결과는 `carousel` 로 넘기고, 간격은 `Carousel.Content` 의 `gap-*` 으로 줍니다.",
+          "`useCarousel` 의 `slides.perView` 는 한 번에 보이는 장 수, `slides.toScroll` 은 한 번에 넘기는 장 수입니다. `toScroll: 'auto'` 면 보이는 만큼 넘기고, 점은 넘기는 묶음마다 하나입니다. 결과는 `carousel` 로 넘깁니다. 장 사이의 간격은 슬라이드 안에서 카드를 감싼 `div` 의 padding 입니다.",
       },
     },
   },
@@ -404,13 +445,15 @@ export const ConnectTheEnds: Story = {
     const carousel = useCarousel({ slides: { loop: true } });
 
     return (
-      <Carousel {...args} carousel={carousel} className="w-full max-w-md">
-        {photos.map((photo) => (
-          <Carousel.Slide key={photo.id}>
-            <img src={photo.src} alt={photo.alt} className="aspect-video w-full object-cover" />
-          </Carousel.Slide>
-        ))}
-      </Carousel>
+      <div className="w-full max-w-md">
+        <Carousel {...args} carousel={carousel}>
+          {photos.map((photo) => (
+            <Carousel.Slide key={photo.id}>
+              <img src={photo.src} alt={photo.alt} className="aspect-video w-full object-cover" />
+            </Carousel.Slide>
+          ))}
+        </Carousel>
+      </div>
     );
   },
   parameters: {
@@ -436,15 +479,17 @@ export const RotateABanner: Story = {
     const carousel = useCarousel({ slides: { loop: true }, autoplay: { delay: 5000 } });
 
     return (
-      <Carousel aria-label="공지 배너" carousel={carousel} className="w-full max-w-md">
-        {notices.map((notice) => (
-          <Carousel.Slide key={notice}>
-            <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-32 items-center justify-center px-16 text-center">
-              {notice}
-            </p>
-          </Carousel.Slide>
-        ))}
-      </Carousel>
+      <div className="w-full max-w-md">
+        <Carousel aria-label="공지 배너" carousel={carousel}>
+          {notices.map((notice) => (
+            <Carousel.Slide key={notice}>
+              <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-32 items-center justify-center px-16 text-center">
+                {notice}
+              </p>
+            </Carousel.Slide>
+          ))}
+        </Carousel>
+      </div>
     );
   },
   parameters: {
@@ -478,17 +523,19 @@ export const FlowLogosWithoutStopping: Story = {
     });
 
     return (
-      <Carousel aria-label="후원 단체" carousel={carousel} className="w-full max-w-2xl">
-        <Carousel.Content className="gap-3">
+      <div className="w-full max-w-2xl">
+        <Carousel aria-label="후원 단체" carousel={carousel}>
           {products.map((product) => (
             <Carousel.Slide key={product.id}>
-              <div className="rounded-container text-body-b3-medium bg-neutral-soft flex h-20 items-center justify-center">
-                {product.name}
+              <div className="px-1.5">
+                <div className="rounded-container text-body-b3-medium bg-neutral-soft flex h-20 items-center justify-center">
+                  {product.name}
+                </div>
               </div>
             </Carousel.Slide>
           ))}
-        </Carousel.Content>
-      </Carousel>
+        </Carousel>
+      </div>
     );
   },
   parameters: {
@@ -516,8 +563,8 @@ export const FlowLogosWithoutStopping: Story = {
 
 export const StackNoticesVertically: Story = {
   render: () => (
-    <Carousel aria-label="오늘의 공지" orientation="vertical" className="w-full max-w-sm">
-      <Carousel.Content className="h-40">
+    <div className="h-52 w-full max-w-sm">
+      <Carousel aria-label="오늘의 공지" orientation="vertical">
         {notices.map((notice) => (
           <Carousel.Slide key={notice}>
             <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-full items-center justify-center px-6 text-center">
@@ -525,14 +572,14 @@ export const StackNoticesVertically: Story = {
             </p>
           </Carousel.Slide>
         ))}
-      </Carousel.Content>
-    </Carousel>
+      </Carousel>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '`orientation="vertical"` 이면 위아래로 넘기고 `↑` `↓` 로 옮깁니다. 세로는 `Carousel.Content` 에 높이를 줍니다.',
+          '`orientation="vertical"` 이면 위아래로 넘기고 `↑` `↓` 로 옮깁니다. 세로는 캐러셀을 감싼 부모가 높이를 주고, 캐러셀이 그 높이를 채웁니다.',
       },
     },
   },
@@ -559,39 +606,44 @@ export const PlaceYourOwnControls: Story = {
     const carousel = useCarousel({ slides: { perView: 3, loop: true } });
 
     return (
-      <Carousel
-        aria-labelledby={titleId}
-        value={index}
-        onValueChange={setIndex}
-        carousel={carousel}
-        className="w-full max-w-2xl"
-      >
-        <div className="flex items-center justify-between">
-          <h2 id={titleId} className="text-headline-h4-bold">
-            추천 상품
-          </h2>
-          <div className="flex gap-2">
-            <Carousel.Prev />
-            <Carousel.Next />
+      <div className="w-full max-w-2xl">
+        <Carousel
+          aria-labelledby={titleId}
+          value={index}
+          onValueChange={setIndex}
+          carousel={carousel}
+        >
+          <div className="flex items-center justify-between">
+            <h2 id={titleId} className="text-headline-h4-bold">
+              추천 상품
+            </h2>
+            <div className="flex gap-2">
+              <Carousel.Prev />
+              <Carousel.Next />
+            </div>
           </div>
-        </div>
-        <Carousel.Content className="gap-4">
-          {products.map((product) => (
-            <Carousel.Slide key={product.id}>
-              <Card>
-                <Card.Media className="aspect-square">
-                  <img src={landscape(product.hue)} alt="" />
-                </Card.Media>
-                <Card.Header>
-                  <Card.Title>{product.name}</Card.Title>
-                  <Card.Description>{product.price}</Card.Description>
-                </Card.Header>
-              </Card>
-            </Carousel.Slide>
-          ))}
-        </Carousel.Content>
-        <Carousel.Indicators className="justify-center" />
-      </Carousel>
+          <Carousel.Content>
+            {products.map((product) => (
+              <Carousel.Slide key={product.id}>
+                <div className="px-2">
+                  <Card>
+                    <Card.Media>
+                      <AspectRatio ratio={1}>
+                        <img src={landscape(product.hue)} alt="" />
+                      </AspectRatio>
+                    </Card.Media>
+                    <Card.Header>
+                      <Card.Title>{product.name}</Card.Title>
+                      <Card.Description>{product.price}</Card.Description>
+                    </Card.Header>
+                  </Card>
+                </div>
+              </Carousel.Slide>
+            ))}
+          </Carousel.Content>
+          <Carousel.Indicators />
+        </Carousel>
+      </div>
     );
   },
   parameters: {

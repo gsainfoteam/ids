@@ -4,9 +4,9 @@
 
 - **블록만.** 문장 속 짧은 코드는 지금처럼 `<code className="font-mono">` 로 씁니다.
 - **서버 HTML 에서 이미 강조.** 강조는 [refractor](https://github.com/wooorm/refractor)(Prism 문법)가 렌더 중에 동기로 합니다. 클라이언트에서 다시 칠하지 않고, 깜빡이지 않습니다.
-- **IDS 토큰 색.** 조각마다 `data-token` 이 붙고 색은 IDS 토큰입니다. 테마와 다크 모드를 따릅니다.
+- **IDS 토큰 색.** 조각의 색은 IDS 토큰입니다. 테마와 다크 모드를 따릅니다.
 - **복사.** 오른쪽 위 IconButton 이 코드를 그대로 클립보드에 넣습니다. 줄 번호는 들어가지 않습니다.
-- **가로 스크롤은 ScrollArea.** 긴 줄은 OS 막대 대신 IDS 막대로 스크롤하고, 루트에 `whitespace-pre-wrap` 을 주면 줄을 바꿉니다.
+- **가로 스크롤은 ScrollArea.** 긴 줄은 줄을 바꾸지 않고 OS 막대 대신 IDS 막대로 스크롤합니다.
 
 ```tsx
 import { CodeBlock } from '@gsainfoteam/ids-react';
@@ -20,6 +20,19 @@ import { CodeBlock } from '@gsainfoteam/ids-react';
 </CodeBlock>
 ```
 
+## 크기
+
+- **fill.** CodeBlock 은 부모의 폭을 채우고(`w-full min-w-0`), 높이는 코드 줄 수만큼입니다. 폭은 CodeBlock 을 감싼 요소가 정합니다.
+
+```tsx
+<div className="w-full max-w-2xl">
+  <CodeBlock language="tsx">{code}</CodeBlock>
+</div>
+```
+
+- 가로 flex 안에서는 CodeBlock 을 담은 flex 항목에 `min-w-0` 을 줍니다. 그러지 않으면 그 항목이 가장 긴 줄만큼 넓어집니다.
+- 높이를 줄이려면 `collapsedLines` 로 접습니다. 부모가 높이를 정해도 CodeBlock 은 세로로 스크롤하지 않습니다.
+
 ## 구성
 
 ```tsx
@@ -29,7 +42,7 @@ import { CodeBlock } from '@gsainfoteam/ids-react';
   <button aria-label="코드 복사" /> {/* IconButton */}
   <pre>                          {/* ScrollArea.Viewport */}
     <code>
-      <span data-line="1">...</span>
+      <span>...</span>     {/* 줄마다 하나 */}
       ...
     </code>
   </pre>
@@ -75,7 +88,7 @@ const answer = 42;
 
 ## 색
 
-| `data-token`  | Prism 토큰                                          | 색                     |
+| 종류          | Prism 토큰                                          | 색                     |
 | ------------- | --------------------------------------------------- | ---------------------- |
 | `comment`     | comment, prolog, doctype, cdata                     | `text-neutral`, 기울임     |
 | `keyword`     | keyword, atrule, rule, important                    | `text-primary`       |
@@ -90,7 +103,6 @@ const answer = 42;
 
 - 한 조각에 여러 Prism 토큰이 겹치면 가장 안쪽 토큰, 그 안에서는 먼저 적힌 클래스를 씁니다.
 - 문법 색은 테마의 세 브랜드 색(primary, secondary, tertiary)과 success, warning 입니다. 브랜드 색을 바꾸면 코드 색도 따라 바뀝니다. diff 의 `+`, `-` 만 의미 색(success, danger)을 씁니다.
-- 색을 바꾸려면 `data-token` 으로 고릅니다: `className="[&_[data-token=keyword]]:text-info"`.
 
 ## 제목
 
@@ -119,20 +131,17 @@ const answer = 42;
 - `CodeBlock.LineNumbers` 를 두면 줄 번호가 붙습니다. 파트 자체는 아무것도 그리지 않고, 루트가 줄마다 번호를 붙입니다.
 - 줄 번호는 `::before` 의 CSS counter 입니다(`content: counter(line) / ''`). 글자가 아니라서 골라 복사해도 섞이지 않고, 대체 텍스트가 빈 문자열이라 스크린 리더도 읽지 않습니다.
 - 번호 칸의 폭은 줄 수의 자릿수(`--code-block-digits`, `ch` 단위)입니다.
-- 강조한 줄은 `data-highlighted` 를 받고 바탕(outline 은 `bg-neutral-soft`, soft 는 `bg-base`)과 왼쪽 2px `primary` 막대로 보입니다. 글자 대비를 크게 해치지 않는 옅은 바탕입니다.
-- 줄마다 `data-line` 에 1부터 센 번호가 있습니다.
+- 강조한 줄은 바탕(outline 은 `bg-neutral-soft`, soft 는 `bg-base`)과 왼쪽 2px `primary` 막대로 보입니다. 글자 대비를 크게 해치지 않는 옅은 바탕입니다.
 
 ## 넘침
 
 ```tsx
-<CodeBlock language="ts" />                                  // 긴 줄은 가로로 스크롤한다
-<CodeBlock language="ts" className="whitespace-pre-wrap" />  // 줄을 바꾼다
+<CodeBlock language="ts" />   // 긴 줄은 가로로 스크롤한다
 ```
 
 - 가로 스크롤은 `ScrollArea` 의 `orientation="horizontal"` 이고 `<pre>` 가 viewport 입니다. 넘치면 `<pre>` 가 Tab 멈춤(`tabIndex={0}`)을 받아 화살표 키로 스크롤합니다.
 - 강조한 줄의 바탕은 스크롤한 폭 끝까지 이어집니다. `<code>` 가 가장 긴 줄의 폭(`w-fit min-w-full`)입니다.
-- 루트가 `white-space: pre` 이고 `<pre>` 와 `<code>` 가 그 값을 물려받습니다. 루트에 `whitespace-pre-wrap` 을 주면 줄을 바꾸고, `<code>` 의 `overflow-wrap: anywhere` 로 띄어쓰기 없는 긴 낱말도 자릅니다. 바뀐 줄은 줄 번호 뒤에서 이어집니다.
-- 가로 flex 안에 두면 CodeBlock 을 담은 flex 항목에 `min-w-0` 을 줍니다. 그러지 않으면 `<pre>` 처럼 가장 긴 줄만큼 넓어집니다.
+- 줄은 바꾸지 않습니다(`white-space: pre`).
 - CodeBlock 은 세로로 스크롤하지 않습니다. 긴 코드는 아래처럼 접습니다.
 
 ## 접기
@@ -147,7 +156,6 @@ const answer = 42;
 - 아래 가운데의 `Button`(outline, tiny)이 "N줄 더 보기" 와 "접기" 를 오갑니다. `aria-expanded` 와 `aria-controls`(`<pre>`)가 붙습니다.
 - 접을 때 버튼이 화면 밖으로 밀려나면 버튼이 보이게 스크롤합니다.
 - 줄 수는 서버에서 셉니다. 서버 HTML 부터 접힌 채로 오고, 크기를 재지 않아 hydration 뒤에 높이가 바뀌지 않습니다.
-- 줄을 바꾸면(`whitespace-pre-wrap`) 바뀐 줄도 한 줄로 셉니다. 보이는 높이는 `collapsedLines` 줄 높이 그대로입니다.
 - 접혀 있어도 복사 버튼은 코드 전체를 복사합니다.
 
 ## 복사
@@ -160,7 +168,7 @@ const answer = 42;
 ```
 
 - 기본 이름은 "코드 복사", 복사한 뒤 1.5초 동안 "복사했습니다" 입니다. `aria-label` 을 주면 그 이름을 그대로 씁니다.
-- 복사하면 아이콘이 체크로 바뀌고 `data-copied` 가 붙으며, `role="status"` 로 "복사했습니다" 를 알립니다.
+- 복사하면 아이콘이 체크로 바뀌고, `role="status"` 로 "복사했습니다" 를 알립니다.
 - 복사하는 것은 넘긴 코드 문자열 그대로입니다. 줄 번호도 강조도 들어가지 않습니다.
 - `navigator.clipboard.writeText` 가 없는 곳(보안 컨텍스트가 아닌 http)에서는 그리지 않습니다. 서버 HTML 에도 없고, hydration 뒤에 나타납니다. 자리를 차지하지 않는 절대 위치라 레이아웃이 밀리지 않습니다.
 - 버튼은 IconButton `outline`, `tiny` 입니다. `children` 에 아이콘을 넣으면 그 아이콘을 씁니다. `onClick` 은 복사 전에 불리고 `preventDefault` 하면 복사하지 않습니다.
@@ -180,16 +188,7 @@ const answer = 42;
 
 ## 상태
 
-| 속성                 | 붙는 곳     | 뜻                          |
-| -------------------- | ----------- | --------------------------- |
-| `data-variant`       | root        | 넘긴 값                     |
-| `data-language`      | root        | 넘긴 `language`             |
-| `data-line-numbers`  | root        | `CodeBlock.LineNumbers` 를 둘 때 |
-| `data-collapsed`     | root        | 접혀 있을 때                |
-| `data-line`          | 줄          | 1부터 센 줄 번호            |
-| `data-highlighted`   | 줄          | `highlight` 에 든 줄        |
-| `data-token`         | 강조한 조각 | 위 색 표의 이름             |
-| `data-copied`        | 복사 버튼   | 복사한 뒤 1.5초             |
+- 앱이 읽는 상태는 펼침 하나입니다. `expanded` / `defaultExpanded` / `onExpandedChange` 로 읽고 바꿉니다.
 
 ## Props
 

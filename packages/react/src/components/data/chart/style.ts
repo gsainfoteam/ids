@@ -4,7 +4,7 @@ import type { ChartIndicator } from './config';
 
 export const chartStyle = tv({
   slots: {
-    root: 'm-0 flex min-h-0 min-w-0 flex-col gap-4 text-neutral-strong',
+    root: 'm-0 flex h-full min-h-0 w-full min-w-0 flex-col gap-4 text-neutral-strong',
     caption: 'flex flex-col gap-1',
     title: 'text-body-b2-semibold [overflow-wrap:anywhere]',
     description: 'text-body-b3-regular text-neutral',
