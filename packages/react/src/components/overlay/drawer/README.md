@@ -74,8 +74,8 @@ import { Drawer } from '@gsainfoteam/ids-react';
   - 입력 요소(`input`, `textarea`, `select`, `contenteditable`)에서 시작했을 때
   - 글자를 선택해 둔 채로 눌렀을 때
   - `data-drawer-no-drag` 가 붙은 요소 안에서 시작했을 때(지도, 캔버스, 슬라이더 영역)
-  - ScrollArea 의 막대(`data-scroll-area-scrollbar`)에서 시작했을 때. 막대를 끌면 내용이 스크롤됩니다.
-  - 크기 조절 핸들(`data-resize-handle`)에서 시작했을 때. 핸들을 끌면 크기가 바뀝니다.
+  - ScrollArea 의 막대에서 시작했을 때. 막대를 끌면 내용이 스크롤됩니다.
+  - 크기 조절 핸들에서 시작했을 때. 핸들을 끌면 크기가 바뀝니다.
   - 안에 뜬 다른 레이어(Select 시트, Popover)에서 시작했을 때
 - 터치가 취소되면(`pointercancel`) 제자리로 돌아갑니다.
 - `dismissible={false}` 면 끌어도 닫히지 않고 돌아옵니다.
@@ -156,20 +156,15 @@ const choice = await overlay.open<string>(({ close }) => (
 ## 겹쳐 열기
 
 - Drawer 안에서 연 Drawer, Dialog, Select 시트는 위에 쌓입니다. Escape 는 맨 위부터 하나씩 닫습니다.
-- 위에 modal 이 열리면 아래 Drawer 는 `scale((W - 16) / W)` 로 작아지고 자기 축을 따라 16px 안쪽으로 물러납니다(`data-nested-open`).
+- 위에 modal 이 열리면 아래 Drawer 는 `scale((W - 16) / W)` 로 작아지고 자기 축을 따라 16px 안쪽으로 물러납니다.
 - 가장 아래 Drawer 만 배경을 어둡고 흐리게 합니다.
 - modal 을 세 개 이상 겹치면 개발 모드에서 경고합니다.
 
 ## 상태
 
-| 속성                | 붙는 곳                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `data-side`         | `Drawer.Content`, 배경                                     |
-| `data-open`         | `Drawer.Content`                                           |
-| `data-ending-style` | `Drawer.Content`, 배경. 닫히는 애니메이션 동안             |
-| `data-nested-open`  | 위에 다른 modal 이 열린 `Drawer.Content`                   |
-| `data-dragging`     | 시트를 끄는 동안의 `Drawer.Content`, `Drawer.Handle`, 배경 |
-| `data-popup-open`   | 열려 있는 동안의 `Drawer.Trigger`                          |
+- 열림: `open` / `onOpenChange`. 열고 닫는 애니메이션이 끝난 때는 `onOpenChangeComplete` 로 압니다.
+- 멈춘 높이: `useDrawer` 결과의 `drawer.snap.value`, 바뀔 때는 `snap.onValueChange`.
+- 끄는 중인지, 위에 다른 modal 이 열렸는지는 읽는 길이 없습니다.
 
 ## 속성
 

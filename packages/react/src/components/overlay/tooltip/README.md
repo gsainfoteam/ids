@@ -51,7 +51,7 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 <Tooltip.Content sideOffset={10} />     // trigger 와의 간격, 기본 6px
 ```
 
-- 들어갈 자리가 없으면 반대쪽으로 넘어가고, 화면 가장자리에서 8px 안쪽에 머뭅니다. 실제로 놓인 쪽은 `data-side` 로 알 수 있습니다.
+- 들어갈 자리가 없으면 반대쪽으로 넘어가고, 화면 가장자리에서 8px 안쪽에 머뭅니다.
 - 폭은 내용만큼이고 `max-w-xs` 에서 줄바꿈합니다. 바꾸려면 `Tooltip.Content` 에 `className` 을 줍니다.
 
 ## 단축키
@@ -112,14 +112,8 @@ import { TooltipDelayGroup } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-| 속성                | 붙는 곳                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `data-side`         | `Tooltip.Content`. 실제로 놓인 쪽                          |
-| `data-align`        | `Tooltip.Content`                                          |
-| `data-open`         | 열려 있는 `Tooltip.Content`                                |
-| `data-ending-style` | `Tooltip.Content`. 닫히는 애니메이션 동안                  |
-| `data-instant`      | 그룹에서 바로 이어 열린 `Tooltip.Content`. 애니메이션 없음 |
-| `data-popup-open`   | 열려 있는 동안의 trigger                                   |
+- 열림: `open` / `onOpenChange`.
+- 실제로 놓인 쪽과 정렬은 읽는 길이 없습니다.
 
 ## 속성
 

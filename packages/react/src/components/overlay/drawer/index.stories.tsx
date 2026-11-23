@@ -292,7 +292,7 @@ export const StackADrawerOnADrawer: Story = {
     docs: {
       description: {
         story:
-          '서랍 안에 Drawer 를 하나 더 쓰면 위에 쌓이고, 아래 서랍은 `data-nested-open` 을 받아 뒤로 물러납니다. Escape 는 맨 위 서랍만 닫습니다.',
+          '서랍 안에 Drawer 를 하나 더 쓰면 위에 쌓이고, 아래 서랍은 뒤로 물러납니다. Escape 는 맨 위 서랍만 닫습니다.',
       },
     },
   },

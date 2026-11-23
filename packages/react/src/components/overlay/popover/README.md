@@ -61,7 +61,7 @@ import { Popover } from '@gsainfoteam/ids-react';
 </Popover.Content>
 ```
 
-- 놓인 쪽은 `data-side`, `data-align` 으로 읽습니다. 들어오는 애니메이션도 그쪽에서 자랍니다.
+- 들어오는 애니메이션은 실제로 놓인 쪽에서 자랍니다.
 - `anchor` 를 줘도 trigger 가 있으면 누르기와 포커스 되돌리기는 trigger 기준입니다.
 
 ## 열고 닫기
@@ -75,7 +75,7 @@ import { Popover } from '@gsainfoteam/ids-react';
 
 - 포커스를 옮길 곳은 `initialFocus` 선택자, 그다음 `[data-popup-autofocus]` 요소입니다. 둘 다 없으면 옮기지 않습니다.
 - 닫힐 때 포커스가 패널 안에 있었으면 trigger 로 돌아갑니다. 바깥을 눌러 닫으면 누른 곳에 남습니다.
-- 닫히는 애니메이션이 끝날 때까지 요소가 남습니다(`data-ending-style`).
+- 닫히는 애니메이션이 끝날 때까지 요소가 남습니다. 끝난 때는 `onOpenChangeComplete(false)` 로 압니다.
 
 ## hover
 
@@ -132,13 +132,8 @@ const color = await overlay.open<string>(({ close }) => (
 
 ## 상태
 
-| 속성                | 붙는 곳                                                          |
-| ------------------- | ---------------------------------------------------------------- |
-| `data-open`         | `Popover.Content`                                                |
-| `data-ending-style` | `Popover.Content`. 닫히는 애니메이션 동안                        |
-| `data-side`         | `Popover.Content`. 실제로 놓인 쪽(`top` `right` `bottom` `left`) |
-| `data-align`        | `Popover.Content`. 실제 정렬(`start` `center` `end`)             |
-| `data-popup-open`   | 열려 있는 동안의 `Popover.Trigger`                               |
+- 열림: `open` / `onOpenChange`. 열고 닫는 애니메이션이 끝난 때는 `onOpenChangeComplete` 로 압니다.
+- 들어갈 자리가 없어 실제로 놓인 쪽과 정렬은 읽는 길이 없습니다.
 
 ## 속성
 
