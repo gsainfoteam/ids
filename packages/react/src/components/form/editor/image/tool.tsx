@@ -8,7 +8,7 @@ import { noop } from 'es-toolkit';
 import { useInternalEditorContext } from '../context';
 import { IMAGE_ACCEPT } from './types';
 import { useInternalTranslate } from '../../../../internal/translate';
-import { isDevelopment } from '../../../../utils/dev';
+import { warnOnce } from '../../../../utils/dev';
 import { Button } from '../../../action/button';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Spinner } from '../../../feedback/spinner';
@@ -33,12 +33,8 @@ const IMAGE = {
   can: () => true,
 };
 
-let warnedWithoutUpload = false;
-
 function warnThereIsNoUpload() {
-  if (!isDevelopment || warnedWithoutUpload) return;
-  warnedWithoutUpload = true;
-  console.warn(
+  warnOnce(
     '`<Editor.Image>` renders nothing without `onImageUpload` on `<Editor>`, since the image would have nowhere to go.',
   );
 }

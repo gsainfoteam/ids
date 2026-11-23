@@ -3,7 +3,7 @@
 import { use, type MouseEvent, type ReactElement } from 'react';
 
 import { useInternalTranslate } from '../../../../internal/translate';
-import { isDevelopment } from '../../../../utils/dev';
+import { warnOnce } from '../../../../utils/dev';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Tooltip } from '../../../overlay/tooltip';
 import { Kbd } from '../../../typography/kbd';
@@ -35,12 +35,8 @@ export type EditorToggleSpec = {
 export const hasExtension = (editor: TiptapEditor, name: string) =>
   editor.extensionManager.extensions.some((extension) => extension.name === name);
 
-const warned = new Set<string>();
-
 function warnTheExtensionIsMissing(part: string) {
-  if (!isDevelopment || warned.has(part)) return;
-  warned.add(part);
-  console.warn(
+  warnOnce(
     `\`<Editor.${part}>\` found no extension to drive. Place it directly in \`<Editor>\` or \`<Editor.BubbleMenu>\`, not inside a component of your own, so Editor sees it and loads the extension.`,
   );
 }

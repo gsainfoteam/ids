@@ -15,7 +15,7 @@
 | [`part.ts`](#partts)           | 요소나 `asChild` 자식으로 파트 하나를 그리는 함수     | 파트가 많은 필드(Select, ChipField 등)                 |
 | [`dom.ts`](#domts)             | 이벤트 target 판별, 포커스를 두는 pointer 핸들러, pointer capture | 팝업을 여는 필드, `internal/field-popup`, 끄는 컴포넌트 |
 | [`invariant.ts`](#invariantts) | 잘못된 사용에 `IdsError` 를 던지는 assert             | 거의 모든 컴포넌트와 `internal/`                       |
-| [`dev.ts`](#devts)             | 개발 빌드인지 알려 주는 `isDevelopment`               | 개발 경고를 내는 모든 곳                               |
+| [`dev.ts`](#devts)             | `isDevelopment`, 한 번만 내는 경고 `warnOnce`          | 개발 경고를 내는 모든 곳                               |
 
 ## cn.ts
 
@@ -278,7 +278,7 @@ function useInternalTemporal(part: string) {
 
 ## dev.ts
 
-개발 빌드인지 알려 주는 `isDevelopment` 상수입니다.
+개발 빌드인지 알려 주는 `isDevelopment` 상수와, 같은 경고를 페이지에서 한 번만 내는 `warnOnce` 입니다.
 
 ### 쓰는 곳
 
@@ -306,3 +306,5 @@ useLayoutEffect(() => {
 
 - `process.env.NODE_ENV` 를 이 모양 그대로 둡니다. bundler 는 이 표현식을 글자 그대로 찾아 바꾸므로 `const { env } = process` 처럼 풀어 쓰면 바뀌지 않습니다.
 - 값은 모듈을 불러올 때 한 번 읽습니다.
+- `warnOnce(message, about = message)` 는 `about` 이 같은 경고를 페이지가 사는 동안 한 번만 냅니다. 렌더마다 부르는 모듈 수준 경고(Editor 의 도구, icon 이름)에 씁니다. 인스턴스마다 한 번 내야 하는 경고(Tooltip, Button)는 그 컴포넌트의 `useRef` 로 막습니다.
+- `about` 을 따로 주면 메시지가 달라도 한 번만 냅니다. icon 이름 경고는 아이콘마다 이름이 달라도 첫 번째만 냅니다.
