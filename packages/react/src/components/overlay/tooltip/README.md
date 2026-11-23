@@ -11,8 +11,11 @@
 ```tsx
 import { Tooltip } from '@gsainfoteam/ids-react';
 
-<Tooltip content="변경 사항 저장">
-  <Button>저장</Button>
+<Tooltip>
+  <Tooltip.Trigger asChild>
+    <Button>저장</Button>
+  </Tooltip.Trigger>
+  <Tooltip.Content>변경 사항 저장</Tooltip.Content>
 </Tooltip>;
 ```
 
@@ -23,7 +26,7 @@ import { Tooltip } from '@gsainfoteam/ids-react';
   <Tooltip.Trigger asChild>
     <IconButton aria-label="공유" icon={<ShareIcon />} />
   </Tooltip.Trigger>
-  <Tooltip.Content>
+  <Tooltip.Content side="bottom">
     링크 복사
     <Tooltip.Arrow />
   </Tooltip.Content>
@@ -33,19 +36,19 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 | 파트              | 역할                                                                      |
 | ----------------- | ------------------------------------------------------------------------- |
 | `Tooltip.Trigger` | 툴팁을 여는 요소. 기본은 `button`, `asChild` 로 자식 요소에 붙인다        |
-| `Tooltip.Content` | 말풍선. 닫혀 있으면 렌더하지 않는다. `className`, `style` 을 받는다       |
-| `Tooltip.Arrow`   | 말풍선의 꼬리. trigger 쪽을 가리키고, 말풍선 모서리에서 8px 안쪽에 머문다 |
+| `Tooltip.Content` | 말풍선. 닫혀 있으면 렌더하지 않는다. 위치(`side`, `align`, `sideOffset`)와 `className`, `style` 을 받는다 |
+| `Tooltip.Arrow`   | 말풍선의 꼬리. 넣을 때만 그린다. trigger 쪽을 가리키고, 말풍선 모서리에서 8px 안쪽에 머문다 |
 
-- `content` 를 주면 짧은 형태입니다. 자식 요소 하나가 trigger 가 되고, `arrow` 로 꼬리를 붙입니다.
+- `Tooltip` 은 열림 상태와 지연만 정하고, 무엇을 어디에 그릴지는 파트가 정합니다.
 - trigger 는 ref 와 이벤트를 받는 요소여야 합니다. IDS 컴포넌트는 모두 받습니다.
 - 자식이 원래 가진 `aria-describedby` 는 지우지 않고 툴팁 id 를 뒤에 붙입니다.
 
 ## 위치
 
 ```tsx
-<Tooltip side="bottom" />               // 'top'(기본) | 'right' | 'bottom' | 'left'
-<Tooltip align="start" />               // 'start' | 'center'(기본) | 'end'
-<Tooltip sideOffset={10} />             // trigger 와의 간격, 기본 6px
+<Tooltip.Content side="bottom" />       // 'top'(기본) | 'right' | 'bottom' | 'left'
+<Tooltip.Content align="start" />       // 'start' | 'center'(기본) | 'end'
+<Tooltip.Content sideOffset={10} />     // trigger 와의 간격, 기본 6px
 ```
 
 - 들어갈 자리가 없으면 반대쪽으로 넘어가고, 화면 가장자리에서 8px 안쪽에 머뭅니다. 실제로 놓인 쪽은 `data-side` 로 알 수 있습니다.
@@ -54,8 +57,14 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 ## 단축키
 
 ```tsx
-<Tooltip content={<>저장<Kbd keys="Mod+S" /></>}>
-  <IconButton icon={<DocumentIcon />} aria-label="저장" />
+<Tooltip>
+  <Tooltip.Trigger asChild>
+    <IconButton icon={<DocumentIcon />} aria-label="저장" />
+  </Tooltip.Trigger>
+  <Tooltip.Content>
+    저장
+    <Kbd keys="Mod+S" />
+  </Tooltip.Content>
 </Tooltip>
 ```
 
@@ -91,14 +100,20 @@ import { TooltipDelayGroup } from '@gsainfoteam/ids-react';
 ## 비활성 trigger
 
 ```tsx
-<Tooltip content="권한이 없어 삭제할 수 없습니다">
-  <span tabIndex={0} className="inline-flex">
-    <Button disabled className="pointer-events-none">삭제</Button>
-  </span>
+<Tooltip>
+  <Tooltip.Trigger asChild>
+    <span tabIndex={0} className="inline-flex">
+      <Button disabled className="pointer-events-none">삭제</Button>
+    </span>
+  </Tooltip.Trigger>
+  <Tooltip.Content>권한이 없어 삭제할 수 없습니다</Tooltip.Content>
 </Tooltip>
 
-<Tooltip content="권한이 없어 삭제할 수 없습니다">
-  <Button disabled focusableWhenDisabled>삭제</Button>
+<Tooltip>
+  <Tooltip.Trigger asChild>
+    <Button disabled focusableWhenDisabled>삭제</Button>
+  </Tooltip.Trigger>
+  <Tooltip.Content>권한이 없어 삭제할 수 없습니다</Tooltip.Content>
 </Tooltip>
 ```
 
@@ -119,14 +134,17 @@ import { TooltipDelayGroup } from '@gsainfoteam/ids-react';
 
 | 속성                       | 기본 / 동작                                   |
 | -------------------------- | --------------------------------------------- |
-| `content`                  | 짧은 형태의 내용. 주면 자식이 trigger 가 된다 |
-| `arrow`                    | 짧은 형태에서 꼬리를 붙인다. 기본 `false`     |
 | `open` / `defaultOpen`     | 열림 상태. 기본 `false`                       |
 | `onOpenChange`             | 열거나 닫으려 할 때                           |
-| `side` / `align`           | 기본 `top` / `center`                         |
-| `sideOffset`               | 기본 6                                        |
 | `openDelay` / `closeDelay` | 기본은 그룹의 값(600 / 0). 그룹이 없어도 같다 |
 | `disabled`                 | 열리지 않는다. `open` 이어도 숨긴다           |
+
+`Tooltip.Content` 의 위치:
+
+| 속성             | 기본 / 동작           |
+| ---------------- | --------------------- |
+| `side` / `align` | 기본 `top` / `center` |
+| `sideOffset`     | 기본 6                |
 
 ## 알아둘 것
 

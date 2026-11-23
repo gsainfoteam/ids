@@ -69,29 +69,27 @@ export function SidebarTrigger({
   const onlyOpensTheDrawer = !controls.collapsible;
 
   return (
-    <Tooltip
-      side={controls.inside ? 'right' : 'bottom'}
-      content={
-        <>
-          {label}
-          {controls.shortcut && <Kbd keys={controls.shortcut} />}
-        </>
-      }
-    >
-      <IconButton
-        size="tiny"
-        {...props}
-        variant={variant}
-        aria-label={props['aria-label'] ?? label}
-        aria-expanded={expanded}
-        icon={icon ?? defaultIcon}
-        data-sidebar-trigger=""
-        className={cn(onlyOpensTheDrawer && 'sm:hidden', className)}
-        onClick={(event: MouseEvent<HTMLButtonElement>) => {
-          onClick?.(event);
-          if (!event.defaultPrevented) toggleSidebar(controls, small);
-        }}
-      />
+    <Tooltip>
+      <Tooltip.Trigger asChild>
+        <IconButton
+          size="tiny"
+          {...props}
+          variant={variant}
+          aria-label={props['aria-label'] ?? label}
+          aria-expanded={expanded}
+          icon={icon ?? defaultIcon}
+          data-sidebar-trigger=""
+          className={cn(onlyOpensTheDrawer && 'sm:hidden', className)}
+          onClick={(event: MouseEvent<HTMLButtonElement>) => {
+            onClick?.(event);
+            if (!event.defaultPrevented) toggleSidebar(controls, small);
+          }}
+        />
+      </Tooltip.Trigger>
+      <Tooltip.Content side={controls.inside ? 'right' : 'bottom'}>
+        {label}
+        {controls.shortcut && <Kbd keys={controls.shortcut} />}
+      </Tooltip.Content>
     </Tooltip>
   );
 }
