@@ -2,6 +2,7 @@
 
 아이콘, 버튼, 아바타의 모서리에 붙는 카운트나 상태 점입니다. 붙을 요소 하나를 children 으로 감쌉니다. 글 흐름 안의 라벨, 숫자, 점은 `Chip` 을 씁니다.
 
+- **크기는 감싼 요소를 따른다(hug).** Badge 는 감싼 요소 하나만큼 자리를 차지하고, 배지는 그 위에 떠 있어 자리를 늘리지 않습니다. 폭과 높이는 감싼 요소나 Badge 를 둘러싼 앱 요소가 정합니다.
 - **위치는 Badge가 잡는다.** 부모에 `relative` 를 줄 필요 없이 감싼 요소의 모서리를 찾아갑니다. 위치 이름은 논리 방향이라 오른쪽에서 왼쪽으로 쓰는 문서에서는 알아서 뒤집힙니다.
 - **둥근 대상.** 감싼 요소의 모서리를 재서 그 곡선 위에 붙습니다. 동그란 `Avatar`, 둥근 버튼, 카드 모두 모서리 허공이 아니라 가장자리에 붙습니다.
 - **요소 하나를 감싼다.** children 은 요소 하나입니다. 글자, 여러 요소, 빈 값을 주면 `Children.only` 가 오류를 던집니다. `{open && <X />}` 처럼 조건으로 비울 수 있는 자리는 Badge 바깥에서 고릅니다.
@@ -30,7 +31,7 @@ import { Badge } from '@gsainfoteam/ids-react';
 ```
 
 - 음수와 소수는 0 이상의 정수로 셉니다.
-- 숫자가 `max` 를 넘으면 `data-overflow` 가 붙습니다.
+- 숫자가 `max` 를 넘으면 상태의 `overflowed` 가 `true` 입니다.
 
 ## 점
 
@@ -111,17 +112,19 @@ import { Badge } from '@gsainfoteam/ids-react';
 - `primary` 의 `soft` 는 `bg-primary-soft` 배경에 `text-on-primary-soft` 글자, `outline` 은 `text-primary` 글자입니다. 밝은 테마 색에서도 soft 는 APCA Lc 75, outline 은 Lc 60 을 지킵니다.
 - 상태 색의 `soft` 와 `outline` 글자는 `*-strong` 입니다.
 
-## 상태와 data 속성
+## 상태
 
-| 속성             | 붙는 곳 | 뜻                                |
-| ---------------- | ------- | --------------------------------- |
-| `data-badge`     | 루트    | Badge                             |
-| `data-placement` | 루트    | 위치                              |
-| `data-invisible` | 배지    | 0이거나 `invisible` 이라 감춰졌다 |
-| `data-overflow`  | 배지    | 숫자가 `max` 를 넘었다            |
-| `data-dot`       | 배지    | `content` 가 없어 점이다          |
+앱이 실행 중에 배지 상태를 읽는 길은 앱이 넘긴 prop 과 상태 함수입니다.
 
-`className`, `style` 은 `{ count, dot, invisible, overflowed }` 를 받는 함수가 될 수 있습니다.
+- 위치, 숨김, 값은 앱이 넘긴 `placement`, `invisible`, `content`, `max`, `showZero` 그대로입니다.
+- `className`, `style` 은 `{ count, dot, invisible, overflowed }` 를 받는 함수가 될 수 있습니다.
+
+| 상태         | 뜻                                |
+| ------------ | --------------------------------- |
+| `count`      | 숫자 `content` 를 센 값           |
+| `dot`        | `content` 가 없어 점이다          |
+| `invisible`  | 0이거나 `invisible` 이라 감춰졌다 |
+| `overflowed` | 숫자가 `max` 를 넘었다            |
 
 ## 속성
 

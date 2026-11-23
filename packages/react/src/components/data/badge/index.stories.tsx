@@ -139,7 +139,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="card">
           <Badge content="New" colorScheme="primary">
-            <Card variant="outline" className="w-48">
+            <Card variant="outline">
               <Card.Header>
                 <Card.Title>새 공지</Card.Title>
                 <Card.Description>오늘 올라온 글</Card.Description>
@@ -454,14 +454,14 @@ export const EveryCorner: Story = {
                     ),
                     toggle: <Toggle variant="outline">굵게</Toggle>,
                     card: (
-                      <Card variant="outline" className="w-32">
+                      <Card variant="outline">
                         <Card.Header>
                           <Card.Title>공지</Card.Title>
                         </Card.Header>
                       </Card>
                     ),
                     item: (
-                      <Item variant="outline" className="w-32">
+                      <Item variant="outline">
                         <Item.Content>
                           <Item.Title>받은 편지함</Item.Title>
                         </Item.Content>
