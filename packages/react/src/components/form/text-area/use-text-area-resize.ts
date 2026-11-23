@@ -8,16 +8,16 @@ import {
   type ResizeDimension,
 } from '../../../internal/resize-handle';
 
-import type { TextAreaResize } from './use-text-area';
+import type { TextAreaHandle } from './use-text-area';
 
 export type UseTextAreaResizeOptions = {
-  resize: TextAreaResize;
+  resize: TextAreaHandle;
   disabled: boolean;
   shellId: string;
   inputId: string;
 };
 
-const RESIZES: Record<TextAreaResize, readonly ResizeDimension[]> = {
+const RESIZES: Record<TextAreaHandle, readonly ResizeDimension[]> = {
   none: [],
   vertical: ['height'],
   horizontal: ['width'],

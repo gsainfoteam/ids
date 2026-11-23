@@ -227,7 +227,6 @@ export function PromptInputRoot({
             rows={rows}
             minRows={minRows}
             maxRows={maxRows}
-            divided={false}
             className={styles.textArea()}
           >
             {top}

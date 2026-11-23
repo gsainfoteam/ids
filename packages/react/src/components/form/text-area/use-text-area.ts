@@ -26,7 +26,8 @@ export type TextAreaInputProps = Omit<
   'children' | 'className' | 'style' | 'color'
 >;
 
-export type TextAreaResize = 'none' | 'vertical' | 'horizontal' | 'both';
+export type TextAreaResize = 'auto' | 'none' | 'vertical' | 'horizontal' | 'both';
+export type TextAreaHandle = Exclude<TextAreaResize, 'auto'>;
 
 export type UseTextAreaOptions = {
   rootProps: TextAreaInputProps;
@@ -34,8 +35,6 @@ export type UseTextAreaOptions = {
   disabled?: boolean;
   invalid?: boolean;
   onValueChange?: (value: string) => void;
-  autoResize: boolean;
-  resize?: TextAreaResize;
   minRows?: number;
   maxRows?: number;
   countId?: string;
@@ -54,16 +53,10 @@ export function useTextArea({
   disabled: disabledProp,
   invalid,
   onValueChange,
-  autoResize,
-  resize,
   minRows,
   maxRows,
   countId,
 }: UseTextAreaOptions) {
-  invariant(
-    !autoResize || resize == null || resize === 'none',
-    '`<TextArea>` cannot use `resize` together with `autoResize`.',
-  );
   for (const [name, value] of Object.entries({ minRows, maxRows })) {
     invariant(
       value == null || (Number.isInteger(value) && value > 0),

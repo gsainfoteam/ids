@@ -6,11 +6,12 @@ import {
   type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
 import { ColorFieldClear } from './clear';
-import { ColorFieldContent } from './content';
+import { ColorFieldContent, type ColorFieldContentProps } from './content';
 import { ColorFieldContext } from './context';
 import { isType } from './is-type';
 import { colorFieldStyle } from './style';
@@ -21,17 +22,18 @@ import { FormValue } from '../../../internal/form-value';
 import { resolveState } from '../../../internal/state-props';
 import { useTranslate } from '../../../internal/translate';
 import {
+  containsElementOfType,
   flattenFragments,
   invariant,
   isNodeFromAnyWindow,
   mergeProps,
   mergeRefs,
 } from '../../../utils';
+import { ColorPickerAlphaSlider } from '../../data/color-picker/alpha-slider';
 import { useFieldSize } from '../field/context';
 
 import type { FieldTriggerVariant } from '../../../internal/surfaces/field-surface';
 import type { IdsSize } from '../../../tokens/types';
-import type { ColorPickerSwatchOption } from '../../data/color-picker';
 import type { ColorFormat } from '../../data/color-picker/color';
 
 export type ColorFieldVariant = FieldTriggerVariant;
@@ -53,8 +55,6 @@ export type ColorFieldProps = Omit<
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   format?: ColorFormat;
-  alpha?: boolean;
-  swatches?: ColorPickerSwatchOption[];
   variant?: ColorFieldVariant;
   size?: IdsSize;
   invalid?: boolean;
@@ -64,11 +64,12 @@ export type ColorFieldProps = Omit<
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  mobileVariant?: 'popover' | 'drawer';
   className?: string | ((state: ColorFieldState) => string | undefined);
   style?: CSSProperties;
   children?: ReactNode;
 };
+
+const ALPHA_SLIDER = new Set<unknown>([ColorPickerAlphaSlider]);
 
 const FIRST_CONTROL = [
   '[data-color-picker] input:not([type=radio]):not([tabindex="-1"])',
@@ -81,8 +82,6 @@ export function ColorFieldRoot({
   defaultValue,
   onValueChange,
   format = 'hex',
-  alpha = false,
-  swatches,
   variant = 'outline',
   size,
   invalid,
@@ -93,7 +92,6 @@ export function ColorFieldRoot({
   open,
   defaultOpen,
   onOpenChange,
-  mobileVariant,
   name,
   form,
   className,
@@ -105,6 +103,18 @@ export function ColorFieldRoot({
 }: ColorFieldProps) {
   const t = useTranslate();
   const placeholder = placeholderProp ?? t('colorField.placeholder');
+
+  const nodes = flattenFragments(children);
+  const triggers = nodes.filter(isType(ColorFieldTrigger));
+  const clears = nodes.filter(isType(ColorFieldClear));
+  const contents = nodes.filter(isType(ColorFieldContent));
+  invariant(
+    triggers.length <= 1 && contents.length <= 1 && clears.length <= 1,
+    'ColorField accepts one Trigger, Content and Clear.',
+  );
+  const content = contents[0] as ReactElement<ColorFieldContentProps> | undefined;
+  const alpha = containsElementOfType(content?.props.children, ALPHA_SLIDER);
+  const mobileVariant = content?.props.mobileVariant;
 
   const { rootRef, triggerRef, ...field } = useColorField({
     value,
@@ -172,15 +182,6 @@ export function ColorFieldRoot({
     },
   });
 
-  const nodes = flattenFragments(children);
-  const triggers = nodes.filter(isType(ColorFieldTrigger));
-  const clears = nodes.filter(isType(ColorFieldClear));
-  const contents = nodes.filter(isType(ColorFieldContent));
-  invariant(
-    triggers.length <= 1 && contents.length <= 1 && clears.length <= 1,
-    'ColorField accepts one Trigger, Content and Clear.',
-  );
-
   return (
     <ColorFieldContext
       value={{
@@ -194,7 +195,6 @@ export function ColorFieldRoot({
           onValueChange: actions.change,
           format,
           alpha,
-          swatches,
           size: resolvedSize,
           disabled,
           readOnly,

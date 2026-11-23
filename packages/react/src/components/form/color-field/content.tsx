@@ -3,6 +3,7 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
 import { useColorFieldContext } from './context';
+import { type PopupPresentation } from '../../../internal/field-popup';
 import { ColorPicker } from '../../data/color-picker';
 
 export type ColorFieldContentProps = Omit<
@@ -11,9 +12,15 @@ export type ColorFieldContentProps = Omit<
 > & {
   className?: string;
   children?: ReactNode;
+  mobileVariant?: PopupPresentation;
 };
 
-export function ColorFieldContent({ children, className, ...props }: ColorFieldContentProps) {
+export function ColorFieldContent({
+  children,
+  className,
+  mobileVariant: _readByTheRoot,
+  ...props
+}: ColorFieldContentProps) {
   const c = useColorFieldContext('ColorField.Content');
 
   return (

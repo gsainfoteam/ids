@@ -89,6 +89,10 @@ export function countOf(items: ReactNode[], type: unknown) {
   return items.filter((item) => isValidElement(item) && elementTypeOf(item) === type).length;
 }
 
+export function writesNoneOf(items: ReactNode[], parts: unknown[]) {
+  return !items.some((item) => isValidElement(item) && parts.includes(elementTypeOf(item)));
+}
+
 export function Adornments({
   items,
   own = [],

@@ -10,6 +10,7 @@ import {
   SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
+import { noop } from 'es-toolkit';
 
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
@@ -219,7 +220,7 @@ export const PC: Story = {
                   name="starters"
                   value={starters}
                   onValueChange={setStarters}
-                  creatable
+                  onCreate={noop}
                   placeholder="문장을 적고 Enter"
                 />
               </Field>

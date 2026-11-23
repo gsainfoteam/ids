@@ -3,7 +3,7 @@ import { insetButtons } from '../../../internal/text-control/style';
 import { tv } from '../../../utils';
 
 import type { TextAreaVariant } from '.';
-import type { TextAreaResize } from './use-text-area';
+import type { TextAreaHandle } from './use-text-area';
 import type { IdsSize } from '../../../tokens/types';
 
 export const textAreaStyle = tv({
@@ -61,12 +61,8 @@ export const textAreaStyle = tv({
       },
     } satisfies Record<IdsSize, object>,
     position: {
-      top: {},
-      bottom: {},
-    },
-    divided: {
-      true: {},
-      false: {},
+      top: { bar: 'border-b' },
+      bottom: { bar: 'border-t' },
     },
     resize: {
       none: {},
@@ -79,16 +75,11 @@ export const textAreaStyle = tv({
         root: 'relative min-w-24 overflow-visible',
         input: 'min-h-[calc(1lh+var(--text-area-pad-y)*2)]',
       },
-    } satisfies Record<TextAreaResize, object>,
+    } satisfies Record<TextAreaHandle, object>,
   },
-  compoundVariants: [
-    { divided: true, position: 'top', class: { bar: 'border-b' } },
-    { divided: true, position: 'bottom', class: { bar: 'border-t' } },
-  ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',
     resize: 'none',
-    divided: true,
   },
 });

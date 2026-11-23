@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { CalendarDateTime } from '@internationalized/date';
+import { noop } from 'es-toolkit';
 
 import { Button } from '../../components/action/button';
 import { Card } from '../../components/data/card';
@@ -81,7 +82,7 @@ export const PC: Story = {
                 <ChipField
                   name="tags"
                   defaultValue={['축제', '동아리']}
-                  creatable
+                  onCreate={noop}
                   placeholder="태그 더하기"
                 >
                   {TAGS.map((tag) => (

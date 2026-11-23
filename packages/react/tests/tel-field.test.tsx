@@ -460,9 +460,9 @@ test('format="international" settles a complete number when the field is left', 
   await expect.element(input).toHaveValue('+82 10 1234 5678');
 });
 
-test('country names come from Intl in the given locale and are searchable', async () => {
+test('country names come from Intl in the provider locale, ko-KR by default, and are searchable', async () => {
   const screen = await render(
-    <TelField locale="ko-KR">
+    <TelField>
       <TelField.CountrySelect />
       <TelField.Input />
     </TelField>,
