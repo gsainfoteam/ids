@@ -644,7 +644,7 @@ describe.each(specs)('$control in a plain form', (spec) => {
 
     await expect.poll(entries).toEqual(expected(spec.edited));
 
-    await userEvent.click(page.getByRole('button', { name: 'Reset' }));
+    (page.getByRole('button', { name: 'Reset' }).element() as HTMLButtonElement).click();
 
     await expect.poll(entries).toEqual(expected(spec.defaults));
     await spec.showsDefault();
