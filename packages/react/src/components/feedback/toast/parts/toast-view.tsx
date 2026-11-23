@@ -9,21 +9,13 @@ import { useInternalTranslate } from '../../../../internal/translate';
 import { Button } from '../../../action/button';
 import { IconButton } from '../../../action/icon-button';
 import { Spinner } from '../../spinner';
-import { useInternalToast, type SwipeDirections } from '../hooks/use-toast';
+import { useInternalToast } from '../hooks/use-toast';
+import { swipeDirectionsOf } from '../lib/swipe-directions';
 import { dismissToast, type ToastRecord } from '../lib/toast-store';
 import { toasterStyle } from '../style';
 
 import type { Toaster } from '..';
 import type { ToastPosition } from '../hooks/use-toaster';
-
-function swipeDirectionsOf(placement: Toaster.Placement): SwipeDirections {
-  const [side, align] = placement.split('-');
-
-  return {
-    y: side === 'top' ? -1 : 1,
-    x: align === 'left' ? -1 : align === 'right' ? 1 : 0,
-  };
-}
 
 function toastIcon(record: ToastRecord) {
   if (record.icon !== undefined) return record.icon;
