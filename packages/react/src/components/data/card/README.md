@@ -6,7 +6,7 @@
 - **가장자리까지 채우는 미디어.** `Card.Media` 는 카드의 패딩을 뚫고 가장자리까지 나가고, 닿는 모서리는 카드의 둥근 모서리를 따릅니다. outline 테두리는 가리지 않습니다.
 - **카드 어디를 눌러도 열린다.** `onClick` 만 주면 카드 어디를 눌러도 열리고, 키보드와 스크린 리더에는 `Card.Title` 이 버튼이 됩니다. 설명은 `Card.Description` 입니다. 카드 안에 다른 버튼을 둬도 버튼이 버튼 안에 들어가지 않습니다.
 - **안쪽 버튼은 따로.** 카드 안의 버튼이나 링크를 눌러도 카드의 `onClick` 은 불리지 않습니다.
-- **링크 카드.** `asChild` 로 `<a>` 나 라우터 링크가 카드가 됩니다.
+- **링크 카드.** `asChild` 로 `<a href>` 나 `href` 를 받는 라우터 링크가 카드가 됩니다.
 - **바닥글은 띠.** `Card.Footer` 는 위쪽 선과 옅은 배경을 깐 띠로 카드 바닥을 가장자리까지 채웁니다.
 
 ```tsx
@@ -94,12 +94,15 @@ import { Button, Card } from '@gsainfoteam/ids-react';
   <a href={`/posts/${post.id}`}>...</a>                {/* 링크 그대로. role을 덧씌우지 않는다 */}
 </Card>
 
-<Card asChild interactive>
-  <Link to="/posts/1">...</Link>                       {/* 라우터 링크는 interactive로 알린다 */}
+<Card asChild>
+  <Link href="/posts/1">...</Link>                     {/* href 를 받는 라우터 링크도 같다 */}
 </Card>
 
 <Card onClick={open} disabled />                       {/* 제목 버튼이 disabled, 카드는 aria-disabled */}
 ```
+
+- 누를 수 있는 카드는 따로 켜지 않습니다. `onClick` 이 있거나, `asChild` 의 자식이 `href` 가 있는 요소(`<a href>`, Next.js `Link`)나 `<button>` 이면 누를 수 있는 모양과 동작이 됩니다.
+- 자식은 JSX 에 적힌 대로 봅니다. `to` 만 받는 라우터 링크(React Router, TanStack Router)는 알아보지 못하므로, 링크 컴포넌트가 그리는 `<a>` 를 `asChild` 로 감쌀 수 없으면 `onClick` 으로 이동합니다.
 
 | 키      | 동작                                       |
 | ------- | ------------------------------------------ |
@@ -131,19 +134,18 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 | `data-hovered`, `data-active`, `data-focus-visible`                                      | 인터랙션 상태     |
 | `data-card-header`, `-title`, `-description`, `-action`, `-content`, `-footer`, `-media` | 각 부분           |
 
-루트의 `className`, `style`, `children` 은 인터랙션 상태와 `interactive` 를 받는 함수가 될 수 있습니다.
+루트의 `className`, `style`, `children` 은 인터랙션 상태와 누를 수 있는지(`interactive`)를 받는 함수가 될 수 있습니다.
 
 ## 속성
 
-| 속성          | 기본 / 동작                                                     |
-| ------------- | --------------------------------------------------------------- |
-| `variant`     | `outline`(기본) / `soft` / `ghost`                              |
-| `size`        | `standard`(기본) / `tiny`                                       |
-| `onClick`     | 주면 카드 어디를 눌러도 불린다. 제목이 버튼이 된다              |
-| `interactive` | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동 |
-| `disabled`    | 누를 수 없고 흐려진다                                           |
-| `asChild`     | 루트 `div` 대신 자식 요소에 속성을 합친다                       |
-| 각 부분       | `asChild` 와 `div` 의 native 속성                               |
+| 속성       | 기본 / 동작                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| `variant`  | `outline`(기본) / `soft` / `ghost`                                    |
+| `size`     | `standard`(기본) / `tiny`                                             |
+| `onClick`  | 주면 카드 어디를 눌러도 불린다. 제목이 버튼이 된다                    |
+| `disabled` | 누를 수 없고 흐려진다                                                 |
+| `asChild`  | 루트 `div` 대신 자식 요소에 속성을 합친다. `href` 가 있으면 링크 카드 |
+| 각 부분    | `asChild` 와 `div` 의 native 속성                                     |
 
 ## 알아둘 것
 

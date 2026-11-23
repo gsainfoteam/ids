@@ -28,7 +28,6 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    interactive: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
   args: { variant: 'outline', size: 'standard' },
@@ -51,6 +50,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Card className="w-80">
+      <Card.Header>
+        <Card.Title>알림 설정</Card.Title>
+        <Card.Description>받을 알림을 고릅니다.</Card.Description>
+      </Card.Header>
+      <Card.Content>메일과 푸시로 받습니다.</Card.Content>
+    </Card>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -170,7 +181,10 @@ export const Gallery: Story = {
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section title="Interactive">
+      <Showcase.Section
+        title="Interactive"
+        description="onClick 이 있거나 asChild 의 자식에 href 가 있으면 누를 수 있는 카드가 됩니다."
+      >
         <Showcase.Row label="onClick">
           <Card onClick={() => {}} className="w-64">
             <Card.Media className="aspect-video">
@@ -197,12 +211,22 @@ export const Gallery: Story = {
             </Card.Footer>
           </Card>
         </Showcase.Row>
+        <Showcase.Row label="asChild link">
+          <Card asChild className="w-64">
+            <a href="#walk">
+              <Card.Header>
+                <Card.Title>주말 산책</Card.Title>
+                <Card.Description>사진 3장</Card.Description>
+              </Card.Header>
+            </a>
+          </Card>
+        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Anatomy: Story = {
+export const PutAnActionInTheHeader: Story = {
   render: () => (
     <Card className="w-80">
       <Card.Header>
@@ -239,7 +263,7 @@ export const Anatomy: Story = {
   },
 };
 
-export const MediaBleed: Story = {
+export const ShowAPhotoEdgeToEdge: Story = {
   render: () => (
     <div className="flex gap-4">
       <Card className="w-64">
@@ -288,7 +312,7 @@ export const MediaBleed: Story = {
   },
 };
 
-export const Interactive: Story = {
+export const OpenTheCardFromAnywhere: Story = {
   args: { onClick: fn() },
   render: function Render(args) {
     const [liked, setLiked] = useState(0);
@@ -335,7 +359,7 @@ export const Interactive: Story = {
   },
 };
 
-export const LinkCard: Story = {
+export const MakeTheWholeCardALink: Story = {
   render: () => (
     <Card asChild className="w-72">
       <a href="#design-review">
@@ -350,7 +374,7 @@ export const LinkCard: Story = {
     docs: {
       description: {
         story:
-          '`asChild` 로 카드 전체를 링크로 만듭니다. 링크는 원래 키보드와 포커스를 갖고 있으므로 role을 덧씌우지 않고, 이름은 제목으로 좁힙니다.',
+          '`asChild` 로 카드 전체를 링크로 만듭니다. 자식에 `href` 가 있으면 누를 수 있는 모양이 따로 켜지지 않아도 붙습니다. 링크는 원래 키보드와 포커스를 갖고 있으므로 role을 덧씌우지 않고, 이름은 제목으로 좁힙니다.',
       },
     },
   },
@@ -363,8 +387,16 @@ export const LinkCard: Story = {
   },
 };
 
-export const Disabled: Story = {
+export const DisableAPressableCard: Story = {
   args: { onClick: fn(), disabled: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`onClick` 이 있는 카드에 `disabled` 를 주면 제목 버튼이 disabled 가 되고 카드는 `aria-disabled` 로 흐려집니다. 카드 어디를 눌러도 불리지 않습니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent, args }) => {
     const title = canvas.getByRole('button', { name: '새 프로젝트 만들기' });
     await expect(title).toBeDisabled();
