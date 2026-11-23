@@ -11,7 +11,7 @@
 ```tsx
 import { Field, Switch } from '@gsainfoteam/ids-react';
 
-<Field variant="horizontal">
+<Field orientation="horizontal">
   <Field.Label>다크 모드</Field.Label>
   <Switch checked={dark} onCheckedChange={setDark} />
 </Field>;
@@ -108,7 +108,7 @@ import { Field, Switch } from '@gsainfoteam/ids-react';
 ```tsx
 import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
-<Field name="autoSave" variant="horizontal">          {/* register() 로 연결된다 */}
+<Field name="autoSave" orientation="horizontal">          {/* register() 로 연결된다 */}
   <Field.Label>자동 저장</Field.Label>
   <Switch />
 </Field>

@@ -292,7 +292,6 @@ const { useAppForm } = createFormHook({
 
 - 입력이 하나가 아니거나, 라벨이 없거나, Label · Description · Hint가 중복되면 개발 빌드에서 경고합니다.
 - 일반 Field는 `value` 나 `onChange` 를 건드리지 않습니다. 다른 폼 라이브러리의 props를 그대로 연결할 수 있습니다.
-- `variant="horizontal"` 은 `orientation` 의 예전 이름입니다. 다음 버전에서 빠집니다.
 - `react-hook-form@^7.62.0` 은 optional peer입니다. `/react-hook-form` 경로를 쓸 때만 설치하고, 기본 import는 RHF를 불러오지 않습니다.
 - RHF Field는 `FormProvider` 와 `name` 이 모두 있을 때만 등록합니다. `name` 만 있으면 개발 빌드에서 경고하고 일반 Field로 동작합니다.
 - `value` / `checked` 모드에서는 RHF가 값의 주인입니다. 자식의 `value`, `defaultValue` 보다 `defaultValues` 와 RHF 상태가 우선합니다.

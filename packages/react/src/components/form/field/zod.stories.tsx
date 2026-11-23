@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { noop } from 'es-toolkit';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect } from 'storybook/test';
 import { z } from 'zod';
+
+import { Showcase } from '~story-kit';
 
 import { Field } from '../../../react-hook-form';
 import { Button } from '../../action/button';
@@ -11,35 +14,165 @@ import { TextField } from '../text-field';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const schema = z
-  .object({
-    account: z.object({
-      email: z
-        .string()
-        .trim()
-        .min(1, '가입 이메일을 입력하세요.')
-        .email('올바른 이메일 주소를 입력하세요.')
-        .transform((value) => value.toLowerCase()),
-    }),
-    confirmation: z.string().trim().toLowerCase().min(1, '이메일 확인을 입력하세요.'),
-    agreed: z.boolean().refine((value) => value, '약관에 동의해 주세요.'),
-  })
-  .refine((values) => values.account.email === values.confirmation, {
-    path: ['confirmation'],
-    message: '두 이메일 주소가 일치하지 않습니다.',
-  });
-
 const meta = {
   title: 'Form/Field/Zod',
   component: Field,
   tags: ['autodocs'],
-  args: { children: null },
+  argTypes: {
+    orientation: { control: 'radio', options: ['vertical', 'horizontal'] },
+    size: { control: 'radio', options: ['standard', 'tiny'] },
+    disabled: { control: 'boolean' },
+    required: { control: 'boolean' },
+  },
+  args: {
+    orientation: 'vertical',
+    size: 'standard',
+    required: true,
+    disabled: false,
+    children: null,
+  },
 } satisfies Meta<typeof Field>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const SchemaValidation: Story = {
+export const Playground: Story = {
+  render: function Render({ children: _children, ...args }) {
+    const schema = z.object({
+      email: z
+        .string()
+        .trim()
+        .min(1, '이메일을 입력하세요.')
+        .email('올바른 이메일 주소를 입력하세요.'),
+    });
+    const methods = useForm({ resolver: zodResolver(schema), defaultValues: { email: '' } });
+
+    return (
+      <FormProvider {...methods}>
+        <form noValidate className="flex w-80 flex-col gap-3" onSubmit={methods.handleSubmit(noop)}>
+          <Field {...args} name="email">
+            <Field.Label>이메일</Field.Label>
+            <TextField inputMode="email" />
+            <Field.Error />
+          </Field>
+          <Button type="submit">제출</Button>
+        </form>
+      </FormProvider>
+    );
+  },
+};
+
+export const Usage: Story = {
   render: function Render() {
+    const schema = z.object({
+      email: z
+        .string()
+        .trim()
+        .min(1, '이메일을 입력하세요.')
+        .email('올바른 이메일 주소를 입력하세요.'),
+    });
+    const methods = useForm({ resolver: zodResolver(schema), defaultValues: { email: '' } });
+    const [submitted, setSubmitted] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex w-80 flex-col gap-3"
+          onSubmit={methods.handleSubmit((values) => setSubmitted(values.email))}
+        >
+          <Field name="email" required>
+            <Field.Label>이메일</Field.Label>
+            <TextField inputMode="email" />
+            <Field.Error />
+          </Field>
+          <Button type="submit">제출</Button>
+          <output aria-label="제출 값">{submitted}</output>
+        </form>
+      </FormProvider>
+    );
+  },
+};
+
+export const Gallery: Story = {
+  render: function Render() {
+    const schema = z.object({
+      empty: z.string().min(1, '이메일을 입력하세요.'),
+      format: z.string().email('올바른 이메일 주소를 입력하세요.'),
+      valid: z.string().email('올바른 이메일 주소를 입력하세요.'),
+      agreed: z.boolean().refine((value) => value, '약관에 동의해 주세요.'),
+    });
+    const methods = useForm({
+      resolver: zodResolver(schema),
+      defaultValues: { empty: '', format: 'infoteam', valid: 'user@example.com', agreed: false },
+    });
+    const { trigger } = methods;
+
+    useEffect(() => {
+      void trigger();
+    }, [trigger]);
+
+    return (
+      <FormProvider {...methods}>
+        <Showcase>
+          <Showcase.Section
+            title="Schema errors"
+            description="스키마의 메시지가 Field.Error에 나타나고, 컨트롤에 aria-invalid가 붙습니다."
+          >
+            <Showcase.Row label="min(1)">
+              <Field name="empty" required className="w-80">
+                <Field.Label>가입 이메일</Field.Label>
+                <TextField inputMode="email" />
+                <Field.Error />
+              </Field>
+            </Showcase.Row>
+            <Showcase.Row label="email()">
+              <Field name="format" required className="w-80">
+                <Field.Label>연락 이메일</Field.Label>
+                <TextField inputMode="email" />
+                <Field.Error />
+              </Field>
+            </Showcase.Row>
+            <Showcase.Row label="refine()">
+              <Field name="agreed" required orientation="horizontal" className="w-80">
+                <Field.Label>이용 약관 동의</Field.Label>
+                <input type="checkbox" />
+                <Field.Error />
+              </Field>
+            </Showcase.Row>
+            <Showcase.Row label="valid">
+              <Field name="valid" required className="w-80">
+                <Field.Label>확인한 이메일</Field.Label>
+                <TextField inputMode="email" />
+                <Field.Hint>스키마를 통과한 값입니다.</Field.Hint>
+                <Field.Error />
+              </Field>
+            </Showcase.Row>
+          </Showcase.Section>
+        </Showcase>
+      </FormProvider>
+    );
+  },
+};
+
+export const ValidateASignUpFormWithZod: Story = {
+  render: function Render() {
+    const schema = z
+      .object({
+        account: z.object({
+          email: z
+            .string()
+            .trim()
+            .min(1, '가입 이메일을 입력하세요.')
+            .email('올바른 이메일 주소를 입력하세요.')
+            .transform((value) => value.toLowerCase()),
+        }),
+        confirmation: z.string().trim().toLowerCase().min(1, '이메일 확인을 입력하세요.'),
+        agreed: z.boolean().refine((value) => value, '약관에 동의해 주세요.'),
+      })
+      .refine((values) => values.account.email === values.confirmation, {
+        path: ['confirmation'],
+        message: '두 이메일 주소가 일치하지 않습니다.',
+      });
     const methods = useForm({
       resolver: zodResolver(schema),
       defaultValues: { account: { email: '' }, confirmation: '', agreed: false },
@@ -84,6 +217,14 @@ export const SchemaValidation: Story = {
         </form>
       </FormProvider>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'useForm에 zodResolver(schema)를 넘기면 Field는 name으로 연결된 경로의 스키마 오류를 Field.Error에 보여 주고, 제출할 때 첫 오류의 컨트롤로 포커스를 옮깁니다. account.email 같은 중첩 경로, 두 값을 비교하는 refine의 path, 제출 값에만 적용되는 trim과 toLowerCase도 그대로 따릅니다.',
+      },
+    },
   },
   play: async ({ canvas, userEvent }) => {
     const email = canvas.getByRole('textbox', { name: '가입 이메일' });

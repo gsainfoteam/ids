@@ -59,6 +59,16 @@ export const Playground: Story = {
   ),
 };
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-80">
+      <Field.Label>이메일</Field.Label>
+      <TextField type="email" placeholder="name@example.com" />
+      <Field.Hint>로그인에 사용합니다.</Field.Hint>
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -150,7 +160,54 @@ export const Gallery: Story = {
   ),
 };
 
-export const NativeValidation: Story = {
+export const PlaceTheLabelBesideTheControl: Story = {
+  render: () => (
+    <div className="flex w-96 flex-col gap-4">
+      <Field orientation="horizontal">
+        <Field.Label>이름</Field.Label>
+        <TextField placeholder="홍길동" />
+      </Field>
+      <Field orientation="horizontal" invalid>
+        <Field.Label>학번</Field.Label>
+        <Field.Description>입학 연도로 시작하는 8자리</Field.Description>
+        <TextField defaultValue="2024" />
+        <Field.Error>8자리를 입력하세요.</Field.Error>
+      </Field>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'orientation="horizontal"이면 라벨이 왼쪽 열에, 설명과 컨트롤, 힌트, 오류가 오른쪽 열에 놓입니다. 라벨은 컨트롤과 같은 줄에 맞춰집니다. 설정 화면처럼 항목이 여럿 늘어선 폼에 씁니다.',
+      },
+    },
+  },
+};
+
+export const UseYourOwnLabelElement: Story = {
+  render: () => (
+    <Field required className="w-80">
+      <Field.Label asChild>
+        <label className="font-bold">사용자 이름</label>
+      </Field.Label>
+      <TextField />
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Field.Label에 asChild를 주면 직접 쓴 label 요소가 라벨이 됩니다. htmlFor 연결과 컨트롤의 required는 Field가 그대로 맡습니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('textbox', { name: '사용자 이름' })).toBeRequired();
+  },
+};
+
+export const ShowTheBrowsersValidationMessage: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState('');
 
@@ -206,7 +263,7 @@ export const NativeValidation: Story = {
   },
 };
 
-export const MatchValidity: Story = {
+export const WriteAMessagePerValidityError: Story = {
   render: () => (
     <form className="flex w-80 flex-col gap-4" onSubmit={(event) => event.preventDefault()}>
       <Field>
@@ -237,7 +294,7 @@ export const MatchValidity: Story = {
   },
 };
 
-export const FieldState: Story = {
+export const StyleByFieldState: Story = {
   render: () => (
     <Field className="rounded-standard data-focused:bg-block w-80 p-3 transition-colors" required>
       <Field.Label>닉네임</Field.Label>
@@ -279,38 +336,7 @@ export const FieldState: Story = {
   },
 };
 
-export const Horizontal: Story = {
-  render: () => (
-    <div className="flex w-96 flex-col gap-4">
-      <Field orientation="horizontal">
-        <Field.Label>이름</Field.Label>
-        <TextField placeholder="홍길동" />
-      </Field>
-      <Field orientation="horizontal" invalid>
-        <Field.Label>학번</Field.Label>
-        <Field.Description>입학 연도로 시작하는 8자리</Field.Description>
-        <TextField defaultValue="2024" />
-        <Field.Error>8자리를 입력하세요.</Field.Error>
-      </Field>
-    </div>
-  ),
-};
-
-export const CustomLabel: Story = {
-  render: () => (
-    <Field required className="w-80">
-      <Field.Label asChild>
-        <label className="font-bold">사용자 이름</label>
-      </Field.Label>
-      <TextField />
-    </Field>
-  ),
-  play: async ({ canvas }) => {
-    await expect(canvas.getByRole('textbox', { name: '사용자 이름' })).toBeRequired();
-  },
-};
-
-export const ReactHookForm: Story = {
+export const ConnectReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ defaultValues: { email: '' } });
     const [submitted, setSubmitted] = useState('');
@@ -367,11 +393,7 @@ export const ReactHookForm: Story = {
   },
 };
 
-const mustBeEmail = ({ value }: { value: string }) =>
-  value.includes('@') ? undefined : '이메일 형식을 확인하세요.';
-const mustAgree = ({ value }: { value: boolean }) => (value ? undefined : '약관에 동의해 주세요.');
-
-export const TanStackForm: Story = {
+export const ConnectTanStackForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState('');
     const form = useTanStackForm({
@@ -388,7 +410,12 @@ export const TanStackForm: Story = {
           void form.handleSubmit();
         }}
       >
-        <form.Field name="email" validators={{ onBlur: mustBeEmail }}>
+        <form.Field
+          name="email"
+          validators={{
+            onBlur: ({ value }) => (value.includes('@') ? undefined : '이메일 형식을 확인하세요.'),
+          }}
+        >
           {(field) => (
             <TanStackField field={field}>
               <TanStackField.Label>이메일</TanStackField.Label>
@@ -397,7 +424,10 @@ export const TanStackForm: Story = {
             </TanStackField>
           )}
         </form.Field>
-        <form.Field name="agree" validators={{ onChange: mustAgree }}>
+        <form.Field
+          name="agree"
+          validators={{ onChange: ({ value }) => (value ? undefined : '약관에 동의해 주세요.') }}
+        >
           {(field) => (
             <TanStackField field={field} controlMode="checked">
               <TanStackField.Label>약관에 동의합니다</TanStackField.Label>

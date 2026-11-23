@@ -86,7 +86,7 @@ export const Gallery: Story = {
           </Label>
         </Showcase.Row>
         <Showcase.Row label="Field">
-          <Field variant="horizontal">
+          <Field orientation="horizontal">
             <Field.Label>다크 모드</Field.Label>
             <Switch />
           </Field>
@@ -141,7 +141,7 @@ export const Settings: Story = {
     return (
       <div className="flex w-80 flex-col gap-4">
         {rows.map(([key, label]) => (
-          <Field key={key} variant="horizontal" className="grid-cols-[minmax(0,1fr)_auto]">
+          <Field key={key} orientation="horizontal" className="grid-cols-[minmax(0,1fr)_auto]">
             <Field.Label>{label}</Field.Label>
             <Switch
               checked={settings[key]}
@@ -275,7 +275,7 @@ export const ReactHookForm: Story = {
           className="flex flex-col items-start gap-4"
           onSubmit={methods.handleSubmit((values) => setResult(JSON.stringify(values)))}
         >
-          <FormField name="autoSave" variant="horizontal">
+          <FormField name="autoSave" orientation="horizontal">
             <FormField.Label>자동 저장</FormField.Label>
             <Switch />
           </FormField>
