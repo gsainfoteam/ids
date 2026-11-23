@@ -396,28 +396,47 @@ const britishEnglish = defineIdsLocale({
 ### next-intl
 
 ```tsx
+import { useMemo } from 'react';
 import { useLocale, useMessages } from 'next-intl';
+import { defineIdsLocale, IdsProvider } from '@gsainfoteam/ids-react';
 import { en } from '@gsainfoteam/ids-react/locales/en';
 
 export function IdsWithIntl({ children }: { children: React.ReactNode }) {
   const tag = useLocale();
   const { ids } = useMessages();
-  const locale = defineIdsLocale({ language: new Intl.Locale(tag).language, tag, messages: ids, base: en });
+  const locale = useMemo(
+    () => defineIdsLocale({ language: new Intl.Locale(tag).language, tag, messages: ids, base: en }),
+    [tag, ids],
+  );
   return <IdsProvider theme={theme} locale={locale}>{children}</IdsProvider>;
 }
 ```
 
 - 앱 메시지 파일의 `"ids"` 아래에 `en.messages` 를 복사해 두고 번역한다.
+- locale 객체를 `useMemo` 로 묶는다. 렌더마다 새 객체를 넘기면 문구를 읽는 IDS 컴포넌트가 모두 다시 그려진다.
 - 문구는 `{name}` 자리만 쓰므로 next-intl 의 ICU 와 같은 문법이다.
 
 ### i18next
 
 ```tsx
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { defineIdsLocale, IdsProvider } from '@gsainfoteam/ids-react';
+import { en } from '@gsainfoteam/ids-react/locales/en';
+
 export function IdsWithI18next({ children }: { children: React.ReactNode }) {
   const { i18n } = useTranslation();
   const tag = i18n.resolvedLanguage ?? 'ko-KR';
-  const messages = i18n.getResourceBundle(tag, 'ids') ?? {};
-  const locale = defineIdsLocale({ language: new Intl.Locale(tag).language, tag, messages, base: en });
+  const locale = useMemo(
+    () =>
+      defineIdsLocale({
+        language: new Intl.Locale(tag).language,
+        tag,
+        messages: i18n.getResourceBundle(tag, 'ids') ?? {},
+        base: en,
+      }),
+    [i18n, tag],
+  );
   return <IdsProvider theme={theme} locale={locale}>{children}</IdsProvider>;
 }
 ```
