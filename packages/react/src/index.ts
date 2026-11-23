@@ -90,7 +90,7 @@ export { ImageGroup, type ImageGroupLayout } from './components/data/image-group
 export { QRCode } from './components/data/qr-code';
 export { CodeBlock } from './components/data/code-block';
 export { Marquee } from './components/data/marquee';
-export type { MarqueeOrientation, MarqueeSpeed } from './components/data/marquee';
+export type { MarqueeDirection, MarqueeSpeed, MarqueeVariant } from './components/data/marquee';
 export { Table } from './components/data/table';
 export type {
   TableProps,

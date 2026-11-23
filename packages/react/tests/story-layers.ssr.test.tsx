@@ -22,7 +22,6 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/data/empty/index.stories.tsx',
   'components/data/image/index.stories.tsx',
   'components/data/item/index.stories.tsx',
-  'components/data/marquee/index.stories.tsx',
   'components/data/qr-code/index.stories.tsx',
   'components/data/table/index.stories.tsx',
   'components/data/time-picker/index.stories.tsx',
