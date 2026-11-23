@@ -12,10 +12,12 @@ const CHECKBOX_COLUMN_WIDTH = 48;
 
 function SelectAllRows({ table }: HeaderContext<DataTableFeatures, RowData, unknown>) {
   const t = useTranslate();
-  const { size } = useDataTableContext();
+  const { size, selection } = useDataTableContext();
 
-  const all = table.getIsAllRowsSelected();
-  const some = table.getIsSomeRowsSelected();
+  const selectable = table.getCoreRowModel().flatRows.filter((row) => row.getCanSelect());
+  const chosen = selectable.filter((row) => selection[row.id]).length;
+  const all = selectable.length > 0 && chosen === selectable.length;
+  const some = chosen > 0;
 
   return (
     <Checkbox
@@ -30,7 +32,7 @@ function SelectAllRows({ table }: HeaderContext<DataTableFeatures, RowData, unkn
 
 function SelectRow({ row, table }: CellContext<DataTableFeatures, RowData, unknown>) {
   const t = useTranslate();
-  const { size } = useDataTableContext();
+  const { size, selection } = useDataTableContext();
   const getRowLabel = table.options.meta?.getRowLabel;
 
   const label = getRowLabel
@@ -43,7 +45,7 @@ function SelectRow({ row, table }: CellContext<DataTableFeatures, RowData, unkno
     <Checkbox
       size={size}
       aria-label={label}
-      checked={row.getIsSelected() ? true : row.getIsSomeSelected() ? 'indeterminate' : false}
+      checked={Boolean(selection[row.id])}
       disabled={!row.getCanSelect()}
       onChange={row.getToggleSelectedHandler()}
     />

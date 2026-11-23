@@ -8,7 +8,7 @@ import type { DataTableFeatures } from './features';
 import type { dataTableStyle, DataTableVariant } from './style';
 import type { IdsSize } from '../../../tokens/types';
 import type { ReactTable } from '@tanstack/react-table';
-import type { RowData } from '@tanstack/table-core';
+import type { RowData, RowSelectionState } from '@tanstack/table-core';
 
 export type DataTableLabelling = {
   id?: string;
@@ -24,6 +24,7 @@ type Context = {
   size: IdsSize;
   rtl: boolean;
   busy: boolean;
+  selection: RowSelectionState;
   caption: ReactNode;
   empty: ReactNode;
   labelling: DataTableLabelling;

@@ -300,5 +300,5 @@ column.accessor('name', {
 
 - 필터, 열 숨기기, 열 고정, 행 펼치기, 가상화는 아직 없습니다. 필요하면 `Table` 파트로 TanStack 표를 직접 그립니다.
 - 열 정의의 `footer` 는 그리지 않습니다.
-- 고른 행은 root 가 hook 의 표에 layout effect 로 넘깁니다. 서버 HTML 에는 `value` 와 `defaultValue` 의 체크가 빠지고, hydration 직후 그려지기 전에 채워집니다.
+- DataTable 은 체크, 고른 행의 색, 고른 수를 root 의 `value` 와 `defaultValue` 로 그려서 서버 HTML 에도 나옵니다. hook 의 표(`table.getSelectedRowModel()`, `row.getIsSelected()`)는 첫 렌더 뒤 layout effect 에서 같은 값을 받으니, 첫 렌더에 고른 행이 필요하면 root 에 넘긴 값을 읽습니다.
 - 선택을 켠 `table` 은 DataTable 하나에만 줍니다. 두 root 가 같은 표의 선택을 나눠 가지지 못합니다.

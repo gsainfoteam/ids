@@ -49,6 +49,8 @@ function useSelectionTrio(
   useLayoutEffect(() => {
     if (meta && !isEqual(selection, shown)) meta.showSelection(selection);
   }, [meta, selection, shown]);
+
+  return selection;
 }
 
 function isRtl(element: HTMLElement) {
@@ -91,7 +93,7 @@ export function DataTableRoot<TData extends RowData>({
   const table = instance as unknown as ReactTable<DataTableFeatures, RowData>;
   const rootRef = useRef<HTMLDivElement>(null);
   const setRtl = table.options.meta?.setRtl;
-  useSelectionTrio(table, { value, defaultValue, onValueChange });
+  const selection = useSelectionTrio(table, { value, defaultValue, onValueChange });
 
   useLayoutEffect(() => {
     if (rootRef.current) setRtl?.(isRtl(rootRef.current));
@@ -117,6 +119,7 @@ export function DataTableRoot<TData extends RowData>({
         size,
         rtl: table.options.columnResizeDirection === 'rtl',
         busy,
+        selection,
         caption,
         empty,
         labelling: {

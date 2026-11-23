@@ -14,7 +14,8 @@ import { TableRow } from '../table/row';
 export type DataTableContentProps = { className?: string };
 
 export function DataTableContent({ className }: DataTableContentProps) {
-  const { table, styles, variant, size, busy, caption, empty, labelling } = useDataTableContext();
+  const { table, styles, variant, size, busy, selection, caption, empty, labelling } =
+    useDataTableContext();
 
   const resizable = table.options.meta?.resizable ?? false;
   const rows = table.getRowModel().rows;
@@ -51,7 +52,7 @@ export function DataTableContent({ className }: DataTableContentProps) {
         <TableBody>
           {rows.length > 0 ? (
             rows.map((row) => (
-              <TableRow key={row.id} selected={row.getIsSelected()} className={styles.row()}>
+              <TableRow key={row.id} selected={Boolean(selection[row.id])} className={styles.row()}>
                 {row.getAllCells().map((cell) => (
                   <TableCell
                     key={cell.id}

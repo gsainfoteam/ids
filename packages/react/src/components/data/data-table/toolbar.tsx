@@ -9,10 +9,10 @@ export type DataTableToolbarProps = ComponentProps<'div'>;
 
 export function DataTableToolbar({ className, children, ...props }: DataTableToolbarProps) {
   const t = useTranslate();
-  const { table, styles } = useDataTableContext();
+  const { table, styles, selection } = useDataTableContext();
 
   const selectable = table.options.meta?.selectable ?? false;
-  const selected = Object.values(table.state.rowSelection).filter(Boolean).length;
+  const selected = Object.values(selection).filter(Boolean).length;
 
   return (
     <DataTableToolbarContext value>
