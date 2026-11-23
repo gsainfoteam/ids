@@ -2,9 +2,9 @@
 
 import type { ComponentProps, MouseEvent, ReactNode } from 'react';
 
-import { useInternalPaginationControl } from './control';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { Button } from '../../../action/button';
+import { useInternalPaginationControl } from '../hooks/use-pagination-control';
 
 export type PaginationLinkProps = Omit<
   ComponentProps<'button'>,
