@@ -210,7 +210,7 @@ export const PC: Story = {
 
                 <Card>
                   <Card.Content>
-                    <Chart config={WAIT_CONFIG} ratio={2} legend={false}>
+                    <Chart config={WAIT_CONFIG}>
                       <Chart.Title>시간대별 대기 시간</Chart.Title>
                       <Chart.Description>학생회관 정류장 · 지난 4주 평균</Chart.Description>
                       <BarChart data={route.waits}>
@@ -218,6 +218,7 @@ export const PC: Story = {
                         <XAxis dataKey="hour" name="시간대" tickLine={false} axisLine={false} />
                         <YAxis width={28} tickLine={false} axisLine={false} />
                         <Bar dataKey="wait" radius={4} />
+                        <Chart.Tooltip />
                       </BarChart>
                     </Chart>
                   </Card.Content>
