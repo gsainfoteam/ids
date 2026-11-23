@@ -62,17 +62,15 @@ import { Field, Switch } from '@gsainfoteam/ids-react';
     {(state) => (state.checked ? <MoonIcon /> : <SunIcon />)}
   </Switch.Thumb>
 </Switch>
-
-<Switch className="data-[state=checked]:bg-success-solid" />   {/* 트랙은 루트다 */}
 ```
 
-- 루트가 트랙입니다. `className` 과 `style` 은 트랙으로 갑니다.
+- 루트가 트랙입니다.
 - `Switch.Thumb` 은 `asChild` 를 받습니다. 아이콘은 thumb의 3/4 크기로 그립니다.
 - thumb은 `--ids-motion-fast` 동안 미끄러집니다. `prefers-reduced-motion` 이면 바로 옮겨집니다.
 
 ## 상태와 스타일
 
-`className`, `style`, `children` 은 상태를 받는 함수도 됩니다. 같은 상태가 트랙에 `data-*` 로 붙고, thumb에는 `data-state` 가 붙습니다.
+상태가 트랙에 `data-*` 로 붙고, thumb에는 `data-state` 가 붙습니다. `Switch.Thumb` 의 `children` 은 상태를 받는 함수도 됩니다.
 
 | 상태           | `data-*`                 | 뜻                                |
 | -------------- | ------------------------ | --------------------------------- |
@@ -125,6 +123,8 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 <Switch size="tiny" /> // standard(36 × 20px, thumb 16px) / tiny(28 × 16px, thumb 12px). 생략하면 Field를 따른다
 ```
 
+- **크기 계약: hug.** 트랙 크기만큼 차지하고 바깥 여백이 없습니다. 자리와 간격은 감싸는 요소와 그 `gap` 이 정합니다.
+
 ## 속성
 
 | 속성                         | 기본 / 동작                                                     |
@@ -134,7 +134,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `readOnly`                   | 바뀌지 않는다. `aria-readonly`                                  |
 | `invalid`                    | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선      |
 | `size`                       | `standard` / `tiny`. 생략하면 `Field` 크기                      |
-| `className` / `style`        | 트랙으로 간다. 상태를 받는 함수도 된다                          |
+| `className` / `style`        | 트랙으로 간다. 새 디자인(`custom-design`)에서만 쓴다                          |
 | `children`                   | `Switch.Thumb`. 생략하면 기본 thumb                             |
 | `ref`                        | 실제 input                                                      |
 | 그 외 native 속성            | input으로 간다 (`name`, `value`, `id`, `required`, `aria-*` 등) |

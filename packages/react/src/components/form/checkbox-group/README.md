@@ -102,12 +102,28 @@ type Skill = 'js' | 'ts' | 'py';
 
 ```tsx
 <CheckboxGroup orientation="horizontal" />                 // vertical(기본) / horizontal
-<CheckboxGroup className="grid grid-cols-2" />             // 격자는 className으로
+
+<div className="w-80">                                      {/* 너비는 감싸는 요소가 */}
+  <CheckboxGroup aria-label="관심 기술">
+    {({ Item }) => (
+      <div className="grid grid-cols-2 gap-3">               {/* 격자는 안쪽 div 로 */}
+        {skills.map((skill) => (
+          <Label key={skill.value}>
+            <Item value={skill.value} />
+            {skill.label}
+          </Label>
+        ))}
+      </div>
+    )}
+  </CheckboxGroup>
+</div>
 ```
+
+- **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`).
 
 ## 상태와 스타일
 
-`className` 과 `style` 은 그룹 상태를 받는 함수도 됩니다. 같은 상태가 루트에 `data-*` 로 붙습니다. 항목의 상태는 [Checkbox](../checkbox/README.md) 를 봅니다.
+그룹 상태가 루트에 `data-*` 로 붙습니다. 항목의 상태는 [Checkbox](../checkbox/README.md) 를 봅니다.
 
 | 상태          | `data-*`                         | 뜻                          |
 | ------------- | -------------------------------- | --------------------------- |
@@ -172,7 +188,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `disabled` / `readOnly`  | 모든 항목에 전해진다                           |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선       |
 | `size` / `variant`       | 항목으로 전해진다                              |
-| `className` / `style`    | 루트로 간다. 그룹 상태를 받는 함수도 된다      |
+| `className` / `style`    | 루트로 간다. 새 디자인(`custom-design`)에서만 쓴다      |
 | `children`               | `({ All, Item }) => ReactNode` 또는 Checkbox들 |
 | `ref`                    | 그룹 루트. `focus()` 는 항목으로 넘어간다      |
 

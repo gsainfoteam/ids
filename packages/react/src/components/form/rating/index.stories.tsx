@@ -89,7 +89,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Glyphs" description="모양은 Rating.Item으로 바꿉니다.">
         <Showcase.Row label="heart">
-          <Rating defaultValue={3} aria-label="하트" className="scheme-danger">
+          <Rating defaultValue={3} aria-label="하트">
             <Rating.Item>
               <HeartIcon />
             </Rating.Item>
@@ -284,7 +284,7 @@ export const ShowAnAverageScore: Story = {
 
 export const ChangeTheGlyph: Story = {
   render: () => (
-    <Rating defaultValue={3} aria-label="좋아요" className="scheme-danger">
+    <Rating defaultValue={3} aria-label="좋아요">
       <Rating.Item>
         <HeartIcon />
       </Rating.Item>
@@ -294,7 +294,7 @@ export const ChangeTheGlyph: Story = {
     docs: {
       description: {
         story:
-          '`Rating.Item` 하나를 넣으면 모든 자리가 그 모양입니다. `index` 를 준 `Rating.Item` 은 그 자리만 바꿉니다. 색은 `scheme-*` 로 고릅니다.',
+          '`Rating.Item` 하나를 넣으면 모든 자리가 그 모양입니다. `index` 를 준 `Rating.Item` 은 그 자리만 바꿉니다.',
       },
     },
   },

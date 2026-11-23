@@ -128,7 +128,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 - `Questionnaire.Submit` 은 다음과 보내기를 맡는 submit 버튼입니다. 쓰지 않으면 기본 버튼이 그려집니다.
 - 어디에 적어도 이동 버튼 묶음 안, 건너뛰기 뒤에 그려집니다.
 - `children` 은 마지막 질문에서만 보입니다. 기본은 `보내기`, 마지막이 아닐 때는 늘 `다음` 입니다.
-- 그 밖의 속성은 `Button` 으로 갑니다(`variant`, `colorScheme`, `className`). `type` 은 늘 `submit` 이고, 답하지 않은 필수 질문에서는 꺼집니다.
+- 그 밖의 속성은 `Button` 으로 갑니다(`variant`, `colorScheme`). `type` 은 늘 `submit` 이고, 답하지 않은 필수 질문에서는 꺼집니다.
 
 ## 고르면 바로 넘어가기
 
@@ -169,6 +169,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 - 보기 카드의 가로 여백은 `standard` 12px, `tiny` 10px 로 직접 입력과 같아, 라디오와 입력 글자의 시작이 맞습니다.
 - 이동 버튼은 크기와 상관없이 `tiny` 입니다. 보기보다 눈에 띄지 않게 둡니다.
+- **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`).
 
 ## 속성
 
@@ -178,7 +179,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 | `onComplete`             | 마지막 질문에서 보낼 때 답을 받는다                                     |
 | `advanceOnSelect`        | `false`. 하나만 고르는 질문을 고르면 바로 넘어간다                      |
 | `size`                   | `standard`(기본) / `tiny`                                               |
-| 그 외 속성               | `<form>` 으로 간다 (`id`, `aria-label`, `className` 등)                 |
+| 그 외 속성               | `<form>` 으로 간다 (`id`, `aria-label`)                 |
 | Question `name`          | 답의 키이자 FormData 이름                                               |
 | Question `selectionMode` | `single`(기본) / `multiple`                                             |
 | Question `optional`      | `false`. 켜면 건너뛰기 버튼                                             |

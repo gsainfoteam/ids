@@ -63,12 +63,11 @@ import { Field, Rating } from '@gsainfoteam/ids-react';
     <span className="block size-full rounded-full bg-current" />   {/* 점 */}
   </Rating.Item>
 </Rating>
-
-<Rating className="scheme-warning" />   {/* 채운 색은 text-scheme. 기본 scheme-primary */}
 ```
 
 - 아이콘은 빈 층과 채운 층에 두 번 그려지고, 채운 층을 잘라서 반 점을 표시합니다. `currentColor` 로 그리는 아이콘이면 됩니다.
-- `Rating.Item` 의 `className`, `style`, `children` 은 자리 상태(`index`, `itemValue`, `fill`)를 받는 함수도 됩니다.
+- `Rating.Item` 의 `children` 은 자리 상태(`index`, `itemValue`, `fill`)를 받는 함수도 됩니다.
+- 채운 색은 `text-scheme` 이고 `scheme-primary` 입니다. 오류면 `scheme-danger` 입니다.
 - 아이콘은 `aria-hidden` 이고 `inert` 입니다. 이벤트 핸들러, `id`, 폼 컨트롤을 넣지 않습니다.
 
 ## 상태와 스타일
@@ -82,7 +81,7 @@ import { Field, Rating } from '@gsainfoteam/ids-react';
 | `data-required`   | 루트    | 필수                                         |
 | `data-invalid`    | 루트    | 오류. 채운 색이 danger                       |
 
-- `Rating.State` 는 `value`, `previewValue`, `interactive`, `disabled`, `readOnly`, `required`, `invalid` 입니다. 루트의 `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+- `Rating.State` 는 `value`, `previewValue`, `interactive`, `disabled`, `readOnly`, `required`, `invalid` 입니다.
 
 ## 폼
 
@@ -132,6 +131,8 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 <Rating size="tiny" /> // standard(28px 아이콘) / tiny(22px). 줄 높이는 컨트롤 높이(36px / 32px). 생략하면 Field를 따른다
 ```
 
+- **크기 계약: hug.** 아이콘 줄 크기만큼 차지하고 바깥 여백이 없습니다. 자리와 간격은 감싸는 요소와 그 `gap` 이 정합니다. 부모보다 넓으면 줄을 바꿉니다.
+
 ## 속성
 
 | 속성                     | 기본 / 동작                                             |
@@ -149,7 +150,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `size`                   | `standard` / `tiny`                                     |
 | `children`               | `Rating.Item` 들. 생략하면 별                           |
 | `ref`                    | 그룹. `focus()` 는 고른 점수로 넘어간다                 |
-| 그 외 속성               | 그룹으로 간다 (`id`, `aria-*`, `className`, `style` 등) |
+| 그 외 속성               | 그룹으로 간다 (`id`, `aria-*`) |
 
 ## 알아둘 것
 

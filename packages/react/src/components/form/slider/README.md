@@ -83,15 +83,6 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 
 <Slider formatLabel={(v) => `₩${v.toLocaleString()}`} /> // 값 라벨, 눈금 라벨, aria-valuetext
 
-<Slider>
-  <Slider.Track>
-    <Slider.Range />
-    <Slider.Thumb>
-      <Slider.ValueLabel className="opacity-100" /> {/* 늘 보인다 */}
-    </Slider.Thumb>
-  </Slider.Track>
-</Slider>
-
 <Slider.Thumb>{null}</Slider.Thumb>            // 값 라벨 없는 thumb
 ```
 
@@ -104,9 +95,8 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Slider max={360}>
-  <Slider.Track className="bg-[linear-gradient(to_right,red,yellow,lime,cyan,blue,magenta,red)]">
-    {/* Range를 빼면 채워진 구간이 없다 */}
-    <Slider.Thumb style={(thumb) => ({ backgroundColor: `hsl(${thumb.thumbValue} 90% 55%)` })} />
+  <Slider.Track>
+    <Slider.Thumb />                           {/* Range를 빼면 채워진 구간이 없다 */}
   </Slider.Track>
 </Slider>
 
@@ -120,8 +110,8 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 ```
 
 - 자식에 `Track` 이 없으면 기본 `Track` 을 먼저 그리고, 그 안에 `Range` 와 thumb이 들어갑니다. `Track` 만 두면 그 안이 기본으로 채워집니다.
-- 모든 부분이 `asChild`, 상태를 받는 `className` `style` `children` 을 받습니다.
-- thumb 크기는 `[--slider-thumb:20px]` 처럼 변수로 바꿉니다. thumb 의 크기와 트랙 안 위치가 모두 이 값을 따릅니다.
+- 모든 부분이 `asChild` 와 상태를 받는 `children` 을 받습니다.
+- 트랙에 색상 띠를 깔고 thumb 을 고른 색으로 칠하는 예는 `PaintTheTrack` 스토리(`custom-design`)에 있습니다.
 
 ## 상태와 스타일
 
@@ -181,6 +171,8 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 </div>
 ```
 
+- **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`). 세로 슬라이더는 부모 높이를 채웁니다.
+
 ## 속성
 
 | 속성                     | 기본 / 동작                                                   |
@@ -197,7 +189,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선                      |
 | `name` / `form`          | hidden input으로 제출                                         |
 | `size`                   | `standard` / `tiny`                                           |
-| `className` / `style`    | 루트로 간다. 상태를 받는 함수도 된다                          |
+| `className` / `style`    | 루트로 간다. 새 디자인(`custom-design`)에서만 쓴다                          |
 | `ref`                    | 루트. `focus()` 는 첫 thumb으로 넘어간다                      |
 
 ## 알아둘 것

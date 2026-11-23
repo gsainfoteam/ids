@@ -6,7 +6,6 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Label } from '../../typography/label';
 import { Checkbox } from '../checkbox';
@@ -27,7 +26,6 @@ const skills: Array<{ value: Skill; label: string }> = [
 
 const orientations = ['vertical', 'horizontal'] as const;
 const sizes = ['standard', 'tiny'] as const;
-const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
 const meta = {
   title: 'Form/CheckboxGroup',
@@ -49,7 +47,7 @@ const meta = {
     onValueChange: fn(),
     children: ({ Item }) =>
       skills.map((skill) => (
-        <Label key={skill.value} className={row}>
+        <Label key={skill.value}>
           <Item value={skill.value} />
           {skill.label}
         </Label>
@@ -65,11 +63,11 @@ export const Playground: Story = {};
 export const Usage: Story = {
   render: () => (
     <CheckboxGroup aria-label="알림" defaultValue={['mail']}>
-      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+      <Label>
         <Checkbox value="mail" />
         메일
       </Label>
-      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+      <Label>
         <Checkbox value="push" />
         푸시
       </Label>
@@ -93,7 +91,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -122,7 +120,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -138,13 +136,13 @@ export const Gallery: Story = {
           <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['js']}>
             {({ All, Item }) => (
               <>
-                <Label className={row}>
+                <Label>
                   <All />
                   전체 선택
                 </Label>
                 <div className="flex flex-col gap-3 ps-6">
                   {skills.map((skill) => (
-                    <Label key={skill.value} className={row}>
+                    <Label key={skill.value}>
                       <Item value={skill.value} disabled={skill.value === 'rs'} />
                       {skill.label}
                       {skill.value === 'rs' && ' (준비 중)'}
@@ -156,20 +154,20 @@ export const Gallery: Story = {
           </CheckboxGroup>
         </Showcase.Row>
         <Showcase.Row label="grid">
-          <CheckboxGroup<Skill>
-            aria-label="관심 기술"
-            className="grid w-80 grid-cols-2"
-            defaultValue={['py']}
-          >
-            {({ Item }) =>
-              skills.map((skill) => (
-                <Label key={skill.value} className={row}>
-                  <Item value={skill.value} />
-                  {skill.label}
-                </Label>
-              ))
-            }
-          </CheckboxGroup>
+          <div className="w-80">
+            <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['py']}>
+              {({ Item }) => (
+                <div className="grid grid-cols-2 gap-3">
+                  {skills.map((skill) => (
+                    <Label key={skill.value}>
+                      <Item value={skill.value} />
+                      {skill.label}
+                    </Label>
+                  ))}
+                </div>
+              )}
+            </CheckboxGroup>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="Field">
           <Field>
@@ -178,7 +176,7 @@ export const Gallery: Story = {
             <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['js']}>
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -202,13 +200,13 @@ export const AddASelectAllBox: Story = {
     >
       {({ All, Item }) => (
         <>
-          <Label className={row}>
+          <Label>
             <All />
             전체 선택
           </Label>
           <div className="flex flex-col gap-3 ps-6">
             {skills.map((skill) => (
-              <Label key={skill.value} className={row}>
+              <Label key={skill.value}>
                 <Item value={skill.value} disabled={skill.value === 'rs'} />
                 {skill.label}
                 {skill.value === 'rs' && ' (준비 중)'}
@@ -273,7 +271,7 @@ export const RequireAtLeastOneInANativeForm: Story = {
           <CheckboxGroup<Skill> aria-label="관심 기술" name="skills">
             {({ Item }) =>
               skills.map((skill) => (
-                <Label key={skill.value} className={row}>
+                <Label key={skill.value}>
                   <Item value={skill.value} />
                   {skill.label}
                 </Label>
@@ -339,7 +337,7 @@ export const ValidateWithReactHookForm: Story = {
             <CheckboxGroup<Skill> aria-label="관심 기술">
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -376,15 +374,15 @@ export const ValidateWithReactHookForm: Story = {
 export const PlaceCheckboxesWithoutARenderFunction: Story = {
   render: () => (
     <CheckboxGroup aria-label="알림" defaultValue={['mail']}>
-      <Label className={row}>
+      <Label>
         <CheckboxGroup.All />
         모두
       </Label>
-      <Label className={row}>
+      <Label>
         <Checkbox value="mail" />
         메일
       </Label>
-      <Label className={row}>
+      <Label>
         <Checkbox value="push" />
         푸시
       </Label>

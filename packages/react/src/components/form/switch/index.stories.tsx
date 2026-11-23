@@ -46,7 +46,7 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Label className="text-body-b3-medium inline-flex items-center gap-2">
+    <Label>
       <Switch defaultChecked />
       자동 저장
     </Label>
@@ -89,7 +89,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Composition">
         <Showcase.Row label="Label">
-          <Label className="text-body-b3-medium inline-flex items-center gap-2">
+          <Label>
             <Switch defaultChecked />
             자동 저장
           </Label>
@@ -106,7 +106,7 @@ export const Gallery: Story = {
               {(state) => (state.checked ? <CheckIcon /> : <XMarkIcon />)}
             </Switch.Thumb>
           </Switch>
-          <Switch aria-label="테마" className="data-[state=checked]:bg-neutral-solid">
+          <Switch aria-label="테마">
             <Switch.Thumb>{(state) => (state.checked ? <MoonIcon /> : <SunIcon />)}</Switch.Thumb>
           </Switch>
         </Showcase.Row>
@@ -128,13 +128,14 @@ export const ToggleSettingsRightAway: Story = {
     return (
       <div className="flex w-80 flex-col gap-4">
         {rows.map(([key, label]) => (
-          <Field key={key} variant="horizontal" className="grid-cols-[minmax(0,1fr)_auto]">
-            <Field.Label>{label}</Field.Label>
+          <div key={key} className="flex items-center justify-between gap-4">
+            <Label htmlFor={`setting-${key}`}>{label}</Label>
             <Switch
+              id={`setting-${key}`}
               checked={settings[key]}
               onCheckedChange={(next) => setSettings((prev) => ({ ...prev, [key]: next }))}
             />
-          </Field>
+          </div>
         ))}
         <output aria-label="설정" className="text-body-b3-regular font-mono">
           {JSON.stringify(settings)}
@@ -146,7 +147,7 @@ export const ToggleSettingsRightAway: Story = {
     docs: {
       description: {
         story:
-          '즉시 반영되는 설정에 씁니다. `Field` 로 감싸면 라벨을 눌러도 바뀌고, 라벨이 스위치의 이름이 됩니다.',
+          '즉시 반영되는 설정에 씁니다. `Label htmlFor` 로 이으면 라벨을 눌러도 바뀌고, 라벨이 스위치의 이름이 됩니다. 줄 배치는 감싸는 `div` 가 정합니다.',
       },
     },
   },
@@ -169,7 +170,7 @@ export const SubmitWithANativeForm: Story = {
           setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
         }}
       >
-        <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Label>
           <Switch name="autosave" value="yes" defaultChecked />
           자동 저장
         </Label>

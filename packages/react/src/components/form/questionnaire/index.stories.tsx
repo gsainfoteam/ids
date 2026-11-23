@@ -2,7 +2,6 @@ import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Card } from '../../data/card';
 
@@ -23,7 +22,6 @@ const meta = {
   args: {
     size: 'standard',
     advanceOnSelect: false,
-    className: cn('w-96'),
     onComplete: fn(),
     children: (
       <>
@@ -52,22 +50,32 @@ const button = (canvasElement: HTMLElement, name: string) =>
 const radio = (canvasElement: HTMLElement, name: string | RegExp) =>
   within(canvasElement).getByRole('radio', { name });
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-96">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: () => (
-    <Questionnaire className="w-96">
-      <Questionnaire.Question name="tone">
-        어떤 말투로 쓸까요?
-        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
-        <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-      </Questionnaire.Question>
-      <Questionnaire.Question name="length">
-        얼마나 길게 쓸까요?
-        <Questionnaire.Option value="short">짧게</Questionnaire.Option>
-        <Questionnaire.Option value="long">길게</Questionnaire.Option>
-      </Questionnaire.Question>
-    </Questionnaire>
+    <div className="w-96">
+      <Questionnaire>
+        <Questionnaire.Question name="tone">
+          어떤 말투로 쓸까요?
+          <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+          <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+        </Questionnaire.Question>
+        <Questionnaire.Question name="length">
+          얼마나 길게 쓸까요?
+          <Questionnaire.Option value="short">짧게</Questionnaire.Option>
+          <Questionnaire.Option value="long">길게</Questionnaire.Option>
+        </Questionnaire.Question>
+      </Questionnaire>
+    </div>
   ),
 };
 
@@ -77,125 +85,143 @@ export const Gallery: Story = {
       <Showcase.Section title="Size">
         {sizes.map((size) => (
           <Showcase.Row key={size} label={size}>
-            <Questionnaire size={size} className="w-96" defaultValue={{ tone: 'casual' }}>
-              <Questionnaire.Question name="tone">
-                어떤 말투로 쓸까요?
-                <Questionnaire.Description>나중에 바꿀 수 있어요.</Questionnaire.Description>
-                <Questionnaire.Option value="formal" description="보고서, 공지">
-                  격식
-                </Questionnaire.Option>
-                <Questionnaire.Option value="casual" description="동아리 단톡방">
-                  편하게
-                </Questionnaire.Option>
-                <Questionnaire.Other />
-              </Questionnaire.Question>
-              <Questionnaire.Question name="length">
-                얼마나 길게 쓸까요?
-                <Questionnaire.Option value="short">짧게</Questionnaire.Option>
-                <Questionnaire.Option value="long">길게</Questionnaire.Option>
-              </Questionnaire.Question>
-            </Questionnaire>
+            <div className="w-96">
+              <Questionnaire size={size} defaultValue={{ tone: 'casual' }}>
+                <Questionnaire.Question name="tone">
+                  어떤 말투로 쓸까요?
+                  <Questionnaire.Description>나중에 바꿀 수 있어요.</Questionnaire.Description>
+                  <Questionnaire.Option value="formal" description="보고서, 공지">
+                    격식
+                  </Questionnaire.Option>
+                  <Questionnaire.Option value="casual" description="동아리 단톡방">
+                    편하게
+                  </Questionnaire.Option>
+                  <Questionnaire.Other />
+                </Questionnaire.Question>
+                <Questionnaire.Question name="length">
+                  얼마나 길게 쓸까요?
+                  <Questionnaire.Option value="short">짧게</Questionnaire.Option>
+                  <Questionnaire.Option value="long">길게</Questionnaire.Option>
+                </Questionnaire.Question>
+              </Questionnaire>
+            </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>
 
       <Showcase.Section title="Selection mode">
         <Showcase.Row label="single">
-          <Questionnaire className="w-96" defaultValue={{ tone: 'formal' }}>
-            <Questionnaire.Question name="tone">
-              어떤 말투로 쓸까요?
-              <Questionnaire.Option value="formal">격식</Questionnaire.Option>
-              <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-96">
+            <Questionnaire defaultValue={{ tone: 'formal' }}>
+              <Questionnaire.Question name="tone">
+                어떤 말투로 쓸까요?
+                <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+                <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="multiple, optional">
-          <Questionnaire className="w-96" defaultValue={{ topics: ['summary', '회의 일정'] }}>
-            <Questionnaire.Question name="topics" selectionMode="multiple" optional>
-              무엇을 넣을까요?
-              <Questionnaire.Option value="summary">요약</Questionnaire.Option>
-              <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
-              <Questionnaire.Other />
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-96">
+            <Questionnaire defaultValue={{ topics: ['summary', '회의 일정'] }}>
+              <Questionnaire.Question name="topics" selectionMode="multiple" optional>
+                무엇을 넣을까요?
+                <Questionnaire.Option value="summary">요약</Questionnaire.Option>
+                <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
+                <Questionnaire.Other />
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="unanswered">
-          <Questionnaire className="w-96">
-            <Questionnaire.Question name="tone">
-              어떤 말투로 쓸까요?
-              <Questionnaire.Option value="formal">격식</Questionnaire.Option>
-              <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-96">
+            <Questionnaire>
+              <Questionnaire.Question name="tone">
+                어떤 말투로 쓸까요?
+                <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+                <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled option">
-          <Questionnaire className="w-96" defaultValue={{ seat: 'window' }}>
-            <Questionnaire.Question name="seat">
-              어느 자리로 할까요?
-              <Questionnaire.Option value="window">창가</Questionnaire.Option>
-              <Questionnaire.Option value="aisle" disabled description="남은 자리가 없어요">
-                통로
-              </Questionnaire.Option>
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-96">
+            <Questionnaire defaultValue={{ seat: 'window' }}>
+              <Questionnaire.Question name="seat">
+                어느 자리로 할까요?
+                <Questionnaire.Option value="window">창가</Questionnaire.Option>
+                <Questionnaire.Option value="aisle" disabled description="남은 자리가 없어요">
+                  통로
+                </Questionnaire.Option>
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="other filled">
-          <Questionnaire className="w-96" defaultValue={{ tone: '반말로 짧게' }}>
-            <Questionnaire.Question name="tone">
-              어떤 말투로 쓸까요?
-              <Questionnaire.Option value="formal">격식</Questionnaire.Option>
-              <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-              <Questionnaire.Other />
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-96">
+            <Questionnaire defaultValue={{ tone: '반말로 짧게' }}>
+              <Questionnaire.Question name="tone">
+                어떤 말투로 쓸까요?
+                <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+                <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+                <Questionnaire.Other />
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Variant">
         <Showcase.Row label="toggle, single">
-          <Questionnaire className="w-96" defaultValue={{ tone: 'casual' }}>
-            <Questionnaire.Question name="tone" variant="toggle" orientation="horizontal">
-              어떤 말투로 쓸까요?
-              <Questionnaire.Option value="formal">격식</Questionnaire.Option>
-              <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-              <Questionnaire.Option value="cute">귀엽게</Questionnaire.Option>
-              <Questionnaire.Other />
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-96">
+            <Questionnaire defaultValue={{ tone: 'casual' }}>
+              <Questionnaire.Question name="tone" variant="toggle" orientation="horizontal">
+                어떤 말투로 쓸까요?
+                <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+                <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+                <Questionnaire.Option value="cute">귀엽게</Questionnaire.Option>
+                <Questionnaire.Other />
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="toggle, multiple">
-          <Questionnaire className="w-96" defaultValue={{ goods: ['sticker', 'badge'] }}>
-            <Questionnaire.Question
-              name="goods"
-              selectionMode="multiple"
-              variant="toggle"
-              orientation="horizontal"
-            >
-              어떤 굿즈를 팔까요?
-              <Questionnaire.Option value="sticker">스티커</Questionnaire.Option>
-              <Questionnaire.Option value="keyring">키링</Questionnaire.Option>
-              <Questionnaire.Option value="badge">뱃지</Questionnaire.Option>
-              <Questionnaire.Option value="postcard" disabled>
-                엽서
-              </Questionnaire.Option>
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-96">
+            <Questionnaire defaultValue={{ goods: ['sticker', 'badge'] }}>
+              <Questionnaire.Question
+                name="goods"
+                selectionMode="multiple"
+                variant="toggle"
+                orientation="horizontal"
+              >
+                어떤 굿즈를 팔까요?
+                <Questionnaire.Option value="sticker">스티커</Questionnaire.Option>
+                <Questionnaire.Option value="keyring">키링</Questionnaire.Option>
+                <Questionnaire.Option value="badge">뱃지</Questionnaire.Option>
+                <Questionnaire.Option value="postcard" disabled>
+                  엽서
+                </Questionnaire.Option>
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Suggested prompts">
         <Showcase.Row label="toggle, advanceOnSelect">
-          <Questionnaire advanceOnSelect size="tiny" className="w-120">
-            <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
-              무엇을 도와드릴까요?
-              <Questionnaire.Option value="학식">오늘 학식</Questionnaire.Option>
-              <Questionnaire.Option value="셔틀">셔틀 시간표</Questionnaire.Option>
-              <Questionnaire.Option value="도서관">도서관 빈자리</Questionnaire.Option>
-            </Questionnaire.Question>
-          </Questionnaire>
+          <div className="w-120">
+            <Questionnaire advanceOnSelect size="tiny">
+              <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
+                무엇을 도와드릴까요?
+                <Questionnaire.Option value="학식">오늘 학식</Questionnaire.Option>
+                <Questionnaire.Option value="셔틀">셔틀 시간표</Questionnaire.Option>
+                <Questionnaire.Option value="도서관">도서관 빈자리</Questionnaire.Option>
+              </Questionnaire.Question>
+            </Questionnaire>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -352,22 +378,24 @@ export const StartOverWithAFormReset: Story = {
 
 export const SuggestPromptsToStartAChat: Story = {
   render: (args) => (
-    <Card className="w-120">
-      <Card.Header>
-        <Card.Title>지스트 도우미</Card.Title>
-        <Card.Description>학교생활에 대해 무엇이든 물어보세요.</Card.Description>
-      </Card.Header>
-      <Card.Content>
-        <Questionnaire advanceOnSelect size="tiny" onComplete={args.onComplete}>
-          <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
-            이런 걸 물어볼 수 있어요
-            <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
-            <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
-            <Questionnaire.Option value="도서관 빈자리 있어?">도서관 빈자리</Questionnaire.Option>
-          </Questionnaire.Question>
-        </Questionnaire>
-      </Card.Content>
-    </Card>
+    <div className="w-120">
+      <Card>
+        <Card.Header>
+          <Card.Title>지스트 도우미</Card.Title>
+          <Card.Description>학교생활에 대해 무엇이든 물어보세요.</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <Questionnaire advanceOnSelect size="tiny" onComplete={args.onComplete}>
+            <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
+              이런 걸 물어볼 수 있어요
+              <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
+              <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
+              <Questionnaire.Option value="도서관 빈자리 있어?">도서관 빈자리</Questionnaire.Option>
+            </Questionnaire.Question>
+          </Questionnaire>
+        </Card.Content>
+      </Card>
+    </div>
   ),
   parameters: {
     docs: {

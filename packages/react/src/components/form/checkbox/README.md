@@ -11,7 +11,7 @@
 ```tsx
 import { Checkbox, Label } from '@gsainfoteam/ids-react';
 
-<Label className="inline-flex items-center gap-2">
+<Label>
   <Checkbox checked={agreed} onCheckedChange={setAgreed} />
   약관에 동의합니다
 </Label>;
@@ -99,12 +99,7 @@ import { Checkbox, Label } from '@gsainfoteam/ids-react';
 
 ## 상태와 스타일
 
-`className`, `style`, `children` 은 상태를 받는 함수도 됩니다. 같은 상태가 상자에 `data-*` 로 붙습니다.
-
-```tsx
-<Checkbox className={(state) => (state.checked ? 'shadow-md' : undefined)} />
-<Checkbox className="data-[state=checked]:scheme-success" />
-```
+`Checkbox.Indicator` 의 `children` 은 상태를 받는 함수도 됩니다. 같은 상태가 상자에 `data-*` 로 붙습니다.
 
 | 상태            | `data-*`                     | 뜻                                |
 | --------------- | ---------------------------- | --------------------------------- |
@@ -164,6 +159,8 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 <Checkbox invalid />           // 테두리와 체크 색이 danger
 ```
 
+- **크기 계약: hug.** 상자 크기만큼 차지하고 바깥 여백이 없습니다. 자리와 간격은 감싸는 요소와 그 `gap` 이 정합니다.
+
 ## 속성
 
 | 속성                         | 기본 / 동작                                                     |
@@ -175,7 +172,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `invalid`                    | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선      |
 | `variant`                    | `outline`(기본) / `soft`                                        |
 | `size`                       | `standard` / `tiny`. 생략하면 `Field` 크기                      |
-| `className` / `style`        | 상자로 간다. 상태를 받는 함수도 된다                            |
+| `className` / `style`        | 상자로 간다. 새 디자인(`custom-design`)에서만 쓴다                            |
 | `children`                   | `Checkbox.Indicator`. 생략하면 체크와 대시                      |
 | `ref`                        | 실제 input                                                      |
 | 그 외 native 속성            | input으로 간다 (`name`, `value`, `id`, `required`, `aria-*` 등) |
@@ -185,4 +182,4 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 - `checked` 와 `defaultChecked` 를 함께 주면 오류가 납니다.
 - 폼 초기화는 `onCheckedChange` 를 부르지 않습니다. native 체크박스도 change 이벤트를 보내지 않습니다.
 - input은 상자 크기만큼만 덮습니다. 누를 곳을 넓히려면 `Label` 로 감쌉니다.
-- `className` 과 `style` 만 상자로 가고, 이벤트 핸들러를 포함한 나머지는 input으로 갑니다.
+- 이벤트 핸들러를 포함한 native 속성은 input으로 갑니다.

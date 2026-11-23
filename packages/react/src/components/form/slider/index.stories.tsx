@@ -125,27 +125,6 @@ export const Gallery: Story = {
             </Slider>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="value label shown">
-          <div className="w-64 pt-8">
-            <Slider
-              defaultValue={[30000, 70000]}
-              max={100000}
-              step={1000}
-              formatLabel={(value) => `₩${value.toLocaleString()}`}
-              aria-label="가격"
-            >
-              <Slider.Track>
-                <Slider.Range />
-                <Slider.Thumb index={0}>
-                  <Slider.ValueLabel className="opacity-100" />
-                </Slider.Thumb>
-                <Slider.Thumb index={1}>
-                  <Slider.ValueLabel className="opacity-100" />
-                </Slider.Thumb>
-              </Slider.Track>
-            </Slider>
-          </div>
-        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Layout">
@@ -167,22 +146,6 @@ export const Gallery: Story = {
               <Slider defaultValue={70} />
               <Field.Hint>화면 밝기</Field.Hint>
             </Field>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="custom track">
-          <div className="w-64">
-            <Slider
-              defaultValue={200}
-              max={360}
-              aria-label="색상"
-              formatLabel={(value) => `${value}°`}
-            >
-              <Slider.Track className="bg-[linear-gradient(to_right,red,yellow,lime,cyan,blue,magenta,red)]">
-                <Slider.Thumb
-                  style={(state) => ({ backgroundColor: `hsl(${state.thumbValue} 90% 55%)` })}
-                />
-              </Slider.Track>
-            </Slider>
           </div>
         </Showcase.Row>
       </Showcase.Section>
@@ -286,23 +249,15 @@ export const LabelTheSteps: Story = {
 
 export const ShowTheValueWhileDragging: Story = {
   render: () => (
-    <div className="flex w-80 flex-col gap-10 pt-8">
+    <div className="w-80 pt-8">
       <Slider defaultValue={50} formatLabel={(value) => `${value}%`} aria-label="밝기" />
-      <Slider defaultValue={30} formatLabel={(value) => `${value}%`} aria-label="대비">
-        <Slider.Track>
-          <Slider.Range />
-          <Slider.Thumb>
-            <Slider.ValueLabel className="opacity-100" />
-          </Slider.Thumb>
-        </Slider.Track>
-      </Slider>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '기본 thumb 은 `Slider.ValueLabel` 을 품고 있어, 끄는 동안과 키보드 포커스가 있을 때 값을 띄웁니다. 늘 보이게 하려면 `className="opacity-100"` 을 주고, 빼려면 `<Slider.Thumb>{null}</Slider.Thumb>` 처럼 thumb 을 비웁니다.',
+          '기본 thumb 은 `Slider.ValueLabel` 을 품고 있어, 끄는 동안과 키보드 포커스가 있을 때 `formatLabel` 로 만든 값을 띄웁니다. 빼려면 `<Slider.Thumb>{null}</Slider.Thumb>` 처럼 thumb 을 비웁니다.',
       },
     },
   },
@@ -312,8 +267,6 @@ export const ShowTheValueWhileDragging: Story = {
     await userEvent.tab();
     await waitFor(() => expect(getComputedStyle(label).opacity).toBe('1'));
     await expect(label).toHaveTextContent('50%');
-    const shown = thumb(canvasElement, 1).querySelector('[aria-hidden=true]')!;
-    await expect(getComputedStyle(shown).opacity).toBe('1');
   },
 };
 
@@ -352,6 +305,35 @@ export const NameEachThumb: Story = {
     await expect(canvas.getByRole('slider', { name: '최고가' })).toHaveAttribute(
       'aria-valuenow',
       '60000',
+    );
+  },
+};
+
+export const PaintTheTrack: Story = {
+  tags: ['custom-design'],
+  render: () => (
+    <div className="w-64">
+      <Slider defaultValue={200} max={360} aria-label="색상" formatLabel={(value) => `${value}°`}>
+        <Slider.Track className="bg-[linear-gradient(to_right,red,yellow,lime,cyan,blue,magenta,red)]">
+          <Slider.Thumb
+            style={(state) => ({ backgroundColor: `hsl(${state.thumbValue} 90% 55%)` })}
+          />
+        </Slider.Track>
+      </Slider>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'IDS 위에 새로 그린 디자인입니다(`custom-design`). `Slider.Range` 를 뺀 `Slider.Track` 에 색상 띠를 깔고, thumb 은 상태를 받는 `style` 로 고른 색을 칠합니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('slider', { name: '색상' })).toHaveAttribute(
+      'aria-valuenow',
+      '200',
     );
   },
 };

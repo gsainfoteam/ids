@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Label } from '../../typography/label';
 import { Field } from '../field';
@@ -45,13 +44,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
-
 export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Label className="text-body-b3-medium inline-flex items-center gap-2">
+    <Label>
       <Checkbox defaultChecked />
       약관에 동의합니다
     </Label>
@@ -107,7 +104,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Label" description="라벨은 감싸거나 htmlFor로 잇습니다.">
         <Showcase.Row label="wrap">
-          <Label className={row}>
+          <Label>
             <Checkbox defaultChecked />
             약관에 동의합니다
           </Label>
@@ -115,9 +112,7 @@ export const Gallery: Story = {
         <Showcase.Row label="htmlFor">
           <div className="flex items-center gap-2">
             <Checkbox id="gallery-marketing" />
-            <Label htmlFor="gallery-marketing" className="text-body-b3-medium">
-              마케팅 수신
-            </Label>
+            <Label htmlFor="gallery-marketing">마케팅 수신</Label>
           </div>
         </Showcase.Row>
         <Showcase.Row label="Field">
@@ -136,13 +131,6 @@ export const Gallery: Story = {
             </Checkbox.Indicator>
           </Checkbox>
         </Showcase.Row>
-        <Showcase.Row label="className">
-          <Checkbox
-            defaultChecked
-            aria-label="둥근 체크박스"
-            className="data-[state=checked]:scheme-success rounded-full"
-          />
-        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
@@ -159,7 +147,7 @@ export const SelectAllWithAPartialState: Story = {
 
     return (
       <div className="flex flex-col gap-2">
-        <Label className={row}>
+        <Label>
           <Checkbox
             checked={all ? true : some ? 'indeterminate' : false}
             onCheckedChange={(next) => setChecked(checked.map(() => next))}
@@ -168,7 +156,7 @@ export const SelectAllWithAPartialState: Story = {
         </Label>
         <div className="flex flex-col gap-2 ps-6">
           {languages.map((name, index) => (
-            <Label key={name} className={row}>
+            <Label key={name}>
               <Checkbox
                 checked={checked[index]}
                 onCheckedChange={(next) =>
@@ -233,11 +221,11 @@ export const SubmitWithANativeForm: Story = {
           setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
         }}
       >
-        <Label className={row}>
+        <Label>
           <Checkbox name="terms" value="agreed" required />
           약관에 동의합니다 (필수)
         </Label>
-        <Label className={row}>
+        <Label>
           <Checkbox name="news" defaultChecked />
           소식 받기
         </Label>
@@ -333,7 +321,7 @@ export const ValidateWithReactHookForm: Story = {
 export const ReplaceTheCheckMark: Story = {
   render: () => (
     <div className="flex flex-col gap-3">
-      <Label className={row}>
+      <Label>
         <Checkbox defaultChecked>
           <Checkbox.Indicator asChild>
             <HeartIcon />
@@ -341,11 +329,8 @@ export const ReplaceTheCheckMark: Story = {
         </Checkbox>
         좋아요
       </Label>
-      <Label className={row}>
-        <Checkbox
-          defaultChecked="indeterminate"
-          className={(state) => (state.checked ? 'scheme-success' : undefined)}
-        >
+      <Label>
+        <Checkbox defaultChecked="indeterminate">
           <Checkbox.Indicator>
             {(state) => (state.indeterminate ? <MinusIcon /> : <StarIcon />)}
           </Checkbox.Indicator>
@@ -358,7 +343,7 @@ export const ReplaceTheCheckMark: Story = {
     docs: {
       description: {
         story:
-          '`Checkbox.Indicator` 로 표시만 바꿉니다. `asChild` 면 자식이 표시 요소가 되고, `className` 과 `children` 은 상태를 받는 함수도 됩니다.',
+          '`Checkbox.Indicator` 로 표시만 바꿉니다. `asChild` 면 자식이 표시 요소가 되고, `children` 은 상태를 받는 함수도 됩니다.',
       },
     },
   },
@@ -371,7 +356,7 @@ export const ReplaceTheCheckMark: Story = {
     const favorite = canvas.getByRole('checkbox', { name: '즐겨찾기' });
     await userEvent.click(favorite);
     await expect(favorite).toBeChecked();
-    await expect(favorite.closest('[data-checkbox]')!.className).toContain('scheme-success');
+    await expect(favorite.closest('[data-checkbox]')!.querySelector('svg')).toBeTruthy();
   },
 };
 

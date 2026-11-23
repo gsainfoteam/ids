@@ -6,7 +6,6 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Label } from '../../typography/label';
 
@@ -40,7 +39,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 const stateOf = (radio: HTMLElement) => radio.closest('[data-radio]')!.getAttribute('data-state');
 
 export const Playground: Story = {};
@@ -49,11 +47,11 @@ export const Usage: Story = {
   render: () => (
     <fieldset className="flex flex-col gap-3">
       <legend className="text-body-b3-medium mb-3">배송</legend>
-      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+      <Label>
         <Radio name="delivery" value="standard" defaultChecked />
         일반 배송
       </Label>
-      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+      <Label>
         <Radio name="delivery" value="express" />
         빠른 배송
       </Label>
@@ -100,18 +98,9 @@ export const Gallery: Story = {
       <Showcase.Section title="Indicator">
         <Showcase.Row label="asChild">
           <Radio defaultChecked aria-label="별">
-            <Radio.Indicator asChild className="size-3">
-              <StarIcon />
+            <Radio.Indicator asChild>
+              <StarIcon className="size-3" />
             </Radio.Indicator>
-          </Radio>
-        </Showcase.Row>
-        <Showcase.Row label="className">
-          <Radio
-            defaultChecked
-            aria-label="채운 원"
-            className="data-[state=checked]:bg-primary-solid data-[state=checked]:inset-ring-primary-strong"
-          >
-            <Radio.Indicator className="text-on-primary-solid" />
           </Radio>
         </Showcase.Row>
       </Showcase.Section>
@@ -133,15 +122,15 @@ export const GroupRadiosByName: Story = {
       >
         <fieldset className="flex flex-col gap-3">
           <legend className="text-body-b3-medium mb-3">배송</legend>
-          <Label className={row}>
+          <Label>
             <Radio name="shipping" value="standard" defaultChecked />
             일반 배송
           </Label>
-          <Label className={row}>
+          <Label>
             <Radio name="shipping" value="express" />
             빠른 배송
           </Label>
-          <Label className={row}>
+          <Label>
             <Radio name="shipping" value="pickup" />
             매장 수령
           </Label>
@@ -190,11 +179,11 @@ export const BindEachRadioWithRegister: Story = {
     return (
       <div className="flex flex-col items-start gap-4">
         <div role="radiogroup" aria-label="플랜" className="flex flex-col gap-3">
-          <Label className={row}>
+          <Label>
             <Radio {...register('plan')} value="free" />
             무료
           </Label>
-          <Label className={row}>
+          <Label>
             <Radio {...register('plan')} value="pro" />
             Pro
           </Label>

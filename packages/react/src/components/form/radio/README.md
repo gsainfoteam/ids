@@ -67,8 +67,8 @@ import { Label, Radio, RadioGroup } from '@gsainfoteam/ids-react';
 <Radio value="a" />                                  {/* 가운데 점 */}
 
 <Radio value="star">
-  <Radio.Indicator asChild className="size-3">       {/* 자식이 표시 요소가 된다 */}
-    <StarIcon />
+  <Radio.Indicator asChild>                          {/* 자식이 표시 요소가 된다 */}
+    <StarIcon className="size-3" />
   </Radio.Indicator>
 </Radio>
 ```
@@ -78,13 +78,9 @@ import { Label, Radio, RadioGroup } from '@gsainfoteam/ids-react';
 
 ## 상태와 스타일
 
-`className`, `style`, `children` 은 상태를 받는 함수도 됩니다. 같은 상태가 원에 `data-*` 로 붙습니다.
+상태가 원에 `data-*` 로 붙습니다. `Radio.Indicator` 의 `children` 은 상태를 받는 함수도 됩니다.
 
-```tsx
-<Radio value="red" className="size-7 rounded-standard" />   // 원 대신 네모로. 네 모서리까지 눌린다
-```
-
-- 위를 덮은 input은 원의 모서리를 그대로 받습니다. `className` 으로 모양을 바꾸면 누를 수 있는 곳도 그 모양을 따릅니다.
+- 위를 덮은 input은 원의 모서리를 그대로 받아, 누를 수 있는 곳이 원과 같습니다.
 
 | 상태           | `data-*`                 | 뜻                                |
 | -------------- | ------------------------ | --------------------------------- |
@@ -121,6 +117,8 @@ const { register } = useForm({ defaultValues: { plan: 'free' } });
 <Radio invalid />           // 테두리와 점이 danger 색
 ```
 
+- **크기 계약: hug.** 원 크기만큼 차지하고 바깥 여백이 없습니다. 자리와 간격은 감싸는 요소와 그 `gap` 이 정합니다.
+
 ## 속성
 
 | 속성                         | 기본 / 동작                                                    |
@@ -132,7 +130,7 @@ const { register } = useForm({ defaultValues: { plan: 'free' } });
 | `invalid`                    | `aria-invalid` 와 danger 색                                    |
 | `variant`                    | `outline`(기본) / `soft`                                       |
 | `size`                       | `standard` / `tiny`                                            |
-| `className` / `style`        | 원으로 간다. 상태를 받는 함수도 된다                           |
+| `className` / `style`        | 원으로 간다. 새 디자인(`custom-design`)에서만 쓴다                           |
 | `children`                   | `Radio.Indicator`. 생략하면 점                                 |
 | `ref`                        | 실제 input                                                     |
 | 그 외 native 속성            | input으로 간다 (`name`, `id`, `required`, `form`, `aria-*` 등) |

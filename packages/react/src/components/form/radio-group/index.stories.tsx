@@ -26,7 +26,6 @@ const plans: Array<{ value: Plan; label: string; description: string }> = [
 
 const orientations = ['vertical', 'horizontal'] as const;
 const sizes = ['standard', 'tiny'] as const;
-const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
 const meta = {
   title: 'Form/RadioGroup',
@@ -48,7 +47,7 @@ const meta = {
     onValueChange: fn(),
     children: ({ Item }) =>
       plans.map((plan) => (
-        <Label key={plan.value} className={row}>
+        <Label key={plan.value}>
           <Item value={plan.value} />
           {plan.label}
         </Label>
@@ -64,11 +63,11 @@ export const Playground: Story = {};
 export const Usage: Story = {
   render: () => (
     <RadioGroup aria-label="구독 플랜" defaultValue="free">
-      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+      <Label>
         <Radio value="free" />
         무료
       </Label>
-      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+      <Label>
         <Radio value="pro" />
         Pro
       </Label>
@@ -92,7 +91,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -121,7 +120,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -134,7 +133,7 @@ export const Gallery: Story = {
           <RadioGroup<Plan> orientation="horizontal" defaultValue="free" aria-label="일부 비활성">
             {({ Item }) =>
               plans.map((plan) => (
-                <Label key={plan.value} className={row}>
+                <Label key={plan.value}>
                   <Item value={plan.value} disabled={plan.value === 'team'} />
                   {plan.label}
                 </Label>
@@ -152,7 +151,7 @@ export const Gallery: Story = {
             <RadioGroup<Plan> defaultValue="free">
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -161,32 +160,6 @@ export const Gallery: Story = {
             </RadioGroup>
           </Field>
         </Showcase.Row>
-        <Showcase.Row label="cards">
-          <RadioGroup<Plan>
-            defaultValue="pro"
-            aria-label="플랜 카드"
-            className="grid w-full max-w-md gap-3"
-          >
-            {({ Item }) =>
-              plans.map((plan) => (
-                <Label
-                  key={plan.value}
-                  className={cn(
-                    'rounded-standard flex cursor-pointer items-start gap-3 p-4',
-                    'inset-ring-neutral inset-ring-1',
-                    'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
-                  )}
-                >
-                  <Item value={plan.value} className="mt-0.5" />
-                  <span className="flex flex-col gap-1">
-                    <span className="text-body-b3-medium">{plan.label}</span>
-                    <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
-                  </span>
-                </Label>
-              ))
-            }
-          </RadioGroup>
-        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
@@ -194,38 +167,40 @@ export const Gallery: Story = {
 
 export const ChooseAPlanFromCards: Story = {
   args: { onValueChange: fn() },
+  tags: ['custom-design'],
   render: (args) => (
-    <RadioGroup<Plan>
-      defaultValue="pro"
-      onValueChange={args.onValueChange}
-      aria-label="플랜 카드"
-      className="grid w-full max-w-md gap-3"
-    >
-      {({ Item }) =>
-        plans.map((plan) => (
-          <Label
-            key={plan.value}
-            className={cn(
-              'rounded-standard flex cursor-pointer items-start gap-3 p-4',
-              'inset-ring-neutral inset-ring-1',
-              'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
-            )}
-          >
-            <Item value={plan.value} className="mt-0.5" />
-            <span className="flex flex-col gap-1">
-              <span className="text-body-b3-medium">{plan.label}</span>
-              <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
-            </span>
-          </Label>
-        ))
-      }
-    </RadioGroup>
+    <div className="w-full max-w-md">
+      <RadioGroup<Plan>
+        defaultValue="pro"
+        onValueChange={args.onValueChange}
+        aria-label="플랜 카드"
+      >
+        {({ Item }) =>
+          plans.map((plan) => (
+            <Label
+              key={plan.value}
+              className={cn(
+                'rounded-standard flex cursor-pointer items-start gap-3 p-4',
+                'inset-ring-neutral inset-ring-1',
+                'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
+              )}
+            >
+              <Item value={plan.value} className="mt-0.5" />
+              <span className="flex flex-col gap-1">
+                <span className="text-body-b3-medium">{plan.label}</span>
+                <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
+              </span>
+            </Label>
+          ))
+        }
+      </RadioGroup>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '카드형 선택지는 합성으로 만듭니다. `Label` 로 감싸면 카드 어디를 눌러도 선택되고, `has-data-[state=checked]:` 로 선택된 카드를 꾸밉니다.',
+          '카드형 선택지는 IDS 위에 새로 그린 디자인입니다(`custom-design`). `Label` 로 감싸면 카드 어디를 눌러도 선택되고, `has-data-[state=checked]:` 로 선택된 카드를 꾸밉니다.',
       },
     },
   },
@@ -253,7 +228,7 @@ export const RequireAChoiceInANativeForm: Story = {
           <RadioGroup<Plan> name="plan">
             {({ Item }) =>
               plans.map((plan) => (
-                <Label key={plan.value} className={row}>
+                <Label key={plan.value}>
                   <Item value={plan.value} />
                   {plan.label}
                 </Label>
@@ -313,7 +288,7 @@ export const ValidateWithReactHookForm: Story = {
             <RadioGroup<Plan>>
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -371,7 +346,7 @@ export const PlaceRadiosDirectly: Story = {
   render: () => (
     <RadioGroup aria-label="사이즈" orientation="horizontal" defaultValue="m">
       {['s', 'm', 'l', 'xl'].map((size) => (
-        <Label key={size} className={row}>
+        <Label key={size}>
           <Radio value={size} />
           {size.toUpperCase()}
         </Label>
@@ -407,7 +382,7 @@ export const Keyboard: Story = {
     <RadioGroup {...args}>
       {({ Item }) =>
         plans.map((plan) => (
-          <Label key={plan.value} className={row}>
+          <Label key={plan.value}>
             <Item value={plan.value} disabled={plan.value === 'pro'} />
             {plan.label}
           </Label>
