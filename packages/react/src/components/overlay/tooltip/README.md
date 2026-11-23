@@ -52,7 +52,14 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 ```
 
 - 들어갈 자리가 없으면 반대쪽으로 넘어가고, 화면 가장자리에서 8px 안쪽에 머뭅니다.
-- 폭은 내용만큼이고 `max-w-xs` 에서 줄바꿈합니다. 바꾸려면 `Tooltip.Content` 에 `className` 을 줍니다.
+- 폭은 내용을 따르고 20rem(`max-w-xs`)에서 줄바꿈합니다. `className` 은 쓰지 않습니다. 더 좁게 끊으려면 내용을 앱의 요소로 감쌉니다.
+- 20rem 을 넘는 설명은 툴팁 대신 Popover 에 둡니다.
+
+```tsx
+<Tooltip.Content>
+  <span className="block w-48">보관한 항목은 30일 뒤에 지워집니다</span>
+</Tooltip.Content>
+```
 
 ## 단축키
 
