@@ -32,7 +32,7 @@ export namespace Sidebar {
   export type Props = Omit<ComponentProps<'aside'>, 'children'> & {
     value?: string;
     variant?: Variant;
-    collapsible?: boolean | CollapsibleMode;
+    collapsible?: CollapsibleMode;
     collapsed?: boolean;
     defaultCollapsed?: boolean;
     onCollapsedChange?: (collapsed: boolean) => void;

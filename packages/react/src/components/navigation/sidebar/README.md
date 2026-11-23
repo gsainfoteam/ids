@@ -12,7 +12,7 @@
 ```tsx
 import { Chip, Sidebar } from '@gsainfoteam/ids-react';
 
-<Sidebar value={pathname} collapsible>
+<Sidebar value={pathname} collapsible="icon">
   <Sidebar.Header>
     <Logo />
   </Sidebar.Header>
@@ -236,12 +236,12 @@ onItemsChange={async (next, { item, to }) => {
 ## 접기
 
 ```tsx
-<Sidebar collapsible />                                         // 'icon' 과 같다. 아이콘 띠로 접힌다
+<Sidebar collapsible="icon" />                                  // 아이콘 띠로 접힌다
 <Sidebar collapsible="offcanvas" />                             // 통째로 밀려 나간다. Provider 가 필요하다
-<Sidebar collapsible defaultCollapsed />                        // 비제어
-<Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed} /> // 제어
-<Sidebar collapsible shortcut="Mod+\" />                        // 단축키를 바꾼다
-<Sidebar collapsible shortcut={false} />                        // 단축키를 끈다
+<Sidebar collapsible="icon" defaultCollapsed />                 // 비제어
+<Sidebar collapsible="icon" collapsed={collapsed} onCollapsedChange={setCollapsed} /> // 제어
+<Sidebar collapsible="icon" shortcut="Mod+\" />                 // 단축키를 바꾼다
+<Sidebar collapsible="icon" shortcut={false} />                 // 단축키를 끈다
 ```
 
 - 아이콘 띠는 48px 입니다. 라벨과 묶음 라벨은 화면에서만 숨고, 끝 칸은 사라집니다. 항목에 마우스를 올리거나 키보드로 오면 라벨이 오른쪽 Tooltip 으로 뜹니다.
@@ -262,7 +262,7 @@ export default async function Layout({ children }) {
 
   return (
     <Sidebar.Provider>
-      <Sidebar collapsible persist="sidebar" defaultCollapsed={collapsed}>…</Sidebar>
+      <Sidebar collapsible="icon" persist="sidebar" defaultCollapsed={collapsed}>…</Sidebar>
       <Sidebar.Inset>{children}</Sidebar.Inset>
     </Sidebar.Provider>
   );
@@ -320,7 +320,7 @@ export default async function Layout({ children }) {
 | -------------------------------------------- | ------------------------------------------------------------------- |
 | `value`                                      | 지금 페이지. 같은 `value` 의 항목에 `aria-current="page"`           |
 | `variant`                                    | `sidebar`(기본) / `floating` / `inset`                              |
-| `collapsible`                                | `false`(기본) / `true`(= `'icon'`) / `'icon'` / `'offcanvas'`       |
+| `collapsible`                                | `'icon'` / `'offcanvas'`. 주지 않으면 접지 않는다                   |
 | `collapsed` / `defaultCollapsed`             | 접힘 상태. 기본 `false`                                             |
 | `onCollapsedChange`                          | 접거나 펼칠 때 새 상태로                                            |
 | `shortcut`                                   | `'Mod+B'`. `false` 면 끈다                                          |
