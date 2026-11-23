@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
-import { expect, fn, waitFor } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 import { z } from 'zod';
 
 import { Showcase } from '~story-kit';
@@ -10,6 +10,7 @@ import { Showcase } from '~story-kit';
 import { Field as FormField } from '../../../react-hook-form';
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
+import { IdsProvider } from '../../utility/ids-provider';
 import { Field } from '../field';
 
 import { NumberField } from '.';
@@ -32,8 +33,6 @@ const meta = {
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     invalid: { control: 'boolean' },
-    allowWheelScrub: { control: 'boolean' },
-    hideStepper: { control: 'boolean' },
   },
   args: {
     'aria-label': '수량',
@@ -49,6 +48,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-56">
+      <Field.Label>수량</Field.Label>
+      <NumberField defaultValue={1} min={1} />
+    </Field>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -89,7 +97,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Composition"
-        description="자식을 두지 않으면 끝에 위아래 버튼이 붙습니다. Decrement와 Increment를 직접 두면 입력 양옆에 놓입니다."
+        description="부품을 하나도 쓰지 않으면 끝에 위아래 버튼이 붙습니다. Input, Stepper, Increment, Decrement, Clear 중 하나라도 쓰면 쓴 부품만, 쓴 자리에 그립니다."
       >
         <Showcase.Row label="inline">
           <NumberField defaultValue={2} min={0} aria-label="인원" className="w-40">
@@ -114,7 +122,6 @@ export const Gallery: Story = {
         <Showcase.Row label="currency">
           <NumberField
             defaultValue={1234.5}
-            locale="ko-KR"
             formatOptions={{ style: 'currency', currency: 'KRW' }}
             aria-label="금액"
             className="w-56"
@@ -131,159 +138,121 @@ export const Gallery: Story = {
           />
         </Showcase.Row>
         <Showcase.Row label="no stepper">
-          <NumberField defaultValue={42} hideStepper aria-label="버튼 없음" className="w-48" />
+          <NumberField defaultValue={42} aria-label="버튼 없음" className="w-48">
+            <NumberField.Input />
+          </NumberField>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Keyboard: Story = {
-  args: { defaultValue: 5, min: 0, max: 100 },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '↑↓는 step, Shift는 largeStep, Alt(Option)는 smallStep, PageUp·PageDown은 largeStep, Home·End는 min·max로 갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, args, userEvent }) => {
-    const input = canvas.getByRole('spinbutton', { name: '수량' });
-    await userEvent.click(input);
-    await userEvent.keyboard('{ArrowUp}');
-    await expect(input).toHaveValue('6');
-    await userEvent.keyboard('{Shift>}{ArrowUp}{/Shift}');
-    await expect(input).toHaveValue('16');
-    await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}');
-    await expect(input).toHaveValue('15.9');
-    await userEvent.keyboard('{End}');
-    await expect(input).toHaveAttribute('aria-valuenow', '100');
-    await userEvent.keyboard('{Home}');
-    await expect(input).toHaveAttribute('aria-valuenow', '0');
-    await userEvent.keyboard('{PageUp}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(10);
-  },
-};
-
-export const PressAndHold: Story = {
-  args: { defaultValue: 0 },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '버튼을 누르고 있으면 0.4초 뒤부터 계속 바뀌고 점점 빨라집니다. 마우스로 누르면 포커스는 입력에 남고, 터치로 누르면 화상 키보드를 띄우지 않습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('spinbutton', { name: '수량' });
-    const increment = canvas.getByRole('button', { name: '값 늘리기' });
-    await userEvent.pointer({ keys: '[MouseLeft>]', target: increment });
-    await userEvent.pointer({ keys: '[/MouseLeft]', target: increment });
-    await expect(input).toHaveAttribute('aria-valuenow', '1');
-    await expect(input).toHaveFocus();
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    await expect(input).toHaveAttribute('aria-valuenow', '1');
-  },
-};
-
-export const StepSnapping: Story = {
-  args: { defaultValue: null, min: 0, step: 0.5, 'aria-label': '시간' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'step을 주면 입력을 마칠 때 min에서 시작하는 step 격자로 맞춥니다. 격자 밖의 값에서 ↑↓를 누르면 가까운 격자로 먼저 갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('spinbutton', { name: '시간' });
-    await userEvent.type(input, '1.3');
-    await userEvent.tab();
-    await expect(input).toHaveValue('1.5');
-    await userEvent.clear(input);
-    await userEvent.type(input, '2.2{ArrowUp}');
-    await expect(input).toHaveValue('2.5');
-  },
-};
-
-export const WheelScrub: Story = {
-  args: { defaultValue: 10, allowWheelScrub: true },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'allowWheelScrub을 켜면 포커스가 있는 동안 휠로 값을 바꿉니다. 포커스가 없으면 휠은 페이지를 스크롤합니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('spinbutton', { name: '수량' });
-    const wheel = (deltaY: number) =>
-      input.dispatchEvent(new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true }))
-        ? 'page scrolls'
-        : 'field keeps the wheel';
-    await expect(wheel(-100)).toBe('page scrolls');
-    await expect(input).toHaveValue('10');
-    await userEvent.click(input);
-    await expect(wheel(-100)).toBe('field keeps the wheel');
-    wheel(-100);
-    await waitFor(() => expect(input).toHaveValue('12'));
-    wheel(100);
-    await waitFor(() => expect(input).toHaveValue('11'));
-  },
-};
-
-export const RangeValidity: Story = {
+export const LeaveOutTheButtons: Story = {
   render: () => (
-    <form className="flex w-64 flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
-      <Field>
-        <Field.Label>좌석 수</Field.Label>
-        <NumberField name="seats" min={1} max={8} defaultValue={12} />
-        <Field.Hint>1에서 8까지</Field.Hint>
-        <Field.Error />
-      </Field>
-      <Button type="submit">예약</Button>
-    </form>
+    <Field className="w-56">
+      <Field.Label>키</Field.Label>
+      <NumberField defaultValue={170} min={0}>
+        <NumberField.Input />
+        <span>cm</span>
+      </NumberField>
+    </Field>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '범위를 벗어난 값은 native 검증으로도 알립니다. 폼이 제출을 막고 Field.Error가 이유를 보여 줍니다. 입력을 마치면 범위 안으로 맞춰집니다.',
+          '`<NumberField.Input />` 만 쓰면 위아래 버튼 없이 입력만 그립니다. 부품을 하나라도 쓰면 쓴 부품만 그리기 때문입니다. `<span>cm</span>` 같은 단위는 부품이 아니라서 버튼을 되살리지 않습니다. ↑↓ 키와 검증은 그대로 동작합니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('spinbutton', { name: '좌석 수' });
-    await userEvent.click(canvas.getByRole('button', { name: '예약' }));
-    await expect(await canvas.findByText('값은 8 이하여야 합니다.')).toBeVisible();
+    const input = canvas.getByRole('spinbutton', { name: '키' });
+    await expect(canvas.queryByRole('button')).toBeNull();
     await userEvent.click(input);
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(input).toHaveValue('8');
-    await expect(canvas.queryByText('값은 8 이하여야 합니다.')).toBeNull();
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(input).toHaveValue('171');
   },
 };
 
-const NO_BREAK_SPACE = '\u00a0';
+export const PutMinusAndPlusOnTheSides: Story = {
+  render: () => (
+    <Field className="w-40">
+      <Field.Label>인원</Field.Label>
+      <NumberField defaultValue={2} min={0}>
+        <NumberField.Decrement />
+        <NumberField.Input className="text-center" />
+        <NumberField.Increment />
+      </NumberField>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`NumberField.Decrement` 와 `NumberField.Increment` 를 Input 양옆에 쓰면 쌓인 위아래 버튼 대신 −와 + 버튼이 그 자리에 놓입니다. 가운데 정렬은 Input 의 `className` 으로 줍니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('spinbutton', { name: '인원' });
+    await userEvent.click(canvas.getByRole('button', { name: '값 늘리기' }));
+    await expect(input).toHaveAttribute('aria-valuenow', '3');
+    await userEvent.click(canvas.getByRole('button', { name: '값 줄이기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '값 줄이기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '값 줄이기' }));
+    await expect(input).toHaveAttribute('aria-valuenow', '0');
+    await expect(canvas.getByRole('button', { name: '값 줄이기' })).toBeDisabled();
+  },
+};
 
-export const LocaleFormats: Story = {
+export const NameTheStepperButtons: Story = {
+  render: () => (
+    <Field className="w-56">
+      <Field.Label>참석 인원</Field.Label>
+      <NumberField defaultValue={4} min={1} max={10}>
+        <NumberField.Input />
+        <NumberField.Stepper>
+          <NumberField.Increment aria-label="참석 인원 늘리기" />
+          <NumberField.Decrement aria-label="참석 인원 줄이기" />
+        </NumberField.Stepper>
+      </NumberField>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '버튼의 이름은 기본으로 "값 늘리기"와 "값 줄이기"입니다. 한 화면에 숫자 필드가 여럿이면 `NumberField.Stepper` 안에 Increment 와 Decrement 를 쓰고 각각 `aria-label` 을 주어 무엇을 바꾸는 버튼인지 알립니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('spinbutton', { name: '참석 인원' });
+    await userEvent.click(canvas.getByRole('button', { name: '참석 인원 늘리기' }));
+    await expect(input).toHaveAttribute('aria-valuenow', '5');
+    await userEvent.click(canvas.getByRole('button', { name: '참석 인원 줄이기' }));
+    await expect(input).toHaveAttribute('aria-valuenow', '4');
+  },
+};
+
+const NO_BREAK_SPACE = ' ';
+
+export const FormatForAnotherLocale: Story = {
   render: function Render() {
     const [currency, setCurrency] = useState<number | null>(1234.567);
 
     return (
       <div className="grid w-72 gap-4">
-        <Field>
-          <Field.Label>금액</Field.Label>
-          <NumberField
-            value={currency}
-            onValueChange={setCurrency}
-            locale="de-DE"
-            formatOptions={{ style: 'currency', currency: 'EUR' }}
-          />
-        </Field>
+        <IdsProvider.Scope locale="de-DE">
+          <Field>
+            <Field.Label>금액</Field.Label>
+            <NumberField
+              value={currency}
+              onValueChange={setCurrency}
+              formatOptions={{ style: 'currency', currency: 'EUR' }}
+            />
+          </Field>
+        </IdsProvider.Scope>
         <Field>
           <Field.Label>비율</Field.Label>
           <NumberField
@@ -297,6 +266,14 @@ export const LocaleFormats: Story = {
         <output aria-label="금액 숫자">{JSON.stringify(currency)}</output>
       </div>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '숫자는 가장 가까운 `IdsProvider` 의 `locale` 로 쓰고 읽습니다. 앱 전체는 바깥 `IdsProvider` 의 `locale` 로 정하고, 한 필드만 다른 형식으로 보이려면 그 필드를 `<IdsProvider.Scope locale="de-DE">` 로 감쌉니다. `formatOptions` 로 통화와 퍼센트를 고르고, 입력하는 동안에는 쓴 글자를 그대로 두었다가 입력을 마치면 그 형식으로 다시 씁니다.',
+      },
+    },
   },
   play: async ({ canvas, userEvent }) => {
     const price = canvas.getByRole('spinbutton', { name: '금액' });
@@ -321,6 +298,80 @@ export const LocaleFormats: Story = {
   },
 };
 
+export const HoldAButtonToRepeat: Story = {
+  args: { defaultValue: 0 },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '버튼을 누르고 있으면 0.4초 뒤부터 계속 바뀌고 점점 빨라집니다. 마우스로 누르면 포커스는 입력에 남고, 터치로 누르면 화상 키보드를 띄우지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('spinbutton', { name: '수량' });
+    const increment = canvas.getByRole('button', { name: '값 늘리기' });
+    await userEvent.pointer({ keys: '[MouseLeft>]', target: increment });
+    await userEvent.pointer({ keys: '[/MouseLeft]', target: increment });
+    await expect(input).toHaveAttribute('aria-valuenow', '1');
+    await expect(input).toHaveFocus();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await expect(input).toHaveAttribute('aria-valuenow', '1');
+  },
+};
+
+export const SnapToTheStep: Story = {
+  args: { defaultValue: null, min: 0, step: 0.5, 'aria-label': '시간' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`step` 을 주면 입력을 마칠 때 `min` 에서 시작하는 step 격자로 맞춥니다. 격자 밖의 값에서 ↑↓를 누르면 가까운 격자로 먼저 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('spinbutton', { name: '시간' });
+    await userEvent.type(input, '1.3');
+    await userEvent.tab();
+    await expect(input).toHaveValue('1.5');
+    await userEvent.clear(input);
+    await userEvent.type(input, '2.2{ArrowUp}');
+    await expect(input).toHaveValue('2.5');
+  },
+};
+
+export const BlockValuesOutOfRange: Story = {
+  render: () => (
+    <form className="flex w-64 flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
+      <Field>
+        <Field.Label>좌석 수</Field.Label>
+        <NumberField name="seats" min={1} max={8} defaultValue={12} />
+        <Field.Hint>1에서 8까지</Field.Hint>
+        <Field.Error />
+      </Field>
+      <Button type="submit">예약</Button>
+    </form>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`min` 과 `max` 를 벗어난 값은 native 검증으로도 알립니다. 폼이 제출을 막고 `Field.Error` 가 이유를 보여 줍니다. 입력을 마치면 범위 안으로 맞춰집니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('spinbutton', { name: '좌석 수' });
+    await userEvent.click(canvas.getByRole('button', { name: '예약' }));
+    await expect(await canvas.findByText('값은 8 이하여야 합니다.')).toBeVisible();
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(input).toHaveValue('8');
+    await expect(canvas.queryByText('값은 8 이하여야 합니다.')).toBeNull();
+  },
+};
+
 const schema = z.object({
   quantity: z
     .number()
@@ -331,7 +382,7 @@ const schema = z.object({
     ),
 });
 
-export const ZodForm: Story = {
+export const SubmitANumberWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({
       resolver: zodResolver(schema),
@@ -372,7 +423,7 @@ export const ZodForm: Story = {
     docs: {
       description: {
         story:
-          'controlMode="value"는 onValueChange로 숫자를 받습니다. 화면의 글자가 아니라 number | null이 RHF에 들어갑니다.',
+          'react-hook-form 의 `Field` 에 `controlMode="value"` 를 주면 onValueChange 로 숫자를 받습니다. 화면의 글자가 아니라 number | null 이 폼 값에 들어가므로 zod 의 `z.number()` 로 바로 검증합니다.',
       },
     },
   },
@@ -392,5 +443,34 @@ export const ZodForm: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '초기화' }));
     await expect(input).toHaveValue('');
     await expect(canvas.getByLabelText('제출 값')).toBeEmptyDOMElement();
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { defaultValue: 5, min: 0, max: 100 },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '↑↓는 step, Shift는 largeStep, Alt(Option)는 smallStep, PageUp·PageDown은 largeStep, Home·End는 min·max로 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, args, userEvent }) => {
+    const input = canvas.getByRole('spinbutton', { name: '수량' });
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(input).toHaveValue('6');
+    await userEvent.keyboard('{Shift>}{ArrowUp}{/Shift}');
+    await expect(input).toHaveValue('16');
+    await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}');
+    await expect(input).toHaveValue('15.9');
+    await userEvent.keyboard('{End}');
+    await expect(input).toHaveAttribute('aria-valuenow', '100');
+    await userEvent.keyboard('{Home}');
+    await expect(input).toHaveAttribute('aria-valuenow', '0');
+    await userEvent.keyboard('{PageUp}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(10);
   },
 };

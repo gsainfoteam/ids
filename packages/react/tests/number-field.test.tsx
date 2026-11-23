@@ -11,13 +11,14 @@ import { z } from 'zod';
 import { Field, IdsProvider, NumberField } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
+import { LanguageContext } from '../src/internal/translate';
 import { Field as FormField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function controlled(props: NumberField.Props = {}) {
+function controlled(props: NumberField.Props = {}, locale?: string) {
   const changes: Array<number | null> = [];
   const latest = { value: props.defaultValue ?? null, set: (_next: number | null) => {} };
   function Controlled() {
@@ -40,7 +41,11 @@ function controlled(props: NumberField.Props = {}) {
     );
   }
   return {
-    node: <Controlled />,
+    node: (
+      <LanguageContext value={{ locale }}>
+        <Controlled />
+      </LanguageContext>
+    ),
     value: () => latest.value,
     set: (next: number | null) => latest.set(next),
     changes,
@@ -167,11 +172,13 @@ test('controlled partial drafts, negative/decimal values, zero, null and externa
 });
 
 test('currency, locale decimal/grouping, percent typing and display-only precision', async () => {
-  const euro = controlled({
-    defaultValue: 1234.567,
-    formatOptions: { style: 'currency', currency: 'EUR' },
-    locale: 'de-DE',
-  });
+  const euro = controlled(
+    {
+      defaultValue: 1234.567,
+      formatOptions: { style: 'currency', currency: 'EUR' },
+    },
+    'de-DE',
+  );
   const screen = await render(euro.node);
   const input = screen.getByRole('spinbutton');
   await expect.element(input).toHaveValue('1.234,57 €');
@@ -209,7 +216,7 @@ test('currency, locale decimal/grouping, percent typing and display-only precisi
 });
 
 test('localized digits and accounting parentheses parse; text that is no number is refused', async () => {
-  const arabic = controlled({ locale: 'ar-EG' });
+  const arabic = controlled({}, 'ar-EG');
   const screen = await render(arabic.node);
   const input = screen.getByRole('spinbutton');
   await userEvent.fill(input, '١٬٢٣٤٫٥');
@@ -569,7 +576,7 @@ test('Zod + RHF value adapter: number/null validation, focus, numeric submit, se
   await expect.poll(() => result?.quantity).toBeUndefined();
 });
 
-test('invalid props/structures fail clearly and hideStepper removes automatic controls', () => {
+test('invalid props/structures fail clearly, and writing a part leaves out the default stepper', () => {
   const scientific: Intl.NumberFormatOptions = { notation: 'scientific' };
   const invalidProps: NumberField.Props[] = [
     { min: 5, max: 1 },
@@ -599,7 +606,15 @@ test('invalid props/structures fail clearly and hideStepper removes automatic co
   expect(() => renderToString(<NumberField.Input />)).toThrow(
     /`<NumberField.Input>` must be used inside `<NumberField>`/,
   );
-  expect(parse(renderToString(<NumberField hideStepper />)).querySelector('button')).toBeNull();
+  expect(
+    parse(
+      renderToString(
+        <NumberField>
+          <NumberField.Input />
+        </NumberField>,
+      ),
+    ).querySelector('button'),
+  ).toBeNull();
 });
 
 function layoutOf(shell: HTMLElement) {
@@ -658,6 +673,7 @@ test('Input disabled/readOnly override the root and drive container state', asyn
   await screen.rerender(
     <NumberField defaultValue={1}>
       <NumberField.Input readOnly />
+      <NumberField.Stepper />
     </NumberField>,
   );
   expect(shellOf(input).dataset.readonly).toBe('');
@@ -673,8 +689,9 @@ test('children without an Input become leading adornments before an auto-inserte
   const input = screen.getByRole('spinbutton');
   expect(layoutOf(shellOf(input))).toEqual(['$', 'INPUT', 'STEPPER']);
   await screen.rerender(
-    <NumberField defaultValue={1} hideStepper>
+    <NumberField defaultValue={1}>
       <span>$</span>
+      <NumberField.Input />
     </NumberField>,
   );
   expect(layoutOf(shellOf(input))).toEqual(['$', 'INPUT']);
@@ -831,26 +848,37 @@ test('out-of-range values reach Field.Error through native validity', async () =
     .toBeNull();
 });
 
-test('the wheel steps only when allowed and the input has focus', async () => {
-  const form = controlled({ defaultValue: 1, allowWheelScrub: true });
+test('the wheel scrolls the page and never steps, focused or not', async () => {
+  const form = controlled({ defaultValue: 1 });
   const screen = await render(form.node);
   const input = screen.getByRole('spinbutton');
   expect(await wheelWasPrevented(input, -100), 'an unfocused field lets the page scroll').toBe(
     false,
   );
-  expect(form.changes).toEqual([]);
   node(input).focus();
-  expect(await wheelWasPrevented(input, -100)).toBe(true);
-  await expect.poll(() => form.value()).toBe(2);
-  await userEvent.keyboard('{Shift>}');
-  expect(await wheelWasPrevented(input, 100)).toBe(true);
-  await userEvent.keyboard('{/Shift}');
-  await expect.poll(() => form.value()).toBe(-8);
-  await userEvent.keyboard('{Control>}');
-  expect(await wheelWasPrevented(input, -100), 'ctrl+wheel stays the browser zoom').toBe(false);
-  expect(await wheelWasPrevented(input, 100), 'and zooms Firefox back out').toBe(false);
-  await userEvent.keyboard('{/Control}');
-  expect(form.changes).toEqual([2, -8]);
+  expect(await wheelWasPrevented(input, -100), 'a focused field lets it scroll too').toBe(false);
+  expect(form.changes).toEqual([]);
+});
+
+test('Increment and Decrement inside a Stepper stack and take their own names', async () => {
+  const screen = await render(
+    <NumberField defaultValue={2} aria-label="Seats">
+      <NumberField.Input />
+      <NumberField.Stepper>
+        <NumberField.Increment aria-label="Add a seat" />
+        <NumberField.Decrement aria-label="Remove a seat" />
+      </NumberField.Stepper>
+    </NumberField>,
+  );
+  const stepper = screen.container.querySelector('[data-number-field-stepper]')!;
+  const increment = screen.getByRole('button', { name: 'Add a seat' });
+  await expect.element(increment).toBeInTheDocument();
+  expect(stepper.contains(increment.element())).toBe(true);
+  expect(stepper.querySelectorAll('button')).toHaveLength(2);
+  await userEvent.click(increment);
+  await expect.element(screen.getByRole('spinbutton')).toHaveValue('3');
+  await userEvent.click(screen.getByRole('button', { name: 'Remove a seat' }));
+  await expect.element(screen.getByRole('spinbutton')).toHaveValue('2');
 });
 
 test('holding a stepper repeats and speeds up; releasing stops it', async () => {

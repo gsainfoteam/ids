@@ -15,7 +15,7 @@
 
 | 가져가는 것                                                                                                                  | 쓰는 곳                                                   |
 | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `textControlStyle`, `TextControlContext`, `TextControlClear`, `Adornments`, `splitAroundInput`, `countOf`, `stateAttributes` | TextField, PasswordField, NumberField, TelField           |
+| `textControlStyle`, `TextControlContext`, `TextControlClear`, `Adornments`, `splitAroundInput`, `countOf`, `writesNoneOf`, `stateAttributes` | TextField, PasswordField, NumberField, TelField           |
 | `insetButtons`, `stateAttributes`                                                                                            | TextArea                                                  |
 | `useTextControl`, `useMergedRef`, `isInvalid`                                                                                | TextField, PasswordField, NumberField, TelField, TextArea |
 | `useInputValue`                                                                                                              | TextField, PasswordField, TextArea                        |
@@ -60,6 +60,7 @@ const styles = textControlStyle({ variant, size });
 ### 왜 이렇게
 
 - `splitAroundInput`: Input 앞의 자식은 앞쪽 장식, 뒤의 자식은 뒤쪽 장식입니다. Input 이 없으면 모든 자식이 앞쪽이고 Input 은 맨 뒤에 그립니다(`fallback`). 자식은 `flattenFragments` 로 풀어서 key 가 겹치지 않습니다.
+- `writesNoneOf`: 자식에 필드의 파트(Input 포함)가 하나도 없는지 봅니다. 없으면 필드가 기본 파트(NumberField 의 Stepper, PasswordField 의 CapsLock 과 VisibilityToggle)를 그리고, 하나라도 있으면 앱이 쓴 파트만 그립니다. 장식(아이콘, 단위 글자)은 파트가 아니라서 기본 파트를 지우지 않습니다.
 - `Adornments`: 앱이 넣은 내용은 `<span data-${marker}-adornment>` 로 감싸, 아이콘과 글자가 `bg-neutral-soft` 색과 아이콘 크기를 받습니다. 필드 자신의 파트(`own`, 예: Clear)는 스스로 크기를 정하므로 감싸지 않습니다.
 - `TextControlClear` 는 값이 있고 disabled, readOnly 가 아닐 때만 그립니다.
 - Clear 는 검색 필드의 지우기 버튼처럼 Tab 순서에서 빠집니다(`tabIndex: -1`). 키보드로는 Escape 와 전체 선택 뒤 지우기가 같은 일을 합니다.

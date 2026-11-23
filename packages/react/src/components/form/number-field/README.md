@@ -68,8 +68,11 @@ const [seats, setSeats] = useState<number | null>(2);
 ## 버튼
 
 ```tsx
-<NumberField />                                {/* 끝에 위아래 버튼이 붙는다 */}
-<NumberField hideStepper />                    {/* 버튼 없이 */}
+<NumberField />                                {/* 파트를 쓰지 않으면 끝에 위아래 버튼이 붙는다 */}
+
+<NumberField>
+  <NumberField.Input />                        {/* 파트를 하나라도 쓰면 쓴 것만 그린다: 버튼 없이 */}
+</NumberField>
 
 <NumberField>
   <NumberField.Decrement />                    {/* 입력 양옆에 −, + */}
@@ -77,33 +80,35 @@ const [seats, setSeats] = useState<number | null>(2);
   <NumberField.Increment />
 </NumberField>
 
-<NumberField incrementLabel="인원 늘리기" decrementLabel="인원 줄이기" />
+<NumberField>
+  <NumberField.Input />
+  <NumberField.Stepper>                        {/* 위아래 버튼의 이름을 바꾼다 */}
+    <NumberField.Increment aria-label="인원 늘리기" />
+    <NumberField.Decrement aria-label="인원 줄이기" />
+  </NumberField.Stepper>
+</NumberField>
 ```
+
+- 파트는 `Input`, `Stepper`, `Increment`, `Decrement`, `Clear` 입니다. 단위 글자나 아이콘 같은 장식은 파트가 아니라서, 장식만 넣으면 위아래 버튼이 그대로 붙습니다.
+- 버튼의 기본 이름은 "값 늘리기", "값 줄이기" 입니다. `IdsProvider` 의 `translate` 가 `numberField.increment`, `numberField.decrement` 로 바꿉니다.
 
 - 버튼은 탭 순서에 없습니다. 키보드에서는 입력의 ↑↓가 같은 일을 합니다.
 - 경계에 닿으면 그쪽 버튼이 비활성이 됩니다.
 - 누르고 있으면 계속 바뀌고, 떼거나 포인터가 취소되면 멈춥니다.
 
-## 휠
-
-```tsx
-<NumberField allowWheelScrub />                // 포커스가 있을 때만 휠로 증감. Shift는 largeStep
-```
-
-- 켜면 포커스가 있는 입력 위에서 휠이 페이지 대신 값을 바꿉니다. 그래서 기본은 꺼져 있습니다.
-- `Ctrl`·`⌘` + 휠은 브라우저 확대로 남겨 둡니다.
-
 ## 형식
 
 ```tsx
-<NumberField defaultValue={1234.567} locale="de-DE" formatOptions={{ style: 'currency', currency: 'EUR' }} />
-// "1.234,57 €". 포커스해도 이 글자를 그대로 고친다. 값은 1234.567 그대로다
+<IdsProvider theme={theme} locale="de-DE">
+  <NumberField defaultValue={1234.567} formatOptions={{ style: 'currency', currency: 'EUR' }} />
+  {/* "1.234,57 €". 포커스해도 이 글자를 그대로 고친다. 값은 1234.567 그대로다 */}
+</IdsProvider>
 
 <NumberField defaultValue={0.125} formatOptions={{ style: 'percent', minimumFractionDigits: 1 }} />
 // "12.5%". 퍼센트로 입력한다: "25" 나 "25%" 는 0.25
 ```
 
-- `locale` 기본값은 `en-US` 입니다. SSR과 브라우저가 같은 글자를 그리게 하기 위해서입니다.
+- 숫자 형식은 가장 가까운 `IdsProvider` 의 `locale` 을 따르고, 없으면 `en-US` 입니다. SSR과 브라우저가 같은 글자를 그리게 하기 위해서입니다.
 - 형식의 반올림은 보이는 글자와 `aria-valuetext` 에만 씁니다. 글자를 고치지 않으면 값은 그대로입니다.
 - `notation` 은 `standard` 만 됩니다. `1.2E-6` 이나 `1.2K` 는 다시 숫자로 읽을 수 없기 때문입니다.
 
@@ -114,7 +119,7 @@ const [seats, setSeats] = useState<number | null>(2);
   <NumberField.Input />
   <span>kg</span>                              {/* Input 뒤 = 뒤쪽 */}
   <NumberField.Clear />                        {/* 값이 있을 때만. 누르거나 Escape면 null */}
-  <NumberField.Stepper />                      {/* 직접 두면 그 자리에 놓인다 */}
+  <NumberField.Stepper />                      {/* 파트를 썼으니 버튼도 직접 둔다. 둔 자리에 놓인다 */}
 </NumberField>
 ```
 
@@ -158,10 +163,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 | `min` / `max`                         | 제한 없음. `min <= max`                                       |
 | `step`                                | ↑↓ 단위. 주면 격자에 맞춘다                                   |
 | `smallStep` / `largeStep`             | `step` ÷ 10 / `step` × 10. 양수                               |
-| `locale` / `formatOptions`            | `en-US` / `Intl.NumberFormat` 옵션. `notation` 제외           |
-| `allowWheelScrub`                     | `false`                                                       |
-| `hideStepper`                         | `false`. 자동 버튼만 숨긴다                                   |
-| `incrementLabel` / `decrementLabel`   | "값 늘리기" / "값 줄이기"                                     |
+| `formatOptions`                       | `Intl.NumberFormat` 옵션. `notation` 제외. locale 은 provider |
 | `variant`                             | `outline`(기본) / `soft` / `ghost`                            |
 | `size`                                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |

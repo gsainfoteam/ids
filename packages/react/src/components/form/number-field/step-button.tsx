@@ -1,11 +1,12 @@
 'use client';
 
-import { type ComponentProps } from 'react';
+import { use, type ComponentProps } from 'react';
 
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/16/solid';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 
-import { useNumberContext } from './context';
+import { InsideStepperContext, useNumberContext } from './context';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 
@@ -13,13 +14,12 @@ export type NumberFieldStepProps = Omit<ComponentProps<'button'>, 'children'>;
 
 type StepButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
   direction: 1 | -1;
-  stacked?: boolean;
 };
 
-export function StepButton({ direction, stacked = false, className, ...props }: StepButtonProps) {
-  const { field, state, incrementLabel, decrementLabel, styles } = useNumberContext(
-    direction > 0 ? 'Increment' : 'Decrement',
-  );
+export function StepButton({ direction, className, ...props }: StepButtonProps) {
+  const t = useTranslate();
+  const stacked = use(InsideStepperContext);
+  const { field, state, styles } = useNumberContext(direction > 0 ? 'Increment' : 'Decrement');
   const blocked =
     state.disabled || state.readOnly || !(direction > 0 ? field.canIncrease : field.canDecrease);
   const icon = stacked ? (
@@ -40,7 +40,9 @@ export function StepButton({ direction, stacked = false, className, ...props }: 
       tabIndex={-1}
       variant="ghost"
       size={state.size}
-      aria-label={props['aria-label'] ?? (direction > 0 ? incrementLabel : decrementLabel)}
+      aria-label={
+        props['aria-label'] ?? t(direction > 0 ? 'numberField.increment' : 'numberField.decrement')
+      }
       aria-controls={field.inputProps.id}
       disabled={blocked || props.disabled}
       data-number-field-step={direction > 0 ? 'increment' : 'decrement'}
