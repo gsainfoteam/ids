@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 import { matchesSearch } from '../../../../internal/lib/search-text';
-import { hasExtension } from '../parts/tool';
+import { hasExtension } from '../lib/extensions';
 import { insertTable } from '../table/insert';
 
 import type { Translate } from '../../../../internal/translate';

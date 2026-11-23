@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react';
 
 import { Resizable, useResizable } from '../../../layout/resizable';
+import { useInternalEditorImageWidth } from '../hooks/use-editor-image-width';
 import { editorStyle } from '../style';
 
 const MIN_IMAGE_WIDTH = 48;
@@ -12,22 +13,9 @@ const styles = editorStyle();
 
 const widthOf = (width: unknown) => (typeof width === 'number' ? width : undefined);
 
-function useInternalWidthOf(element: HTMLElement | null) {
-  const [width, setWidth] = useState<number>();
-
-  useEffect(() => {
-    if (!element) return;
-    const observer = new ResizeObserver(([entry]) => setWidth(entry?.contentRect.width));
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [element]);
-
-  return width;
-}
-
 export function EditorImageView({ node, editor, selected, updateAttributes }: ReactNodeViewProps) {
   const [wrapper, setWrapper] = useState<HTMLElement | null>(null);
-  const room = useInternalWidthOf(wrapper);
+  const room = useInternalEditorImageWidth(wrapper);
   const { src, alt, title } = node.attrs as { src: string; alt?: string; title?: string };
   const resizable = useResizable({
     width: {

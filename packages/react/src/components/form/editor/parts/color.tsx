@@ -8,13 +8,7 @@ import { Baseline } from 'lucide-react';
 
 import { useInternalEditorContext } from '../context';
 import { editorMessages } from '../messages-catalog';
-import {
-  EditorToolTip,
-  extensionIsLoaded,
-  hasExtension,
-  useInternalEditorToolProps,
-  type EditorToolProps,
-} from './tool';
+import { EditorToolTip, type EditorToolProps } from './tool';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Popover } from '../../../overlay/popover';
@@ -24,6 +18,8 @@ import {
   type DocumentColor,
 } from '../../../typography/rich-text/lib/document-colors';
 import { useInternalEditorSelector } from '../hooks/use-editor-selector';
+import { useInternalEditorToolProps } from '../hooks/use-editor-tool-props';
+import { extensionIsLoaded, hasExtension } from '../lib/extensions';
 
 import type { IdsMessageKey } from '../../../../internal/messages';
 import type { Editor as TiptapEditor } from '@tiptap/core';
