@@ -21,7 +21,6 @@ export namespace TelField {
     onValueChange?: (value: string) => void;
     defaultCountry?: CountryCode;
     format?: TelFieldFormat;
-    locale?: string;
     variant?: TelFieldVariant;
     size?: IdsSize;
     invalid?: boolean;

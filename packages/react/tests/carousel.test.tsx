@@ -5,7 +5,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Carousel } from '../src';
+import { Carousel, useCarousel } from '../src';
 import { skipWithoutCdp } from './engines';
 import { slidesLayout, useSlides, type SlidesDragEvent } from '../src/internal/slides';
 
@@ -76,21 +76,25 @@ async function dragAcross(element: Element, by: number) {
   await mouse('mouseReleased', { x: start.x + by, y: start.y });
 }
 
+function CarouselWith({ options, ...props }: Carousel.Props & { options?: Carousel.Options }) {
+  return <Carousel {...props} carousel={useCarousel(options)} />;
+}
+
 function Photos({
   count = 5,
   before,
   ...props
-}: Partial<Carousel.Props> & { count?: number; before?: ReactNode }) {
+}: Partial<Carousel.Props> & { count?: number; before?: ReactNode; options?: Carousel.Options }) {
   return (
     <>
       {before}
-      <Carousel aria-label="사진" {...props}>
+      <CarouselWith aria-label="사진" {...props}>
         {Array.from({ length: count }, (_, index) => (
           <Carousel.Slide key={index}>
             <div className="flex h-32 items-center justify-center">사진 {index + 1}</div>
           </Carousel.Slide>
         ))}
-      </Carousel>
+      </CarouselWith>
     </>
   );
 }
@@ -160,7 +164,7 @@ test('SSR: CSS alone lays the server HTML out, already moved to defaultValue', (
     '--slides-offset:2',
   );
 
-  const three = place(<Photos slidesPerView={3} defaultValue={1} />);
+  const three = place(<Photos options={{ slides: { perView: 3 } }} defaultValue={1} />);
   expect(three.slides[1].left).toBeCloseTo(three.view.left, 0);
   expect(three.slides[3].right).toBeCloseTo(three.view.right, 0);
   expect(three.slides[0].width).toBeCloseTo(three.view.width / 3, 0);
@@ -194,7 +198,11 @@ test('buttons: Previous and Next stay focusable with aria-disabled at the ends',
 test('indicators: one per snap, named by the first slide it shows, and a press jumps there', async () => {
   const onValueChange = vi.fn();
   await render(
-    <Photos count={6} slidesPerView={2} slidesToScroll={2} onValueChange={onValueChange} />,
+    <Photos
+      count={6}
+      options={{ slides: { perView: 2, toScroll: 2 } }}
+      onValueChange={onValueChange}
+    />,
   );
 
   await expect
@@ -381,7 +389,7 @@ test('value: a controlled owner can drive the carousel from outside', async () =
 
 test('loop: the ends connect, so Previous and Next never disable', async () => {
   const onValueChange = vi.fn();
-  await render(<Photos loop onValueChange={onValueChange} />);
+  await render(<Photos options={{ slides: { loop: true } }} onValueChange={onValueChange} />);
 
   await expect.element(previous()).not.toHaveAttribute('aria-disabled');
   await userEvent.click(previous());
@@ -397,13 +405,13 @@ test('loop: the ends connect, so Previous and Next never disable', async () => {
 
 test('inert: Tab reaches only the slides in view', async () => {
   await render(
-    <Carousel aria-label="사진" slidesPerView={2}>
+    <CarouselWith aria-label="사진" options={{ slides: { perView: 2 } }}>
       {[1, 2, 3, 4].map((n) => (
         <Carousel.Slide key={n}>
           <a href={`#photo-${n}`}>사진 {n}</a>
         </Carousel.Slide>
       ))}
-    </Carousel>,
+    </CarouselWith>,
   );
 
   await expect.poll(inertSlides).toEqual([3, 4]);
@@ -418,7 +426,10 @@ test('inert: Tab reaches only the slides in view', async () => {
 test('motion: autoplay brings a Pause that holds until it is pressed again', async () => {
   const onPlayingChange = vi.fn();
   await render(
-    <Photos before={outsideButton} autoplay defaultPlaying onPlayingChange={onPlayingChange} />,
+    <Photos
+      before={outsideButton}
+      options={{ autoplay: { defaultValue: true, onValueChange: onPlayingChange } }}
+    />,
   );
   await userEvent.hover(outside());
 
@@ -442,8 +453,36 @@ test('motion: autoplay brings a Pause that holds until it is pressed again', asy
   await expect.element(region()).toHaveAttribute('data-playing');
 });
 
+test('motion: autoplay value and onValueChange hand the Pause state to the app', async () => {
+  function Banner() {
+    const [playing, setPlaying] = useState(false);
+    const carousel = useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
+
+    return (
+      <>
+        {outsideButton}
+        <p>{playing ? '넘기는 중' : '멈춤'}</p>
+        <Carousel aria-label="사진" carousel={carousel}>
+          {[1, 2, 3].map((n) => (
+            <Carousel.Slide key={n}>사진 {n}</Carousel.Slide>
+          ))}
+        </Carousel>
+      </>
+    );
+  }
+
+  await render(<Banner />);
+  await userEvent.hover(outside());
+
+  await expect.element(pause()).toHaveAttribute('aria-pressed', 'true');
+  await expect.element(region()).not.toHaveAttribute('data-playing');
+  await userEvent.click(pause());
+  await expect.element(page.getByText('넘기는 중')).toBeInTheDocument();
+  await expect.element(region()).toHaveAttribute('data-playing');
+});
+
 test('motion: hovering the slides or keyboard focus inside pauses only while it lasts', async () => {
-  await render(<Photos before={outsideButton} autoplay defaultPlaying />);
+  await render(<Photos before={outsideButton} options={{ autoplay: { defaultValue: true } }} />);
 
   await userEvent.hover(slide(1));
   await expect.element(region()).not.toHaveAttribute('data-playing');
@@ -471,7 +510,7 @@ test('motion: hovering the slides or keyboard focus inside pauses only while it 
 
 test('motion: a finger held on the slides pauses rotation until it lifts', async (context) => {
   skipWithoutCdp(context);
-  await render(<Photos before={outsideButton} autoplay defaultPlaying />);
+  await render(<Photos before={outsideButton} options={{ autoplay: { defaultValue: true } }} />);
   await userEvent.hover(outside());
   const point = centerOf(slide(1).element());
 
@@ -485,7 +524,7 @@ test('motion: a finger held on the slides pauses rotation until it lifts', async
 });
 
 test('motion: with reduced motion preferred, autoplay starts paused', async () => {
-  await render(<Photos autoplay />);
+  await render(<Photos options={{ autoplay: {} }} />);
 
   await expect.element(pause()).toHaveAttribute('aria-pressed', 'true');
   await expect.element(region()).not.toHaveAttribute('data-playing');
@@ -503,7 +542,7 @@ test('motion: with no motion preference, autoplay starts playing', async (contex
     });
   });
 
-  await render(<Photos before={outsideButton} autoplay />);
+  await render(<Photos before={outsideButton} options={{ autoplay: {} }} />);
   await userEvent.hover(outside());
   await expect.element(pause()).toHaveAttribute('aria-pressed', 'false');
   await expect.element(region()).toHaveAttribute('data-playing');
@@ -514,8 +553,7 @@ test('motion: autoplay moves on after the delay, and a paused carousel stays put
   await render(
     <Photos
       before={outsideButton}
-      autoplay={{ delay: 60 }}
-      defaultPlaying
+      options={{ autoplay: { delay: 60, defaultValue: true } }}
       onValueChange={onValueChange}
     />,
   );
@@ -535,10 +573,10 @@ test('motion: autoScroll flows past the snaps, and Pause stops the track', async
     <Photos
       before={outsideButton}
       count={8}
-      slidesPerView={3}
-      loop
-      autoScroll={{ speed: 20 }}
-      defaultPlaying
+      options={{
+        slides: { perView: 3, loop: true },
+        autoScroll: { speed: 20, defaultValue: true },
+      }}
       onValueChange={onValueChange}
     />,
   );
@@ -560,10 +598,10 @@ test('motion: autoScroll without loop pauses at the end, and playing again start
     <Photos
       before={outsideButton}
       count={4}
-      slidesPerView={2}
-      autoScroll={{ speed: 40 }}
-      defaultPlaying
-      onPlayingChange={onPlayingChange}
+      options={{
+        slides: { perView: 2 },
+        autoScroll: { speed: 40, defaultValue: true, onValueChange: onPlayingChange },
+      }}
       onValueChange={onValueChange}
     />,
   );
@@ -593,7 +631,7 @@ test('motion: without autoplay or autoScroll there is no Pause and the announcer
 
 test('parts: placed controls replace the defaults, and autoplay still brings a Pause', async () => {
   await render(
-    <Carousel aria-label="사진" autoplay>
+    <CarouselWith aria-label="사진" options={{ autoplay: {} }}>
       <div>
         <Carousel.Prev variant="ghost" />
         <Carousel.Next variant="ghost" />
@@ -603,7 +641,7 @@ test('parts: placed controls replace the defaults, and autoplay still brings a P
           <Carousel.Slide key={n}>사진 {n}</Carousel.Slide>
         ))}
       </Carousel.Content>
-    </Carousel>,
+    </CarouselWith>,
   );
 
   await expect.element(pause()).toBeInTheDocument();
@@ -649,12 +687,12 @@ test('warnings: no name, a slide outside Carousel.Content, and two motions at on
 
   await render(
     // @ts-expect-error a carousel needs aria-label or aria-labelledby
-    <Carousel autoplay autoScroll>
+    <CarouselWith options={{ autoplay: {}, autoScroll: {} }}>
       <Carousel.Content>
         <Carousel.Slide>사진 1</Carousel.Slide>
       </Carousel.Content>
       <Carousel.Slide>사진 2</Carousel.Slide>
-    </Carousel>,
+    </CarouselWith>,
   );
 
   const warned = () => warn.mock.calls.flat().join('\n');

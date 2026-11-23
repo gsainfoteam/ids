@@ -15,9 +15,10 @@ import {
   countOf,
   splitAroundInput,
   stateAttributes,
+  writesNoneOf,
   type TextControlState,
 } from '../../../internal/text-control';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+import { useProviderLocale } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -41,26 +42,17 @@ export function NumberFieldRoot({
   step,
   smallStep,
   largeStep,
-  locale: localeProp,
   formatOptions,
-  allowWheelScrub = false,
-  hideStepper = false,
   invalid,
   disabled,
   size,
   variant = 'outline',
-  incrementLabel: incrementLabelProp,
-  decrementLabel: decrementLabelProp,
   className,
   style,
   children,
   ...rootProps
 }: NumberField.Props) {
-  const t = useTranslate();
-  const providerLocale = useProviderLocale();
-  const locale = localeProp ?? providerLocale ?? 'en-US';
-  const decrementLabel = decrementLabelProp ?? t('numberField.decrement');
-  const incrementLabel = incrementLabelProp ?? t('numberField.increment');
+  const locale = useProviderLocale() ?? 'en-US';
 
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const { items, leading, input, trailing } = splitAroundInput<NumberField.InputProps>(
@@ -69,10 +61,12 @@ export function NumberFieldRoot({
     () => <NumberFieldInput />,
     'NumberField',
   );
-  const steppers = countOf(items, NumberFieldStepper);
-  invariant(steppers <= 1, 'NumberField: Stepper must be declared at most once.');
-  const placesSteps =
-    steppers + countOf(items, NumberFieldIncrement) + countOf(items, NumberFieldDecrement) > 0;
+  invariant(
+    countOf(items, NumberFieldStepper) <= 1,
+    'NumberField: Stepper must be declared at most once.',
+  );
+  const own = [NumberFieldStepper, NumberFieldIncrement, NumberFieldDecrement, TextControlClear];
+  const drawsDefaultParts = writesNoneOf(items, [NumberFieldInput, ...own]);
 
   const field = useNumberField({
     rootProps,
@@ -87,17 +81,15 @@ export function NumberFieldRoot({
     largeStep,
     locale,
     formatOptions,
-    allowWheelScrub,
     disabled,
     invalid,
     clearable: countOf(items, TextControlClear) > 0,
   });
   const state: NumberFieldState = { size: resolvedSize, variant, ...field.state };
   const styles = numberFieldStyle({ variant, size: resolvedSize });
-  const own = [NumberFieldStepper, NumberFieldIncrement, NumberFieldDecrement, TextControlClear];
 
   return (
-    <NumberFieldContext value={{ field, state, incrementLabel, decrementLabel, styles }}>
+    <NumberFieldContext value={{ field, state, styles }}>
       <TextControlContext
         value={{ state, inputId: field.inputProps.id, clear: field.clear, styles }}
       >
@@ -121,7 +113,7 @@ export function NumberFieldRoot({
             marker="number-field"
             className={styles.adornment()}
           />
-          {!hideStepper && !placesSteps && <NumberFieldStepper />}
+          {drawsDefaultParts && <NumberFieldStepper />}
         </div>
         {field.hiddenInputName && (
           <input

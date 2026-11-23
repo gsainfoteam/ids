@@ -1,8 +1,8 @@
 import { type FormEvent } from 'react';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
@@ -33,7 +33,9 @@ export const PC: Story = {
     <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
       <div className="flex w-full max-w-md flex-col gap-8">
         <div className="flex flex-col items-center gap-4 text-center">
-          <Badge content="점검 중" variant="soft" colorScheme="warning" />
+          <Chip variant="soft" colorScheme="warning">
+            점검 중
+          </Chip>
           <h1 className="text-headline-h2-bold">더 빨라지려고 잠시 쉬어요</h1>
           <p className="text-body-b2-regular">
             10월 3일 새벽 2시부터 6시까지 서버를 옮겨요. 끝나면 이 페이지가 저절로 새로 고쳐져요.
@@ -47,7 +49,7 @@ export const PC: Story = {
             </Card.Title>
             <Card.Description>10월 3일 금요일</Card.Description>
             <Card.Action>
-              <Badge content="약 2시간 남음" variant="soft" />
+              <Chip variant="soft">약 2시간 남음</Chip>
             </Card.Action>
           </Card.Header>
           <Card.Content className="flex flex-col gap-6">

@@ -1,23 +1,19 @@
 'use client';
 
+import { useRef } from 'react';
+
 import { badgeStyle } from './style';
 import { useBadge } from './use-badge';
+import { useBadgeInset } from './use-badge-inset';
 import { resolveState } from '../../../internal/state-props';
+import { mergeRefs } from '../../../utils';
 
 import type { Badge } from '.';
 
 export type BadgePlacement = 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start';
-export type BadgeShape = 'rectangular' | 'circular';
 export type BadgeVariant = 'solid' | 'soft' | 'outline';
 export type BadgeColorScheme =
-  | 'neutral'
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info';
+  'neutral' | 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'info';
 
 function flag(on: boolean) {
   return on ? '' : undefined;
@@ -25,39 +21,32 @@ function flag(on: boolean) {
 
 export function BadgeRoot({
   content,
-  dot = false,
   max = 99,
   showZero = false,
   invisible = false,
   placement = 'top-end',
-  shape,
   variant = 'solid',
-  colorScheme,
+  colorScheme = 'danger',
   size = 'standard',
   className,
   style,
   children,
+  ref,
   'aria-label': label,
   ...rest
 }: Badge.Props) {
-  const { indicatorId, display, hidden, anchor } = useBadge({
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const { indicatorId, dot, display, hidden, anchor } = useBadge({
     content,
-    dot,
     max,
     showZero,
     invisible,
     label,
     children,
   });
-  const standalone = children == null || typeof children === 'boolean';
-  const styles = badgeStyle({
-    variant,
-    colorScheme: colorScheme ?? (standalone ? 'neutral' : 'danger'),
-    size,
-    dot,
-    placement: standalone ? 'none' : placement,
-    shape: shape ?? 'auto',
-  });
+  useBadgeInset(rootRef, placement);
+
+  const styles = badgeStyle({ variant, colorScheme, size, dot, placement });
   const state: Badge.State = {
     count: display.count,
     dot,
@@ -85,20 +74,10 @@ export function BadgeRoot({
         }),
   };
 
-  if (standalone)
-    return (
-      <span
-        {...rest}
-        {...indicator}
-        data-badge=""
-        className={styles.indicator({ className: resolveState(className, state) })}
-        style={resolveState(style, state)}
-      />
-    );
-
   return (
     <span
       {...rest}
+      ref={mergeRefs(ref, rootRef)}
       data-badge=""
       data-placement={placement}
       className={styles.root({ className: resolveState(className, state) })}

@@ -18,12 +18,10 @@ import { Card } from '../card';
 
 export type ChartTooltipProps = TooltipProps & {
   indicator?: ChartIndicator;
-  hideLabel?: boolean;
 };
 
 export type ChartTooltipContentProps = Partial<TooltipContentProps> & {
   indicator?: ChartIndicator;
-  hideLabel?: boolean;
 };
 
 type Row = { fill?: unknown };
@@ -37,6 +35,8 @@ const pointIn = (frameRef: RefObject<HTMLDivElement | null>, x: number, y: numbe
   },
 });
 
+const isDrawable = (node: ReactNode) => node !== undefined && node !== null && node !== '';
+
 const colorOf = (item: TooltipPayloadEntry) =>
   item.color ?? (item.payload as Row | undefined)?.fill?.toString() ?? item.fill?.toString();
 
@@ -45,7 +45,6 @@ export function ChartTooltipContent({
   payload,
   label,
   indicator = 'dot',
-  hideLabel = false,
   formatter,
   labelFormatter,
   coordinate,
@@ -79,7 +78,8 @@ export function ChartTooltipContent({
   if (!open || !payload) return null;
 
   const labelText: ReactNode = entryFor(config, label)?.entry.label ?? label;
-  const heading = labelFormatter ? labelFormatter(labelText, payload) : labelText;
+  const heading =
+    isDrawable(labelText) && labelFormatter ? labelFormatter(labelText, payload) : labelText;
 
   return (
     <Card
@@ -92,7 +92,7 @@ export function ChartTooltipContent({
       className={styles.tooltip()}
       style={anchored.floatingStyles}
     >
-      {!hideLabel && heading !== undefined && heading !== '' && (
+      {isDrawable(labelText) && isDrawable(heading) && (
         <p className={styles.tooltipLabel()}>{heading}</p>
       )}
       <dl className={styles.tooltipList()}>
@@ -122,14 +122,14 @@ export function ChartTooltipContent({
 
 ChartTooltipContent.displayName = 'Chart.TooltipContent';
 
-export function ChartTooltip({ indicator, hideLabel, content, ...props }: ChartTooltipProps) {
+export function ChartTooltip({ indicator, content, ...props }: ChartTooltipProps) {
   const { config } = useChartContext('Chart.Tooltip');
 
   return (
     <Tooltip
       itemSorter={(item) => configOrder(config, item.name, item.dataKey)}
       {...props}
-      content={content ?? <ChartTooltipContent indicator={indicator} hideLabel={hideLabel} />}
+      content={content ?? <ChartTooltipContent indicator={indicator} />}
     />
   );
 }

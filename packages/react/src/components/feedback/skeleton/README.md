@@ -44,7 +44,7 @@ import { Skeleton } from '@gsainfoteam/ids-react';
   - 자식의 모서리가 그대로입니다. Avatar 는 원, Card 는 concentric 모서리입니다.
   - 자식의 테두리, 그림자, 글자, `::before` 와 `::after` 는 숨깁니다.
   - 자식 요소가 곧 불러오는 내용이라서 `aria-busy` 와 `inert` 가 그 요소에 함께 붙습니다.
-- 인라인 요소(Avatar, Badge, Button)는 `asChild` 로 칠합니다. 기본 `div` 는 블록이라서 줄 너비를 채웁니다. 글자 한 줄을 그 글 너비만큼 칠하려면 `className="w-fit"` 을 줍니다.
+- 인라인 요소(Avatar, Chip, Button)는 `asChild` 로 칠합니다. 기본 `div` 는 블록이라서 줄 너비를 채웁니다. 글자 한 줄을 그 글 너비만큼 칠하려면 `className="w-fit"` 을 줍니다.
 
 ## 합성
 

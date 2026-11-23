@@ -17,8 +17,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Sidebar } from '../../components/navigation/sidebar';
 
@@ -41,26 +41,42 @@ const ITEMS = [
     id: 'board',
     label: '게시판',
     icon: <MegaphoneIcon />,
-    badge: <Badge content={12} variant="soft" colorScheme="primary" />,
+    badge: (
+      <Chip variant="soft" colorScheme="primary">
+        {12}
+      </Chip>
+    ),
   },
   {
     id: 'shuttle',
     label: '셔틀',
     icon: <TruckIcon />,
-    badge: <Badge content="운행 중" variant="outline" colorScheme="success" />,
+    badge: (
+      <Chip variant="outline" colorScheme="success">
+        운행 중
+      </Chip>
+    ),
   },
   {
     id: 'posts',
     label: '내 글',
     icon: <DocumentTextIcon />,
-    badge: <Badge content={4} variant="soft" colorScheme="info" />,
+    badge: (
+      <Chip variant="soft" colorScheme="info">
+        {4}
+      </Chip>
+    ),
   },
   { id: 'bookmarks', label: '북마크', icon: <BookmarkIcon /> },
   {
     id: 'reservations',
     label: '예약',
     icon: <CalendarDaysIcon />,
-    badge: <Badge content="D-2" variant="soft" colorScheme="warning" />,
+    badge: (
+      <Chip variant="soft" colorScheme="warning">
+        D-2
+      </Chip>
+    ),
   },
 ];
 
@@ -76,7 +92,7 @@ const PINNED: {
     label: 'Ziggle v3 출시',
     icon: <RocketLaunchSolid />,
     colorScheme: 'primary',
-    badge: <Badge dot colorScheme="success" />,
+    badge: <Chip variant="solid" colorScheme="success" />,
   },
   { id: 'festival', label: '축제 부스 준비', icon: <TicketSolid />, colorScheme: 'warning' },
   {
@@ -84,7 +100,7 @@ const PINNED: {
     label: '알고리즘 스터디',
     icon: <BookOpenSolid />,
     colorScheme: 'success',
-    badge: <Badge dot colorScheme="danger" />,
+    badge: <Chip variant="solid" colorScheme="danger" />,
   },
 ];
 
@@ -146,7 +162,9 @@ export const PC: Story = {
             <Sidebar.Item href="#profile">
               <Avatar name="김지수" size="tiny" />
               김지수
-              <Badge content="관리자" variant="soft" colorScheme="primary" />
+              <Chip variant="soft" colorScheme="primary">
+                관리자
+              </Chip>
             </Sidebar.Item>
           </Sidebar.Footer>
         </Sidebar>

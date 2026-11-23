@@ -2,8 +2,8 @@ import { ArrowRightIcon, MegaphoneIcon } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
@@ -27,7 +27,9 @@ export const PC: Story = {
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-4 py-20 break-keep sm:px-6">
       <section aria-labelledby="board" className="grid items-center gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
-          <Badge content="게시판" variant="soft" colorScheme="primary" className="self-start" />
+          <Chip variant="soft" colorScheme="primary" className="self-start">
+            게시판
+          </Chip>
           <h2 id="board" className="text-headline-h2-bold">
             놓치면 안 되는 공지만 먼저
           </h2>
@@ -59,11 +61,9 @@ export const PC: Story = {
                     <Item.Description>{description}</Item.Description>
                   </Item.Content>
                   <Item.Actions>
-                    <Badge
-                      content={due}
-                      variant="soft"
-                      colorScheme={due === 'D-1' ? 'danger' : 'neutral'}
-                    />
+                    <Chip variant="soft" colorScheme={due === 'D-1' ? 'danger' : 'neutral'}>
+                      {due}
+                    </Chip>
                   </Item.Actions>
                 </Item>
               ))}
@@ -79,7 +79,9 @@ export const PC: Story = {
               <Card.Description>학생회관 정류장</Card.Description>
               <Card.Title>6분 뒤 광주송정역행</Card.Title>
               <Card.Action>
-                <Badge content="12:20" variant="soft" colorScheme="primary" />
+                <Chip variant="soft" colorScheme="primary">
+                  12:20
+                </Chip>
               </Card.Action>
             </Card.Header>
             <Card.Content className="flex flex-col gap-4">
@@ -102,7 +104,9 @@ export const PC: Story = {
           </Card>
         </Card>
         <div className="flex flex-col gap-4">
-          <Badge content="셔틀" variant="soft" colorScheme="primary" className="self-start" />
+          <Chip variant="soft" colorScheme="primary" className="self-start">
+            셔틀
+          </Chip>
           <h2 id="shuttle" className="text-headline-h2-bold">
             정류장에서 기다리지 않게
           </h2>
@@ -118,7 +122,9 @@ export const PC: Story = {
 
       <section aria-labelledby="people" className="grid items-center gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
-          <Badge content="동아리" variant="soft" colorScheme="primary" className="self-start" />
+          <Chip variant="soft" colorScheme="primary" className="self-start">
+            동아리
+          </Chip>
           <h2 id="people" className="text-headline-h2-bold">
             동아리 사람들과 한곳에서
           </h2>

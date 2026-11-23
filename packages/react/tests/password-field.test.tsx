@@ -211,11 +211,13 @@ test('disabled/invalid overrides and hidden auto toggle while explicit compositi
   await expect.element(input).toHaveAttribute('type', 'password');
 
   await screen.rerender(
-    <PasswordField aria-label="Password" name="password" hideVisibilityToggle />,
+    <PasswordField aria-label="Password" name="password">
+      <PasswordField.Input />
+    </PasswordField>,
   );
   await expect.element(toggle).not.toBeInTheDocument();
   await screen.rerender(
-    <PasswordField aria-label="Password" name="password" hideVisibilityToggle>
+    <PasswordField aria-label="Password" name="password">
       <>
         <PasswordField.Input />
         <PasswordField.VisibilityToggle />
@@ -376,6 +378,7 @@ test('Input values win over root values, but root and Input handlers both run', 
       onChange={() => changes.push('root')}
     >
       <PasswordField.Input name="new-password" onChange={() => changes.push('input')} />
+      <PasswordField.VisibilityToggle />
     </PasswordField>,
   );
   const input = screen.getByLabelText('Password');
@@ -412,7 +415,10 @@ test('sentinel inside a Fragment splits leading and trailing; the toggle stays u
     </PasswordField>,
   );
   const input = screen.getByLabelText('Password');
-  expect(layoutOf(shellOf(input))).toEqual(['Lead', 'INPUT', 'BUTTON', 'Trail', 'CAPS']);
+  expect(
+    layoutOf(shellOf(input)),
+    'a written part leaves out the default Caps Lock indicator',
+  ).toEqual(['Lead', 'INPUT', 'BUTTON', 'Trail']);
   await userEvent.click(screen.getByRole('button', { name: SHOW }));
   await expect.element(input).toHaveAttribute('type', 'text');
 });
@@ -503,7 +509,10 @@ test('the Caps Lock indicator follows the modifier state while the input has foc
       .not.toBeInTheDocument();
 
     await screen.rerender(
-      <PasswordField key="hidden" aria-label="Password" name="password" hideCapsLock />,
+      <PasswordField key="hidden" aria-label="Password" name="password">
+        <PasswordField.Input />
+        <PasswordField.VisibilityToggle />
+      </PasswordField>,
     );
     await expect.element(status).not.toBeInTheDocument();
     await screen.rerender(

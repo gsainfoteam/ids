@@ -1,6 +1,12 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
-import { CheckCircleIcon } from '@heroicons/react/16/solid';
+import {
+  BuildingLibraryIcon,
+  BuildingOffice2Icon,
+  CheckCircleIcon,
+  HomeModernIcon,
+  TruckIcon,
+} from '@heroicons/react/16/solid';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, fn, waitFor } from 'storybook/test';
 
@@ -65,7 +71,239 @@ type Story = StoryObj<typeof meta>;
 const trigger = (canvasElement: HTMLElement) =>
   canvasElement.querySelector<HTMLButtonElement>('[data-select] [role=combobox]')!;
 
-export const Playground: Story = {};
+const itemSets = {
+  fruits: [
+    <Select.Item key="apple" value="apple">
+      사과
+    </Select.Item>,
+    <Select.Item key="banana" value="banana">
+      바나나
+    </Select.Item>,
+    <Select.Item key="cherry" value="cherry">
+      체리
+    </Select.Item>,
+  ],
+  longList: Array.from({ length: 40 }, (_, index) => (
+    <Select.Item key={index} value={`room-${index + 101}`}>
+      {`${index + 101}호`}
+    </Select.Item>
+  )),
+  groups: [
+    <Select.Group key="korean" heading="한식">
+      <Select.Item value="bibimbap">비빔밥</Select.Item>
+      <Select.Item value="kimchi">김치찌개</Select.Item>
+    </Select.Group>,
+    <Select.Separator key="separator" />,
+    <Select.Group key="western" heading="양식">
+      <Select.Item value="pasta">파스타</Select.Item>
+      <Select.Item value="risotto" disabled>
+        리소토 (품절)
+      </Select.Item>
+    </Select.Group>,
+  ],
+  iconsAndSearchValues: [
+    <Select.Item
+      key="library"
+      value="library"
+      label="학술정보원"
+      searchValue="학술정보원 도서관 library"
+    >
+      <BuildingLibraryIcon className="size-4" />
+      학술정보원
+    </Select.Item>,
+    <Select.Item key="dorm" value="dorm" label="기숙사" searchValue="기숙사 생활관 dorm">
+      <HomeModernIcon className="size-4" />
+      기숙사
+    </Select.Item>,
+    <Select.Item key="office" value="office" label="행정동" searchValue="행정동 본관 office">
+      <BuildingOffice2Icon className="size-4" />
+      행정동
+    </Select.Item>,
+    <Select.Item key="shuttle" value="shuttle" label="셔틀 정류장" searchValue="셔틀 버스 shuttle">
+      <TruckIcon className="size-4" />
+      셔틀 정류장
+    </Select.Item>,
+  ],
+};
+
+type SelectPlaygroundArgs = Omit<
+  Select.Props,
+  'value' | 'defaultValue' | 'onValueChange' | 'selectionMode'
+> & {
+  selectionMode?: 'single' | 'multiple';
+  onValueChange?: (value: string | string[] | null) => void;
+  items?: ReactNode;
+  defaultValue?: string;
+  defaultValues?: string[];
+  searchField?: boolean;
+  clearButton?: boolean;
+  wrapInField?: boolean;
+  fieldLabel?: string;
+  fieldDescription?: string;
+};
+
+export const Playground: StoryObj<SelectPlaygroundArgs> = {
+  args: {
+    items: 'fruits',
+    selectionMode: 'single',
+    defaultValue: '',
+    defaultValues: [],
+    searchField: false,
+    clearButton: false,
+    wrapInField: true,
+    fieldLabel: '과일',
+    fieldDescription: '',
+    disabled: false,
+    readOnly: false,
+    required: false,
+    invalid: false,
+  },
+  argTypes: {
+    items: {
+      control: 'select',
+      options: Object.keys(itemSets),
+      mapping: itemSets,
+      description:
+        'Select 안에 둘 part 묶음. 그룹과 구분선, 아이콘과 searchValue 를 단 항목, 스크롤되는 긴 목록.',
+      table: { category: 'Items' },
+    },
+    searchField: {
+      control: 'boolean',
+      description: '<Select.SearchField /> 와 <Select.Empty /> 를 맨 위와 끝에 둡니다.',
+      table: { category: 'Items' },
+    },
+    clearButton: {
+      control: 'boolean',
+      description: '<Select.Clear /> 를 둡니다. 값이 있을 때만 보입니다.',
+      table: { category: 'Items' },
+    },
+    selectionMode: {
+      control: 'inline-radio',
+      options: ['single', 'multiple'],
+      table: { category: 'Value' },
+    },
+    defaultValue: {
+      control: 'text',
+      if: { arg: 'selectionMode', eq: 'single' },
+      description: '처음 고를 항목의 value. 바꾸면 Select 를 새로 그립니다.',
+      table: { category: 'Value' },
+    },
+    defaultValues: {
+      name: 'defaultValue (multiple)',
+      control: 'object',
+      if: { arg: 'selectionMode', eq: 'multiple' },
+      description: '여러 개를 고를 때의 처음 값. string[] 입니다.',
+      table: { category: 'Value' },
+    },
+    placeholder: { control: 'text', table: { category: 'Value' } },
+    variant: { table: { category: 'Look' } },
+    size: { table: { category: 'Look' } },
+    mobileVariant: { table: { category: 'Look' } },
+    disabled: { table: { category: 'State' } },
+    readOnly: { table: { category: 'State' } },
+    required: { table: { category: 'State' } },
+    invalid: { table: { category: 'State' } },
+    wrapInField: {
+      control: 'boolean',
+      description: '<Field> 로 감싸 Field.Label 이 이름을 붙입니다. 끄면 aria-label 을 씁니다.',
+      table: { category: 'Field' },
+    },
+    fieldLabel: {
+      control: 'text',
+      if: { arg: 'wrapInField' },
+      table: { category: 'Field' },
+    },
+    fieldDescription: {
+      control: 'text',
+      if: { arg: 'wrapInField' },
+      description: '비우면 Field.Description 을 두지 않습니다.',
+      table: { category: 'Field' },
+    },
+    onValueChange: { table: { category: 'Events' } },
+    onOpenChange: { table: { category: 'Events' } },
+  },
+  parameters: {
+    controls: {
+      include: [
+        'items',
+        'searchField',
+        'clearButton',
+        'selectionMode',
+        'defaultValue',
+        'defaultValues',
+        'placeholder',
+        'variant',
+        'size',
+        'mobileVariant',
+        'disabled',
+        'readOnly',
+        'required',
+        'invalid',
+        'wrapInField',
+        'fieldLabel',
+        'fieldDescription',
+        'onValueChange',
+        'onOpenChange',
+      ],
+    },
+  },
+  render: ({
+    items,
+    selectionMode,
+    defaultValue,
+    defaultValues,
+    searchField,
+    clearButton,
+    wrapInField,
+    fieldLabel,
+    fieldDescription,
+    'aria-label': ariaLabel,
+    onValueChange,
+    ...args
+  }) => {
+    const clear = clearButton && <Select.Clear />;
+    const search = searchField && <Select.SearchField placeholder="검색" />;
+    const empty = searchField && <Select.Empty>결과 없음</Select.Empty>;
+    const select =
+      selectionMode === 'multiple' ? (
+        <Select
+          {...args}
+          key="multiple"
+          aria-label={wrapInField ? undefined : ariaLabel}
+          selectionMode="multiple"
+          defaultValue={defaultValues?.length ? defaultValues : undefined}
+          onValueChange={onValueChange}
+        >
+          {clear}
+          {search}
+          {items}
+          {empty}
+        </Select>
+      ) : (
+        <Select
+          {...args}
+          key="single"
+          aria-label={wrapInField ? undefined : ariaLabel}
+          defaultValue={defaultValue || null}
+          onValueChange={onValueChange}
+        >
+          {clear}
+          {search}
+          {items}
+          {empty}
+        </Select>
+      );
+
+    if (!wrapInField) return <div className="w-64">{select}</div>;
+    return (
+      <Field className="w-64">
+        <Field.Label>{fieldLabel}</Field.Label>
+        {select}
+        {fieldDescription && <Field.Description>{fieldDescription}</Field.Description>}
+      </Field>
+    );
+  },
+};
 
 export const Usage: Story = {
   render: () => (

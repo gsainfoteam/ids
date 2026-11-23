@@ -112,7 +112,12 @@ function splitChildren(children: ReactNode) {
           input: items[inputIndex] as ReactElement<ChipInputProps>,
           trailing: items.slice(inputIndex + 1),
         };
-  return { ...adornments, popup: contents.length ? contents : <ChipContent>{popup}</ChipContent> };
+  const content = contents[0] as ReactElement<ChipContentProps> | undefined;
+  return {
+    ...adornments,
+    popup: contents.length ? contents : <ChipContent>{popup}</ChipContent>,
+    mobileVariant: content?.props.mobileVariant ?? 'drawer',
+  };
 }
 
 function Adornments({ items, className }: { items: ReactNode[]; className: string }) {
@@ -134,14 +139,12 @@ export function ChipFieldRoot({
   open,
   defaultOpen,
   onOpenChange,
-  creatable = false,
   onCreate,
   validate,
   maxCount,
   variant = 'outline',
   size,
   invalid,
-  mobileVariant = 'drawer',
   disabled,
   required = false,
   name,
@@ -173,7 +176,8 @@ export function ChipFieldRoot({
     new Set(options.map((option) => option.value)).size === options.length,
     '`<ChipField>` has a duplicate `<ChipField.Item>` value.',
   );
-  const { leading, input, trailing, popup } = splitChildren(children);
+  const { leading, input, trailing, popup, mobileVariant } = splitChildren(children);
+  const creatable = onCreate !== undefined;
 
   const merged = { ...inputProps, ...input.props };
   const isDisabled = !!(input.props.disabled ?? disabled);

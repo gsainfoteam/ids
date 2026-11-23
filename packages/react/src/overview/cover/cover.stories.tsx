@@ -171,7 +171,10 @@ export const Cover: Story = {
                       </Table.Row>
                       <Table.Row>
                         <Table.Cell>
-                          사진부 <Badge content="모집 중" variant="soft" colorScheme="primary" />
+                          사진부{' '}
+                          <Chip variant="soft" colorScheme="primary">
+                            모집 중
+                          </Chip>
                         </Table.Cell>
                         <Table.Cell>25</Table.Cell>
                       </Table.Row>
@@ -324,11 +327,21 @@ export const Cover: Story = {
 
               <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row flex-wrap gap-2')}>
-                  <Badge content="새 기능" colorScheme="primary" />
-                  <Badge content="베타" variant="soft" colorScheme="primary" />
-                  <Badge content="안정" variant="outline" colorScheme="success" />
-                  <Badge content="주의" variant="soft" colorScheme="warning" />
-                  <Badge content="중단" variant="soft" colorScheme="danger" />
+                  <Chip variant="solid" colorScheme="primary">
+                    새 기능
+                  </Chip>
+                  <Chip variant="soft" colorScheme="primary">
+                    베타
+                  </Chip>
+                  <Chip variant="outline" colorScheme="success">
+                    안정
+                  </Chip>
+                  <Chip variant="soft" colorScheme="warning">
+                    주의
+                  </Chip>
+                  <Chip variant="soft" colorScheme="danger">
+                    중단
+                  </Chip>
                 </Card>
               </IdsProvider.Scope>
             </div>
@@ -360,7 +373,10 @@ export const Cover: Story = {
                       </Table.Row>
                       <Table.Row>
                         <Table.Cell>
-                          09:30 <Badge content="곧" variant="soft" colorScheme="primary" />
+                          09:30{' '}
+                          <Chip variant="soft" colorScheme="primary">
+                            곧
+                          </Chip>
                         </Table.Cell>
                         <Table.Cell>09:55</Table.Cell>
                         <Table.Cell>송정역</Table.Cell>
@@ -375,11 +391,17 @@ export const Cover: Story = {
                   <Card.Header>
                     <Card.Title>강조 색</Card.Title>
                   </Card.Header>
-                  <ColorPicker
-                    defaultValue="#D946EF"
-                    swatches={['#EF4444', '#F59E0B', '#10B981', '#0EA5E9', '#8B5CF6', '#EC4899']}
-                    aria-label="강조 색"
-                  />
+                  <ColorPicker defaultValue="#D946EF" aria-label="강조 색">
+                    <ColorPicker.Area />
+                    <ColorPicker.HueSlider />
+                    <ColorPicker.Swatches>
+                      {['#EF4444', '#F59E0B', '#10B981', '#0EA5E9', '#8B5CF6', '#EC4899'].map(
+                        (color) => (
+                          <ColorPicker.Swatch key={color} value={color} />
+                        ),
+                      )}
+                    </ColorPicker.Swatches>
+                  </ColorPicker>
                 </Card>
               </IdsProvider.Scope>
 
@@ -463,7 +485,9 @@ export const Cover: Story = {
                   <Card.Header>
                     <Card.Title>알림</Card.Title>
                     <Card.Action>
-                      <Badge content={3} aria-label="새 알림 3개" colorScheme="danger" />
+                      <Chip variant="solid" aria-label="새 알림 3개" colorScheme="danger">
+                        {3}
+                      </Chip>
                     </Card.Action>
                   </Card.Header>
                   <ItemGroup aria-label="알림" size="tiny">
@@ -592,25 +616,33 @@ export const Cover: Story = {
                       <Table.Row>
                         <Table.Cell>접근성</Table.Cell>
                         <Table.Cell>
-                          <Badge content="완료" variant="soft" colorScheme="success" />
+                          <Chip variant="soft" colorScheme="success">
+                            완료
+                          </Chip>
                         </Table.Cell>
                       </Table.Row>
                       <Table.Row>
                         <Table.Cell>다크 모드</Table.Cell>
                         <Table.Cell>
-                          <Badge content="완료" variant="soft" colorScheme="success" />
+                          <Chip variant="soft" colorScheme="success">
+                            완료
+                          </Chip>
                         </Table.Cell>
                       </Table.Row>
                       <Table.Row>
                         <Table.Cell>17가지 색</Table.Cell>
                         <Table.Cell>
-                          <Badge content="완료" variant="soft" colorScheme="success" />
+                          <Chip variant="soft" colorScheme="success">
+                            완료
+                          </Chip>
                         </Table.Cell>
                       </Table.Row>
                       <Table.Row>
                         <Table.Cell>Flutter</Table.Cell>
                         <Table.Cell>
-                          <Badge content="진행 중" variant="soft" colorScheme="warning" />
+                          <Chip variant="soft" colorScheme="warning">
+                            진행 중
+                          </Chip>
                         </Table.Cell>
                       </Table.Row>
                     </Table.Body>
@@ -723,7 +755,9 @@ export const Cover: Story = {
                         <Item.Description>10월 3일 반납</Item.Description>
                       </Item.Content>
                       <Item.Actions>
-                        <Badge content="D-3" variant="soft" colorScheme="warning" />
+                        <Chip variant="soft" colorScheme="warning">
+                          D-3
+                        </Chip>
                       </Item.Actions>
                     </Item>
                     <Item>
@@ -796,7 +830,9 @@ export const Cover: Story = {
                       <p className={hint}>이번 주 방문자</p>
                       <div className="flex items-end justify-between">
                         <p className="text-headline-h3-bold">12,840</p>
-                        <Badge content="+18%" variant="soft" colorScheme="success" />
+                        <Chip variant="soft" colorScheme="success">
+                          +18%
+                        </Chip>
                       </div>
                       <Progress value={64} aria-label="목표 대비 방문자" />
                     </Card>
@@ -819,7 +855,9 @@ export const Cover: Story = {
                                 <Item.Description>생활관 운영팀</Item.Description>
                               </Item.Content>
                               <Item.Actions>
-                                <Badge content="새 글" variant="soft" colorScheme="primary" />
+                                <Chip variant="soft" colorScheme="primary">
+                                  새 글
+                                </Chip>
                               </Item.Actions>
                             </Item>
                             <Item>
@@ -1585,7 +1623,10 @@ export const Cover: Story = {
                       </Table.Row>
                       <Table.Row>
                         <Table.Cell>
-                          화 <Badge content="오늘" variant="soft" colorScheme="primary" />
+                          화{' '}
+                          <Chip variant="soft" colorScheme="primary">
+                            오늘
+                          </Chip>
                         </Table.Cell>
                         <Table.Cell>선형대수</Table.Cell>
                         <Table.Cell>B104</Table.Cell>
@@ -1684,7 +1725,9 @@ export const Cover: Story = {
                         <Item.Title>김지수</Item.Title>
                       </Item.Content>
                       <Item.Actions>
-                        <Badge content="소유자" variant="soft" colorScheme="primary" />
+                        <Chip variant="soft" colorScheme="primary">
+                          소유자
+                        </Chip>
                       </Item.Actions>
                     </Item>
                     <Item>
@@ -1872,7 +1915,9 @@ export const Cover: Story = {
                   <div className="flex min-w-0 flex-col items-start gap-1">
                     <p className={hint}>모바일 학생증</p>
                     <p className="text-body-b1-semibold">김지수</p>
-                    <Badge content="재학" variant="soft" colorScheme="primary" />
+                    <Chip variant="soft" colorScheme="primary">
+                      재학
+                    </Chip>
                   </div>
                 </Card>
               </IdsProvider.Scope>
@@ -1882,7 +1927,9 @@ export const Cover: Story = {
                   <p className={hint}>이번 달 지출</p>
                   <div className="flex items-end justify-between">
                     <p className="text-headline-h4-bold">128,400원</p>
-                    <Badge content="-6%" variant="soft" colorScheme="success" />
+                    <Chip variant="soft" colorScheme="success">
+                      -6%
+                    </Chip>
                   </div>
                   <Progress value={48} aria-label="예산 대비 지출" />
                 </Card>
@@ -1932,7 +1979,10 @@ export const Cover: Story = {
                       </Table.Row>
                       <Table.Row>
                         <Table.Cell>
-                          글쓰기 <Badge content="재수강" variant="soft" colorScheme="primary" />
+                          글쓰기{' '}
+                          <Chip variant="soft" colorScheme="primary">
+                            재수강
+                          </Chip>
                         </Table.Cell>
                         <Table.Cell>B+</Table.Cell>
                       </Table.Row>

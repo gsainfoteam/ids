@@ -1,6 +1,11 @@
 import { clamp } from 'es-toolkit';
 
-import { ROUND_CORNER_EXPONENT, cornerExponent } from '../../../internal/corner-shape';
+import { cornerRadius, diagonalInset } from '../../../internal/corner-geometry';
+import {
+  ROUND_CORNER_EXPONENT,
+  cornerExponent,
+  type PhysicalCorner,
+} from '../../../internal/corner-shape';
 
 export type Axis = 'x' | 'y';
 export type Placement = 'start' | 'end';
@@ -28,15 +33,15 @@ export const MIN_THUMB_LENGTH = 20;
 export const PAGE_FRACTION = 0.875;
 export const NO_THUMB: ThumbLayout = { size: 0, offset: 0, travel: 0 };
 
-function lengthOf(value: string, box: number) {
-  const number = parseFloat(value) || 0;
-  return value.trim().endsWith('%') ? (number / 100) * box : number;
-}
-
-function innerRadius(outer: string, borderA: string, borderB: string, box: number) {
-  const radius = Math.min(lengthOf(outer, box), box / 2);
+function innerRadius(
+  style: CSSStyleDeclaration,
+  corner: PhysicalCorner,
+  borderA: string,
+  borderB: string,
+  box: number,
+) {
   const border = Math.max(parseFloat(borderA) || 0, parseFloat(borderB) || 0);
-  return Math.max(0, radius - border);
+  return Math.max(0, cornerRadius(style, corner, box) - border);
 }
 
 export function readShape(root: HTMLElement): Shape {
@@ -45,26 +50,24 @@ export function readShape(root: HTMLElement): Shape {
   const height = root.clientHeight;
   const box = Math.min(width, height);
 
-  const topLeft = innerRadius(
-    style.borderTopLeftRadius,
-    style.borderTopWidth,
-    style.borderLeftWidth,
-    box,
-  );
+  const topLeft = innerRadius(style, 'top-left', style.borderTopWidth, style.borderLeftWidth, box);
   const topRight = innerRadius(
-    style.borderTopRightRadius,
+    style,
+    'top-right',
     style.borderTopWidth,
     style.borderRightWidth,
     box,
   );
   const bottomLeft = innerRadius(
-    style.borderBottomLeftRadius,
+    style,
+    'bottom-left',
     style.borderBottomWidth,
     style.borderLeftWidth,
     box,
   );
   const bottomRight = innerRadius(
-    style.borderBottomRightRadius,
+    style,
+    'bottom-right',
     style.borderBottomWidth,
     style.borderRightWidth,
     box,
@@ -92,8 +95,7 @@ export function clearOfCurve(radius: number, gap: number, exponent = ROUND_CORNE
 }
 
 export function cornerSquareFits(radius: number, gap: number, exponent = ROUND_CORNER_EXPONENT) {
-  const diagonalInsetPerRadius = 1 - 2 ** (-1 / exponent);
-  return radius * diagonalInsetPerRadius <= gap;
+  return diagonalInset(radius, exponent) <= gap;
 }
 
 export function edgeInset(radius: number, shape: Shape, takenAtThisEnd: number) {

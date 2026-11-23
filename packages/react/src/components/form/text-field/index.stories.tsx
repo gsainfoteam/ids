@@ -16,7 +16,6 @@ import { expect, fn } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Field as RhfField } from '../../../react-hook-form';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
 import { IconToggle } from '../../action/icon-toggle';
@@ -47,7 +46,6 @@ const meta = {
     size: 'standard',
     placeholder: '검색어를 입력하세요',
     'aria-label': '검색어',
-    className: cn('w-72'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TextField>;
@@ -55,7 +53,26 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-72">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="w-72">
+      <Field>
+        <Field.Label>이름</Field.Label>
+        <TextField placeholder="홍길동" />
+      </Field>
+    </div>
+  ),
+};
 
 export const Gallery: Story = {
   render: function Render() {
@@ -68,39 +85,46 @@ export const Gallery: Story = {
             rows={sizes}
             columns={variants}
             render={(size, variant) => (
-              <TextField
-                size={size}
-                variant={variant}
-                placeholder="이름"
-                aria-label={`${variant} ${size}`}
-                className="w-56"
-              />
+              <div className="w-56">
+                <TextField
+                  size={size}
+                  variant={variant}
+                  placeholder="이름"
+                  aria-label={`${variant} ${size}`}
+                />
+              </div>
             )}
           />
         </Showcase.Section>
 
         <Showcase.Section title="States">
           <Showcase.Row label="empty">
-            <TextField placeholder="이름" aria-label="비어 있음" className="w-56" />
+            <div className="w-56">
+              <TextField placeholder="이름" aria-label="비어 있음" />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="filled">
-            <TextField defaultValue="인포팀" aria-label="채움" className="w-56" />
+            <div className="w-56">
+              <TextField defaultValue="인포팀" aria-label="채움" />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="invalid">
-            <TextField defaultValue="인포팀!" invalid aria-label="잘못됨" className="w-56" />
-            <TextField
-              defaultValue="인포팀!"
-              invalid
-              variant="soft"
-              aria-label="잘못됨 soft"
-              className="w-56"
-            />
+            <div className="w-56">
+              <TextField defaultValue="인포팀!" invalid aria-label="잘못됨" />
+            </div>
+            <div className="w-56">
+              <TextField defaultValue="인포팀!" invalid variant="soft" aria-label="잘못됨 soft" />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="disabled">
-            <TextField defaultValue="인포팀" disabled aria-label="비활성" className="w-56" />
+            <div className="w-56">
+              <TextField defaultValue="인포팀" disabled aria-label="비활성" />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="readOnly">
-            <TextField defaultValue="인포팀" readOnly aria-label="읽기 전용" className="w-56" />
+            <div className="w-56">
+              <TextField defaultValue="인포팀" readOnly aria-label="읽기 전용" />
+            </div>
           </Showcase.Row>
         </Showcase.Section>
 
@@ -109,98 +133,107 @@ export const Gallery: Story = {
           description="TextField.Input 앞의 자식은 앞쪽, 뒤의 자식은 뒤쪽에 놓입니다. 아이콘과 글자는 흐린 색이 되고, 버튼은 안쪽 크기로 줄어듭니다."
         >
           <Showcase.Row label="leading icon">
-            <TextField placeholder="검색" aria-label="검색" className="w-72">
-              <MagnifyingGlassIcon />
-              <TextField.Input />
-            </TextField>
-            <TextField size="tiny" placeholder="검색" aria-label="검색 tiny" className="w-56">
-              <MagnifyingGlassIcon />
-              <TextField.Input />
-            </TextField>
+            <div className="w-72">
+              <TextField placeholder="검색" aria-label="검색">
+                <MagnifyingGlassIcon />
+                <TextField.Input />
+              </TextField>
+            </div>
+            <div className="w-56">
+              <TextField size="tiny" placeholder="검색" aria-label="검색 tiny">
+                <MagnifyingGlassIcon />
+                <TextField.Input />
+              </TextField>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="Clear">
-            <TextField defaultValue="인포팀" aria-label="지우기 예시" className="w-72">
-              <MagnifyingGlassIcon />
-              <TextField.Input />
-              <TextField.Clear />
-            </TextField>
-            <TextField size="tiny" defaultValue="인포팀" aria-label="지우기 tiny" className="w-56">
-              <TextField.Input />
-              <TextField.Clear />
-            </TextField>
+            <div className="w-72">
+              <TextField defaultValue="인포팀" aria-label="지우기 예시">
+                <MagnifyingGlassIcon />
+                <TextField.Input />
+                <TextField.Clear />
+              </TextField>
+            </div>
+            <div className="w-56">
+              <TextField size="tiny" defaultValue="인포팀" aria-label="지우기 tiny">
+                <TextField.Input />
+                <TextField.Clear />
+              </TextField>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="prefix · suffix">
-            <TextField defaultValue="gistory" aria-label="주소" className="w-72">
-              <span>https://</span>
-              <TextField.Input />
-              <span>.me</span>
-            </TextField>
-            <TextField placeholder="아이디" aria-label="아이디" className="w-72">
-              <TextField.Input />
-              <span>@gm.gist.ac.kr</span>
-            </TextField>
+            <div className="w-72">
+              <TextField defaultValue="gistory" aria-label="주소">
+                <span>https://</span>
+                <TextField.Input />
+                <span>.me</span>
+              </TextField>
+            </div>
+            <div className="w-72">
+              <TextField placeholder="아이디" aria-label="아이디">
+                <TextField.Input />
+                <span>@gm.gist.ac.kr</span>
+              </TextField>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="buttons">
-            <TextField
-              defaultValue="https://gistory.me/ids"
-              readOnly
-              aria-label="공유 링크"
-              className="w-72"
-            >
-              <TextField.Input />
-              <IconButton
-                aria-label={copied ? '복사됨' : '복사'}
-                icon={copied ? <CheckIcon /> : <DocumentDuplicateIcon />}
-                onClick={() => {
-                  void navigator.clipboard?.writeText('https://gistory.me/ids');
-                  setCopied(true);
-                  window.setTimeout(() => setCopied(false), 1500);
-                }}
-              />
-            </TextField>
-            <TextField placeholder="북마크 이름" aria-label="북마크" className="w-72">
-              <TextField.Input />
-              <IconToggle
-                aria-label="즐겨찾기"
-                icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
-              />
-            </TextField>
+            <div className="w-72">
+              <TextField defaultValue="https://gistory.me/ids" readOnly aria-label="공유 링크">
+                <TextField.Input />
+                <IconButton
+                  aria-label={copied ? '복사됨' : '복사'}
+                  icon={copied ? <CheckIcon /> : <DocumentDuplicateIcon />}
+                  onClick={() => {
+                    void navigator.clipboard?.writeText('https://gistory.me/ids');
+                    setCopied(true);
+                    window.setTimeout(() => setCopied(false), 1500);
+                  }}
+                />
+              </TextField>
+            </div>
+            <div className="w-72">
+              <TextField placeholder="북마크 이름" aria-label="북마크">
+                <TextField.Input />
+                <IconToggle
+                  aria-label="즐겨찾기"
+                  icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
+                />
+              </TextField>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="text button">
-            <TextField placeholder="검색어" aria-label="범위 검색" className="w-72">
-              <TextField.Input />
-              <Button variant="ghost">
-                전체
-                <ChevronDownIcon />
-              </Button>
-            </TextField>
+            <div className="w-72">
+              <TextField placeholder="검색어" aria-label="범위 검색">
+                <TextField.Input />
+                <Button variant="ghost">
+                  전체
+                  <ChevronDownIcon />
+                </Button>
+              </TextField>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="shortcut">
-            <TextField placeholder="빠른 검색" aria-label="빠른 검색" className="w-72">
-              <MagnifyingGlassIcon />
-              <TextField.Input />
-              <Kbd>⌘K</Kbd>
-            </TextField>
+            <div className="w-72">
+              <TextField placeholder="빠른 검색" aria-label="빠른 검색">
+                <MagnifyingGlassIcon />
+                <TextField.Input />
+                <Kbd>⌘K</Kbd>
+              </TextField>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="email">
-            <TextField
-              type="email"
-              placeholder="name@example.com"
-              aria-label="이메일"
-              className="w-72"
-            >
-              <EnvelopeIcon />
-              <TextField.Input />
-            </TextField>
-            <TextField
-              variant="soft"
-              placeholder="username"
-              aria-label="사용자 이름"
-              className="w-72"
-            >
-              <AtSymbolIcon />
-              <TextField.Input />
-            </TextField>
+            <div className="w-72">
+              <TextField type="email" placeholder="name@example.com" aria-label="이메일">
+                <EnvelopeIcon />
+                <TextField.Input />
+              </TextField>
+            </div>
+            <div className="w-72">
+              <TextField variant="soft" placeholder="username" aria-label="사용자 이름">
+                <AtSymbolIcon />
+                <TextField.Input />
+              </TextField>
+            </div>
           </Showcase.Row>
         </Showcase.Section>
       </Showcase>
@@ -208,13 +241,15 @@ export const Gallery: Story = {
   },
 };
 
-export const Clearable: Story = {
+export const ClearTheValue: Story = {
   render: (args) => (
-    <TextField {...args} defaultValue="인포팀">
-      <MagnifyingGlassIcon />
-      <TextField.Input />
-      <TextField.Clear />
-    </TextField>
+    <div className="w-72">
+      <TextField {...args} defaultValue="인포팀">
+        <MagnifyingGlassIcon />
+        <TextField.Input />
+        <TextField.Clear />
+      </TextField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -238,19 +273,21 @@ export const Clearable: Story = {
   },
 };
 
-export const InvalidState: Story = {
+export const ShowAnErrorUnderTheField: Story = {
   render: () => (
-    <Field invalid className="w-72">
-      <Field.Label>닉네임</Field.Label>
-      <TextField defaultValue="a" />
-      <Field.Error>2자 이상 입력하세요.</Field.Error>
-    </Field>
+    <div className="w-72">
+      <Field invalid>
+        <Field.Label>닉네임</Field.Label>
+        <TextField defaultValue="a" />
+        <Field.Error>2자 이상 입력하세요.</Field.Error>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'Field나 invalid, aria-invalid로 입력이 잘못되면 테두리 컨테이너에 data-invalid가 붙어 danger 테두리와 포커스 링이 그려집니다.',
+          'Field나 invalid, aria-invalid로 입력이 잘못되면 danger 테두리와 포커스 링이 그려지고 입력에 aria-invalid가 붙습니다.',
       },
     },
   },
@@ -262,14 +299,14 @@ export const InvalidState: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ConnectReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ defaultValues: { query: '' } });
     const query = useWatch({ control: methods.control, name: 'query' });
 
     return (
       <FormProvider {...methods}>
-        <form className="flex w-72 flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
+        <form className="grid w-72 gap-3" onSubmit={(event) => event.preventDefault()}>
           <RhfField name="query">
             <RhfField.Label>검색어</RhfField.Label>
             <TextField>
@@ -309,16 +346,15 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const PointerFocus: Story = {
+export const PointerFocusFromAnAdornment: Story = {
+  tags: ['verification'],
   render: () => (
-    <TextField
-      aria-label="포커스 테스트"
-      placeholder="아이콘을 눌러도 입력으로 갑니다"
-      className="w-72"
-    >
-      <MagnifyingGlassIcon />
-      <TextField.Input />
-    </TextField>
+    <div className="w-72">
+      <TextField aria-label="포커스 테스트" placeholder="아이콘을 눌러도 입력으로 갑니다">
+        <MagnifyingGlassIcon />
+        <TextField.Input />
+      </TextField>
+    </div>
   ),
   parameters: {
     docs: {

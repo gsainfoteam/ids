@@ -8,7 +8,6 @@ import {
   ComposedChart,
   Funnel,
   FunnelChart,
-  Legend,
   Line,
   LineChart,
   Pie,
@@ -20,7 +19,6 @@ import {
   RadialBarChart,
   Scatter,
   ScatterChart,
-  Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -58,9 +56,6 @@ export const RECHARTS_CHARTS: ReadonlySet<unknown> = new Set([
   RadialBarChart,
   ScatterChart,
 ]);
-
-export const RECHARTS_TOOLTIP = Tooltip;
-export const RECHARTS_LEGEND = Legend;
 
 const PAINTED_BY_KEY = new Map<unknown, readonly PaintProperty[]>([
   [Area, ['stroke', 'fill']],

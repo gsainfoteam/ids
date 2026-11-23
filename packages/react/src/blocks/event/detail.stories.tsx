@@ -8,8 +8,8 @@ import { ToggleGroup } from '../../components/action/toggle-group';
 import { Accordion } from '../../components/data/accordion';
 import { Avatar } from '../../components/data/avatar';
 import { AvatarGroup } from '../../components/data/avatar-group';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
@@ -90,8 +90,12 @@ export const PC: Story = {
           <article className="flex flex-col gap-8">
             <header className="flex flex-col gap-3">
               <div className="flex flex-wrap gap-1.5">
-                <Badge content="축제" variant="soft" colorScheme="primary" />
-                <Badge content="D-15" variant="soft" colorScheme="warning" />
+                <Chip variant="soft" colorScheme="primary">
+                  축제
+                </Chip>
+                <Chip variant="soft" colorScheme="warning">
+                  D-15
+                </Chip>
               </div>
               <h1 className="text-headline-h2-bold">2026 GIST 가을 축제</h1>
               <p className="text-body-b1-regular">

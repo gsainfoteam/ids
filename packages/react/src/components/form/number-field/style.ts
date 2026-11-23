@@ -7,6 +7,8 @@ import type { IdsSize } from '../../../tokens/types';
 export const numberFieldStyle = tv({
   extend: textControlStyle,
   slots: {
+    input:
+      '[:is([data-number-field-step=decrement],:has(>[data-number-field-step=decrement]))~&]:text-center',
     stepper: 'flex shrink-0 flex-col self-center',
     stepButton: [fieldAction.base, 'min-w-0 rounded-indicator px-0 touch-manipulation select-none'],
   },

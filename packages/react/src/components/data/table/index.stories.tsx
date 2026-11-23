@@ -4,7 +4,7 @@ import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { Badge } from '../badge';
+import { Chip } from '../chip';
 
 import { Table } from '.';
 
@@ -159,7 +159,7 @@ export const Gallery: Story = {
                 <Table.Row key={member.id}>
                   <Table.Cell>{member.name}</Table.Cell>
                   <Table.Cell>
-                    <Badge variant="soft" content={member.role} />
+                    <Chip variant="soft">{member.role}</Chip>
                   </Table.Cell>
                   <Table.Cell align="end">{won(member.balance)}</Table.Cell>
                 </Table.Row>

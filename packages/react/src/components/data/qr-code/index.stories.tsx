@@ -10,6 +10,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const shapes = ['square', 'rounded', 'dots'] as const;
 const finderShapes = ['square', 'rounded', 'circle'] as const;
 const levels = ['L', 'M', 'Q', 'H'] as const;
+const variants = ['theme', 'light', 'dark'] as const;
 
 const PROFILE = 'https://gistory.me/profile/alice';
 const BRAND_MARK = `data:image/svg+xml;utf8,${encodeURIComponent(
@@ -34,20 +35,24 @@ const meta = {
   component: QRCode,
   tags: ['autodocs'],
   argTypes: {
+    variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: ['standard', 'tiny', 192] },
     shape: { control: 'radio', options: shapes },
     finderShape: { control: 'radio', options: [undefined, ...finderShapes] },
     errorCorrection: { control: 'radio', options: [undefined, ...levels] },
     quietZone: { control: { type: 'number', min: 0, max: 8 } },
-    inverted: { control: 'radio', options: [undefined, false, true] },
   },
-  args: { value: PROFILE, size: 'standard', shape: 'square', quietZone: 4 },
+  args: { value: PROFILE, variant: 'theme', size: 'standard', shape: 'square', quietZone: 4 },
 } satisfies Meta<typeof QRCode>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => <QRCode value="https://gistory.me/profile/alice" aria-label="Alice의 프로필" />,
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -85,18 +90,14 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section
-        title="Tone"
-        description="기본은 테마를 따라 다크 모드에서 반전됩니다. inverted={false} 는 어느 모드에서나 밝은 바탕에 어두운 모듈입니다."
+        title="Variant"
+        description="theme 은 테마를 따라 다크 모드에서 반전됩니다. light 는 어느 모드에서나 밝은 바탕에 어두운 모듈, dark 는 어두운 바탕에 밝은 모듈입니다."
       >
-        <Showcase.Row label="theme">
-          <QRCode value={PROFILE} shape="rounded" />
-        </Showcase.Row>
-        <Showcase.Row label="inverted={false}">
-          <QRCode value={PROFILE} shape="rounded" inverted={false} />
-        </Showcase.Row>
-        <Showcase.Row label="inverted">
-          <QRCode value={PROFILE} shape="rounded" inverted />
-        </Showcase.Row>
+        <Showcase.Matrix
+          rows={shapes}
+          columns={variants}
+          render={(shape, variant) => <QRCode value={PROFILE} shape={shape} variant={variant} />}
+        />
       </Showcase.Section>
 
       <Showcase.Section
@@ -138,7 +139,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const WithLogo: Story = {
+export const PutALogoInTheMiddle: Story = {
   render: () => (
     <QRCode value="https://gistory.me/pay/8203" shape="rounded" aria-label="결제 페이지 QR 코드">
       <QRCode.Logo>
@@ -161,18 +162,18 @@ export const WithLogo: Story = {
   },
 };
 
-export const Contrast: Story = {
+export const KeepALightPlateInDarkMode: Story = {
   render: () => (
     <div className="flex flex-wrap items-start gap-4">
       <QRCode value={PROFILE} aria-label="테마를 따르는 QR 코드" />
-      <QRCode value={PROFILE} inverted={false} aria-label="밝은 바탕의 QR 코드" />
+      <QRCode value={PROFILE} variant="light" aria-label="밝은 바탕의 QR 코드" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '색은 `text-neutral-strong` 모듈에 `bg-base` 바탕이라 다크 모드에서는 밝은 모듈이 어두운 바탕에 놓입니다. 휴대폰 카메라 앱은 반전된 코드도 읽지만 오래된 스캐너는 못 읽을 수 있습니다. 결제나 출입처럼 어떤 스캐너가 읽을지 모를 때는 `inverted={false}` 로 항상 밝은 바탕에 어두운 모듈을 그립니다.',
+          '색은 `text-neutral-strong` 모듈에 `bg-base` 바탕이라 다크 모드에서는 밝은 모듈이 어두운 바탕에 놓입니다. 휴대폰 카메라 앱은 반전된 코드도 읽지만 오래된 스캐너는 못 읽을 수 있습니다. 결제나 출입처럼 어떤 스캐너가 읽을지 모를 때는 `variant="light"` 로 항상 밝은 바탕에 어두운 모듈을 그립니다.',
       },
     },
   },
@@ -189,7 +190,7 @@ export const Contrast: Story = {
   },
 };
 
-export const AccessibleName: Story = {
+export const SayWhereTheCodeLeads: Story = {
   render: () => (
     <figure className="flex flex-col items-center gap-2">
       <QRCode value={PROFILE} aria-labelledby="qr-profile-caption" />

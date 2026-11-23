@@ -14,7 +14,6 @@ import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Toggle } from '../../components/action/toggle';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
@@ -102,8 +101,10 @@ export const PC: Story = {
         <article className="flex flex-col gap-6">
           <header className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-1.5">
-              <Badge content="행사" variant="soft" />
-              <Badge content="마감 D-7" variant="soft" colorScheme="warning" />
+              <Chip variant="soft">행사</Chip>
+              <Chip variant="soft" colorScheme="warning">
+                마감 D-7
+              </Chip>
             </div>
             <h1 className="text-headline-h2-bold">가을 축제 부스 운영 동아리 모집</h1>
             <Item variant="soft">
@@ -238,7 +239,9 @@ export const PC: Story = {
                               <p className="text-body-b3-semibold flex items-center gap-2">
                                 {reply.name}
                                 {reply.name === AUTHOR && (
-                                  <Badge content="글쓴이" variant="soft" colorScheme="primary" />
+                                  <Chip variant="soft" colorScheme="primary">
+                                    글쓴이
+                                  </Chip>
                                 )}
                                 <span className="text-caption-c1-regular">{reply.time}</span>
                               </p>

@@ -9,7 +9,7 @@ import {
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
+import { Chip } from '../../components/data/chip';
 import { DataTable, useDataTable } from '../../components/data/data-table';
 import { Empty } from '../../components/data/empty';
 import { toast } from '../../components/feedback/toast';
@@ -181,7 +181,7 @@ const COLUMNS = column.columns([
     size: 320,
     cell: ({ row, getValue }) => (
       <>
-        <Badge content={row.original.label} variant="outline" /> {getValue()}
+        <Chip variant="outline">{row.original.label}</Chip> {getValue()}
       </>
     ),
   }),
@@ -189,11 +189,9 @@ const COLUMNS = column.columns([
     header: '상태',
     size: 112,
     cell: ({ getValue }) => (
-      <Badge
-        content={STATUS[getValue()].label}
-        variant="soft"
-        colorScheme={STATUS[getValue()].colorScheme}
-      />
+      <Chip variant="soft" colorScheme={STATUS[getValue()].colorScheme}>
+        {STATUS[getValue()].label}
+      </Chip>
     ),
   }),
   column.accessor('priority', {

@@ -27,8 +27,8 @@
 | `bg-field-block-outline` | `bg-block` | `bg-surface` | outline Editor 의 표 머리글 |
 | `bg-switch-thumb` | `bg-base` | `bg-neutral-solid` | 꺼진 Switch 의 thumb |
 | `bg-segment` | `bg-base` | `border-neutral-strong` | SegmentedControl 과 segmented Tabs 에서 `bg-neutral-soft` 트랙 위의 고른 칸 |
-| `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode `inverted={false}`: 밝은 바탕, 어두운 모듈 |
-| `bg-qr-code-inverse`, `text-qr-code-inverse` | `bg-neutral-solid`, `text-on-neutral-solid` | `bg-base`, `text-neutral-strong` | QRCode `inverted`: 어두운 바탕, 밝은 모듈 |
+| `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode `variant="light"`: 밝은 바탕, 어두운 모듈 |
+| `bg-qr-code-inverse`, `text-qr-code-inverse` | `bg-neutral-solid`, `text-on-neutral-solid` | `bg-base`, `text-neutral-strong` | QRCode `variant="dark"`: 어두운 바탕, 밝은 모듈 |
 
 - 다크의 outline 컨트롤과 필드는 `bg-block` 바탕에 `border-neutral-strong` 테두리입니다. 진한 테두리라 `bg-block` 구역 위에서도 구별됩니다.
 

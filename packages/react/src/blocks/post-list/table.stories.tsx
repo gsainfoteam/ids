@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { MagnifyingGlassIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
+import { Chip } from '../../components/data/chip';
 import { DataTable, useDataTable } from '../../components/data/data-table';
 import { TextField } from '../../components/form/text-field';
 import { Link } from '../../components/typography/link';
@@ -184,7 +184,7 @@ const column = DataTable.createColumnHelper<Post>();
 const COLUMNS = column.columns([
   column.accessor('category', {
     header: '분류',
-    cell: ({ getValue }) => <Badge content={CATEGORY_LABEL[getValue()]} variant="soft" />,
+    cell: ({ getValue }) => <Chip variant="soft">{CATEGORY_LABEL[getValue()]}</Chip>,
     size: 88,
   }),
   column.accessor('title', {
@@ -194,7 +194,9 @@ const COLUMNS = column.columns([
       <Link href={`#${row.original.id}`} colorScheme="neutral" underline="hover">
         {row.original.pinned && (
           <>
-            <Badge content="고정" variant="soft" colorScheme="primary" />{' '}
+            <Chip variant="soft" colorScheme="primary">
+              고정
+            </Chip>{' '}
           </>
         )}
         {getValue()}

@@ -1,10 +1,10 @@
 'use client';
 
-import { type ComponentProps, type ReactNode } from 'react';
+import { use, type ComponentProps, type ReactNode } from 'react';
 
 import { ColorPickerAlphaSlider } from './alpha-slider';
 import { ColorPickerArea } from './area';
-import { PickerContext, usePicker } from './context';
+import { PickerContext, PickerDefaultsContext, usePicker } from './context';
 import { ColorPickerCopy } from './copy';
 import { ColorPickerEyeDropper } from './eye-dropper';
 import { ColorPickerHueSlider } from './hue-slider';
@@ -14,6 +14,7 @@ import { ColorPickerSwatches } from './swatches';
 import { useColorPicker } from './use-color-picker';
 import { resolveState } from '../../../internal/state-props';
 import { useTranslate } from '../../../internal/translate';
+import { containsElementOfType } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { ColorFormat } from './color';
@@ -36,8 +37,6 @@ export type ColorPickerProps = Omit<
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   format?: ColorFormat;
-  alpha?: boolean;
-  swatches?: ColorPickerSwatchOption[];
   disabled?: boolean;
   readOnly?: boolean;
   size?: IdsSize;
@@ -45,13 +44,13 @@ export type ColorPickerProps = Omit<
   children?: ReactNode;
 };
 
+const ALPHA_SLIDER = new Set<unknown>([ColorPickerAlphaSlider]);
+
 export function ColorPickerRoot({
   value,
   defaultValue,
   onValueChange,
   format = 'hex',
-  alpha = false,
-  swatches,
   disabled = false,
   readOnly = false,
   size,
@@ -60,6 +59,9 @@ export function ColorPickerRoot({
   ...props
 }: ColorPickerProps) {
   const t = useTranslate();
+  const defaults = use(PickerDefaultsContext);
+  const alpha = defaults.alpha ?? containsElementOfType(children, ALPHA_SLIDER);
+  const swatches = defaults.swatches;
 
   const picker = useColorPicker({
     value,

@@ -5,7 +5,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const fieldStyle = tv({
   slots: {
-    root: 'grid min-w-0 gap-x-3 gap-y-2',
+    root: 'grid w-full min-w-0 gap-x-3 gap-y-2',
     description: 'text-neutral',
     hint: 'text-neutral',
     error: 'text-danger',

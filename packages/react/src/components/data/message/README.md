@@ -113,7 +113,7 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 <Message align="end" time={sentAt} unread={!seen}>…</Message> {/* 1대1: 점 */}
 ```
 
-- 숫자는 `text-primary`, 점은 `Badge dot colorScheme="primary"` 입니다. 시간 위에 섭니다.
+- 숫자는 `text-primary`, 점은 children 없는 `Chip variant="solid" colorScheme="primary"` 입니다. 시간 위에 섭니다.
 - `0` 이나 `false` 가 되면 줄어들며 사라집니다(`usePresence`). 사라지는 동안 마지막 숫자를 그대로 둡니다.
 - 스크린 리더는 `t('message.unreadBy', { count })`("2명 안 읽음")나 `t('message.unread')`("안 읽음")를 읽습니다.
 - `pending` 과 `error` 인 메시지에는 그리지 않습니다. 아직 닿지 않은 메시지라서입니다.
