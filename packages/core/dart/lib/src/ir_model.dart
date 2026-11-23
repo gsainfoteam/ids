@@ -1659,21 +1659,21 @@ final class IrCssConcentric {
     required this.overlayDepths,
   });
 
-  factory IrCssConcentric.fromJson(
-    Map<String, Object?> json,
-  ) => IrCssConcentric(
-    utility: Name.fromJson((json['utility'] as Map<String, Object?>)),
-    classPrefix: (json['classPrefix'] as String),
-    nested: Name.fromJson((json['nested'] as Map<String, Object?>)),
-    spacing: Name.fromJson((json['spacing'] as Map<String, Object?>)),
-    pads: (json['pads'] as List<Object?>)
-        .map(
-          (item) =>
-              IrCssConcentricPadsItem.fromJson((item as Map<String, Object?>)),
-        )
-        .toList(),
-    overlayDepths: (json['overlayDepths'] as int),
-  );
+  factory IrCssConcentric.fromJson(Map<String, Object?> json) =>
+      IrCssConcentric(
+        utility: Name.fromJson((json['utility'] as Map<String, Object?>)),
+        classPrefix: (json['classPrefix'] as String),
+        nested: Name.fromJson((json['nested'] as Map<String, Object?>)),
+        spacing: Name.fromJson((json['spacing'] as Map<String, Object?>)),
+        pads: (json['pads'] as List<Object?>)
+            .map(
+              (item) => IrCssConcentricPadsItem.fromJson(
+                (item as Map<String, Object?>),
+              ),
+            )
+            .toList(),
+        overlayDepths: (json['overlayDepths'] as int),
+      );
 
   final Name utility;
 
