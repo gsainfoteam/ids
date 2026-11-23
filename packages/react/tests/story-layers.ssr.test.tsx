@@ -66,7 +66,6 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/overlay/popover/index.stories.tsx',
   'components/overlay/tooltip/index.stories.tsx',
   'components/typography/highlight/index.stories.tsx',
-  'components/typography/kbd/index.stories.tsx',
   'components/typography/label/index.stories.tsx',
   'components/typography/link/index.stories.tsx',
   'components/utility/ids-provider/index.stories.tsx',

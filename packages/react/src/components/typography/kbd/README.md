@@ -57,8 +57,22 @@ import { Kbd } from '@gsainfoteam/ids-react';
 ```tsx
 <Kbd keys="Mod+K" />                  // 방문자의 기기를 따른다
 <Kbd keys="Mod+K" platform="mac" />   // 고정. 'mac' | 'windows' | 'linux'
-<Kbd keys="Mod+K" separator=" " />    // 키 사이 표시 바꾸기. null이면 없음
 ```
+
+## 키 사이 표시
+
+```tsx
+<Kbd keys="Mod+K">
+  <Kbd.Separator>then</Kbd.Separator>
+</Kbd>
+<Kbd keys="Mod+Shift+K">
+  <Kbd.Separator />
+</Kbd>
+```
+
+- 기본은 Mac 에서 없음, 그 밖에서 `+` 입니다.
+- `keys` 가 키 여럿일 때 `Kbd.Separator` 를 자식으로 두면 키 사이마다 그것을 그립니다. 글자를 비우면 `+` 이고, Mac 에서도 그립니다.
+- 표시를 없애려면 `<Kbd.Separator hidden />` 을 둡니다.
 
 - 기기는 TanStack Hotkeys 의 `detectPlatform()` 으로 알아냅니다. `Mod` 를 푸는 기준과 같습니다.
 
@@ -101,10 +115,13 @@ import { Kbd } from '@gsainfoteam/ids-react';
 | `keys`      | 단축키 문자열(`Kbd.Keys`). 없으면 `children` 을 그린다         |
 | `size`      | `standard` / `tiny`. 생략하면 KbdGroup → Field → `standard`     |
 | `platform`  | `mac` / `windows` / `linux`. 생략하면 기기를 따른다            |
-| `separator` | 키 사이 표시. Mac은 없음, 그 밖은 `+`                          |
 | `labels`    | 스크린 리더가 읽을 키 이름                                     |
 | `className` | 키 칸(묶음이면 바깥 `<kbd>`)으로 간다. 상태를 받는 함수도 된다 |
 | 그 외 속성  | `<kbd>` 로 간다                                                |
+
+| 파트            | 기본 / 동작                                              |
+| --------------- | -------------------------------------------------------- |
+| `Kbd.Separator` | `<span>`. 키 사이 표시. 글자를 비우면 `+`. 그 외 span 속성 |
 
 ## 알아둘 것
 

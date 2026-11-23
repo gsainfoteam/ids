@@ -1,7 +1,8 @@
-import { type ComponentProps, type ReactNode } from 'react';
+import { type ComponentProps } from 'react';
 
 import { type KbdKeys, type KbdLabels, type KbdPlatform } from './keys';
 import { KbdRoot } from './root';
+import { KbdSeparator, type KbdSeparatorProps } from './separator';
 import { kbdStyle } from './style';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -26,9 +27,15 @@ export namespace Kbd {
     size?: IdsSize;
     platform?: Platform;
     labels?: Labels;
-    separator?: ReactNode;
     className?: string | ((state: State) => string | undefined);
   };
+
+  export type SeparatorProps = KbdSeparatorProps;
+
+  export const Separator = KbdSeparator;
+  export namespace Separator {
+    export type Props = KbdSeparatorProps;
+  }
 
   export const Style = kbdStyle;
 }
