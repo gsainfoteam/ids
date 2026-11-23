@@ -257,8 +257,8 @@ tryCapturePointer(bar, event.pointerId);
 ### 쓰는 법
 
 ```ts
-// internal/temporal-field/index.tsx
-function useInternalTemporal(part: string) {
+// internal/temporal-field/context.ts
+export function useInternalTemporalContext(part: string) {
   const context = use(TemporalContext);
   invariant(context, `${part} must be inside its field.`);
   return context;                        // asserts condition 이라 여기서 null 이 아니다

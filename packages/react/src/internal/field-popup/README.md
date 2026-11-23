@@ -234,12 +234,12 @@ const styles = popupStyle();
 ### 쓰는 법
 
 ```tsx
-// internal/temporal-field/index.tsx
+// internal/temporal-field/parts/content.tsx
 <FieldPopupHeader
   title={config.messages.title}
   closeLabel={config.messages.close}
   autoFocus                              // 닫기 버튼이 초기 포커스 후보가 된다
-  onClose={() => close(true)}
+  onClose={() => c.picker.close(true)}
 />
 ```
 
