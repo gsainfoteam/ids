@@ -29,8 +29,6 @@ export namespace Popover {
     onOpenChangeComplete?: (open: boolean) => void;
     modal?: boolean;
     triggerType?: TriggerType;
-    openDelay?: number;
-    closeDelay?: number;
     children?: ReactNode;
   };
 

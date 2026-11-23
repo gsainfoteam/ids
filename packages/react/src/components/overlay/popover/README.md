@@ -5,7 +5,7 @@
 - **trigger 옆에 붙습니다.** `side`, `align` 쪽에 놓이고, 자리가 모자라면 반대쪽으로 넘어가며 화면 가장자리에서 8px 안쪽에 머뭅니다.
 - **포커스를 옮기지 않습니다.** 열어도 포커스는 trigger 에 남습니다. 안의 입력으로 보내려면 `initialFocus` 나 `data-popup-autofocus` 를 씁니다.
 - **닫는 법.** Escape, 바깥 누르기, 포커스가 밖으로 나갈 때, trigger 를 다시 누를 때, `Popover.Close`. Escape 와 `Popover.Close` 는 포커스를 trigger 로 돌려주고, 바깥 누르기는 누른 곳에 둡니다.
-- **hover 로도 엽니다.** `triggerType="hover"` 면 올려 둔 채 `openDelay` 뒤에 열리고, 포인터가 content 로 건너가는 동안은 닫히지 않습니다.
+- **hover 로도 엽니다.** `triggerType="hover"` 면 올려 둔 채 `Popover.Trigger` 의 `openDelay` 뒤에 열리고, 포인터가 content 로 건너가는 동안은 닫히지 않습니다.
 - **modal.** `modal` 이면 Dialog 처럼 포커스를 가두고 뒤 페이지를 잠급니다.
 - **겹쳐 열 수 있습니다.** 안에서 연 popover 는 위에 쌓이고, 바깥 popover 를 누르면 안쪽만 닫힙니다.
 
@@ -69,8 +69,8 @@ import { Popover } from '@gsainfoteam/ids-react';
 ## hover
 
 ```tsx
-<Popover triggerType="hover" openDelay={200} closeDelay={100}>
-  <Popover.Trigger asChild>
+<Popover triggerType="hover">
+  <Popover.Trigger asChild openDelay={200} closeDelay={100}>
     <a href="/users/42">김지스트</a>
   </Popover.Trigger>
   <Popover.Content>
@@ -79,6 +79,7 @@ import { Popover } from '@gsainfoteam/ids-react';
 </Popover>
 ```
 
+- 기다리는 시간은 hover 에서만 쓰므로 `Popover.Trigger` 가 받습니다. 기본은 `openDelay` 200ms, `closeDelay` 100ms 입니다.
 - trigger 에서 content 로 가는 삼각형 안을 지나는 동안은 닫히지 않습니다(`safePolygon`).
 - trigger 를 누르면(터치, 키보드 Enter 포함) 열리고, 포인터가 떠나도 닫히지 않습니다. Escape 나 바깥 누르기로 닫습니다.
 
@@ -137,8 +138,14 @@ const color = await overlay.open<string>(({ close }) => (
 | `onOpenChangeComplete` | 열고 닫는 애니메이션이 끝난 뒤                         |
 | `modal`                | 기본 `false`. 포커스를 가두고 뒤 페이지를 잠근다       |
 | `triggerType`          | `click`(기본) / `hover`                                |
-| `openDelay`            | hover 로 열리기까지 ms. 기본 `200`                     |
-| `closeDelay`           | hover 가 떠난 뒤 닫히기까지 ms. 기본 `100`             |
+
+`Popover.Trigger`
+
+| 속성         | 기본 / 동작                                |
+| ------------ | ------------------------------------------ |
+| `asChild`    | 자식 요소를 trigger 로 쓴다                |
+| `openDelay`  | hover 로 열리기까지 ms. 기본 `200`         |
+| `closeDelay` | hover 가 떠난 뒤 닫히기까지 ms. 기본 `100` |
 
 `Popover.Content`
 

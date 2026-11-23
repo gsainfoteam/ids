@@ -19,23 +19,13 @@ const meta = {
   argTypes: {
     modal: { control: 'boolean' },
     triggerType: { control: 'radio', options: ['click', 'hover'] },
-    openDelay: { control: { type: 'number', min: 0, step: 50 } },
-    closeDelay: { control: { type: 'number', min: 0, step: 50 } },
   },
   args: {
     modal: false,
     triggerType: 'click',
-    openDelay: 200,
-    closeDelay: 100,
     onOpenChange: fn(),
     onOpenChangeComplete: fn(),
   },
-} satisfies Meta<typeof Popover>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Playground: Story = {
   render: (args) => (
     <Popover {...args}>
       <Popover.Trigger asChild>
@@ -49,10 +39,29 @@ export const Playground: Story = {
       </Popover.Content>
     </Popover>
   ),
-};
+} satisfies Meta<typeof Popover>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 const sides = ['top', 'right', 'bottom', 'left'] as const;
 const aligns = ['start', 'center', 'end'] as const;
+
+export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Popover>
+      <Popover.Trigger asChild>
+        <Button variant="outline">도움말</Button>
+      </Popover.Trigger>
+      <Popover.Content>
+        <Popover.Title>공개 범위</Popover.Title>
+        <Popover.Description>링크가 있는 사람은 누구나 볼 수 있습니다.</Popover.Description>
+      </Popover.Content>
+    </Popover>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -128,7 +137,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Trigger type"
-        description="hover 는 올려 둔 채 openDelay 가 지나면 열리고, 포인터가 content 로 건너가는 동안은 닫히지 않습니다."
+        description="hover 는 올려 둔 채 Popover.Trigger 의 openDelay(기본 200ms)가 지나면 열리고, 포인터가 content 로 건너가는 동안은 닫히지 않습니다. 떠난 뒤 closeDelay(기본 100ms)가 지나면 닫힙니다."
       >
         <Showcase.Row label="click">
           <Popover>
@@ -141,7 +150,7 @@ export const Gallery: Story = {
         <Showcase.Row label="hover">
           <Popover triggerType="hover">
             <Popover.Trigger asChild>
-              <Button variant="ghost">올리면</Button>
+              <Button variant="outline">올리면</Button>
             </Popover.Trigger>
             <Popover.Content>
               <Popover.Title>김지스트</Popover.Title>
@@ -176,31 +185,11 @@ export const Gallery: Story = {
   ),
 };
 
-export const KeyboardAndFocus: Story = {
+export const HoverCardOnAName: Story = {
   render: () => (
-    <Popover>
-      <Popover.Trigger asChild>
-        <Button variant="outline">메모 추가</Button>
-      </Popover.Trigger>
-      <Popover.Content initialFocus="input">
-        <Popover.Title>메모</Popover.Title>
-        <TextField aria-label="메모 내용" data-1p-ignore data-lpignore="true" />
-      </Popover.Content>
-    </Popover>
-  ),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '메모 추가' }));
-    await waitFor(() => expect(canvas.getByRole('textbox', { name: '메모 내용' })).toHaveFocus());
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.getByRole('button', { name: '메모 추가' })).toHaveFocus());
-  },
-};
-
-export const HoverCard: Story = {
-  render: () => (
-    <Popover triggerType="hover" openDelay={0} closeDelay={0}>
-      <Popover.Trigger asChild>
-        <Button variant="ghost">@gistory</Button>
+    <Popover triggerType="hover">
+      <Popover.Trigger asChild openDelay={0} closeDelay={0}>
+        <Button variant="outline">@gistory</Button>
       </Popover.Trigger>
       <Popover.Content>
         <Popover.Arrow />
@@ -209,6 +198,14 @@ export const HoverCard: Story = {
       </Popover.Content>
     </Popover>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`triggerType="hover"` 면 trigger 에 포인터를 올린 채 기다리면 열립니다. 기다리는 시간은 `Popover.Trigger` 의 `openDelay` 와 `closeDelay` 로 정하고, 포인터가 content 로 건너가는 동안은 닫히지 않습니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByRole('button', { name: '@gistory' }));
     await waitFor(() =>
@@ -217,7 +214,7 @@ export const HoverCard: Story = {
   },
 };
 
-export const Modal: Story = {
+export const HoldFocusInside: Story = {
   render: () => (
     <Popover modal>
       <Popover.Trigger asChild>
@@ -231,6 +228,14 @@ export const Modal: Story = {
       </Popover.Content>
     </Popover>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`modal` 이면 포커스를 안에 가두고 뒤 페이지의 스크롤과 누르기를 막습니다. Tab 은 content 안에서만 돌고, `Popover.Close` 로 닫으면 포커스가 trigger 로 돌아옵니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '이름 편집' }));
     await waitFor(() => expect(canvas.getByRole('textbox', { name: '이름' })).toHaveFocus());
@@ -241,7 +246,7 @@ export const Modal: Story = {
   },
 };
 
-export const Nested: Story = {
+export const OpenAPopoverInsideAPopover: Story = {
   render: () => (
     <Popover>
       <Popover.Trigger asChild>
@@ -262,6 +267,14 @@ export const Nested: Story = {
       </Popover.Content>
     </Popover>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Popover.Content 안에 Popover 를 하나 더 쓰면 위에 쌓입니다. 바깥 popover 를 누르면 안쪽만 닫히고 바깥은 남습니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '필터' }));
     await userEvent.click(await canvas.findByRole('button', { name: '기간' }));
@@ -274,8 +287,7 @@ export const Nested: Story = {
   },
 };
 
-export const OpenFromAnywhere: Story = {
-  name: 'overlay.open',
+export const AwaitAChoiceFromOverlayOpen: Story = {
   render: function Render() {
     const [color, setColor] = useState('없음');
     const anchor = useRef<HTMLSpanElement>(null);
@@ -310,9 +322,38 @@ export const OpenFromAnywhere: Story = {
       </div>
     );
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'trigger 없이 `overlay.open` 으로 연 Popover 는 `close(value)` 로 넘긴 값을 promise 로 돌려줍니다. `anchor` 를 주면 그 요소 옆에 뜹니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '색 고르기' }));
     await userEvent.click(await canvas.findByRole('button', { name: '파랑' }));
     await waitFor(() => expect(canvas.getByText('고른 색: 파랑')).toBeInTheDocument());
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  render: () => (
+    <Popover>
+      <Popover.Trigger asChild>
+        <Button variant="outline">메모 추가</Button>
+      </Popover.Trigger>
+      <Popover.Content initialFocus="input">
+        <Popover.Title>메모</Popover.Title>
+        <TextField aria-label="메모 내용" data-1p-ignore data-lpignore="true" />
+      </Popover.Content>
+    </Popover>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '메모 추가' }));
+    await waitFor(() => expect(canvas.getByRole('textbox', { name: '메모 내용' })).toHaveFocus());
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.getByRole('button', { name: '메모 추가' })).toHaveFocus());
   },
 };

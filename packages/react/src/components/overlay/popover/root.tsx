@@ -15,8 +15,6 @@ export function PopoverRoot({
   onOpenChangeComplete,
   modal = false,
   triggerType = 'click',
-  openDelay = 200,
-  closeDelay = 100,
   children,
 }: Popover.Props) {
   const popover = usePopover({
@@ -26,8 +24,6 @@ export function PopoverRoot({
     onOpenChangeComplete,
     modal,
     triggerType,
-    openDelay,
-    closeDelay,
   });
 
   const [titled, setTitled] = useState(false);
