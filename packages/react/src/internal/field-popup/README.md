@@ -62,7 +62,7 @@ revealed.current = true;
 ### 왜 이렇게
 
 - 팝업은 portal 없이 제자리에 렌더하고 `popover="manual"` 로 native top layer 에 올립니다. DOM 위치가 그대로라 IDS theme(`data-mode` 와 Provider 의 테마 변수)을 물려받고, top layer 라서 조상의 `overflow` 에 잘리지 않습니다.
-- 레이어는 popover 일 때 `popup`, drawer 일 때 `modal` 입니다([`useInternalLayer`](../overlay/README.md#liblayer-stackts)). 열린 채 drawer 로 바뀌면 다시 등록되어 스택 맨 위로 갑니다.
+- 레이어는 popover 일 때 `popup`, drawer 일 때 `modal` 입니다([`useInternalLayer`](../overlay/README.md#hooksuse-layerts)). 열린 채 drawer 로 바뀌면 다시 등록되어 스택 맨 위로 갑니다.
 
 #### popover
 

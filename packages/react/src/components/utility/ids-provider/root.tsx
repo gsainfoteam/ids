@@ -3,7 +3,8 @@
 import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 
 import { ThemeContext, useInternalIdsProvider, type ThemeMode } from './hooks/use-ids-provider';
-import { OverlayHost, PortalRootContext } from '../../../internal/overlay/parts/host';
+import { PortalRootContext } from '../../../internal/overlay/context';
+import { OverlayHost } from '../../../internal/overlay/parts/host';
 import { LanguageContext, type IdsTranslate } from '../../../internal/translate';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';

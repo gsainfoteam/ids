@@ -11,32 +11,28 @@ export {
   elementsAbove,
   focusReturnTarget,
   registerLayer,
-  useInternalLayer,
   type DismissReason,
   type Layer,
   type LayerKind,
   type LayerOptions,
   type LayerPosition,
 } from './lib/layer-stack';
+export { useInternalLayer } from './hooks/use-layer';
 export { createExternalStore, type ExternalStore } from './lib/external-store';
-export {
-  OverlayHost,
-  OverlayItemContext,
-  PortalRootContext,
-  useOverlay,
-  useInternalOverlayItem,
-  type OverlayItemBinding,
-} from './parts/host';
+export { OverlayItemContext, PortalRootContext, type OverlayItemBinding } from './context';
+export { OverlayHost } from './parts/host';
+export { useOverlay } from './hooks/use-overlay';
+export { useInternalOverlayItem } from './hooks/use-overlay-item';
 export * from './lib/interactions';
 export { ModalLayer, type ModalLayerProps } from './parts/modal-layer';
 export {
   coveredByKeyboard,
   onViewportChange,
-  useInternalDrawerPresentation,
   visibleHeight,
   DRAWER_BELOW,
   type PopupPresentation,
 } from './lib/sheet-viewport';
+export { useInternalDrawerPresentation } from './hooks/use-drawer-presentation';
 export {
   keepAboveLayers,
   raiseInTopLayer,

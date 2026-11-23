@@ -8,13 +8,11 @@ import { render } from 'vitest-browser-react';
 import { palettes } from '../.storybook/palettes';
 import { IdsProvider } from '../src';
 import { testTheme } from './theme';
+import { OverlayItemContext } from '../src/internal/overlay/context';
+import { useOverlay } from '../src/internal/overlay/hooks/use-overlay';
+import { useInternalOverlayItem } from '../src/internal/overlay/hooks/use-overlay-item';
 import { useInternalPresence } from '../src/internal/overlay/hooks/use-presence';
 import { overlay } from '../src/internal/overlay/lib/store';
-import {
-  OverlayItemContext,
-  useOverlay,
-  useInternalOverlayItem,
-} from '../src/internal/overlay/parts/host';
 
 const nextFrame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
 const finishAnimations = (element: Element) => {
