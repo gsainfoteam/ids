@@ -116,7 +116,7 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 | `PromptInput.ActionMenu`  | + 버튼과 메뉴 (`IconButton` + `Menu`). 자식은 `Menu.Item` 들                              |
 | `PromptInput.AddAttachments` | 파일 고르기를 여는 메뉴 항목 (`Menu.Item`)                                            |
 
-- 입력과 바 사이에는 구분선이 없습니다 (`TextArea divided={false}`).
+- 입력과 바 사이에는 구분선이 없습니다.
 - 넉넉한 입력창입니다. 여백은 `concentric-p-1.5`(tiny `concentric-p-1`)라 모서리가 컨테이너 최대인 16px 이고, 글자는 `body-b2`, 아래 바의 버튼은 36px, 버튼 사이는 8px 입니다(tiny 는 TextArea 바와 같은 버튼에 6px).
 - 모든 파트는 `PromptInput` 의 바로 아래 자식으로 둡니다. 다른 요소로 감싸면 찾지 못해 기본 파트가 하나 더 생깁니다.
 - 모델 고르기처럼 켜고 끄는 것이 아닌 도구는 앱이 `Select` 같은 IDS 컴포넌트로 넣습니다. 아래 바의 버튼은 TextArea 바 안쪽 크기로 줄어듭니다.

@@ -23,6 +23,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
+const resizes = ['auto', 'none', 'vertical', 'horizontal', 'both'] as const;
 
 const meta = {
   title: 'Form/TextArea',
@@ -34,7 +35,7 @@ const meta = {
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     invalid: { control: 'boolean' },
-    autoResize: { control: 'boolean' },
+    resize: { control: 'radio', options: resizes },
     placeholder: { control: 'text' },
   },
   args: {
@@ -51,6 +52,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-80">
+      <Field.Label>자기소개</Field.Label>
+      <TextArea placeholder="자신을 소개해 주세요" />
+    </Field>
+  ),
+};
 
 export const Gallery: Story = {
   render: function Render() {
@@ -192,15 +202,23 @@ export const Gallery: Story = {
               className="w-80"
             />
           </Showcase.Row>
+          <Showcase.Row label="none">
+            <TextArea
+              resize="none"
+              rows={2}
+              placeholder="높이가 rows 로 고정됩니다"
+              aria-label="고정"
+              className="w-80"
+            />
+          </Showcase.Row>
         </Showcase.Section>
 
         <Showcase.Section
           title="Resize"
-          description="autoResize={false} 면 Resizable 과 같은 손잡이를 필드의 테두리 위에 그립니다. vertical 은 아래 가장자리, horizontal 은 끝 가장자리의 막대, both 는 필드의 모서리와 같은 중심으로 휜 호입니다. 누를 영역은 선의 안쪽 끝에서 바깥으로 24px 라서 바의 버튼과 스크롤 막대를 덮지 않습니다."
+          description="resize 가 vertical, horizontal, both 면 Resizable 과 같은 손잡이를 필드의 테두리 위에 그립니다. vertical 은 아래 가장자리, horizontal 은 끝 가장자리의 막대, both 는 필드의 모서리와 같은 중심으로 휜 호입니다. 누를 영역은 선의 안쪽 끝에서 바깥으로 24px 라서 바의 버튼과 스크롤 막대를 덮지 않습니다."
         >
           <Showcase.Row label="vertical" className="gap-8 py-3">
             <TextArea
-              autoResize={false}
               resize="vertical"
               rows={3}
               placeholder="아래 가장자리를 끌어 높이를 바꿉니다"
@@ -208,7 +226,6 @@ export const Gallery: Story = {
               className="w-72"
             />
             <TextArea
-              autoResize={false}
               resize="vertical"
               rows={2}
               maxLength={100}
@@ -223,7 +240,6 @@ export const Gallery: Story = {
           </Showcase.Row>
           <Showcase.Row label="horizontal" className="gap-8 py-3">
             <TextArea
-              autoResize={false}
               resize="horizontal"
               rows={3}
               placeholder="끝 가장자리를 끌어 너비를 바꿉니다"
@@ -231,7 +247,6 @@ export const Gallery: Story = {
               className="w-72"
             />
             <TextArea
-              autoResize={false}
               resize="horizontal"
               rows={2}
               maxLength={100}
@@ -246,7 +261,6 @@ export const Gallery: Story = {
           </Showcase.Row>
           <Showcase.Row label="both" className="gap-8 py-3">
             <TextArea
-              autoResize={false}
               resize="both"
               rows={3}
               placeholder="모서리를 끌어 너비와 높이를 함께 바꿉니다"
@@ -254,7 +268,6 @@ export const Gallery: Story = {
               className="w-72"
             />
             <TextArea
-              autoResize={false}
               resize="both"
               rows={2}
               maxLength={100}
@@ -272,7 +285,6 @@ export const Gallery: Story = {
               <TextArea
                 key={resize}
                 size="tiny"
-                autoResize={false}
                 resize={resize}
                 rows={2}
                 maxLength={100}
@@ -288,7 +300,6 @@ export const Gallery: Story = {
           </Showcase.Row>
           <Showcase.Row label="disabled" className="gap-8 py-3">
             <TextArea
-              autoResize={false}
               resize="vertical"
               rows={2}
               disabled
@@ -297,7 +308,6 @@ export const Gallery: Story = {
               className="w-72"
             />
             <TextArea
-              autoResize={false}
               resize="both"
               rows={2}
               disabled
@@ -309,7 +319,6 @@ export const Gallery: Story = {
           <Showcase.Row label="rtl" className="gap-8 py-3">
             <div dir="rtl" className="flex flex-wrap gap-8">
               <TextArea
-                autoResize={false}
                 resize="horizontal"
                 rows={3}
                 placeholder="끝 가장자리는 왼쪽입니다"
@@ -317,7 +326,6 @@ export const Gallery: Story = {
                 className="w-72"
               />
               <TextArea
-                autoResize={false}
                 resize="both"
                 rows={3}
                 placeholder="호가 왼쪽 아래 모서리로 옮겨 갑니다"
@@ -332,7 +340,7 @@ export const Gallery: Story = {
   },
 };
 
-export const AutoHeight: Story = {
+export const GrowWithTheText: Story = {
   render: () => (
     <Field className="w-80">
       <Field.Label>자기소개</Field.Label>
@@ -343,7 +351,7 @@ export const AutoHeight: Story = {
     docs: {
       description: {
         story:
-          '내용에 맞춰 높이가 늘고 줄어듭니다. maxRows를 넘으면 스크롤이 생깁니다. 붙여넣기, 실행 취소, 폼 reset, 창 크기 변화, 웹폰트 로딩 뒤에도 다시 잽니다.',
+          '기본값 `resize="auto"` 는 내용에 맞춰 높이가 늘고 줄어듭니다. `rows` 가 가장 낮은 높이이고, `maxRows` 를 넘으면 스크롤이 생깁니다. 붙여넣기, 실행 취소, 폼 reset, 창 크기 변화, 웹폰트 로딩 뒤에도 다시 잽니다.',
       },
     },
   },
@@ -363,51 +371,43 @@ export const AutoHeight: Story = {
   },
 };
 
-export const CharacterCount: Story = {
-  render: (args) => (
+export const KeepAFixedHeight: Story = {
+  render: () => (
     <Field className="w-80">
-      <Field.Label>한 줄 소개</Field.Label>
-      <Field.Description>프로필에 보입니다.</Field.Description>
-      <TextArea {...args} maxLength={30} rows={2} aria-label={undefined}>
-        <TextArea.Input />
-        <TextArea.Count />
-      </TextArea>
+      <Field.Label>메모</Field.Label>
+      <TextArea resize="none" rows={3} placeholder="세 줄 높이에서 스크롤합니다" />
     </Field>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'TextArea.Count는 maxLength에 대한 글자 수를 보여 주고 입력의 설명에 들어갑니다. 한도에 가까워지면 입력이 멈춘 뒤 남은 글자 수를 스크린 리더에 알립니다.',
+          '`resize="none"` 은 높이를 `rows` 로 고정하고 손잡이도 그리지 않습니다. 넘치는 내용은 필드 안에서 스크롤합니다. 목록이나 카드 안처럼 필드가 커지면 레이아웃이 흔들리는 자리에 씁니다.',
       },
     },
   },
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    const input = () => canvas.getByRole('textbox', { name: '한 줄 소개' });
-    const count = () => canvasElement.querySelector('[data-text-area-count]')!;
-    await expect(count()).toHaveTextContent('0 / 30');
-    await expect(input()).toHaveAccessibleDescription('프로필에 보입니다. 0 / 30');
-    await userEvent.type(input(), 'GIST 인포팀에서 서비스를 만듭니다. 반갑습니다');
-    await expect(count()).toHaveAttribute('data-near-limit');
-    await waitFor(() =>
-      expect(canvas.getByRole('status')).toHaveTextContent(/자 남았습니다|제한에 도달했습니다/),
-    );
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('textbox', { name: '메모' });
+    const start = input.clientHeight;
+
+    await userEvent.type(input, '한 줄\n두 줄\n세 줄\n네 줄\n다섯 줄');
+    await expect(input.clientHeight).toBe(start);
+    await expect(input.scrollHeight).toBeGreaterThan(input.clientHeight);
+    await expect(canvas.queryByRole('separator')).toBeNull();
   },
 };
 
-export const ResizeHandle: Story = {
+export const LetTheUserResizeIt: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <TextArea
-        autoResize={false}
         resize="vertical"
         rows={3}
         aria-label="높이만"
-        placeholder="resize=vertical (기본)"
+        placeholder="resize=vertical"
         className="w-80"
       />
       <TextArea
-        autoResize={false}
         resize="horizontal"
         rows={2}
         aria-label="너비만"
@@ -415,7 +415,6 @@ export const ResizeHandle: Story = {
         className="w-80"
       />
       <TextArea
-        autoResize={false}
         resize="both"
         rows={3}
         aria-label="둘 다"
@@ -428,7 +427,7 @@ export const ResizeHandle: Story = {
     docs: {
       description: {
         story:
-          '`autoResize={false}` 면 Resizable 과 같은 손잡이가 필드의 테두리 위에 생깁니다. `vertical` 은 아래 가장자리, `horizontal` 은 끝 가장자리의 막대이고, `both` 는 필드의 모서리와 같은 중심으로 휜 호입니다. 브라우저의 CSS 손잡이와 달리 Tab 으로 가서 방향키로 바꿀 수 있고, 터치로 끌립니다. 높이는 textarea 에, 너비는 필드 전체에 들어갑니다. Enter 나 두 번 누르기는 rows 로 정한 크기로 돌아갑니다.',
+          '`resize` 를 `vertical`, `horizontal`, `both` 로 주면 높이가 `rows` 로 정해지고, Resizable 과 같은 손잡이가 필드의 테두리 위에 생깁니다. `vertical` 은 아래 가장자리, `horizontal` 은 끝 가장자리의 막대이고, `both` 는 필드의 모서리와 같은 중심으로 휜 호입니다. 브라우저의 CSS 손잡이와 달리 Tab 으로 가서 방향키로 바꿀 수 있고, 터치로 끌립니다. 높이는 textarea 에, 너비는 필드 전체에 들어갑니다. Enter 나 두 번 누르기는 rows 로 정한 크기로 돌아갑니다.',
       },
     },
   },
@@ -455,7 +454,70 @@ export const ResizeHandle: Story = {
   },
 };
 
-export const Sentinel: Story = {
+export const CountCharacters: Story = {
+  render: (args) => (
+    <Field className="w-80">
+      <Field.Label>한 줄 소개</Field.Label>
+      <Field.Description>프로필에 보입니다.</Field.Description>
+      <TextArea {...args} maxLength={30} rows={2} aria-label={undefined}>
+        <TextArea.Input />
+        <TextArea.Count />
+      </TextArea>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TextArea.Input 아래에 TextArea.Count 를 두면 아래 바에 maxLength 에 대한 글자 수가 보이고, 그 글자 수가 입력의 설명에 들어갑니다. 한도에 가까워지면 입력이 멈춘 뒤 남은 글자 수를 스크린 리더에 알립니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const input = () => canvas.getByRole('textbox', { name: '한 줄 소개' });
+    const count = () => canvasElement.querySelector('[data-text-area-count]')!;
+    await expect(count()).toHaveTextContent('0 / 30');
+    await expect(input()).toHaveAccessibleDescription('프로필에 보입니다. 0 / 30');
+    await userEvent.type(input(), 'GIST 인포팀에서 서비스를 만듭니다. 반갑습니다');
+    await expect(count()).toHaveAttribute('data-near-limit');
+    await waitFor(() =>
+      expect(canvas.getByRole('status')).toHaveTextContent(/자 남았습니다|제한에 도달했습니다/),
+    );
+  },
+};
+
+export const DropTheLineUnderTheToolbar: Story = {
+  render: () => (
+    <TextArea
+      placeholder="마크다운으로 작성하세요"
+      aria-label="본문"
+      className="w-80 [&>[data-text-area-bottom]]:border-t-0 [&>[data-text-area-top]]:border-b-0"
+    >
+      <div className="flex gap-1">
+        <IconButton aria-label="굵게" icon={<BoldIcon />} />
+        <IconButton aria-label="기울임" icon={<ItalicIcon />} />
+        <IconButton aria-label="밑줄" icon={<UnderlineIcon />} />
+      </div>
+      <TextArea.Input />
+    </TextArea>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '바와 입력 사이에는 늘 구분선이 그려집니다. 선 없이 한 면으로 보이게 하려면 `className` 에 `[&>[data-text-area-top]]:border-b-0` 과 `[&>[data-text-area-bottom]]:border-t-0` 을 줍니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const root = canvas.getByRole('textbox', { name: '본문' }).closest('[data-text-area]')!;
+    const top = root.querySelector('[data-text-area-top]')!;
+    await expect(getComputedStyle(top).borderBottomWidth).toBe('0px');
+  },
+};
+
+export const BarsSitAroundTheScrollArea: Story = {
+  tags: ['verification'],
   render: () => (
     <TextArea className="w-80" aria-label="본문" placeholder="본문">
       <span>위</span>
