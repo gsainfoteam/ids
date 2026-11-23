@@ -3,7 +3,7 @@ import { useActionState, type ReactElement } from 'react';
 import { CalendarDate } from '@internationalized/date';
 import { useFormStatus } from 'react-dom';
 import { describe, expect, test, vi } from 'vitest';
-import { page, userEvent, type Locator } from 'vitest/browser';
+import { page, server, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import {
@@ -346,8 +346,10 @@ test('useFormStatus reads pending while the action runs, then the form resets', 
   await expect.element(labelled('textbox')).toHaveValue('hello');
 });
 
-test.fails(
-  'useFormStatus stays pending under a natively disabled Button (fails: disabling it blurs it, its onBlur setState makes React drop pending)',
+const CHROMIUM_BLURS_A_BUTTON_IT_DISABLES = server.browser === 'chromium';
+
+(CHROMIUM_BLURS_A_BUTTON_IT_DISABLES ? test.fails : test)(
+  'useFormStatus stays pending under a natively disabled Button (fails in Chromium: disabling it blurs it, its onBlur setState makes React drop pending)',
   async () => {
     const held = deferred();
     await render(
