@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type Ref, type RefCallback } from 'react';
+
+import { mergeRefs } from '../../../../utils';
 
 export const ANNOUNCE_DELAY = 100;
 
@@ -28,7 +30,15 @@ const QUIET_CONTAINERS = [
 
 export type SpinnerAnnouncement = 'pending' | 'announced' | 'silent';
 
-export function useInternalSpinner(ref: RefObject<Element | null>, hidden: boolean | undefined) {
+export function useInternalSpinner(
+  outerRef: Ref<SVGSVGElement> | undefined,
+  hidden: boolean | undefined,
+) {
+  const ref = useRef<SVGSVGElement>(null);
+  const mergedRef: RefCallback<SVGSVGElement> = useCallback(
+    (node: SVGSVGElement | null) => mergeRefs(ref, outerRef)(node),
+    [outerRef],
+  );
   const [phase, setPhase] = useState<SpinnerAnnouncement>('pending');
 
   useEffect(() => {
@@ -40,5 +50,5 @@ export function useInternalSpinner(ref: RefObject<Element | null>, hidden: boole
     return () => clearTimeout(timer);
   }, [ref, hidden]);
 
-  return { announcement: hidden === true ? ('silent' as const) : phase };
+  return { ref: mergedRef, announcement: hidden === true ? ('silent' as const) : phase };
 }

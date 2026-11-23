@@ -1,22 +1,15 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
-
 import { useInternalSpinner } from './hooks/use-spinner';
+import { hiddenFromScreenReaders } from './lib/aria-hidden';
 import { spinnerStyle } from './style';
 import { Arc } from '../../../internal/parts/arc';
 import { useInternalTranslate } from '../../../internal/translate';
-import { mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { Spinner } from '.';
 
 const SIZE_WHEN_UNSTYLED = '1em';
-
-function hiddenFromScreenReaders(ariaHidden: Spinner.Props['aria-hidden']) {
-  if (ariaHidden === undefined) return undefined;
-  return ariaHidden === true || ariaHidden === 'true';
-}
 
 export function SpinnerRoot({
   size,
@@ -29,12 +22,10 @@ export function SpinnerRoot({
   const t = useInternalTranslate();
 
   const resolvedSize = useFieldSize(size);
-  const svgRef = useRef<SVGSVGElement>(null);
-  const mergedRef = useCallback(
-    (node: SVGSVGElement | null) => mergeRefs(svgRef, ref)(node),
-    [ref],
+  const { ref: mergedRef, announcement } = useInternalSpinner(
+    ref,
+    hiddenFromScreenReaders(ariaHidden),
   );
-  const { announcement } = useInternalSpinner(svgRef, hiddenFromScreenReaders(ariaHidden));
 
   const state: Spinner.State = { size: resolvedSize, announced: announcement === 'announced' };
   const resolvedClassName = typeof className === 'function' ? className(state) : className;
