@@ -151,7 +151,7 @@ import { Table } from '@gsainfoteam/ids-react';
 ## 빈 표
 
 - 행이 없을 때의 안내는 앱이 그립니다. 한 칸짜리 행(`<Table.Cell colSpan={열 수}>`)에 넣거나, 표 대신 Empty 컴포넌트를 둡니다.
-- `DataTable` 은 이 행을 스스로 그립니다(`empty`).
+- `DataTable` 은 이 행을 스스로 그립니다(`DataTable.Empty`).
 
 ## data 속성
 

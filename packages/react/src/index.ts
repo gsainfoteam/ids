@@ -100,12 +100,19 @@ export type {
   TableSection,
   TableVariant,
 } from './components/data/table';
-export { DataTable } from './components/data/data-table';
+export { DataTable, useDataTable } from './components/data/data-table';
 export type {
   DataTableProps,
   DataTableColumnDef,
   DataTableColumnMeta,
   DataTableFeatures,
+  DataTableInstance,
+  DataTableVariant,
+  DataTableSortingOptions,
+  DataTableSelectionOptions,
+  DataTablePaginationOptions,
+  DataTableColumnSizingOptions,
+  UseDataTableOptions,
 } from './components/data/data-table';
 export { Carousel, useCarousel } from './components/data/carousel';
 export type {
