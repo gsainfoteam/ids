@@ -8,6 +8,7 @@ import { Showcase, holdTheNextCall } from '~story-kit';
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Bubble } from '../../data/bubble';
+import { Message } from '../../data/message';
 
 import { MessageScroller } from '.';
 
@@ -64,7 +65,7 @@ const ANSWER = [
   '근로 장학 시간과도 겹치지 않게 골랐어요.',
 ];
 
-const frame = cn('h-80 w-full max-w-md rounded-container border border-neutral');
+const frame = cn('h-80 w-full max-w-md overflow-hidden rounded-container border border-neutral');
 
 const viewportIn = (root: HTMLElement) =>
   root.querySelector<HTMLElement>('[data-message-scroller] [role="log"]')!;
@@ -84,49 +85,48 @@ const LIST_PADDING_PX = 16;
 
 export const Playground: Story = {
   render: (args) => (
-    <MessageScroller {...args} className={frame}>
-      {CONVERSATION.map((line) => (
-        <Bubble
-          key={line.id}
-          align={line.mine ? 'end' : 'start'}
-          variant={line.mine ? 'solid' : 'soft'}
-          className={line.mine ? 'self-end' : 'self-start'}
-        >
-          {line.text}
-        </Bubble>
-      ))}
-    </MessageScroller>
+    <div className={frame}>
+      <MessageScroller {...args}>
+        {CONVERSATION.map((line) => (
+          <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+            <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+          </Message>
+        ))}
+      </MessageScroller>
+    </div>
   ),
 };
 
 export const Usage: Story = {
   render: () => (
-    <MessageScroller className="rounded-container border-neutral h-80 w-full max-w-md border">
-      <Bubble align="start" variant="soft" className="self-start">
-        내일 동아리 회의 몇 시였지?
-      </Bubble>
-      <Bubble align="end" variant="solid" className="self-end">
-        저녁 7시, 학생회관 2층이야.
-      </Bubble>
-      <Bubble align="start" variant="soft" className="self-start">
-        발표 자료는 누가 가져와?
-      </Bubble>
-      <Bubble align="end" variant="solid" className="self-end">
-        내가 노트북에 담아 갈게.
-      </Bubble>
-      <Bubble align="start" variant="soft" className="self-start">
-        좋아. 간식은 내가 사 갈게.
-      </Bubble>
-      <Bubble align="end" variant="solid" className="self-end">
-        고마워. 음료도 부탁해.
-      </Bubble>
-      <Bubble align="start" variant="soft" className="self-start">
-        몇 명 오는지 알아?
-      </Bubble>
-      <Bubble align="end" variant="solid" className="self-end">
-        지금까지 열두 명이 온다고 했어.
-      </Bubble>
-    </MessageScroller>
+    <div className="rounded-container border-neutral h-80 w-full max-w-md overflow-hidden border">
+      <MessageScroller>
+        <Message align="start">
+          <Bubble variant="soft">내일 동아리 회의 몇 시였지?</Bubble>
+        </Message>
+        <Message align="end">
+          <Bubble variant="solid">저녁 7시, 학생회관 2층이야.</Bubble>
+        </Message>
+        <Message align="start">
+          <Bubble variant="soft">발표 자료는 누가 가져와?</Bubble>
+        </Message>
+        <Message align="end">
+          <Bubble variant="solid">내가 노트북에 담아 갈게.</Bubble>
+        </Message>
+        <Message align="start">
+          <Bubble variant="soft">좋아. 간식은 내가 사 갈게.</Bubble>
+        </Message>
+        <Message align="end">
+          <Bubble variant="solid">고마워. 음료도 부탁해.</Bubble>
+        </Message>
+        <Message align="start">
+          <Bubble variant="soft">몇 명 오는지 알아?</Bubble>
+        </Message>
+        <Message align="end">
+          <Bubble variant="solid">지금까지 열두 명이 온다고 했어.</Bubble>
+        </Message>
+      </MessageScroller>
+    </div>
   ),
 };
 
@@ -138,32 +138,26 @@ export const Gallery: Story = {
         description="자식마다 <li> 로 감싼 <ol> 이 role=log 인 스크롤 영역 안에 놓입니다. 처음에는 맨 아래에서 시작합니다."
       >
         <Showcase.Row label="end (기본)">
-          <MessageScroller className={frame}>
-            {CONVERSATION.map((line) => (
-              <Bubble
-                key={line.id}
-                align={line.mine ? 'end' : 'start'}
-                variant={line.mine ? 'solid' : 'soft'}
-                className={line.mine ? 'self-end' : 'self-start'}
-              >
-                {line.text}
-              </Bubble>
-            ))}
-          </MessageScroller>
+          <div className={frame}>
+            <MessageScroller>
+              {CONVERSATION.map((line) => (
+                <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+                  <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+                </Message>
+              ))}
+            </MessageScroller>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="넘치지 않음">
-          <MessageScroller className={frame}>
-            {CONVERSATION.slice(0, 3).map((line) => (
-              <Bubble
-                key={line.id}
-                align={line.mine ? 'end' : 'start'}
-                variant={line.mine ? 'solid' : 'soft'}
-                className={line.mine ? 'self-end' : 'self-start'}
-              >
-                {line.text}
-              </Bubble>
-            ))}
-          </MessageScroller>
+          <div className={frame}>
+            <MessageScroller>
+              {CONVERSATION.slice(0, 3).map((line) => (
+                <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+                  <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+                </Message>
+              ))}
+            </MessageScroller>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -172,41 +166,15 @@ export const Gallery: Story = {
         description="aria-busy 면 위쪽 가운데에 Spinner 가 내용 위로 뜹니다. 목록을 밀지 않습니다."
       >
         <Showcase.Row label="aria-busy">
-          <MessageScroller aria-busy className={frame}>
-            {CONVERSATION.map((line) => (
-              <Bubble
-                key={line.id}
-                align={line.mine ? 'end' : 'start'}
-                variant={line.mine ? 'solid' : 'soft'}
-                className={line.mine ? 'self-end' : 'self-start'}
-              >
-                {line.text}
-              </Bubble>
-            ))}
-          </MessageScroller>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Parts"
-        description="MessageScroller.List 로 목록의 간격과 폭을, MessageScroller.Jump 로 아래로 가기 버튼을 바꿉니다."
-      >
-        <Showcase.Row label="List">
-          <MessageScroller className={frame}>
-            <MessageScroller.List className="mx-auto w-full max-w-sm gap-6 px-6">
+          <div className={frame}>
+            <MessageScroller aria-busy>
               {CONVERSATION.map((line) => (
-                <Bubble
-                  key={line.id}
-                  align={line.mine ? 'end' : 'start'}
-                  variant={line.mine ? 'solid' : 'soft'}
-                  className={line.mine ? 'self-end' : 'self-start'}
-                >
-                  {line.text}
-                </Bubble>
+                <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+                  <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+                </Message>
               ))}
-            </MessageScroller.List>
-            <MessageScroller.Jump variant="soft" colorScheme="primary" />
-          </MessageScroller>
+            </MessageScroller>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -218,22 +186,18 @@ export const FollowNewMessages: Story = {
     const [lines, setLines] = useState(CONVERSATION);
 
     return (
-      <div className="flex w-full max-w-md flex-col gap-3">
-        <MessageScroller className={frame}>
-          {lines.map((line) => (
-            <Bubble
-              key={line.id}
-              align={line.mine ? 'end' : 'start'}
-              variant={line.mine ? 'solid' : 'soft'}
-              className={line.mine ? 'self-end' : 'self-start'}
-            >
-              {line.text}
-            </Bubble>
-          ))}
-        </MessageScroller>
+      <div className="flex w-full max-w-md flex-col items-start gap-3">
+        <div className={frame}>
+          <MessageScroller>
+            {lines.map((line) => (
+              <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+                <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+              </Message>
+            ))}
+          </MessageScroller>
+        </div>
         <Button
           variant="outline"
-          className="self-start"
           onClick={() =>
             setLines((current) => [
               ...current,
@@ -289,20 +253,22 @@ export const KeepTheQuestionInViewInAnAiChat: Story = {
 
     return (
       <div className="flex w-full max-w-md flex-col gap-3">
-        <MessageScroller scrollOnAppend="start" className={frame}>
-          {turns.map((turn) => (
-            <div key={turn.id} className="flex flex-col gap-3">
-              <Bubble align="end" variant="solid" className="self-end">
-                {turn.question}
-              </Bubble>
-              {ANSWER.slice(0, turn.answer).map((paragraph) => (
-                <p key={paragraph} className="text-body-b2-regular">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          ))}
-        </MessageScroller>
+        <div className={frame}>
+          <MessageScroller scrollOnAppend="start">
+            {turns.map((turn) => (
+              <div key={turn.id} className="flex flex-col gap-3">
+                <Message align="end">
+                  <Bubble variant="solid">{turn.question}</Bubble>
+                </Message>
+                {ANSWER.slice(0, turn.answer).map((paragraph) => (
+                  <p key={paragraph} className="text-body-b2-regular">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </MessageScroller>
+        </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -372,29 +338,25 @@ export const LoadEarlierMessages: Story = {
     const [more, setMore] = useState(true);
 
     return (
-      <MessageScroller
-        aria-busy={loading}
-        className={frame}
-        onReachStart={async () => {
-          if (!more) return;
-          setLoading(true);
-          await args.onReachStart?.();
-          setLines((current) => [...EARLIER, ...current]);
-          setMore(false);
-          setLoading(false);
-        }}
-      >
-        {lines.map((line) => (
-          <Bubble
-            key={line.id}
-            align={line.mine ? 'end' : 'start'}
-            variant={line.mine ? 'solid' : 'soft'}
-            className={line.mine ? 'self-end' : 'self-start'}
-          >
-            {line.text}
-          </Bubble>
-        ))}
-      </MessageScroller>
+      <div className={frame}>
+        <MessageScroller
+          aria-busy={loading}
+          onReachStart={async () => {
+            if (!more) return;
+            setLoading(true);
+            await args.onReachStart?.();
+            setLines((current) => [...EARLIER, ...current]);
+            setMore(false);
+            setLoading(false);
+          }}
+        >
+          {lines.map((line) => (
+            <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+              <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+            </Message>
+          ))}
+        </MessageScroller>
+      </div>
     );
   },
   parameters: {
@@ -431,22 +393,19 @@ export const LoadEarlierMessages: Story = {
 
 export const ReplaceTheJumpButton: Story = {
   render: () => (
-    <MessageScroller className={frame}>
-      {CONVERSATION.map((line) => (
-        <Bubble
-          key={line.id}
-          align={line.mine ? 'end' : 'start'}
-          variant={line.mine ? 'solid' : 'soft'}
-          className={line.mine ? 'self-end' : 'self-start'}
-        >
-          {line.text}
-        </Bubble>
-      ))}
-      <MessageScroller.Jump variant="soft" colorScheme="primary">
-        <ArrowDownCircleIcon />
-        최신 메시지
-      </MessageScroller.Jump>
-    </MessageScroller>
+    <div className={frame}>
+      <MessageScroller>
+        {CONVERSATION.map((line) => (
+          <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+            <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+          </Message>
+        ))}
+        <MessageScroller.Jump variant="soft" colorScheme="primary">
+          <ArrowDownCircleIcon />
+          최신 메시지
+        </MessageScroller.Jump>
+      </MessageScroller>
+    </div>
   ),
   parameters: {
     docs: {
@@ -473,5 +432,30 @@ export const ReplaceTheJumpButton: Story = {
 
     await userEvent.click(button);
     await waitFor(() => expect(distanceToEnd(viewport())).toBeLessThanOrEqual(AT_THE_END_PX));
+  },
+};
+
+export const NarrowTheListInAWideChat: Story = {
+  tags: ['custom-design'],
+  render: () => (
+    <div className="border-neutral rounded-container h-80 w-full max-w-2xl overflow-hidden border">
+      <MessageScroller>
+        <MessageScroller.List className="mx-auto w-full max-w-sm gap-6 px-6">
+          {CONVERSATION.map((line) => (
+            <Message key={line.id} align={line.mine ? 'end' : 'start'}>
+              <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
+            </Message>
+          ))}
+        </MessageScroller.List>
+      </MessageScroller>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'IDS 의 목록 간격(`gap-4 p-4`)을 바꾼 앱의 디자인입니다. 메시지를 `MessageScroller.List` 로 감싸고 그 `className` 으로 넓은 화면에서 목록을 가운데의 좁은 단으로 모으고 간격을 넓힙니다.',
+      },
+    },
   },
 };

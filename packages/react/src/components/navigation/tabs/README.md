@@ -6,7 +6,7 @@
 - **키보드 한 번에 한 칸.** 탭 목록 전체가 Tab 한 칸이고 고른 탭에 멈춥니다. 안에서는 화살표, Home, End 로 옮기고, 끝에서 처음으로 돌아가며, 비활성 탭은 건너뜁니다.
 - **자동과 수동.** 기본은 화살표로 옮기면 바로 고릅니다. `activationMode="manual"` 이면 Enter 나 Space 로 고릅니다.
 - **타입으로 막는 잘못된 값.** children 을 함수로 쓰면 탭 값의 타입으로 좁힌 `List`, `Trigger`, `Content` 를 받습니다.
-- **네 가지 모양.** 선(`underline`), 옅은 채움(`pill`), 상자(`enclosed`), 트랙 위 칸(`segmented`). 모양마다 한 가지로 고정되어 있고, 다른 모양은 Trigger의 `className`으로 바꿉니다.
+- **네 가지 모양.** 선(`underline`), 옅은 채움(`pill`), 상자(`enclosed`), 트랙 위 칸(`segmented`). 모양마다 한 가지로 고정되어 있습니다.
 
 ```tsx
 import { Tabs } from '@gsainfoteam/ids-react';
@@ -76,6 +76,12 @@ const [section, setSection] = useState<Section>('docs');
 - 오른쪽에서 왼쪽으로 쓰는 화면에서는 `←` 와 `→` 가 바뀝니다.
 - `manual` 에서 화살표로 옮기고 고르지 않은 채 목록을 나갔다 돌아오면 고른 탭으로 돌아옵니다.
 
+## 크기
+
+- 부모 폭을 채웁니다. 좁히려면 감싸는 요소에 폭을 줍니다: `<div className="w-80"><Tabs>…</Tabs></div>`.
+- 가로 목록은 부모 폭만큼 이어지고 탭은 글자 폭만큼입니다. `segmented` 트랙만 가로면 탭 폭의 합만큼입니다.
+- 세로면 목록이 앞에 놓이고 내용이 남는 폭을 채웁니다.
+
 ## 모양
 
 ```tsx
@@ -92,7 +98,6 @@ const [section, setSection] = useState<Section>('docs');
 - `enclosed` 의 고른 탭은 놓인 면의 색(`--ids-bg-current`)으로 칠해 목록 선을 덮습니다. 페이지, `bg-surface` 카드, `bg-block` 띠 위에서 따로 맞추지 않아도 됩니다.
 - `segmented` 는 `SegmentedControl` 과 같은 모양입니다. 목록이 `bg-neutral-soft` 트랙이고, 고른 탭이 `bg-segment` 칸에 `shadow-xs` 입니다. 글자는 `text-neutral` 에서 `text-neutral-strong` 로 바뀌고 `colorScheme` 은 쓰지 않습니다. 트랙은 탭 높이에 `concentric-p-1` 을 두른 다른 컨트롤과 같은 높이이고, 가로면 내용 폭만큼만 차지합니다.
 - 로그인 방법(QR 코드, 비밀번호)처럼 패널을 오가지만 컨트롤처럼 보여야 하면 `segmented` 를 씁니다. 패널 없이 값만 고르면 `SegmentedControl` 입니다.
-- 가로 탭이 목록 폭을 똑같이 나눠 채우게 하려면 `<Tabs.List className="*:flex-1">` 을 줍니다. `segmented` 는 트랙이 내용 폭이라 `className="w-full *:flex-1"` 입니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 
 ```tsx
 <Tabs.Trigger value="profile">
@@ -116,14 +121,17 @@ const [section, setSection] = useState<Section>('docs');
 ## 상태
 
 ```tsx
-<Tabs.Trigger value="a" className={({ selected }) => (selected ? 'font-semibold' : '')}>
+<Tabs value={tab} onValueChange={setTab} />   // 고른 탭은 value 로 읽는다
+
+<Tabs.Trigger value="a">
   {({ selected }) => (selected ? '보는 중' : '보기')}
 </Tabs.Trigger>
 ```
 
-- `Tabs.Trigger` 와 `Tabs.Content` 의 `className`, `style`, `children` 은 상태 함수를 받습니다. Trigger 는 `selected` 와 `hovered`, `focusVisible` 같은 상호작용 상태, Content 는 `selected` 를 줍니다.
-- `Tabs` 의 `className` 과 `style` 은 `value`, `orientation`, `variant`, `size` 를 받습니다. `Tabs` 의 함수 children 은 상태가 아니라 파트를 받습니다.
-- `data-selected` 가 고른 탭과 내용에, `data-orientation` 이 모든 파트에 붙습니다. 루트에는 `data-variant`, `data-size`, `data-activation-mode` 가 붙습니다.
+- 고른 탭은 `value` 와 `onValueChange` 로 읽습니다. 비제어여도 `onValueChange` 가 새 값을 알립니다.
+- `Tabs.Trigger` 와 `Tabs.Content` 의 `children` 은 상태 함수를 받습니다. Trigger 는 `selected` 와 `hovered`, `focusVisible` 같은 상호작용 상태, Content 는 `selected` 를 줍니다.
+- `className` 과 `style` 도 같은 상태 함수를 받습니다. `Tabs` 의 것은 `value`, `orientation`, `variant`, `size` 를 받습니다. 새 디자인을 입힐 때만 씁니다.
+- `Tabs` 의 함수 children 은 상태가 아니라 파트를 받습니다.
 
 ## 속성
 
@@ -137,7 +145,7 @@ const [section, setSection] = useState<Section>('docs');
 | `activationMode`         | `automatic`(기본) / `manual`                                     |
 | `loop`                   | `true`. 화살표가 끝에서 처음으로 돌아간다                        |
 | `size`                   | `standard`(기본) / `tiny`                                        |
-| `Tabs.List`              | `tablist`. 이름은 `aria-label` 로 준다. `*:flex-1` 이면 가로 탭이 폭을 나눈다 |
+| `Tabs.List`              | `tablist`. 이름은 `aria-label` 로 준다                           |
 | `Tabs.Trigger`           | `value`(필수), `disabled`                                        |
 | `Tabs.Content`           | `value`(필수), `forceMount`                                      |
 

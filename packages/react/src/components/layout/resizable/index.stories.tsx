@@ -4,14 +4,11 @@ import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Card } from '../../data/card';
 
 import { Resizable, useResizable } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-const panel = cn('concentric-p-4 border border-neutral bg-base text-body-b3-regular');
 
 const meta = {
   title: 'Layout/Resizable',
@@ -23,8 +20,10 @@ const meta = {
   },
   args: {
     direction: 'both',
-    className: cn(panel, 'h-45 w-80'),
-    children: '모서리나 가장자리의 손잡이를 끌거나, 손잡이에 포커스한 뒤 방향키로 크기를 바꿉니다.',
+    disabled: false,
+  },
+  parameters: {
+    controls: { include: ['direction', 'disabled'] },
   },
 } satisfies Meta<typeof Resizable>;
 
@@ -42,22 +41,55 @@ function middleOf(path: SVGGeometryElement) {
   };
 }
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  render: (args) => (
+    <div className="w-80">
+      <Resizable direction={args.direction} disabled={args.disabled} asChild>
+        <Card>
+          모서리나 가장자리의 손잡이를 끌거나, 손잡이에 포커스한 뒤 방향키로 크기를 바꿉니다.
+        </Card>
+      </Resizable>
+    </div>
+  ),
+};
 
 export const Usage: Story = {
-  render: () => (
-    <Resizable className="concentric-p-4 border-neutral bg-base text-body-b3-regular h-45 w-80 border">
-      모서리를 끌어 너비와 높이를 바꿉니다.
-    </Resizable>
-  ),
+  render: function Render() {
+    const resizable = useResizable({
+      width: { defaultValue: 320, min: 240 },
+      height: { defaultValue: 180, min: 120 },
+    });
+
+    return (
+      <Resizable resizable={resizable} asChild>
+        <Card>모서리를 끌어 너비와 높이를 바꿉니다.</Card>
+      </Resizable>
+    );
+  },
 };
 
 export const Gallery: Story = {
   render: function Render() {
+    const both = useResizable({ width: { defaultValue: 280 }, height: { defaultValue: 140 } });
+    const horizontal = useResizable({
+      width: { defaultValue: 280 },
+      height: { defaultValue: 112 },
+    });
+    const vertical = useResizable({ width: { defaultValue: 288 }, height: { defaultValue: 112 } });
+    const disabledCorner = useResizable({
+      width: { defaultValue: 280 },
+      height: { defaultValue: 112 },
+    });
+    const disabledEdge = useResizable({
+      width: { defaultValue: 200 },
+      height: { defaultValue: 112 },
+    });
     const bounded = useResizable({
       width: { defaultValue: 240, min: 200, max: 320 },
       height: { defaultValue: 120, min: 96, max: 160 },
     });
+    const rtlCorner = useResizable({ width: { defaultValue: 240 }, height: { defaultValue: 112 } });
+    const rtlEdge = useResizable({ width: { defaultValue: 200 }, height: { defaultValue: 112 } });
 
     return (
       <Showcase>
@@ -66,95 +98,77 @@ export const Gallery: Story = {
           description="both 는 모서리 손잡이 하나(Tab 한 칸, 방향키가 두 축을 바꿉니다), horizontal 은 끝 가장자리, vertical 은 아래 가장자리 손잡이입니다."
         >
           <Showcase.Row label="both">
-            <Resizable className={cn(panel, 'h-35 w-70')}>
-              모서리를 끌어 너비와 높이를 함께 바꿉니다.
+            <Resizable resizable={both} asChild>
+              <Card>모서리를 끌어 너비와 높이를 함께 바꿉니다.</Card>
             </Resizable>
           </Showcase.Row>
           <Showcase.Row label="horizontal">
-            <Resizable direction="horizontal" className={cn(panel, 'h-28 w-70')}>
-              끝 가장자리를 끌어 너비를 바꿉니다.
+            <Resizable resizable={horizontal} direction="horizontal" asChild>
+              <Card>끝 가장자리를 끌어 너비를 바꿉니다.</Card>
             </Resizable>
           </Showcase.Row>
           <Showcase.Row label="vertical">
-            <Resizable direction="vertical" className={cn(panel, 'h-28 w-72')}>
-              아래 가장자리를 끌어 높이를 바꿉니다.
+            <Resizable resizable={vertical} direction="vertical" asChild>
+              <Card>아래 가장자리를 끌어 높이를 바꿉니다.</Card>
             </Resizable>
           </Showcase.Row>
         </Showcase.Section>
 
         <Showcase.Section
           title="Corner"
-          description="모서리 손잡이는 가장자리 손잡이와 같은 두께, 색, 자리의 선을 요소의 모서리를 따라 휘어 그립니다. 반지름은 요소에서 읽어서 같은 중심의 호가 되고, 반지름이 0 이면 끝이 살짝 둥근 ㄴ 자가 됩니다."
+          description="모서리 손잡이는 가장자리 손잡이와 같은 두께, 색, 자리의 선을 요소의 모서리를 따라 휘어 그립니다. 반지름은 크기를 바꿀 요소(여기서는 앱의 div)에서 읽어서 같은 중심의 호가 되고, 반지름이 0 이면 끝이 살짝 둥근 ㄴ 자가 됩니다."
         >
           <Showcase.Row label="radius">
-            <Resizable className="text-body-b3-regular border-neutral bg-base h-28 w-45 rounded-none border p-4">
-              0
+            <Resizable asChild>
+              <div className="text-body-b3-regular border-neutral bg-base h-28 w-45 rounded-none border p-4">
+                0
+              </div>
             </Resizable>
-            <Resizable className="rounded-standard text-body-b3-regular border-neutral bg-base h-28 w-45 border p-4">
-              standard
+            <Resizable asChild>
+              <div className="rounded-standard text-body-b3-regular border-neutral bg-base h-28 w-45 border p-4">
+                standard
+              </div>
             </Resizable>
-            <Resizable className={cn(panel, 'h-28 w-45')}>concentric-p-4</Resizable>
-            <Resizable className="text-body-b3-regular border-neutral bg-base h-28 w-45 rounded-full border px-8 py-4">
-              full
+            <Resizable asChild>
+              <div className="concentric-p-4 text-body-b3-regular border-neutral bg-base h-28 w-45 border">
+                concentric-p-4
+              </div>
+            </Resizable>
+            <Resizable asChild>
+              <div className="text-body-b3-regular border-neutral bg-base h-28 w-45 rounded-full border px-8 py-4">
+                full
+              </div>
+            </Resizable>
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Size"
+          description="asChild 가 없으면 부모가 준 너비와 높이를 채웁니다. asChild 면 자식 요소의 크기를 씁니다. 처음 크기와 한계는 useResizable 이 정하고, 바꾸는 순간부터 px 크기를 가집니다."
+        >
+          <Showcase.Row label="parent">
+            <div className="h-28 w-80">
+              <Resizable direction="horizontal">
+                <div className="concentric-p-4 text-body-b3-regular border-neutral bg-base h-full border">
+                  처음에는 부모(h-28 w-80)를 채웁니다.
+                </div>
+              </Resizable>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="min / max">
+            <Resizable resizable={bounded} asChild>
+              <Card>너비 200 ~ 320px, 높이 96 ~ 160px 안에서만 바뀝니다.</Card>
             </Resizable>
           </Showcase.Row>
         </Showcase.Section>
 
         <Showcase.Section title="States">
           <Showcase.Row label="disabled">
-            <Resizable disabled className={cn(panel, 'h-28 w-70')}>
-              손잡이가 흐려지고 끌거나 포커스할 수 없습니다.
+            <Resizable resizable={disabledCorner} disabled asChild>
+              <Card>손잡이가 흐려지고 끌거나 포커스할 수 없습니다.</Card>
             </Resizable>
-            <Resizable direction="horizontal" disabled className={cn(panel, 'h-28 w-50')}>
-              비활성
-            </Resizable>
-          </Showcase.Row>
-          <Showcase.Row label="min / max">
-            <Resizable resizable={bounded} className={panel}>
-              너비 200 ~ 320px, 높이 96 ~ 160px 안에서만 바뀝니다.
-            </Resizable>
-          </Showcase.Row>
-          <Showcase.Row label="natural size">
-            <div className="w-80">
-              <Resizable direction="horizontal" className={cn(panel, 'h-28 w-full')}>
-                처음에는 CSS 크기를 따르고, 바꾸는 순간부터 px 크기를 가집니다.
-              </Resizable>
-            </div>
-          </Showcase.Row>
-        </Showcase.Section>
-
-        <Showcase.Section
-          title="Custom handle"
-          description="Resizable.Handle 을 선언하면 기본 손잡이 대신 그립니다. className 으로 모양과 색을 바꾸고, children 으로 모서리의 호를 다른 표시로 바꿉니다."
-        >
-          <Showcase.Row label="edge">
-            <Resizable direction="horizontal" className={cn(panel, 'h-28 w-65')}>
-              테마 색 막대가 손잡이입니다.
-              <Resizable.Handle className="bg-primary-solid inset-y-3 -end-0.5 w-1 before:hidden" />
-            </Resizable>
-          </Showcase.Row>
-          <Showcase.Row label="corner color">
-            <Resizable className={cn(panel, 'h-30 w-65')}>
-              호의 색은 글자색입니다. 올리거나 끄는 동안은 손잡이 단계를 따릅니다.
-              <Resizable.Handle className="text-primary" />
-            </Resizable>
-          </Showcase.Row>
-          <Showcase.Row label="corner mark">
-            <Resizable className={cn(panel, 'h-30 w-65')}>
-              children 은 호 대신 그릴 표시입니다.
-              <Resizable.Handle>
-                <span className="size-1.5 rounded-full bg-current" />
-              </Resizable.Handle>
-            </Resizable>
-          </Showcase.Row>
-          <Showcase.Row label="asChild root">
-            <Resizable asChild>
-              <Card className="w-70">
-                <Card.Title>카드 자체의 크기</Card.Title>
-                <Card.Description>
-                  Resizable asChild 는 자식 요소의 크기를 바꾸고 손잡이를 그 안에 둡니다.
-                </Card.Description>
-              </Card>
+            <Resizable resizable={disabledEdge} direction="horizontal" disabled asChild>
+              <Card>비활성</Card>
             </Resizable>
           </Showcase.Row>
         </Showcase.Section>
@@ -165,9 +179,11 @@ export const Gallery: Story = {
         >
           <Showcase.Row label="rtl">
             <div dir="rtl" className="flex flex-wrap gap-4">
-              <Resizable className={cn(panel, 'h-28 w-60')}>모서리 손잡이</Resizable>
-              <Resizable direction="horizontal" className={cn(panel, 'h-28 w-50')}>
-                가장자리 손잡이
+              <Resizable resizable={rtlCorner} asChild>
+                <Card>모서리 손잡이</Card>
+              </Resizable>
+              <Resizable resizable={rtlEdge} direction="horizontal" asChild>
+                <Card>가장자리 손잡이</Card>
               </Resizable>
             </div>
           </Showcase.Row>
@@ -178,16 +194,22 @@ export const Gallery: Story = {
 };
 
 export const ResizeByDragging: Story = {
-  render: () => (
-    <Resizable className={cn(panel, 'h-30 w-60')}>
-      모서리를 끌면 두 축이 함께 바뀝니다. 끄는 동안 Escape 를 누르면 처음 크기로 돌아갑니다.
-    </Resizable>
-  ),
+  render: function Render() {
+    const resizable = useResizable({ width: { defaultValue: 240 }, height: { defaultValue: 120 } });
+
+    return (
+      <Resizable resizable={resizable} asChild>
+        <Card>
+          모서리를 끌면 두 축이 함께 바뀝니다. 끄는 동안 Escape 를 누르면 처음 크기로 돌아갑니다.
+        </Card>
+      </Resizable>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          '처음 크기는 요소의 CSS(`w-60 h-30`)가 정하고, 모서리를 끌어 두 축을 함께 바꿉니다. 끄는 동안에는 한 프레임에 한 번 DOM 에 크기를 쓰고, 놓을 때부터 px 크기를 가집니다. 손잡이를 두 번 누르면 CSS 크기로 돌아갑니다.',
+          '`asChild` 로 Card 가 크기를 바꿀 요소가 되고, 처음 크기는 `useResizable` 의 `defaultValue`(240 x 120)입니다. 모서리를 끌어 두 축을 함께 바꿉니다. 끄는 동안에는 한 프레임에 한 번 DOM 에 크기를 쓰고, 놓을 때 한 번 알립니다. 손잡이를 두 번 누르면 처음 크기로 돌아갑니다.',
       },
     },
   },
@@ -218,14 +240,15 @@ export const ResizeByDragging: Story = {
 export const SnapTheSizeToAStep: Story = {
   render: function Render() {
     const resizable = useResizable({
+      width: { defaultValue: 256 },
       height: { defaultValue: 96, min: 48, max: 240 },
       step: 12,
       getValueLabel: (size) => `${size / 48}시간`,
     });
 
     return (
-      <Resizable resizable={resizable} direction="vertical" className={cn(panel, 'w-64')}>
-        아래 가장자리를 끌면 높이가 12px 단위로 맞습니다.
+      <Resizable resizable={resizable} direction="vertical" asChild>
+        <Card>아래 가장자리를 끌면 높이가 12px 단위로 맞습니다.</Card>
       </Resizable>
     );
   },
@@ -262,11 +285,14 @@ export const SnapTheSizeToAStep: Story = {
 
 export const LimitTheSize: Story = {
   render: function Render() {
-    const resizable = useResizable({ width: { defaultValue: 240, min: 200, max: 320 } });
+    const resizable = useResizable({
+      width: { defaultValue: 240, min: 200, max: 320 },
+      height: { defaultValue: 112 },
+    });
 
     return (
-      <Resizable resizable={resizable} direction="horizontal" className={cn(panel, 'h-28')}>
-        너비가 200 ~ 320px 안에서만 바뀝니다.
+      <Resizable resizable={resizable} direction="horizontal" asChild>
+        <Card>너비가 200 ~ 320px 안에서만 바뀝니다.</Card>
       </Resizable>
     );
   },
@@ -298,10 +324,12 @@ export const ControlTheSize: Story = {
     });
 
     return (
-      <Resizable resizable={resizable} className={panel}>
-        <output aria-live="polite">
-          {width} x {height}
-        </output>
+      <Resizable resizable={resizable} asChild>
+        <Card>
+          <output aria-live="polite">
+            {width} x {height}
+          </output>
+        </Card>
       </Resizable>
     );
   },
@@ -322,17 +350,65 @@ export const ControlTheSize: Story = {
   },
 };
 
+export const DesignYourOwnHandle: Story = {
+  tags: ['custom-design'],
+  render: function Render() {
+    const edge = useResizable({ width: { defaultValue: 260 }, height: { defaultValue: 112 } });
+    const color = useResizable({ width: { defaultValue: 260 }, height: { defaultValue: 120 } });
+    const mark = useResizable({ width: { defaultValue: 260 }, height: { defaultValue: 120 } });
+
+    return (
+      <div className="flex flex-wrap gap-4">
+        <Resizable resizable={edge} direction="horizontal" asChild>
+          <Card>
+            테마 색 막대가 손잡이입니다.
+            <Resizable.Handle className="bg-primary-solid inset-y-3 -end-0.5 w-1 before:hidden" />
+          </Card>
+        </Resizable>
+        <Resizable resizable={color} asChild>
+          <Card>
+            호의 색은 글자색입니다. 올리거나 끄는 동안은 손잡이 단계를 따릅니다.
+            <Resizable.Handle className="text-primary" />
+          </Card>
+        </Resizable>
+        <Resizable resizable={mark} asChild>
+          <Card>
+            children 은 호 대신 그릴 표시입니다.
+            <Resizable.Handle>
+              <span className="size-1.5 rounded-full bg-current" />
+            </Resizable.Handle>
+          </Card>
+        </Resizable>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'IDS 의 손잡이 위에 앱이 새로 그린 디자인입니다. `Resizable.Handle` 을 적으면 기본 손잡이 대신 그것을 그리고, 그 `className` 으로 막대의 자리와 색을, `children` 으로 모서리의 호 대신 그릴 표시를 바꿉니다. 손잡이의 종류(가장자리, 모서리)는 `direction` 이 정합니다.',
+      },
+    },
+  },
+};
+
 export const Keyboard: Story = {
   tags: ['verification'],
   render: function Render() {
-    const edge = useResizable({ width: { defaultValue: 240, max: 360 } });
+    const edge = useResizable({
+      width: { defaultValue: 240, max: 360 },
+      height: { defaultValue: 96 },
+    });
+    const corner = useResizable({ width: { defaultValue: 240 }, height: { defaultValue: 120 } });
 
     return (
       <div className="flex flex-col gap-6">
-        <Resizable resizable={edge} direction="horizontal" className={cn(panel, 'h-24')}>
-          가장자리: ← → 16px, Shift 64px, Home End 최솟값과 최댓값, Enter 처음 크기
+        <Resizable resizable={edge} direction="horizontal" asChild>
+          <Card>가장자리: ← → 16px, Shift 64px, Home End 최솟값과 최댓값, Enter 처음 크기</Card>
         </Resizable>
-        <Resizable className={cn(panel, 'h-30 w-60')}>모서리: ← → 너비, ↑ ↓ 높이</Resizable>
+        <Resizable resizable={corner} asChild>
+          <Card>모서리: ← → 너비, ↑ ↓ 높이</Card>
+        </Resizable>
       </div>
     );
   },

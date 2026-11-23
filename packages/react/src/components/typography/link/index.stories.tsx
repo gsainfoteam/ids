@@ -113,17 +113,19 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="muted text">
-          <Card className="w-72">
-            <Card.Header>
-              <Card.Title>계정</Card.Title>
-              <Card.Description>
-                <Link href="#privacy" colorScheme="neutral">
-                  개인정보 처리방침
-                </Link>
-                을 읽어 주세요.
-              </Card.Description>
-            </Card.Header>
-          </Card>
+          <div className="w-72">
+            <Card>
+              <Card.Header>
+                <Card.Title>계정</Card.Title>
+                <Card.Description>
+                  <Link href="#privacy" colorScheme="neutral">
+                    개인정보 처리방침
+                  </Link>
+                  을 읽어 주세요.
+                </Card.Description>
+              </Card.Header>
+            </Card>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>

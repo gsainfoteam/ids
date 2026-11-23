@@ -17,7 +17,7 @@ const meta = {
   tags: ['autodocs'],
   parameters: { controls: { disable: true } },
   args: {
-    className: cn('rounded-standard bg-primary-solid text-on-primary-solid px-4 py-2'),
+    title: 'Slot이 입힌 title',
     children: <a href="#slot">Slot이 감싼 링크</a>,
   },
 } satisfies Meta<typeof Slot>;
@@ -47,14 +47,14 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Slot className="rounded-standard bg-primary-solid text-on-primary-solid px-4 py-2">
+    <Slot aria-current="page">
       <a href="#slot">Slot이 감싼 링크</a>
     </Slot>
   ),
   play: async ({ canvas }) => {
     const link = canvas.getByRole('link', { name: 'Slot이 감싼 링크' });
     await expect(link.tagName).toBe('A');
-    await expect(link).toHaveClass('rounded-standard');
+    await expect(link).toHaveAttribute('aria-current', 'page');
   },
 };
 
@@ -84,11 +84,13 @@ export const Gallery: Story = {
         description="asChild를 받는 IDS 파트는 모두 Slot을 씁니다."
       >
         <Showcase.Row label="Alert.Title">
-          <Alert className="w-80">
-            <Alert.Title asChild>
-              <h3>h3로 그린 제목</h3>
-            </Alert.Title>
-          </Alert>
+          <div className="w-80">
+            <Alert>
+              <Alert.Title asChild>
+                <h3>h3로 그린 제목</h3>
+              </Alert.Title>
+            </Alert>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -122,39 +124,26 @@ export const BuildAnAsChildComponent: Story = {
 
 export const MergeClassNames: Story = {
   render: () => (
-    <Slot className="text-primary px-2">
-      <span className="px-4 underline">양쪽 className이 합쳐진다</span>
-    </Slot>
+    <Tag asChild>
+      <a href="#notices" className="px-4 underline">
+        양쪽 className이 합쳐진다
+      </a>
+    </Tag>
   ),
   parameters: {
     docs: {
       description: {
-        story: '`className` 은 둘을 합치고, 같은 속성을 다투면 Slot 쪽이 이깁니다(`px-2`).',
+        story:
+          '`Tag` 가 `Slot` 에 넘긴 className 과 자식 `<a>` 의 className 을 합치고, 같은 속성을 다투면 Slot 쪽이 이깁니다(`px-2.5`). `style` 도 얕게 합쳐지고 겹치는 속성은 Slot 쪽이 이깁니다.',
       },
     },
   },
   play: async ({ canvas }) => {
-    const span = canvas.getByText('양쪽 className이 합쳐진다');
-    await expect(span).toHaveClass('underline');
-    await expect(span).toHaveClass('text-primary');
-    await expect(span).toHaveClass('px-2');
-    await expect(span).not.toHaveClass('px-4');
-  },
-};
-
-export const MergeStyles: Story = {
-  render: () => (
-    <Slot style={{ color: 'var(--ids-color-text-primary)' }}>
-      <span style={{ color: 'red', fontWeight: 600 }}>style 합치기</span>
-    </Slot>
-  ),
-  parameters: {
-    docs: { description: { story: '`style` 은 얕게 합쳐지고 겹치는 속성은 Slot 쪽이 이깁니다.' } },
-  },
-  play: async ({ canvas }) => {
-    const span = canvas.getByText('style 합치기');
-    await expect(span.style.fontWeight).toBe('600');
-    await expect(span.style.color).toBe('var(--ids-color-text-primary)');
+    const link = canvas.getByRole('link', { name: '양쪽 className이 합쳐진다' });
+    await expect(link).toHaveClass('underline');
+    await expect(link).toHaveClass('bg-primary-soft');
+    await expect(link).toHaveClass('px-2.5');
+    await expect(link).not.toHaveClass('px-4');
   },
 };
 

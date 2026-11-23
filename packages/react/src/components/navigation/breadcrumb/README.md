@@ -107,7 +107,14 @@ import { Link } from 'react-router';
 ```tsx
 <Breadcrumb size="standard" />  // body b3, 16px 아이콘
 <Breadcrumb size="tiny" />      // caption c1, 14px 아이콘
+
+<div className="w-80">
+  <Breadcrumb>...</Breadcrumb>  {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
+</div>
 ```
+
+- 부모의 너비를 다 채웁니다. 항목은 시작 쪽부터 놓이고, 자리가 모자라면 다음 줄로 넘어갑니다.
+- 너비와 자리는 부모가 정합니다. 바깥 여백은 주지 않고, 간격은 부모의 `gap` 으로 둡니다.
 
 ## 이름
 

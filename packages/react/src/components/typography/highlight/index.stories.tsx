@@ -107,7 +107,7 @@ export const Gallery: Story = {
         <Showcase.Row label="custom">
           <Highlight query="셔틀">
             셔틀 막차는 밤 11시예요.
-            <Highlight.Mark className="font-semibold" />
+            <Highlight.Mark variant="solid" />
           </Highlight>
         </Showcase.Row>
         <Showcase.Row label="alone">
@@ -212,14 +212,14 @@ export const StyleTheMarks: Story = {
     docs: {
       description: {
         story:
-          '`Highlight.Mark` 를 children 에 넣으면 그 `variant` 와 `className` 이 모든 표시에 입혀집니다.',
+          '`Highlight.Mark` 를 children 에 넣으면 그 props(`variant`, `data-*`)가 모든 표시에 입혀집니다.',
       },
     },
   },
   render: () => (
     <Highlight query="셔틀">
       개천절 셔틀은 주말 시간표로 다녀요. 셔틀 막차는 밤 11시예요.
-      <Highlight.Mark variant="solid" className="font-semibold" />
+      <Highlight.Mark variant="solid" data-match="shuttle" />
     </Highlight>
   ),
   play: async ({ canvasElement }) => {
@@ -228,7 +228,7 @@ export const StyleTheMarks: Story = {
     await expect(marks).toHaveLength(2);
     for (const mark of marks) {
       await expect(mark).toHaveAttribute('data-variant', 'solid');
-      await expect(mark).toHaveClass('font-semibold');
+      await expect(mark).toHaveAttribute('data-match', 'shuttle');
     }
   },
 };

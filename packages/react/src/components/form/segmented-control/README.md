@@ -67,16 +67,15 @@ type Period = 'day' | 'week' | 'month';
 - 비활성 칸은 어느 키로도 건너뜁니다.
 - `readOnly` 면 포커스만 옮겨지고 선택은 그대로입니다.
 
-## 배치와 크기
+## 크기
 
 ```tsx
 <SegmentedControl size="tiny" />              // standard(기본) / tiny. 생략하면 Field 를 따른다
-<SegmentedControl className="w-full *:flex-1" />  // 부모 폭을 채우고 칸이 폭을 나눠 갖는다
 <SegmentedControl orientation="vertical" />   // horizontal(기본) / vertical. aria-orientation 도 붙는다
 ```
 
+- 가로 트랙은 칸 내용 폭만큼만 차지하고, 세로 트랙은 부모 폭을 채웁니다.
 - 트랙은 다른 컨트롤과 같은 높이입니다. 칸이 8px 낮고 트랙이 `concentric-p-1` 로 둘러쌉니다.
-- 가로 트랙은 내용 폭만큼만 차지합니다. `w-full` 은 트랙을 넓히고, `*:flex-1` 은 칸이 그 폭을 똑같이 나누게 합니다.
 
 ## 모양
 
@@ -85,20 +84,15 @@ type Period = 'day' | 'week' | 'month';
 - 고르지 않은 칸의 hover 와 press 는 state layer 입니다. 글자색은 바뀌지 않습니다.
 - 키보드 포커스는 칸에 ring 을 그립니다. `invalid` 면 트랙에 `border-danger-strong` 테두리가 붙습니다.
 
-## 상태와 스타일
+## 상태
 
-| 속성                              | 붙는 곳 | 뜻                        |
-| --------------------------------- | ------- | ------------------------- |
-| `data-orientation`                | 루트    | `horizontal` / `vertical` |
-| `data-size`                       | 루트    | `standard` / `tiny`       |
-| `data-disabled` / `disabled`      | 루트    | 모든 칸이 비활성          |
-| `data-readonly` / `aria-readonly` | 루트    | 선택을 바꿀 수 없다       |
-| `data-required` / `aria-required` | 루트    | 필수                      |
-| `data-invalid` / `aria-invalid`   | 루트    | 오류                      |
-| `data-state`                      | 칸      | `checked` / `unchecked`   |
-| `data-disabled`                   | 칸      | 이 칸이 비활성            |
-| `data-hovered` / `data-active`    | 칸      | 포인터가 올라감 / 누르는 중 |
-| `data-focus-visible`              | 칸      | 키보드 포커스             |
+```tsx
+<SegmentedControl value={period} onValueChange={setPeriod} />  // 고른 칸은 value 로 읽는다
+```
+
+- 고른 값은 `value` 와 `onValueChange` 로 읽습니다. 비제어여도 `onValueChange` 가 새 값을 알립니다.
+- `disabled`, `readOnly`, `required`, `invalid`, `size`, `orientation` 은 앱이 넘긴 속성이라 앱이 이미 압니다.
+- 칸의 hover, press, 키보드 포커스는 읽을 방법이 없습니다. `className` 과 `style` 은 상태 함수를 받지 않습니다.
 
 ## 폼
 

@@ -6,6 +6,7 @@ import { Showcase } from '~story-kit';
 
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
+import { Image } from '../../data/image';
 
 import { AspectRatio } from '.';
 
@@ -51,8 +52,8 @@ export const Playground: Story = {
 export const Usage: Story = {
   render: () => (
     <div className="w-80">
-      <AspectRatio ratio={16 / 9} className="rounded-standard bg-neutral-soft overflow-hidden">
-        <div className="text-body-b3-medium text-neutral flex items-center justify-center">
+      <AspectRatio ratio={16 / 9}>
+        <div className="rounded-standard bg-neutral-soft text-body-b3-medium text-neutral flex items-center justify-center">
           16:9
         </div>
       </AspectRatio>
@@ -76,18 +77,25 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Media"
-        description="img와 video는 칸을 채우고 넘치는 부분은 잘립니다(cover). 자식에 클래스를 주면 그 클래스가 이깁니다."
+        description="Image 와 img, video 는 칸을 채우고 넘치는 부분은 잘립니다(cover). Image 는 모서리도 깎습니다. 앱의 img 에 준 클래스는 기본값을 이깁니다."
       >
-        <Showcase.Row label="cover (default)" className="items-start">
+        <Showcase.Row label="Image" className="items-start">
           <div className="w-40">
-            <AspectRatio className="rounded-standard overflow-hidden">
+            <AspectRatio>
+              <Image src={picture} alt="그라데이션" />
+            </AspectRatio>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="img" className="items-start">
+          <div className="w-40">
+            <AspectRatio>
               <img src={picture} alt="그라데이션" />
             </AspectRatio>
           </div>
         </Showcase.Row>
         <Showcase.Row label="object-contain" className="items-start">
           <div className="w-40">
-            <AspectRatio className="rounded-standard bg-neutral-soft overflow-hidden">
+            <AspectRatio>
               <img src={picture} alt="그라데이션" className="object-contain" />
             </AspectRatio>
           </div>
@@ -133,11 +141,11 @@ export const KeepTheRatioWhileTheWidthChanges: Story = {
   },
 };
 
-export const FillTheFrameWithAnImage: Story = {
+export const GiveAnImageARatio: Story = {
   render: () => (
     <div className="w-60">
-      <AspectRatio data-testid="frame" className="rounded-standard overflow-hidden">
-        <img src={picture} alt="그라데이션" />
+      <AspectRatio ratio={1} data-testid="frame">
+        <Image src={picture} alt="그라데이션" />
       </AspectRatio>
     </div>
   ),
@@ -145,28 +153,28 @@ export const FillTheFrameWithAnImage: Story = {
     docs: {
       description: {
         story:
-          '`img` 나 `video` 를 자식으로 두면 칸을 채웁니다. 3:1 그림을 1:1 칸에 넣어도 칸을 채우고, 넘치는 좌우는 잘립니다(`object-cover`). 모서리는 `rounded-standard overflow-hidden` 으로 깎습니다.',
+          '비율이 없는 Image, `video`, `iframe` 은 AspectRatio 로 감싸 비율을 줍니다. 자식은 칸을 채우고, 3:1 그림을 1:1 칸에 넣어도 넘치는 좌우가 잘립니다(`object-cover`). 모서리는 Image 가 스스로 깎습니다.',
       },
     },
   },
   play: async ({ canvas }) => {
     const frame = canvas.getByTestId('frame').getBoundingClientRect();
-    const image = canvas.getByRole('img').getBoundingClientRect();
+    const picture = canvas.getByRole('img', { name: '그라데이션' });
+    const image = picture.getBoundingClientRect();
     await expect(image.width).toBeCloseTo(frame.width, 0);
     await expect(image.height).toBeCloseTo(frame.height, 0);
-    await expect(getComputedStyle(canvas.getByRole('img')).objectFit).toBe('cover');
+    await expect(getComputedStyle(picture).objectFit).toBe('cover');
   },
 };
 
 export const ClipContentTallerThanTheFrame: Story = {
   render: () => (
     <div className="w-60">
-      <AspectRatio
-        data-testid="square"
-        className="rounded-standard bg-neutral-soft overflow-hidden"
-      >
-        <div className="text-body-b3-regular h-96 p-3">
-          콘텐츠가 커도 바깥 정사각형 비율은 그대로입니다.
+      <AspectRatio data-testid="square">
+        <div className="rounded-standard bg-neutral-soft overflow-hidden">
+          <div className="text-body-b3-regular h-96 p-3">
+            콘텐츠가 커도 바깥 정사각형 비율은 그대로입니다.
+          </div>
         </div>
       </AspectRatio>
     </div>
@@ -175,7 +183,7 @@ export const ClipContentTallerThanTheFrame: Story = {
     docs: {
       description: {
         story:
-          '자식이 칸보다 커도 칸은 늘어나지 않고 비율을 지킵니다. 넘치는 부분은 `overflow-hidden` 으로 자릅니다.',
+          '자식이 칸보다 커도 칸은 늘어나지 않고 비율을 지킵니다. 자식은 칸을 채우므로, 넘치는 부분은 자식(앱의 요소)의 `overflow-hidden` 으로 자릅니다.',
       },
     },
   },

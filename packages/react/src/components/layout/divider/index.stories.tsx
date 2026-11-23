@@ -99,7 +99,9 @@ export const Gallery: Story = {
             <Button size="tiny" variant="ghost">
               복사
             </Button>
-            <Divider orientation="vertical" aria-hidden className="h-4 self-center" />
+            <div className="flex h-5">
+              <Divider orientation="vertical" aria-hidden />
+            </div>
             <Button size="tiny" variant="ghost">
               붙여넣기
             </Button>

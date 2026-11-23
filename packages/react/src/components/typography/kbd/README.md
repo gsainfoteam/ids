@@ -89,6 +89,7 @@ import { Kbd } from '@gsainfoteam/ids-react';
 ```
 
 - 크기를 주지 않으면 `KbdGroup`, 그다음 `Field` 의 크기를 따릅니다.
+- 너비는 키 글자만큼입니다(`inline-flex`, `w-fit`). 부모를 채우지 않고, 글자 한 칸짜리 키도 높이만큼의 정사각형보다 좁아지지 않습니다.
 
 ## 읽는 이름 바꾸기
 
@@ -100,13 +101,13 @@ import { Kbd } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-| 상태          | 뜻                                       |
+- 새 디자인을 그릴 때만 `className` 에 상태를 받는 함수(`(state) => string`)를 줍니다. 받는 필드는 아래와 같습니다.
+
+| 필드          | 뜻                                       |
 | ------------- | ---------------------------------------- |
 | `size`        | 적용된 크기                              |
 | `platform`    | 그린 플랫폼. `mac` / `windows` / `linux` |
 | `combination` | 키 여러 개를 묶어 그렸다                 |
-
-- 키 칸에는 `data-kbd`, 묶음에는 `data-kbd-group`, 둘 다 `data-size` 와 `data-platform` 이 붙습니다. `+` 표시에는 `data-kbd-separator` 가 붙습니다.
 
 ## 속성
 

@@ -184,28 +184,6 @@ export const Gallery: Story = {
             <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
           </Tabs>
         </Showcase.Row>
-        <Showcase.Row label="pill *:flex-1" className="w-full max-w-md">
-          <Tabs defaultValue="new" variant="pill" className="w-full">
-            <Tabs.List aria-label="정렬" className="*:flex-1">
-              <Tabs.Trigger value="new">최신</Tabs.Trigger>
-              <Tabs.Trigger value="popular">인기</Tabs.Trigger>
-              <Tabs.Trigger value="comments">댓글 많은</Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="new">최신 글</Tabs.Content>
-            <Tabs.Content value="popular">인기 글</Tabs.Content>
-            <Tabs.Content value="comments">댓글 많은 글</Tabs.Content>
-          </Tabs>
-        </Showcase.Row>
-        <Showcase.Row label="segmented w-full *:flex-1" className="w-full max-w-md">
-          <Tabs defaultValue="qr" variant="segmented" className="w-full">
-            <Tabs.List aria-label="로그인 방법" className="w-full *:flex-1">
-              <Tabs.Trigger value="qr">QR 코드</Tabs.Trigger>
-              <Tabs.Trigger value="password">비밀번호</Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="qr">휴대폰으로 QR 코드를 비춰요</Tabs.Content>
-            <Tabs.Content value="password">이메일과 비밀번호로 로그인해요</Tabs.Content>
-          </Tabs>
-        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
@@ -326,48 +304,6 @@ export const SwitchTabsFromOutside: Story = {
   },
 };
 
-export const SpreadTabsAcrossTheWidth: Story = {
-  render: () => (
-    <div className="flex w-full max-w-md flex-col gap-6">
-      <Tabs defaultValue="new" variant="pill">
-        <Tabs.List aria-label="정렬" className="*:flex-1">
-          <Tabs.Trigger value="new">최신</Tabs.Trigger>
-          <Tabs.Trigger value="popular">인기</Tabs.Trigger>
-          <Tabs.Trigger value="comments">댓글 많은</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="new">최신 글</Tabs.Content>
-        <Tabs.Content value="popular">인기 글</Tabs.Content>
-        <Tabs.Content value="comments">댓글 많은 글</Tabs.Content>
-      </Tabs>
-      <Tabs defaultValue="qr" variant="segmented">
-        <Tabs.List aria-label="로그인 방법" className="w-full *:flex-1">
-          <Tabs.Trigger value="qr">QR 코드</Tabs.Trigger>
-          <Tabs.Trigger value="password">비밀번호</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="qr">휴대폰으로 QR 코드를 비춰요</Tabs.Content>
-        <Tabs.Content value="password">이메일과 비밀번호로 로그인해요</Tabs.Content>
-      </Tabs>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '카드 폭에 맞춘 두세 칸짜리 탭은 `Tabs.List` 에 `className="*:flex-1"` 을 주어 탭이 목록 폭을 똑같이 나누게 합니다. 내용 폭만 차지하는 segmented 는 `className="w-full *:flex-1"` 로 트랙부터 폭을 채웁니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    for (const name of ['정렬', '로그인 방법']) {
-      const list = canvas.getByRole('tablist', { name });
-      const widths = [...list.querySelectorAll('[role="tab"]')].map(
-        (tab) => tab.getBoundingClientRect().width,
-      );
-      for (const width of widths) await expect(Math.abs(width - widths[0]!)).toBeLessThan(1);
-    }
-  },
-};
-
 export const KeepHiddenPanelsMounted: Story = {
   render: () => (
     <Tabs defaultValue="write" variant="enclosed">
@@ -375,13 +311,15 @@ export const KeepHiddenPanelsMounted: Story = {
         <Tabs.Trigger value="write">쓰기</Tabs.Trigger>
         <Tabs.Trigger value="preview">미리보기</Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value="write" forceMount className="p-1">
-        <TextField
-          aria-label="댓글"
-          placeholder="댓글을 남겨 주세요"
-          data-1p-ignore
-          data-lpignore="true"
-        />
+      <Tabs.Content value="write" forceMount>
+        <div className="p-1">
+          <TextField
+            aria-label="댓글"
+            placeholder="댓글을 남겨 주세요"
+            data-1p-ignore
+            data-lpignore="true"
+          />
+        </div>
       </Tabs.Content>
       <Tabs.Content value="preview" forceMount>
         미리보기에 들어갈 글은 페이지 안 찾기로도 찾을 수 있습니다.

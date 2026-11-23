@@ -50,14 +50,18 @@ import { Highlight } from '@gsainfoteam/ids-react';
 ```tsx
 <Highlight query={query}>
   {text}
-  <Highlight.Mark className="font-semibold" />
+  <Highlight.Mark variant="solid" data-match="query" />
 </Highlight>
 
 <p>신청은 <Highlight.Mark>금요일까지</Highlight.Mark> 받아요.</p>
 ```
 
-- Highlight 안에 두면 맞은 부분마다 그 props(`className`, `variant`, `data-*`)를 씁니다. 내용은 맞은 글자가 채웁니다.
+- Highlight 안에 두면 맞은 부분마다 그 props(`variant`, `data-*`)를 씁니다. 내용은 맞은 글자가 채웁니다.
 - 따로 쓰면 형광펜처럼 칠한 `<mark>` 하나입니다.
+
+## 크기
+
+- 글 흐름 안의 인라인 `<span>` 으로, 글자만큼만 차지합니다. 너비, 줄바꿈, 글자 크기는 감싼 문단이 정합니다.
 
 ## 알아둘 것
 

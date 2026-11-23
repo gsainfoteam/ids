@@ -206,20 +206,6 @@ export const Gallery: Story = {
             </Stepper>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="dots">
-          <div className="w-72">
-            <Stepper value={1} size="tiny">
-              {[0, 1, 2, 3].map((step) => (
-                <Stepper.Item key={step}>
-                  <Stepper.Indicator className="size-2.5 ring-0 data-current:ring-0">
-                    {null}
-                  </Stepper.Indicator>
-                  <Stepper.Title className="sr-only">{`${step + 1}단계`}</Stepper.Title>
-                </Stepper.Item>
-              ))}
-            </Stepper>
-          </div>
-        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section
@@ -379,7 +365,7 @@ export const ShowEachStepsPanel: Story = {
     const [step, setStep] = useState(0);
 
     return (
-      <div className="w-full max-w-md">
+      <div className="flex w-full max-w-md flex-col gap-4">
         <Stepper orientation="vertical" value={step} onValueChange={setStep}>
           <Stepper.Item>
             <Stepper.Title>계정</Stepper.Title>
@@ -398,7 +384,7 @@ export const ShowEachStepsPanel: Story = {
           <Stepper.Content value={2}>입력한 내용을 검토합니다.</Stepper.Content>
           <Stepper.Content value={3}>가입이 끝났습니다.</Stepper.Content>
         </Stepper>
-        <div className="mt-4 flex justify-between">
+        <div className="flex justify-between">
           <Button
             variant="outline"
             disabled={step === 0}
