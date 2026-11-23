@@ -34,10 +34,29 @@ export namespace Questionnaire {
   export type SubmitProps = QuestionnaireSubmitProps;
 
   export const Question = QuestionnaireQuestion;
+  export namespace Question {
+    export type Props = QuestionProps;
+  }
+
   export const Option = QuestionnaireOption;
+  export namespace Option {
+    export type Props = OptionProps;
+  }
+
   export const Other = QuestionnaireOther;
+  export namespace Other {
+    export type Props = OtherProps;
+  }
+
   export const Description = QuestionnaireDescription;
+  export namespace Description {
+    export type Props = DescriptionProps;
+  }
+
   export const Submit = QuestionnaireSubmit;
+  export namespace Submit {
+    export type Props = SubmitProps;
+  }
 
   export const Style = questionnaireStyle;
 }
