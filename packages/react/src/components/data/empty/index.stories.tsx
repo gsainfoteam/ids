@@ -65,6 +65,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Empty className="max-w-md">
+      <Empty.Media>
+        <FolderOpenIcon />
+      </Empty.Media>
+      <Empty.Title>아직 프로젝트가 없습니다</Empty.Title>
+      <Empty.Description>첫 프로젝트를 만들어 팀원과 함께 시작해 보세요.</Empty.Description>
+      <Empty.Actions>
+        <Button>프로젝트 만들기</Button>
+      </Empty.Actions>
+    </Empty>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -151,7 +166,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const InCard: Story = {
+export const ShowAnEmptyCard: Story = {
   render: () => (
     <Card className="w-96">
       <Card.Header>
@@ -193,7 +208,7 @@ export const InCard: Story = {
   },
 };
 
-export const TableEmptyState: Story = {
+export const FillAnEmptyTableBody: Story = {
   render: () => (
     <table className="text-body-b3-regular w-full max-w-xl">
       <caption className="text-body-b3-semibold mb-2 text-start">구성원</caption>
@@ -245,7 +260,7 @@ export const TableEmptyState: Story = {
   },
 };
 
-export const ListEmptyState: Story = {
+export const ReplaceAListWithNoMatches: Story = {
   render: function Render() {
     const [query, setQuery] = useState('');
     const matches = CITIES.filter((city) => city.includes(query.trim()));
