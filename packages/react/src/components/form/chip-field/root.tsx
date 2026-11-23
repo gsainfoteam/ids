@@ -1,15 +1,17 @@
 'use client';
 
-import { isValidElement, useId, type ComponentProps, type FocusEvent, type ReactNode } from 'react';
+import { useId, type ComponentProps, type FocusEvent } from 'react';
 
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 
-import { ChipContext, useInternalChip, type InputAttributes } from './context';
+import { ChipContext, type InputAttributes } from './context';
 import { useInternalChipField } from './hooks/use-chip-field';
 import { useInternalChipFieldItemsWarning } from './hooks/use-chip-field-items-warning';
 import { chipOptionsIn, isForeignComponent, splitChildren } from './lib/chip-children';
+import { ChipAdornments } from './parts/adornments';
 import { ChipContent } from './parts/content';
 import { ChipInput } from './parts/input';
+import { ChipValues } from './parts/values';
 import { chipFieldStyle } from './style';
 import { FieldPopup, useInternalDrawerPresentation } from '../../../internal/field-popup';
 import { resolveState } from '../../../internal/lib/state-props';
@@ -17,7 +19,6 @@ import { FormValue } from '../../../internal/parts/form-value';
 import { type FieldTriggerVariant } from '../../../internal/surfaces/lib/field-surface';
 import { useInternalTranslate } from '../../../internal/translate';
 import { invariant, isNodeFromAnyWindow } from '../../../utils';
-import { Chip } from '../../data/chip';
 import { useFieldSize } from '../field/context';
 
 import type { ChipField } from '.';
@@ -52,20 +53,6 @@ export type ChipFieldInputProps = Omit<
   | 'color'
   | 'disabled'
 >;
-
-const cancelChipFocusMove = (event: Chip.RemoveEvent) => event.preventDefault();
-
-function Adornments({ items, className }: { items: ReactNode[]; className: string }) {
-  return items.map((item, index) => (
-    <span
-      key={(isValidElement(item) && item.key) || index}
-      data-chip-field-adornment=""
-      className={className}
-    >
-      {item}
-    </span>
-  ));
-}
 
 export function ChipFieldRoot({
   value,
@@ -239,12 +226,12 @@ export function ChipFieldRoot({
           field.actions.setOpen(true);
         }}
       >
-        <Adornments items={leading} className={styles.adornment()} />
+        <ChipAdornments items={leading} className={styles.adornment()} />
         <div data-chip-field-values="" className={styles.values()}>
-          <Chips />
+          <ChipValues />
           {input}
         </div>
-        <Adornments items={trailing} className={styles.adornment()} />
+        <ChipAdornments items={trailing} className={styles.adornment()} />
         {options.length > 0 && (
           <ChevronDownIcon aria-hidden="true" data-chip-field-icon="" className={styles.icon()} />
         )}
@@ -276,42 +263,4 @@ export function ChipFieldRoot({
       )}
     </ChipContext>
   );
-}
-
-function Chips() {
-  const c = useInternalChip('Chips');
-  return c.field.state.selected.map((item) => {
-    const option = c.options.find((candidate) => candidate.value === item);
-    const label = option?.label ?? item;
-    const removable = !c.field.state.blocked && !option?.disabled;
-    return (
-      <Chip
-        key={item}
-        size={c.size}
-        disabled={option?.disabled}
-        data-chip-field-chip=""
-        className={c.styles.chip()}
-        onRemove={
-          removable
-            ? (event) => {
-                cancelChipFocusMove(event);
-                c.field.handlers.onChipRemove(item);
-              }
-            : undefined
-        }
-      >
-        {label}
-        {removable && (
-          <Chip.Close
-            tabIndex={-1}
-            aria-label={c.removeLabel(label)}
-            data-chip-field-remove={item}
-            data-field-input=""
-            className={c.styles.chipRemove()}
-            onKeyDown={(event) => c.field.handlers.onChipKeyDown(event, item)}
-          />
-        )}
-      </Chip>
-    );
-  });
 }
