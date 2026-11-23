@@ -1,23 +1,17 @@
 'use client';
 
-import {
-  isValidElement,
-  useId,
-  type ComponentProps,
-  type CSSProperties,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { useId, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { StarIcon } from '@heroicons/react/24/solid';
 
-import { isCheckedScore, useInternalRating } from './hooks/use-rating';
+import { useInternalRating } from './hooks/use-rating';
+import { ratingItemsIn } from './lib/rating-items';
+import { isCheckedScore } from './lib/score';
 import { resolve, type StateProp } from './lib/state-prop';
-import { RatingItem, type RatingItemProps } from './parts/item';
 import { ratingStyle, type RatingOptionPlacement } from './style';
 import { FormValue } from '../../../internal/parts/form-value';
 import { useInternalTranslate } from '../../../internal/translate';
-import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -100,25 +94,7 @@ export function RatingRoot({
   invariant(Number.isInteger(max) && max > 0, 'Rating: max must be a positive integer.');
   invariant(step === 1 || step === 0.5, 'Rating: step must be 1 or 0.5.');
 
-  let template: ReactElement<RatingItemProps> | undefined;
-  const indexed = new Map<number, ReactElement<RatingItemProps>>();
-  for (const child of flattenFragments(children)) {
-    invariant(
-      isValidElement<RatingItemProps>(child) && elementTypeOf(child) === RatingItem,
-      'Rating children must be Rating.Item elements.',
-    );
-    const { index } = child.props;
-    if (index === undefined) {
-      invariant(template === undefined, 'Rating takes one Rating.Item without an index.');
-      template = child;
-      continue;
-    }
-    invariant(
-      Number.isInteger(index) && index >= 0 && index < max && !indexed.has(index),
-      'Rating.Item index must be unique and between 0 and max - 1.',
-    );
-    indexed.set(index, child);
-  }
+  const { template, indexed } = ratingItemsIn(children, max);
 
   const interactive = !readOnly && !disabled;
   const resolvedSize = useFieldSize(size) ?? 'standard';
