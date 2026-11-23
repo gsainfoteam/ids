@@ -6,7 +6,7 @@
 - **넘치는 사람은 `+N` 으로.** `max` 를 넘는 사람은 `+N` 하나로 모이고, 스크린 리더는 "외 N명" 이라고 읽습니다.
 - **렌더하지 않은 사람까지.** 서버가 앞의 몇 명과 전체 수만 줄 때 `total` 로 나머지를 셉니다.
 - **쌓이는 순서.** 앞사람을 위로 올릴지 뒷사람을 올릴지 고릅니다. 오른쪽에서 왼쪽으로 쓰는 문서에서는 알아서 뒤집힙니다.
-- **크기와 모양 전파.** 그룹의 `size` 와 `shape` 를 아바타가 따릅니다.
+- **크기 전파.** 그룹의 `size` 를 아바타가 따릅니다.
 
 ```tsx
 import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
@@ -46,14 +46,13 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 ```
 
 - 아래에 깔린 아바타는 겹친 쪽에 `data-cutout="start"` 또는 `"end"` 가 붙고, 그쪽이 2px 틈을 두고 오려집니다.
-- 네모난 아바타는 위 아바타의 둥근 모서리 모양대로 오려집니다. 테마가 squircle 이면 squircle 모양대로 오려서, 모서리 대각선에서도 틈이 2px 입니다.
 - `dir="rtl"` 안에서는 방향이 뒤집힙니다.
 
-## 크기와 모양
+## 크기
 
 ```tsx
-<AvatarGroup size="tiny" shape="square">
-  <Avatar name="Acme" /> {/* tiny, square */}
+<AvatarGroup size="tiny">
+  <Avatar name="Acme" /> {/* tiny */}
   <Avatar name="Globex" size="standard" /> {/* 직접 준 값이 이긴다 */}
 </AvatarGroup>
 ```
@@ -66,7 +65,7 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 | 각 아바타 | `data-cutout="start \| end"` (겹쳐서 오려진 쪽)                  |
 | `+N`      | `data-avatar-group-overflow`                                     |
 
-루트의 `className`, `style` 은 `{ visible, hidden, layout, stacking, size, shape }` 를 받는 함수가 될 수 있고, `Overflow` 의 `className`, `style`, `children` 은 `{ count }` 를 받습니다.
+루트의 `className`, `style` 은 `{ visible, hidden, layout, stacking, size }` 를 받는 함수가 될 수 있고, `Overflow` 의 `className`, `style`, `children` 은 `{ count }` 를 받습니다.
 
 ## 속성
 
@@ -77,7 +76,6 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 | `layout`        | `stack`(기본) / `inline`                     |
 | `stacking`      | `first-on-top`(기본) / `last-on-top`         |
 | `size`          | `standard`(기본) / `tiny`. 아바타로 전파     |
-| `shape`         | `circle`(기본) / `square`. 아바타로 전파     |
 | `overflowLabel` | `+N` 의 이름. 기본 `(count) => '외 N명'`     |
 | 그 외           | 루트 `ul` 의 native 속성. `aria-label` 권장  |
 

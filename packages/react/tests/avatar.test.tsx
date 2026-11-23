@@ -31,7 +31,6 @@ test('SSR: a named image with an empty inner alt, and no fallback while the imag
   expect(root.getAttribute('role')).toBe('img');
   expect(root.getAttribute('aria-label')).toBe('Alice Kim');
   expect(root.dataset.status).toBe('loading');
-  expect(root.dataset.shape).toBe('circle');
   expect(root.dataset.size).toBe('standard');
   const img = doc.querySelector('img')!;
   expect(img.getAttribute('alt')).toBe('');
@@ -150,17 +149,16 @@ test('alt="" makes it decorative; state reaches className and fallback children'
   await screen.rerender(
     <Avatar
       name="Acme"
-      shape="square"
       size="tiny"
-      className={(state) => `status-${state.status} shape-${state.shape}`}
+      className={(state) => `status-${state.status} size-${state.size}`}
     >
       <Avatar.Fallback>{(state) => `${state.size}`}</Avatar.Fallback>
     </Avatar>,
   );
   await expect.element(avatar).toHaveClass('status-error');
-  await expect.element(avatar).toHaveClass('shape-square');
+  await expect.element(avatar).toHaveClass('size-tiny');
   expect(avatar.textContent).toBe('tiny');
-  await expect.element(avatar).toHaveAttribute('data-shape', 'square');
+  await expect.element(avatar).not.toHaveAttribute('data-shape');
 });
 
 test('Avatar.Image takes its own src and native attributes', async (context) => {

@@ -32,7 +32,7 @@ export const badgeStyle = tv({
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
     dot: { true: {}, false: {} },
     shape: {
-      auto: { root: 'has-[>[data-avatar][data-shape=circle]]:[--badge-inset:14.6%]' },
+      auto: { root: 'has-[>[data-avatar]]:[--badge-inset:14.6%]' },
       rectangular: {},
       circular: { root: '[--badge-inset:14.6%]' },
     },

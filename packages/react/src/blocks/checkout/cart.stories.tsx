@@ -82,7 +82,7 @@ export const PC: Story = {
                 {lines.map((product) => (
                   <Item key={product.id}>
                     <Item.Media>
-                      <Avatar name={product.name} shape="square" />
+                      <Avatar name={product.name} />
                     </Item.Media>
                     <Item.Content>
                       <Item.Title>{product.name}</Item.Title>

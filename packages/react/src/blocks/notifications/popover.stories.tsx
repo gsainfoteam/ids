@@ -6,6 +6,7 @@ import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
+import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Skeleton } from '../../components/feedback/skeleton';
@@ -42,7 +43,7 @@ export const PC: Story = {
       <div className="flex min-h-dvh flex-col break-keep">
         <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <div className="text-body-b2-semibold flex items-center gap-2">
-            <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+            <Avatar name="인포팀" size="tiny" aria-hidden>
               <Avatar.Fallback>
                 <CubeTransparentIcon />
               </Avatar.Fallback>
@@ -101,12 +102,31 @@ export const PC: Story = {
         <Divider />
 
         <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton shape="text" lines={3} />
+          <Skeleton loading className="w-fit">
+            <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
+          </Skeleton>
+          <Skeleton loading>
+            <p className="text-body-b3-regular">
+              수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
+              시간표가 겹치지 않는지 미리 살펴 두세요.
+            </p>
+          </Skeleton>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Skeleton className="aspect-video" />
-            <Skeleton className="aspect-video" />
-            <Skeleton className="aspect-video" />
+            <Skeleton loading asChild>
+              <Card className="aspect-video">
+                <Card.Title>수강 신청</Card.Title>
+              </Card>
+            </Skeleton>
+            <Skeleton loading asChild>
+              <Card className="aspect-video">
+                <Card.Title>장학금 안내</Card.Title>
+              </Card>
+            </Skeleton>
+            <Skeleton loading asChild>
+              <Card className="aspect-video">
+                <Card.Title>동아리 모집</Card.Title>
+              </Card>
+            </Skeleton>
           </div>
         </main>
       </div>

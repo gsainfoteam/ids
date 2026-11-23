@@ -18,6 +18,7 @@ import {
 
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
+import { Card } from '../../components/data/card';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Sidebar } from '../../components/navigation/sidebar';
 
@@ -97,7 +98,7 @@ export const PC: Story = {
       <Sidebar.Provider className="break-keep">
         <Sidebar value={current} collapsible aria-label="주 메뉴">
           <Sidebar.Header>
-            <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+            <Avatar name="인포팀" size="tiny" aria-hidden>
               <Avatar.Fallback>
                 <CubeTransparentIcon />
               </Avatar.Fallback>
@@ -155,13 +156,34 @@ export const PC: Story = {
             <Sidebar.Trigger />
             <h1 className="text-headline-h3-bold">{label}</h1>
           </div>
-          <Skeleton shape="text" lines={2} />
+          <Skeleton loading>
+            <p className="text-body-b3-regular">
+              수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
+              시간표가 겹치지 않는지 미리 살펴 두세요.
+            </p>
+          </Skeleton>
           <div className="grid gap-4 lg:grid-cols-3">
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
+            <Skeleton loading asChild>
+              <Card className="h-32">
+                <Card.Title>수강 신청</Card.Title>
+              </Card>
+            </Skeleton>
+            <Skeleton loading asChild>
+              <Card className="h-32">
+                <Card.Title>장학금 안내</Card.Title>
+              </Card>
+            </Skeleton>
+            <Skeleton loading asChild>
+              <Card className="h-32">
+                <Card.Title>동아리 모집</Card.Title>
+              </Card>
+            </Skeleton>
           </div>
-          <Skeleton className="h-64" />
+          <Skeleton loading asChild>
+            <Card className="h-64">
+              <Card.Title>본문</Card.Title>
+            </Card>
+          </Skeleton>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );

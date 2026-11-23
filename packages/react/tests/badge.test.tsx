@@ -81,9 +81,7 @@ test('placement is logical and a round Avatar pulls the badge onto its edge', ()
   expect(indicator.className).toContain('start-(--badge-inset)');
   expect(indicator.className).toContain('rtl:translate-x-1/2');
   const onAvatar = renderBadge({ content: 1 }, <Avatar name="Alice Kim" />).root;
-  expect(onAvatar.className).toContain(
-    'has-[>[data-avatar][data-shape=circle]]:[--badge-inset:14.6%]',
-  );
+  expect(onAvatar.className).toContain('has-[>[data-avatar]]:[--badge-inset:14.6%]');
   const forced = renderBadge(
     { content: 1, shape: 'rectangular' },
     <Avatar name="Alice Kim" />,

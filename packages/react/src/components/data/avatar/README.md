@@ -1,6 +1,6 @@
 # Avatar
 
-사람이나 조직을 사진, 이니셜, 아이콘 순서로 보여 주는 동그란 또는 네모난 표시입니다.
+사람이나 조직을 사진, 이니셜, 아이콘 순서로 보여 주는 동그란 표시입니다.
 
 - **이미지 상태.** 불러오는 중, 불러옴, 실패를 `data-status` 로 알리고 `onStatusChange` 로 넘겨줍니다.
 - **깜빡임 없는 fallback.** 이미지를 불러오는 동안 600ms를 기다렸다가 이니셜을 보여 주므로, 빨리 오는 이미지 앞에 글자가 번쩍이지 않습니다. 이미지가 없거나 깨지면 바로 보여 줍니다.
@@ -22,7 +22,7 @@ import { Avatar } from '@gsainfoteam/ids-react';
 <Avatar name="류현승" />                         {/* 이미지가 없으면 바로 "류" */}
 <Avatar alt="알 수 없는 사용자" />                {/* 이름도 없으면 사람 아이콘 */}
 
-<Avatar name="Acme" shape="square">
+<Avatar name="Acme">
   <Avatar.Fallback>
     <BuildingOffice2Icon />                      {/* fallback을 직접 그린다 */}
   </Avatar.Fallback>
@@ -59,16 +59,15 @@ import { Avatar } from '@gsainfoteam/ids-react';
 
 - 이미지는 `loading="lazy"`, `decoding="async"` 가 기본입니다. `Avatar.Image` 에 넘기면 바꿀 수 있습니다.
 
-## 모양과 크기
+## 크기
 
 ```tsx
-<Avatar shape="circle" />        // 기본
-<Avatar shape="square" />        // 조직, 브랜드
 <Avatar size="tiny" />           // standard(40px, 기본) / tiny(24px)
 <Avatar className="size-20" />   // 그 밖의 크기. 이니셜도 비율에 맞게 커진다
 ```
 
-- `AvatarGroup` 안에서는 그룹의 `size` 와 `shape` 를 따릅니다. 직접 준 값이 이깁니다.
+- 늘 원입니다. 조직 로고나 상품 사진도 원 안에 그립니다. `Item` 의 행에서 네모난 타일이 필요하면 `Item.Media variant="soft"` 에 아이콘이나 이미지를 넣습니다.
+- `AvatarGroup` 안에서는 그룹의 `size` 를 따릅니다. 직접 준 값이 이깁니다.
 
 ## 접근성
 
@@ -86,11 +85,10 @@ import { Avatar } from '@gsainfoteam/ids-react';
 | 속성          | 뜻                                |
 | ------------- | --------------------------------- |
 | `data-status` | `loading` / `loaded` / `error`    |
-| `data-shape`  | `circle` / `square`               |
 | `data-size`   | `standard` / `tiny`               |
 | `data-cutout` | 그룹에서 겹친 쪽: `start` / `end` |
 
-함수로 받는 상태는 `{ status, shape, size }` 입니다. 루트의 `className`, `style` 과 `Avatar.Image`, `Avatar.Fallback` 의 `className`, `style`, `Fallback` 의 `children` 이 받습니다.
+함수로 받는 상태는 `{ status, size }` 입니다. 루트의 `className`, `style` 과 `Avatar.Image`, `Avatar.Fallback` 의 `className`, `style`, `Fallback` 의 `children` 이 받습니다.
 
 ## 속성
 
@@ -99,7 +97,6 @@ import { Avatar } from '@gsainfoteam/ids-react';
 | `src`              | 이미지 주소                                          |
 | `name`             | 이니셜과 접근성 이름                                 |
 | `alt`              | 접근성 이름. `""` 이면 장식용                        |
-| `shape`            | `circle`(기본) / `square`                            |
 | `size`             | `standard`(기본) / `tiny`. 그룹 안에서는 그룹을 따름 |
 | `onStatusChange`   | 이미지 상태가 바뀔 때                                |
 | `Image`            | `img` 의 native 속성. `src` 를 따로 줄 수 있다       |

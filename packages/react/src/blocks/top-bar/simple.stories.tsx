@@ -3,6 +3,7 @@ import { Bars3Icon, CubeTransparentIcon } from '@heroicons/react/24/outline';
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
+import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
@@ -75,7 +76,7 @@ export const PC: Story = {
           underline="none"
           className="text-body-b2-semibold flex items-center gap-2"
         >
-          <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+          <Avatar name="인포팀" size="tiny" aria-hidden>
             <Avatar.Fallback>
               <CubeTransparentIcon />
             </Avatar.Fallback>
@@ -108,11 +109,28 @@ export const PC: Story = {
 
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
         <h1 className="text-headline-h3-bold">그룹</h1>
-        <Skeleton shape="text" lines={3} />
+        <Skeleton loading>
+          <p className="text-body-b3-regular">
+            수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
+            시간표가 겹치지 않는지 미리 살펴 두세요.
+          </p>
+        </Skeleton>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Skeleton className="aspect-video" />
-          <Skeleton className="aspect-video" />
-          <Skeleton className="aspect-video" />
+          <Skeleton loading asChild>
+            <Card className="aspect-video">
+              <Card.Title>수강 신청</Card.Title>
+            </Card>
+          </Skeleton>
+          <Skeleton loading asChild>
+            <Card className="aspect-video">
+              <Card.Title>장학금 안내</Card.Title>
+            </Card>
+          </Skeleton>
+          <Skeleton loading asChild>
+            <Card className="aspect-video">
+              <Card.Title>동아리 모집</Card.Title>
+            </Card>
+          </Skeleton>
         </div>
       </main>
     </div>
