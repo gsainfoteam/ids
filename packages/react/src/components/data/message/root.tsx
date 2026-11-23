@@ -17,11 +17,11 @@ import { containsElementOfType, elementTypeOf, flattenFragments } from '../../..
 import { Button } from '../../action/button';
 import { Marker } from '../../feedback/marker';
 import { Bubble } from '../bubble';
+import { BubbleAlignContext } from '../bubble/context';
 import { BubbleRoot } from '../bubble/root';
 
 import type { Message } from '.';
 
-export type MessageShape = 'bubble' | 'plain';
 export type MessageAlign = 'start' | 'end';
 export type MessageStatus = 'sent' | 'pending' | 'error';
 
@@ -76,7 +76,6 @@ function Failure({
 }
 
 export function MessageRoot({
-  shape = 'bubble',
   align: alignProp,
   name,
   avatar,
@@ -94,15 +93,14 @@ export function MessageRoot({
   const contentRef = useRef<HTMLDivElement>(null);
   const readContent = useCallback(() => contentRef.current?.innerText ?? '', []);
 
-  const align = shape === 'plain' ? 'start' : (alignProp ?? group?.align ?? 'start');
+  const align = alignProp ?? group?.align ?? 'start';
   const first = group?.first ?? true;
   const last = group?.last ?? true;
   const { body, part } = splitParts(children);
   const header = part(MessageHeader);
   const content = part(MessageContent);
   const footer = part(MessageFooter);
-  const bubbled =
-    shape === 'bubble' || containsElementOfType(content ? childrenOf(content) : body, BUBBLE);
+  const bubbled = containsElementOfType(content ? childrenOf(content) : body, BUBBLE);
   const timeIn = bubbled ? 'side' : footer !== undefined || group !== null ? 'footer' : 'header';
   const labelled = name !== undefined || childrenOf(header) != null;
   const styles = messageStyle({ align, first, bubbled, status });
@@ -119,7 +117,6 @@ export function MessageRoot({
     <MessageContext
       value={{
         styles,
-        shape,
         align,
         name,
         avatar,
@@ -135,32 +132,33 @@ export function MessageRoot({
       }}
     >
       <MessageGroupContext value={null}>
-        <article
-          aria-labelledby={labelled ? labelId : undefined}
-          {...rest}
-          data-message=""
-          data-shape={shape}
-          data-align={align}
-          data-status={status}
-          data-first={group !== null && first ? '' : undefined}
-          data-last={group !== null && last ? '' : undefined}
-          className={styles.root({ className })}
-        >
-          {drawnAvatar}
-          <div className={styles.column()}>
-            {drawnHeader}
-            <div className={styles.body()}>
-              {drawnContent}
-              <MessageSide onRetry={bubbled ? onRetry : undefined} />
+        <BubbleAlignContext value={align}>
+          <article
+            aria-labelledby={labelled ? labelId : undefined}
+            {...rest}
+            data-message=""
+            data-align={align}
+            data-status={status}
+            data-first={group !== null && first ? '' : undefined}
+            data-last={group !== null && last ? '' : undefined}
+            className={styles.root({ className })}
+          >
+            {drawnAvatar}
+            <div className={styles.column()}>
+              {drawnHeader}
+              <div className={styles.body()}>
+                {drawnContent}
+                <MessageSide onRetry={bubbled ? onRetry : undefined} />
+              </div>
+              {content !== undefined && body}
+              {status === 'error' && (
+                <Failure styles={styles} onRetry={bubbled ? undefined : onRetry} />
+              )}
+              {part(MessageActions)}
+              {drawnFooter}
             </div>
-            {content !== undefined && body}
-            {status === 'error' && (
-              <Failure styles={styles} onRetry={bubbled ? undefined : onRetry} />
-            )}
-            {part(MessageActions)}
-            {drawnFooter}
-          </div>
-        </article>
+          </article>
+        </BubbleAlignContext>
       </MessageGroupContext>
     </MessageContext>
   );

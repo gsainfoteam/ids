@@ -16,7 +16,6 @@ import { Message } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const shapes = ['bubble', 'plain'] as const;
 const aligns = ['start', 'end'] as const;
 const statuses = ['sent', 'pending', 'error'] as const;
 
@@ -34,20 +33,18 @@ const meta = {
   component: Message,
   tags: ['autodocs'],
   argTypes: {
-    shape: { control: 'radio', options: shapes },
     align: { control: 'radio', options: aligns },
     status: { control: 'radio', options: statuses },
     avatar: { control: false },
     time: { control: false },
   },
   args: {
-    shape: 'bubble',
     align: 'end',
     name: '김지수',
     time: SENT_AT,
     status: 'sent',
     unread: 1,
-    children: '오늘 셔틀 몇 시에 와?',
+    children: <Bubble>오늘 셔틀 몇 시에 와?</Bubble>,
   },
   render: (args) => (
     <div className="w-96 break-keep">
@@ -65,7 +62,7 @@ export const Usage: Story = {
   render: () => (
     <div className="w-96 break-keep">
       <Message name="김지수" avatar={JISU} time={SENT_AT}>
-        오늘 셔틀 몇 시에 와?
+        <Bubble>오늘 셔틀 몇 시에 와?</Bubble>
       </Message>
     </div>
   ),
@@ -75,26 +72,26 @@ export const Gallery: Story = {
   render: () => (
     <Showcase className="break-keep">
       <Showcase.Section
-        title="Shape × Align"
-        description="shape 은 모양을, align 은 붙는 쪽을 고릅니다. bubble 은 본문을 Bubble 로 감싸고, plain 은 본문을 메시지 폭 그대로 그립니다. 누가 말하는지와는 상관없습니다."
+        title="Body × Align"
+        description="본문에 Bubble 을 두면 말풍선으로, 두지 않으면 본문을 메시지 폭 그대로 그립니다. align 은 붙는 쪽을 고르고, 안의 Bubble 은 그 align 을 받습니다. 누가 말하는지와는 상관없습니다."
       >
-        <Showcase.Row label="bubble · start">
+        <Showcase.Row label="Bubble · start">
           <div className="w-96">
             <Message name="김지수" time={SENT_AT}>
-              오늘 셔틀 몇 시에 와?
+              <Bubble>오늘 셔틀 몇 시에 와?</Bubble>
             </Message>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="bubble · end">
+        <Showcase.Row label="Bubble · end">
           <div className="w-96">
             <Message align="end" time={SENT_AT}>
-              오늘 셔틀 몇 시에 와?
+              <Bubble variant="solid">오늘 셔틀 몇 시에 와?</Bubble>
             </Message>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="plain · start">
+        <Showcase.Row label="본문 · start">
           <div className="w-96">
-            <Message shape="plain" name="GIST 도우미" time={ANSWERED_AT}>
+            <Message name="GIST 도우미" time={ANSWERED_AT}>
               <Marker>
                 <GlobeAltIcon />웹 검색 3건
               </Marker>
@@ -103,9 +100,9 @@ export const Gallery: Story = {
             </Message>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="plain · start (내 말)">
+        <Showcase.Row label="본문 · end">
           <div className="w-96">
-            <Message shape="plain" name="나" time={SENT_AT}>
+            <Message align="end" name="나" time={SENT_AT}>
               다음 학기 전공 필수 과목을 성적표와 견줘서, 남은 과목과 들을 수 있는 학기를 정리해 줘.
             </Message>
           </div>
@@ -119,7 +116,7 @@ export const Gallery: Story = {
           <Showcase.Row key={status} label={status}>
             <div className="w-96">
               <Message align="end" time={SENT_AT} status={status} onRetry={() => {}}>
-                학식 메뉴 알려 줘
+                <Bubble>학식 메뉴 알려 줘</Bubble>
               </Message>
             </div>
           </Showcase.Row>
@@ -132,21 +129,21 @@ export const Gallery: Story = {
         <Showcase.Row label="3">
           <div className="w-96">
             <Message align="end" time={SENT_AT} unread={3}>
-              12시 20분 셔틀 타자
+              <Bubble>12시 20분 셔틀 타자</Bubble>
             </Message>
           </div>
         </Showcase.Row>
         <Showcase.Row label="true">
           <div className="w-96">
             <Message align="end" time={SENT_AT} unread>
-              도착했어?
+              <Bubble>도착했어?</Bubble>
             </Message>
           </div>
         </Showcase.Row>
         <Showcase.Row label="0">
           <div className="w-96">
             <Message align="end" time={SENT_AT} unread={0}>
-              다 읽었어
+              <Bubble>다 읽었어</Bubble>
             </Message>
           </div>
         </Showcase.Row>
@@ -179,7 +176,7 @@ export const Gallery: Story = {
                 </Avatar>
               }
             >
-              무엇을 도와 드릴까요?
+              <Bubble>무엇을 도와 드릴까요?</Bubble>
             </Message>
           </div>
         </Showcase.Row>
@@ -191,8 +188,10 @@ export const Gallery: Story = {
 export const FoldReasoningAndToolSteps: Story = {
   render: () => (
     <div className="flex w-96 flex-col gap-6 break-keep">
-      <Message align="end">다음 학기 전공 필수 과목 정리해 줘</Message>
-      <Message shape="plain" name="GIST 도우미" time={ANSWERED_AT}>
+      <Message align="end">
+        <Bubble>다음 학기 전공 필수 과목 정리해 줘</Bubble>
+      </Message>
+      <Message name="GIST 도우미" time={ANSWERED_AT}>
         <Accordion type="multiple">
           <Accordion.Item value="reasoning">
             <Accordion.Header asChild>
@@ -244,7 +243,7 @@ export const FoldReasoningAndToolSteps: Story = {
 export const CopyAnAnswer: Story = {
   render: () => (
     <div className="w-96 break-keep">
-      <Message shape="plain" name="GIST 도우미">
+      <Message name="GIST 도우미">
         12시 20분에 광주송정역행 셔틀이 와요.
         <Message.Actions />
       </Message>
@@ -286,7 +285,7 @@ export const ResendAFailedMessage: Story = {
             setStatus('pending');
           }}
         >
-          보내기 실패한 글
+          <Bubble>보내기 실패한 글</Bubble>
         </Message>
       </div>
     );
@@ -319,10 +318,10 @@ export const CountWhoHasNotReadIt: Story = {
     return (
       <div className="flex w-96 flex-col gap-4 break-keep">
         <Message align="end" time={SENT_AT} unread={unread}>
-          12시 20분 셔틀 타자
+          <Bubble>12시 20분 셔틀 타자</Bubble>
         </Message>
         <Message align="end" time={ANSWERED_AT} unread={!seen}>
-          도착했어?
+          <Bubble>도착했어?</Bubble>
         </Message>
         <div className="flex gap-2">
           <Button
@@ -370,7 +369,7 @@ export const Keyboard: Story = {
   tags: ['verification'],
   render: () => (
     <div className="w-96 break-keep">
-      <Message shape="plain" name="GIST 도우미">
+      <Message name="GIST 도우미">
         도서관은 밤 11시까지 열어요.
         <Message.Actions>
           <Message.Copy />
