@@ -4,6 +4,7 @@
 
 - **`Carousel.Slide` 만 넣어도 동작.** 잘라 보이는 영역, 이전과 다음 버튼, 위치 점을 기본으로 그립니다.
 - **끌어서 넘기기.** 드래그, 관성, 스냅은 [Embla Carousel](https://www.embla-carousel.com/) 이 합니다. 두 번째 손가락이 닿으면 끌기를 놓습니다.
+- **설정은 `useCarousel` 로.** 여러 장 보기, 이어 붙이기, 자동 넘김은 `useCarousel({ slides, autoplay, autoScroll })` 의 결과를 `carousel` 로 넘겨 켭니다. 없으면 한 장씩, 자동 넘김 없이 동작합니다.
 - **자동 넘김.** `autoplay` 는 한 장씩 넘기고 `autoScroll` 은 멈추지 않고 흐릅니다. 멈춤 버튼(`Carousel.Pause`)이 함께 그려집니다(WCAG 2.2.2).
 - **보이는 것만 읽고 누른다.** 화면 밖 슬라이드는 `inert` 라서 Tab 과 스크린 리더가 들르지 않습니다. 넘기면 "5장 중 2번째" 를 알립니다.
 - **서버 렌더링.** 서버 HTML 은 CSS 만으로 슬라이드를 줄 세웁니다. `defaultValue` 의 자리도 CSS 변수로 미리 그려서 엔진이 붙을 때 흔들리지 않습니다.
@@ -32,10 +33,33 @@ import { Carousel } from '@gsainfoteam/ids-react';
 - 제어일 때 부모가 값을 바꾸지 않으면 트랙은 그 자리로 돌아갑니다.
 - 범위 밖의 값은 가까운 끝으로 맞춰 그립니다.
 
+## useCarousel
+
+```tsx
+'use client';
+
+import { Carousel, useCarousel } from '@gsainfoteam/ids-react';
+
+const carousel = useCarousel({
+  slides: { perView: 3, toScroll: 'auto', align: 'start', loop: true, dragFree: false },
+  autoplay: { delay: 5000, value: playing, onValueChange: setPlaying },
+});
+
+<Carousel aria-label="추천 상품" carousel={carousel}>...</Carousel>;
+```
+
+- 기능마다 객체 하나입니다. `autoplay`, `autoScroll` 은 객체를 주면 켜지고(`autoplay: {}` 면 기본값으로), 빼면 꺼집니다.
+- 자동 넘김을 멈췄는지는 그 기능 객체 안의 `value` / `defaultValue` / `onValueChange` 입니다.
+- 결과 하나는 `Carousel` 하나에 넘깁니다. 자동 넘김 플러그인이 캐러셀마다 따로 돌기 때문입니다.
+- hook 이라 클라이언트 컴포넌트에서 부릅니다. Server Component 는 `carousel` 없이 `<Carousel>` 을 그립니다.
+- `import { Carousel }` 만 쓰는 앱은 자동 넘김 플러그인을 싣지 않습니다. 플러그인은 `useCarousel` 이 불러옵니다.
+
 ## 여러 장 보기
 
 ```tsx
-<Carousel aria-label="추천 상품" slidesPerView={3} slidesToScroll="auto">
+const carousel = useCarousel({ slides: { perView: 3, toScroll: 'auto' } });
+
+<Carousel aria-label="추천 상품" carousel={carousel}>
   <Carousel.Content className="gap-4">
     {products.map((product) => (
       <Carousel.Slide key={product.id}>
@@ -46,20 +70,20 @@ import { Carousel } from '@gsainfoteam/ids-react';
 </Carousel>
 ```
 
-- `slidesPerView`(기본 1)는 한 번에 보이는 장 수입니다. `1.5` 처럼 소수를 주면 다음 장이 조금 보입니다.
-- `slidesToScroll`(기본 1)은 한 번에 넘기는 장 수입니다. `'auto'` 면 보이는 만큼 넘깁니다.
+- `slides.perView`(기본 1)는 한 번에 보이는 장 수입니다. `1.5` 처럼 소수를 주면 다음 장이 조금 보입니다.
+- `slides.toScroll`(기본 1)은 한 번에 넘기는 장 수입니다. `'auto'` 면 보이는 만큼 넘깁니다.
 - 점은 멈추는 자리마다 하나입니다. 세 장씩 넘기면 점 하나가 세 장을 맡고, 이름은 그 첫 장("4번째 슬라이드로")입니다.
 - 간격은 `Carousel.Content` 의 `gap-*` 으로 줍니다. 장의 폭은 간격을 빼고 나눕니다.
-- `align` 은 멈춘 장을 어디에 맞출지입니다. `start`(기본), `center`, `end`.
-- `dragFree` 면 끈 만큼 미끄러지고 스냅에 맞추지 않습니다.
-- `loop` 면 끝과 처음이 이어지고 이전, 다음 버튼이 비활성이 되지 않습니다. 슬라이드가 너무 적어 이어 붙일 수 없으면 엔진이 `loop` 없이 동작합니다.
+- `slides.align` 은 멈춘 장을 어디에 맞출지입니다. `start`(기본), `center`, `end`.
+- `slides.dragFree` 면 끈 만큼 미끄러지고 스냅에 맞추지 않습니다.
+- `slides.loop` 면 끝과 처음이 이어지고 이전, 다음 버튼이 비활성이 되지 않습니다. 슬라이드가 너무 적어 이어 붙일 수 없으면 엔진이 `loop` 없이 동작합니다.
 
 ## 자동 넘김
 
 ```tsx
-<Carousel aria-label="공지 배너" loop autoplay={{ delay: 5000 }}>...</Carousel>
-<Carousel aria-label="후원 단체" loop autoScroll={{ speed: 1 }} slidesPerView={4}>...</Carousel>
-<Carousel aria-label="배너" autoplay playing={playing} onPlayingChange={setPlaying} />
+useCarousel({ slides: { loop: true }, autoplay: { delay: 5000 } });
+useCarousel({ slides: { loop: true, perView: 4 }, autoScroll: { speed: 1 } });
+useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
 ```
 
 - `autoplay` 는 `delay`(기본 4000ms)마다 다음 자리로 넘깁니다. 끝에서는 처음으로 돌아갑니다.
@@ -75,19 +99,19 @@ import { Carousel } from '@gsainfoteam/ids-react';
 | 멈춤 버튼을 누른 뒤                 | 다시 누를 때까지                            |
 | `prefers-reduced-motion` 인 사용자  | 멈춘 채 시작한다. 누르면 넘기기 시작한다     |
 
-- `playing` / `defaultPlaying` / `onPlayingChange` 는 사용자가 고른 상태(멈춤 버튼)입니다. 잠깐 멈춘 것은 바꾸지 않습니다.
-- `loop` 없는 `autoScroll` 이 끝에 닿으면 멈춤 상태가 됩니다. 다시 누르면 처음부터 흐릅니다.
+- `autoplay`(또는 `autoScroll`)의 `value` / `defaultValue` / `onValueChange` 는 사용자가 고른 상태(멈춤 버튼)입니다. 잠깐 멈춘 것은 바꾸지 않습니다.
+- `slides.loop` 없는 `autoScroll` 이 끝에 닿으면 멈춤 상태가 됩니다. 다시 누르면 처음부터 흐릅니다.
 - 자동으로 넘기는 동안 알림 영역은 `aria-live="off"` 이고, 멈추면 `polite` 가 되어 손으로 넘긴 장을 알립니다.
 
 ## 파트 배치
 
 ```tsx
-<Carousel aria-labelledby={titleId} slidesPerView={3} loop>
+<Carousel aria-labelledby={titleId} carousel={carousel}>
   <div className="flex items-center justify-between">
     <h2 id={titleId}>추천 상품</h2>
     <div className="flex gap-2">
-      <Carousel.Prev variant="ghost" />
-      <Carousel.Next variant="ghost" />
+      <Carousel.Prev />
+      <Carousel.Next />
     </div>
   </div>
   <Carousel.Content className="gap-4">...</Carousel.Content>
@@ -164,7 +188,7 @@ import { Carousel } from '@gsainfoteam/ids-react';
 <Carousel.Slide className="basis-2/3" />           // 장마다 폭을 따로 줄 때
 ```
 
-- `size` 는 이전, 다음, 멈춤 버튼과 점의 크기입니다. 슬라이드 크기는 `slidesPerView` 나 슬라이드의 `className` 이 정합니다.
+- `size` 는 이전, 다음, 멈춤 버튼과 점의 크기입니다. 슬라이드 크기는 `slides.perView` 나 슬라이드의 `className` 이 정합니다.
 - 점은 8px(tiny 6px)이고 누르는 영역은 24px 입니다. 현재 점은 `primary` 색으로 길어지고, 나머지는 `bg-(--ids-color-border-neutral-strong)` 이고 올리거나 누르면 `text-neutral` 색(`bg-(--ids-color-text-neutral)`)으로 진해집니다. 6px 점에서는 글자색 층이 보이지 않아 색을 바꿉니다.
 - 기본 버튼은 Content 위에 겹쳐 그립니다. `outline` 이라 사진 위에서도 보입니다.
 
@@ -190,15 +214,19 @@ import { Carousel } from '@gsainfoteam/ids-react';
 | `value` / `defaultValue`              | 멈춘 자리의 번호. 기본 `0`                                 |
 | `onValueChange`                       | `(value: number) => void`                                  |
 | `orientation`                         | `horizontal`(기본) / `vertical`                            |
-| `slidesPerView`                       | `1`. 한 번에 보이는 장 수                                  |
-| `slidesToScroll`                      | `1`. 한 번에 넘기는 장 수, 또는 `'auto'`                   |
-| `align`                               | `start`(기본) / `center` / `end`                           |
-| `loop`, `dragFree`                    | `false`                                                    |
-| `autoplay`                            | `false`. `true` 면 4초, `{ delay }`                         |
-| `autoScroll`                          | `false`. `true` 면 속도 2, `{ speed, direction }`           |
-| `playing` / `defaultPlaying`          | 자동 넘김을 켰는지. 기본 `true`, 줄인 동작이면 `false`      |
-| `onPlayingChange`                     | `(playing: boolean) => void`. 멈춤 버튼을 누를 때           |
 | `size`                                | `standard`(기본) / `tiny`. 버튼과 점                        |
+| `carousel`                            | `useCarousel()` 의 결과. 없으면 한 장씩, 자동 넘김 없음     |
+
+| `useCarousel` 옵션                    | 기본 / 동작                                                |
+| ------------------------------------- | ---------------------------------------------------------- |
+| `slides.perView`                      | `1`. 한 번에 보이는 장 수                                  |
+| `slides.toScroll`                     | `1`. 한 번에 넘기는 장 수, 또는 `'auto'`                   |
+| `slides.align`                        | `start`(기본) / `center` / `end`                           |
+| `slides.loop`, `slides.dragFree`      | `false`                                                    |
+| `autoplay`                            | 없음. `{}` 면 4초, `{ delay }`                              |
+| `autoScroll`                          | 없음. `{}` 면 속도 2, `{ speed, direction }`                |
+| `autoplay.value` / `.defaultValue`    | 넘기는 중인지. 기본 `true`, 줄인 동작이면 `false`. `autoScroll` 도 같다 |
+| `autoplay.onValueChange`              | `(playing: boolean) => void`. 멈춤 버튼을 누를 때           |
 | `Carousel.Content`                    | 잘라 보이는 영역과 트랙. `asChild`, `gap-*`                 |
 | `Carousel.Slide`                      | 한 장. `asChild`, `aria-label` 로 이름을 바꿀 수 있다       |
 | `Carousel.Prev` / `Carousel.Next`     | `IconButton` 속성. 이름 "이전 슬라이드" / "다음 슬라이드"   |
