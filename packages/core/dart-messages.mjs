@@ -53,8 +53,12 @@ const localeExpression = (tag) => {
 export function dartMessages(locales) {
   const [{ argumentTypes }] = locales;
   const contract = messageEntries(locales[0].runtime, argumentTypes);
-  for (const { name } of contract)
+  const names = new Set();
+  for (const { id, name } of contract) {
     if (MEMBERS_OF_THE_BASE.has(name)) throw new Error(`Reserved Dart member: ${name}`);
+    if (names.has(name)) throw new Error(`Duplicate Dart member ${name}: ${id}`);
+    names.add(name);
+  }
 
   const languageClass = ({ language, tag, runtime }) => {
     const entries = messageEntries(runtime, argumentTypes);
