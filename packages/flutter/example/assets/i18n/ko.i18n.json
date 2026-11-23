@@ -1,6 +1,6 @@
 {
   "ids(singleInterface=IdsMessages)": {
-    "spinnerLabel": "불러오는 중"
+    "commonLoading": "불러오는 중"
   },
   "demo": {
     "specimen": "Aa Wi 0123 한글",

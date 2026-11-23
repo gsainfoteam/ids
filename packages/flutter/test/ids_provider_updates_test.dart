@@ -5,10 +5,10 @@ import 'package:ids_flutter/ids.dart';
 import 'test_theme.dart';
 
 class _Messages with IdsMessages {
-  const _Messages(this.dialogClose);
+  const _Messages(this.commonClose);
 
   @override
-  final String? dialogClose;
+  final String? commonClose;
 }
 
 class _Consumer extends StatefulWidget {
@@ -34,7 +34,7 @@ class _ConsumerState extends State<_Consumer> {
           shape: scope.shape(),
         ),
         child: Text(
-          '${widget.name}: $count / ${scope.locale} / ${scope.translation?.dialogClose ?? IdsMessages.ko.dialogClose}',
+          '${widget.name}: $count / ${scope.locale} / ${scope.translation?.commonClose ?? IdsMessages.ko.commonClose}',
           key: ValueKey(widget.name),
           style: scope.textStyle(
             IdsTypography.bodyB3Regular,
