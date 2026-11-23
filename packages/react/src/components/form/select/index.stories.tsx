@@ -10,7 +10,6 @@ import {
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, fn, waitFor } from 'storybook/test';
 
-import { LiveCodeDocsPage, liveCodeStory } from '~live-code';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
@@ -33,32 +32,10 @@ const fruits = [
   ['mango', '망고'],
 ] as const;
 
-const live = {
-  id: 'form-select',
-  code: `import { Field, Select } from '@gsainfoteam/ids-react';
-
-export default function Example() {
-  return (
-    <Field className="w-64">
-      <Field.Label>과일</Field.Label>
-      <Select placeholder="과일 선택">
-        <Select.Item value="apple">사과</Select.Item>
-        <Select.Item value="banana">바나나</Select.Item>
-        <Select.Item value="cherry">체리</Select.Item>
-      </Select>
-    </Field>
-  );
-}
-`,
-};
-
 const meta = {
   title: 'Form/Select',
   component: Select,
   tags: ['autodocs'],
-  parameters: {
-    docs: { page: () => <LiveCodeDocsPage of={LiveCode} {...live} /> },
-  },
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
@@ -291,7 +268,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
       selectionMode === 'multiple' ? (
         <Select
           {...args}
-          key={`multiple:${defaultValues?.join()}`}
+          key="multiple"
           aria-label={wrapInField ? undefined : ariaLabel}
           selectionMode="multiple"
           defaultValue={defaultValues?.length ? defaultValues : undefined}
@@ -305,7 +282,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
       ) : (
         <Select
           {...args}
-          key={`single:${defaultValue}`}
+          key="single"
           aria-label={wrapInField ? undefined : ariaLabel}
           defaultValue={defaultValue || null}
           onValueChange={onValueChange}
@@ -471,12 +448,6 @@ export const Gallery: Story = {
     </Showcase>
   ),
 };
-
-export const LiveCode: Story = liveCodeStory({
-  ...live,
-  description:
-    '편집기에서 코드를 고치면 바로 그려집니다. Live code editor 패널(또는 Docs 맨 위)에서 @gsainfoteam/ids-react 와 @heroicons/react 를 import 해 쓰고, 빌드 CSS 에 없는 Tailwind 클래스는 이 미리보기에서만 브라우저가 만듭니다.',
-});
 
 export const PickSeveralWithSearch: Story = {
   render: function Render() {

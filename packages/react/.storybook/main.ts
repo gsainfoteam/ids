@@ -37,14 +37,10 @@ const config: StorybookConfig = {
   },
 };
 
-const liveCodeEditor = {
-  addon: 'storybook-addon-code-editor',
-  staticDirs: getCodeEditorStaticDirs(import.meta.filename),
-};
-config.addons = [...(config.addons ?? []), liveCodeEditor.addon];
+const monacoFilesForTheLiveCodeEditor = getCodeEditorStaticDirs(import.meta.filename);
 config.staticDirs = [
   ...(Array.isArray(config.staticDirs) ? config.staticDirs : []),
-  ...liveCodeEditor.staticDirs,
+  ...monacoFilesForTheLiveCodeEditor,
 ];
 
 export default config;

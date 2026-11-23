@@ -2,7 +2,6 @@ import { useState, type ReactNode } from 'react';
 
 import { expect, fn, waitFor } from 'storybook/test';
 
-import { LiveCodeDocsPage, liveCodeStory } from '~live-code';
 import { Showcase } from '~story-kit';
 
 import { overlay } from '../../../internal/overlay';
@@ -14,42 +13,10 @@ import { Dialog } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const live = {
-  id: 'overlay-dialog',
-  code: `import { Button, Dialog, TextField } from '@gsainfoteam/ids-react';
-
-export default function Example() {
-  return (
-    <Dialog>
-      <Dialog.Trigger asChild>
-        <Button variant="outline">프로필 수정</Button>
-      </Dialog.Trigger>
-      <Dialog.Content>
-        <Dialog.Header>
-          <Dialog.Title>프로필 수정</Dialog.Title>
-          <Dialog.Description>바꾼 내용은 저장을 눌러야 반영됩니다.</Dialog.Description>
-        </Dialog.Header>
-        <TextField aria-label="이름" defaultValue="김지스트" />
-        <Dialog.Footer>
-          <Dialog.Close>취소</Dialog.Close>
-          <Dialog.Close asChild>
-            <Button>저장</Button>
-          </Dialog.Close>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
-  );
-}
-`,
-};
-
 const meta = {
   title: 'Overlay/Dialog',
   component: Dialog,
   tags: ['autodocs'],
-  parameters: {
-    docs: { page: () => <LiveCodeDocsPage of={LiveCode} {...live} /> },
-  },
   argTypes: {
     role: { control: 'radio', options: ['dialog', 'alertdialog'] },
     dismissible: { control: 'boolean' },
@@ -365,12 +332,6 @@ export const Gallery: Story = {
     </Showcase>
   ),
 };
-
-export const LiveCode: Story = liveCodeStory({
-  ...live,
-  description:
-    '편집기에서 코드를 고치면 바로 그려집니다. Live code editor 패널(또는 Docs 맨 위)에서 @gsainfoteam/ids-react 와 @heroicons/react 를 import 해 쓰고, 빌드 CSS 에 없는 Tailwind 클래스는 이 미리보기에서만 브라우저가 만듭니다.',
-});
 
 export const OpenFromAnywhere: Story = {
   name: 'overlay.open',

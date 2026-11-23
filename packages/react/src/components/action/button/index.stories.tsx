@@ -11,7 +11,6 @@ import {
 } from '@heroicons/react/16/solid';
 import { expect, fn, spyOn, waitFor } from 'storybook/test';
 
-import { LiveCodeDocsPage, liveCodeStory } from '~live-code';
 import { Showcase, holdTheNextCall } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
@@ -34,31 +33,10 @@ const colorSchemes = [
 ] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-const live = {
-  id: 'action-button',
-  code: `import { PlusIcon } from '@heroicons/react/16/solid';
-import { Button } from '@gsainfoteam/ids-react';
-
-export default function Example() {
-  return (
-    <div className="flex gap-2">
-      <Button>
-        <PlusIcon />새 글
-      </Button>
-      <Button variant="outline">취소</Button>
-    </div>
-  );
-}
-`,
-};
-
 const meta = {
   title: 'Action/Button',
   component: Button,
   tags: ['autodocs'],
-  parameters: {
-    docs: { page: () => <LiveCodeDocsPage of={LiveCode} {...live} /> },
-  },
   argTypes: {
     variant: { control: 'radio', options: variants },
     colorScheme: { control: 'select', options: colorSchemes },
@@ -293,12 +271,6 @@ export const Gallery: Story = {
 };
 
 const A_SAVE_TAKES = 2000;
-
-export const LiveCode: Story = liveCodeStory({
-  ...live,
-  description:
-    '편집기에서 코드를 고치면 바로 그려집니다. Live code editor 패널(또는 Docs 맨 위)에서 @gsainfoteam/ids-react 와 @heroicons/react 를 import 해 쓰고, 빌드 CSS 에 없는 Tailwind 클래스는 이 미리보기에서만 브라우저가 만듭니다.',
-});
 
 export const AddAnActionWithoutABackground: Story = {
   render: () => (
