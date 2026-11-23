@@ -1,20 +1,12 @@
 'use client';
 
-import {
-  Children,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useRef,
-  type ComponentProps,
-  type CSSProperties,
-  type KeyboardEvent,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { isValidElement, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { CarouselContext, type CarouselContextValue } from './context';
+import { useInternalCarouselKeys } from './hooks/use-carousel-keys';
 import { useInternalCarouselMotion } from './hooks/use-carousel-motion';
+import { useInternalCarouselNameWarning } from './hooks/use-carousel-name-warning';
+import { findElementOfType, startsFromAStep } from './lib/carousel-children';
 import { CarouselContent, slidesOf } from './parts/content';
 import { CarouselIndicator } from './parts/indicator';
 import { CarouselIndicators } from './parts/indicators';
@@ -24,10 +16,8 @@ import { CarouselPrev } from './parts/prev';
 import { carouselStyle } from './style';
 import { resolveState, type StateValue } from '../../../internal/lib/state-props';
 import {
-  moveWithKeys,
   SlidesAnnouncer,
   useInternalSlides,
-  type SlidesDragEvent,
   type SlidesOrientation,
 } from '../../../internal/slides';
 import { useInternalTranslate } from '../../../internal/translate';
@@ -36,9 +26,7 @@ import {
   elementTypeOf,
   flattenFragments,
   mergeEventHandlers,
-  mergeRefs,
 } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { CarouselInstance } from './hooks/use-carousel';
 import type { IdsSize } from '../../../tokens/types';
@@ -73,8 +61,6 @@ export type CarouselProps = Omit<
   CarouselOwnProps &
   CarouselName;
 
-type Holder = ReactElement<{ children?: ReactNode; asChild?: boolean }>;
-
 const CONTENT = new Set<unknown>([CarouselContent]);
 const NAVIGATION = new Set<unknown>([
   CarouselPrev,
@@ -98,18 +84,6 @@ const flag = (on: boolean) => (on ? '' : undefined);
 const isSlideLike = (node: ReactNode) =>
   isValidElement(node) && !NOT_A_SLIDE.has(elementTypeOf(node));
 
-function findElementOfType(children: unknown, types: ReadonlySet<unknown>): Holder | undefined {
-  if (typeof children === 'function') return undefined;
-
-  for (const child of Children.toArray(children as ReactNode)) {
-    if (!isValidElement<{ children?: ReactNode }>(child)) continue;
-    if (types.has(elementTypeOf(child))) return child as Holder;
-    const nested = findElementOfType(child.props.children, types);
-    if (nested) return nested;
-  }
-  return undefined;
-}
-
 function withSlidesInContent(nodes: ReactNode[]) {
   const slides = nodes.filter(isSlideLike);
   const firstSlide = nodes.findIndex(isSlideLike);
@@ -119,18 +93,6 @@ function withSlidesInContent(nodes: ReactNode[]) {
   const beforeTheSlides = nodes.slice(0, firstSlide);
   const others = nodes.slice(firstSlide).filter((node) => !isSlideLike(node));
   return [...beforeTheSlides, content, ...others];
-}
-
-const startsFromAStep = (_api: unknown, event: SlidesDragEvent) =>
-  !(event.target as Element | null)?.closest?.('[data-carousel-step]');
-
-function useInternalNameWarning(named: boolean) {
-  useEffect(() => {
-    if (isDevelopment && !named)
-      console.warn(
-        '[IDS] Carousel: give the carousel a name with aria-label (or aria-labelledby). Screen readers announce it with the carousel role.',
-      );
-  }, [named]);
 }
 
 export function CarouselRoot(props: CarouselProps) {
@@ -152,11 +114,8 @@ export function CarouselRoot(props: CarouselProps) {
   } = props;
 
   const t = useInternalTranslate();
-  const rootRef = useRef<HTMLElement>(null);
-  const focusIndicatorAfterMove = useRef(false);
-  const mergedRef = useCallback((node: HTMLElement | null) => mergeRefs(rootRef, ref)(node), [ref]);
 
-  useInternalNameWarning(Boolean(props['aria-label'] || props['aria-labelledby']));
+  useInternalCarouselNameWarning(Boolean(props['aria-label'] || props['aria-labelledby']));
 
   const composedContent = findElementOfType(children, CONTENT);
   const nodes = composedContent ? [] : flattenFragments(children);
@@ -180,19 +139,7 @@ export function CarouselRoot(props: CarouselProps) {
     plugins,
   });
   const rotation = useInternalCarouselMotion({ slides, motion, scrollDirection, playing });
-
-  useEffect(() => {
-    if (!focusIndicatorAfterMove.current) return;
-    focusIndicatorAfterMove.current = false;
-
-    const root = rootRef.current;
-    const indicators = root?.querySelectorAll<HTMLElement>(
-      '[data-carousel-indicator][data-current]',
-    );
-    [...(indicators ?? [])]
-      .find((indicator) => indicator.closest('[data-carousel]') === root)
-      ?.focus();
-  }, [slides.selected]);
+  const { mergedRef, moveOnKeyDown } = useInternalCarouselKeys({ slides, ref, onKeyDown });
 
   const composedNavigation = containsElementOfType(children, NAVIGATION);
   const composedPause = containsElementOfType(children, PAUSE);
@@ -232,14 +179,7 @@ export function CarouselRoot(props: CarouselProps) {
         data-dragging={flag(slides.dragging)}
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
-        onKeyDown={(event: KeyboardEvent<HTMLElement>) => {
-          onKeyDown?.(event);
-          if (event.defaultPrevented) return;
-          const fromIndicator = Boolean(
-            (event.target as Element).closest('[data-carousel-indicator]'),
-          );
-          if (moveWithKeys(slides, event)) focusIndicatorAfterMove.current = fromIndicator;
-        }}
+        onKeyDown={moveOnKeyDown}
         onFocus={mergeEventHandlers(onFocus, rotation.onFocus)}
         onBlur={mergeEventHandlers(onBlur, rotation.onBlur)}
       >

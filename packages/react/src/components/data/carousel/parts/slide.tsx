@@ -1,11 +1,11 @@
 'use client';
 
-import { use, useEffect, type ComponentProps } from 'react';
+import { use, type ComponentProps } from 'react';
 
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
 import { part } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
 import { SlideIndexContext, useInternalCarouselContext } from '../context';
+import { useInternalCarouselSlideStrayWarning } from '../hooks/use-carousel-slide-stray-warning';
 
 import type { SlideState } from '../../../../internal/slides';
 
@@ -19,15 +19,6 @@ export type CarouselSlideProps = Omit<
     asChild?: boolean;
   };
 
-function useInternalStrayWarning(stray: boolean) {
-  useEffect(() => {
-    if (isDevelopment && stray)
-      console.warn(
-        '[IDS] Carousel.Slide must be a child of Carousel.Content. A slide outside it is not part of the track and cannot be reached by dragging, buttons or keys.',
-      );
-  }, [stray]);
-}
-
 export function CarouselSlide({
   asChild = false,
   className,
@@ -37,7 +28,7 @@ export function CarouselSlide({
 }: CarouselSlideProps) {
   const { slides, styles } = useInternalCarouselContext('Carousel.Slide');
   const index = use(SlideIndexContext);
-  useInternalStrayWarning(index === null);
+  useInternalCarouselSlideStrayWarning(index === null);
 
   const state = slides.slideState(index ?? 0);
   if (index === null) return <div {...rest}>{resolveState(children, state)}</div>;
