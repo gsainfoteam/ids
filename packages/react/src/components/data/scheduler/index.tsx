@@ -6,6 +6,12 @@ import {
   type SchedulerSlot,
   type SchedulerView,
 } from './layout';
+import {
+  SchedulerEventMenu,
+  SchedulerSlotMenu,
+  type SchedulerEventMenuPartProps,
+  type SchedulerSlotMenuPartProps,
+} from './menus';
 import { SchedulerRoot, type SchedulerProps } from './root';
 import { schedulerStyle } from './style';
 
@@ -27,6 +33,17 @@ export namespace Scheduler {
   export const Event = SchedulerEvent;
   export namespace Event {
     export type Props = SchedulerEventPartProps;
+  }
+
+  export const EventMenu = SchedulerEventMenu;
+  export namespace EventMenu {
+    export type Props<E extends SchedulerEventData = SchedulerEventData> =
+      SchedulerEventMenuPartProps<E>;
+  }
+
+  export const SlotMenu = SchedulerSlotMenu;
+  export namespace SlotMenu {
+    export type Props = SchedulerSlotMenuPartProps;
   }
 
   export const Style = schedulerStyle;
