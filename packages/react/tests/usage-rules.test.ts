@@ -7,7 +7,14 @@ import { expect, test } from 'vitest';
 
 const SRC = fileURLToPath(new URL('../src/', import.meta.url));
 const PACKAGE = fileURLToPath(new URL('../', import.meta.url));
-const PUBLIC_ENTRIES = ['index.ts', 'chart.ts', 'editor.ts', 'rich-text.ts'];
+const PUBLIC_ENTRIES = [
+  'index.ts',
+  'chart.ts',
+  'editor.ts',
+  'rich-text.ts',
+  'react-hook-form.tsx',
+  'tanstack-form.tsx',
+];
 const CUSTOM_DESIGN = 'custom-design';
 const COMPONENTS = `${SRC}components/`;
 const PUBLIC_PACKAGE = /^@gsainfoteam\/ids-react(\/|$)/;
@@ -44,9 +51,13 @@ const publicNames = new Set(
   ),
 );
 
+const ENTRY_MODULES = new Set(PUBLIC_ENTRIES.map((entry) => SRC + entry.replace(/\.tsx?$/, '')));
+
 const importsIds = (specifier: string, directory: string) =>
   PUBLIC_PACKAGE.test(specifier) ||
-  (specifier.startsWith('.') && resolve(directory, specifier).startsWith(COMPONENTS));
+  (specifier.startsWith('.') &&
+    (resolve(directory, specifier).startsWith(COMPONENTS) ||
+      ENTRY_MODULES.has(resolve(directory, specifier))));
 
 function idsNamesImportedBy(source: SourceFile, directory: string) {
   const names = new Set<string>();
