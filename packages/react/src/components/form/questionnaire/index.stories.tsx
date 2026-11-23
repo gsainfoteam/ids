@@ -54,6 +54,23 @@ const radio = (canvasElement: HTMLElement, name: string | RegExp) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Questionnaire className="w-96">
+      <Questionnaire.Question name="tone">
+        어떤 말투로 쓸까요?
+        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+        <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+      </Questionnaire.Question>
+      <Questionnaire.Question name="length">
+        얼마나 길게 쓸까요?
+        <Questionnaire.Option value="short">짧게</Questionnaire.Option>
+        <Questionnaire.Option value="long">길게</Questionnaire.Option>
+      </Questionnaire.Question>
+    </Questionnaire>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -185,9 +202,8 @@ export const Gallery: Story = {
   ),
 };
 
-export const MultiStep: Story = {
+export const AskSeveralQuestionsInSteps: Story = {
   args: {
-    submitLabel: '계획 세우기',
     children: (
       <>
         <Questionnaire.Question name="size">
@@ -211,6 +227,7 @@ export const MultiStep: Story = {
           <Questionnaire.Option value="keyring">키링</Questionnaire.Option>
           <Questionnaire.Other />
         </Questionnaire.Question>
+        <Questionnaire.Submit>계획 세우기</Questionnaire.Submit>
       </>
     ),
   },
@@ -218,7 +235,7 @@ export const MultiStep: Story = {
     docs: {
       description: {
         story:
-          '질문이 여럿이면 위에 Progress 가 붙고, 한 번에 한 질문만 보입니다. 답하지 않은 필수 질문에서는 다음 버튼이 꺼져 있고, optional 질문에는 건너뛰기가 붙습니다. 마지막 질문에서 보내면 onComplete 가 건너뛴 질문을 뺀 답을 받습니다.',
+          '질문이 여럿이면 위에 Progress 가 붙고, 한 번에 한 질문만 보입니다. 답하지 않은 필수 질문에서는 다음 버튼이 꺼져 있고, optional 질문에는 건너뛰기가 붙습니다. 마지막 질문의 버튼 글자는 Questionnaire.Submit 의 children 으로 바꿉니다. 마지막 질문에서 보내면 onComplete 가 건너뛴 질문을 뺀 답을 받습니다.',
       },
     },
   },
@@ -255,7 +272,129 @@ export const MultiStep: Story = {
   },
 };
 
+export const LetPeopleWriteTheirOwnAnswer: Story = {
+  args: {
+    children: (
+      <Questionnaire.Question name="tone">
+        어떤 말투로 쓸까요?
+        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+        <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+        <Questionnaire.Other placeholder="예: 반말로 짧게" />
+      </Questionnaire.Question>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Questionnaire.Other 는 보기에 없는 답을 적는 TextField 입니다. 하나만 고르는 질문에서는 적기 시작하면 고른 보기가 풀리고, 보기를 고르면 적은 글이 지워집니다. 적은 글은 질문의 name 으로 FormData 에도 들어갑니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent, args }) => {
+    const other = () => within(canvasElement).getByRole('textbox', { name: '직접 입력' });
+
+    await userEvent.click(radio(canvasElement, '격식'));
+    await userEvent.type(other(), '반말로');
+    await expect(radio(canvasElement, '격식')).not.toBeChecked();
+    await expect(other()).toHaveAttribute('name', 'tone');
+
+    await userEvent.click(radio(canvasElement, '편하게'));
+    await expect(other()).toHaveValue('');
+
+    await userEvent.type(other(), '반말로 짧게{Enter}');
+    await expect(args.onComplete).toHaveBeenCalledOnce();
+    await expect(args.onComplete).toHaveBeenCalledWith({ tone: '반말로 짧게' });
+  },
+};
+
+export const StartOverWithAFormReset: Story = {
+  render: (args) => (
+    <Questionnaire {...args} defaultValue={{ tone: 'formal' }}>
+      <Questionnaire.Question name="tone">
+        어떤 말투로 쓸까요?
+        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+        <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+        <Questionnaire.Other />
+      </Questionnaire.Question>
+      <Questionnaire.Question name="length">
+        얼마나 길게 쓸까요?
+        <Questionnaire.Option value="short">짧게</Questionnaire.Option>
+        <Questionnaire.Option value="long">길게</Questionnaire.Option>
+      </Questionnaire.Question>
+      <Button type="reset" variant="outline">
+        처음부터
+      </Button>
+    </Questionnaire>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'form 의 reset 은 답을 defaultValue 로 되돌리고 첫 질문으로 돌아갑니다. native 입력처럼 onComplete 는 불리지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent, args }) => {
+    await userEvent.click(radio(canvasElement, '편하게'));
+    await userEvent.click(button(canvasElement, '다음'));
+    await userEvent.click(radio(canvasElement, '길게'));
+
+    await userEvent.click(button(canvasElement, '처음부터'));
+    await waitFor(() => expect(radio(canvasElement, '격식')).toBeChecked());
+    await expect(within(canvasElement).getByText('어떤 말투로 쓸까요?')).toBeVisible();
+    await expect(args.onComplete).not.toHaveBeenCalled();
+
+    await userEvent.click(button(canvasElement, '다음'));
+    await expect(radio(canvasElement, '길게')).not.toBeChecked();
+  },
+};
+
+export const SuggestPromptsToStartAChat: Story = {
+  render: (args) => (
+    <Card className="w-120">
+      <Card.Header>
+        <Card.Title>지스트 도우미</Card.Title>
+        <Card.Description>학교생활에 대해 무엇이든 물어보세요.</Card.Description>
+      </Card.Header>
+      <Card.Content>
+        <Questionnaire advanceOnSelect size="tiny" onComplete={args.onComplete}>
+          <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
+            이런 걸 물어볼 수 있어요
+            <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
+            <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
+            <Questionnaire.Option value="도서관 빈자리 있어?">도서관 빈자리</Questionnaire.Option>
+          </Questionnaire.Question>
+        </Questionnaire>
+      </Card.Content>
+    </Card>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '채팅 시작 화면의 추천 질문은 한 단계짜리 Questionnaire 입니다. variant="toggle" 이라 보기가 라디오 없는 Toggle 로 그려집니다. advanceOnSelect 면 하나만 고르는 질문은 보기를 누르는 순간 넘어가고, 질문이 하나뿐이라 바로 onComplete 가 불립니다. 화살표 키로 옮겨 다니는 동안은 넘어가지 않고 Space 나 Enter 로 고릅니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent, args }) => {
+    await expect(within(canvasElement).queryByRole('progressbar')).toBeNull();
+    await expect(within(canvasElement).queryByRole('button')).toBeNull();
+
+    await userEvent.click(radio(canvasElement, '셔틀 시간표'));
+    await expect(args.onComplete).toHaveBeenLastCalledWith({ prompt: '다음 셔틀은 언제 와?' });
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(radio(canvasElement, '도서관 빈자리')).toBeChecked();
+    await expect(args.onComplete).toHaveBeenCalledOnce();
+
+    await userEvent.keyboard(' ');
+    await expect(args.onComplete).toHaveBeenLastCalledWith({ prompt: '도서관 빈자리 있어?' });
+  },
+};
+
 export const Keyboard: Story = {
+  tags: ['verification'],
   args: {
     children: (
       <>
@@ -301,126 +440,5 @@ export const Keyboard: Story = {
       tone: 'casual',
       topics: ['summary'],
     });
-  },
-};
-
-export const OtherInput: Story = {
-  args: {
-    children: (
-      <Questionnaire.Question name="tone">
-        어떤 말투로 쓸까요?
-        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
-        <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-        <Questionnaire.Other placeholder="예: 반말로 짧게" />
-      </Questionnaire.Question>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Questionnaire.Other 는 보기에 없는 답을 적는 TextField 입니다. 하나만 고르는 질문에서는 적기 시작하면 고른 보기가 풀리고, 보기를 고르면 적은 글이 지워집니다. 적은 글은 질문의 name 으로 FormData 에도 들어갑니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, userEvent, args }) => {
-    const other = () => within(canvasElement).getByRole('textbox', { name: '직접 입력' });
-
-    await userEvent.click(radio(canvasElement, '격식'));
-    await userEvent.type(other(), '반말로');
-    await expect(radio(canvasElement, '격식')).not.toBeChecked();
-    await expect(other()).toHaveAttribute('name', 'tone');
-
-    await userEvent.click(radio(canvasElement, '편하게'));
-    await expect(other()).toHaveValue('');
-
-    await userEvent.type(other(), '반말로 짧게{Enter}');
-    await expect(args.onComplete).toHaveBeenCalledOnce();
-    await expect(args.onComplete).toHaveBeenCalledWith({ tone: '반말로 짧게' });
-  },
-};
-
-export const FormReset: Story = {
-  render: (args) => (
-    <Questionnaire {...args} defaultValue={{ tone: 'formal' }}>
-      <Questionnaire.Question name="tone">
-        어떤 말투로 쓸까요?
-        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
-        <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-        <Questionnaire.Other />
-      </Questionnaire.Question>
-      <Questionnaire.Question name="length">
-        얼마나 길게 쓸까요?
-        <Questionnaire.Option value="short">짧게</Questionnaire.Option>
-        <Questionnaire.Option value="long">길게</Questionnaire.Option>
-      </Questionnaire.Question>
-      <Button type="reset" variant="outline">
-        처음부터
-      </Button>
-    </Questionnaire>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'form 의 reset 은 답을 defaultValue 로 되돌리고 첫 질문으로 돌아갑니다. native 입력처럼 onComplete 는 불리지 않습니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, userEvent, args }) => {
-    await userEvent.click(radio(canvasElement, '편하게'));
-    await userEvent.click(button(canvasElement, '다음'));
-    await userEvent.click(radio(canvasElement, '길게'));
-
-    await userEvent.click(button(canvasElement, '처음부터'));
-    await waitFor(() => expect(radio(canvasElement, '격식')).toBeChecked());
-    await expect(within(canvasElement).getByText('어떤 말투로 쓸까요?')).toBeVisible();
-    await expect(args.onComplete).not.toHaveBeenCalled();
-
-    await userEvent.click(button(canvasElement, '다음'));
-    await expect(radio(canvasElement, '길게')).not.toBeChecked();
-  },
-};
-
-export const SuggestedPrompts: Story = {
-  render: (args) => (
-    <Card className="w-120">
-      <Card.Header>
-        <Card.Title>지스트 도우미</Card.Title>
-        <Card.Description>학교생활에 대해 무엇이든 물어보세요.</Card.Description>
-      </Card.Header>
-      <Card.Content>
-        <Questionnaire advanceOnSelect size="tiny" onComplete={args.onComplete}>
-          <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
-            이런 걸 물어볼 수 있어요
-            <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
-            <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
-            <Questionnaire.Option value="도서관 빈자리 있어?">도서관 빈자리</Questionnaire.Option>
-          </Questionnaire.Question>
-        </Questionnaire>
-      </Card.Content>
-    </Card>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '채팅 시작 화면의 추천 질문은 한 단계짜리 Questionnaire 입니다. variant="toggle" 이라 보기가 라디오 없는 Toggle 로 그려집니다. advanceOnSelect 면 하나만 고르는 질문은 보기를 누르는 순간 넘어가고, 질문이 하나뿐이라 바로 onComplete 가 불립니다. 화살표 키로 옮겨 다니는 동안은 넘어가지 않고 Space 나 Enter 로 고릅니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, userEvent, args }) => {
-    await expect(within(canvasElement).queryByRole('progressbar')).toBeNull();
-    await expect(within(canvasElement).queryByRole('button')).toBeNull();
-
-    await userEvent.click(radio(canvasElement, '셔틀 시간표'));
-    await expect(args.onComplete).toHaveBeenLastCalledWith({ prompt: '다음 셔틀은 언제 와?' });
-
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(radio(canvasElement, '도서관 빈자리')).toBeChecked();
-    await expect(args.onComplete).toHaveBeenCalledOnce();
-
-    await userEvent.keyboard(' ');
-    await expect(args.onComplete).toHaveBeenLastCalledWith({ prompt: '도서관 빈자리 있어?' });
   },
 };

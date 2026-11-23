@@ -15,6 +15,7 @@ import { RatingItem, type RatingItemProps } from './item';
 import { resolve, type StateProp } from './state-prop';
 import { ratingStyle, type RatingOptionPlacement } from './style';
 import { isCheckedScore, useRating } from './use-rating';
+import { FormValue } from '../../../internal/form-value';
 import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
@@ -50,12 +51,10 @@ export type RatingProps = Omit<
   max?: number;
   step?: 1 | 0.5;
   size?: IdsSize;
-  selectionMode?: 'single' | 'none';
   disabled?: boolean;
   readOnly?: boolean;
   invalid?: boolean;
   required?: boolean;
-  requiredMessage?: string;
   name?: string;
   form?: string;
   getValueLabel?: (value: number, max: number) => string;
@@ -72,12 +71,10 @@ export function RatingRoot({
   max = 5,
   step = 1,
   size,
-  selectionMode = 'single',
   disabled = false,
   readOnly = false,
   invalid,
   required = false,
-  requiredMessage: requiredMessageProp,
   name,
   form,
   getValueLabel: getValueLabelProp,
@@ -99,7 +96,6 @@ export function RatingRoot({
   const t = useTranslate();
   const getValueLabel =
     getValueLabelProp ?? ((value: number, max: number) => t('rating.valueLabel', { value, max }));
-  const requiredMessage = requiredMessageProp ?? t('rating.required');
 
   invariant(Number.isInteger(max) && max > 0, 'Rating: max must be a positive integer.');
   invariant(step === 1 || step === 0.5, 'Rating: step must be 1 or 0.5.');
@@ -124,8 +120,7 @@ export function RatingRoot({
     indexed.set(index, child);
   }
 
-  const displayOnly = selectionMode === 'none';
-  const interactive = !displayOnly && !disabled && !readOnly;
+  const interactive = !readOnly && !disabled;
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const rating = useRating({
     value,
@@ -135,10 +130,19 @@ export function RatingRoot({
     max,
     step,
     interactive,
-    missingMessage: required && interactive ? requiredMessage : null,
+    missingMessage: required && interactive ? t('rating.required') : null,
     ref,
   });
-  const { current, hover, displayed, rootRef, preview, choose, forwardRootFocusToChecked } = rating;
+  const {
+    current,
+    hover,
+    displayed,
+    rootRef,
+    anchorRef,
+    preview,
+    choose,
+    forwardRootFocusToChecked,
+  } = rating;
   const ariaInvalid = ariaInvalidProp ?? invalid;
   const state: RatingState = {
     value: current,
@@ -188,22 +192,19 @@ export function RatingRoot({
       {...rest}
       ref={rootRef}
       id={id}
-      role={displayOnly ? 'img' : 'radiogroup'}
-      tabIndex={displayOnly ? undefined : -1}
+      role={readOnly ? 'img' : 'radiogroup'}
+      tabIndex={readOnly ? undefined : -1}
       aria-label={
-        displayOnly
+        readOnly
           ? ariaLabel
             ? `${ariaLabel}: ${scoreLabel}`
             : scoreLabel
           : (ariaLabel ?? (ariaLabelledby ? undefined : t('rating.label')))
       }
-      aria-labelledby={
-        displayOnly && ariaLabelledby ? `${ariaLabelledby} ${scoreId}` : ariaLabelledby
-      }
-      aria-required={displayOnly ? undefined : (ariaRequired ?? (required || undefined))}
-      aria-readonly={!displayOnly && readOnly ? true : undefined}
+      aria-labelledby={readOnly && ariaLabelledby ? `${ariaLabelledby} ${scoreId}` : ariaLabelledby}
+      aria-required={readOnly ? undefined : (ariaRequired ?? (required || undefined))}
       aria-disabled={disabled || undefined}
-      aria-invalid={displayOnly ? undefined : ariaInvalid}
+      aria-invalid={readOnly ? undefined : ariaInvalid}
       data-rating=""
       data-size={resolvedSize}
       data-disabled={disabled ? '' : undefined}
@@ -227,7 +228,7 @@ export function RatingRoot({
         onFocus?.(event);
       }}
     >
-      {!displayOnly && option(0, 'zero')}
+      {!readOnly && option(0, 'zero')}
       {Array.from({ length: max }, (_, index) => {
         const item = (indexed.get(index) ?? template)?.props;
         const fill = Math.min(1, Math.max(0, displayed - index));
@@ -255,7 +256,7 @@ export function RatingRoot({
                 {graphic}
               </span>
             </span>
-            {!displayOnly &&
+            {!readOnly &&
               (step === 0.5 ? (
                 <>
                   {option(index + 0.5, 'start')}
@@ -267,10 +268,19 @@ export function RatingRoot({
           </span>
         );
       })}
-      {displayOnly && (
+      {readOnly && (
         <span id={scoreId} className="sr-only">
           {scoreLabel}
         </span>
+      )}
+      {readOnly && current > 0 && (
+        <FormValue
+          name={name}
+          form={form}
+          value={String(current)}
+          disabled={disabled}
+          anchor={anchorRef}
+        />
       )}
     </div>
   );

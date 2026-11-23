@@ -49,6 +49,15 @@ const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Label className="text-body-b3-medium inline-flex items-center gap-2">
+      <Checkbox defaultChecked />
+      약관에 동의합니다
+    </Label>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -131,7 +140,7 @@ export const Gallery: Story = {
           <Checkbox
             defaultChecked
             aria-label="둥근 체크박스"
-            className="rounded-full data-[state=checked]:scheme-success"
+            className="data-[state=checked]:scheme-success rounded-full"
           />
         </Showcase.Row>
       </Showcase.Section>
@@ -139,30 +148,9 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '실제 체크박스 하나라서 Tab으로 들어가고 Space로 바뀝니다. 키보드로 들어오면 포커스 링이 보입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    const box = canvas.getByRole('checkbox', { name: '약관 동의' });
-    await userEvent.tab();
-    await expect(box).toHaveFocus();
-    await expect(box.closest('[data-checkbox]')).toHaveAttribute('data-focus-visible');
-    await userEvent.keyboard(' ');
-    await expect(box).toBeChecked();
-    await expect(args.onCheckedChange).toHaveBeenLastCalledWith(true);
-    await expect(box.closest('[data-checkbox]')).toHaveAttribute('data-state', 'checked');
-  },
-};
-
 const languages = ['JavaScript', 'TypeScript', 'Rust'];
 
-export const Indeterminate: Story = {
+export const SelectAllWithAPartialState: Story = {
   render: function Render() {
     const [checked, setChecked] = useState([true, false, false]);
 
@@ -213,25 +201,7 @@ export const Indeterminate: Story = {
   },
 };
 
-export const ControlledIndeterminate: Story = {
-  args: { checked: 'indeterminate', 'aria-label': '부모가 고정한 일부 선택' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '제어 모드에서 부모가 값을 바꾸지 않으면 눌러도 일부 선택으로 남습니다. 브라우저가 누를 때 지우는 indeterminate 를 되돌립니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    const box = canvas.getByRole('checkbox');
-    await userEvent.click(box);
-    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
-    await expect(box).toBePartiallyChecked();
-  },
-};
-
-export const ReadOnly: Story = {
+export const ShowAChoiceThatCannotChange: Story = {
   args: { readOnly: true, defaultChecked: true, 'aria-label': '읽기 전용' },
   parameters: {
     docs: {
@@ -251,7 +221,7 @@ export const ReadOnly: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -310,7 +280,7 @@ const schema = z.object({
   terms: z.boolean().refine((agreed) => agreed, { error: '약관에 동의해야 합니다.' }),
 });
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ resolver: zodResolver(schema), defaultValues: { terms: false } });
     const [result, setResult] = useState('');
@@ -360,7 +330,7 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const CustomIndicator: Story = {
+export const ReplaceTheCheckMark: Story = {
   render: () => (
     <div className="flex flex-col gap-3">
       <Label className={row}>
@@ -374,9 +344,7 @@ export const CustomIndicator: Story = {
       <Label className={row}>
         <Checkbox
           defaultChecked="indeterminate"
-          className={(state) =>
-            state.checked ? 'scheme-success' : undefined
-          }
+          className={(state) => (state.checked ? 'scheme-success' : undefined)}
         >
           <Checkbox.Indicator>
             {(state) => (state.indeterminate ? <MinusIcon /> : <StarIcon />)}
@@ -404,5 +372,46 @@ export const CustomIndicator: Story = {
     await userEvent.click(favorite);
     await expect(favorite).toBeChecked();
     await expect(favorite.closest('[data-checkbox]')!.className).toContain('scheme-success');
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '실제 체크박스 하나라서 Tab으로 들어가고 Space로 바뀝니다. 키보드로 들어오면 포커스 링이 보입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    const box = canvas.getByRole('checkbox', { name: '약관 동의' });
+    await userEvent.tab();
+    await expect(box).toHaveFocus();
+    await expect(box.closest('[data-checkbox]')).toHaveAttribute('data-focus-visible');
+    await userEvent.keyboard(' ');
+    await expect(box).toBeChecked();
+    await expect(args.onCheckedChange).toHaveBeenLastCalledWith(true);
+    await expect(box.closest('[data-checkbox]')).toHaveAttribute('data-state', 'checked');
+  },
+};
+
+export const ControlledIndeterminate: Story = {
+  tags: ['verification'],
+  args: { checked: 'indeterminate', 'aria-label': '부모가 고정한 일부 선택' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '제어 모드에서 부모가 값을 바꾸지 않으면 눌러도 일부 선택으로 남습니다. 브라우저가 누를 때 지우는 indeterminate 를 되돌립니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    const box = canvas.getByRole('checkbox');
+    await userEvent.click(box);
+    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
+    await expect(box).toBePartiallyChecked();
   },
 };

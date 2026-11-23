@@ -24,7 +24,6 @@ const meta = {
   argTypes: {
     size: { control: 'radio', options: sizes },
     step: { control: 'radio', options: steps },
-    selectionMode: { control: 'radio', options: ['single', 'none'] },
     max: { control: { type: 'number', min: 1, max: 10 } },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
@@ -46,6 +45,15 @@ const option = (canvasElement: HTMLElement, value: number) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field>
+      <Field.Label>만족도</Field.Label>
+      <Rating defaultValue={3} />
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -65,9 +73,6 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section title="States">
-        <Showcase.Row label="display only">
-          <Rating selectionMode="none" value={4.5} step={0.5} aria-label="평균 평점" />
-        </Showcase.Row>
         <Showcase.Row label="invalid">
           <Rating invalid defaultValue={0} aria-label="오류" />
         </Showcase.Row>
@@ -75,7 +80,7 @@ export const Gallery: Story = {
           <Rating disabled defaultValue={2} aria-label="비활성" />
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <Rating readOnly defaultValue={4} aria-label="읽기 전용" />
+          <Rating readOnly value={4.5} step={0.5} aria-label="평균 평점" />
         </Showcase.Row>
         <Showcase.Row label="max 10">
           <Rating max={10} size="tiny" defaultValue={7} aria-label="10점 만점" />
@@ -84,11 +89,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Glyphs" description="모양은 Rating.Item으로 바꿉니다.">
         <Showcase.Row label="heart">
-          <Rating
-            defaultValue={3}
-            aria-label="하트"
-            className="scheme-danger"
-          >
+          <Rating defaultValue={3} aria-label="하트" className="scheme-danger">
             <Rating.Item>
               <HeartIcon />
             </Rating.Item>
@@ -124,7 +125,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const HalfSteps: Story = {
+export const PickHalfPoints: Story = {
   render: () => (
     <Field>
       <Field.Label>만족도</Field.Label>
@@ -151,7 +152,7 @@ export const HalfSteps: Story = {
   },
 };
 
-export const HoverPreview: Story = {
+export const PreviewTheScoreOnHover: Story = {
   parameters: {
     docs: {
       description: {
@@ -173,7 +174,7 @@ export const HoverPreview: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const SubmitTheScoreWithAForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -220,7 +221,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ defaultValues: { score: 0 } });
     const [result, setResult] = useState('');
@@ -265,18 +266,39 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const DisplayOnly: Story = {
-  args: { selectionMode: 'none', value: 4.5, step: 0.5, 'aria-label': '평균 평점' },
+export const ShowAnAverageScore: Story = {
+  render: () => <Rating readOnly value={4.5} step={0.5} aria-label="평균 평점" />,
   parameters: {
     docs: {
       description: {
         story:
-          '`selectionMode="none"` 은 조작할 수 없는 그림입니다. 스크린 리더에는 "평균 평점: 5점 만점에 4.5점" 한 번으로 읽히고 Tab이 멈추지 않습니다.',
+          '`readOnly` 는 조작할 수 없는 그림입니다. 스크린 리더에는 "평균 평점: 5점 만점에 4.5점" 한 번으로 읽히고 Tab이 멈추지 않습니다. `name` 을 주면 점수를 그대로 제출합니다.',
       },
     },
   },
   play: async ({ canvas, canvasElement }) => {
     await expect(canvas.getByRole('img')).toHaveAccessibleName('평균 평점: 5점 만점에 4.5점');
-    await expect(canvasElement.querySelectorAll('button')).toHaveLength(0);
+    await expect(canvasElement.querySelectorAll('input[type=radio]')).toHaveLength(0);
+  },
+};
+
+export const ChangeTheGlyph: Story = {
+  render: () => (
+    <Rating defaultValue={3} aria-label="좋아요" className="scheme-danger">
+      <Rating.Item>
+        <HeartIcon />
+      </Rating.Item>
+    </Rating>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Rating.Item` 하나를 넣으면 모든 자리가 그 모양입니다. `index` 를 준 `Rating.Item` 은 그 자리만 바꿉니다. 색은 `scheme-*` 로 고릅니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelectorAll('[data-rating-item] svg')).toHaveLength(10);
   },
 };

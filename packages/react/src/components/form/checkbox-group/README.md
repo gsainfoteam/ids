@@ -130,7 +130,7 @@ type Skill = 'js' | 'ts' | 'py';
 </form>
 ```
 
-- `required` 는 체크박스 하나하나가 아니라 그룹에 걸립니다. 메시지는 `requiredMessage` 로 바꿉니다.
+- `required` 는 체크박스 하나하나가 아니라 그룹에 걸립니다. 메시지 "하나 이상 선택하세요." 는 `IdsProvider` 의 `translate` 에서 `checkboxGroup.required` 키로 바꿉니다.
 - 읽기 전용이나 비활성인 그룹은 검사하지 않습니다.
 
 ## react-hook-form
@@ -169,7 +169,6 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `name` / `form`          | 항목의 `name` 과 `form`                        |
 | `orientation`            | `vertical`(기본) / `horizontal`                |
 | `required`               | 하나 이상 골라야 제출된다                      |
-| `requiredMessage`        | 비었을 때 메시지. 기본 `하나 이상 선택하세요.` |
 | `disabled` / `readOnly`  | 모든 항목에 전해진다                           |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선       |
 | `size` / `variant`       | 항목으로 전해진다                              |

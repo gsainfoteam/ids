@@ -16,6 +16,8 @@ export type QuestionnaireContextValue = {
   draftOf: (name: string) => QuestionnaireDraft;
   setDraft: (name: string, draft: QuestionnaireDraft) => void;
   advance: () => void;
+  last: boolean;
+  canLeaveCurrent: boolean;
 };
 
 export const QuestionnaireContext = createContext<QuestionnaireContextValue | null>(null);

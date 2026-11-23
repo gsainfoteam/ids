@@ -62,6 +62,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <CheckboxGroup aria-label="알림" defaultValue={['mail']}>
+      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Checkbox value="mail" />
+        메일
+      </Label>
+      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Checkbox value="push" />
+        푸시
+      </Label>
+    </CheckboxGroup>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -177,7 +192,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const SelectAll: Story = {
+export const AddASelectAllBox: Story = {
   args: { onValueChange: fn() },
   render: (args) => (
     <CheckboxGroup<Skill>
@@ -226,27 +241,7 @@ export const SelectAll: Story = {
   },
 };
 
-export const Keyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story: '체크박스마다 Tab이 멈추고 Space로 켜고 끕니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.tab();
-    await expect(canvas.getByRole('checkbox', { name: 'JavaScript' })).toHaveFocus();
-    await userEvent.keyboard(' ');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js']);
-    await userEvent.tab();
-    await userEvent.tab();
-    await userEvent.keyboard(' ');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js', 'py']);
-  },
-};
-
-export const ReadOnly: Story = {
+export const ShowChoicesThatCannotChange: Story = {
   args: { readOnly: true },
   parameters: {
     docs: {
@@ -261,7 +256,7 @@ export const ReadOnly: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const RequireAtLeastOneInANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -321,7 +316,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ skills: Skill[] }>({ defaultValues: { skills: [] } });
     const [result, setResult] = useState('');
@@ -378,7 +373,7 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const PlainChildren: Story = {
+export const PlaceCheckboxesWithoutARenderFunction: Story = {
   render: () => (
     <CheckboxGroup aria-label="알림" defaultValue={['mail']}>
       <Label className={row}>
@@ -406,5 +401,26 @@ export const PlainChildren: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('checkbox', { name: '푸시' }));
     await expect(canvas.getByRole('checkbox', { name: '모두' })).toBeChecked();
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story: '체크박스마다 Tab이 멈추고 Space로 켜고 끕니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole('checkbox', { name: 'JavaScript' })).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js']);
+    await userEvent.tab();
+    await userEvent.tab();
+    await userEvent.keyboard(' ');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js', 'py']);
   },
 };

@@ -61,6 +61,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <RadioGroup aria-label="구독 플랜" defaultValue="free">
+      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Radio value="free" />
+        무료
+      </Label>
+      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Radio value="pro" />
+        Pro
+      </Label>
+    </RadioGroup>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -177,7 +192,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Cards: Story = {
+export const ChooseAPlanFromCards: Story = {
   args: { onValueChange: fn() },
   render: (args) => (
     <RadioGroup<Plan>
@@ -221,65 +236,7 @@ export const Cards: Story = {
   },
 };
 
-export const Keyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '같은 `name` 을 쓰는 native 라디오라서 Tab은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. Home 과 End 는 처음과 끝 항목을 고릅니다. 비활성 항목은 건너뜁니다.',
-      },
-    },
-  },
-  render: (args) => (
-    <RadioGroup {...args}>
-      {({ Item }) =>
-        plans.map((plan) => (
-          <Label key={plan.value} className={row}>
-            <Item value={plan.value} disabled={plan.value === 'pro'} />
-            {plan.label}
-          </Label>
-        ))
-      }
-    </RadioGroup>
-  ),
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.tab();
-    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toBeChecked();
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
-    await userEvent.keyboard('{Home}');
-    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
-    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
-    await userEvent.keyboard('{End}');
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
-  },
-};
-
-export const ReadOnly: Story = {
-  args: { readOnly: true },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '읽기 전용이면 선택이 바뀌지 않습니다. 화살표 키로 포커스는 옮겨 다닐 수 있고 값은 제출됩니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.click(canvas.getByRole('radio', { name: 'Pro' }));
-    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
-    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
-    await expect(canvas.getByRole('radiogroup')).toHaveAttribute('aria-readonly', 'true');
-    await expect(args.onValueChange).not.toHaveBeenCalled();
-  },
-};
-
-export const NativeForm: Story = {
+export const RequireAChoiceInANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -335,7 +292,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ plan: Plan | '' }>({ defaultValues: { plan: '' } });
     const [result, setResult] = useState('');
@@ -389,7 +346,28 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const PlainChildren: Story = {
+export const ShowAChoiceThatCannotChange: Story = {
+  args: { readOnly: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '읽기 전용이면 선택이 바뀌지 않습니다. 화살표 키로 포커스는 옮겨 다닐 수 있고 값은 제출됩니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole('radio', { name: 'Pro' }));
+    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
+    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
+    await expect(canvas.getByRole('radiogroup')).toHaveAttribute('aria-readonly', 'true');
+    await expect(args.onValueChange).not.toHaveBeenCalled();
+  },
+};
+
+export const PlaceRadiosDirectly: Story = {
   render: () => (
     <RadioGroup aria-label="사이즈" orientation="horizontal" defaultValue="m">
       {['s', 'm', 'l', 'xl'].map((size) => (
@@ -412,5 +390,43 @@ export const PlainChildren: Story = {
     await userEvent.click(canvas.getByRole('radio', { name: 'XL' }));
     await expect(canvas.getByRole('radio', { name: 'XL' })).toBeChecked();
     await expect(canvas.getByRole('radio', { name: 'M' })).not.toBeChecked();
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '같은 `name` 을 쓰는 native 라디오라서 Tab은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. Home 과 End 는 처음과 끝 항목을 고릅니다. 비활성 항목은 건너뜁니다.',
+      },
+    },
+  },
+  render: (args) => (
+    <RadioGroup {...args}>
+      {({ Item }) =>
+        plans.map((plan) => (
+          <Label key={plan.value} className={row}>
+            <Item value={plan.value} disabled={plan.value === 'pro'} />
+            {plan.label}
+          </Label>
+        ))
+      }
+    </RadioGroup>
+  ),
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
+    await userEvent.keyboard('{Home}');
+    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
+    await userEvent.keyboard('{End}');
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
   },
 };

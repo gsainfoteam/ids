@@ -25,7 +25,6 @@ export function ColorPickerHueSlider({ className, ...props }: ColorPicker.Slider
       value={Math.round(color.h)}
       onValueChange={(hue) => c.picker.actions.setChannel('hue', hue)}
       formatLabel={(degrees: number) => t('colorPicker.hueValue', { degrees })}
-      valueLabel="never"
       aria-label={props['aria-label'] ?? t('colorPicker.hue')}
       size={c.size}
       disabled={c.state.disabled}
@@ -33,7 +32,7 @@ export function ColorPickerHueSlider({ className, ...props }: ColorPicker.Slider
       className={c.styles.slider({ className })}
     >
       <Slider.Track style={{ backgroundImage: HUES }}>
-        <Slider.Thumb style={{ backgroundColor: `hsl(${color.h} 100% 50%)` }} />
+        <Slider.Thumb style={{ backgroundColor: `hsl(${color.h} 100% 50%)` }}>{null}</Slider.Thumb>
       </Slider.Track>
     </Slider>
   );

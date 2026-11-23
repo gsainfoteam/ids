@@ -45,6 +45,22 @@ const stateOf = (radio: HTMLElement) => radio.closest('[data-radio]')!.getAttrib
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="text-body-b3-medium mb-3">배송</legend>
+      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Radio name="delivery" value="standard" defaultChecked />
+        일반 배송
+      </Label>
+      <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Radio name="delivery" value="express" />
+        빠른 배송
+      </Label>
+    </fieldset>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -103,7 +119,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const NativeGroup: Story = {
+export const GroupRadiosByName: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -167,7 +183,7 @@ export const NativeGroup: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const BindEachRadioWithRegister: Story = {
   render: function Render() {
     const { register, setValue } = useForm({ defaultValues: { plan: 'free' } });
 
@@ -207,7 +223,7 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const ReadOnly: Story = {
+export const ShowAChoiceThatCannotChange: Story = {
   args: { readOnly: true, 'aria-label': '읽기 전용' },
   parameters: {
     docs: {

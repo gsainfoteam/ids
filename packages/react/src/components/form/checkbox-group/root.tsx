@@ -61,7 +61,6 @@ export type CheckboxGroupProps<T extends string> = Omit<
   disabled?: boolean;
   readOnly?: boolean;
   required?: boolean;
-  requiredMessage?: string;
   invalid?: boolean;
   className?: StateProp<string | undefined>;
   style?: StateProp<CSSProperties | undefined>;
@@ -107,7 +106,6 @@ export function CheckboxGroupRoot<T extends string>({
   disabled = false,
   readOnly = false,
   required = false,
-  requiredMessage: requiredMessageProp,
   invalid,
   className,
   style,
@@ -118,7 +116,6 @@ export function CheckboxGroupRoot<T extends string>({
   ...rest
 }: CheckboxGroupProps<T>) {
   const t = useTranslate();
-  const requiredMessage = requiredMessageProp ?? t('checkboxGroup.required');
 
   const {
     value,
@@ -187,7 +184,7 @@ export function CheckboxGroupRoot<T extends string>({
           required={required && !readOnly}
           disabled={disabled}
           anchor={anchorRef}
-          message={requiredMessage}
+          message={t('checkboxGroup.required')}
         />
       </fieldset>
     </CheckboxGroupContext.Provider>

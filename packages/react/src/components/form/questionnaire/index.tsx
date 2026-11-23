@@ -13,6 +13,7 @@ import {
   type QuestionnaireVariant,
   type QuestionnaireOrientation,
 } from './style';
+import { QuestionnaireSubmit, type QuestionnaireSubmitProps } from './submit';
 
 export function Questionnaire(props: QuestionnaireProps) {
   return <QuestionnaireRoot {...props} />;
@@ -30,11 +31,13 @@ export namespace Questionnaire {
   export type OptionProps = QuestionnaireOptionProps;
   export type OtherProps = QuestionnaireOtherProps;
   export type DescriptionProps = QuestionnaireDescriptionProps;
+  export type SubmitProps = QuestionnaireSubmitProps;
 
   export const Question = QuestionnaireQuestion;
   export const Option = QuestionnaireOption;
   export const Other = QuestionnaireOther;
   export const Description = QuestionnaireDescription;
+  export const Submit = QuestionnaireSubmit;
 
   export const Style = questionnaireStyle;
 }
