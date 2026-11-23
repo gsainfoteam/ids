@@ -1,12 +1,6 @@
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import {
-  BadgeRoot,
-  type BadgePlacement,
-  type BadgeShape,
-  type BadgeVariant,
-  type BadgeColorScheme,
-} from './root';
+import { BadgeRoot, type BadgePlacement, type BadgeVariant, type BadgeColorScheme } from './root';
 import { badgeStyle } from './style';
 import { type StateValue } from '../../../internal/state-props';
 
@@ -18,7 +12,6 @@ export function Badge(props: Badge.Props) {
 
 export namespace Badge {
   export type Placement = BadgePlacement;
-  export type Shape = BadgeShape;
   export type Variant = BadgeVariant;
   export type ColorScheme = BadgeColorScheme;
 
@@ -36,7 +29,6 @@ export namespace Badge {
     showZero?: boolean;
     invisible?: boolean;
     placement?: BadgePlacement;
-    shape?: BadgeShape;
     variant?: BadgeVariant;
     colorScheme?: BadgeColorScheme;
     size?: IdsSize;
@@ -48,9 +40,4 @@ export namespace Badge {
   export const Style = badgeStyle;
 }
 
-export {
-  type BadgePlacement,
-  type BadgeShape,
-  type BadgeVariant,
-  type BadgeColorScheme,
-} from './root';
+export { type BadgePlacement, type BadgeVariant, type BadgeColorScheme } from './root';

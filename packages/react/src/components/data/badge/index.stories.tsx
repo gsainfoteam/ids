@@ -7,7 +7,9 @@ import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { IdsProvider } from '../../utility/ids-provider';
 import { Avatar } from '../avatar';
+import { Card } from '../card';
 
 import { Badge } from '.';
 
@@ -36,7 +38,6 @@ const meta = {
     variant: { control: 'radio', options: variants },
     colorScheme: { control: 'select', options: colorSchemes },
     placement: { control: 'radio', options: placements },
-    shape: { control: 'radio', options: ['rectangular', 'circular'] },
     size: { control: 'radio', options: ['standard', 'tiny'] },
     content: { control: 'number' },
     max: { control: 'number' },
@@ -62,6 +63,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Badge content={3} aria-label="읽지 않은 알림 3개">
+      <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+    </Badge>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -108,8 +117,8 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section
-        title="Shape"
-        description="둥근 대상에는 원의 가장자리로 당겨 붙습니다. Avatar에는 따로 정하지 않아도 그렇게 붙습니다."
+        title="Wrapped corner"
+        description="Badge가 감싼 요소의 모서리를 재서 그 곡선 위에 붙습니다."
       >
         <Showcase.Row label="avatar">
           <Badge content={3}>
@@ -119,10 +128,48 @@ export const Gallery: Story = {
             <Avatar name="Bob Lee" />
           </Badge>
         </Showcase.Row>
-        <Showcase.Row label="circular">
-          <Badge content={2} shape="circular">
+        <Showcase.Row label="icon button">
+          <Badge content={3}>
+            <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+          </Badge>
+          <Badge dot>
+            <IconButton aria-label="받은 편지함" variant="soft" icon={<InboxIcon />} />
+          </Badge>
+        </Showcase.Row>
+        <Showcase.Row label="card">
+          <Badge content="New" colorScheme="primary">
+            <Card variant="outline" className="w-48">
+              <Card.Header>
+                <Card.Title>새 공지</Card.Title>
+                <Card.Description>오늘 올라온 글</Card.Description>
+              </Card.Header>
+            </Card>
+          </Badge>
+        </Showcase.Row>
+        <Showcase.Row label="rounded-full">
+          <Badge content={2}>
             <div className="bg-neutral-soft size-10 rounded-full" />
           </Badge>
+          <Badge content={12}>
+            <div className="bg-neutral-soft h-8 w-20 rounded-full" />
+          </Badge>
+        </Showcase.Row>
+        <Showcase.Row label="square">
+          <Badge content={5}>
+            <div className="bg-neutral-soft size-10" />
+          </Badge>
+        </Showcase.Row>
+        <Showcase.Row label="squircle theme">
+          <IdsProvider.Scope theme={{ cornerShape: 'squircle', radius: 14 }}>
+            <div className="flex gap-6">
+              <Badge content={3}>
+                <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+              </Badge>
+              <Badge content={7}>
+                <Box />
+              </Badge>
+            </div>
+          </IdsProvider.Scope>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -181,7 +228,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Count: Story = {
+export const ShowAnUnreadCount: Story = {
   render: () => (
     <div className="flex items-center gap-8">
       <Badge content={99}>
@@ -224,7 +271,7 @@ export const Count: Story = {
   },
 };
 
-export const Accessibility: Story = {
+export const AnnounceTheCount: Story = {
   render: function Render() {
     const [unread, setUnread] = useState(3);
 
@@ -270,14 +317,17 @@ export const Accessibility: Story = {
   },
 };
 
-export const OnAvatar: Story = {
+export const AttachToAnyRoundedTarget: Story = {
   render: () => (
     <div className="flex items-center gap-6">
       <Badge content={3}>
         <Avatar name="Alice Kim" />
       </Badge>
-      <Badge content={3} shape="rectangular">
-        <Avatar name="Alice Kim" />
+      <Badge content={3}>
+        <div className="bg-neutral-soft size-10 rounded-full" />
+      </Badge>
+      <Badge content={3}>
+        <div className="bg-neutral-soft size-10" />
       </Badge>
     </div>
   ),
@@ -285,18 +335,21 @@ export const OnAvatar: Story = {
     docs: {
       description: {
         story:
-          '둥근 Avatar에 붙이면 모서리 허공이 아니라 원의 가장자리에 붙습니다. `shape` 를 주면 그 값을 따릅니다.',
+          'Badge는 감싼 요소의 모서리 반지름과 `corner-shape` 를 재서 배지 중심을 그 곡선 위에 둡니다. 원에서는 모서리에서 14.6% 안쪽이고, 각진 요소에서는 꼭짓점입니다. 따로 정할 prop은 없습니다.',
       },
     },
   },
   play: async ({ canvasElement }) => {
-    const [round, square] = [...canvasElement.querySelectorAll('[data-badge-indicator]')];
-    await expect(Number.parseFloat(getComputedStyle(round!).top)).toBeGreaterThan(0);
-    await expect(getComputedStyle(square!).top).toBe('0px');
+    const indicators = () => [...canvasElement.querySelectorAll('[data-badge-indicator]')];
+    await waitFor(() =>
+      expect(Number.parseFloat(getComputedStyle(indicators()[0]!).top)).toBeCloseTo(5.86, 1),
+    );
+    await expect(Number.parseFloat(getComputedStyle(indicators()[1]!).top)).toBeCloseTo(5.86, 1);
+    await expect(getComputedStyle(indicators()[2]!).top).toBe('0px');
   },
 };
 
-export const Invisible: Story = {
+export const ShowOnlineStatus: Story = {
   render: function Render() {
     const [online, setOnline] = useState(true);
 

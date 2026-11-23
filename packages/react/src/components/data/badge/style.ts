@@ -31,11 +31,6 @@ export const badgeStyle = tv({
     } satisfies Record<BadgeVariant, object>,
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
     dot: { true: {}, false: {} },
-    shape: {
-      auto: { root: 'has-[>[data-avatar]]:[--badge-inset:14.6%]' },
-      rectangular: {},
-      circular: { root: '[--badge-inset:14.6%]' },
-    },
     placement: {
       'top-end': {
         indicator:
@@ -87,7 +82,6 @@ export const badgeStyle = tv({
     colorScheme: 'neutral',
     size: 'standard',
     dot: false,
-    shape: 'auto',
     placement: 'top-end',
   },
 });

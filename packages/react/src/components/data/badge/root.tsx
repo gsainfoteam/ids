@@ -1,23 +1,19 @@
 'use client';
 
+import { useRef } from 'react';
+
 import { badgeStyle } from './style';
 import { useBadge } from './use-badge';
+import { useBadgeInset } from './use-badge-inset';
 import { resolveState } from '../../../internal/state-props';
+import { mergeRefs } from '../../../utils';
 
 import type { Badge } from '.';
 
 export type BadgePlacement = 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start';
-export type BadgeShape = 'rectangular' | 'circular';
 export type BadgeVariant = 'solid' | 'soft' | 'outline';
 export type BadgeColorScheme =
-  | 'neutral'
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info';
+  'neutral' | 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'info';
 
 function flag(on: boolean) {
   return on ? '' : undefined;
@@ -30,16 +26,17 @@ export function BadgeRoot({
   showZero = false,
   invisible = false,
   placement = 'top-end',
-  shape,
   variant = 'solid',
   colorScheme,
   size = 'standard',
   className,
   style,
   children,
+  ref,
   'aria-label': label,
   ...rest
 }: Badge.Props) {
+  const rootRef = useRef<HTMLSpanElement>(null);
   const { indicatorId, display, hidden, anchor } = useBadge({
     content,
     dot,
@@ -50,13 +47,14 @@ export function BadgeRoot({
     children,
   });
   const standalone = children == null || typeof children === 'boolean';
+  useBadgeInset(rootRef, standalone ? null : placement, anchor);
+
   const styles = badgeStyle({
     variant,
     colorScheme: colorScheme ?? (standalone ? 'neutral' : 'danger'),
     size,
     dot,
     placement: standalone ? 'none' : placement,
-    shape: shape ?? 'auto',
   });
   const state: Badge.State = {
     count: display.count,
@@ -90,6 +88,7 @@ export function BadgeRoot({
       <span
         {...rest}
         {...indicator}
+        ref={ref}
         data-badge=""
         className={styles.indicator({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
@@ -99,6 +98,7 @@ export function BadgeRoot({
   return (
     <span
       {...rest}
+      ref={mergeRefs(ref, rootRef)}
       data-badge=""
       data-placement={placement}
       className={styles.root({ className: resolveState(className, state) })}

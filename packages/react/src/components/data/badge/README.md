@@ -3,7 +3,7 @@
 아이콘, 버튼, 아바타의 모서리에 붙는 카운트나 상태 점입니다. 글 흐름 안의 라벨은 `Chip` 을 씁니다.
 
 - **위치는 Badge가 잡는다.** 부모에 `relative` 를 줄 필요 없이 감싼 요소의 모서리를 찾아갑니다. 위치 이름은 논리 방향이라 오른쪽에서 왼쪽으로 쓰는 문서에서는 알아서 뒤집힙니다.
-- **둥근 대상.** 동그란 `Avatar` 에 붙이면 모서리 허공이 아니라 원의 가장자리에 붙습니다.
+- **둥근 대상.** 감싼 요소의 모서리를 재서 그 곡선 위에 붙습니다. 동그란 `Avatar`, 둥근 버튼, 카드 모두 모서리 허공이 아니라 가장자리에 붙습니다.
 - **카운트.** `99+` 로 줄이고, 0은 숨깁니다. 숨은 배지도 자리를 지켜서 다시 나타날 때 커지며 나타납니다.
 - **읽히는 숫자.** `aria-label` 을 주면 값이 바뀔 때 그 문장을 읽어 주는 live region이 됩니다. 주지 않으면 붙은 버튼의 설명이 되어 "알림, 버튼, 3" 처럼 읽힙니다.
 - **강도와 의미.** `variant` 로 강도(`solid` / `soft` / `outline`), `colorScheme` 으로 의미를 고릅니다.
@@ -45,23 +45,42 @@ import { Badge } from '@gsainfoteam/ids-react';
 
 - `invisible` 은 배지를 지우지 않고 줄여서 감춥니다. live region은 남아 있어 바뀐 상태를 읽습니다.
 
-## 위치와 모양
+## 위치
 
 ```tsx
 <Badge placement="top-end" />      // 기본. 오른쪽에서 왼쪽으로 쓰는 문서에서는 왼쪽 위
 <Badge placement="top-start" />
 <Badge placement="bottom-end" />
 <Badge placement="bottom-start" />
-
-<Badge shape="circular">           {/* 둥근 대상. Avatar는 생략해도 된다 */}
-  <div className="size-10 rounded-full" />
-</Badge>
-<Badge shape="rectangular">        {/* 둥근 Avatar라도 사각형 모서리에 */}
-  <Avatar name="Alice Kim" />
-</Badge>
 ```
 
-- 원 위의 45도 지점은 사각형 모서리에서 14.6% 안쪽이라 그만큼 당겨 붙습니다.
+## 붙는 대상의 모서리를 따라간다
+
+```tsx
+<Badge content={3}>                       {/* 원: 모서리에서 14.6% 안쪽 */}
+  <Avatar name="Alice Kim" />
+</Badge>
+<Badge content={3}>                       {/* 10px 모서리의 곡선 위 */}
+  <IconButton aria-label="알림" icon={<BellIcon />} />
+</Badge>
+<Badge content="New">                     {/* 카드의 16px 모서리 */}
+  <Card>...</Card>
+</Badge>
+<Badge content={2}>                       {/* rounded-full 이면 어떤 요소든 원처럼 */}
+  <div className="size-10 rounded-full" />
+</Badge>
+<IdsProvider theme={defineIdsTheme({ primary, cornerShape: 'squircle' })}>
+  <Badge content={3}>                     {/* squircle 곡선 위 */}
+    <IconButton aria-label="알림" icon={<BellIcon />} />
+  </Badge>
+</IdsProvider>
+```
+
+- Badge는 감싼 요소(첫 자식 요소)에서 `placement` 가 가리키는 모서리 하나의 계산된 `border-radius` 와 `corner-shape` 를 읽고, 배지 중심을 그 곡선의 45도 지점에 둡니다. 원은 반지름의 29.3%(지름의 14.6%), squircle 은 반지름의 15.9% 안쪽입니다.
+- 오른쪽에서 왼쪽으로 쓰는 문서에서는 `end` 가 왼쪽이므로 왼쪽 모서리를 읽습니다.
+- 각진 요소에서는 꼭짓점에 붙습니다.
+- 퍼센트 반지름처럼 크기에 따라 바뀌는 모서리는 `ResizeObserver` 로 다시 잽니다.
+- 서버 HTML 과 hydration 전의 첫 그림에서는 꼭짓점에 있다가, hydration 뒤 곡선 위로 옮겨 갑니다.
 
 ## 제자리에 그리기
 
@@ -121,7 +140,6 @@ import { Badge } from '@gsainfoteam/ids-react';
 | `showZero`    | 0도 보인다                                                              |
 | `invisible`   | 지우지 않고 감춘다                                                      |
 | `placement`   | `top-end`(기본) / `top-start` / `bottom-end` / `bottom-start`           |
-| `shape`       | `rectangular` / `circular`. 생략하면 Avatar를 보고 정한다               |
 | `variant`     | `solid`(기본) / `soft` / `outline`                                      |
 | `colorScheme` | `danger`(붙은 배지 기본) / `neutral`(혼자 쓰는 배지 기본) / `primary` / `success` / `warning` / `info` |
 | `size`        | `standard`(기본) / `tiny`                                               |
@@ -132,3 +150,4 @@ import { Badge } from '@gsainfoteam/ids-react';
 
 - 배지는 `pointer-events: none` 이라 아래 버튼의 클릭을 가로채지 않습니다.
 - 배지 둘레에는 표면색 링이 있어 대상과 겹쳐도 경계가 보입니다.
+- 크기는 그대로인 채 모서리만 바뀌면(테마의 `radius` 나 `cornerShape` 를 바꾸는 경우) Badge가 다시 렌더될 때 다시 잽니다.
