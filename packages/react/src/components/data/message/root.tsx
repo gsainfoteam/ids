@@ -1,10 +1,11 @@
 'use client';
 
-import { isValidElement, use, useCallback, useId, useRef, type ReactNode } from 'react';
+import { isValidElement, use, useId, type ReactNode } from 'react';
 
 import { ArrowPathIcon, ExclamationCircleIcon } from '@heroicons/react/16/solid';
 
 import { MessageContext, MessageGroupContext } from './context';
+import { useInternalMessageContentReader } from './hooks/use-message-content-reader';
 import { MessageActions } from './parts/actions';
 import { MessageAvatar } from './parts/avatar';
 import { MessageContent } from './parts/content';
@@ -89,8 +90,7 @@ export function MessageRoot({
 }: Message.Props) {
   const group = use(MessageGroupContext);
   const labelId = useId();
-  const contentRef = useRef<HTMLDivElement>(null);
-  const readContent = useCallback(() => contentRef.current?.innerText ?? '', []);
+  const { contentRef, readContent } = useInternalMessageContentReader();
 
   const align = alignProp ?? group?.align ?? 'start';
   const first = group?.first ?? true;
