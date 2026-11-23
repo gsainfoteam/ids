@@ -150,7 +150,11 @@ final class Name {
 }
 
 final class IrTargetsCss {
-  const IrTargetsCss({required this.symbols, required this.outputs});
+  const IrTargetsCss({
+    required this.symbols,
+    required this.outputs,
+    this.modules,
+  });
 
   factory IrTargetsCss.fromJson(Map<String, Object?> json) => IrTargetsCss(
     symbols: (json['symbols'] as Map<String, Object?>).map(
@@ -160,15 +164,26 @@ final class IrTargetsCss {
     outputs: (json['outputs'] as Map<String, Object?>).map(
       (key, value) => MapEntry(key, (value as String)),
     ),
+    modules: json['modules'] == null
+        ? null
+        : (json['modules'] as Map<String, Object?>).map(
+            (key, value) => MapEntry(key, (value as String)),
+          ),
   );
 
   final Map<String, Name> symbols;
 
   final Map<String, String> outputs;
+
+  final Map<String, String>? modules;
 }
 
 final class IrTargetsTs {
-  const IrTargetsTs({required this.symbols, required this.outputs});
+  const IrTargetsTs({
+    required this.symbols,
+    required this.outputs,
+    this.modules,
+  });
 
   factory IrTargetsTs.fromJson(Map<String, Object?> json) => IrTargetsTs(
     symbols: (json['symbols'] as Map<String, Object?>).map(
@@ -178,15 +193,26 @@ final class IrTargetsTs {
     outputs: (json['outputs'] as Map<String, Object?>).map(
       (key, value) => MapEntry(key, (value as String)),
     ),
+    modules: json['modules'] == null
+        ? null
+        : (json['modules'] as Map<String, Object?>).map(
+            (key, value) => MapEntry(key, (value as String)),
+          ),
   );
 
   final Map<String, Name> symbols;
 
   final Map<String, String> outputs;
+
+  final Map<String, String>? modules;
 }
 
 final class IrTargetsDart {
-  const IrTargetsDart({required this.symbols, required this.outputs});
+  const IrTargetsDart({
+    required this.symbols,
+    required this.outputs,
+    this.modules,
+  });
 
   factory IrTargetsDart.fromJson(Map<String, Object?> json) => IrTargetsDart(
     symbols: (json['symbols'] as Map<String, Object?>).map(
@@ -196,11 +222,18 @@ final class IrTargetsDart {
     outputs: (json['outputs'] as Map<String, Object?>).map(
       (key, value) => MapEntry(key, (value as String)),
     ),
+    modules: json['modules'] == null
+        ? null
+        : (json['modules'] as Map<String, Object?>).map(
+            (key, value) => MapEntry(key, (value as String)),
+          ),
   );
 
   final Map<String, Name> symbols;
 
   final Map<String, String> outputs;
+
+  final Map<String, String>? modules;
 }
 
 final class IrTargets {
@@ -1832,6 +1865,241 @@ final class IrCss {
   final IrCssScale scale;
 }
 
+final class IrMessagesLocalesItemSubtags {
+  const IrMessagesLocalesItemSubtags({
+    required this.language,
+    this.script,
+    this.region,
+  });
+
+  factory IrMessagesLocalesItemSubtags.fromJson(Map<String, Object?> json) =>
+      IrMessagesLocalesItemSubtags(
+        language: (json['language'] as String),
+        script: json['script'] == null ? null : (json['script'] as String),
+        region: json['region'] == null ? null : (json['region'] as String),
+      );
+
+  final String language;
+
+  final String? script;
+
+  final String? region;
+}
+
+final class IrMessagesLocalesItem {
+  const IrMessagesLocalesItem({
+    required this.language,
+    required this.tag,
+    required this.name,
+    required this.catalog,
+    required this.subtags,
+  });
+
+  factory IrMessagesLocalesItem.fromJson(Map<String, Object?> json) =>
+      IrMessagesLocalesItem(
+        language: (json['language'] as String),
+        tag: (json['tag'] as String),
+        name: Name.fromJson((json['name'] as Map<String, Object?>)),
+        catalog: Name.fromJson((json['catalog'] as Map<String, Object?>)),
+        subtags: IrMessagesLocalesItemSubtags.fromJson(
+          (json['subtags'] as Map<String, Object?>),
+        ),
+      );
+
+  final String language;
+
+  final String tag;
+
+  final Name name;
+
+  final Name catalog;
+
+  final IrMessagesLocalesItemSubtags subtags;
+}
+
+final class IrMessagesCatalogsItem {
+  const IrMessagesCatalogsItem({required this.name, required this.groups});
+
+  factory IrMessagesCatalogsItem.fromJson(Map<String, Object?> json) =>
+      IrMessagesCatalogsItem(
+        name: Name.fromJson((json['name'] as Map<String, Object?>)),
+        groups: (json['groups'] as List<Object?>)
+            .map((item) => (item as String))
+            .toList(),
+      );
+
+  final Name name;
+
+  final List<String> groups;
+}
+
+enum IrMessagesEntriesItemParametersItemType { string, number }
+
+final class IrMessagesEntriesItemParametersItem {
+  const IrMessagesEntriesItemParametersItem({
+    required this.name,
+    required this.type,
+  });
+
+  factory IrMessagesEntriesItemParametersItem.fromJson(
+    Map<String, Object?> json,
+  ) => IrMessagesEntriesItemParametersItem(
+    name: (json['name'] as String),
+    type: IrMessagesEntriesItemParametersItemType.values.byName(
+      (json['type'] as String),
+    ),
+  );
+
+  final String name;
+
+  final IrMessagesEntriesItemParametersItemType type;
+}
+
+sealed class IrMessagesEntriesItemTextsItemPartsItem {
+  const IrMessagesEntriesItemTextsItemPartsItem();
+
+  factory IrMessagesEntriesItemTextsItemPartsItem.fromJson(
+    Map<String, Object?> json,
+  ) => json['kind'] == 'text'
+      ? IrMessagesEntriesItemTextsItemPartsItemText.fromJson(json)
+      : json['kind'] == 'argument'
+      ? IrMessagesEntriesItemTextsItemPartsItemArgument.fromJson(json)
+      : throw FormatException('names no variant', json['kind']);
+}
+
+final class IrMessagesEntriesItemTextsItemPartsItemText
+    extends IrMessagesEntriesItemTextsItemPartsItem {
+  const IrMessagesEntriesItemTextsItemPartsItemText({required this.text});
+
+  factory IrMessagesEntriesItemTextsItemPartsItemText.fromJson(
+    Map<String, Object?> json,
+  ) => IrMessagesEntriesItemTextsItemPartsItemText(
+    text: (json['text'] as String),
+  );
+
+  final String text;
+}
+
+final class IrMessagesEntriesItemTextsItemPartsItemArgument
+    extends IrMessagesEntriesItemTextsItemPartsItem {
+  const IrMessagesEntriesItemTextsItemPartsItemArgument({
+    required this.argument,
+  });
+
+  factory IrMessagesEntriesItemTextsItemPartsItemArgument.fromJson(
+    Map<String, Object?> json,
+  ) => IrMessagesEntriesItemTextsItemPartsItemArgument(
+    argument: (json['argument'] as String),
+  );
+
+  final String argument;
+}
+
+final class IrMessagesEntriesItemTextsItem {
+  const IrMessagesEntriesItemTextsItem({
+    required this.language,
+    required this.parts,
+  });
+
+  factory IrMessagesEntriesItemTextsItem.fromJson(Map<String, Object?> json) =>
+      IrMessagesEntriesItemTextsItem(
+        language: (json['language'] as String),
+        parts: (json['parts'] as List<Object?>)
+            .map(
+              (item) => IrMessagesEntriesItemTextsItemPartsItem.fromJson(
+                (item as Map<String, Object?>),
+              ),
+            )
+            .toList(),
+      );
+
+  final String language;
+
+  final List<IrMessagesEntriesItemTextsItemPartsItem> parts;
+}
+
+final class IrMessagesEntriesItem {
+  const IrMessagesEntriesItem({
+    required this.id,
+    required this.path,
+    required this.name,
+    required this.parameters,
+    required this.texts,
+  });
+
+  factory IrMessagesEntriesItem.fromJson(Map<String, Object?> json) =>
+      IrMessagesEntriesItem(
+        id: (json['id'] as String),
+        path: (json['path'] as List<Object?>)
+            .map((item) => (item as String))
+            .toList(),
+        name: Name.fromJson((json['name'] as Map<String, Object?>)),
+        parameters: (json['parameters'] as List<Object?>)
+            .map(
+              (item) => IrMessagesEntriesItemParametersItem.fromJson(
+                (item as Map<String, Object?>),
+              ),
+            )
+            .toList(),
+        texts: (json['texts'] as List<Object?>)
+            .map(
+              (item) => IrMessagesEntriesItemTextsItem.fromJson(
+                (item as Map<String, Object?>),
+              ),
+            )
+            .toList(),
+      );
+
+  final String id;
+
+  final List<String> path;
+
+  final Name name;
+
+  final List<IrMessagesEntriesItemParametersItem> parameters;
+
+  final List<IrMessagesEntriesItemTextsItem> texts;
+}
+
+final class IrMessages {
+  const IrMessages({
+    required this.fallback,
+    required this.locales,
+    required this.catalogs,
+    required this.entries,
+  });
+
+  factory IrMessages.fromJson(Map<String, Object?> json) => IrMessages(
+    fallback: (json['fallback'] as String),
+    locales: (json['locales'] as List<Object?>)
+        .map(
+          (item) =>
+              IrMessagesLocalesItem.fromJson((item as Map<String, Object?>)),
+        )
+        .toList(),
+    catalogs: (json['catalogs'] as List<Object?>)
+        .map(
+          (item) =>
+              IrMessagesCatalogsItem.fromJson((item as Map<String, Object?>)),
+        )
+        .toList(),
+    entries: (json['entries'] as List<Object?>)
+        .map(
+          (item) =>
+              IrMessagesEntriesItem.fromJson((item as Map<String, Object?>)),
+        )
+        .toList(),
+  );
+
+  final String fallback;
+
+  final List<IrMessagesLocalesItem> locales;
+
+  final List<IrMessagesCatalogsItem> catalogs;
+
+  final List<IrMessagesEntriesItem> entries;
+}
+
 final class Ir {
   const Ir({
     required this.version,
@@ -1853,6 +2121,7 @@ final class Ir {
     required this.fonts,
     required this.paletteModel,
     required this.css,
+    required this.messages,
   });
 
   factory Ir.fromJson(Map<String, Object?> json) => Ir(
@@ -1910,6 +2179,7 @@ final class Ir {
       (json['paletteModel'] as Map<String, Object?>),
     ),
     css: IrCss.fromJson((json['css'] as Map<String, Object?>)),
+    messages: IrMessages.fromJson((json['messages'] as Map<String, Object?>)),
   );
 
   final int version;
@@ -1949,4 +2219,6 @@ final class Ir {
   final IrPaletteModel paletteModel;
 
   final IrCss css;
+
+  final IrMessages messages;
 }

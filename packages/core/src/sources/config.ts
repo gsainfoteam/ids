@@ -29,6 +29,8 @@ const outputKey = v.pipe(v.string(), v.regex(/^[a-z][A-Za-z0-9]*$/, 'must be cam
 
 const outputs = v.record(outputKey, v.pipe(v.string(), v.minLength(1)));
 
+const modules = v.record(outputKey, v.pipe(v.string(), v.minLength(1)));
+
 export const TargetsConfigSchema = v.object({
   prefix: v.array(word),
   placeholders: v.object({ family: v.string() }),
@@ -46,6 +48,7 @@ export const TargetsConfigSchema = v.object({
       names: v.object({ constant: spelling, member: spelling, type: spelling, key: spelling }),
       symbols,
       outputs,
+      modules,
     }),
     dart: v.object({
       manifest: v.string(),
@@ -197,6 +200,31 @@ export const PubManifestSchema = v.object({
   }),
 });
 
+const language = v.pipe(
+  v.string(),
+  v.regex(/^[a-z]{2,3}$/, 'must be a 2 or 3 letter language code'),
+);
+
+const messageKey = v.pipe(v.string(), v.regex(/^[a-z][a-zA-Z0-9]*$/, 'must be a camelCase key'));
+
+export const MessagesConfigSchema = v.object({
+  fallback: language,
+  catalog: v.array(word),
+  ownCatalogs: v.array(messageKey),
+});
+
+export type MessageTree = { [key: string]: string | MessageTree };
+
+const MessageTreeSchema: v.GenericSchema<MessageTree> = v.lazy(() =>
+  v.record(messageKey, v.union([v.string(), MessageTreeSchema])),
+);
+
+export const MessageFileSchema = v.object({
+  language,
+  tag: v.pipe(v.string(), v.minLength(1)),
+  messages: MessageTreeSchema,
+});
+
 export const CONFIG_FILES = {
   targets: { file: 'config/targets.json', schema: TargetsConfigSchema },
   colorRoles: { file: 'config/color-roles.json', schema: ColorRolesConfigSchema },
@@ -206,6 +234,7 @@ export const CONFIG_FILES = {
   fonts: { file: 'config/fonts.json', schema: FontsConfigSchema },
   paletteModel: { file: 'config/palette-model.json', schema: PaletteModelConfigSchema },
   css: { file: 'config/css.json', schema: CssConfigSchema },
+  messages: { file: 'config/messages.json', schema: MessagesConfigSchema },
 } as const;
 
 export { FAMILY as FAMILY_PLACEHOLDER };
@@ -218,4 +247,6 @@ export type EnumsConfig = v.InferOutput<typeof EnumsConfigSchema>;
 export type FontsConfig = v.InferOutput<typeof FontsConfigSchema>;
 export type PaletteModelConfig = v.InferOutput<typeof PaletteModelConfigSchema>;
 export type CssConfig = v.InferOutput<typeof CssConfigSchema>;
+export type MessagesConfig = v.InferOutput<typeof MessagesConfigSchema>;
+export type MessageFile = v.InferOutput<typeof MessageFileSchema>;
 export type PubManifest = v.InferOutput<typeof PubManifestSchema>;

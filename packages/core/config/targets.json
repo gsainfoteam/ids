@@ -34,15 +34,22 @@
         "componentColors": ["component", "colors"],
         "componentShadows": ["component", "shadows"],
         "paletteModel": ["palette", "model"],
-        "statusPalettes": ["status", "palettes"]
+        "statusPalettes": ["status", "palettes"],
+        "messageArguments": ["message", "arguments"],
+        "defineLocale": ["define", "ids", "locale"]
       },
       "outputs": {
         "foundations": "src/tokens/foundations.json",
         "types": "src/tokens/types.ts",
         "colorRoles": "src/tokens/color-roles.ts",
         "componentTokens": "src/tokens/component-tokens.ts",
-        "paletteModel": "src/tokens/palette-model.ts"
-      }
+        "paletteModel": "src/tokens/palette-model.ts",
+        "messages": "src/internal/messages-catalog.ts",
+        "editorMessages": "src/components/form/editor/messages-catalog.ts",
+        "messageArguments": "src/internal/message-arguments.ts",
+        "locales": "src/locales/"
+      },
+      "modules": { "locale": "src/internal/locale.ts" }
     },
     "dart": {
       "manifest": "../flutter/pubspec.yaml",
@@ -85,7 +92,14 @@
         "monoFontFamily": ["mono", "font", "family"],
         "monoFontFamilyFallback": ["mono", "font", "family", "fallback"],
         "paletteModel": ["palette", "model"],
-        "statusPalettes": ["status", "palettes"]
+        "statusPalettes": ["status", "palettes"],
+        "messagesBase": ["messages", "base"],
+        "language": ["language"],
+        "locale": ["locale"],
+        "localeMessages": ["messages"],
+        "locales": ["values"],
+        "sampleArguments": ["sample", "arguments"],
+        "messageReaders": ["message", "readers"]
       },
       "outputs": {
         "enums": "lib/tokens/ids_enums.dart",
@@ -93,7 +107,9 @@
         "motion": "lib/tokens/ids_motion.dart",
         "componentTokens": "lib/tokens/ids_component_tokens.dart",
         "typography": "lib/tokens/ids_typography.dart",
-        "paletteModel": "lib/tokens/ids_palette_model.dart"
+        "paletteModel": "lib/tokens/ids_palette_model.dart",
+        "messages": "lib/messages/ids_messages.dart",
+        "messageReaders": "test/generated/ids_message_readers.dart"
       }
     }
   }

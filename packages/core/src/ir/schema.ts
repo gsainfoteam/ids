@@ -250,9 +250,49 @@ export const PackagesSchema = v.object({
 const TargetSchema = v.object({
   symbols: v.record(v.string(), NameSchema),
   outputs: v.record(v.string(), identifier),
+  modules: v.optional(v.record(v.string(), identifier)),
 });
 
 export const TargetsSchema = v.object({ css: TargetSchema, ts: TargetSchema, dart: TargetSchema });
+
+export const MESSAGE_ARGUMENT_TYPES = ['string', 'number'] as const;
+
+export const MessagePartSchema = v.variant('kind', [
+  v.object({ kind: v.literal('text'), text: v.string() }),
+  v.object({ kind: v.literal('argument'), argument: identifier }),
+]);
+
+const MessageParameterSchema = v.object({
+  name: identifier,
+  type: v.picklist(MESSAGE_ARGUMENT_TYPES),
+});
+
+const MessageLocaleSchema = v.object({
+  language: identifier,
+  tag: identifier,
+  name: NameSchema,
+  catalog: NameSchema,
+  subtags: v.object({
+    language: identifier,
+    script: v.optional(identifier),
+    region: v.optional(identifier),
+  }),
+});
+
+const MessageSchema = v.object({
+  id: identifier,
+  path: v.array(identifier),
+  name: NameSchema,
+  parameters: v.array(MessageParameterSchema),
+  texts: v.array(v.object({ language: identifier, parts: v.array(MessagePartSchema) })),
+});
+
+export const MessagesSchema = v.object({
+  fallback: identifier,
+  locales: v.array(MessageLocaleSchema),
+  catalogs: v.array(v.object({ name: NameSchema, groups: v.array(identifier) })),
+  entries: v.array(MessageSchema),
+});
 
 export const IrSchema = v.object({
   version: v.literal(IR_VERSION),
@@ -274,6 +314,7 @@ export const IrSchema = v.object({
   fonts: FontsSchema,
   paletteModel: PaletteModelSchema,
   css: CssSchema,
+  messages: MessagesSchema,
 });
 
 export const IR_DEFINITIONS = {
@@ -295,3 +336,6 @@ export type Dimension = v.InferOutput<typeof DimensionSchema>;
 export type LineHeight = v.InferOutput<typeof LineHeightSchema>;
 export type DimensionToken = v.InferOutput<typeof DimensionTokenSchema>;
 export type Ir = v.InferOutput<typeof IrSchema>;
+export type Messages = v.InferOutput<typeof MessagesSchema>;
+export type MessagePart = v.InferOutput<typeof MessagePartSchema>;
+export type MessageArgumentType = (typeof MESSAGE_ARGUMENT_TYPES)[number];

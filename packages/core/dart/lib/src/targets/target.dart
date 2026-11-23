@@ -5,6 +5,10 @@ import '../ir_model.dart' as ir;
 
 const foundation = 'package:flutter/foundation.dart';
 const painting = 'package:flutter/painting.dart';
+const widgets = 'package:flutter/widgets.dart';
+const intl = 'package:intl/intl.dart';
+
+const _lib = 'lib';
 
 final class DartTarget {
   DartTarget(this.model, this.coreDirectory);
@@ -32,6 +36,14 @@ final class DartTarget {
   String importFrom(String fromOutput, String toOutput) => p.posix.relative(
     p.posix.joinAll(p.split(output(toOutput))),
     from: p.posix.dirname(p.posix.joinAll(p.split(output(fromOutput)))),
+  );
+
+  String packageImport(String output) => p.posix.join(
+    'package:${model.packages.dart.name}',
+    p.posix.relative(
+      p.posix.joinAll(p.split(this.output(output))),
+      from: p.posix.join(p.posix.joinAll(p.split(packageDirectory)), _lib),
+    ),
   );
 
   Reference symbolType(String key, String fromOutput, String definedIn) =>

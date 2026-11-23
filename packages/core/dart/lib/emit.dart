@@ -8,6 +8,7 @@ import 'src/library.dart';
 import 'src/targets/color_roles.dart';
 import 'src/targets/component_tokens.dart';
 import 'src/targets/enums.dart';
+import 'src/targets/messages.dart';
 import 'src/targets/motion.dart';
 import 'src/targets/palette_model.dart';
 import 'src/targets/target.dart';
@@ -20,6 +21,8 @@ const _libraries = <String, Iterable<Spec> Function(DartTarget)>{
   'componentTokens': componentTokensLibrary,
   'typography': typographyLibrary,
   'paletteModel': paletteModelLibrary,
+  'messages': messagesLibrary,
+  'messageReaders': messageReadersLibrary,
 };
 
 Map<String, String> tokenOutputs(String irFile, String coreDirectory) {
