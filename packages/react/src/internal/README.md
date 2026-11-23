@@ -47,7 +47,7 @@
 | [`surfaces/toggle-surface.ts`](#surfacestoggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
 | [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useInternalTranslate`, `useInternalProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
 | [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
-| [`use-copy-feedback.ts`](#use-copy-feedbackts)   | 클립보드에 쓰고 1.5초 동안 복사했다고 알리는 hook                                    | CodeBlock.Copy, Message.Copy |
+| [`use-copy-feedback.ts`](#use-copy-feedbackts)   | 클립보드에 쓰고 1.5초 동안 복사했다고 알리는 hook                                    | CodeBlock.Copy, Message.Copy, ColorPicker.Copy |
 | [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image |
 
 ## arc.tsx
@@ -1420,7 +1420,7 @@ useInternalFormReset(inputRef, () => {
 
 ### 쓰는 곳
 
-- CodeBlock(`code-block/copy.tsx`), Message(`message/copy.tsx`)
+- CodeBlock(`code-block/parts/copy.tsx`), Message(`message/parts/copy.tsx`), ColorPicker(`color-picker/hooks/use-color-picker.ts`)
 
 ### 쓰는 법
 
