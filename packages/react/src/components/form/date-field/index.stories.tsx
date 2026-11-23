@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Calendar } from '../../data/calendar';
 import { IdsProvider } from '../../utility/ids-provider';
@@ -39,7 +38,6 @@ const meta = {
     'aria-label': '날짜',
     variant: 'outline',
     size: 'standard',
-    className: cn('w-72'),
     onValueChange: fn(),
     onOpenChange: fn(),
   },
@@ -51,14 +49,24 @@ type Story = StoryObj<typeof meta>;
 const day = (key: string) =>
   document.querySelector<HTMLButtonElement>(`[data-calendar-day="${key}"]`)!;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-72">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-72">
-      <Field.Label>체크인</Field.Label>
-      <DateField defaultValue={new CalendarDate(2026, 9, 15)} />
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>체크인</Field.Label>
+        <DateField defaultValue={new CalendarDate(2026, 9, 15)} />
+      </Field>
+    </div>
   ),
 };
 
@@ -70,119 +78,118 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <DateField
-              size={size}
-              variant={variant}
-              defaultValue={new CalendarDate(2026, 9, 15)}
-              className="w-56"
-              aria-label={`${variant} ${size}`}
-            />
+            <div className="w-56">
+              <DateField
+                size={size}
+                variant={variant}
+                defaultValue={new CalendarDate(2026, 9, 15)}
+                aria-label={`${variant} ${size}`}
+              />
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="Selection mode">
         <Showcase.Row label="single">
-          <DateField className="w-72" aria-label="하루" />
-          <DateField
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="하루 값"
-          />
+          <div className="w-72">
+            <DateField aria-label="하루" />
+          </div>
+          <div className="w-72">
+            <DateField defaultValue={new CalendarDate(2026, 9, 15)} aria-label="하루 값" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="range">
-          <DateField selectionMode="range" className="w-72" aria-label="기간" />
-          <DateField
-            selectionMode="range"
-            defaultValue={{
-              start: new CalendarDate(2026, 9, 15),
-              end: new CalendarDate(2026, 9, 19),
-            }}
-            className="w-72"
-            aria-label="기간 값"
-          />
+          <div className="w-72">
+            <DateField selectionMode="range" aria-label="기간" />
+          </div>
+          <div className="w-72">
+            <DateField
+              selectionMode="range"
+              defaultValue={{
+                start: new CalendarDate(2026, 9, 15),
+                end: new CalendarDate(2026, 9, 19),
+              }}
+              aria-label="기간 값"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="multiple">
-          <DateField
-            selectionMode="multiple"
-            defaultValue={[
-              new CalendarDate(2026, 9, 3),
-              new CalendarDate(2026, 9, 10),
-              new CalendarDate(2026, 9, 17),
-            ]}
-            className="w-72"
-            aria-label="여러 날"
-          />
+          <div className="w-72">
+            <DateField
+              selectionMode="multiple"
+              defaultValue={[
+                new CalendarDate(2026, 9, 3),
+                new CalendarDate(2026, 9, 10),
+                new CalendarDate(2026, 9, 17),
+              ]}
+              aria-label="여러 날"
+            />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="invalid">
-          <DateField
-            invalid
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="잘못됨"
-          />
+          <div className="w-72">
+            <DateField invalid defaultValue={new CalendarDate(2026, 9, 15)} aria-label="잘못됨" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <DateField
-            readOnly
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="읽기 전용"
-          />
+          <div className="w-72">
+            <DateField
+              readOnly
+              defaultValue={new CalendarDate(2026, 9, 15)}
+              aria-label="읽기 전용"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <DateField
-            disabled
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="비활성"
-          />
+          <div className="w-72">
+            <DateField disabled defaultValue={new CalendarDate(2026, 9, 15)} aria-label="비활성" />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Format">
         <Showcase.Row label="default · ko-KR">
-          <DateField
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="기본"
-          />
+          <div className="w-72">
+            <DateField defaultValue={new CalendarDate(2026, 9, 15)} aria-label="기본" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="Intl options">
-          <DateField
-            format={{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }}
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="한국어 형식"
-          />
+          <div className="w-72">
+            <DateField
+              format={{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }}
+              defaultValue={new CalendarDate(2026, 9, 15)}
+              aria-label="한국어 형식"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="en-US · de-DE">
           <IdsProvider.Scope locale="en-US">
-            <DateField
-              defaultValue={new CalendarDate(2026, 9, 15)}
-              className="w-72"
-              aria-label="English"
-            />
+            <div className="w-72">
+              <DateField defaultValue={new CalendarDate(2026, 9, 15)} aria-label="English" />
+            </div>
           </IdsProvider.Scope>
           <IdsProvider.Scope locale="de-DE">
-            <DateField
-              format={{ dateStyle: 'long' }}
-              defaultValue={new CalendarDate(2026, 9, 15)}
-              className="w-72"
-              aria-label="Deutsch"
-            />
+            <div className="w-72">
+              <DateField
+                format={{ dateStyle: 'long' }}
+                defaultValue={new CalendarDate(2026, 9, 15)}
+                aria-label="Deutsch"
+              />
+            </div>
           </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="function">
-          <DateField
-            format={(date) => `${date.month}/${date.day}`}
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="함수"
-          />
+          <div className="w-72">
+            <DateField
+              format={(date) => `${date.month}/${date.day}`}
+              defaultValue={new CalendarDate(2026, 9, 15)}
+              aria-label="함수"
+            />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -191,15 +198,16 @@ export const Gallery: Story = {
 
 export const PickAndClearADate: Story = {
   render: (args) => (
-    <DateField
-      aria-label="날짜"
-      min={new CalendarDate(2026, 9, 1)}
-      max={new CalendarDate(2026, 9, 30)}
-      onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
-      className="w-72"
-    >
-      <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
-    </DateField>
+    <div className="w-72">
+      <DateField
+        aria-label="날짜"
+        min={new CalendarDate(2026, 9, 1)}
+        max={new CalendarDate(2026, 9, 30)}
+        onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
+      >
+        <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+      </DateField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -227,14 +235,15 @@ export const PickAndClearADate: Story = {
 
 export const PickARangeOverTwoMonths: Story = {
   render: (args) => (
-    <DateField
-      aria-label="날짜"
-      selectionMode="range"
-      onValueChange={args.onValueChange as (value: Calendar.Range | null) => void}
-      className="w-80"
-    >
-      <DateField.Calendar today={new CalendarDate(2026, 9, 15)} monthsToShow={2} />
-    </DateField>
+    <div className="w-80">
+      <DateField
+        aria-label="날짜"
+        selectionMode="range"
+        onValueChange={args.onValueChange as (value: Calendar.Range | null) => void}
+      >
+        <DateField.Calendar today={new CalendarDate(2026, 9, 15)} monthsToShow={2} />
+      </DateField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -262,21 +271,22 @@ export const PickARangeOverTwoMonths: Story = {
 
 export const PickABirthday: Story = {
   render: (args) => (
-    <DateField
-      aria-label="생년월일"
-      min={new CalendarDate(1920, 1, 1)}
-      max={new CalendarDate(2026, 9, 15)}
-      format={{ dateStyle: 'long' }}
-      onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
-      className="w-72"
-    >
-      <DateField.Calendar
-        today={new CalendarDate(2026, 9, 15)}
-        defaultMonth={new CalendarDate(2000, 1, 1)}
+    <div className="w-72">
+      <DateField
+        aria-label="생년월일"
+        min={new CalendarDate(1920, 1, 1)}
+        max={new CalendarDate(2026, 9, 15)}
+        format={{ dateStyle: 'long' }}
+        onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
       >
-        <Calendar.Caption layout="dropdown" />
-      </DateField.Calendar>
-    </DateField>
+        <DateField.Calendar
+          today={new CalendarDate(2026, 9, 15)}
+          defaultMonth={new CalendarDate(2000, 1, 1)}
+        >
+          <Calendar.Caption layout="dropdown" />
+        </DateField.Calendar>
+      </DateField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -301,24 +311,26 @@ export const PickABirthday: Story = {
 
 export const TypeADate: Story = {
   render: (args) => (
-    <Field className="w-72">
-      <Field.Label>생년월일</Field.Label>
-      <DateField
-        max={new CalendarDate(2026, 9, 15)}
-        autoComplete="bday"
-        onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
-      >
-        <DateField.Input />
-        <DateField.Clear />
-        <DateField.Trigger />
-        <DateField.Calendar today={new CalendarDate(2026, 9, 15)}>
-          <Calendar.Caption layout="dropdown" />
-        </DateField.Calendar>
-      </DateField>
-      <Field.Hint>
-        2000. 01. 31., 2000-01-31, 2000년 1월 31일, Jan 31 2000, 20000131 모두 됩니다.
-      </Field.Hint>
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>생년월일</Field.Label>
+        <DateField
+          max={new CalendarDate(2026, 9, 15)}
+          autoComplete="bday"
+          onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
+        >
+          <DateField.Input />
+          <DateField.Clear />
+          <DateField.Trigger />
+          <DateField.Calendar today={new CalendarDate(2026, 9, 15)}>
+            <Calendar.Caption layout="dropdown" />
+          </DateField.Calendar>
+        </DateField>
+        <Field.Hint>
+          2000. 01. 31., 2000-01-31, 2000년 1월 31일, Jan 31 2000, 20000131 모두 됩니다.
+        </Field.Hint>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -349,12 +361,14 @@ export const TypeADate: Story = {
 export const ShowAnotherLanguage: Story = {
   render: () => (
     <IdsProvider.Scope locale="en-US">
-      <Field className="w-72">
-        <Field.Label>Check-in</Field.Label>
-        <DateField defaultValue={new CalendarDate(2026, 9, 15)}>
-          <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
-        </DateField>
-      </Field>
+      <div className="w-72">
+        <Field>
+          <Field.Label>Check-in</Field.Label>
+          <DateField defaultValue={new CalendarDate(2026, 9, 15)}>
+            <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+          </DateField>
+        </Field>
+      </div>
     </IdsProvider.Scope>
   ),
   parameters: {
@@ -376,12 +390,14 @@ export const ShowAnotherLanguage: Story = {
 
 export const OpenAsADrawerOnPhones: Story = {
   render: () => (
-    <Field className="w-72">
-      <Field.Label>체크인</Field.Label>
-      <DateField defaultValue={new CalendarDate(2026, 9, 15)}>
-        <DateField.Content mobileVariant="drawer" />
-      </DateField>
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>체크인</Field.Label>
+        <DateField defaultValue={new CalendarDate(2026, 9, 15)}>
+          <DateField.Content mobileVariant="drawer" />
+        </DateField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -399,20 +415,20 @@ export const SubmitWithANativeForm: Story = {
 
     return (
       <form
-        className="flex w-80 flex-col items-start gap-4"
+        className="grid w-80 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>체크인</Field.Label>
           <DateField name="checkin" required>
             <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
           </DateField>
           <Field.Hint>비워 두면 제출되지 않습니다.</Field.Hint>
         </Field>
-        <Field className="w-full">
+        <Field>
           <Field.Label>숙박 기간</Field.Label>
           <DateField
             name="stay"
@@ -476,18 +492,20 @@ export const ValidateWithReactHookForm: Story = {
     return (
       <FormProvider {...methods}>
         <form
-          className="flex w-80 flex-col items-start gap-4"
+          className="grid w-80 gap-4"
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(data.date?.toString() ?? ''))}
         >
-          <FormField name="date" controlMode="value" required className="w-full">
+          <FormField name="date" controlMode="value" required>
             <FormField.Label>예약 날짜</FormField.Label>
             <DateField>
               <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
             </DateField>
             <FormField.Error />
           </FormField>
-          <Button type="submit">예약</Button>
+          <div>
+            <Button type="submit">예약</Button>
+          </div>
           <output aria-label="예약 결과">{result}</output>
         </form>
       </FormProvider>
@@ -516,17 +534,15 @@ export const ValidateWithReactHookForm: Story = {
 
 export const CustomizeTheTrigger: Story = {
   render: () => (
-    <DateField
-      format={{ month: 'long', day: 'numeric', weekday: 'long' }}
-      aria-label="마감일"
-      className="w-72"
-    >
-      <DateField.Trigger>
-        <DateField.Value className="font-medium" />
-      </DateField.Trigger>
-      <DateField.Clear aria-label="마감일 지우기" />
-      <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
-    </DateField>
+    <div className="w-72">
+      <DateField format={{ month: 'long', day: 'numeric', weekday: 'long' }} aria-label="마감일">
+        <DateField.Trigger>
+          <DateField.Value />
+        </DateField.Trigger>
+        <DateField.Clear aria-label="마감일 지우기" />
+        <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+      </DateField>
+    </div>
   ),
   parameters: {
     docs: {

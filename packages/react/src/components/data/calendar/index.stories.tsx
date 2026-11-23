@@ -290,6 +290,7 @@ export const BlockDaysOutsideLimits: Story = {
 };
 
 export const MarkDaysWithEvents: Story = {
+  tags: ['custom-design'],
   render: function Render() {
     const [date, setDate] = useState<CalendarDate | null>(null);
 

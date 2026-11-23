@@ -6,7 +6,7 @@ const fadeOffWhileItsRingShows = cn('focus-visible:mask-none');
 
 export const timePickerStyle = tv({
   slots: {
-    root: 'flex min-w-0 flex-wrap gap-1 text-neutral-strong',
+    root: 'flex w-fit min-w-0 flex-wrap gap-1 text-neutral-strong',
     header: 'flex w-full basis-full gap-1 text-neutral select-none',
     headerLabel: 'min-w-12 flex-1 text-center',
     separator: 'self-center text-neutral select-none',

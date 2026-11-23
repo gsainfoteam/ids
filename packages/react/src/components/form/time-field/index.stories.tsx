@@ -5,7 +5,6 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
 import { Field } from '../field';
@@ -38,7 +37,6 @@ const meta = {
     'aria-label': '시간',
     variant: 'outline',
     size: 'standard',
-    className: cn('w-60'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TimeField>;
@@ -51,14 +49,24 @@ const column = (unit: string) =>
 const option = (unit: string, n: number) =>
   column(unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-60">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-60">
-      <Field.Label>알람</Field.Label>
-      <TimeField defaultValue={new Time(7, 30)} />
-    </Field>
+    <div className="w-60">
+      <Field>
+        <Field.Label>알람</Field.Label>
+        <TimeField defaultValue={new Time(7, 30)} />
+      </Field>
+    </div>
   ),
 };
 
@@ -70,62 +78,72 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <TimeField
-              size={size}
-              variant={variant}
-              defaultValue={at(14, 30)}
-              className="w-44"
-              aria-label={`${variant} ${size}`}
-            />
+            <div className="w-44">
+              <TimeField
+                size={size}
+                variant={variant}
+                defaultValue={at(14, 30)}
+                aria-label={`${variant} ${size}`}
+              />
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="Format">
         <Showcase.Row label="locale · ko-KR">
-          <TimeField defaultValue={at(14, 30)} className="w-44" aria-label="한국어" />
+          <div className="w-44">
+            <TimeField defaultValue={at(14, 30)} aria-label="한국어" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="hourCycle 24h">
-          <TimeField
-            hourCycle="24h"
-            defaultValue={at(14, 30)}
-            className="w-44"
-            aria-label="24시간"
-          />
+          <div className="w-44">
+            <TimeField hourCycle="24h" defaultValue={at(14, 30)} aria-label="24시간" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="Intl options · en-US">
           <IdsProvider.Scope locale="en-US">
-            <TimeField
-              format={{ hour: '2-digit', minute: '2-digit' }}
-              defaultValue={at(14, 30)}
-              className="w-44"
-              aria-label="English"
-            />
+            <div className="w-44">
+              <TimeField
+                format={{ hour: '2-digit', minute: '2-digit' }}
+                defaultValue={at(14, 30)}
+                aria-label="English"
+              />
+            </div>
           </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="second">
-          <TimeField
-            precision="second"
-            hourCycle="24h"
-            defaultValue={at(14, 30)}
-            className="w-44"
-            aria-label="초 단위"
-          />
+          <div className="w-44">
+            <TimeField
+              precision="second"
+              hourCycle="24h"
+              defaultValue={at(14, 30)}
+              aria-label="초 단위"
+            />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <TimeField className="w-44" aria-label="비어 있음" />
+          <div className="w-44">
+            <TimeField aria-label="비어 있음" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <TimeField invalid defaultValue={at(9)} className="w-44" aria-label="잘못됨" />
+          <div className="w-44">
+            <TimeField invalid defaultValue={at(9)} aria-label="잘못됨" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <TimeField readOnly defaultValue={at(9)} className="w-44" aria-label="읽기 전용" />
+          <div className="w-44">
+            <TimeField readOnly defaultValue={at(9)} aria-label="읽기 전용" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <TimeField disabled defaultValue={at(9)} className="w-44" aria-label="비활성" />
+          <div className="w-44">
+            <TimeField disabled defaultValue={at(9)} aria-label="비활성" />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -134,14 +152,15 @@ export const Gallery: Story = {
 
 export const PickAndClearATime: Story = {
   render: (args) => (
-    <TimeField
-      aria-label="시간"
-      defaultValue={new Time(9, 30)}
-      hourCycle="24h"
-      step={15}
-      onValueChange={args.onValueChange}
-      className="w-60"
-    />
+    <div className="w-60">
+      <TimeField
+        aria-label="시간"
+        defaultValue={new Time(9, 30)}
+        hourCycle="24h"
+        step={15}
+        onValueChange={args.onValueChange}
+      />
+    </div>
   ),
   parameters: {
     docs: {
@@ -168,15 +187,16 @@ export const PickAndClearATime: Story = {
 
 export const LimitToOfficeHours: Story = {
   render: (args) => (
-    <TimeField
-      aria-label="상담 시간"
-      min={new Time(9, 0)}
-      max={new Time(18, 0)}
-      hourCycle="24h"
-      step={30}
-      onValueChange={args.onValueChange}
-      className="w-60"
-    />
+    <div className="w-60">
+      <TimeField
+        aria-label="상담 시간"
+        min={new Time(9, 0)}
+        max={new Time(18, 0)}
+        hourCycle="24h"
+        step={30}
+        onValueChange={args.onValueChange}
+      />
+    </div>
   ),
   parameters: {
     docs: {
@@ -198,12 +218,14 @@ export const LimitToOfficeHours: Story = {
 
 export const PickOnAWheel: Story = {
   render: () => (
-    <Field className="w-60">
-      <Field.Label>출발 시각</Field.Label>
-      <TimeField defaultValue={new Time(21, 15)}>
-        <TimeField.TimePicker variant="wheel" />
-      </TimeField>
-    </Field>
+    <div className="w-60">
+      <Field>
+        <Field.Label>출발 시각</Field.Label>
+        <TimeField defaultValue={new Time(21, 15)}>
+          <TimeField.TimePicker variant="wheel" />
+        </TimeField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -225,12 +247,14 @@ export const PickOnAWheel: Story = {
 
 export const OpenAsADrawerOnPhones: Story = {
   render: () => (
-    <Field className="w-60">
-      <Field.Label>알람</Field.Label>
-      <TimeField defaultValue={new Time(7, 30)}>
-        <TimeField.Content mobileVariant="drawer" />
-      </TimeField>
-    </Field>
+    <div className="w-60">
+      <Field>
+        <Field.Label>알람</Field.Label>
+        <TimeField defaultValue={new Time(7, 30)}>
+          <TimeField.Content mobileVariant="drawer" />
+        </TimeField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -248,13 +272,13 @@ export const SubmitWithANativeForm: Story = {
 
     return (
       <form
-        className="flex w-64 flex-col items-start gap-4"
+        className="grid w-64 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>알람</Field.Label>
           <TimeField name="alarm" required hourCycle="24h" defaultValue={new Time(7, 0)} />
         </Field>

@@ -5,7 +5,6 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
 import { Field } from '../field';
@@ -39,7 +38,6 @@ const meta = {
     'aria-label': '일시',
     variant: 'outline',
     size: 'standard',
-    className: cn('w-80'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof DateTimeField>;
@@ -54,14 +52,24 @@ const option = (unit: string, n: number) =>
     `[role=dialog] [data-time-column="${unit}"] [data-time-option="${n}"]`,
   )!;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-80">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-80">
-      <Field.Label>회의 일시</Field.Label>
-      <DateTimeField defaultValue={new CalendarDateTime(2026, 9, 15, 14, 30)} />
-    </Field>
+    <div className="w-80">
+      <Field>
+        <Field.Label>회의 일시</Field.Label>
+        <DateTimeField defaultValue={new CalendarDateTime(2026, 9, 15, 14, 30)} />
+      </Field>
+    </div>
   ),
 };
 
@@ -73,65 +81,73 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <DateTimeField
-              size={size}
-              variant={variant}
-              defaultValue={at(15, 14, 30)}
-              className="w-64"
-              aria-label={`${variant} ${size}`}
-            />
+            <div className="w-64">
+              <DateTimeField
+                size={size}
+                variant={variant}
+                defaultValue={at(15, 14, 30)}
+                aria-label={`${variant} ${size}`}
+              />
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="Format">
         <Showcase.Row label="locale · ko-KR">
-          <DateTimeField defaultValue={at(15, 14, 30)} className="w-72" aria-label="한국어" />
+          <div className="w-72">
+            <DateTimeField defaultValue={at(15, 14, 30)} aria-label="한국어" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="Intl options">
-          <DateTimeField
-            format={{ dateStyle: 'long', timeStyle: 'short', hourCycle: 'h23' }}
-            defaultValue={at(15, 14, 30)}
-            className="w-72"
-            aria-label="Intl 옵션"
-          />
+          <div className="w-72">
+            <DateTimeField
+              format={{ dateStyle: 'long', timeStyle: 'short', hourCycle: 'h23' }}
+              defaultValue={at(15, 14, 30)}
+              aria-label="Intl 옵션"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="en-US · 12h">
           <IdsProvider.Scope locale="en-US">
-            <DateTimeField
-              format={{
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-              }}
-              hourCycle="12h"
-              defaultValue={at(15, 14, 30)}
-              className="w-72"
-              aria-label="English"
-            />
+            <div className="w-72">
+              <DateTimeField
+                format={{
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                }}
+                hourCycle="12h"
+                defaultValue={at(15, 14, 30)}
+                aria-label="English"
+              />
+            </div>
           </IdsProvider.Scope>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <DateTimeField className="w-72" aria-label="비어 있음" />
+          <div className="w-72">
+            <DateTimeField aria-label="비어 있음" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <DateTimeField invalid defaultValue={at(15, 9)} className="w-72" aria-label="잘못됨" />
+          <div className="w-72">
+            <DateTimeField invalid defaultValue={at(15, 9)} aria-label="잘못됨" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <DateTimeField
-            readOnly
-            defaultValue={at(15, 9)}
-            className="w-72"
-            aria-label="읽기 전용"
-          />
+          <div className="w-72">
+            <DateTimeField readOnly defaultValue={at(15, 9)} aria-label="읽기 전용" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <DateTimeField disabled defaultValue={at(15, 9)} className="w-72" aria-label="비활성" />
+          <div className="w-72">
+            <DateTimeField disabled defaultValue={at(15, 9)} aria-label="비활성" />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -140,16 +156,17 @@ export const Gallery: Story = {
 
 export const ChangeTheDayAndKeepTheTime: Story = {
   render: (args) => (
-    <DateTimeField
-      aria-label="일시"
-      defaultValue={new CalendarDateTime(2026, 9, 15, 9, 30)}
-      hourCycle="24h"
-      step={15}
-      onValueChange={args.onValueChange}
-      className="w-80"
-    >
-      <DateTimeField.Calendar today={new CalendarDate(2026, 9, 15)} />
-    </DateTimeField>
+    <div className="w-80">
+      <DateTimeField
+        aria-label="일시"
+        defaultValue={new CalendarDateTime(2026, 9, 15, 9, 30)}
+        hourCycle="24h"
+        step={15}
+        onValueChange={args.onValueChange}
+      >
+        <DateTimeField.Calendar today={new CalendarDate(2026, 9, 15)} />
+      </DateTimeField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -175,18 +192,19 @@ export const ChangeTheDayAndKeepTheTime: Story = {
 
 export const LimitTheBookableTimes: Story = {
   render: (args) => (
-    <DateTimeField
-      aria-label="면담 일시"
-      min={new CalendarDateTime(2026, 9, 15, 9, 30)}
-      max={new CalendarDateTime(2026, 9, 18, 18, 0)}
-      disabled={{ dayOfWeek: [0, 6] }}
-      hourCycle="24h"
-      step={30}
-      onValueChange={args.onValueChange}
-      className="w-80"
-    >
-      <DateTimeField.Calendar today={new CalendarDate(2026, 9, 15)} />
-    </DateTimeField>
+    <div className="w-80">
+      <DateTimeField
+        aria-label="면담 일시"
+        min={new CalendarDateTime(2026, 9, 15, 9, 30)}
+        max={new CalendarDateTime(2026, 9, 18, 18, 0)}
+        disabled={{ dayOfWeek: [0, 6] }}
+        hourCycle="24h"
+        step={30}
+        onValueChange={args.onValueChange}
+      >
+        <DateTimeField.Calendar today={new CalendarDate(2026, 9, 15)} />
+      </DateTimeField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -210,15 +228,16 @@ export const LimitTheBookableTimes: Story = {
 
 export const PickTheTimeOnAWheel: Story = {
   render: (args) => (
-    <DateTimeField
-      aria-label="출발 일시"
-      defaultValue={new CalendarDateTime(2026, 9, 15, 21, 15)}
-      onValueChange={args.onValueChange}
-      className="w-80"
-    >
-      <DateTimeField.Calendar today={new CalendarDate(2026, 9, 15)} />
-      <DateTimeField.TimePicker variant="wheel" />
-    </DateTimeField>
+    <div className="w-80">
+      <DateTimeField
+        aria-label="출발 일시"
+        defaultValue={new CalendarDateTime(2026, 9, 15, 21, 15)}
+        onValueChange={args.onValueChange}
+      >
+        <DateTimeField.Calendar today={new CalendarDate(2026, 9, 15)} />
+        <DateTimeField.TimePicker variant="wheel" />
+      </DateTimeField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -240,12 +259,14 @@ export const PickTheTimeOnAWheel: Story = {
 
 export const OpenAsADrawerOnPhones: Story = {
   render: () => (
-    <Field className="w-80">
-      <Field.Label>회의 일시</Field.Label>
-      <DateTimeField defaultValue={new CalendarDateTime(2026, 9, 15, 14, 30)}>
-        <DateTimeField.Content mobileVariant="drawer" />
-      </DateTimeField>
-    </Field>
+    <div className="w-80">
+      <Field>
+        <Field.Label>회의 일시</Field.Label>
+        <DateTimeField defaultValue={new CalendarDateTime(2026, 9, 15, 14, 30)}>
+          <DateTimeField.Content mobileVariant="drawer" />
+        </DateTimeField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -263,19 +284,21 @@ export const SubmitWithANativeForm: Story = {
 
     return (
       <form
-        className="flex w-80 flex-col items-start gap-4"
+        className="grid w-80 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>회의 일시</Field.Label>
           <DateTimeField name="meeting" required hourCycle="24h">
             <DateTimeField.Calendar today={new CalendarDate(2026, 9, 15)} />
           </DateTimeField>
         </Field>
-        <Button type="submit">예약</Button>
+        <div>
+          <Button type="submit">예약</Button>
+        </div>
         <output aria-label="예약 결과" className="text-body-b3-regular font-mono">
           {submitted}
         </output>

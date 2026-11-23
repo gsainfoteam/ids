@@ -5,7 +5,6 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { IdsProvider } from '../../utility/ids-provider';
 
 import { TimePicker } from '.';
@@ -34,7 +33,6 @@ const meta = {
     size: 'standard',
     precision: 'minute',
     step: 1,
-    className: cn('w-72'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TimePicker>;
@@ -50,7 +48,7 @@ const option = (canvasElement: HTMLElement, unit: string, n: number) =>
 export const Playground: Story = {};
 
 export const Usage: Story = {
-  render: () => <TimePicker defaultValue={new Time(14, 30)} className="w-72" />,
+  render: () => <TimePicker defaultValue={new Time(14, 30)} />,
 };
 
 export const Gallery: Story = {
@@ -66,7 +64,6 @@ export const Gallery: Story = {
               size={size}
               hourCycle="24h"
               defaultValue={at(9, 30)}
-              className="w-56"
               aria-label={`${variant} ${size}`}
             />
           )}
@@ -78,12 +75,7 @@ export const Gallery: Story = {
         description="시간제는 locale의 CLDR 시간제를 따르고 hourCycle로 정합니다. 12시간제에는 오전/오후 컬럼이 locale이 쓰는 자리에 붙습니다."
       >
         <Showcase.Row label="24h minute">
-          <TimePicker
-            hourCycle="24h"
-            defaultValue={at(14, 30)}
-            className="w-56"
-            aria-label="24시간"
-          />
+          <TimePicker hourCycle="24h" defaultValue={at(14, 30)} aria-label="24시간" />
         </Showcase.Row>
         <Showcase.Row label="12h second">
           <TimePicker
@@ -91,25 +83,19 @@ export const Gallery: Story = {
             precision="second"
             step={15}
             defaultValue={at(14, 30, 45)}
-            className="w-80"
             aria-label="12시간 초"
           />
         </Showcase.Row>
         <Showcase.Row label="hour · en-US">
           <IdsProvider.Scope locale="en-US">
-            <TimePicker
-              precision="hour"
-              defaultValue={at(14)}
-              className="w-44"
-              aria-label="Hour only"
-            />
+            <TimePicker precision="hour" defaultValue={at(14)} aria-label="Hour only" />
           </IdsProvider.Scope>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <TimePicker hourCycle="24h" className="w-56" aria-label="비어 있음" />
+          <TimePicker hourCycle="24h" aria-label="비어 있음" />
         </Showcase.Row>
         <Showcase.Row label="limits">
           <TimePicker
@@ -118,33 +104,20 @@ export const Gallery: Story = {
             min={at(9, 30)}
             max={at(18)}
             defaultValue={at(9, 45)}
-            className="w-56"
             aria-label="영업 시간"
           />
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <TimePicker
-            hourCycle="24h"
-            readOnly
-            defaultValue={at(9, 30)}
-            className="w-56"
-            aria-label="읽기 전용"
-          />
+          <TimePicker hourCycle="24h" readOnly defaultValue={at(9, 30)} aria-label="읽기 전용" />
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <TimePicker
-            hourCycle="24h"
-            disabled
-            defaultValue={at(9, 30)}
-            className="w-56"
-            aria-label="비활성"
-          />
+          <TimePicker hourCycle="24h" disabled defaultValue={at(9, 30)} aria-label="비활성" />
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Composition">
         <Showcase.Row label="header · separator">
-          <TimePicker hourCycle="24h" defaultValue={at(9, 30)} className="w-56" aria-label="머리글">
+          <TimePicker hourCycle="24h" defaultValue={at(9, 30)} aria-label="머리글">
             <TimePicker.Header />
             <TimePicker.Column unit="hour" />
             <TimePicker.Separator />
@@ -152,12 +125,7 @@ export const Gallery: Story = {
           </TimePicker>
         </Showcase.Row>
         <Showcase.Row label="period first">
-          <TimePicker
-            hourCycle="12h"
-            defaultValue={at(21, 15)}
-            className="w-64"
-            aria-label="오전 오후 먼저"
-          >
+          <TimePicker hourCycle="12h" defaultValue={at(21, 15)} aria-label="오전 오후 먼저">
             <TimePicker.Period />
             <TimePicker.Column unit="hour" />
             <TimePicker.Column unit="minute" />
@@ -173,7 +141,7 @@ export const ClearTheTime: Story = {
     const [value, setValue] = useState<Time | null>(new Time(8, 30));
 
     return (
-      <div className="flex w-56 flex-col gap-3">
+      <div className="flex flex-col items-start gap-3">
         <TimePicker hourCycle="24h" value={value} onValueChange={setValue} />
         <output aria-label="값" className="text-body-b3-regular">
           {value ? `${value.hour}:${value.minute}` : 'null'}
@@ -222,7 +190,6 @@ export const PickWithAScrollWheel: Story = {
     variant: 'wheel',
     hourCycle: '12h',
     defaultValue: at(14, 30),
-    className: cn('w-64'),
   },
   parameters: {
     docs: {
@@ -244,26 +211,16 @@ export const PickWithAScrollWheel: Story = {
 export const FollowTheLocale: Story = {
   render: () => (
     <div className="flex flex-wrap gap-8">
-      <TimePicker defaultValue={new Time(14, 30)} className="w-64" aria-label="한국어" />
-      <TimePicker
-        hourCycle="24h"
-        defaultValue={new Time(14, 30)}
-        className="w-44"
-        aria-label="한국어 24시간"
-      />
+      <TimePicker defaultValue={new Time(14, 30)} aria-label="한국어" />
+      <TimePicker hourCycle="24h" defaultValue={new Time(14, 30)} aria-label="한국어 24시간" />
       <IdsProvider.Scope locale="en-US">
-        <TimePicker defaultValue={new Time(14, 30)} className="w-64" aria-label="English" />
+        <TimePicker defaultValue={new Time(14, 30)} aria-label="English" />
       </IdsProvider.Scope>
       <IdsProvider.Scope locale="de-DE">
-        <TimePicker defaultValue={new Time(14, 30)} className="w-44" aria-label="Deutsch" />
+        <TimePicker defaultValue={new Time(14, 30)} aria-label="Deutsch" />
       </IdsProvider.Scope>
       <IdsProvider.Scope locale="ja-JP">
-        <TimePicker
-          hourCycle="12h"
-          defaultValue={new Time(14, 30)}
-          className="w-64"
-          aria-label="日本語"
-        />
+        <TimePicker hourCycle="12h" defaultValue={new Time(14, 30)} aria-label="日本語" />
       </IdsProvider.Scope>
     </div>
   ),
@@ -303,13 +260,7 @@ export const FollowTheLocale: Story = {
 
 export const LabelOptionsYourWay: Story = {
   render: () => (
-    <TimePicker
-      hourCycle="24h"
-      step={30}
-      defaultValue={new Time(9, 30)}
-      className="w-64"
-      aria-label="회의 시간"
-    >
+    <TimePicker hourCycle="24h" step={30} defaultValue={new Time(9, 30)} aria-label="회의 시간">
       <TimePicker.Column unit="hour">{(option) => `${option.label}시`}</TimePicker.Column>
       <TimePicker.Column unit="minute">
         {(option) => (option.value === 0 ? '정각' : `${option.label}분`)}

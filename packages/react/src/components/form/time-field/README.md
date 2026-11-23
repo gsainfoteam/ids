@@ -116,6 +116,20 @@ const schema = z.object({
 - `TimeField.State` 는 `value`, `open`, `empty`, `invalid`, `disabled`, `readOnly`, `required` 입니다. `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
 - 필드 표면에는 `data-open`, `data-empty`, `data-invalid`, `data-disabled`, `data-readonly`, `data-required`, `data-size`, `data-variant` 가 붙습니다.
 
+## 크기
+
+- 부모 너비를 다 채웁니다(fill). 블록 요소이고 `min-w-0` 이라 flex 와 grid 안에서도 줄어듭니다.
+- 너비와 자리는 부모가 정합니다. 필드에 `className` 으로 너비나 여백을 주지 않습니다.
+
+```tsx
+<form className="grid w-80 gap-4">
+  <Field>
+    <Field.Label>시각</Field.Label>
+    <TimeField />
+  </Field>
+</form>
+```
+
 ## 속성
 
 | 속성                                       | 기본 / 동작                                             |

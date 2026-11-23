@@ -121,6 +121,20 @@ const schema = z.object({
 - `DateTimeField.Trigger`, `Value`, `Clear`, `Content` 와 부분 규칙은 [DateField](../date-field/README.md#합성) 와 같습니다. `Content` 의 기본은 `DateTimeField.Calendar` 와 `DateTimeField.TimePicker` 입니다.
 - `DateTimeField.State` 와 `data-*` 는 [DateField](../date-field/README.md#상태) 와 같습니다.
 
+## 크기
+
+- 부모 너비를 다 채웁니다(fill). 블록 요소이고 `min-w-0` 이라 flex 와 grid 안에서도 줄어듭니다.
+- 너비와 자리는 부모가 정합니다. 필드에 `className` 으로 너비나 여백을 주지 않습니다.
+
+```tsx
+<form className="grid w-80 gap-4">
+  <Field>
+    <Field.Label>일시</Field.Label>
+    <DateTimeField />
+  </Field>
+</form>
+```
+
 ## 속성
 
 | 속성                                             | 기본 / 동작                            |

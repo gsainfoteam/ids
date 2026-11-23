@@ -153,6 +153,8 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 
 ## 날짜 칸 꾸미기
 
+`Calendar.Day` 의 `className` 은 IDS 위에 새 디자인을 지을 때만 씁니다. 앱 화면에서는 `modifiers` 와 children 함수로 충분합니다.
+
 ```tsx
 <Calendar>
   <Calendar.Day
@@ -201,6 +203,17 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 
 - 날짜 칸(`td`)에는 react-day-picker 의 `data-day`, `data-selected`, `data-today`, `data-outside` 가 붙습니다.
 - 루트의 `className` 과 `style` 은 `Calendar.State`(`value`, `month`, `disabled`, `readOnly`, `selectionMode`)를 받는 함수도 됩니다. 루트에는 `data-disabled`, `data-readonly`, `data-size`, `data-selection-mode` 가 붙습니다.
+
+## 크기
+
+- 내용 너비(hug)입니다. 달 수와 `size` 가 너비를 정하고, 부모 너비로 늘어나지 않습니다.
+- 자리는 부모가 정합니다. 여백은 부모의 `gap` 으로 둡니다.
+
+```tsx
+<div className="flex justify-center">
+  <Calendar />
+</div>
+```
 
 ## 속성
 

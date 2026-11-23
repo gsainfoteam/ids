@@ -125,6 +125,11 @@ const [time, setTime] = useState<Time | null>(null);
 - 옵션에는 같은 상태가 `data-selected`, `data-active`, `data-disabled` 로 붙고, 컬럼에는 `data-time-column` 이 붙습니다.
 - 루트에는 `data-hour-cycle`, `data-variant`, `data-size`, `data-empty`, `data-disabled`, `data-readonly` 가 붙고, `className` 과 `style` 은 `TimePicker.State`(`value`, `hourCycle`, `precision`, `step`, `disabled`, `readOnly`)를 받는 함수도 됩니다. `hourCycle` 은 locale 에서 풀이한 시간제입니다.
 
+## 크기
+
+- 내용 너비(hug)입니다. 컬럼 수와 `size` 가 너비를 정하고, 부모 너비로 늘어나지 않습니다.
+- 자리는 부모가 정합니다. 여백은 부모의 `gap` 으로 둡니다.
+
 ## 속성
 
 | 속성                                       | 기본 / 동작                                                 |
@@ -148,6 +153,6 @@ const [time, setTime] = useState<Time | null>(null);
 - 컬럼은 `size="tiny"`(6px) [ScrollArea](../../layout/scroll-area/README.md) 이고, listbox 자신이 스크롤 요소입니다(`Viewport asChild`). OS 막대 대신 가리키거나 스크롤할 때만 얇은 IDS 막대가 보입니다. 마우스 휠, 트랙패드, 터치, 키보드로 움직입니다.
 - 컬럼은 위나 아래에 옵션이 더 남으면 그 가장자리를 16px 까지 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)). 가운데 줄의 고른 시각은 흐린 띠에 닿지 않습니다. 키보드로 들어와 컬럼의 포커스 링이 보이는 동안은 흐리지 않습니다. 마스크가 링을 잘라 내기 때문입니다.
 - 컬럼의 폭(`min-w-12 flex-1`)은 ScrollArea root 에 있습니다. `TimePicker.Column` 의 `className` 은 listbox 에 붙습니다.
-- 컬럼 높이는 옵션 다섯 개입니다. `className="[--time-picker-height:calc(var(--time-option)*7)]"` 처럼 바꿀 수 있고, 위아래 여백이 반 컬럼씩이라 어느 높이에서도 고른 시각이 가운데 줄에 옵니다.
+- 컬럼 높이는 옵션 다섯 개입니다. 위아래 여백이 반 컬럼씩이라 고른 시각이 가운데 줄에 옵니다.
 - 12시간제의 시 컬럼은 12, 1, 2, ... 11 순서입니다.
 - 오전/오후 이름은 런타임의 `Intl` 데이터입니다. 서버(Node)와 브라우저의 ICU 가 다르면 글자가 조금 다를 수 있습니다.
