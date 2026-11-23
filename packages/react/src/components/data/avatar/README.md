@@ -66,7 +66,7 @@ import { Avatar } from '@gsainfoteam/ids-react';
 <Avatar className="size-20" />   // 그 밖의 크기. 이니셜도 비율에 맞게 커진다
 ```
 
-- 늘 원입니다. 네모난 로고나 상품 사진 자리는 Avatar 가 아닌 다른 요소로 그립니다.
+- 늘 원입니다. 조직 로고나 상품 사진도 원 안에 그립니다. `Item` 의 행에서 네모난 타일이 필요하면 `Item.Media variant="soft"` 에 아이콘이나 이미지를 넣습니다.
 - `AvatarGroup` 안에서는 그룹의 `size` 를 따릅니다. 직접 준 값이 이깁니다.
 
 ## 접근성
