@@ -636,22 +636,23 @@ export const ValidateWithReactHookForm: Story = {
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(`저장: ${data.fruit}`))}
         >
-          <FormField
-            name="fruit"
-            controlMode="value"
-            registerOptions={{ required: '과일을 고르세요.' }}
-            className="w-full"
-          >
-            <FormField.Label>과일</FormField.Label>
-            <Select>
-              {fruits.map(([value, label]) => (
-                <Select.Item key={value} value={value}>
-                  {label}
-                </Select.Item>
-              ))}
-            </Select>
-            <FormField.Error />
-          </FormField>
+          <div className="w-full">
+            <FormField
+              name="fruit"
+              controlMode="value"
+              registerOptions={{ required: '과일을 고르세요.' }}
+            >
+              <FormField.Label>과일</FormField.Label>
+              <Select>
+                {fruits.map(([value, label]) => (
+                  <Select.Item key={value} value={value}>
+                    {label}
+                  </Select.Item>
+                ))}
+              </Select>
+              <FormField.Error />
+            </FormField>
+          </div>
           <Button type="submit">저장</Button>
           <output aria-label="저장 결과">{result}</output>
         </form>

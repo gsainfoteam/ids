@@ -123,7 +123,7 @@ useInternalFormReset(controlRef, () => {
 | 이름                                        | 쓰는 곳                                                                                                        |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `useInteractiveProps`                       | Button 의 `use-button.ts`. Button, IconButton, Toggle, IconToggle, FloatingButton 이 이 hook 을 거친다         |
-| `useInteractive`                            | Checkbox, Radio, Chip, Accordion.Trigger, [`internal/lib/surface.ts`](../internal/README.md#surfacets)(Card, Item) |
+| `useInteractive`                            | Checkbox, Radio, Chip, Accordion.Trigger, [`internal/lib/surface.ts`](../internal/README.md#libsurfacets)(Card, Item) |
 | `interactiveDataProps`                      | Chip, Accordion.Trigger, `internal/lib/surface.ts`, `useInteractiveProps`                                          |
 | `WithInteractiveValues`, `InteractiveState` | Button, IconButton, Toggle, IconToggle, FloatingButton 의 Props                                                |
 | `INTERACTIVE_STATE_DEFAULTS`                | InteractiveState foundation 스토리                                                                             |
