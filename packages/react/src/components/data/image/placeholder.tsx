@@ -13,7 +13,14 @@ export function ImagePlaceholder({ className, children, ...rest }: ImagePlacehol
 
   if (children === undefined)
     return (
-      <Skeleton {...rest} data-image-placeholder="" className={styles.placeholder({ className })} />
+      <Skeleton loading asChild>
+        <span
+          aria-hidden
+          {...rest}
+          data-image-placeholder=""
+          className={styles.placeholder({ className })}
+        />
+      </Skeleton>
     );
 
   return (
