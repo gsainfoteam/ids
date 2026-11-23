@@ -1,9 +1,10 @@
 'use client';
 
-import { type ReactNode, type CSSProperties } from 'react';
+import { isValidElement, type CSSProperties, type ReactElement, type ReactNode } from 'react';
 
-import { DayPicker, type DayPickerProps, type Numerals } from 'react-day-picker';
+import { DayPicker, type DayPickerProps } from 'react-day-picker';
 
+import { CalendarCaption, type CalendarCaptionProps } from './caption';
 import { Chevron } from './chevron';
 import { CalendarContext, type NativeProps } from './context';
 import {
@@ -11,23 +12,24 @@ import {
   type DateMatcher as CalendarDateMatcher,
   type DateSelection,
 } from './date';
+import { CalendarDay, type CalendarDayProps } from './day';
 import { CalendarDayButton } from './day-button';
 import { dayPickerFormatters, dayPickerLabels } from './day-picker-locale';
 import { Dropdown } from './dropdown';
+import { CalendarFooter } from './footer';
 import { MonthButton } from './month-button';
 import { MonthGrid } from './month-grid';
 import { Root } from './picker-root';
 import { calendarStyle } from './style';
-import { useCalendar, type CalendarModifiers, type CalendarState } from './use-calendar';
-import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
+import { useCalendar, type CalendarState } from './use-calendar';
+import { CalendarWeekNumber, type CalendarWeekNumberProps } from './week-number';
+import { resolveLocale, weekStartOf } from '../../../internal/date-locale';
 import { useProviderLocale, useTranslate } from '../../../internal/translate';
-import { mergeRefs } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant, mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 import type { CalendarDate } from '@internationalized/date';
-
-export type CalendarCaptionLayout = 'label' | 'dropdown';
 
 export type CalendarDayState = {
   selected: boolean;
@@ -46,9 +48,6 @@ export type CalendarOptions = {
   disabled?: CalendarDateMatcher | CalendarDateMatcher[];
   readOnly?: boolean;
   monthsToShow?: number;
-  locale?: string;
-  weekStartsOn?: WeekDay;
-  captionLayout?: CalendarCaptionLayout;
   size?: IdsSize;
   month?: CalendarDate;
   defaultMonth?: CalendarDate;
@@ -56,26 +55,12 @@ export type CalendarOptions = {
   today?: CalendarDate;
   autoFocus?: boolean;
   dir?: 'ltr' | 'rtl';
-  showOutsideDays?: boolean;
-  fixedWeeks?: boolean;
-  showWeekNumber?: boolean;
-  numerals?: Numerals;
-  modifiers?: CalendarModifiers;
-  modifiersClassNames?: Record<string, string>;
-  renderDay?: (day: CalendarDate, state: CalendarDayState) => ReactNode;
-  footer?: ReactNode;
-};
-
-type NoneSelection = {
-  selectionMode: 'none';
-  value?: CalendarDate | null;
-  defaultValue?: CalendarDate | null;
-  onValueChange?: never;
+  children?: ReactNode;
 };
 
 export type CalendarProps = NativeProps &
   CalendarOptions &
-  (DateSelection | NoneSelection) & {
+  DateSelection & {
     className?: string | ((state: CalendarState) => string | undefined);
     style?: CSSProperties | ((state: CalendarState) => CSSProperties | undefined);
   };
@@ -88,7 +73,34 @@ const dayPickerParts = {
   MonthGrid,
   PreviousMonthButton: MonthButton,
   NextMonthButton: MonthButton,
+  Footer: ({ children }: { children?: ReactNode }) => <>{children}</>,
 };
+
+const CALENDAR_PARTS = new Set<unknown>([
+  CalendarDay,
+  CalendarFooter,
+  CalendarWeekNumber,
+  CalendarCaption,
+]);
+
+function calendarParts(children: ReactNode) {
+  const parts = flattenFragments(children);
+  invariant(
+    parts.every((child) => isValidElement(child) && CALENDAR_PARTS.has(elementTypeOf(child))),
+    'Calendar: children must be Calendar.Day, Calendar.Caption, Calendar.WeekNumber or Calendar.Footer.',
+  );
+
+  const find = <P,>(type: unknown) =>
+    parts.find((child) => elementTypeOf(child as ReactElement) === type) as
+      ReactElement<P> | undefined;
+
+  return {
+    day: find<CalendarDayProps>(CalendarDay)?.props,
+    caption: find<CalendarCaptionProps>(CalendarCaption)?.props,
+    weekNumber: find<CalendarWeekNumberProps>(CalendarWeekNumber)?.props,
+    footer: find(CalendarFooter),
+  };
+}
 
 export function CalendarRoot(props: CalendarProps) {
   const t = useTranslate();
@@ -103,9 +115,6 @@ export function CalendarRoot(props: CalendarProps) {
     disabled,
     readOnly = false,
     monthsToShow = 1,
-    locale,
-    weekStartsOn,
-    captionLayout = 'label',
     size,
     month,
     defaultMonth,
@@ -113,19 +122,15 @@ export function CalendarRoot(props: CalendarProps) {
     today,
     autoFocus = false,
     dir,
-    showOutsideDays,
-    fixedWeeks = true,
-    showWeekNumber,
-    numerals,
-    modifiers,
-    modifiersClassNames,
-    renderDay,
-    footer,
+    children,
     className,
     style,
     ref,
     ...native
   } = props;
+
+  const { day, caption, weekNumber, footer } = calendarParts(children);
+  const captionLayout = caption?.layout ?? 'label';
   const api = useCalendar({
     selectionMode,
     value,
@@ -136,7 +141,6 @@ export function CalendarRoot(props: CalendarProps) {
     disabled,
     readOnly,
     monthsToShow,
-    weekStartsOn,
     month,
     defaultMonth,
     onMonthChange,
@@ -145,7 +149,7 @@ export function CalendarRoot(props: CalendarProps) {
     dir,
   });
   const { state } = api;
-  const resolvedLocale = resolveLocale(locale ?? providerLocale);
+  const locale = resolveLocale(providerLocale);
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = calendarStyle({ size: resolvedSize });
 
@@ -159,15 +163,14 @@ export function CalendarRoot(props: CalendarProps) {
         // eslint-disable-next-line react-hooks/refs
         rootRef: mergeRefs(api.rootRef, ref),
         onGridMouseLeave: api.onGridMouseLeave,
-        modifierNames: Object.keys(modifiers ?? {}),
-        renderDay,
+        day,
       }}
     >
       <DayPicker
         {...(api.selection as DayPickerProps)}
-        lang={resolvedLocale}
-        locale={{ code: resolvedLocale, labels: {} }}
-        weekStartsOn={weekStartsOn ?? weekStartOf(resolvedLocale)}
+        lang={locale}
+        locale={{ code: locale, labels: {} }}
+        weekStartsOn={weekStartOf(locale)}
         numberOfMonths={monthsToShow}
         month={api.month}
         onMonthChange={api.setMonth}
@@ -179,18 +182,16 @@ export function CalendarRoot(props: CalendarProps) {
         autoFocus={autoFocus}
         captionLayout={captionLayout}
         navLayout="around"
-        fixedWeeks={fixedWeeks}
-        showOutsideDays={showOutsideDays ?? monthsToShow === 1}
-        showWeekNumber={showWeekNumber}
-        numerals={numerals}
+        fixedWeeks
+        showOutsideDays={monthsToShow === 1}
+        showWeekNumber={!!weekNumber}
         dir={api.dir}
         footer={footer}
-        modifiers={api.modifiers(modifiers)}
+        modifiers={api.modifiers(day?.modifiers)}
         modifiersClassNames={{
           range_preview: styles.previewMiddle(),
           range_preview_start: styles.previewStart(),
           range_preview_end: styles.previewEnd(),
-          ...modifiersClassNames,
         }}
         style={typeof style === 'function' ? style(state) : style}
         classNames={{
@@ -199,7 +200,7 @@ export function CalendarRoot(props: CalendarProps) {
           }),
           months: styles.months(),
           month: styles.month(),
-          month_caption: styles.caption(),
+          month_caption: styles.caption({ className: caption?.className }),
           caption_label: styles.captionLabel(),
           dropdowns: styles.dropdowns(),
           button_previous: styles.previous(),
@@ -209,17 +210,16 @@ export function CalendarRoot(props: CalendarProps) {
           weekdays: styles.weekdays(),
           weekday: styles.weekday(),
           week: styles.week(),
-          week_number_header: styles.weekNumber(),
-          week_number: styles.weekNumber(),
+          week_number_header: styles.weekNumber({ className: weekNumber?.className }),
+          week_number: styles.weekNumber({ className: weekNumber?.className }),
           day: styles.day(),
           range_start: styles.rangeStart(),
           range_middle: styles.rangeMiddle(),
           range_end: styles.rangeEnd(),
           hidden: styles.hidden(),
-          footer: styles.footer(),
         }}
-        labels={dayPickerLabels(resolvedLocale, numerals, t)}
-        formatters={dayPickerFormatters(resolvedLocale, numerals)}
+        labels={dayPickerLabels(locale, t)}
+        formatters={dayPickerFormatters(locale)}
         components={dayPickerParts}
         onDayMouseEnter={api.onDayMouseEnter}
         onDayFocus={api.onDayFocus}

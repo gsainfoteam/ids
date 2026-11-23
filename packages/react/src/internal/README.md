@@ -229,19 +229,23 @@ BCP 47 locale 태그를 풀이하고, 날짜와 시각의 locale 데이터를 �
 - `hourCycleOf`: TimePicker 의 `time.ts` (`resolveHourCycle`)
 - `periodFirst`, `periodLabel`: TimePicker
 - `numericDate`, `numericDateParts`, `dateOrder`, `monthNamed`, `nativeDigits`: DateField 의 `parse.ts`, temporal-field 의 `format.ts`
-- `weekStartOf`: Calendar
+- `weekStartOf`: Calendar, Scheduler
+- `withWeekStart`: Scheduler 의 날짜 이동 달력
 
 ### 쓰는 법
 
 ```ts
 // components/form/time-field/root.tsx
-const dateLocale = resolveLocale(locale ?? providerLocale); // 'ko-KR' 같은 BCP 47 태그. 둘 다 없으면 DEFAULT_LOCALE
+const dateLocale = resolveLocale(providerLocale); // 'ko-KR' 같은 BCP 47 태그. 없으면 DEFAULT_LOCALE
 
 // components/data/calendar/root.tsx
-weekStartsOn={weekStartsOn ?? weekStartOf(resolvedLocale)}
+weekStartsOn={weekStartOf(locale)}
 
 // components/data/calendar/day-picker-locale.ts
-formatDay: (date) => formatPart(date, 'day', locale, { day: 'numeric', numberingSystem }),
+formatDay: (date) => formatPart(date, 'day', locale, { day: 'numeric' }),
+
+// components/data/scheduler/toolbar.tsx
+<LanguageContext value={{ ...language, locale: withWeekStart(locale, weekStartsOn) }}>
 
 // components/form/date-field/parse.ts
 const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE);
@@ -257,12 +261,14 @@ const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE
 | `monthNames`           | 월 이름(긴, 짧은, 날짜 안의 꼴과 홀로 쓰는 꼴)을 소문자로 → 월 번호    | `9월` → 9   | `sep` → 9    | `sept` → 9   |
 | `nativeDigits`         | locale 의 기본 숫자 글자 → 0 ~ 9                                       |             |              |              |
 | `weekStartOf`          | 주 시작 요일. `0`(일) ~ `6`(토)                                        | `0`         | `0`          | `1`          |
+| `withWeekStart(l, 1)`  | 주 시작을 `-u-fw-` 확장으로 적은 태그                                   | `ko-KR-u-fw-mon` | `en-US-u-fw-mon` | `de-DE-u-fw-mon` |
 
 ### 왜 이렇게
 
 - `resolveLocale` 은 `Intl.getCanonicalLocales` 로 태그를 검사하고 정규형(`ko-kr` → `ko-KR`)을 돌려줍니다. 어떤 태그든 import 없이 됩니다. locale 데이터는 런타임의 ICU 에 이미 있습니다.
-- 인자를 생략하면 `DEFAULT_LOCALE`(`'ko-KR'`)을 씁니다. 컴포넌트는 자기 `locale` prop, 가장 가까운 `IdsProvider` 의 `locale`([translate.ts](#translatets) 의 `useProviderLocale`) 순서로 넘깁니다.
+- 인자를 생략하면 `DEFAULT_LOCALE`(`'ko-KR'`)을 씁니다. 날짜와 시간 컴포넌트는 `locale` prop 이 없고 가장 가까운 `IdsProvider` 의 `locale`([translate.ts](#translatets) 의 `useProviderLocale`)을 넘깁니다. 주 시작과 숫자 체계도 그 태그의 `-u-fw-`, `-u-nu-` 확장으로 정합니다.
 - `dateFormatter` 는 `@internationalized/date` 의 `DateFormatter` 입니다. 같은 locale 과 옵션의 `Intl.DateTimeFormat` 을 캐시하고, Chrome 의 `hour12` 버그를 피합니다.
+- `withWeekStart` 는 태그에 이미 있는 `-fw-` 를 지우고 `-u-` 확장 안에 다시 적습니다. Scheduler 는 자기 `weekStartsOn` 을 Calendar 에 넘길 prop 이 없어서, 이 태그를 `LanguageContext` 로 내려 줍니다.
 - `periodFirst`, `dateOrder`, `monthNames`, `nativeDigits` 는 locale 마다 한 번 계산합니다(`memoize`).
 - `weekStartOf` 는 알려진 일요일(`A_SUNDAY`)이 그 locale 의 주에서 몇 번째 날인지(`getDayOfWeek`)로 주 시작을 거꾸로 구합니다. `getDayOfWeek` 은 `Intl.Locale` 의 주 정보와 `-u-fw-` 확장을 따릅니다.
 - `monthNames` 는 날짜 안의 꼴(`{ day, month }` 의 `month` 부분)과 홀로 쓰는 꼴(`{ month }`)을 모두 담습니다. 러시아어처럼 두 꼴이 다른 언어가 있습니다. 끝의 `.`(`oct.`, `Sept.`)은 떼고 비교합니다.

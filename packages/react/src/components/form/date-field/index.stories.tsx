@@ -11,13 +11,14 @@ import { Showcase } from '~story-kit';
 import { Field as FormField } from '../../../react-hook-form';
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
+import { Calendar } from '../../data/calendar';
+import { IdsProvider } from '../../utility/ids-provider';
 import { Field } from '../field';
 
 import { DateField } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const today = new CalendarDate(2026, 9, 15);
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
@@ -26,18 +27,16 @@ const meta = {
   component: DateField,
   tags: ['autodocs'],
   argTypes: {
+    selectionMode: { control: 'radio', options: ['single', 'range', 'multiple'] },
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    captionLayout: { control: 'radio', options: ['label', 'dropdown'] },
-    locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP', 'ar-EG'] },
-    mobileVariant: { control: 'radio', options: ['popover', 'drawer'] },
     invalid: { control: 'boolean' },
     required: { control: 'boolean' },
     readOnly: { control: 'boolean' },
+    disabled: { control: 'boolean' },
   },
   args: {
     'aria-label': '날짜',
-    today,
     variant: 'outline',
     size: 'standard',
     className: cn('w-72'),
@@ -53,6 +52,15 @@ const day = (key: string) =>
   document.querySelector<HTMLButtonElement>(`[data-calendar-day="${key}"]`)!;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>체크인</Field.Label>
+      <DateField defaultValue={new CalendarDate(2026, 9, 15)} />
+    </Field>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -152,19 +160,21 @@ export const Gallery: Story = {
           />
         </Showcase.Row>
         <Showcase.Row label="en-US · de-DE">
-          <DateField
-            locale="en-US"
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="English"
-          />
-          <DateField
-            locale="de-DE"
-            format={{ dateStyle: 'long' }}
-            defaultValue={new CalendarDate(2026, 9, 15)}
-            className="w-72"
-            aria-label="Deutsch"
-          />
+          <IdsProvider.Scope locale="en-US">
+            <DateField
+              defaultValue={new CalendarDate(2026, 9, 15)}
+              className="w-72"
+              aria-label="English"
+            />
+          </IdsProvider.Scope>
+          <IdsProvider.Scope locale="de-DE">
+            <DateField
+              format={{ dateStyle: 'long' }}
+              defaultValue={new CalendarDate(2026, 9, 15)}
+              className="w-72"
+              aria-label="Deutsch"
+            />
+          </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="function">
           <DateField
@@ -179,13 +189,23 @@ export const Gallery: Story = {
   ),
 };
 
-export const SelectAndClear: Story = {
-  args: { min: new CalendarDate(2026, 9, 1), max: new CalendarDate(2026, 9, 30) },
+export const PickAndClearADate: Story = {
+  render: (args) => (
+    <DateField
+      aria-label="날짜"
+      min={new CalendarDate(2026, 9, 1)}
+      max={new CalendarDate(2026, 9, 30)}
+      onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
+      className="w-72"
+    >
+      <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+    </DateField>
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          'Trigger에서 ↓ 또는 Enter로 열면 고른 날(없으면 오늘)에 포커스가 갑니다. 날짜를 고르면 닫히고 포커스는 Trigger로 돌아옵니다. Clear는 값을 비웁니다.',
+          'Trigger에서 ↓ 또는 Enter로 열면 고른 날(없으면 오늘)에 포커스가 갑니다. 날짜를 고르면 닫히고 포커스는 Trigger로 돌아옵니다. Clear는 값을 비웁니다. 고를 수 있는 기간은 루트의 min과 max가 정합니다.',
       },
     },
   },
@@ -205,13 +225,22 @@ export const SelectAndClear: Story = {
   },
 };
 
-export const Range: Story = {
-  args: { selectionMode: 'range', monthsToShow: 2, className: cn('w-80') },
+export const PickARangeOverTwoMonths: Story = {
+  render: (args) => (
+    <DateField
+      aria-label="날짜"
+      selectionMode="range"
+      onValueChange={args.onValueChange as (value: Calendar.Range | null) => void}
+      className="w-80"
+    >
+      <DateField.Calendar today={new CalendarDate(2026, 9, 15)} monthsToShow={2} />
+    </DateField>
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          '기간은 두 번 눌러 고르고, 고르는 동안 팝업이 열려 있습니다. 끝을 고르기 전에는 포인터나 키보드가 있는 날까지 미리 보여 줍니다. 닫기는 Esc, 바깥 클릭, Trigger입니다.',
+          'selectionMode="range"이면 두 번 눌러 기간을 고르고, 고르는 동안 팝업이 열려 있습니다. 끝을 고르기 전에는 포인터나 키보드가 있는 날까지 미리 보여 줍니다. 두 달을 나란히 보이려면 DateField.Calendar에 monthsToShow={2}를 줍니다. 닫기는 Esc, 바깥 클릭, Trigger입니다.',
       },
     },
   },
@@ -231,20 +260,29 @@ export const Range: Story = {
   },
 };
 
-export const Birthday: Story = {
-  args: {
-    captionLayout: 'dropdown',
-    min: new CalendarDate(1920, 1, 1),
-    max: today,
-    defaultMonth: new CalendarDate(2000, 1, 1),
-    format: { dateStyle: 'long' },
-    'aria-label': '생년월일',
-  },
+export const PickABirthday: Story = {
+  render: (args) => (
+    <DateField
+      aria-label="생년월일"
+      min={new CalendarDate(1920, 1, 1)}
+      max={new CalendarDate(2026, 9, 15)}
+      format={{ dateStyle: 'long' }}
+      onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
+      className="w-72"
+    >
+      <DateField.Calendar
+        today={new CalendarDate(2026, 9, 15)}
+        defaultMonth={new CalendarDate(2000, 1, 1)}
+      >
+        <Calendar.Caption layout="dropdown" />
+      </DateField.Calendar>
+    </DateField>
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          '먼 날짜는 captionLayout="dropdown"으로 연도와 월을 목록에서 바로 고릅니다. 연도 목록은 min부터 max까지입니다.',
+          '먼 날짜는 DateField.Calendar 안에 Calendar.Caption layout="dropdown"을 넣어 연도와 월을 목록에서 바로 고릅니다. 연도 목록은 min부터 max까지이고, 처음 보일 달은 defaultMonth로 정합니다.',
       },
     },
   },
@@ -261,7 +299,101 @@ export const Birthday: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const TypeADate: Story = {
+  render: (args) => (
+    <Field className="w-72">
+      <Field.Label>생년월일</Field.Label>
+      <DateField
+        max={new CalendarDate(2026, 9, 15)}
+        autoComplete="bday"
+        onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
+      >
+        <DateField.Input />
+        <DateField.Clear />
+        <DateField.Trigger />
+        <DateField.Calendar today={new CalendarDate(2026, 9, 15)}>
+          <Calendar.Caption layout="dropdown" />
+        </DateField.Calendar>
+      </DateField>
+      <Field.Hint>
+        2000. 01. 31., 2000-01-31, 2000년 1월 31일, Jan 31 2000, 20000131 모두 됩니다.
+      </Field.Hint>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateField.Input을 넣으면 날짜를 글자로 칠 수 있습니다. Enter나 포커스를 떠날 때 읽고 표시 형식으로 다시 씁니다. 못 읽거나 고를 수 없는 날짜는 그대로 두고 오류로 표시하며, Esc로 되돌립니다. ↓는 달력을 엽니다.',
+      },
+    },
+  },
+  play: async ({ canvas, args, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: '생년월일' });
+    await userEvent.click(input);
+    await userEvent.keyboard('20000131{Enter}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(2000, 1, 31));
+    await expect(input).toHaveValue('2000. 01. 31.');
+    await userEvent.clear(input);
+    await userEvent.type(input, '2030-01-01');
+    await userEvent.tab();
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await userEvent.click(input);
+    await userEvent.keyboard('{Escape}');
+    await expect(input).toHaveValue('2000. 01. 31.');
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(day('2000-01-31')).toHaveFocus());
+  },
+};
+
+export const ShowAnotherLanguage: Story = {
+  render: () => (
+    <IdsProvider.Scope locale="en-US">
+      <Field className="w-72">
+        <Field.Label>Check-in</Field.Label>
+        <DateField defaultValue={new CalendarDate(2026, 9, 15)}>
+          <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+        </DateField>
+      </Field>
+    </IdsProvider.Scope>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '날짜의 언어와 순서, 주의 첫날은 가장 가까운 IdsProvider의 locale을 따릅니다. 한 필드만 다른 언어로 보이려면 그 필드를 <IdsProvider.Scope locale="en-US">로 감쌉니다. 주의 첫날을 바꾸려면 "en-US-u-fw-mon"처럼 locale에 적습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole('combobox', { name: 'Check-in' });
+    await expect(trigger).toHaveTextContent('09/15/2026');
+    await userEvent.click(trigger);
+    await waitFor(() => expect(day('2026-09-15')).toHaveFocus());
+    await expect(await canvas.findByRole('dialog')).toHaveTextContent(/September 2026/);
+  },
+};
+
+export const OpenAsADrawerOnPhones: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>체크인</Field.Label>
+      <DateField defaultValue={new CalendarDate(2026, 9, 15)}>
+        <DateField.Content mobileVariant="drawer" />
+      </DateField>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '좁은 화면에서 팝업을 아래에서 올라오는 드로어로 띄우려면 DateField.Content에 mobileVariant="drawer"를 줍니다. 넓은 화면에서는 그대로 팝오버입니다. 달력 옵션은 DateField.Calendar에, 팝업 옵션은 DateField.Content에 둡니다.',
+      },
+    },
+  },
+};
+
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -275,7 +407,9 @@ export const NativeForm: Story = {
       >
         <Field className="w-full">
           <Field.Label>체크인</Field.Label>
-          <DateField name="checkin" required today={today} />
+          <DateField name="checkin" required>
+            <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+          </DateField>
           <Field.Hint>비워 두면 제출되지 않습니다.</Field.Hint>
         </Field>
         <Field className="w-full">
@@ -287,8 +421,9 @@ export const NativeForm: Story = {
               start: new CalendarDate(2026, 9, 20),
               end: new CalendarDate(2026, 9, 22),
             }}
-            today={today}
-          />
+          >
+            <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+          </DateField>
         </Field>
         <div className="flex gap-2">
           <Button type="submit">제출</Button>
@@ -333,7 +468,7 @@ const schema = z.object({
     .refine(Boolean, '날짜를 고르세요.'),
 });
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ resolver: zodResolver(schema), defaultValues: { date: null } });
     const [result, setResult] = useState('');
@@ -347,7 +482,9 @@ export const ReactHookForm: Story = {
         >
           <FormField name="date" controlMode="value" required className="w-full">
             <FormField.Label>예약 날짜</FormField.Label>
-            <DateField today={today} />
+            <DateField>
+              <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
+            </DateField>
             <FormField.Error />
           </FormField>
           <Button type="submit">예약</Button>
@@ -377,10 +514,9 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const Composition: Story = {
+export const CustomizeTheTrigger: Story = {
   render: () => (
     <DateField
-      today={today}
       format={{ month: 'long', day: 'numeric', weekday: 'long' }}
       aria-label="마감일"
       className="w-72"
@@ -389,13 +525,14 @@ export const Composition: Story = {
         <DateField.Value className="font-medium" />
       </DateField.Trigger>
       <DateField.Clear aria-label="마감일 지우기" />
+      <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
     </DateField>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'Trigger 안을 직접 채우고 Clear의 이름을 바꿀 수 있습니다. 부분을 하나라도 주면 준 것만 그립니다.',
+          'Trigger 안을 직접 채우고 Clear의 이름을 바꿀 수 있습니다. 부분을 하나라도 주면 준 것만 그립니다. DateField.Calendar와 DateField.Content는 팝업 안의 부분이라 이 규칙에 들지 않습니다.',
       },
     },
   },
@@ -405,51 +542,5 @@ export const Composition: Story = {
     await userEvent.click(day('2026-09-18'));
     await expect(trigger).toHaveTextContent('9월 18일 금요일');
     await expect(canvas.getByRole('button', { name: '마감일 지우기' })).toBeVisible();
-  },
-};
-
-export const TypedEntry: Story = {
-  render: (args) => (
-    <Field className="w-72">
-      <Field.Label>생년월일</Field.Label>
-      <DateField
-        today={today}
-        max={today}
-        captionLayout="dropdown"
-        autoComplete="bday"
-        onValueChange={args.onValueChange}
-      >
-        <DateField.Input />
-        <DateField.Clear />
-        <DateField.Trigger />
-      </DateField>
-      <Field.Hint>
-        2000. 01. 31., 2000-01-31, 2000년 1월 31일, Jan 31 2000, 20000131 모두 됩니다.
-      </Field.Hint>
-    </Field>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'DateField.Input을 넣으면 날짜를 글자로 칠 수 있습니다. Enter나 포커스를 떠날 때 읽고 표시 형식으로 다시 씁니다. 못 읽거나 고를 수 없는 날짜는 그대로 두고 오류로 표시하며, Esc로 되돌립니다. ↓는 달력을 엽니다.',
-      },
-    },
-  },
-  play: async ({ canvas, args, userEvent }) => {
-    const input = canvas.getByRole('combobox', { name: '생년월일' });
-    await userEvent.click(input);
-    await userEvent.keyboard('20000131{Enter}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(2000, 1, 31));
-    await expect(input).toHaveValue('2000. 01. 31.');
-    await userEvent.clear(input);
-    await userEvent.type(input, '2030-01-01');
-    await userEvent.tab();
-    await expect(input).toHaveAttribute('aria-invalid', 'true');
-    await userEvent.click(input);
-    await userEvent.keyboard('{Escape}');
-    await expect(input).toHaveValue('2000. 01. 31.');
-    await userEvent.keyboard('{ArrowDown}');
-    await waitFor(() => expect(day('2000-01-31')).toHaveFocus());
   },
 };

@@ -12,6 +12,7 @@ import {
   type MouseEvent,
   type ReactElement,
   type ReactNode,
+  type RefObject,
 } from 'react';
 
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -60,7 +61,6 @@ export type TemporalFieldProps<V> = Omit<
   readOnly?: boolean;
   disabled?: boolean;
   placeholder?: string;
-  mobileVariant?: 'popover' | 'drawer';
   autoComplete?: ComponentProps<'input'>['autoComplete'];
   className?: string | ((state: TemporalFieldState<V>) => string | undefined);
   style?: CSSProperties | ((state: TemporalFieldState<V>) => CSSProperties | undefined);
@@ -75,12 +75,14 @@ export type TemporalMessages = {
   open?: string;
 };
 
-export type TemporalPicker<V> = (api: {
+export type TemporalPickerApi<V> = {
   value: V;
   change: TemporalChange<V>;
   close: (restoreFocus: boolean) => void;
   size: IdsSize;
-}) => ReactNode;
+};
+
+export type TemporalPicker<V> = (api: TemporalPickerApi<V>) => ReactNode;
 
 export type TemporalConfig<V> = {
   kind: 'date' | 'time' | 'date-time';
@@ -96,12 +98,16 @@ export type TemporalConfig<V> = {
   initialFocusSelector: string;
   parse?: (text: string) => V | undefined;
   inputHint?: string;
+  pickerParts?: ReadonlySet<unknown>;
 };
 
 export type TriggerProps = ComponentProps<'button'> & { asChild?: boolean };
 export type ValueProps = ComponentProps<'span'> & { asChild?: boolean };
 export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
-export type ContentProps = ComponentProps<'div'> & { asChild?: boolean };
+export type ContentProps = ComponentProps<'div'> & {
+  asChild?: boolean;
+  mobileVariant?: 'popover' | 'drawer';
+};
 export type InputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue' | 'type'> & {
   asChild?: boolean;
 };
@@ -120,6 +126,13 @@ type ContextValue = {
   icon: ComponentType<ComponentProps<'svg'>>;
   messages: TemporalMessages;
   content: () => ReactNode;
+  picker: TemporalPickerApi<unknown>;
+  popup: {
+    id: string;
+    anchor: RefObject<HTMLDivElement | null>;
+    preferredWidth: number | undefined;
+    initialFocusSelector: string;
+  };
   styles: ReturnType<typeof temporalFieldStyle>;
 };
 
@@ -129,6 +142,16 @@ function useTemporal(part: string) {
   const context = use(TemporalContext);
   invariant(context, `${part} must be inside its field.`);
   return context;
+}
+
+export function pickerPart<P>(children: ReactNode, type: unknown) {
+  return flattenFragments(children).find(
+    (child) => isValidElement(child) && elementTypeOf(child) === type,
+  ) as ReactElement<P> | undefined;
+}
+
+export function useTemporalPicker<V>(part: string) {
+  return useTemporal(part).picker as TemporalPickerApi<V>;
 }
 
 export function TemporalValue({ asChild, children, ...props }: ValueProps) {
@@ -214,13 +237,37 @@ export function TemporalClear({ asChild, children, className, ...props }: ClearP
   );
 }
 
-export function TemporalContent({ asChild, children, ...props }: ContentProps) {
+export function TemporalContent({ asChild, children, mobileVariant, ...props }: ContentProps) {
   const c = useTemporal('Content');
-  return part(
-    'div',
-    asChild,
-    children ?? c.content(),
-    mergeProps({ className: c.styles.content() }, props),
+  if (!c.state.open) return null;
+
+  return (
+    <FieldPopup
+      anchor={c.popup.anchor}
+      onClose={c.picker.close}
+      mobileVariant={mobileVariant}
+      preferredWidth={c.popup.preferredWidth}
+      initialFocusSelector={c.popup.initialFocusSelector}
+      role="dialog"
+      id={c.popup.id}
+      label={c.messages.title}
+      data-temporal-owner={c.popup.id}
+      className="concentric-p-3"
+      onBlur={c.onBlur as (event: FocusEvent<HTMLDivElement>) => void}
+    >
+      <FieldPopupHeader
+        title={c.messages.title}
+        closeLabel={c.messages.close}
+        autoFocus
+        onClose={() => c.picker.close(true)}
+      />
+      {part(
+        'div',
+        asChild,
+        children ?? c.content(),
+        mergeProps({ className: c.styles.content() }, props),
+      )}
+    </FieldPopup>
   );
 }
 
@@ -239,7 +286,6 @@ export function TemporalField<V>({
   readOnly = false,
   disabled = false,
   placeholder,
-  mobileVariant,
   name,
   form,
   className,
@@ -282,9 +328,12 @@ export function TemporalField<V>({
     onBlur,
   });
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const picker: TemporalPickerApi<V> = { value: state.value, change, close, size: resolvedSize };
   const styles = temporalFieldStyle({ variant, size: resolvedSize, disabled });
 
-  const parts = flattenFragments(children);
+  const parts = flattenFragments(children).filter(
+    (n) => !(isValidElement(n) && config.pickerParts?.has(elementTypeOf(n))),
+  );
   const contents = parts.filter((n) => isValidElement(n) && elementTypeOf(n) === TemporalContent);
   const shell = parts.filter((n) => !(isValidElement(n) && elementTypeOf(n) === TemporalContent));
   const count = (type: unknown) =>
@@ -390,13 +439,14 @@ export function TemporalField<V>({
           : config.display(state.value),
         icon: config.icon,
         messages: config.messages,
-        content: () =>
-          config.picker({
-            value: state.value,
-            change,
-            close,
-            size: resolvedSize,
-          }),
+        content: () => config.picker(picker),
+        picker: picker as TemporalPickerApi<unknown>,
+        popup: {
+          id: popupId,
+          anchor: rootRef,
+          preferredWidth: config.preferredWidth,
+          initialFocusSelector: config.initialFocusSelector,
+        },
         styles,
       }}
     >
@@ -438,29 +488,7 @@ export function TemporalField<V>({
           anchor={controlRef}
         />
       </div>
-      {state.open && (
-        <FieldPopup
-          anchor={rootRef}
-          onClose={close}
-          mobileVariant={mobileVariant}
-          preferredWidth={config.preferredWidth}
-          initialFocusSelector={config.initialFocusSelector}
-          role="dialog"
-          id={popupId}
-          label={config.messages.title}
-          data-temporal-owner={popupId}
-          className="concentric-p-3"
-          onBlur={handleBlur as (event: FocusEvent<HTMLDivElement>) => void}
-        >
-          <FieldPopupHeader
-            title={config.messages.title}
-            closeLabel={config.messages.close}
-            autoFocus
-            onClose={() => close(true)}
-          />
-          {contents.length ? contents : <TemporalContent />}
-        </FieldPopup>
-      )}
+      {contents.length ? contents : <TemporalContent />}
     </TemporalContext.Provider>
   );
 }

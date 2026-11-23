@@ -7,6 +7,7 @@ import { Showcase } from '~story-kit';
 
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
+import { IdsProvider } from '../../utility/ids-provider';
 import { Field } from '../field';
 
 import { TimeField } from '.';
@@ -26,12 +27,12 @@ const meta = {
     size: { control: 'radio', options: sizes },
     precision: { control: 'radio', options: ['hour', 'minute', 'second'] },
     hourCycle: { control: 'radio', options: [undefined, '12h', '24h'] },
-    pickerVariant: { control: 'radio', options: ['grid', 'wheel'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
     format: { control: 'object' },
     invalid: { control: 'boolean' },
     required: { control: 'boolean' },
     readOnly: { control: 'boolean' },
+    disabled: { control: 'boolean' },
   },
   args: {
     'aria-label': '시간',
@@ -51,6 +52,15 @@ const option = (unit: string, n: number) =>
   column(unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-60">
+      <Field.Label>알람</Field.Label>
+      <TimeField defaultValue={new Time(7, 30)} />
+    </Field>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -84,13 +94,14 @@ export const Gallery: Story = {
           />
         </Showcase.Row>
         <Showcase.Row label="Intl options · en-US">
-          <TimeField
-            locale="en-US"
-            format={{ hour: '2-digit', minute: '2-digit' }}
-            defaultValue={at(14, 30)}
-            className="w-44"
-            aria-label="English"
-          />
+          <IdsProvider.Scope locale="en-US">
+            <TimeField
+              format={{ hour: '2-digit', minute: '2-digit' }}
+              defaultValue={at(14, 30)}
+              className="w-44"
+              aria-label="English"
+            />
+          </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="second">
           <TimeField
@@ -121,13 +132,22 @@ export const Gallery: Story = {
   ),
 };
 
-export const SelectAndClear: Story = {
-  args: { defaultValue: at(9, 30), hourCycle: '24h', step: 15 },
+export const PickAndClearATime: Story = {
+  render: (args) => (
+    <TimeField
+      aria-label="시간"
+      defaultValue={new Time(9, 30)}
+      hourCycle="24h"
+      step={15}
+      onValueChange={args.onValueChange}
+      className="w-60"
+    />
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          '↓로 열면 첫 컬럼에 포커스가 갑니다. 방향키로 둘러보고 Enter로 고르며, 고르는 동안 팝업이 열려 있습니다. Esc로 닫으면 포커스는 Trigger로 돌아옵니다.',
+          '↓로 열면 첫 컬럼에 포커스가 갑니다. 방향키로 둘러보고 Enter로 고르며, 고르는 동안 팝업이 열려 있습니다. Esc로 닫으면 포커스는 Trigger로 돌아옵니다. 분 간격은 step, 12시간·24시간 표기는 hourCycle로 정합니다.',
       },
     },
   },
@@ -146,14 +166,18 @@ export const SelectAndClear: Story = {
   },
 };
 
-export const Limits: Story = {
-  args: {
-    hourCycle: '24h',
-    step: 30,
-    min: at(9),
-    max: at(18),
-    'aria-label': '상담 시간',
-  },
+export const LimitToOfficeHours: Story = {
+  render: (args) => (
+    <TimeField
+      aria-label="상담 시간"
+      min={new Time(9, 0)}
+      max={new Time(18, 0)}
+      hourCycle="24h"
+      step={30}
+      onValueChange={args.onValueChange}
+      className="w-60"
+    />
+  ),
   parameters: {
     docs: {
       description: {
@@ -172,7 +196,53 @@ export const Limits: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const PickOnAWheel: Story = {
+  render: () => (
+    <Field className="w-60">
+      <Field.Label>출발 시각</Field.Label>
+      <TimeField defaultValue={new Time(21, 15)}>
+        <TimeField.TimePicker variant="wheel" />
+      </TimeField>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '팝업의 시계를 스크롤해서 고르는 휠로 바꾸려면 TimeField 안에 TimeField.TimePicker variant="wheel"을 둡니다. 멈춘 자리의 값이 선택됩니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('combobox', { name: '출발 시각' }));
+    const dialog = await canvas.findByRole('dialog');
+    await expect(dialog.querySelector('[data-time-picker]')).toHaveAttribute(
+      'data-variant',
+      'wheel',
+    );
+  },
+};
+
+export const OpenAsADrawerOnPhones: Story = {
+  render: () => (
+    <Field className="w-60">
+      <Field.Label>알람</Field.Label>
+      <TimeField defaultValue={new Time(7, 30)}>
+        <TimeField.Content mobileVariant="drawer" />
+      </TimeField>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '좁은 화면에서 팝업을 아래에서 올라오는 드로어로 띄우려면 TimeField.Content에 mobileVariant="drawer"를 줍니다. 넓은 화면에서는 그대로 팝오버입니다.',
+      },
+    },
+  },
+};
+
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -186,7 +256,7 @@ export const NativeForm: Story = {
       >
         <Field className="w-full">
           <Field.Label>알람</Field.Label>
-          <TimeField name="alarm" required hourCycle="24h" defaultValue={at(7)} />
+          <TimeField name="alarm" required hourCycle="24h" defaultValue={new Time(7, 0)} />
         </Field>
         <div className="flex gap-2">
           <Button type="submit">저장</Button>
@@ -216,16 +286,5 @@ export const NativeForm: Story = {
     await expect(form.checkValidity()).toBe(false);
     await userEvent.click(canvas.getByRole('button', { name: '초기화' }));
     await waitFor(() => expect(form.checkValidity()).toBe(true));
-  },
-};
-
-export const Wheel: Story = {
-  args: { pickerVariant: 'wheel', defaultValue: at(21, 15), 'aria-label': '출발 시각' },
-  parameters: {
-    docs: {
-      description: {
-        story: '팝업의 시계를 스크롤해서 고르는 휠로 바꿉니다. 멈춘 자리의 값이 선택됩니다.',
-      },
-    },
   },
 };

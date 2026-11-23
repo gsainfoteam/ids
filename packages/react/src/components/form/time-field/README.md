@@ -2,7 +2,7 @@
 
 누르면 시계가 열리고, 고른 시각을 필드에 보여 주는 시간 입력입니다.
 
-- **locale 시간제.** 한국어는 `오후 2:30`, 미국 영어는 `2:30 PM`, 독일어는 `14:30` 처럼 브라우저의 `Intl`(CLDR)을 따라 보이고, 시계도 같은 시간제로 열립니다. `hourCycle` 로 바꿉니다. `locale` 은 BCP 47 태그라 어떤 언어든 import 없이 됩니다.
+- **locale 시간제.** 한국어는 `오후 2:30`, 미국 영어는 `2:30 PM`, 독일어는 `14:30` 처럼 브라우저의 `Intl`(CLDR)을 따라 보이고, 시계도 같은 시간제로 열립니다. `hourCycle` 로 바꿉니다. locale 은 `IdsProvider` 의 `locale`(BCP 47 태그)이라 어떤 언어든 import 없이 됩니다.
 - **간격과 범위.** `step` 으로 15분 단위처럼 끊고 `min` / `max` 밖은 고를 수 없습니다.
 - **키보드.** Trigger에서 `↓` 로 열면 첫 컬럼에 포커스가 가고, 숫자를 치거나 방향키로 옮겨 Enter로 고릅니다.
 - **폼.** `name` 을 주면 `14:30` 이 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막습니다. `reset` 은 `defaultValue` 로 되돌립니다.
@@ -35,8 +35,8 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 ```tsx
 <TimeField />                                   // ko-KR: 오후 2:30
 <TimeField hourCycle="24h" />                   // 14:30. 시계도 24시간제
-<TimeField locale="en-US" />                    // 2:30 PM
-<TimeField locale="ja-JP" hourCycle="12h" />    // 午後2:30
+<IdsProvider.Scope locale="en-US"><TimeField /></IdsProvider.Scope>                  // 2:30 PM
+<IdsProvider.Scope locale="ja-JP"><TimeField hourCycle="12h" /></IdsProvider.Scope>  // 午後2:30
 <TimeField precision="hour" />                  // 오후 2시
 <TimeField format={{ hour: '2-digit', minute: '2-digit' }} />   // Intl 옵션. 오후 02:30
 <TimeField format={{ timeStyle: 'short' }} hourCycle="24h" />   // hourCycle 이 옵션에도 간다
@@ -53,10 +53,15 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 ```tsx
 <TimeField precision="second" step={10} />                    // 시·분·초, 초는 10초 간격
 <TimeField min={new Time(9)} max={new Time(18)} />           // 양 끝 포함
-<TimeField pickerVariant="wheel" />                          // 스크롤해서 멈춘 자리를 고르는 휠
+<TimeField>
+  <TimeField.TimePicker variant="wheel" />                   // 스크롤해서 멈춘 자리를 고르는 휠
+  <TimeField.Content mobileVariant="drawer" />               // 640px 보다 좁으면 아래에서 올라오는 판
+</TimeField>
 ```
 
 - 단위, 간격, 키보드는 [TimePicker](../../data/time-picker/README.md) 와 같습니다.
+- `TimeField.TimePicker` 는 TimePicker 의 `variant`, `className`, 컬럼 part 를 받습니다. 값, `precision`, `step`, `hourCycle`, `min` / `max`, 크기는 필드가 넘깁니다. 필드의 자식으로 적고 팝업 안에 그려집니다.
+- `TimeField.Content` 는 팝업이고 `mobileVariant` 를 받습니다. [DateField](../date-field/README.md#열기와-닫기) 와 같습니다.
 
 ## 폼
 
@@ -100,7 +105,7 @@ const schema = z.object({
     <TimeField.Value /> {/* 값이나 placeholder(시간 선택) */}
   </TimeField.Trigger>
   <TimeField.Clear />
-  <TimeField.Content>{/* 기본은 TimePicker */}</TimeField.Content>
+  <TimeField.Content>{/* 기본은 TimeField.TimePicker */}</TimeField.Content>
 </TimeField>
 ```
 
@@ -120,13 +125,11 @@ const schema = z.object({
 | `format`                                   | locale 시각. Intl 옵션이나 `(time, locale) => string`   |
 | `hourCycle`                                | locale 시간제. `12h` / `24h`. 표시와 시계 모두          |
 | `precision` / `step` / `min` / `max`       | `minute` / `1`. `min` / `max` 는 `Time`. 시계로 간다    |
-| `pickerVariant`                            | `grid`(기본) / `wheel`                                  |
-| `locale`                                   | `ko-KR`. BCP 47 태그                                    |
 | `placeholder`                              | `시간 선택`                                             |
 | `name` / `form` / `required`               | 숨은 값 입력과 브라우저 검증                            |
 | `disabled` / `readOnly`                    | 열기, 고르기, Clear 를 막는다                           |
 | `invalid`                                  | danger 테두리와 링. Field 의 `aria-invalid` 가 우선     |
-| `variant` / `size` / `mobileVariant`       | `outline` / `standard` / `popover`                      |
+| `variant` / `size`                         | `outline` / `standard`                                  |
 | `className` / `style`                      | 필드 표면. 상태를 받는 함수도 된다                      |
 | 그 외 native 속성, `ref`                   | Trigger `button` 으로 간다                              |
 
@@ -134,6 +137,6 @@ const schema = z.object({
 
 - 시간대 변환은 없습니다. 값은 날짜 없는 벽시계 시각이고, 표시는 UTC 의 한 날에 놓고 `timeZone: 'UTC'` 로 그려서 로컬 시간대가 글자를 바꾸지 못합니다.
 - 오전/오후 이름과 표시 글자는 런타임의 `Intl` 데이터입니다. 서버(Node)와 브라우저의 ICU 가 다르면 글자가 조금 다를 수 있습니다.
-- BCP 47 태그가 아닌 `locale`(date-fns `Locale` 객체, `'de_DE'`)은 오류입니다.
+- locale 은 `IdsProvider` 의 것입니다. BCP 47 태그가 아니면(`'de_DE'`) 오류입니다.
 - `drawer` 는 modal 입니다. 뒤 화면을 어둡게 가리고 스크롤을 잠그며, 포커스를 sheet 안에 둡니다. 배경을 누르거나 Escape 로 닫으면 포커스가 필드로 돌아갑니다.
 - 팝업이 남은 화면보다 길면 안에서 스크롤하고, 위나 아래에 내용이 더 남은 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)).

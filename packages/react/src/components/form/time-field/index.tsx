@@ -1,4 +1,5 @@
 import { TimeFieldRoot, type TimeFieldProps } from './root';
+import { TimeFieldTimePicker, type TimeFieldTimePickerProps } from './time-picker';
 import {
   TemporalClear,
   TemporalContent,
@@ -25,11 +26,17 @@ export namespace TimeField {
   export type ValueProps = SharedValueProps;
   export type ClearProps = SharedClearProps;
   export type ContentProps = SharedContentProps;
+  export type TimePickerProps = TimeFieldTimePickerProps;
   export const Trigger = TemporalTrigger;
   export const Value = TemporalValue;
   export const Clear = TemporalClear;
   export const Content = TemporalContent;
+  export const TimePicker = TimeFieldTimePicker;
+  export namespace TimePicker {
+    export type Props = TimeFieldTimePickerProps;
+  }
   export const Style = temporalFieldStyle;
 }
 
 export type { TimeFieldProps } from './root';
+export type { TimeFieldTimePickerProps } from './time-picker';

@@ -6,6 +6,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
+import { IdsProvider } from '../../utility/ids-provider';
 
 import { Calendar, type DateRange } from '.';
 
@@ -20,19 +21,14 @@ const meta = {
   component: Calendar,
   tags: ['autodocs'],
   argTypes: {
-    selectionMode: { control: 'radio', options: ['single', 'range', 'multiple', 'none'] },
+    selectionMode: { control: 'radio', options: modes },
     size: { control: 'radio', options: sizes },
-    captionLayout: { control: 'radio', options: ['label', 'dropdown'] },
     monthsToShow: { control: { type: 'number', min: 1, max: 3 } },
-    weekStartsOn: { control: { type: 'number', min: 0, max: 6 } },
-    locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP', 'ar-EG'] },
     readOnly: { control: 'boolean' },
-    showWeekNumber: { control: 'boolean' },
   },
   args: {
     today,
     size: 'standard',
-    captionLayout: 'label',
     monthsToShow: 1,
     onValueChange: fn(),
     onMonthChange: fn(),
@@ -48,6 +44,12 @@ const focusedDay = () => (document.activeElement as HTMLElement).dataset.calenda
 const grid = (canvasElement: HTMLElement) => canvasElement.querySelector('[role=grid]');
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Calendar defaultValue={new CalendarDate(2026, 9, 18)} today={new CalendarDate(2026, 9, 15)} />
+  ),
+};
 
 const valueFor = {
   single: { defaultValue: new CalendarDate(2026, 9, 18) },
@@ -85,11 +87,19 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section
-        title="Caption"
-        description="dropdown은 연도와 월을 바로 고르는 native select입니다. 여러 달을 보이면 이전, 다음 버튼은 양 끝 달에만 놓입니다."
+        title="Parts"
+        description='Calendar.Caption layout="dropdown" 은 연도와 월을 바로 고르는 native select 입니다. Calendar.WeekNumber 는 주차 열을, Calendar.Footer 는 달력 아래 알림 영역을 붙입니다.'
       >
-        <Showcase.Row label="dropdown">
-          <Calendar captionLayout="dropdown" today={today} aria-label="드롭다운" />
+        <Showcase.Row label="Caption dropdown">
+          <Calendar today={today} aria-label="드롭다운">
+            <Calendar.Caption layout="dropdown" />
+          </Calendar>
+        </Showcase.Row>
+        <Showcase.Row label="WeekNumber · Footer">
+          <Calendar today={today} defaultValue={new CalendarDate(2026, 9, 18)} aria-label="주차">
+            <Calendar.WeekNumber />
+            <Calendar.Footer>9월 18일을 골랐습니다.</Calendar.Footer>
+          </Calendar>
         </Showcase.Row>
         <Showcase.Row label="two months">
           <Calendar
@@ -115,18 +125,12 @@ export const Gallery: Story = {
             aria-label="제한"
           />
         </Showcase.Row>
-        <Showcase.Row label="readOnly · none">
+        <Showcase.Row label="readOnly">
           <Calendar
             readOnly
             defaultValue={new CalendarDate(2026, 9, 18)}
             today={today}
             aria-label="읽기 전용"
-          />
-          <Calendar
-            selectionMode="none"
-            value={new CalendarDate(2026, 9, 18)}
-            today={today}
-            aria-label="선택 없음"
           />
         </Showcase.Row>
         <Showcase.Row label="disabled">
@@ -137,29 +141,334 @@ export const Gallery: Story = {
             aria-label="비활성"
           />
         </Showcase.Row>
-        <Showcase.Row label="week numbers">
-          <Calendar showWeekNumber today={today} aria-label="주차" />
-        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Locale">
         <Showcase.Row label="en-US">
-          <Calendar locale="en-US" today={today} aria-label="English" />
+          <IdsProvider.Scope locale="en-US">
+            <Calendar today={today} aria-label="English" />
+          </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="de-DE">
-          <Calendar locale="de-DE" today={today} aria-label="Deutsch" />
+          <IdsProvider.Scope locale="de-DE">
+            <Calendar today={today} aria-label="Deutsch" />
+          </IdsProvider.Scope>
         </Showcase.Row>
-        <Showcase.Row label="ar-EG · rtl">
-          <div dir="rtl">
-            <Calendar locale="ar-EG" numerals="arab" today={today} aria-label="العربية" />
-          </div>
+        <Showcase.Row label="ar-EG-u-nu-arab · rtl">
+          <IdsProvider.Scope locale="ar-EG-u-nu-arab" dir="rtl">
+            <Calendar today={today} aria-label="العربية" />
+          </IdsProvider.Scope>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
+export const PickARange: Story = {
+  render: function Render() {
+    const [range, setRange] = useState<DateRange | null>(null);
+
+    return (
+      <div className="flex flex-col gap-3">
+        <Calendar
+          selectionMode="range"
+          value={range}
+          onValueChange={setRange}
+          monthsToShow={2}
+          today={today}
+        />
+        <output aria-label="기간" className="text-body-b3-regular">
+          {range?.start?.day ?? '–'} ~ {range?.end?.day ?? '–'}
+        </output>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'selectionMode="range" 는 첫 클릭이 시작, 두 번째 클릭이 끝입니다. 끝을 고르기 전에는 포인터나 키보드 포커스가 있는 날까지 기간을 미리 보여 줍니다. 더 이른 날을 고르면 시작과 끝이 바뀌고, 세 번째 클릭은 새 기간을 시작합니다. 값은 { start, end } 이고, monthsToShow 로 두 달을 나란히 보입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(day(canvasElement, '2026-09-24'));
+    await expect(canvas.getByLabelText('기간')).toHaveTextContent('24 ~ –');
+    await userEvent.hover(day(canvasElement, '2026-10-02'));
+    await waitFor(() =>
+      expect(day(canvasElement, '2026-09-30')).toHaveAttribute('data-range-preview'),
+    );
+    await userEvent.keyboard('{ArrowLeft}');
+    await waitFor(() =>
+      expect(day(canvasElement, '2026-09-23')).toHaveAttribute('data-range-preview'),
+    );
+    await expect(day(canvasElement, '2026-09-30')).not.toHaveAttribute('data-range-preview');
+    await userEvent.click(day(canvasElement, '2026-10-02'));
+    await expect(canvas.getByLabelText('기간')).toHaveTextContent('24 ~ 2');
+    await expect(day(canvasElement, '2026-09-30')).toHaveAttribute('data-range-middle');
+    await userEvent.click(day(canvasElement, '2026-09-20'));
+    await userEvent.click(day(canvasElement, '2026-09-12'));
+    await expect(canvas.getByLabelText('기간')).toHaveTextContent('12 ~ 20');
+  },
+};
+
+export const PickSeveralDays: Story = {
+  args: { selectionMode: 'multiple', defaultValue: [new CalendarDate(2026, 9, 3)] },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'selectionMode="multiple" 은 누를 때마다 그날을 넣고 빼며, 값은 CalendarDate 배열입니다. 격자는 aria-multiselectable 로 여러 날을 고를 수 있다고 알립니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, args, userEvent }) => {
+    await userEvent.click(day(canvasElement, '2026-09-10'));
+    await userEvent.click(day(canvasElement, '2026-09-03'));
+    await expect(args.onValueChange).toHaveBeenLastCalledWith([new CalendarDate(2026, 9, 10)]);
+    await expect(grid(canvasElement)).toHaveAttribute('aria-multiselectable', 'true');
+  },
+};
+
+export const JumpToAFarYearWithDropdowns: Story = {
+  args: {
+    min: new CalendarDate(1990, 1, 1),
+    max: new CalendarDate(2026, 12, 31),
+    defaultMonth: new CalendarDate(2026, 9, 1),
+    children: <Calendar.Caption layout="dropdown" />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '생년월일처럼 먼 날짜는 <Calendar.Caption layout="dropdown" /> 을 넣어 연도와 월 목록으로 바로 옮깁니다. 목록은 min/max 안의 연도만 보이고, 범위를 벗어난 달은 고를 수 없습니다. 한국어는 연도를 먼저 놓습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    await userEvent.selectOptions(canvas.getByRole('combobox', { name: '연도' }), '1995');
+    await expect(args.onMonthChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 9, 1));
+    await userEvent.selectOptions(canvas.getByRole('combobox', { name: '월' }), '0');
+    await expect(grid(canvasElement)).toHaveAccessibleName('1995년 1월');
+    await userEvent.click(canvas.getByRole('button', { name: '이전 달' }));
+    await expect(grid(canvasElement)).toHaveAccessibleName('1994년 12월');
+  },
+};
+
+export const BlockDaysOutsideLimits: Story = {
+  args: {
+    min: new CalendarDate(2026, 9, 10),
+    max: new CalendarDate(2026, 10, 20),
+    disabled: { dayOfWeek: [0] },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'min/max 밖의 날짜와 disabled 가 막은 날짜는 고를 수 없고 키보드도 건너뜁니다. disabled 는 react-day-picker 의 matcher 라서 함수, 날짜, 기간, 요일을 받습니다. 범위 끝에서 달 버튼은 눌리지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    await expect(day(canvasElement, '2026-09-09')).toBeDisabled();
+    await expect(day(canvasElement, '2026-09-20')).toBeDisabled();
+    await expect(args.onValueChange).not.toHaveBeenCalled();
+    await userEvent.click(day(canvasElement, '2026-09-19'));
+    await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(focusedDay()).toBe('2026-09-21'));
+    const previous = canvas.getByRole('button', { name: '이전 달' });
+    await expect(previous).toHaveAttribute('aria-disabled', 'true');
+    const next = canvas.getByRole('button', { name: '다음 달' });
+    await userEvent.click(next);
+    await expect(next).toHaveAttribute('aria-disabled', 'true');
+    await expect(next).toHaveFocus();
+    const noHoverFillUnderPointer = { backgroundColor: 'rgba(0, 0, 0, 0)' };
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: '다음 달' })).toHaveStyle(noHoverFillUnderPointer),
+    );
+  },
+};
+
+export const MarkDaysWithEvents: Story = {
+  render: function Render() {
+    const [date, setDate] = useState<CalendarDate | null>(null);
+
+    const events = [
+      new CalendarDate(2026, 9, 4),
+      new CalendarDate(2026, 9, 15),
+      new CalendarDate(2026, 9, 22),
+      new CalendarDate(2026, 10, 2),
+    ];
+    const busy = !!date && events.some((event) => event.compare(date) === 0);
+
+    return (
+      <Calendar value={date} onValueChange={setDate} today={new CalendarDate(2026, 9, 15)}>
+        <Calendar.Day
+          modifiers={{ event: events }}
+          className="data-event:after:bg-primary-solid after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:size-1 after:rounded-full data-event:data-selected:after:bg-current"
+        />
+        <Calendar.Footer>
+          {date ? (busy ? '일정이 있는 날입니다.' : '일정이 없습니다.') : '날짜를 고르세요.'}
+        </Calendar.Footer>
+      </Calendar>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Calendar.Day 의 modifiers 는 날짜에 이름을 붙이고, 이름마다 날짜 버튼에 data-<이름> 속성이 붙습니다(event 는 data-event, bookedOut 은 data-booked-out). Calendar.Day 의 className 이 그 속성으로 점을 그립니다. Calendar.Footer 는 화면 읽기 프로그램이 읽는 알림 영역입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(canvas.getByText('날짜를 고르세요.')).toHaveAttribute('role', 'status');
+    await expect(day(canvasElement, '2026-09-22')).toHaveAttribute('data-event');
+    await expect(day(canvasElement, '2026-09-21')).not.toHaveAttribute('data-event');
+    await userEvent.click(day(canvasElement, '2026-09-22'));
+    await expect(canvas.getByText('일정이 있는 날입니다.')).toBeInTheDocument();
+    await expect(day(canvasElement, '2026-09-22')).toHaveTextContent('22');
+  },
+};
+
+export const LabelTheFirstDayOfAMonth: Story = {
+  render: () => (
+    <Calendar today={new CalendarDate(2026, 9, 15)}>
+      <Calendar.Day>{(date) => (date.day === 1 ? `${date.month}/1` : date.day)}</Calendar.Day>
+    </Calendar>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Calendar.Day 의 children 은 (date, state) 를 받아 날짜 칸의 내용만 바꿉니다. 버튼 모양, 포커스, 상태 속성, 화면 읽기 프로그램이 읽는 이름은 IDS 가 그대로 그립니다. state 는 선택, 오늘, 기간, 바깥 날짜와 modifiers 를 담습니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await expect(day(canvasElement, '2026-09-01')).toHaveTextContent('9/1');
+    await expect(day(canvasElement, '2026-10-01')).toHaveTextContent('10/1');
+    await expect(day(canvasElement, '2026-09-22')).toHaveTextContent('22');
+    await expect(day(canvasElement, '2026-09-01')).toHaveAttribute(
+      'aria-label',
+      '2026년 9월 1일 화요일',
+    );
+  },
+};
+
+export const GoBackToToday: Story = {
+  render: function Render() {
+    const [date, setDate] = useState<CalendarDate | null>(null);
+    const [month, setMonth] = useState(new CalendarDate(2026, 9, 1));
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Button
+          size="tiny"
+          variant="outline"
+          onClick={() => {
+            setMonth(new CalendarDate(2026, 9, 1));
+            setDate(new CalendarDate(2026, 9, 15));
+          }}
+        >
+          오늘
+        </Button>
+        <Calendar
+          value={date}
+          onValueChange={setDate}
+          month={month}
+          onMonthChange={setMonth}
+          today={new CalendarDate(2026, 9, 15)}
+        />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'month 와 onMonthChange 로 보이는 달을 앱이 쥐면, 달력 밖의 버튼이 오늘이 있는 달로 돌아가고 오늘을 고를 수 있습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '다음 달' }));
+    await expect(grid(canvasElement)).toHaveAccessibleName('2026년 10월');
+    await userEvent.click(canvas.getByRole('button', { name: '오늘' }));
+    await expect(grid(canvasElement)).toHaveAccessibleName('2026년 9월');
+    await expect(day(canvasElement, '2026-09-15')).toHaveAttribute('data-selected');
+  },
+};
+
+export const ShowWeekNumbers: Story = {
+  render: () => (
+    <Calendar today={new CalendarDate(2026, 9, 15)}>
+      <Calendar.WeekNumber />
+    </Calendar>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Calendar.WeekNumber 를 넣으면 줄마다 주차 열이 붙습니다. 주차는 locale 의 첫 요일을 따릅니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelectorAll('[role=rowheader]')).toHaveLength(6);
+    await expect(canvasElement.querySelector('th[scope=col]')).toHaveAttribute(
+      'aria-label',
+      '주차',
+    );
+  },
+};
+
+export const FollowTheLocale: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-8">
+      <IdsProvider.Scope locale="en-US">
+        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="English" />
+      </IdsProvider.Scope>
+      <IdsProvider.Scope locale="en-US-u-fw-mon">
+        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Monday first" />
+      </IdsProvider.Scope>
+      <IdsProvider.Scope locale="ja-JP">
+        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="日本語" />
+      </IdsProvider.Scope>
+      <IdsProvider.Scope locale="de-DE">
+        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Deutsch" />
+      </IdsProvider.Scope>
+      <IdsProvider.Scope locale="ar-EG-u-nu-arab" dir="rtl">
+        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="العربية" />
+      </IdsProvider.Scope>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Calendar 는 가장 가까운 IdsProvider 의 locale 을 따릅니다. locale 은 BCP 47 태그이고, 달 이름, 요일, 날짜 이름은 브라우저의 Intl 로 그리므로 import 할 locale 데이터가 없습니다. 주 시작은 locale 을 따르고 -u-fw- 확장(en-US-u-fw-mon)으로 바꿉니다. 숫자 체계는 -u-nu- 확장(ar-EG-u-nu-arab)으로 바꿉니다. 버튼 이름은 IDS 메시지를 씁니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const english = canvas.getByRole('group', { name: 'English' });
+    await expect(english.querySelector('th')).toHaveTextContent('S');
+    await expect(english.querySelector('th')).toHaveAttribute('aria-label', 'Sunday');
+    const monday = canvas.getByRole('group', { name: 'Monday first' });
+    await expect(monday.querySelector('th')).toHaveAttribute('aria-label', 'Monday');
+    const japanese = canvas.getByRole('group', { name: '日本語' });
+    await expect(japanese.querySelector('[role=grid]')).toHaveAccessibleName('2026年9月');
+    const german = canvas.getByRole('group', { name: 'Deutsch' });
+    await expect(german.querySelector('th')).toHaveAttribute('aria-label', 'Montag');
+    const arabic = canvas.getByRole('group', { name: 'العربية' });
+    await expect(arabic).toHaveAttribute('dir', 'rtl');
+    await expect(arabic.querySelector('[data-calendar-day="2026-09-15"]')).toHaveTextContent('١٥');
+  },
+};
+
 export const Keyboard: Story = {
+  tags: ['verification'],
   args: {
     autoFocus: true,
     defaultValue: new CalendarDate(2026, 1, 31),
@@ -193,231 +502,29 @@ export const Keyboard: Story = {
   },
 };
 
-export const Range: Story = {
-  render: function Render() {
-    const [range, setRange] = useState<DateRange | null>(null);
-
-    return (
-      <div className="flex flex-col gap-3">
-        <Calendar
-          selectionMode="range"
-          value={range}
-          onValueChange={setRange}
-          monthsToShow={2}
-          today={today}
-        />
-        <output aria-label="기간" className="text-body-b3-regular">
-          {range?.start?.day ?? '–'} ~ {range?.end?.day ?? '–'}
-        </output>
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '첫 클릭이 시작, 두 번째 클릭이 끝입니다. 끝을 고르기 전에는 포인터나 키보드 포커스가 있는 날까지 기간을 미리 보여 줍니다. 더 이른 날을 고르면 시작과 끝이 바뀌고, 세 번째 클릭은 새 기간을 시작합니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    await userEvent.click(day(canvasElement, '2026-09-24'));
-    await expect(canvas.getByLabelText('기간')).toHaveTextContent('24 ~ –');
-    await userEvent.hover(day(canvasElement, '2026-10-02'));
-    await waitFor(() =>
-      expect(day(canvasElement, '2026-09-30')).toHaveAttribute('data-range-preview'),
-    );
-    await userEvent.keyboard('{ArrowLeft}');
-    await waitFor(() =>
-      expect(day(canvasElement, '2026-09-23')).toHaveAttribute('data-range-preview'),
-    );
-    await expect(day(canvasElement, '2026-09-30')).not.toHaveAttribute('data-range-preview');
-    await userEvent.click(day(canvasElement, '2026-10-02'));
-    await expect(canvas.getByLabelText('기간')).toHaveTextContent('24 ~ 2');
-    await expect(day(canvasElement, '2026-09-30')).toHaveAttribute('data-range-middle');
-    await userEvent.click(day(canvasElement, '2026-09-20'));
-    await userEvent.click(day(canvasElement, '2026-09-12'));
-    await expect(canvas.getByLabelText('기간')).toHaveTextContent('12 ~ 20');
-  },
-};
-
-export const Multiple: Story = {
-  args: { selectionMode: 'multiple', defaultValue: [new CalendarDate(2026, 9, 3)] },
-  play: async ({ canvasElement, args, userEvent }) => {
-    await userEvent.click(day(canvasElement, '2026-09-10'));
-    await userEvent.click(day(canvasElement, '2026-09-03'));
-    await expect(args.onValueChange).toHaveBeenLastCalledWith([new CalendarDate(2026, 9, 10)]);
-    await expect(grid(canvasElement)).toHaveAttribute('aria-multiselectable', 'true');
-  },
-};
-
-export const DropdownCaption: Story = {
-  args: {
-    captionLayout: 'dropdown',
-    min: new CalendarDate(1990, 1, 1),
-    max: new CalendarDate(2026, 12, 31),
-    defaultMonth: new CalendarDate(2026, 9, 1),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '생년월일처럼 먼 날짜는 연도와 월 목록으로 바로 옮깁니다. 목록은 min/max 안의 연도만 보이고, 범위를 벗어난 달은 고를 수 없습니다. 한국어는 연도를 먼저 놓습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement, args, userEvent }) => {
-    await userEvent.selectOptions(canvas.getByRole('combobox', { name: '연도' }), '1995');
-    await expect(args.onMonthChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 9, 1));
-    await userEvent.selectOptions(canvas.getByRole('combobox', { name: '월' }), '0');
-    await expect(grid(canvasElement)).toHaveAccessibleName('1995년 1월');
-    await userEvent.click(canvas.getByRole('button', { name: '이전 달' }));
-    await expect(grid(canvasElement)).toHaveAccessibleName('1994년 12월');
-  },
-};
-
-export const Limits: Story = {
-  args: {
-    min: new CalendarDate(2026, 9, 10),
-    max: new CalendarDate(2026, 10, 20),
-    disabled: { dayOfWeek: [0] },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'min/max 밖의 날짜와 disabled가 막은 날짜는 고를 수 없고 키보드도 건너뜁니다. disabled는 react-day-picker의 matcher라서 함수, 날짜, 기간, 요일을 받습니다. 범위 끝에서 달 버튼은 눌리지 않습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement, args, userEvent }) => {
-    await expect(day(canvasElement, '2026-09-09')).toBeDisabled();
-    await expect(day(canvasElement, '2026-09-20')).toBeDisabled();
-    await expect(args.onValueChange).not.toHaveBeenCalled();
-    await userEvent.click(day(canvasElement, '2026-09-19'));
-    await userEvent.keyboard('{ArrowRight}');
-    await waitFor(() => expect(focusedDay()).toBe('2026-09-21'));
-    const previous = canvas.getByRole('button', { name: '이전 달' });
-    await expect(previous).toHaveAttribute('aria-disabled', 'true');
-    const next = canvas.getByRole('button', { name: '다음 달' });
-    await userEvent.click(next);
-    await expect(next).toHaveAttribute('aria-disabled', 'true');
-    await expect(next).toHaveFocus();
-    const noHoverFillUnderPointer = { backgroundColor: 'rgba(0, 0, 0, 0)' };
-    await waitFor(() =>
-      expect(canvas.getByRole('button', { name: '다음 달' })).toHaveStyle(noHoverFillUnderPointer),
-    );
-  },
-};
-
-export const Locale: Story = {
+export const RightToLeft: Story = {
+  tags: ['verification'],
   render: () => (
-    <div className="flex flex-wrap gap-8">
-      <Calendar locale="en-US" today={today} aria-label="English" />
-      <Calendar weekStartsOn={1} today={today} aria-label="월요일 시작" />
-      <Calendar locale="ja-JP" today={today} aria-label="日本語" />
-      <Calendar locale="de-DE" today={today} aria-label="Deutsch" />
-      <div dir="rtl">
-        <Calendar locale="ar-EG" numerals="arab" today={today} aria-label="العربية" />
-      </div>
+    <div dir="rtl">
+      <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="오른쪽에서 왼쪽" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'locale은 BCP 47 태그이고, 달 이름, 요일, 날짜 이름은 브라우저의 Intl로 그립니다. import할 locale 데이터가 없습니다. 버튼 이름은 IDS 메시지를 씁니다. 주 시작은 locale을 따르고(-u-fw- 확장도 따름) weekStartsOn으로 바꿉니다. numerals는 숫자 체계를 바꿉니다. 오른쪽에서 왼쪽으로 쓰는 문서에서는 방향키 좌우가 뒤집힙니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const english = canvas.getByRole('group', { name: 'English' });
-    await expect(english.querySelector('th')).toHaveTextContent('S');
-    await expect(english.querySelector('th')).toHaveAttribute('aria-label', 'Sunday');
-    const monday = canvas.getByRole('group', { name: '월요일 시작' });
-    await expect(monday.querySelector('th')).toHaveAttribute('aria-label', '월요일');
-    const japanese = canvas.getByRole('group', { name: '日本語' });
-    await expect(japanese.querySelector('[role=grid]')).toHaveAccessibleName('2026年9月');
-    const german = canvas.getByRole('group', { name: 'Deutsch' });
-    await expect(german.querySelector('th')).toHaveAttribute('aria-label', 'Montag');
-    const arabic = canvas.getByRole('group', { name: 'العربية' });
-    await expect(arabic).toHaveAttribute('dir', 'rtl');
-    arabic.querySelector<HTMLButtonElement>('[data-calendar-day="2026-09-15"]')!.focus();
-    await userEvent.keyboard('{ArrowLeft}');
-    await waitFor(() => expect(focusedDay()).toBe('2026-09-16'));
-  },
-};
-
-const events = [
-  new CalendarDate(2026, 9, 4),
-  new CalendarDate(2026, 9, 15),
-  new CalendarDate(2026, 9, 22),
-  new CalendarDate(2026, 10, 2),
-];
-
-export const Parts: Story = {
-  render: function Render() {
-    const [date, setDate] = useState<CalendarDate | null>(null);
-    const [month, setMonth] = useState(new CalendarDate(2026, 9, 1));
-
-    const busy = !!date && events.some((event) => event.compare(date) === 0);
-
-    return (
-      <div className="flex flex-col items-start gap-3">
-        <Button
-          size="tiny"
-          variant="outline"
-          onClick={() => {
-            setMonth(new CalendarDate(2026, 9, 1));
-            setDate(today);
-          }}
-        >
-          오늘
-        </Button>
-        <Calendar
-          value={date}
-          onValueChange={setDate}
-          month={month}
-          onMonthChange={setMonth}
-          today={today}
-          modifiers={{ event: events }}
-          renderDay={(day, state) => (
-            <span className="flex flex-col items-center leading-none">
-              {day.day}
-              <span
-                aria-hidden="true"
-                className={
-                  state.modifiers.event
-                    ? state.selected
-                      ? 'mt-0.5 size-1 rounded-full bg-current'
-                      : 'bg-primary-solid mt-0.5 size-1 rounded-full'
-                    : 'mt-0.5 size-1'
-                }
-              />
-            </span>
-          )}
-          footer={date ? (busy ? '일정이 있는 날입니다.' : '일정이 없습니다.') : '날짜를 고르세요.'}
-        />
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'renderDay는 날짜 칸의 내용만 바꿉니다. 버튼 모양, 포커스, 상태 속성은 IDS가 그대로 그리고, 두 번째 인자로 선택, 오늘, 기간, modifiers 상태를 받습니다. modifiers는 날짜에 이름을 붙이고, footer는 화면 읽기 프로그램이 읽는 알림 영역입니다.',
+          '오른쪽에서 왼쪽으로 쓰는 문서에서는 Calendar 가 물려받은 방향을 따르고, 좌우 방향키가 뒤집힙니다.',
       },
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    await expect(canvas.getByText('날짜를 고르세요.')).toHaveAttribute('role', 'status');
-    await userEvent.click(day(canvasElement, '2026-09-22'));
-    await expect(canvas.getByText('일정이 있는 날입니다.')).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole('button', { name: '다음 달' }));
-    await expect(grid(canvasElement)).toHaveAccessibleName('2026년 10월');
-    await userEvent.click(canvas.getByRole('button', { name: '오늘' }));
-    await expect(grid(canvasElement)).toHaveAccessibleName('2026년 9월');
-    await expect(day(canvasElement, '2026-09-15')).toHaveAttribute('data-selected');
-    await expect(day(canvasElement, '2026-09-22')).toHaveTextContent('22');
+    await waitFor(() =>
+      expect(canvas.getByRole('group', { name: '오른쪽에서 왼쪽' })).toHaveAttribute('dir', 'rtl'),
+    );
+    day(canvasElement, '2026-09-15').focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await waitFor(() => expect(focusedDay()).toBe('2026-09-16'));
+    await userEvent.keyboard('{ArrowRight}{ArrowRight}');
+    await waitFor(() => expect(focusedDay()).toBe('2026-09-14'));
   },
 };

@@ -6,6 +6,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { cn } from '../../../utils';
+import { IdsProvider } from '../../utility/ids-provider';
 
 import { TimePicker } from '.';
 
@@ -25,7 +26,6 @@ const meta = {
     precision: { control: 'radio', options: ['hour', 'minute', 'second'] },
     hourCycle: { control: 'radio', options: [undefined, '12h', '24h'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
-    locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP'] },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -48,6 +48,10 @@ const option = (canvasElement: HTMLElement, unit: string, n: number) =>
   column(canvasElement, unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => <TimePicker defaultValue={new Time(14, 30)} className="w-72" />,
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -92,13 +96,14 @@ export const Gallery: Story = {
           />
         </Showcase.Row>
         <Showcase.Row label="hour · en-US">
-          <TimePicker
-            precision="hour"
-            locale="en-US"
-            defaultValue={at(14)}
-            className="w-44"
-            aria-label="Hour only"
-          />
+          <IdsProvider.Scope locale="en-US">
+            <TimePicker
+              precision="hour"
+              defaultValue={at(14)}
+              className="w-44"
+              aria-label="Hour only"
+            />
+          </IdsProvider.Scope>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -163,36 +168,9 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  args: { hourCycle: '24h', step: 15, defaultValue: at(9, 15) },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '컬럼마다 Tab으로 들어갑니다. 위아래 방향키와 Home/End, PageUp/PageDown은 옮기기만 하고 Enter나 Space로 고릅니다. 숫자를 치면 그 숫자로 가고, 좌우 방향키는 옆 컬럼으로 갑니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, args, userEvent }) => {
-    const hour = column(canvasElement, 'hour');
-    hour.focus();
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(option(canvasElement, 'hour', 10)).toHaveAttribute('data-active');
-    await expect(args.onValueChange).not.toHaveBeenCalled();
-    await userEvent.keyboard('{Enter}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(at(10, 15));
-    await userEvent.keyboard('14{Enter}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(at(14, 15));
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(column(canvasElement, 'minute')).toHaveFocus();
-    await userEvent.keyboard('{End} ');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(at(14, 45));
-  },
-};
-
-export const Clear: Story = {
+export const ClearTheTime: Story = {
   render: function Render() {
-    const [value, setValue] = useState<Time | null>(at(8, 30));
+    const [value, setValue] = useState<Time | null>(new Time(8, 30));
 
     return (
       <div className="flex w-56 flex-col gap-3">
@@ -207,7 +185,7 @@ export const Clear: Story = {
     docs: {
       description: {
         story:
-          '값은 Time | null입니다. 컬럼에서 Delete나 Backspace를 누르면 null이 되고, 선택 표시가 사라집니다.',
+          '값은 Time | null 입니다. 컬럼에서 Delete 나 Backspace 를 누르면 null 이 되고, 선택 표시가 사라집니다.',
       },
     },
   },
@@ -221,13 +199,13 @@ export const Clear: Story = {
   },
 };
 
-export const Limits: Story = {
+export const KeepTheTimeInsideBusinessHours: Story = {
   args: { hourCycle: '24h', step: 15, min: at(9, 30), max: at(10, 15), defaultValue: at(9, 45) },
   parameters: {
     docs: {
       description: {
         story:
-          'min과 max도 Time입니다. 범위 밖 옵션은 고를 수 없고, 시를 고르면 그 시간 안에서 가장 가까운 허용 시각으로 갑니다.',
+          'min 과 max 도 Time 입니다. 범위 밖 옵션은 고를 수 없고, 시를 고르면 그 시간 안에서 가장 가까운 허용 시각으로 갑니다. step 은 분 컬럼의 간격입니다.',
       },
     },
   },
@@ -239,11 +217,10 @@ export const Limits: Story = {
   },
 };
 
-export const Wheel: Story = {
+export const PickWithAScrollWheel: Story = {
   args: {
     variant: 'wheel',
     hourCycle: '12h',
-    locale: 'en-US',
     defaultValue: at(14, 30),
     className: cn('w-64'),
   },
@@ -251,7 +228,7 @@ export const Wheel: Story = {
     docs: {
       description: {
         story:
-          '가운데로 스냅되는 스크롤 컬럼입니다. 스크롤이 멈추면 가운데 값이 선택됩니다. scrollend가 없는 브라우저에서도 마지막 스크롤 150ms 뒤에 확정합니다.',
+          'variant="wheel" 은 가운데로 스냅되는 스크롤 컬럼입니다. 스크롤이 멈추면 가운데 값이 선택됩니다. scrollend 가 없는 브라우저에서도 마지막 스크롤 150ms 뒤에 확정합니다.',
       },
     },
   },
@@ -264,32 +241,37 @@ export const Wheel: Story = {
   },
 };
 
-export const Locale: Story = {
+export const FollowTheLocale: Story = {
   render: () => (
     <div className="flex flex-wrap gap-8">
-      <TimePicker defaultValue={at(14, 30)} className="w-64" aria-label="한국어" />
+      <TimePicker defaultValue={new Time(14, 30)} className="w-64" aria-label="한국어" />
       <TimePicker
         hourCycle="24h"
-        defaultValue={at(14, 30)}
+        defaultValue={new Time(14, 30)}
         className="w-44"
         aria-label="한국어 24시간"
       />
-      <TimePicker locale="en-US" defaultValue={at(14, 30)} className="w-64" aria-label="English" />
-      <TimePicker locale="de-DE" defaultValue={at(14, 30)} className="w-44" aria-label="Deutsch" />
-      <TimePicker
-        locale="ja-JP"
-        hourCycle="12h"
-        defaultValue={at(14, 30)}
-        className="w-64"
-        aria-label="日本語"
-      />
+      <IdsProvider.Scope locale="en-US">
+        <TimePicker defaultValue={new Time(14, 30)} className="w-64" aria-label="English" />
+      </IdsProvider.Scope>
+      <IdsProvider.Scope locale="de-DE">
+        <TimePicker defaultValue={new Time(14, 30)} className="w-44" aria-label="Deutsch" />
+      </IdsProvider.Scope>
+      <IdsProvider.Scope locale="ja-JP">
+        <TimePicker
+          hourCycle="12h"
+          defaultValue={new Time(14, 30)}
+          className="w-64"
+          aria-label="日本語"
+        />
+      </IdsProvider.Scope>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'locale은 BCP 47 태그이고, 시간제와 오전/오후 이름과 자리는 브라우저의 Intl(CLDR)을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어와 일본어는 24시간제이고 hourCycle로 바꿀 수 있습니다. 한국어와 일본어는 오전/오후 컬럼이 앞에 옵니다.',
+          'TimePicker 는 가장 가까운 IdsProvider 의 locale 을 따릅니다. 시간제와 오전/오후 이름과 자리는 브라우저의 Intl(CLDR)을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어와 일본어는 24시간제이고 hourCycle 로 바꿀 수 있습니다. 한국어와 일본어는 오전/오후 컬럼이 앞에 옵니다.',
       },
     },
   },
@@ -319,12 +301,12 @@ export const Locale: Story = {
   },
 };
 
-export const CustomOption: Story = {
+export const LabelOptionsYourWay: Story = {
   render: () => (
     <TimePicker
       hourCycle="24h"
       step={30}
-      defaultValue={at(9, 30)}
+      defaultValue={new Time(9, 30)}
       className="w-64"
       aria-label="회의 시간"
     >
@@ -338,12 +320,40 @@ export const CustomOption: Story = {
     docs: {
       description: {
         story:
-          'Column의 children은 옵션 상태를 받는 함수입니다. 옵션의 이름표만 바꾸고 선택과 키보드는 그대로 둡니다.',
+          'TimePicker.Column 의 children 은 옵션 상태를 받는 함수입니다. 옵션의 이름표만 바꾸고 선택과 키보드는 그대로 둡니다.',
       },
     },
   },
   play: async ({ canvasElement }) => {
     await expect(option(canvasElement, 'minute', 0)).toHaveTextContent('정각');
     await expect(option(canvasElement, 'hour', 9)).toHaveTextContent('09시');
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { hourCycle: '24h', step: 15, defaultValue: at(9, 15) },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '컬럼마다 Tab으로 들어갑니다. 위아래 방향키와 Home/End, PageUp/PageDown은 옮기기만 하고 Enter나 Space로 고릅니다. 숫자를 치면 그 숫자로 가고, 좌우 방향키는 옆 컬럼으로 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, args, userEvent }) => {
+    const hour = column(canvasElement, 'hour');
+    hour.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(option(canvasElement, 'hour', 10)).toHaveAttribute('data-active');
+    await expect(args.onValueChange).not.toHaveBeenCalled();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(at(10, 15));
+    await userEvent.keyboard('14{Enter}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(at(14, 15));
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(column(canvasElement, 'minute')).toHaveFocus();
+    await userEvent.keyboard('{End} ');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(at(14, 45));
   },
 };

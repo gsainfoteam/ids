@@ -4,10 +4,22 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { TimePicker } from '../src';
+import { IdsProvider, TimePicker } from '../src';
+import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
-const ssr = (props: TimePicker.Props) => parse(renderToString(<TimePicker {...props} />));
+const ssr = (props: TimePicker.Props, locale?: string) =>
+  parse(
+    renderToString(
+      locale ? (
+        <IdsProvider theme={testTheme} locale={locale}>
+          <TimePicker {...props} />
+        </IdsProvider>
+      ) : (
+        <TimePicker {...props} />
+      ),
+    ),
+  );
 const col = (unit: string) => document.querySelector<HTMLElement>(`[data-time-column="${unit}"]`)!;
 const option = (unit: string, n: number) =>
   col(unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
@@ -31,16 +43,17 @@ test('SSR: Korean names by default, the clock and periods from the locale tag, d
   expect(doc.querySelectorAll('[data-time-column=second] [role=option]')).toHaveLength(4);
   expect(doc.querySelector('[data-time-picker]')!.hasAttribute('data-empty')).toBe(true);
   expect(periods(ssr({ hourCycle: '12h' }))).toEqual(['오전', '오후']);
-  const english = ssr({ locale: 'en-US' });
+  const english = ssr({}, 'en-US');
   expect(english.querySelector('[data-time-picker]')!.getAttribute('data-hour-cycle')).toBe('12h');
   expect(periods(english)).toEqual(['AM', 'PM']);
-  expect(ssr({ locale: 'de-DE' }).querySelector('[data-time-column=period]')).toBeNull();
-  const japanese = ssr({ locale: 'ja-JP', hourCycle: '12h' });
+  expect(ssr({}, 'de-DE').querySelector('[data-time-column=period]')).toBeNull();
+  const japanese = ssr({ hourCycle: '12h' }, 'ja-JP');
   expect(periods(japanese)).toEqual(['午前', '午後']);
   expect(labels(japanese)[0]).toBe('오전/오후');
-  expect(labels(ssr({ locale: 'en-US' }))).toEqual(['시', '분', '오전/오후']);
-  expect(periods(ssr({ locale: 'ar-EG' }))).toEqual(['ص', 'م']);
-  expect(() => ssr({ locale: 'en US' })).toThrow(/BCP 47/);
+  expect(labels(ssr({}, 'en-US'))).toEqual(['시', '분', '오전/오후']);
+  expect(periods(ssr({}, 'ar-EG'))).toEqual(['ص', 'م']);
+  expect(ssr({}, 'en-US-u-hc-h23').querySelector('[data-time-column=period]')).toBeNull();
+  expect(() => ssr({}, 'en US')).toThrow(/BCP 47/);
   // @ts-expect-error A Date is no longer a time value.
   expect(() => ssr({ value: new Date(2026, 8, 15, 9) })).toThrow(/expected a Time/);
   // @ts-expect-error min takes a Time.
@@ -210,7 +223,7 @@ test('12h noon/midnight and range-aware upper-unit selection', async () => {
   await expect.element(option('minute', 15)).toHaveAttribute('aria-disabled', 'true');
 });
 
-test('controlled values, none/readonly/disabled and hour precision', async () => {
+test('controlled values, readonly/disabled and hour precision', async () => {
   let value = undefined as Time | null | undefined;
   const view = (props: Partial<TimePicker.Props>) => (
     <TimePicker
@@ -227,11 +240,7 @@ test('controlled values, none/readonly/disabled and hour precision', async () =>
   expect(value?.second).toBe(0);
   await expect.element(option('hour', 9)).toHaveAttribute('aria-selected', 'true');
   await expect.element(option('hour', 9)).toHaveAttribute('data-selected');
-  for (const props of [
-    { selectionMode: 'none' },
-    { readOnly: true },
-    { disabled: true },
-  ] as const) {
+  for (const props of [{ readOnly: true }, { disabled: true }] as const) {
     value = undefined;
     await screen.rerender(view(props));
     await userEvent.click(option('hour', 10), { force: true });

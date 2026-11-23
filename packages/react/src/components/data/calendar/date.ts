@@ -5,7 +5,7 @@ import { invariant } from '../../../utils';
 
 export type DateRange = { start: CalendarDate | null; end: CalendarDate | null };
 export type CalendarValue = CalendarDate | DateRange | CalendarDate[] | null;
-export type CalendarSelectionMode = 'single' | 'range' | 'multiple' | 'none';
+export type CalendarSelectionMode = 'single' | 'range' | 'multiple';
 
 export type DateMatcher =
   | CalendarDate

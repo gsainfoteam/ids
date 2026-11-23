@@ -1,13 +1,14 @@
-import { StrictMode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
 
 import { Time } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, test, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { TimeField } from '../src';
+import { IdsProvider, TimeField } from '../src';
+import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -16,18 +17,27 @@ const col = (unit: string) =>
 const option = (unit: string, n: number) =>
   col(unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
 const d = (hour = 9, minute = 30, second = 0) => new Time(hour, minute, second);
+const inLocale = (locale: string | undefined, children: ReactNode) => (
+  <IdsProvider theme={testTheme} locale={locale}>
+    {children}
+  </IdsProvider>
+);
 
 test('SSR: display follows format, hourCycle and the locale tag; FormData follows precision', () => {
   const at = d(14, 5, 9);
-  const html = (props: TimeField.Props) =>
+  type Props = TimeField.Props & { locale?: string };
+  const html = ({ locale, ...props }: Props) =>
     parse(
       renderToString(
-        <form>
-          <TimeField name="at" {...props} />
-        </form>,
+        inLocale(
+          locale,
+          <form>
+            <TimeField name="at" {...props} />
+          </form>,
+        ),
       ),
     );
-  const text = (props: TimeField.Props) =>
+  const text = (props: Props) =>
     html({ defaultValue: at, ...props }).querySelector('[role=combobox]')!.textContent;
   expect(text({})).toBe('오후 2:05');
   expect(text({ hourCycle: '12h' })).toBe('오후 2:05');
@@ -47,7 +57,7 @@ test('SSR: display follows format, hourCycle and the locale tag; FormData follow
   expect(text({ format: (time, locale) => `${locale} ${time.hour}` })).toBe('ko-KR 14');
   expect(text({ defaultValue: d(23, 59), hourCycle: '24h' })).toBe('23:59');
   expect(text({ defaultValue: d(0, 0), hourCycle: '24h' })).toBe('00:00');
-  const form = (props: TimeField.Props) =>
+  const form = (props: Props) =>
     new FormData(html({ defaultValue: at, ...props }).querySelector('form')!).get('at');
   expect(form({ precision: 'hour' })).toBe('14');
   expect(form({})).toBe('14:05');
@@ -121,8 +131,8 @@ test('custom parts, readOnly, and a native onClick that prevents opening', async
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   await screen.rerender(
-    <TimeField mobileVariant="drawer">
-      <TimeField.Content>Custom time controls</TimeField.Content>
+    <TimeField>
+      <TimeField.Content mobileVariant="drawer">Custom time controls</TimeField.Content>
     </TimeField>,
   );
   await userEvent.click(screen.getByRole('combobox'));
@@ -181,4 +191,32 @@ test('react-hook-form value mode submits a Time and FormData keeps the precision
   await expect.poll(() => submitted.mock.lastCall?.[0].at).toBeInstanceOf(Time);
   expect(submitted.mock.lastCall?.[0].at.toString()).toBe('14:00:09');
   expect(new FormData(screen.container.querySelector('form')!).get('at')).toBe('14:00:09');
+});
+
+test('TimeField.TimePicker takes the picker variant, and Content opens a drawer on a narrow screen', async () => {
+  const screen = await render(
+    <TimeField defaultValue={d()}>
+      <TimeField.Content mobileVariant="drawer" />
+      <TimeField.TimePicker variant="wheel" />
+    </TimeField>,
+  );
+  const trigger = screen.getByRole('combobox');
+  await userEvent.click(trigger);
+  const dialog = screen.getByRole('dialog');
+  await expect.element(dialog).toHaveAttribute('data-presentation', 'drawer');
+  await expect.element(dialog).toHaveAttribute('aria-modal', 'true');
+  await expect
+    .element(document.querySelector<HTMLElement>('[role=dialog] [data-time-picker]'))
+    .toHaveAttribute('data-variant', 'wheel');
+  await userEvent.keyboard('{Escape}');
+  await expect.element(dialog).not.toBeInTheDocument();
+  await page.viewport(1024, 768);
+  try {
+    await userEvent.click(trigger);
+    await expect
+      .element(screen.getByRole('dialog'))
+      .toHaveAttribute('data-presentation', 'popover');
+  } finally {
+    await page.viewport(414, 896);
+  }
 });

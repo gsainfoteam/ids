@@ -1,3 +1,4 @@
+import { DateFieldCalendar, type DateFieldCalendarProps } from './calendar';
 import { DateFieldRoot, type DateFieldProps } from './root';
 import {
   TemporalClear,
@@ -27,12 +28,18 @@ export namespace DateField {
   export type ClearProps = SharedClearProps;
   export type ContentProps = SharedContentProps;
   export type InputProps = SharedInputProps;
+  export type CalendarProps = DateFieldCalendarProps;
   export const Trigger = TemporalTrigger;
   export const Input = TemporalInput;
   export const Value = TemporalValue;
   export const Clear = TemporalClear;
   export const Content = TemporalContent;
+  export const Calendar = DateFieldCalendar;
+  export namespace Calendar {
+    export type Props = DateFieldCalendarProps;
+  }
   export const Style = temporalFieldStyle;
 }
 
 export type { DateFieldFormat, DateFieldProps } from './root';
+export type { DateFieldCalendarProps } from './calendar';

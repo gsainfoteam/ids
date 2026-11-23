@@ -8,7 +8,18 @@ import { Calendar, IdsProvider } from '../src';
 import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
-const ssr = (props: Calendar.Props) => parse(renderToString(<Calendar {...props} />));
+const ssr = (props: Calendar.Props, locale?: string) =>
+  parse(
+    renderToString(
+      locale ? (
+        <IdsProvider theme={testTheme} locale={locale}>
+          <Calendar {...props} />
+        </IdsProvider>
+      ) : (
+        <Calendar {...props} />
+      ),
+    ),
+  );
 const d = (y: number, m: number, day: number) => new CalendarDate(y, m, day);
 const dateKey = (date: CalendarDate | null | undefined) => date && date.toString();
 const day = (key: string) =>
@@ -40,51 +51,48 @@ test('SSR: Korean by default, two months without duplicate dates, one tab stop',
 });
 
 test('any BCP 47 tag drives names, the first weekday and the day labels without an import', () => {
-  const first = (props: Calendar.Props) =>
-    ssr({ today: d(2026, 9, 15), ...props }).querySelector('th')!;
-  expect(first({ locale: 'en-US' }).textContent).toBe('S');
-  expect(first({ locale: 'en-US' }).getAttribute('aria-label')).toBe('Sunday');
-  expect(first({ locale: 'de-DE' }).getAttribute('aria-label')).toBe('Montag');
-  expect(first({ locale: 'fr-FR' }).getAttribute('aria-label')).toBe('lundi');
-  expect(first({ locale: 'en-US-u-fw-mon' }).getAttribute('aria-label')).toBe('Monday');
-  expect(first({ locale: 'de-DE', weekStartsOn: 0 }).getAttribute('aria-label')).toBe('Sonntag');
-  expect(first({ weekStartsOn: 1 }).getAttribute('aria-label')).toBe('월요일');
-  const labelOf = (props: Calendar.Props, key = '2026-09-15') =>
-    ssr({ today: d(2026, 9, 14), ...props })
+  const first = (locale?: string) => ssr({ today: d(2026, 9, 15) }, locale).querySelector('th')!;
+  expect(first('en-US').textContent).toBe('S');
+  expect(first('en-US').getAttribute('aria-label')).toBe('Sunday');
+  expect(first('de-DE').getAttribute('aria-label')).toBe('Montag');
+  expect(first('fr-FR').getAttribute('aria-label')).toBe('lundi');
+  expect(first('en-US-u-fw-mon').getAttribute('aria-label')).toBe('Monday');
+  expect(first('de-DE-u-fw-sun').getAttribute('aria-label')).toBe('Sonntag');
+  expect(first('ko-KR-u-fw-mon').getAttribute('aria-label')).toBe('월요일');
+  const labelOf = (locale: string, key = '2026-09-15') =>
+    ssr({ today: d(2026, 9, 14) }, locale)
       .querySelector(`[data-calendar-day="${key}"]`)!
       .getAttribute('aria-label');
-  expect(labelOf({ locale: 'en-US' })).toBe('Tuesday, September 15, 2026');
-  expect(labelOf({ locale: 'en-US' }, '2026-09-14')).toBe('오늘, Monday, September 14, 2026');
-  expect(labelOf({ locale: 'fr-FR' })).toBe('mardi 15 septembre 2026');
-  const japanese = ssr({ locale: 'ja-JP', today: d(2026, 9, 15) });
+  expect(labelOf('en-US')).toBe('Tuesday, September 15, 2026');
+  expect(labelOf('en-US', '2026-09-14')).toBe('오늘, Monday, September 14, 2026');
+  expect(labelOf('fr-FR')).toBe('mardi 15 septembre 2026');
+  const japanese = ssr({ today: d(2026, 9, 15) }, 'ja-JP');
   expect(japanese.querySelector('[data-calendar]')!.getAttribute('lang')).toBe('ja-JP');
   expect(japanese.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('2026年9月');
   expect(japanese.querySelector('[role=status]')!.textContent).toBe('2026年9月');
   expect(japanese.querySelector('th')!.getAttribute('aria-label')).toBe('日曜日');
   expect(japanese.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('15');
-  const french = ssr({ locale: 'fr-FR', today: d(2026, 9, 15) });
+  const french = ssr({ today: d(2026, 9, 15) }, 'fr-FR');
   expect(french.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('septembre 2026');
-  expect(() => ssr({ locale: 'not a tag' })).toThrow(/BCP 47/);
+  expect(() => ssr({}, 'not a tag')).toThrow(/BCP 47/);
 });
 
-test('numerals draw every number in the chosen system', () => {
-  const arabic = ssr({
-    locale: 'ar-EG',
-    numerals: 'arab',
-    showWeekNumber: true,
-    today: d(2026, 9, 15),
-  });
+test('a -u-nu- tag draws every number in the chosen system', () => {
+  const arabic = ssr(
+    { today: d(2026, 9, 15), children: <Calendar.WeekNumber /> },
+    'ar-EG-u-nu-arab',
+  );
   expect(arabic.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('١٥');
   expect(arabic.querySelector('[role=status]')!.textContent).toBe('سبتمبر ٢٠٢٦');
   expect(arabic.querySelector('[role=rowheader]')!.textContent).toMatch(/^[٠-٩]{2}$/);
-  const latin = ssr({ locale: 'ar-EG', numerals: 'latn', today: d(2026, 9, 15) });
+  const latin = ssr({ today: d(2026, 9, 15) }, 'ar-EG-u-nu-latn');
   expect(latin.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('15');
-  const devanagari = ssr({ numerals: 'deva', today: d(2026, 9, 15) });
+  const devanagari = ssr({ today: d(2026, 9, 15) }, 'ko-KR-u-nu-deva');
   expect(devanagari.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('१५');
 });
 
 test('grid, weekday and week number labels are Korean by default', () => {
-  const doc = ssr({ today: d(2026, 9, 15), showWeekNumber: true });
+  const doc = ssr({ today: d(2026, 9, 15), children: <Calendar.WeekNumber /> });
   expect(doc.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('2026년 9월');
   expect(
     [...doc.querySelectorAll('th[scope=col]')].map((th) => th.getAttribute('aria-label')),
@@ -97,15 +105,16 @@ test('diagnostics for mismatched values, limits and parts outside the calendar',
   expect(() => ssr({ selectionMode: 'range', value: d(2026, 1, 1) })).toThrow(/range requires/);
   expect(() => ssr({ min: d(2026, 2, 1), max: d(2026, 1, 1) })).toThrow(/min <= max/);
   expect(() => ssr({ monthsToShow: 0 })).toThrow(/monthsToShow/);
-  // @ts-expect-error A week starts on 0 to 6.
-  expect(() => ssr({ weekStartsOn: 7 })).toThrow(/weekStartsOn/);
+  expect(() => ssr({ children: <div /> })).toThrow(/children must be Calendar\.Day/);
   // @ts-expect-error The react-day-picker parts are no longer public.
   expect(Calendar.DayButton).toBeUndefined();
 });
 
 test('keyboard: month ends clamp, Home and End follow the week start, Shift jumps', async () => {
   await render(
-    <Calendar defaultValue={d(2024, 1, 31)} today={d(2024, 1, 1)} autoFocus weekStartsOn={1} />,
+    <IdsProvider theme={testTheme} locale="ko-KR-u-fw-mon">
+      <Calendar defaultValue={d(2024, 1, 31)} today={d(2024, 1, 1)} autoFocus />
+    </IdsProvider>,
   );
   await expect.element(day('2024-01-31')).toHaveFocus();
   await userEvent.keyboard('{PageDown}');
@@ -260,7 +269,7 @@ test('multiple toggles by day and marks the grid multiselectable', async () => {
   await expect.element(screen.getByRole('grid')).toHaveAttribute('aria-multiselectable', 'true');
 });
 
-test('readOnly and none browse without changes; disabled blocks navigation and selection', async () => {
+test('readOnly browses without changes and keeps a value; disabled blocks navigation and selection', async () => {
   const onValueChange = vi.fn();
   const screen = await render(
     <Calendar today={d(2026, 9, 15)} onValueChange={onValueChange} readOnly />,
@@ -271,7 +280,7 @@ test('readOnly and none browse without changes; disabled blocks navigation and s
   await userEvent.click(screen.getByRole('button', { name: '다음 달' }));
   await expect.element(day('2026-10-15')).toBeInTheDocument();
   await screen.rerender(
-    <Calendar key="none" today={d(2026, 9, 15)} selectionMode="none" value={d(2026, 9, 18)} />,
+    <Calendar key="readonly value" today={d(2026, 9, 15)} readOnly value={d(2026, 9, 18)} />,
   );
   await expect.element(day('2026-09-18')).toHaveAttribute('data-selected');
   await userEvent.click(day('2026-09-20'));
@@ -294,12 +303,13 @@ test('caption dropdowns jump by year and month within min and max', async () => 
   const months: CalendarDate[] = [];
   const screen = await render(
     <Calendar
-      captionLayout="dropdown"
       today={d(2026, 9, 15)}
       min={d(2020, 3, 10)}
       max={d(2026, 10, 5)}
       onMonthChange={(next) => months.push(next)}
-    />,
+    >
+      <Calendar.Caption layout="dropdown" />
+    </Calendar>,
   );
   const [year, month] = screen.container.querySelectorAll('select');
   expect(year).toHaveAttribute('aria-label', '연도');
@@ -325,7 +335,11 @@ test('caption dropdowns jump by year and month within min and max', async () => 
 });
 
 test('without limits the year menu spans a century either side of today', async () => {
-  const screen = await render(<Calendar captionLayout="dropdown" today={d(2026, 9, 15)} />);
+  const screen = await render(
+    <Calendar today={d(2026, 9, 15)}>
+      <Calendar.Caption layout="dropdown" />
+    </Calendar>,
+  );
   const year = screen.getByRole('combobox', { name: '연도' }).element() as HTMLSelectElement;
   expect(year.options[0].value).toBe('1926');
   expect(year.options[year.options.length - 1].value).toBe('2126');
@@ -335,12 +349,9 @@ test('without limits the year menu spans a century either side of today', async 
 test('a month picked in the second caption lands in the second grid', async () => {
   const months: CalendarDate[] = [];
   const screen = await render(
-    <Calendar
-      captionLayout="dropdown"
-      monthsToShow={2}
-      today={d(2026, 9, 15)}
-      onMonthChange={(next) => months.push(next)}
-    />,
+    <Calendar monthsToShow={2} today={d(2026, 9, 15)} onMonthChange={(next) => months.push(next)}>
+      <Calendar.Caption layout="dropdown" />
+    </Calendar>,
   );
   const selects = screen.getByRole('combobox', { name: '월' });
   expect(selects.elements()).toHaveLength(2);
@@ -417,7 +428,7 @@ test('a controlled month waits for the parent', async () => {
   await expect.element(day('2026-09-15')).toBeInTheDocument();
 });
 
-test('renderDay replaces only the content and gets the day state; modifiers and a footer', async () => {
+test('Calendar.Day children replace only the content and get the day state; modifiers and a footer', async () => {
   const states: Record<string, Calendar.DayState> = {};
   const screen = await render(
     <Calendar
@@ -425,23 +436,27 @@ test('renderDay replaces only the content and gets the day state; modifiers and 
       today={d(2026, 9, 15)}
       defaultValue={{ start: d(2026, 9, 21), end: d(2026, 9, 23) }}
       disabled={d(2026, 9, 5)}
-      modifiers={{ event: [d(2026, 9, 4), d(2026, 9, 22)], weekend: { dayOfWeek: [0, 6] } }}
-      modifiersClassNames={{ event: 'has-event' }}
-      renderDay={(date, state) => {
-        states[date.toString()] = state;
-        return (
-          <>
-            {`${date.day}일`}
-            {state.modifiers.event && <span data-event-dot="" />}
-          </>
-        );
-      }}
-      footer="일정 2개"
-    />,
+    >
+      <Calendar.Day
+        modifiers={{ event: [d(2026, 9, 4), d(2026, 9, 22)], weekend: { dayOfWeek: [0, 6] } }}
+        className="has-event-dot"
+      >
+        {(date, state) => {
+          states[date.toString()] = state;
+          return (
+            <>
+              {`${date.day}일`}
+              {state.modifiers.event && <span data-event-dot="" />}
+            </>
+          );
+        }}
+      </Calendar.Day>
+      <Calendar.Footer>일정 2개</Calendar.Footer>
+    </Calendar>,
   );
   expect(day('2026-09-04').querySelector('[data-event-dot]')).toBeInTheDocument();
   expect(day('2026-09-06').querySelector('[data-event-dot]')).toBeNull();
-  expect(day('2026-09-22').parentElement).toHaveClass('has-event');
+  expect(day('2026-09-22')).toHaveClass('has-event-dot');
   expect(day('2026-09-06').textContent).toBe('6일');
   expect(day('2026-09-06')).toHaveClass('rounded-standard');
   expect(day('2026-09-22')).toHaveAttribute('data-range-middle');
@@ -457,6 +472,43 @@ test('renderDay replaces only the content and gets the day state; modifiers and 
   await userEvent.click(day('2026-09-10'));
   await expect.element(day('2026-09-10')).toHaveAttribute('data-selected');
   expect(states['2026-09-10'].selected).toBe(true);
+});
+
+test('parts: Day modifiers become data attributes; WeekNumber, a dropdown Caption and Footer render', () => {
+  const doc = ssr({
+    today: d(2026, 9, 15),
+    children: (
+      <>
+        <Calendar.Day
+          modifiers={{ bookedOut: [d(2026, 9, 9)], weekend: { dayOfWeek: [0, 6] } }}
+          className="custom-day"
+        />
+        <Calendar.WeekNumber className="custom-week" />
+        <Calendar.Caption layout="dropdown" className="custom-caption" />
+        <Calendar.Footer asChild>
+          <p>9월 일정</p>
+        </Calendar.Footer>
+      </>
+    ),
+  });
+  const booked = doc.querySelector('[data-calendar-day="2026-09-09"]')!;
+  expect(booked.hasAttribute('data-booked-out')).toBe(true);
+  expect(booked.hasAttribute('data-weekend')).toBe(false);
+  expect(booked.classList.contains('custom-day')).toBe(true);
+  const saturday = doc.querySelector('[data-calendar-day="2026-09-12"]')!;
+  expect(saturday.hasAttribute('data-weekend')).toBe(true);
+  expect(saturday.hasAttribute('data-booked-out')).toBe(false);
+  expect(doc.querySelectorAll('[role=rowheader]')).toHaveLength(6);
+  expect(doc.querySelector('[role=rowheader]')!.classList.contains('custom-week')).toBe(true);
+  expect(doc.querySelector('th[scope=col]')!.getAttribute('aria-label')).toBe('주차');
+  expect(doc.querySelectorAll('select')).toHaveLength(2);
+  expect(doc.querySelector('.custom-caption select')).not.toBeNull();
+  const footer = doc.querySelector('p[role=status]')!;
+  expect(footer.textContent).toBe('9월 일정');
+  expect(footer.getAttribute('aria-live')).toBe('polite');
+  const plain = ssr({ today: d(2026, 9, 15) });
+  expect(plain.querySelector('[role=rowheader]')).toBeNull();
+  expect(plain.querySelector('select')).toBeNull();
 });
 
 test('every DateMatcher form blocks the days it names', () => {

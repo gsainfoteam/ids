@@ -2,12 +2,12 @@
 
 날짜를 한 달 단위 격자로 보여 주고 하루, 기간, 여러 날을 고르게 하는 달력입니다. [react-day-picker](https://daypicker.dev) 위에 IDS 모양과 값 규칙을 얹었습니다.
 
-- **세 가지 선택.** `single`, `range`, `multiple` 에 탐색만 하는 `none` 까지. 값은 [`@internationalized/date`](https://react-spectrum.adobe.com/internationalized/date/CalendarDate.html) 의 `CalendarDate` 입니다. 시간과 시간대가 없어서 로컬 시간대가 날짜를 하루 밀지 못합니다.
+- **세 가지 선택.** `single`, `range`, `multiple`. 고르지 않고 보여 주기만 하려면 `readOnly` 입니다. 값은 [`@internationalized/date`](https://react-spectrum.adobe.com/internationalized/date/CalendarDate.html) 의 `CalendarDate` 입니다. 시간과 시간대가 없어서 로컬 시간대가 날짜를 하루 밀지 못합니다.
 - **기간 미리 보기.** 시작을 고른 뒤에는 포인터나 키보드 포커스가 있는 날까지 기간이 미리 그려집니다.
-- **빠른 이동.** `captionLayout="dropdown"` 이면 연도와 월을 목록에서 바로 고릅니다. 생년월일처럼 먼 날짜도 몇 번 만에 갑니다.
+- **빠른 이동.** `<Calendar.Caption layout="dropdown" />` 을 넣으면 연도와 월을 목록에서 바로 고릅니다. 생년월일처럼 먼 날짜도 몇 번 만에 갑니다.
 - **WAI-ARIA 격자 키보드.** react-day-picker 의 키보드 그대로입니다. 막힌 날은 건너뛰고, 오른쪽에서 왼쪽으로 쓰는 문서에서는 좌우가 뒤집힙니다.
-- **Intl locale.** 월, 요일 이름, 날짜 숫자, 주 시작 요일을 브라우저의 `Intl` 로 그립니다. `locale` 은 BCP 47 태그이고, 어떤 언어든 import 없이 됩니다. 기본은 한국어입니다.
-- **날짜 칸 꾸미기.** `modifiers` 로 날짜에 이름을 붙이고 `renderDay` 로 칸의 내용을 바꿉니다. 모양, 포커스, 상태 속성은 IDS 가 그립니다.
+- **Intl locale.** 월, 요일 이름, 날짜 숫자, 주 시작 요일을 브라우저의 `Intl` 로 그립니다. locale 은 `IdsProvider` 의 `locale`(BCP 47 태그)을 따르고, 어떤 언어든 import 없이 됩니다. 기본은 한국어입니다.
+- **날짜 칸 꾸미기.** `Calendar.Day` part 가 날짜에 이름을 붙이고(`modifiers`) 칸의 내용을 바꿉니다. 모양, 포커스, 상태 속성은 IDS 가 그립니다.
 
 ```tsx
 import { CalendarDate } from '@internationalized/date';
@@ -24,16 +24,16 @@ const [date, setDate] = useState<CalendarDate | null>(null);
 <Calendar value={date} onValueChange={setDate} />                              // single(기본): CalendarDate | null
 <Calendar selectionMode="range" value={range} onValueChange={setRange} />      // DateRange | null
 <Calendar selectionMode="multiple" value={dates} onValueChange={setDates} />   // CalendarDate[]
-<Calendar selectionMode="none" value={meeting} />                              // 표시만. 고를 수 없다
+<Calendar readOnly value={meeting} />                                          // 표시만. 고를 수 없다
 
 <Calendar defaultValue={new CalendarDate(2026, 9, 15)} />                      // 비제어. 월은 1부터
 ```
 
 - 값을 만들려면 앱도 `@internationalized/date` 를 설치합니다. IDS 는 다시 내보내지 않습니다. 오늘은 `today(getLocalTimeZone())` 입니다.
 - 값은 `instanceof` 가 아니라 모양(`year`, `month`, `day`, `calendar.identifier`, `compare`)으로 검사합니다. 다른 버전의 패키지여도 되고, `Date` 나 문자열은 오류입니다.
-- 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `locale="ja-JP-u-ca-japanese"` 처럼 태그에 적습니다.
+- 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `IdsProvider` 의 `locale="ja-JP-u-ca-japanese"` 처럼 태그에 적습니다.
 - `onValueChange` 는 값이 바뀔 때만 부릅니다. 이미 고른 날을 다시 눌러도 부르지 않습니다.
-- 고른 날은 primary 로 채웁니다. 오늘은 `text-primary` 글자에 primary 테두리를 두르고, 고른 날이 오늘이면 채움만 보입니다. `renderDay` 로 칸 안에 점을 그려도 오늘 표시와 겹치지 않습니다.
+- 고른 날은 primary 로 채웁니다. 오늘은 `text-primary` 글자에 primary 테두리를 두르고, 고른 날이 오늘이면 채움만 보입니다. `Calendar.Day` 로 칸 안에 점을 그려도 오늘 표시와 겹치지 않습니다.
 - `multiple` 에서 고른 날을 다시 누르면 빠집니다.
 
 ## 기간
@@ -56,8 +56,12 @@ const [range, setRange] = useState<DateRange | null>(null);
 ## 월과 연도 이동
 
 ```tsx
-<Calendar captionLayout="dropdown" />                               // 제목 대신 연도, 월 목록
-<Calendar captionLayout="dropdown" min={new CalendarDate(1920, 1, 1)} max={today(getLocalTimeZone())} />
+<Calendar>
+  <Calendar.Caption layout="dropdown" />                            // 제목 대신 연도, 월 목록
+</Calendar>
+<Calendar min={new CalendarDate(1920, 1, 1)} max={today(getLocalTimeZone())}>
+  <Calendar.Caption layout="dropdown" />
+</Calendar>
 <Calendar monthsToShow={2} />                                       // 1~12. 이전은 첫 달, 다음은 마지막 달에만
 <Calendar defaultMonth={new CalendarDate(2026, 9, 1)} />            // 처음 보일 달
 <Calendar month={month} onMonthChange={setMonth} />                 // 보이는 달을 제어. 그 달 1일의 CalendarDate
@@ -68,6 +72,7 @@ const [range, setRange] = useState<DateRange | null>(null);
 - 범위 밖의 달은 월 목록에서 고를 수 없습니다.
 - 이전/다음은 ghost [IconButton](../../action/icon-button/README.md) 입니다. 범위 끝에서는 `disabled` 대신 `aria-disabled` 가 되어 눌리지 않고, 마지막 달로 넘긴 버튼에서 포커스가 빠지지 않습니다.
 - 두 번째 달의 목록에서 고른 달은 두 번째 칸에 옵니다.
+- `Calendar.Caption` 의 `className` 은 달 제목 줄에 붙습니다. part 가 없으면 `layout="label"` 입니다.
 - 달 제목은 `role="status"` 라서 달이 바뀌면 화면 읽기 프로그램이 새 달을 읽습니다.
 
 ## 제한
@@ -116,15 +121,18 @@ const [range, setRange] = useState<DateRange | null>(null);
 
 ## locale
 
+locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나만 다른 언어로 그리려면 그 둘레에 `IdsProvider.Scope` 를 둡니다.
+
 ```tsx
 <Calendar />                                   // 한국어: 2026년 9월, 일 월 화 ...
-<Calendar locale="en-US" />                    // September 2026, S M T ...
-<Calendar locale="de-DE" />                    // 월요일부터 시작
-<Calendar locale="en-US-u-fw-mon" />           // -u-fw- 확장으로 주 시작을 바꾼 태그
-<Calendar locale="ja-JP" />                    // 2026年9月
-<Calendar weekStartsOn={1} />                  // 주 시작을 직접 정한다. 0 = 일요일
+<IdsProvider.Scope locale="en-US">
+  <Calendar />                                 // September 2026, S M T ...
+</IdsProvider.Scope>
+<IdsProvider.Scope locale="de-DE"><Calendar /></IdsProvider.Scope>            // 월요일부터 시작
+<IdsProvider.Scope locale="ko-KR-u-fw-mon"><Calendar /></IdsProvider.Scope>   // -u-fw- 확장으로 주 시작을 바꾼다
+<IdsProvider.Scope locale="ja-JP"><Calendar /></IdsProvider.Scope>            // 2026年9月
 <div dir="rtl">
-  <Calendar locale="ar-EG" numerals="arab" />  // 아랍 숫자(١٥), 좌우 반전
+  <IdsProvider.Scope locale="ar-EG-u-nu-arab"><Calendar /></IdsProvider.Scope> // -u-nu- 확장으로 아랍 숫자(١٥), 좌우 반전
 </div>
 ```
 
@@ -138,36 +146,43 @@ const [range, setRange] = useState<DateRange | null>(null);
 | 주차                         | 두 자리 숫자                                                |
 
 - 잘못된 태그(`'de_DE'`, date-fns `Locale` 객체)는 오류입니다.
-- `numerals` 는 Intl 의 `numberingSystem` 입니다. 날짜, 제목, 주차, 이름 모두 그 숫자로 그립니다.
-- 주 시작은 locale 에서 구합니다(`@internationalized/date` 의 `getDayOfWeek`). `weekStartsOn` 이 있으면 그쪽이 먼저입니다.
+- 숫자 체계는 태그의 `-u-nu-` 확장입니다. 날짜, 제목, 주차, 이름 모두 그 숫자로 그립니다.
+- 주 시작은 locale 에서 구합니다(`@internationalized/date` 의 `getDayOfWeek`). 태그의 `-u-fw-` 확장이 있으면 그쪽을 따릅니다.
 - 이전/다음 달 버튼, 연도/월 목록, 주차 이름은 IDS 메시지(한국어)입니다. 날짜, 격자, 요일 이름은 locale 을 따르고 영어로 새지 않습니다.
 - 날짜 버튼 이름은 `오늘, 2026년 9월 15일 화요일, 선택됨` 처럼 오늘과 선택 여부를 함께 읽습니다.
 
 ## 날짜 칸 꾸미기
 
 ```tsx
-<Calendar
-  modifiers={{ event: eventDates, weekend: { dayOfWeek: [0, 6] } }} // 이름: DateMatcher
-  modifiersClassNames={{ event: 'font-bold' }} // 그 이름의 칸(td)에 클래스
-  renderDay={(day, state) => (
-    <>
-      {day.day}
-      {state.modifiers.event && <span className="size-1 rounded-full bg-current" />}
-    </>
-  )}
-  footer="일정 3개" // role="status" 알림 영역
-/>
+<Calendar>
+  <Calendar.Day
+    modifiers={{ event: eventDates, weekend: { dayOfWeek: [0, 6] } }} // 이름: DateMatcher
+    className="data-event:font-bold"                                    // 날짜 버튼에 붙는다
+  >
+    {(day, state) => (
+      <>
+        {day.day}
+        {state.modifiers.event && <span className="size-1 rounded-full bg-current" />}
+      </>
+    )}
+  </Calendar.Day>
+  <Calendar.WeekNumber />                    // 있으면 주차 열을 그린다
+  <Calendar.Footer>일정 3개</Calendar.Footer> // role="status" 알림 영역
+</Calendar>
 ```
 
-- `renderDay` 는 날짜 버튼의 내용만 바꿉니다. 버튼 모양, 포커스 이동, `data-*` 상태, 이름(`aria-label`)은 IDS 가 그대로 그립니다.
-- `renderDay` 를 주면 날짜 숫자도 직접 그립니다. `numerals` 를 따르려면 `Intl.NumberFormat(locale, { numberingSystem })` 로 씁니다.
+- `Calendar.Day` 는 날짜 버튼 하나하나의 틀입니다. 그 자리에 그려지지 않고, 달력이 날마다 읽습니다.
+- `modifiers` 의 이름마다 날짜 버튼에 `data-<이름>`(kebab-case)이 붙습니다. 모양은 `className` 의 `data-*` variant 로 바꿉니다.
+- children 함수는 날짜 버튼의 내용만 바꿉니다. 버튼 모양, 포커스 이동, `data-*` 상태, 이름(`aria-label`)은 IDS 가 그대로 그립니다. 함수를 주면 날짜 숫자도 직접 그립니다. 숫자 체계를 따르려면 `Intl.NumberFormat(locale)` 로 씁니다.
+- `Calendar.WeekNumber` 의 `className` 은 주차 칸과 머리글에 붙습니다.
+- `Calendar.Footer` 는 `role="status"` 인 `div` 이고 `asChild` 를 받습니다.
 
 | `Calendar.DayState`                        | 뜻                                               |
 | ------------------------------------------ | ------------------------------------------------ |
 | `selected`                                 | 선택됨. 기간의 가운데 날도 포함                  |
 | `today` / `outside` / `disabled`           | 오늘 / 앞뒤 달의 날 / 고를 수 없음               |
 | `rangeStart` / `rangeMiddle` / `rangeEnd`  | 기간의 시작 / 가운데 / 끝                        |
-| `modifiers`                                | `modifiers` 로 준 이름마다 그 날이 맞는지(`boolean`) |
+| `modifiers`                                | `Calendar.Day` 의 `modifiers` 이름마다 그 날이 맞는지(`boolean`) |
 
 - 이름, 요일, 제목 글자는 Intl 로 그립니다([locale](#locale)). react-day-picker 의 `components`, `formatters`, `labels` 는 받지 않습니다.
 
@@ -182,37 +197,38 @@ const [range, setRange] = useState<DateRange | null>(null);
 | `data-outside`                                              | 앞뒤 달의 날                    |
 | `data-range-start` / `data-range-middle` / `data-range-end` | 기간의 시작 / 가운데 / 끝       |
 | `data-range-preview`                                        | 끝을 고르기 전 미리 보기 안     |
+| `data-<modifier>`                                           | `Calendar.Day` 의 `modifiers` 이름에 맞는 날 |
 
 - 날짜 칸(`td`)에는 react-day-picker 의 `data-day`, `data-selected`, `data-today`, `data-outside` 가 붙습니다.
 - 루트의 `className` 과 `style` 은 `Calendar.State`(`value`, `month`, `disabled`, `readOnly`, `selectionMode`)를 받는 함수도 됩니다. 루트에는 `data-disabled`, `data-readonly`, `data-size`, `data-selection-mode` 가 붙습니다.
 
 ## 속성
 
-| 속성                                                                                    | 기본 / 동작                                               |
-| --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `selectionMode`                                                                         | `single`(기본) / `range` / `multiple` / `none`            |
-| `value` / `defaultValue` / `onValueChange`                                              | 모드별 타입. 기본 `null`, `multiple` 은 `[]`              |
-| `min` / `max`                                                                           | `CalendarDate`. 양 끝 포함                                |
-| `disabled`                                                                              | `true` 면 전체, `DateMatcher` 면 날짜별                   |
-| `readOnly`                                                                              | 이동만                                                    |
-| `captionLayout`                                                                         | `label`(기본) / `dropdown`                                |
-| `monthsToShow`                                                                          | `1`. 1~12                                                 |
-| `month` / `defaultMonth` / `onMonthChange`                                              | 보이는 첫 달. 그 달 1일의 `CalendarDate`                  |
-| `today`                                                                                 | `today(getLocalTimeZone())`. 오늘 표시와 첫 달의 기준     |
-| `locale`                                                                                | `ko-KR`. BCP 47 태그. 루트의 `lang` 이 된다               |
-| `weekStartsOn`                                                                          | locale 의 주 시작. `0`(일) ~ `6`(토)                      |
-| `dir`                                                                                   | 부모 방향                                                 |
-| `size`                                                                                  | `standard`(칸 36px) / `tiny`(32px). 생략하면 `Field` 크기 |
-| `autoFocus`                                                                             | 선택한 날, 없으면 오늘에 포커스                           |
-| `showOutsideDays`                                                                       | 한 달이면 `true`, 여러 달이면 `false`                     |
-| `fixedWeeks`                                                                            | `true`. 어느 달이든 6주라 높이가 그대로다                 |
-| `showWeekNumber`                                                                        | react-day-picker 그대로                                   |
-| `numerals`                                                                              | locale 의 숫자. Intl `numberingSystem`                    |
-| `modifiers` / `modifiersClassNames`                                                     | 이름별 `DateMatcher` / 이름별 칸 클래스                   |
-| `renderDay`                                                                             | 날짜 버튼의 내용. `(day, state) => ReactNode`             |
-| `footer`                                                                                | 달력 아래 `role="status"` 알림 영역                       |
-| `className` / `style`                                                                   | 루트. 상태를 받는 함수도 된다                             |
-| 그 외 native 속성, `ref`                                                                | 루트 `div`. 기본 `role="group"`, 이름 `달력`              |
+| 속성                                       | 기본 / 동작                                               |
+| ------------------------------------------ | --------------------------------------------------------- |
+| `selectionMode`                            | `single`(기본) / `range` / `multiple`                     |
+| `value` / `defaultValue` / `onValueChange` | 모드별 타입. 기본 `null`, `multiple` 은 `[]`              |
+| `min` / `max`                              | `CalendarDate`. 양 끝 포함                                |
+| `disabled`                                 | `true` 면 전체, `DateMatcher` 면 날짜별                   |
+| `readOnly`                                 | 이동만                                                    |
+| `monthsToShow`                             | `1`. 1~12. 한 달이면 앞뒤 달의 날도 보이고, 여러 달이면 숨긴다 |
+| `month` / `defaultMonth` / `onMonthChange` | 보이는 첫 달. 그 달 1일의 `CalendarDate`                  |
+| `today`                                    | `today(getLocalTimeZone())`. 오늘 표시와 첫 달의 기준     |
+| `dir`                                      | 부모 방향                                                 |
+| `size`                                     | `standard`(칸 36px) / `tiny`(32px). 생략하면 `Field` 크기 |
+| `autoFocus`                                | 선택한 날, 없으면 오늘에 포커스                           |
+| `className` / `style`                      | 루트. 상태를 받는 함수도 된다                             |
+| 그 외 native 속성, `ref`                   | 루트 `div`. 기본 `role="group"`, 이름 `달력`              |
+
+| part                  | 하는 일                                                        |
+| --------------------- | -------------------------------------------------------------- |
+| `Calendar.Day`        | `modifiers`, 날짜 버튼의 `className`, 내용 함수 `(day, state)` |
+| `Calendar.Caption`    | `layout`: `label`(기본) / `dropdown`, 달 제목 줄의 `className` |
+| `Calendar.WeekNumber` | 있으면 주차 열. 칸의 `className`                               |
+| `Calendar.Footer`     | 달력 아래 `role="status"` 알림 영역                            |
+
+- 어느 달이든 6주를 그려서 달을 넘겨도 높이가 그대로입니다.
+- 루트의 locale 은 `IdsProvider` 의 `locale` 이고, 루트의 `lang` 이 됩니다.
 
 ## 알아둘 것
 

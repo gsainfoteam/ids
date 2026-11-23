@@ -3,7 +3,7 @@
 시, 분, 초와 오전/오후를 세로 목록에서 골라 시각을 정하는 컴포넌트입니다.
 
 - **값은 `Time | null`.** [`@internationalized/date`](https://react-spectrum.adobe.com/internationalized/date/Time.html) 의 `Time` 입니다. 날짜와 시간대가 없는 벽시계 시각이라, 로컬 시간대나 서머타임이 값을 흔들지 않습니다.
-- **locale 시간제.** 브라우저의 `Intl`(CLDR)을 따라 한국어와 미국 영어는 12시간제에 오전/오후 컬럼, 독일어와 일본어는 24시간제가 기본입니다. `hourCycle` 로 정할 수도 있습니다. `locale` 은 BCP 47 태그라 어떤 언어든 import 없이 됩니다.
+- **locale 시간제.** 브라우저의 `Intl`(CLDR)을 따라 한국어와 미국 영어는 12시간제에 오전/오후 컬럼, 독일어와 일본어는 24시간제가 기본입니다. `hourCycle` 로 정할 수도 있습니다. locale 은 `IdsProvider` 의 `locale`(BCP 47 태그)이라 어떤 언어든 import 없이 됩니다.
 - **간격과 범위.** `step` 으로 분이나 초를 15분 단위처럼 끊고, `min` / `max` 밖의 시각은 고를 수 없습니다.
 - **키보드.** 방향키로 둘러보고 Enter로 고릅니다. 숫자를 치면 그 숫자로 가고, Delete로 비웁니다.
 - **휠.** `variant="wheel"` 은 iOS처럼 가운데로 스냅되는 컬럼이고, 스크롤이 멈추면 가운데 값이 선택됩니다.
@@ -59,10 +59,14 @@ const [time, setTime] = useState<Time | null>(null);
 ```tsx
 <TimePicker />                             // ko-KR: 오전/오후 컬럼이 앞에 오는 12시간제
 <TimePicker hourCycle="24h" />             // 24시간제, 오전/오후 컬럼 없음
-<TimePicker locale="en-US" />              // 12시간제, AM/PM 이 뒤에
-<TimePicker locale="de-DE" />              // 24시간제
-<TimePicker locale="ja-JP" hourCycle="12h" /> // 午前/午後 가 앞에
+<IdsProvider.Scope locale="en-US">
+  <TimePicker />                           // 12시간제, AM/PM 이 뒤에
+</IdsProvider.Scope>
+<IdsProvider.Scope locale="de-DE"><TimePicker /></IdsProvider.Scope>                 // 24시간제
+<IdsProvider.Scope locale="ja-JP"><TimePicker hourCycle="12h" /></IdsProvider.Scope> // 午前/午後 가 앞에
 ```
+
+- locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 시계 하나만 다른 언어로 그리려면 그 둘레에 `IdsProvider.Scope` 를 둡니다.
 
 - 시간제는 브라우저의 `Intl` 이 그 locale 에 쓰는 시간제(CLDR)를 따릅니다.
 - 오전/오후 컬럼은 locale 이 쓰는 자리에 놓입니다. 12시간제 시각을 `formatToParts` 로 나눠 `dayPeriod` 가 `hour` 앞인지 봅니다. 한국어, 일본어는 앞, 영어는 뒤입니다.
@@ -130,9 +134,7 @@ const [time, setTime] = useState<Time | null>(null);
 | `step`                                     | `1`. 가장 작은 단위의 간격                                  |
 | `hourCycle`                                | locale 시간제. `12h` / `24h`                                |
 | `min` / `max`                              | `Time`. 양 끝 포함                                          |
-| `locale`                                   | `ko-KR`. BCP 47 태그                                        |
 | `variant`                                  | `grid`(기본) / `wheel`                                      |
-| `selectionMode`                            | `single`(기본) / `none`(둘러보기만)                         |
 | `readOnly`                                 | 둘러보기만                                                  |
 | `disabled`                                 | 조작과 Tab 진입을 막는다                                    |
 | `size`                                     | `standard`(옵션 36px) / `tiny`(32px). 생략하면 `Field` 크기 |

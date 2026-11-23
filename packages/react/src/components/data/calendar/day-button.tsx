@@ -2,12 +2,14 @@
 
 import { useEffect, useRef } from 'react';
 
+import { kebabCase } from 'es-toolkit';
 import { type DayButtonProps } from 'react-day-picker';
 
 import { useCalendarContext } from './context';
 import { dayKey } from './date';
 import { fromLocalDate } from './day-picker-bridge';
 import { calendarStyle } from './style';
+import { cn } from '../../../utils';
 
 import type { CalendarDayState } from '.';
 
@@ -36,6 +38,7 @@ export function CalendarDayButton({
   });
   const flag = (on: boolean | undefined) => (on ? '' : undefined);
   const date = fromLocalDate(day.date);
+  const modifierNames = Object.keys(c.day?.modifiers ?? {});
 
   const dayState: CalendarDayState = {
     selected: !!modifiers.selected,
@@ -45,12 +48,16 @@ export function CalendarDayButton({
     rangeStart: !!modifiers.range_start,
     rangeMiddle: !!modifiers.range_middle,
     rangeEnd: !!modifiers.range_end,
-    modifiers: Object.fromEntries(c.modifierNames.map((name) => [name, !!modifiers[name]])),
+    modifiers: Object.fromEntries(modifierNames.map((name) => [name, !!modifiers[name]])),
   };
+  const modifierAttributes = Object.fromEntries(
+    modifierNames.map((name) => [`data-${kebabCase(name)}`, flag(modifiers[name])]),
+  );
 
   return (
     <button
       {...props}
+      {...modifierAttributes}
       ref={own}
       data-calendar-day={dayKey(date)}
       data-selected={flag(modifiers.selected)}
@@ -61,9 +68,9 @@ export function CalendarDayButton({
       data-range-middle={flag(modifiers.range_middle)}
       data-range-end={flag(modifiers.range_end)}
       data-range-preview={flag(preview)}
-      className={styles.dayButton({ className })}
+      className={styles.dayButton({ className: cn(className, c.day?.className) })}
     >
-      {c.renderDay ? c.renderDay(date, dayState) : children}
+      {c.day?.children ? c.day.children(date, dayState) : children}
     </button>
   );
 }
