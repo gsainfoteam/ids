@@ -1,8 +1,8 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chart } from '../../components/data/chart';
+import { Chip } from '../../components/data/chip';
 import { Table } from '../../components/data/table';
 import { Alert } from '../../components/feedback/alert';
 import { Progress } from '../../components/feedback/progress';
@@ -155,7 +155,7 @@ export const PC: Story = {
                     </Card.Title>
                     {next && (
                       <Card.Action>
-                        <Badge content={`${next} 출발`} variant="soft" colorScheme="primary" />
+                        <Chip variant="soft" colorScheme="primary">{`${next} 출발`}</Chip>
                       </Card.Action>
                     )}
                   </Card.Header>
@@ -197,9 +197,11 @@ export const PC: Story = {
                           <Table.Cell>{clockOf(minutesOf(departure) + route.minutes)}</Table.Cell>
                           <Table.Cell align="end">
                             {departure === next ? (
-                              <Badge content="다음 차" variant="soft" colorScheme="primary" />
+                              <Chip variant="soft" colorScheme="primary">
+                                다음 차
+                              </Chip>
                             ) : gone ? (
-                              <Badge content="떠남" variant="outline" />
+                              <Chip variant="outline">떠남</Chip>
                             ) : null}
                           </Table.Cell>
                         </Table.Row>
@@ -210,7 +212,7 @@ export const PC: Story = {
 
                 <Card>
                   <Card.Content>
-                    <Chart config={WAIT_CONFIG} ratio={2} legend={false}>
+                    <Chart config={WAIT_CONFIG}>
                       <Chart.Title>시간대별 대기 시간</Chart.Title>
                       <Chart.Description>학생회관 정류장 · 지난 4주 평균</Chart.Description>
                       <BarChart data={route.waits}>
@@ -218,6 +220,7 @@ export const PC: Story = {
                         <XAxis dataKey="hour" name="시간대" tickLine={false} axisLine={false} />
                         <YAxis width={28} tickLine={false} axisLine={false} />
                         <Bar dataKey="wait" radius={4} />
+                        <Chart.Tooltip />
                       </BarChart>
                     </Chart>
                   </Card.Content>

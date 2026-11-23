@@ -3,8 +3,8 @@ import { useState, type FormEvent } from 'react';
 import { CalendarDate, Time } from '@internationalized/date';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
@@ -161,12 +161,9 @@ export const PC: Story = {
           </h2>
           <Card>
             <Card.Header>
-              <Badge
-                content="행사"
-                variant="soft"
-                colorScheme="primary"
-                className="justify-self-start"
-              />
+              <Chip variant="soft" colorScheme="primary" className="justify-self-start">
+                행사
+              </Chip>
               <Card.Title className="text-headline-h5-bold">{name || '행사 이름'}</Card.Title>
             </Card.Header>
             <ItemGroup size="tiny" aria-label="행사 정보">

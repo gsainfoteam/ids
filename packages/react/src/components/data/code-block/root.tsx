@@ -14,7 +14,9 @@ import { CodeBlockContext } from './context';
 import { CodeBlockCopy } from './copy';
 import { CodeBlockFold } from './fold';
 import { isPlainText } from './highlight';
+import { CodeBlockLineNumbers } from './line-numbers';
 import { codeBlockStyle } from './style';
+import { CodeBlockTitle } from './title';
 import { useHighlightedLines } from './use-code-block';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { elementTypeOf } from '../../../utils';
@@ -24,31 +26,35 @@ import { ScrollArea } from '../../layout/scroll-area';
 
 import type { CodeBlock } from '.';
 
-const COPY_PARTS: ReadonlySet<unknown> = new Set([CodeBlockCopy]);
-
 const withoutEdgeNewlines = (code: string) => code.replace(/^\r?\n/, '').replace(/\r?\n$/, '');
+
+const isPart = (child: ReactNode, part: unknown): child is ReactElement =>
+  isValidElement(child) && elementTypeOf(child) === part;
 
 function splitChildren(children: ReactNode) {
   let code = '';
+  let title: ReactElement | undefined;
   let copy: ReactElement | undefined;
+  let lineNumbers = false;
 
   Children.toArray(children).forEach((child) => {
     if (typeof child === 'string' || typeof child === 'number') code += String(child);
-    else if (isValidElement(child) && COPY_PARTS.has(elementTypeOf(child))) copy = child;
+    else if (isPart(child, CodeBlockTitle)) title = child;
+    else if (isPart(child, CodeBlockCopy)) copy = child;
+    else if (isPart(child, CodeBlockLineNumbers)) lineNumbers = true;
     else if (isDevelopment)
-      console.warn('CodeBlock: children take the code as a string and `CodeBlock.Copy`.');
+      console.warn(
+        'CodeBlock: children take the code as a string, `CodeBlock.Title`, `CodeBlock.LineNumbers` and `CodeBlock.Copy`.',
+      );
   });
 
-  return { code: withoutEdgeNewlines(code.replace(/\r\n/g, '\n')), copy };
+  return { code: withoutEdgeNewlines(code.replace(/\r\n/g, '\n')), title, copy, lineNumbers };
 }
 
 export function CodeBlockRoot({
   children,
   language = 'text',
-  title,
-  lineNumbers = false,
   highlight,
-  wrap = false,
   variant = 'outline',
   collapsedLines,
   expanded: expandedProp,
@@ -58,7 +64,7 @@ export function CodeBlockRoot({
   style,
   ...rest
 }: CodeBlock.Props) {
-  const { code, copy } = splitChildren(children);
+  const { code, title, copy, lineNumbers } = splitChildren(children);
   const lines = useHighlightedLines(code, language);
   const highlighted = new Set(highlight);
   const preId = useId();
@@ -72,7 +78,7 @@ export function CodeBlockRoot({
   const collapsed = foldable && !expanded;
   const showLanguage = !isPlainText(language);
   const hasCaption = title != null || showLanguage;
-  const styles = codeBlockStyle({ variant, wrap, lineNumbers, captioned: hasCaption, collapsed });
+  const styles = codeBlockStyle({ variant, lineNumbers, captioned: hasCaption, collapsed });
   const digits = String(lines.length).length;
 
   return (
@@ -81,7 +87,6 @@ export function CodeBlockRoot({
         {...rest}
         data-variant={variant}
         data-language={language}
-        data-wrap={wrap ? '' : undefined}
         data-line-numbers={lineNumbers ? '' : undefined}
         data-collapsed={collapsed ? '' : undefined}
         className={styles.root({ className })}
@@ -89,7 +94,7 @@ export function CodeBlockRoot({
       >
         {hasCaption && (
           <figcaption className={styles.caption()}>
-            {title != null && <span className={styles.title()}>{title}</span>}
+            {title}
             {showLanguage && <span className={styles.language()}>{language}</span>}
           </figcaption>
         )}

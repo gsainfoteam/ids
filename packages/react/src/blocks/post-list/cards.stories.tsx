@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Spacer } from '../../components/layout/spacer';
@@ -233,7 +232,9 @@ export const PC: Story = {
                     </Card.Title>
                     {post.pinned && (
                       <Card.Action>
-                        <Badge content="고정" variant="soft" colorScheme="primary" />
+                        <Chip variant="soft" colorScheme="primary">
+                          고정
+                        </Chip>
                       </Card.Action>
                     )}
                   </Card.Header>

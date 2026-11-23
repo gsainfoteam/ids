@@ -8,6 +8,7 @@
 - **붙여넣기.** 전체 코드는 어느 칸에서든 통째로 들어가고, 일부만 붙여넣으면 선택한 칸부터 덮어씁니다. `123-456` 의 하이픈 같은 문자는 걸러집니다.
 - **폼.** `name` 하나에 FormData 항목 하나입니다. 다 채우지 않으면 브라우저 검증이 제출을 막고, `<label>` 을 누르면 다음 입력 칸으로 갑니다.
 - **react-hook-form, TanStack Form.** `register()` 도, 값 기반 연결도 그대로 됩니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 칸은 제 크기를 지키고 줄의 시작에 붙습니다. 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-80"><OTPField length={6} /></div>`.
 
 ```tsx
 import { Field, OTPField } from '@gsainfoteam/ids-react';
@@ -90,10 +91,7 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 ## 칸 직접 그리기
 
 ```tsx
-<OTPField.Slot
-  index={0}
-  className={(slot) => (slot.isFilled ? 'bg-primary-solid text-on-primary-solid' : undefined)}
->
+<OTPField.Slot index={0}>
   {(slot) => (slot.isFilled ? '✓' : slot.hasFakeCaret && <OTPField.Caret />)}
 </OTPField.Slot>
 ```
@@ -106,8 +104,8 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 | `isFilled`     | 글자가 있다                         |
 | `hasFakeCaret` | 활성인 빈 칸이라 캐럿을 그려야 한다 |
 
-- 칸에는 같은 상태가 `data-active`, `data-filled` 로도 붙어 CSS만으로 꾸밀 수 있습니다.
-- 루트에는 `data-focused`, `data-complete`, `data-invalid`, `data-disabled`, `data-readonly` 가 붙습니다.
+- Slot 의 `className` 도 같은 상태를 받는 함수가 됩니다. 새 디자인을 만들 때만 씁니다.
+- 코드 전체는 `value` / `defaultValue` / `onValueChange` 와 `onComplete` 로 읽습니다.
 
 ## 마스크와 자리 표시
 
@@ -189,7 +187,6 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `invalid`                | `aria-invalid` 와 danger 색                                           |
 | `variant`                | `outline`(기본) / `soft`                                              |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                            |
-| `className` / `style`    | 루트로 간다                                                           |
 | `ref`                    | 실제 input                                                            |
 | 그 외 native 속성        | 실제 input으로 간다 (`name`, `id`, `required`, `onBlur`, `aria-*` 등) |
 

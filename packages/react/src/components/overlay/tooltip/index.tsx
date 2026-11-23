@@ -7,7 +7,7 @@ import { tooltipStyle } from './style';
 import { TooltipTrigger, type TooltipTriggerProps } from './trigger';
 import { type UseTooltipOptions } from './use-tooltip';
 
-import type { AnchoredSide } from '../../../internal/overlay';
+import type { AnchoredAlign, AnchoredSide } from '../../../internal/overlay';
 
 export function Tooltip(props: Tooltip.Props) {
   return <TooltipRoot {...props} />;
@@ -15,10 +15,9 @@ export function Tooltip(props: Tooltip.Props) {
 
 export namespace Tooltip {
   export type Side = AnchoredSide;
+  export type Align = AnchoredAlign;
 
   export type Props = UseTooltipOptions & {
-    content?: ReactNode;
-    arrow?: boolean;
     children?: ReactNode;
   };
 

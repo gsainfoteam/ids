@@ -5,12 +5,13 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const badgeStyle = tv({
   slots: {
-    root: 'relative inline-flex shrink-0 align-middle [--badge-inset:0px]',
+    root: 'relative inline-flex shrink-0 align-middle [--badge-inset-x:0px] [--badge-inset-y:0px]',
     indicator: [
       'inline-flex shrink-0 items-center justify-center rounded-full tabular-nums',
       'whitespace-nowrap select-none',
       'transition-[scale,opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'data-invisible:scale-0 data-invisible:opacity-0',
+      'pointer-events-none absolute z-10 ring-2 ring-(--ids-bg-current)',
     ],
   },
   variants: {
@@ -31,38 +32,26 @@ export const badgeStyle = tv({
     } satisfies Record<BadgeVariant, object>,
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
     dot: { true: {}, false: {} },
-    shape: {
-      auto: { root: 'has-[>[data-avatar]]:[--badge-inset:14.6%]' },
-      rectangular: {},
-      circular: { root: '[--badge-inset:14.6%]' },
-    },
     placement: {
       'top-end': {
         indicator:
-          'top-(--badge-inset) end-(--badge-inset) -translate-y-1/2 ltr:translate-x-1/2 rtl:-translate-x-1/2',
+          'top-(--badge-inset-y) end-(--badge-inset-x) -translate-y-1/2 ltr:translate-x-1/2 rtl:-translate-x-1/2',
       },
       'top-start': {
         indicator:
-          'start-(--badge-inset) top-(--badge-inset) -translate-y-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2',
+          'start-(--badge-inset-x) top-(--badge-inset-y) -translate-y-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2',
       },
       'bottom-end': {
         indicator:
-          'end-(--badge-inset) bottom-(--badge-inset) translate-y-1/2 ltr:translate-x-1/2 rtl:-translate-x-1/2',
+          'end-(--badge-inset-x) bottom-(--badge-inset-y) translate-y-1/2 ltr:translate-x-1/2 rtl:-translate-x-1/2',
       },
       'bottom-start': {
         indicator:
-          'start-(--badge-inset) bottom-(--badge-inset) translate-y-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2',
+          'start-(--badge-inset-x) bottom-(--badge-inset-y) translate-y-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2',
       },
-      none: {},
-    } satisfies Record<BadgePlacement | 'none', object>,
+    } satisfies Record<BadgePlacement, object>,
   },
   compoundVariants: [
-    {
-      placement: ['top-end', 'top-start', 'bottom-end', 'bottom-start'],
-      class: {
-        indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-(--ids-bg-current)'],
-      },
-    },
     {
       dot: false,
       size: 'standard',
@@ -84,10 +73,9 @@ export const badgeStyle = tv({
   ],
   defaultVariants: {
     variant: 'solid',
-    colorScheme: 'neutral',
+    colorScheme: 'danger',
     size: 'standard',
     dot: false,
-    shape: 'auto',
     placement: 'top-end',
   },
 });

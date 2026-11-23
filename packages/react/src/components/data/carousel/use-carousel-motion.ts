@@ -1,95 +1,26 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type FocusEvent } from 'react';
-
-import AutoScroll from 'embla-carousel-auto-scroll';
-import Autoplay from 'embla-carousel-autoplay';
+import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { isNodeFromAnyWindow } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { CarouselMotion } from './context';
+import type { CarouselAutoScrollDirection, CarouselPlaying } from './use-carousel';
 import type { Slides } from '../../../internal/slides';
-import type { EmblaCarouselType, EmblaPluginType } from 'embla-carousel';
-
-export type CarouselAutoplay = boolean | { delay?: number };
-
-export type CarouselAutoScrollDirection = 'forward' | 'backward';
-
-export type CarouselAutoScroll =
-  | boolean
-  | { speed?: number; direction?: CarouselAutoScrollDirection };
-
-type PluginOptions = {
-  autoplay: CarouselAutoplay | undefined;
-  autoScroll: CarouselAutoScroll | undefined;
-};
+import type { EmblaCarouselType } from 'embla-carousel';
 
 type MotionOptions = {
   slides: Slides;
   motion: CarouselMotion | null;
   scrollDirection: CarouselAutoScrollDirection;
-  playing: boolean | undefined;
-  defaultPlaying: boolean | undefined;
-  onPlayingChange: ((playing: boolean) => void) | undefined;
+  playing: CarouselPlaying;
 };
 
-const AUTOPLAY_DELAY = 4000;
-const AUTO_SCROLL_SPEED = 2;
 const PAUSE_CONTROL = '[data-carousel-pause]';
-const NO_PLUGINS: EmblaPluginType[] = [];
-const IDS_DECIDES_WHEN_TO_PLAY = {
-  playOnInit: false,
-  stopOnInteraction: true,
-  stopOnFocusIn: false,
-  stopOnMouseEnter: false,
-};
-
-const settingsOf = <T extends object>(value: boolean | T | undefined): Partial<T> | null => {
-  if (value === undefined || value === false) return null;
-  return value === true ? {} : value;
-};
-
-type CarouselPlugins = {
-  motion: CarouselMotion | null;
-  plugins: EmblaPluginType[];
-  scrollDirection: CarouselAutoScrollDirection;
-};
 
 function reachedTheEnd(api: EmblaCarouselType, direction: CarouselAutoScrollDirection) {
   return direction === 'backward' ? !api.canScrollPrev() : !api.canScrollNext();
-}
-
-export function useCarouselPlugins({ autoplay, autoScroll }: PluginOptions): CarouselPlugins {
-  const autoplaySettings = settingsOf(autoplay);
-  const autoScrollSettings = autoplaySettings ? null : settingsOf(autoScroll);
-  const bothRequested = autoplaySettings !== null && settingsOf(autoScroll) !== null;
-
-  const motion: CarouselMotion | null = autoplaySettings
-    ? 'autoplay'
-    : autoScrollSettings
-      ? 'autoScroll'
-      : null;
-  const delay = autoplaySettings?.delay ?? AUTOPLAY_DELAY;
-  const speed = autoScrollSettings?.speed ?? AUTO_SCROLL_SPEED;
-  const scrollDirection = autoScrollSettings?.direction ?? 'forward';
-
-  const plugins = useMemo(() => {
-    if (motion === 'autoplay') return [Autoplay({ ...IDS_DECIDES_WHEN_TO_PLAY, delay })];
-    if (motion === 'autoScroll')
-      return [AutoScroll({ ...IDS_DECIDES_WHEN_TO_PLAY, speed, direction: scrollDirection })];
-    return NO_PLUGINS;
-  }, [motion, delay, speed, scrollDirection]);
-
-  useEffect(() => {
-    if (isDevelopment && bothRequested)
-      console.warn(
-        '[IDS] Carousel: autoplay and autoScroll cannot run together, so autoplay runs. Keep only one of them.',
-      );
-  }, [bothRequested]);
-
-  return { motion, plugins, scrollDirection };
 }
 
 function startOrStop(
@@ -111,15 +42,13 @@ export function useCarouselMotion({
   slides,
   motion,
   scrollDirection,
-  playing: playingProp,
-  defaultPlaying,
-  onPlayingChange,
+  playing: { value, defaultValue, onValueChange },
 }: MotionOptions) {
   const [chosen, setChosen] = useControllableState<boolean | undefined>({
-    value: playingProp,
-    defaultValue: defaultPlaying,
+    value,
+    defaultValue,
     onValueChange: (next) => {
-      if (next !== undefined) onPlayingChange?.(next);
+      if (next !== undefined) onValueChange?.(next);
     },
   });
   const [hovered, setHovered] = useState(false);

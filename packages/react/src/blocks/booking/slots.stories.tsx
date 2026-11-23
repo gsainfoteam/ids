@@ -5,9 +5,9 @@ import { CalendarDate } from '@internationalized/date';
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Calendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Field } from '../../components/form/field';
 import { TextArea } from '../../components/form/text-area';
@@ -57,10 +57,10 @@ export const PC: Story = {
                 <h1 className="text-headline-h4-bold">지도 교수 면담</h1>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                <Badge content="30분" variant="outline" />
-                <Badge content="연구동 B 312호" variant="outline" />
+                <Chip variant="outline">30분</Chip>
+                <Chip variant="outline">연구동 B 312호</Chip>
                 {date && time && (
-                  <Badge content={`${dayOf(date)} ${time}`} variant="soft" colorScheme="primary" />
+                  <Chip variant="soft" colorScheme="primary">{`${dayOf(date)} ${time}`}</Chip>
                 )}
               </div>
             </div>

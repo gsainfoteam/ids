@@ -108,9 +108,9 @@ export const Gallery: Story = {
           </Chip>
         </Showcase.Row>
         <Showcase.Row label="truncate">
-          <Chip className="max-w-32" onRemove={() => {}}>
-            아주 긴 태그 이름은 말줄임표로 줄어듭니다
-          </Chip>
+          <div className="max-w-32">
+            <Chip onRemove={() => {}}>아주 긴 태그 이름은 말줄임표로 줄어듭니다</Chip>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>

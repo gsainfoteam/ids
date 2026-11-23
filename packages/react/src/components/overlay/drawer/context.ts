@@ -6,15 +6,14 @@ import { invariant } from '../../../utils';
 
 import type { Drawer } from '.';
 import type { drawerStyle } from './style';
-import type { useDrawer } from './use-drawer';
+import type { useDrawerRoot } from './use-drawer-root';
 
 type DrawerContextValue = {
-  drawer: ReturnType<typeof useDrawer>;
+  drawer: ReturnType<typeof useDrawerRoot>;
   role: Drawer.Role;
   side: Drawer.Side;
   modal: boolean;
   dismissible: boolean;
-  hideClose: boolean;
   overlay: Drawer.Overlay.Props | undefined;
   titled: boolean;
   setTitled: (titled: boolean) => void;

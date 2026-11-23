@@ -27,3 +27,10 @@ export function usePicker(part: string) {
   invariant(context, `${part} must be rendered inside ColorPicker.`);
   return context;
 }
+
+export type PickerDefaults = {
+  alpha?: boolean;
+  swatches?: ColorPickerSwatchOption[];
+};
+
+export const PickerDefaultsContext = createContext<PickerDefaults>({});

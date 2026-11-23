@@ -6,7 +6,7 @@ export const popoverStyle = tv({
   slots: {
     backdrop: 'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none border-0 bg-transparent p-0',
     content: [
-      'fixed z-50 m-0 flex max-h-(--available-height) w-72 max-w-[calc(100vw-var(--spacing)*4)] flex-col overflow-visible outline-none',
+      'fixed z-50 m-0 flex max-h-(--available-height) w-max max-w-[calc(100vw-var(--spacing)*4)] flex-col overflow-visible outline-none',
       cornerOfThePaddedViewport,
       'border border-neutral bg-surface text-neutral-strong',
       'text-body-b3-regular shadow-md',
@@ -17,7 +17,7 @@ export const popoverStyle = tv({
     ],
     scrollArea: 'min-h-0 rounded-[inherit]',
     viewport: 'flex flex-col gap-2 p-3',
-    title: 'text-body-b3-semibold [overflow-wrap:anywhere]',
-    description: 'text-body-b3-regular text-neutral',
+    title: 'max-w-72 text-body-b3-semibold [overflow-wrap:anywhere]',
+    description: 'max-w-72 text-body-b3-regular text-neutral',
   },
 });

@@ -13,12 +13,12 @@ type Field = ReturnType<typeof useNumberField>;
 type NumberFieldContextValue = {
   field: Field;
   state: NumberFieldState;
-  incrementLabel: string;
-  decrementLabel: string;
   styles: ReturnType<typeof numberFieldStyle>;
 };
 
 export const NumberFieldContext = createContext<NumberFieldContextValue | null>(null);
+
+export const InsideStepperContext = createContext(false);
 
 export function useNumberContext(part: string) {
   const context = use(NumberFieldContext);

@@ -1,7 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../components/action/icon-button';
-import { Badge } from '../../components/data/badge';
+import { Chip } from '../../components/data/chip';
 import { Table } from '../../components/data/table';
 import { Alert } from '../../components/feedback/alert';
 import { Tabs } from '../../components/navigation/tabs';
@@ -90,12 +90,14 @@ export const PC: Story = {
                       <Table.Cell>
                         {row.day} ({row.weekday}){' '}
                         {row.day === TODAY && (
-                          <Badge content="오늘" variant="soft" colorScheme="primary" />
+                          <Chip variant="soft" colorScheme="primary">
+                            오늘
+                          </Chip>
                         )}
                       </Table.Cell>
                       {closed ? (
                         <Table.Cell colSpan={3}>
-                          <Badge content="쉬는 날" variant="outline" />
+                          <Chip variant="outline">쉬는 날</Chip>
                         </Table.Cell>
                       ) : (
                         <>

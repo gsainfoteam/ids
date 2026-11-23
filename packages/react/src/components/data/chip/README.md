@@ -2,6 +2,7 @@
 
 상태, 카테고리, 태그, 필터처럼 글 흐름 안에 놓이는 작은 라벨입니다. 모서리에 붙는 카운트나 점은 `Badge` 를 씁니다.
 
+- **크기는 글에 맞춘다(hug).** 칩은 글 폭만큼이고 부모 폭을 넘지 않습니다. grid 나 `flex-col` 부모 안에서는 그 칸만큼 늘어납니다.
 - **하는 일에 맞는 요소.** 그냥 라벨은 `span`, 누르거나 켜고 끄는 칩은 진짜 `<button>` 입니다. 켜고 끄는 칩은 `aria-pressed` 로 상태를 알립니다.
 - **지우기.** `onRemove` 만 주면 끝에 삭제 버튼이 붙고, 그 이름은 "frontend 삭제" 처럼 칩의 글과 이어집니다.
 - **키보드로 지우기.** 포커스된 칩이나 삭제 버튼에서 `Backspace` 나 `Delete` 를 누르면 지워지고, 포커스는 옆 칩으로 옮겨 갑니다.
@@ -16,6 +17,19 @@ import { Chip } from '@gsainfoteam/ids-react';
 <Chip onRemove={() => removeTag('react')}>react</Chip>
 ```
 
+## 점
+
+```tsx
+<Chip variant="solid" colorScheme="primary" aria-label="읽지 않음" />  // 읽는 점: role="img"
+<Chip variant="solid" colorScheme="success" aria-hidden />          // 장식 점
+<Chip variant="solid" size="tiny" aria-hidden />                    // 8px
+```
+
+- children 이 없으면 글자 없는 점(standard 10px, tiny 8px)으로 그립니다.
+- `aria-label` 을 주면 `role="img"` 가 되어 그 이름을 읽습니다.
+- 점은 `variant` 의 배경색을 씁니다. 눈에 띄는 점은 `solid` 입니다.
+- 무언가의 모서리에 붙는 점은 `Badge` 입니다.
+
 ## 켜고 끄기
 
 ```tsx
@@ -24,7 +38,7 @@ import { Chip } from '@gsainfoteam/ids-react';
 <Chip onClick={openFilter}>필터</Chip>                                         {/* 토글이 아닌 버튼 */}
 ```
 
-- 켜진 칩은 `colorScheme` 의 진한 색으로 채워지고 `data-selected` 가 붙습니다.
+- 켜진 칩은 `colorScheme` 의 진한 색으로 채워집니다.
 - `selected` 만 주고 `onSelectedChange` 가 없으면 눌러도 바뀌지 않습니다.
 
 ## 지우기
@@ -82,7 +96,13 @@ import { Chip } from '@gsainfoteam/ids-react';
 </Chip>
 ```
 
-- 긴 글은 한 줄에서 말줄임표로 줄어듭니다. 폭은 `className="max-w-32"` 처럼 정합니다.
+```tsx
+<div className="max-w-32">
+  <Chip>아주 긴 태그 이름</Chip>   {/* 부모 폭에서 말줄임표 */}
+</div>
+```
+
+- 긴 글은 한 줄에서 말줄임표로 줄어듭니다. 칩은 부모 폭을 넘지 않으므로, 폭은 칩을 둘러싼 앱 요소에서 정합니다.
 
 ## variant와 색
 
@@ -99,26 +119,14 @@ import { Chip } from '@gsainfoteam/ids-react';
 - 상태 색도 같아서 `soft` 는 `bg-X-soft` 에 `text-on-X-soft`, `outline` 은 `text-X` 글자입니다.
 - 누를 수 있는 칩은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹습니다.
 
-## 상태와 data 속성
+## 상태
 
-| 속성                                                          | 뜻                       |
-| ------------------------------------------------------------- | ------------------------ |
-| `data-chip`, `data-variant`, `data-color-scheme`, `data-size` | 루트                     |
-| `data-selected`                                               | 켜짐                     |
-| `data-removable`                                              | 지울 수 있음             |
-| `data-interactive`                                            | 누르거나 켜고 끌 수 있음 |
-| `data-disabled`                                               | 비활성                   |
-| `data-hovered`, `data-active`, `data-focus-visible`           | 인터랙션 상태            |
+앱이 실행 중에 칩 상태를 읽는 길은 prop, 콜백, 상태 함수입니다.
 
-`className`, `style`, `children` 은 `{ selected, removable, interactive, hovered, ... }` 를 받는 함수가 될 수 있습니다.
-
-- 누를 수 없는 칩은 스스로 포커스를 받지 않습니다. 삭제 버튼에 키보드 포커스가 있으면 칩에 `data-focus-visible` 이 붙고 상태의 `focusVisible` 이 `true` 가 됩니다. 칩 사이를 방향키로 오가는 필드가 포커스된 칩을 칠할 때 씁니다.
-
-```tsx
-<Chip className="data-focus-visible:bg-primary-solid/15" onRemove={remove}>
-  react
-</Chip>
-```
+- 켜짐은 `selected` 와 `onSelectedChange`, 지우기는 `onRemove`, 비활성은 `disabled` 로 앱이 이미 압니다.
+- 누를 수 있는 칩의 올림, 누름, 포커스는 `onInteractionChange` 가 `{ hovered, active, focused, focusVisible }` 로 알립니다.
+- `className`, `style`, `children` 은 `{ selected, removable, interactive, hovered, active, focused, focusVisible }` 를 받는 함수가 될 수 있습니다.
+- 누를 수 없는 칩은 스스로 포커스를 받지 않습니다. 삭제 버튼에 키보드 포커스가 있으면 상태의 `focusVisible` 이 `true` 가 됩니다. 칩 사이를 방향키로 오가는 필드가 포커스된 칩을 알아볼 때 씁니다.
 
 ## 속성
 

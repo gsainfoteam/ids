@@ -8,7 +8,6 @@ import { Toggle } from '../../components/action/toggle';
 import { ToggleGroup } from '../../components/action/toggle-group';
 import { Avatar } from '../../components/data/avatar';
 import { AvatarGroup } from '../../components/data/avatar-group';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
@@ -148,6 +147,7 @@ export const PC: Story = {
                   <Button type="submit">열기</Button>
                 </Drawer.Footer>
               </form>
+              <Drawer.Close />
             </Drawer.Content>
           </Drawer>
         </div>
@@ -199,11 +199,9 @@ export const PC: Story = {
                         </h2>
                       </Card.Title>
                       <Card.Action>
-                        <Badge
-                          content={left > 0 ? `${left}자리 남음` : '다 찼어요'}
-                          variant="soft"
-                          colorScheme={left > 0 ? 'primary' : 'neutral'}
-                        />
+                        <Chip variant="soft" colorScheme={left > 0 ? 'primary' : 'neutral'}>
+                          {left > 0 ? `${left}자리 남음` : '다 찼어요'}
+                        </Chip>
                       </Card.Action>
                     </Card.Header>
                     <Card.Content className="flex items-center gap-3">

@@ -59,6 +59,7 @@ export { MessageGroup } from './components/data/message-group';
 export { Alert } from './components/feedback/alert';
 export { Dialog } from './components/overlay/dialog';
 export { Drawer } from './components/overlay/drawer';
+export { useDrawer } from './components/overlay/drawer/use-drawer';
 export { Menu } from './components/overlay/menu';
 export { Popover } from './components/overlay/popover';
 export { Tooltip, TooltipDelayGroup } from './components/overlay/tooltip';
@@ -90,7 +91,7 @@ export { ImageGroup, type ImageGroupLayout } from './components/data/image-group
 export { QRCode } from './components/data/qr-code';
 export { CodeBlock } from './components/data/code-block';
 export { Marquee } from './components/data/marquee';
-export type { MarqueeOrientation, MarqueeSpeed } from './components/data/marquee';
+export type { MarqueeDirection, MarqueeSpeed, MarqueeVariant } from './components/data/marquee';
 export { Table } from './components/data/table';
 export type {
   TableProps,
@@ -106,8 +107,13 @@ export type {
   DataTableColumnMeta,
   DataTableFeatures,
 } from './components/data/data-table';
-export { Carousel } from './components/data/carousel';
-export type { CarouselProps, CarouselState } from './components/data/carousel';
+export { Carousel, useCarousel } from './components/data/carousel';
+export type {
+  CarouselInstance,
+  CarouselOptions,
+  CarouselProps,
+  CarouselState,
+} from './components/data/carousel';
 
 export { Button } from './components/action/button';
 export { IconButton } from './components/action/icon-button';

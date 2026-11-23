@@ -30,6 +30,8 @@ export function ColorPickerSwatches({ className, children, ...props }: ColorPick
           : [],
       )
     : (c.swatches ?? []).map(swatchValue);
+  if (values.length === 0) return null;
+
   return (
     <RadioGroup
       {...props}

@@ -836,7 +836,7 @@ Every other prop is an option. The rules for options:
   object is given, with the feature's state inside as a trio, and the root takes the result as one
   prop. The same result reaches parts the app renders outside the root.
 - **Existing props that break this rule are debt, not precedent.** Some components still carry
-  them (Drawer's `scaleBackground`, Table's `striped`, Dialog's `hideClose`), and other sections
+  them (Table's `striped`, Dialog's `hideClose`), and other sections
   of this file may still describe them. A new prop follows this rule, never their example.
 
 ```tsx
@@ -1005,7 +1005,8 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
   an app-placed `<Toaster />`) and `TooltipDelayGroup`. Nested providers only change the theme.
 - **A modal Drawer scales the page behind it**: only the lowest drawer transforms the outermost
   IdsProvider element, and pins that element's `position: fixed` descendants with `translate` so
-  they stay where they were on screen. `scaleBackground={false}` turns it off.
+  they stay where they were on screen. A drawer that must leave the page alone is
+  `modal={false}`.
 
 ## Tests
 

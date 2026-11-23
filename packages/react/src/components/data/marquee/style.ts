@@ -1,9 +1,9 @@
 import { tv } from '../../../utils';
 
-import type { MarqueeOrientation } from '.';
+import type { MarqueeVariant } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
-export type MarqueeMotion = 'on' | 'off' | 'media';
+export type MarqueeOrientation = 'horizontal' | 'vertical';
 
 export type MarqueePauseSpace = IdsSize | 'none';
 
@@ -12,119 +12,67 @@ export const marqueeStyle = tv({
     root: [
       'grid w-full min-w-0 grid-cols-1 grid-rows-1 gap-8 [--marquee-fade:min(15%,--spacing(20))]',
       '[--marquee-play-state:running] data-paused:[--marquee-play-state:paused]',
-      'data-reduced-motion:h-auto data-reduced-motion:max-h-none',
+      'motion-reduce:h-auto motion-reduce:max-h-none',
     ],
-    viewport: 'col-start-1 row-start-1 flex min-h-0 min-w-0 gap-[inherit]',
-    track: 'flex gap-[inherit]',
-    content: 'm-0 flex list-none gap-[inherit] p-0',
-    listItem: 'flex shrink-0 flex-col',
-    item: 'shrink-0 whitespace-nowrap',
-    pause: 'col-start-1 row-start-1 self-center justify-self-end',
+    viewport: [
+      'col-start-1 row-start-1 flex min-h-0 min-w-0 gap-[inherit] overflow-clip',
+      'hover:[--marquee-play-state:paused] has-focus-visible:[--marquee-play-state:paused]',
+      'motion-reduce:overflow-visible motion-reduce:[mask-image:none]',
+    ],
+    track: [
+      'flex shrink-0 gap-[inherit] animate-marquee after:order-last after:size-0 after:shrink-0',
+      'data-swapped:[&>:first-child]:order-1',
+      'motion-reduce:w-full motion-reduce:min-w-0 motion-reduce:shrink',
+      'motion-reduce:animate-none motion-reduce:after:hidden',
+    ],
+    content: [
+      'm-0 flex shrink-0 list-none justify-around gap-[inherit] p-0',
+      'motion-reduce:w-full motion-reduce:shrink',
+      'motion-reduce:flex-wrap motion-reduce:justify-center',
+    ],
+    listItem: 'flex shrink-0 flex-col motion-reduce:max-w-full',
+    item: 'shrink-0 whitespace-nowrap motion-reduce:max-w-full motion-reduce:whitespace-normal',
+    pause: 'col-start-1 row-start-1 self-center justify-self-end motion-reduce:hidden',
   },
   variants: {
     orientation: {
       horizontal: {
         root: 'items-center',
-        viewport: '-my-1 flex-row py-1',
-        track: 'flex-row',
-        content: 'flex-row items-center',
+        viewport: '-my-1 flex-row py-1 @container',
+        track: 'flex-row [--marquee-translate:-50%] rtl:[--marquee-translate:50%]',
+        content: 'min-w-[100cqw] flex-row items-center motion-reduce:min-w-0',
       },
       vertical: {
         root: 'items-stretch',
-        viewport: '-mx-1 flex-col px-1',
-        track: 'flex-col',
-        content: 'flex-col',
+        viewport: '-mx-1 flex-col px-1 @container-[size] motion-reduce:@container-normal',
+        track: 'flex-col [--marquee-translate:0_-50%]',
+        content: 'min-h-[100cqh] flex-col motion-reduce:min-h-0',
       },
     } satisfies Record<MarqueeOrientation, object>,
-    motion: {
-      on: {},
-      off: {
-        track: 'w-full min-w-0',
-        content: 'w-full flex-wrap justify-center',
-        listItem: 'max-w-full',
-        item: 'max-w-full whitespace-normal',
-      },
-      media: {
-        root: 'motion-reduce:h-auto motion-reduce:max-h-none',
-        viewport: 'motion-reduce:overflow-visible motion-reduce:[mask-image:none]',
-        track: [
-          'motion-reduce:w-full motion-reduce:min-w-0 motion-reduce:shrink',
-          'motion-reduce:animate-none motion-reduce:after:hidden',
-        ],
-        content: [
-          'motion-reduce:w-full motion-reduce:shrink',
-          'motion-reduce:flex-wrap motion-reduce:justify-center',
-        ],
-        listItem: 'motion-reduce:max-w-full',
-        item: 'motion-reduce:max-w-full motion-reduce:whitespace-normal',
-        pause: 'motion-reduce:hidden',
-      },
-    } satisfies Record<MarqueeMotion, object>,
+    variant: {
+      fade: {},
+      plain: {},
+    } satisfies Record<MarqueeVariant, object>,
     copy: {
-      true: {},
+      true: { content: 'motion-reduce:hidden' },
     },
     reverse: {
       true: { track: '[--marquee-direction:reverse]' },
     },
-    fade: {
-      true: {},
-    },
     pauseSpace: {
       none: {},
-      standard: { viewport: 'me-[calc(var(--ids-size-control-standard)+--spacing(2))]' },
-      tiny: { viewport: 'me-[calc(var(--ids-size-control-tiny)+--spacing(2))]' },
+      standard: {
+        viewport: 'me-[calc(var(--ids-size-control-standard)+--spacing(2))] motion-reduce:me-0',
+      },
+      tiny: {
+        viewport: 'me-[calc(var(--ids-size-control-tiny)+--spacing(2))] motion-reduce:me-0',
+      },
     } satisfies Record<MarqueePauseSpace, object>,
-    pauseOnHover: {
-      true: { viewport: 'hover:[--marquee-play-state:paused]' },
-    },
-    pauseOnFocus: {
-      true: { viewport: 'has-focus-visible:[--marquee-play-state:paused]' },
-    },
   },
   compoundVariants: [
     {
-      motion: ['on', 'media'],
-      class: {
-        viewport: 'overflow-clip',
-        track: [
-          'shrink-0 animate-marquee after:order-last after:size-0 after:shrink-0',
-          'data-swapped:[&>:first-child]:order-1',
-        ],
-        content: 'shrink-0 justify-around',
-      },
-    },
-    {
       orientation: 'horizontal',
-      motion: ['on', 'media'],
-      class: {
-        viewport: '@container',
-        track: '[--marquee-translate:-50%] rtl:[--marquee-translate:50%]',
-        content: 'min-w-[100cqw]',
-      },
-    },
-    {
-      orientation: 'vertical',
-      motion: ['on', 'media'],
-      class: {
-        viewport: '@container-[size]',
-        track: '[--marquee-translate:0_-50%]',
-        content: 'min-h-[100cqh]',
-      },
-    },
-    {
-      orientation: 'horizontal',
-      motion: 'media',
-      class: { content: 'motion-reduce:min-w-0' },
-    },
-    {
-      orientation: 'vertical',
-      motion: 'media',
-      class: { viewport: 'motion-reduce:@container-normal', content: 'motion-reduce:min-h-0' },
-    },
-    {
-      orientation: 'horizontal',
-      motion: ['on', 'media'],
-      fade: true,
+      variant: 'fade',
       class: {
         viewport:
           '[mask-image:linear-gradient(to_right,transparent,#000_var(--marquee-fade),#000_calc(100%-var(--marquee-fade)),transparent)]',
@@ -132,23 +80,16 @@ export const marqueeStyle = tv({
     },
     {
       orientation: 'vertical',
-      motion: ['on', 'media'],
-      fade: true,
+      variant: 'fade',
       class: {
         viewport:
           '[mask-image:linear-gradient(to_bottom,transparent,#000_var(--marquee-fade),#000_calc(100%-var(--marquee-fade)),transparent)]',
       },
     },
-    {
-      motion: 'media',
-      pauseSpace: ['standard', 'tiny'],
-      class: { viewport: 'motion-reduce:me-0' },
-    },
-    { motion: 'media', copy: true, class: { content: 'motion-reduce:hidden' } },
   ],
   defaultVariants: {
     orientation: 'horizontal',
-    motion: 'on',
+    variant: 'fade',
     pauseSpace: 'none',
   },
 });

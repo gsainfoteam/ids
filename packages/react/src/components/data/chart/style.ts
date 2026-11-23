@@ -4,12 +4,12 @@ import type { ChartIndicator } from './config';
 
 export const chartStyle = tv({
   slots: {
-    root: 'm-0 flex min-w-0 flex-col gap-4 text-neutral-strong',
+    root: 'm-0 flex h-full min-h-0 w-full min-w-0 flex-col gap-4 text-neutral-strong',
     caption: 'flex flex-col gap-1',
     title: 'text-body-b2-semibold [overflow-wrap:anywhere]',
     description: 'text-body-b3-regular text-neutral',
     frame: [
-      'text-caption-c1-regular',
+      'relative aspect-video min-h-0 w-full flex-1 text-caption-c1-regular',
       '[&_.recharts-surface]:overflow-visible [&_.recharts-surface]:rounded-standard [&_.recharts-surface]:focus-ring',
       '[&_.recharts-text]:fill-neutral',
       '[&_.recharts-cartesian-axis-line]:stroke-neutral [&_.recharts-cartesian-axis-tick-line]:stroke-neutral',

@@ -143,7 +143,9 @@ const [zoom, setZoom] = useState('100');
 
 ```tsx
 <Menu triggerType="contextmenu">
-  <Menu.Trigger className="h-40 border border-dashed">여기를 우클릭하세요</Menu.Trigger>
+  <Menu.Trigger asChild>
+    <div className="h-40 border border-dashed">여기를 우클릭하세요</div>
+  </Menu.Trigger>
   <Menu.Content aria-label="편집">...</Menu.Content>
 </Menu>
 ```
@@ -267,16 +269,10 @@ const route = await overlay.open<string>(({ close }) => (
 
 ## 상태
 
-| 속성                      | 붙는 곳                                         |
-| ------------------------- | ----------------------------------------------- |
-| `data-popup-open`         | 열려 있는 동안의 `Menu.Trigger`                 |
-| `data-open`               | 열린 `Menu.Content`                             |
-| `data-ending-style`       | 닫히는 애니메이션 동안의 `Menu.Content`         |
-| `data-nested`             | 하위 메뉴의 `Menu.Content`                      |
-| `data-side`, `data-align` | 실제로 놓인 쪽과 정렬                           |
-| `data-highlighted`        | 포커스된 항목, 명령 팔레트에서 강조된 항목      |
-| `data-disabled`           | disabled 항목                                   |
-| `data-checked`            | 켜진 `Menu.CheckboxItem`, 고른 `Menu.RadioItem` |
+- 열림: `open` / `onOpenChange`. 하위 메뉴의 `Menu` 도 받습니다.
+- 고른 항목: `Menu.Item` 의 `onSelect`.
+- 켜진 항목: `Menu.CheckboxItem` 의 `checked` / `onCheckedChange`, `Menu.RadioGroup` 의 `value` / `onValueChange`.
+- 키보드로 강조된 항목과 실제로 놓인 쪽은 읽는 길이 없습니다.
 
 ## 속성
 

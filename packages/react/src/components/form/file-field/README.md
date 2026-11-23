@@ -6,6 +6,7 @@
 - **미리보기.** 이미지는 썸네일로 보입니다. 파일을 지우거나 필드가 사라지면 썸네일 주소를 바로 해제합니다.
 - **제한과 거부 사유.** `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받은 뒤, 파일마다 이유를 알립니다.
 - **폼.** 지금 고른 `File` 이 그대로 FormData 에 들어갑니다. `required` 는 브라우저 검증이 막고, `<button type="reset">` 은 처음 값으로 되돌립니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-80"><FileField /></div>`.
 - **끌어 놓는 영역이 필요하면 [FileDropzone](../file-dropzone/README.md).** 같은 값, 제한, part 를 받고, 필드 대신 넓은 영역을 그립니다.
 
 ```tsx
@@ -34,7 +35,7 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 <FileField multiple accept="image/*" />
 ```
 
-- 파일을 끌어 올리는 동안 루트와 트리거에 `data-dragging` 이 붙습니다. 안쪽 요소 위를 지나가도 끊기지 않습니다.
+- 파일을 끌어 올리는 동안 필드가 강조됩니다. 안쪽 요소 위를 지나가도 끊기지 않습니다.
 - 글자나 링크를 끌어 오는 것은 받지 않습니다.
 - 필드 안에 포커스가 있을 때 붙여넣으면 클립보드의 파일이 들어갑니다. 파일이 없는 붙여넣기는 건드리지 않습니다.
 - `onDrop` 에서 `preventDefault()` 하면 기본 처리를 건너뜁니다.
@@ -96,14 +97,15 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 - 목록에서 파일을 지우면 포커스가 그 자리에 온 파일로, 마지막 파일이면 트리거로 갑니다.
 - 모든 part 는 `asChild` 를 받습니다.
 
-## 상태와 data 속성
+## 상태
 
-| 요소   | 속성                                                                                                                |
-| ------ | ------------------------------------------------------------------------------------------------------------------- |
-| 루트   | `data-file-field`, `data-dragging`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-empty` |
-| 트리거 | `data-dragging`, `data-placeholder`                                                                                 |
+```tsx
+<FileField value={resume} onValueChange={setResume} onReject={setRejections} />
+```
 
-- 루트와 `Trigger` 의 `className` 은 `FileField.State` 를 받는 함수도 됩니다.
+- 앱은 값을 `value` / `onValueChange` 로, 거부된 파일을 `onReject` 로 읽습니다. 비어 있는지는 `null` 이나 빈 배열로 압니다.
+- `disabled`, `readOnly`, `invalid`, `required` 는 앱이 준 값 그대로입니다.
+- 새 디자인을 그릴 때만, 루트와 `Trigger` 의 `className` 은 `FileField.State`(`dragging` 포함)를 받는 함수도 됩니다.
 
 ## 폼
 
@@ -158,7 +160,6 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `disabled` / `readOnly`  | 고르기, 놓기, 붙여넣기, 지우기를 막는다                                                 |
 | `name` / `form`          | 지금 파일을 같은 이름으로 제출                                                          |
 | `required`               | 브라우저 검증                                                                           |
-| `className` / `style`    | 루트                                                                                    |
 | `onDrop` / `onDragOver`  | 루트의 끌어다 놓기 이벤트                                                               |
 | `ref`, `id`, `aria-*`    | 트리거 button (`autoFocus`, `tabIndex`, `onClick`, `onFocus`, `onBlur`, `onKeyDown` 도) |
 | 그 외 input 속성         | 숨은 native picker (`capture` 등)                                                       |

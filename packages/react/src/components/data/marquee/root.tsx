@@ -5,44 +5,40 @@ import { isValidElement, useEffect, type CSSProperties, type ReactNode } from 'r
 import { MarqueeContext } from './context';
 import { MarqueePause } from './pause';
 import { isValidSpeed, loopDuration } from './speed';
-import { marqueeStyle, type MarqueeMotion } from './style';
+import { marqueeStyle, type MarqueeOrientation } from './style';
 import { useMarquee } from './use-marquee';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useReducedMotion } from '../../../hooks/use-reduced-motion';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
-import type { Marquee } from '.';
+import type { Marquee, MarqueeDirection } from '.';
 
 const isPause = (node: ReactNode) => isValidElement(node) && elementTypeOf(node) === MarqueePause;
 
-function motionOf(reducedMotion: boolean | undefined): MarqueeMotion {
-  if (reducedMotion === undefined) return 'media';
-  return reducedMotion ? 'off' : 'on';
-}
+const orientationOf = (direction: MarqueeDirection): MarqueeOrientation =>
+  direction === 'up' || direction === 'down' ? 'vertical' : 'horizontal';
+
+const runsBackward = (direction: MarqueeDirection) => direction === 'end' || direction === 'down';
 
 const hasText = (value: unknown) => typeof value === 'string' && value.trim() !== '';
 
 export function MarqueeRoot({
-  orientation = 'horizontal',
-  reverse = false,
+  direction = 'start',
   speed = 'normal',
   playing: playingProp,
   defaultPlaying,
   onPlayingChange,
-  pauseOnHover = true,
-  pauseOnFocus = true,
-  pauseControl = true,
-  fade = true,
+  variant = 'fade',
   size = 'standard',
-  reducedMotion,
   className,
   style,
   children,
   ...rest
 }: Marquee.Props) {
-  const prefersReducedMotion = useReducedMotion();
-  const reduced = reducedMotion ?? prefersReducedMotion;
+  const reduced = useReducedMotion();
+  const orientation = orientationOf(direction);
+  const reverse = runsBackward(direction);
   const [chosen, setChosen] = useControllableState<boolean | undefined>({
     value: playingProp,
     defaultValue: defaultPlaying,
@@ -58,7 +54,7 @@ export function MarqueeRoot({
 
   const nodes = flattenFragments(children);
   const content = nodes.filter((node) => !isPause(node));
-  const pause = pauseControl && !reduced && (nodes.filter(isPause).at(-1) ?? <MarqueePause />);
+  const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
   const named = hasText(rest['aria-label']) || rest['aria-labelledby'] != null;
 
   useEffect(() => {
@@ -73,12 +69,9 @@ export function MarqueeRoot({
 
   const styles = marqueeStyle({
     orientation,
-    motion: motionOf(reducedMotion),
     reverse,
-    fade,
+    variant,
     pauseSpace: pause ? size : 'none',
-    pauseOnHover,
-    pauseOnFocus,
   });
   const listItems = content.map((node, index) => (
     <li key={isValidElement(node) ? node.key : index} className={styles.listItem()}>
@@ -94,7 +87,7 @@ export function MarqueeRoot({
         role="group"
         data-marquee=""
         data-orientation={orientation}
-        data-reverse={reverse ? '' : undefined}
+        data-direction={direction}
         data-playing={playing ? '' : undefined}
         data-paused={playing ? undefined : ''}
         data-reduced-motion={reduced ? '' : undefined}
