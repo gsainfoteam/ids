@@ -4,34 +4,25 @@ import {
   cloneElement,
   Fragment,
   isValidElement,
-  useRef,
-  useState,
   type ComponentProps,
-  type CSSProperties,
   type ReactElement,
   type ReactNode,
 } from 'react';
 
-import { flushSync } from 'react-dom';
-
 import { invariant, mergeProps } from '../../../utils';
-import { keyHandler, type KeyMap } from '../../lib/keys';
 import { useInternalTranslate } from '../../translate';
-import {
-  axisKeyMap,
-  readingDirection,
-  useInternalAxesDrag,
-  useInternalCornerShape,
-} from '../hooks/use-resize-axes';
+import { useInternalAxesDrag, useInternalCornerShape } from '../hooks/use-resize-axes';
+import { useInternalResizeGripSeparators } from '../hooks/use-resize-grip-separators';
 import {
   GRIP_HALO,
   GRIP_STROKE,
   GRIP_TARGET,
   gripArc,
+  sizedToArc,
   type GripArc,
   type ResizeBand,
 } from '../lib/arc';
-import { axisSeparatorProps, type ResizeAxis, type ResizeDimension } from '../lib/axis';
+import { axisSeparatorProps, type ResizeAxis } from '../lib/axis';
 import { resizeGripStyle } from '../style';
 
 export type ResizeGripProps = Omit<ComponentProps<'div'>, 'children'> & {
@@ -47,10 +38,6 @@ export type ResizeGripProps = Omit<ComponentProps<'div'>, 'children'> & {
 type Styles = ReturnType<typeof resizeGripStyle>;
 
 const HALO_WIDTH = GRIP_STROKE + 2 * GRIP_HALO;
-
-function sized(style: CSSProperties | undefined, arc: GripArc | null) {
-  return arc ? { ...style, width: arc.size, height: arc.size } : style;
-}
 
 function Arc({ arc, styles }: { arc: GripArc; styles: Styles }) {
   return (
@@ -108,47 +95,15 @@ export function ResizeGrip({
   const shape = useInternalCornerShape(corner);
   const arc = shape === null || custom ? null : gripArc(shape.radius, band, shape.exponent);
   const drag = useInternalAxesDrag(axes, { disabled, onDraggingChange });
-  const [focusedAxis, setFocusedAxis] = useState<ResizeDimension>(axes[0].dimension);
-  const separators = useRef(new Map<ResizeDimension, HTMLElement>());
+  const separator = useInternalResizeGripSeparators(axes, disabled);
   const styles = resizeGripStyle({ custom });
-
-  const resizeAndFocus = (axis: ResizeAxis) => (size: number) => {
-    flushSync(() => {
-      axis.resize(size);
-      setFocusedAxis(axis.dimension);
-    });
-    separators.current.get(axis.dimension)?.focus();
-  };
-
-  const keysOn = (focused: ResizeAxis): KeyMap<HTMLElement> => ({
-    ...Object.assign(
-      {},
-      ...axes
-        .filter((axis) => axis !== focused)
-        .map((axis) => axisKeyMap(axis, resizeAndFocus(axis))),
-    ),
-    ...axisKeyMap(focused, resizeAndFocus(focused)),
-    Enter: () => {
-      for (const axis of axes) axis.reset();
-    },
-  });
 
   const hiddenSeparators = axes.map((axis) => (
     <div
       key={axis.dimension}
-      ref={(node) => {
-        if (node) separators.current.set(axis.dimension, node);
-        return () => {
-          separators.current.delete(axis.dimension);
-        };
-      }}
       {...axisSeparatorProps(axis, t, disabled)}
-      tabIndex={disabled ? undefined : axis.dimension === focusedAxis ? 0 : -1}
+      {...separator(axis)}
       className={styles.separator()}
-      onFocus={() => setFocusedAxis(axis.dimension)}
-      onKeyDown={(event) => {
-        if (!disabled) keyHandler(keysOn(axis), readingDirection(event.currentTarget))(event);
-      }}
     />
   ));
 
@@ -160,7 +115,7 @@ export function ResizeGrip({
     'data-resize-grip': '',
     'data-disabled': disabled ? '' : undefined,
     className: styles.grip({ className }),
-    style: sized(style, arc),
+    style: sizedToArc(style, arc),
   });
 
   if (!asChild)
