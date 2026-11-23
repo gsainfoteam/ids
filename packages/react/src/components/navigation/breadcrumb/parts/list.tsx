@@ -1,23 +1,15 @@
 'use client';
 
-import { isValidElement, useEffect, type ComponentProps, type ReactNode } from 'react';
+import { isValidElement, type ComponentProps, type ReactNode } from 'react';
 
 import { useInternalBreadcrumbContext } from '../context';
 import { BreadcrumbEllipsis } from './ellipsis';
-import { BreadcrumbItem } from './item';
 import { BreadcrumbSeparator } from './separator';
-import { elementTypeOf, flattenFragments } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
+import { flattenFragments } from '../../../../utils';
+import { useInternalBreadcrumbListEmptyWarning } from '../hooks/use-breadcrumb-list-empty-warning';
+import { isCrumb, isEllipsis, isItem, isSeparator } from '../lib/crumb-kinds';
 
 export type BreadcrumbListProps = ComponentProps<'ol'>;
-
-const isOfType = (node: ReactNode, type: unknown) =>
-  isValidElement(node) && elementTypeOf(node) === type;
-
-const isItem = (node: ReactNode) => isOfType(node, BreadcrumbItem);
-const isEllipsis = (node: ReactNode) => isOfType(node, BreadcrumbEllipsis);
-const isCrumb = (node: ReactNode) => isItem(node) || isEllipsis(node);
-const isSeparator = (node: ReactNode) => isOfType(node, BreadcrumbSeparator);
 
 function collapseMiddle(nodes: ReactNode[], maxItems: number) {
   const items = nodes.filter(isItem);
@@ -63,13 +55,7 @@ function arrange(nodes: ReactNode[], maxItems: number | undefined) {
 export function BreadcrumbList({ className, children, ...props }: BreadcrumbListProps) {
   const { styles, maxItems } = useInternalBreadcrumbContext('Breadcrumb.List');
   const nodes = flattenFragments(children);
-
-  const empty = nodes.length === 0;
-
-  useEffect(() => {
-    if (isDevelopment && empty)
-      console.warn('[IDS] Breadcrumb: add at least one Breadcrumb.Item to the trail.');
-  }, [empty]);
+  useInternalBreadcrumbListEmptyWarning(nodes.length === 0);
 
   return (
     <ol {...props} data-breadcrumb-list="" className={styles.list({ className })}>
