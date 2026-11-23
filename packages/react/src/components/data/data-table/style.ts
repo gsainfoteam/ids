@@ -8,8 +8,8 @@ export type DataTableVariant = 'outline' | 'striped' | 'ghost';
 
 export const dataTableStyle = tv({
   slots: {
-    root: 'flex w-full min-w-0 flex-col',
-    frame: 'relative',
+    root: 'flex max-h-full min-h-0 w-full min-w-0 flex-col',
+    frame: 'relative flex min-h-0 flex-col',
     table: '',
     header: 'sticky top-0 z-10',
     row: 'hover:state-hover',
@@ -42,7 +42,8 @@ export const dataTableStyle = tv({
     message: 'h-24 text-center text-neutral',
     overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-base/60',
     spinner: 'size-6 text-neutral',
-    bar: 'flex flex-wrap items-center gap-3',
+    bar: 'flex shrink-0 flex-wrap items-center gap-3',
+    actions: 'ms-auto flex flex-wrap items-center gap-2',
     summary: 'text-neutral',
     pagination: 'ms-auto',
     page: 'min-w-16 px-1 text-center whitespace-nowrap tabular-nums',

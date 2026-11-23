@@ -22,7 +22,11 @@ export function DataTableToolbar({ className, children, ...props }: DataTableToo
             {t('dataTable.selected', { count: selected })}
           </p>
         )}
-        {children}
+        {children !== undefined && (
+          <div data-data-table-actions="" className={styles.actions()}>
+            {children}
+          </div>
+        )}
       </div>
     </DataTableToolbarContext>
   );

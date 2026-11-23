@@ -75,9 +75,9 @@ const table = useDataTable({
 ```tsx
 <DataTable table={table} aria-label="멤버" />            // Content 와, 선택이나 페이지가 켜져 있으면 아래 Toolbar
 
-<DataTable table={table} aria-label="멤버" className="h-96">
-  <DataTable.Toolbar>                                     // 고른 수 뒤에 앱의 버튼
-    <Button variant="soft" className="ms-auto">내보내기</Button>
+<DataTable table={table} aria-label="멤버">
+  <DataTable.Toolbar>                                     // 고른 수는 앞, 앱의 버튼은 줄 끝
+    <Button variant="soft">내보내기</Button>
   </DataTable.Toolbar>
   <DataTable.Content />
   <DataTable.Pagination />
@@ -88,7 +88,7 @@ const table = useDataTable({
 
 | Part                  | 그리는 것                                                                      |
 | --------------------- | ------------------------------------------------------------------------------ |
-| `DataTable.Toolbar`   | 표 위나 아래의 줄. 선택이 켜져 있으면 "{n}개 선택됨" 을 앞에 적고 children 을 뒤에 둔다 |
+| `DataTable.Toolbar`   | 표 위나 아래의 줄. 선택이 켜져 있으면 "{n}개 선택됨" 을 앞에 적고, children 은 자기 묶음에 넣어 줄 끝에 둔다 |
 | `DataTable.Content`   | 표 카드(머리글, 행, 로딩 막)                                                   |
 | `DataTable.Pagination`| 페이지 이동. Toolbar 안이면 줄 끝에, 바깥이면 자기 줄에                        |
 | `DataTable.Caption`   | `Table.Caption`. 표 아래 `<caption>` 이고 표의 이름이 된다                      |
@@ -96,7 +96,20 @@ const table = useDataTable({
 
 - `Toolbar`, `Content`, `Pagination` 은 적은 순서대로 그립니다. 하나라도 적으면 기본 배치는 그리지 않으니 `Content` 도 적습니다.
 - `Caption` 과 `Empty` 는 어디에 적어도 표 안에 들어갑니다.
-- 머리글은 늘 `sticky` 입니다. DataTable 에 높이(`className="h-96"`)를 주면 행만 스크롤되고 머리글은 위에 남습니다.
+- 머리글은 늘 `sticky` 입니다. 부모가 높이를 정하면 행만 스크롤되고 머리글은 위에 남습니다.
+
+## 크기
+
+```tsx
+<div className="h-96 max-w-2xl">          // 크기와 자리는 감싼 요소가 정한다
+  <DataTable table={table} aria-label="멤버" />
+</div>
+```
+
+- 너비: 부모의 너비를 채웁니다. 열이 넘치면 표 안에서 가로로 스크롤됩니다.
+- 높이: 행 수만큼 자라되, 부모가 높이를 정하면(`h-96`, flex 나 grid 칸) 그 높이를 넘지 않습니다. 행이 넘치면 표 안에서 세로로 스크롤되고 Toolbar 는 줄어들지 않습니다.
+- DataTable 과 Part 에는 `className`, `style` 을 주지 않습니다. 바깥 여백은 부모의 `gap` 으로 띄웁니다.
+- Toolbar 에 넣는 버튼도 클래스 없이 둡니다. Toolbar 가 줄 끝에 모아 둡니다.
 
 ## 열 정의
 
@@ -165,7 +178,7 @@ useDataTable({ columns, data, selection: { multiple: false } });                
 - 머리글 체크박스는 모든 행(모든 페이지)을 고르고 풉니다. 일부만 골랐으면 `indeterminate` 입니다.
 - `Shift` 를 누른 채 체크박스를 누르면 마지막으로 누른 행부터 그 행까지 같은 값으로 바꿉니다.
 - 체크박스 이름은 `getRowLabel` 이 있으면 "{label} 선택", 없으면 "{n}번째 행 선택" 입니다.
-- 선택된 행은 `Table.Row selected` 로 `bg-primary-soft` 가 깔리고 `data-selected` 가 붙습니다.
+- 선택된 행은 `bg-primary-soft` 가 깔립니다.
 - `DataTable.Toolbar` 의 "{n}개 선택됨" 이 `aria-live="polite"` 로 바뀐 수를 알립니다.
 - 값은 `{ [rowId]: true }` 이고 root 의 `value` / `defaultValue` / `onValueChange` 가 가집니다. `table.getSelectedRowModel()` 과 `table.resetRowSelection()` 도 같은 값을 읽고 씁니다.
 - 지운 행의 id 는 스스로 빠지지 않으니 데이터에서 행을 지울 때 선택에서도 뺍니다.
@@ -207,7 +220,7 @@ useDataTable({ columns, data, columnSizing: { value: widths, onValueChange: setW
 - 머리글 끝의 핸들은 `role="separator"` + `aria-orientation="vertical"`, 이름은 "{열} 열 너비", 값은 `aria-valuenow` `aria-valuemin` `aria-valuemax`(px)입니다. Tab 으로 갑니다.
 - 기본 너비는 150px, 최소 48px, 최대 960px 입니다. 열의 `size`, `minSize`, `maxSize` 로 바꿉니다.
 - 켜면 표가 `layout="fixed"` 가 되고 `<colgroup>` 이 열 너비를 정합니다. 열 합이 상자보다 좁으면 남는 폭을 나눠 채우고, 넓으면 가로로 스크롤합니다.
-- 핸들의 선은 쉴 때 투명하고, 올리거나 포커스하거나 끄는 동안(`data-resizing`) `text-neutral` 색(`bg-(--ids-color-text-neutral)`)입니다.
+- 핸들의 선은 쉴 때 투명하고, 올리거나 포커스하거나 끄는 동안 `text-neutral` 색(`bg-(--ids-color-text-neutral)`)입니다.
 
 ## 빈 상태와 로딩
 
@@ -238,7 +251,7 @@ useDataTable({ columns, data, columnSizing: { value: widths, onValueChange: setW
 - `outline` 과 `striped` 의 바깥 `div` 는 `concentric-p-1 bg-neutral-soft` 트레이입니다. 표 카드는 `rounded-standard`(10px) 라 트레이 모서리는 14px 이 됩니다.
 - 표 카드는 `bg-surface`, `border-neutral` 테두리와 `shadow-xs` 이고, 열 사이에 `border-neutral` 세로선이 들어갑니다.
 - 머리글 행은 트레이(`bg-neutral-soft`, 4단계)와 카드(`bg-surface`, 2단계) 사이인 `bg-block`(3단계) 입니다. 트레이와 같은 색이면 다크 모드에서 머리글이 트레이에 묻힙니다.
-- `striped` 의 줄무늬는 DataTable 이 직접 그립니다(`even:not-data-selected:bg-block`). 고른 행은 줄무늬 대신 `bg-primary-soft` 입니다.
+- `striped` 의 줄무늬(`bg-block`)는 DataTable 이 직접 그립니다. 고른 행은 줄무늬 대신 `bg-primary-soft` 입니다.
 - 행에 올리면 늘 글자색 state layer(`hover:state-hover`)가 깔립니다.
 - Toolbar 는 트레이 안쪽의 줄입니다. 페이지 버튼과 정렬 버튼의 hover 와 press 는 글자색 state layer 라 트레이와 머리글 위에서도 따로 맞추지 않아도 보입니다.
 - Toolbar 가 없으면(선택과 페이지가 모두 꺼짐) 트레이는 표 둘레 4px 테두리로만 보입니다.
@@ -266,24 +279,22 @@ column.accessor('name', {
 | `size`                                                   | `standard`(기본) / `tiny`                      |
 | `value`, `defaultValue`, `onValueChange`                 | 고른 행(`RowSelectionState`). `selection` 을 켤 때 |
 | `id`, `aria-label`, `aria-labelledby`, `aria-describedby`, `aria-busy` | `<table>`                        |
-| `className`, `style`                                     | 표와 Toolbar 를 감싼 바깥 `div`                |
 | `children`                                               | Part                                           |
 
-## data 속성
+## 상태
 
-| 속성                                          | 붙는 곳                    |
-| --------------------------------------------- | -------------------------- |
-| `data-data-table`, `data-variant`, `data-loading` | 바깥 `div`             |
-| `data-data-table-content`                     | 표 카드를 감싼 `div`       |
-| `data-sorted`                                 | 정렬된 열의 `th`           |
-| `data-data-table-sort`                        | 정렬 버튼                  |
-| `data-data-table-resizer`, `data-resizing`    | 너비 핸들                  |
-| `data-data-table-message`                     | 빈 상태, 로딩 칸           |
-| `data-data-table-loading`                     | 로딩 막                    |
-| `data-data-table-toolbar`, `-summary`         | Toolbar 와 고른 수         |
-| `data-data-table-pagination`, `-page`         | 페이지 이동과 페이지 글자  |
+표의 상태는 DOM 이 아니라 값으로 읽습니다. `data-*` 속성은 IDS 가 스타일에 쓰는 내부 표시라 약속하지 않습니다.
 
-- 표 자체의 속성(`data-table`, `data-selected` 등)은 `Table` README 에 있습니다.
+| 상태          | 읽는 곳                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| 정렬          | `useDataTable({ sorting: { value, onValueChange } })`, `table.state.sorting`, `column.getIsSorted()` |
+| 고른 행       | root 의 `value` / `onValueChange`, `table.getSelectedRowModel()`, `row.getIsSelected()`  |
+| 페이지        | `useDataTable({ pagination: { value, onValueChange } })`, `table.state.pagination`, `table.getPageCount()` |
+| 열 너비       | `useDataTable({ columnSizing: { value, onValueChange } })`, `column.getSize()`, `column.getIsResizing()` |
+| 로딩          | 앱이 넘기는 `aria-busy`                                                                  |
+| 모양          | 앱이 넘기는 `variant`, `size`                                                            |
+
+- 표 바깥의 버튼이나 글자는 위 값을 읽어 그립니다. 예: `{table.getSelectedRowModel().rows.length}명 내보내기`.
 
 ## 알아둘 것
 

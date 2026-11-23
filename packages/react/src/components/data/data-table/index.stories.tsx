@@ -133,7 +133,11 @@ const meta = {
       pagination: { defaultValue: { pageIndex: 0, pageSize: 5 } },
     });
 
-    return <DataTable {...args} table={table} className="max-w-2xl" />;
+    return (
+      <div className="max-w-2xl">
+        <DataTable {...args} table={table} />
+      </div>
+    );
   },
 } satisfies Meta<typeof DataTable<Member>>;
 
@@ -151,7 +155,11 @@ export const Usage: Story = {
       sorting: {},
     });
 
-    return <DataTable table={table} aria-label="멤버" className="max-w-2xl" />;
+    return (
+      <div className="max-w-2xl">
+        <DataTable table={table} aria-label="멤버" />
+      </div>
+    );
   },
 };
 
@@ -207,66 +215,71 @@ export const Gallery: Story = {
             rows={sizes}
             columns={variants}
             render={(size, variant) => (
-              <DataTable
-                table={looks}
-                variant={variant}
-                size={size}
-                aria-label={`${variant} ${size}`}
-                className="w-[26rem]"
-              />
+              <div className="w-[26rem]">
+                <DataTable
+                  table={looks}
+                  variant={variant}
+                  size={size}
+                  aria-label={`${variant} ${size}`}
+                />
+              </div>
             )}
           />
         </Showcase.Section>
 
         <Showcase.Section title="Selection · Pagination">
           <Showcase.Row label="selection">
-            <DataTable
-              table={selected}
-              defaultValue={{ m2: true, m3: true }}
-              aria-label="선택과 페이지"
-              className="w-[34rem]"
-            />
+            <div className="w-[34rem]">
+              <DataTable
+                table={selected}
+                defaultValue={{ m2: true, m3: true }}
+                aria-label="선택과 페이지"
+              />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="striped tiny">
-            <DataTable
-              table={striped}
-              defaultValue={{ m2: true }}
-              variant="striped"
-              size="tiny"
-              aria-label="줄무늬"
-              className="w-[34rem]"
-            />
+            <div className="w-[34rem]">
+              <DataTable
+                table={striped}
+                defaultValue={{ m2: true }}
+                variant="striped"
+                size="tiny"
+                aria-label="줄무늬"
+              />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="column icons">
-            <DataTable table={withIcons} aria-label="머리글 아이콘" className="w-[34rem]" />
+            <div className="w-[34rem]">
+              <DataTable table={withIcons} aria-label="머리글 아이콘" />
+            </div>
           </Showcase.Row>
         </Showcase.Section>
 
         <Showcase.Section title="Parts">
           <Showcase.Row label="caption">
-            <DataTable table={captioned} aria-label="캡션" className="w-[26rem]">
-              <DataTable.Caption>3월 활동 점수</DataTable.Caption>
-            </DataTable>
+            <div className="w-[26rem]">
+              <DataTable table={captioned} aria-label="캡션">
+                <DataTable.Caption>3월 활동 점수</DataTable.Caption>
+              </DataTable>
+            </div>
           </Showcase.Row>
           <Showcase.Row label="empty">
-            <DataTable table={empty} aria-label="빈 표" className="w-[26rem]" />
+            <div className="w-[26rem]">
+              <DataTable table={empty} aria-label="빈 표" />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="aria-busy">
-            <DataTable
-              table={empty}
-              aria-busy
-              aria-label="처음 불러오는 표"
-              className="w-[26rem]"
-            />
-            <DataTable
-              table={reloading}
-              aria-busy
-              aria-label="다시 불러오는 표"
-              className="w-[26rem]"
-            />
+            <div className="w-[26rem]">
+              <DataTable table={empty} aria-busy aria-label="처음 불러오는 표" />
+            </div>
+            <div className="w-[26rem]">
+              <DataTable table={reloading} aria-busy aria-label="다시 불러오는 표" />
+            </div>
           </Showcase.Row>
           <Showcase.Row label="columnSizing">
-            <DataTable table={resizable} aria-label="열 너비 조절" className="w-[30rem]" />
+            <div className="w-[30rem]">
+              <DataTable table={resizable} aria-label="열 너비 조절" />
+            </div>
           </Showcase.Row>
         </Showcase.Section>
       </Showcase>
@@ -283,7 +296,11 @@ export const SortByAColumn: Story = {
       sorting: {},
     });
 
-    return <DataTable table={table} aria-label="멤버" className="max-w-2xl" />;
+    return (
+      <div className="max-w-2xl">
+        <DataTable table={table} aria-label="멤버" />
+      </div>
+    );
   },
   parameters: {
     docs: {
@@ -325,7 +342,11 @@ export const SelectRows: Story = {
       selection: {},
     });
 
-    return <DataTable table={table} aria-label="멤버" className="max-w-2xl" />;
+    return (
+      <div className="max-w-2xl">
+        <DataTable table={table} aria-label="멤버" />
+      </div>
+    );
   },
   parameters: {
     docs: {
@@ -368,31 +389,26 @@ export const ActOnTheSelectedRows: Story = {
     const chosen = table.getSelectedRowModel().rows.length;
 
     return (
-      <DataTable
-        table={table}
-        value={selection}
-        onValueChange={setSelection}
-        aria-label="멤버"
-        className="max-w-2xl"
-      >
-        <DataTable.Toolbar>
-          <Button
-            variant="soft"
-            colorScheme="danger"
-            size="tiny"
-            disabled={chosen === 0}
-            className="ms-auto"
-            onClick={() => {
-              setData(data.filter((member) => !selection[member.id]));
-              setSelection({});
-            }}
-          >
-            <TrashIcon />
-            {chosen}명 내보내기
-          </Button>
-        </DataTable.Toolbar>
-        <DataTable.Content />
-      </DataTable>
+      <div className="max-w-2xl">
+        <DataTable table={table} value={selection} onValueChange={setSelection} aria-label="멤버">
+          <DataTable.Toolbar>
+            <Button
+              variant="soft"
+              colorScheme="danger"
+              size="tiny"
+              disabled={chosen === 0}
+              onClick={() => {
+                setData(data.filter((member) => !selection[member.id]));
+                setSelection({});
+              }}
+            >
+              <TrashIcon />
+              {chosen}명 내보내기
+            </Button>
+          </DataTable.Toolbar>
+          <DataTable.Content />
+        </DataTable>
+      </div>
     );
   },
   parameters: {
@@ -476,7 +492,11 @@ export const PageThroughManyRows: Story = {
       pagination: { defaultValue: { pageIndex: 0, pageSize: 5 } },
     });
 
-    return <DataTable table={table} aria-label="멤버" className="max-w-2xl" />;
+    return (
+      <div className="max-w-2xl">
+        <DataTable table={table} aria-label="멤버" />
+      </div>
+    );
   },
   parameters: {
     docs: {
@@ -514,7 +534,11 @@ export const ResizeColumns: Story = {
       columnSizing: {},
     });
 
-    return <DataTable table={table} aria-label="멤버" className="max-w-2xl" />;
+    return (
+      <div className="max-w-2xl">
+        <DataTable table={table} aria-label="멤버" />
+      </div>
+    );
   },
   parameters: {
     docs: {
@@ -545,14 +569,51 @@ export const ResizeColumns: Story = {
   },
 };
 
+export const FitTheTableIntoAFixedHeight: Story = {
+  render: function Render() {
+    const table = useDataTable({
+      data: MANY_MEMBERS,
+      columns,
+      getRowId: (member) => member.id,
+      sorting: {},
+      selection: {},
+    });
+
+    return (
+      <div className="h-80 max-w-2xl">
+        <DataTable table={table} aria-label="멤버" />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DataTable 은 부모의 너비를 채우고, 부모가 높이를 정하면 그 높이를 넘지 않습니다. 행이 넘치면 표 안에서만 스크롤되고 머리글과 Toolbar 는 제자리에 남습니다. 크기는 DataTable 을 감싼 요소에 줍니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole('table', { name: '멤버' });
+    const viewport = table.parentElement!;
+    const summary = canvas.getByText('0개 선택됨');
+    const box = table.closest('.h-80')!.getBoundingClientRect();
+    await expect(summary).toBeVisible();
+    await expect(summary.getBoundingClientRect().bottom).toBeLessThanOrEqual(box.bottom + 0.5);
+    await expect(viewport.scrollHeight).toBeGreaterThan(viewport.clientHeight);
+  },
+};
+
 export const DescribeTheTableWithACaption: Story = {
   render: function Render() {
     const table = useDataTable({ data: FEW_MEMBERS, columns, getRowId: (member) => member.id });
 
     return (
-      <DataTable table={table} className="max-w-2xl">
-        <DataTable.Caption>3월 활동 점수</DataTable.Caption>
-      </DataTable>
+      <div className="max-w-2xl">
+        <DataTable table={table}>
+          <DataTable.Caption>3월 활동 점수</DataTable.Caption>
+        </DataTable>
+      </div>
     );
   },
   parameters: {
@@ -645,7 +706,11 @@ export const SortAndPageOnTheServer: Story = {
       },
     });
 
-    return <DataTable table={table} aria-label="서버 멤버" className="max-w-2xl" />;
+    return (
+      <div className="max-w-2xl">
+        <DataTable table={table} aria-label="서버 멤버" />
+      </div>
+    );
   },
   parameters: {
     docs: {
