@@ -6,7 +6,7 @@ const OUTPUT_IS_BUILT_FROM_THE_IR =
   'Emitters build output as target nodes from the IR. A literal the target spells goes in literals.ts.';
 
 export default defineConfig(
-  { ignores: ['node_modules', 'out', 'src/legacy'] },
+  { ignores: ['node_modules', 'out', 'dart'] },
   { extends: [js.configs.recommended, ...tseslint.configs.recommended], files: ['**/*.ts'] },
   {
     files: ['src/targets/**/*.ts'],

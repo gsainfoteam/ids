@@ -1,21 +1,32 @@
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { describe, expect, test } from 'vitest';
 
 import { buildIr } from '../src/ir/build.ts';
 import { IR_SCHEMA_FILE, irJsonSchema } from '../src/ir/write.ts';
-import { legacyOutputs } from '../src/legacy/write.ts';
 import { CONFIG_FILES } from '../src/sources/config.ts';
 import { loadSources, SourceError, validated, type Sources } from '../src/sources/load.ts';
 import { cssOutputs } from '../src/targets/css/emit.ts';
+import { dartOutputs } from '../src/targets/dart/run.ts';
 import { tsOutputs } from '../src/targets/ts/emit.ts';
 
 const root = new URL('../', import.meta.url);
 
+const DART_COMPILES_BOTH_STEPS_FIRST = { timeout: 120_000 };
+
 const read = (file: string) => readFileSync(new URL(file, root), 'utf8');
 
 const sources = () => loadSources(root);
+
+const writtenIr = (ir: unknown) => {
+  const file = join(mkdtempSync(join(tmpdir(), 'ids-ir-')), 'ir.json');
+  writeFileSync(file, JSON.stringify(ir));
+  return pathToFileURL(file);
+};
 
 const buildWith = async (change: (sources: Sources) => void) => {
   const loaded = await sources();
@@ -35,16 +46,20 @@ describe('the IR', () => {
     expect(validate(JSON.parse(JSON.stringify(ir))), ajv.errorsText(validate.errors)).toBe(true);
   });
 
-  test('gives every generated file the bytes that are committed', async () => {
-    const ir = buildIr(await sources());
-    const outputs = {
-      ...legacyOutputs(ir),
-      ...(await cssOutputs(root, ir)),
-      ...(await tsOutputs(root, ir)),
-    };
+  test(
+    'gives every generated file the bytes that are committed',
+    DART_COMPILES_BOTH_STEPS_FIRST,
+    async () => {
+      const ir = buildIr(await sources());
+      const outputs = {
+        ...(await cssOutputs(root, ir)),
+        ...(await tsOutputs(root, ir)),
+        ...dartOutputs(root, writtenIr(ir)),
+      };
 
-    for (const [file, source] of Object.entries(outputs)) expect(source, file).toBe(read(file));
-  });
+      for (const [file, source] of Object.entries(outputs)) expect(source, file).toBe(read(file));
+    },
+  );
 
   test('spells a name for every role a target declares', async () => {
     const ir = buildIr(await sources());

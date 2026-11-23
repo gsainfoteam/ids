@@ -7,12 +7,125 @@ import 'ids_enums.dart';
 
 abstract final class IdsColorRoles {
   static const neutralFamilies = <String>['neutral'];
+
   static const brandFamilies = <String>['primary', 'secondary', 'tertiary'];
-  static const statusFamilies = <String>['success', 'warning', 'danger', 'info'];
-  static const families = <String>['neutral', 'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'];
-  static const familySlots = <String>['bg-base', 'bg-surface', 'bg-block', 'bg-{family}-soft', 'bg-{family}-solid', 'text-on-base', 'text-on-surface', 'text-on-block', 'text-on-{family}-soft', 'text-on-{family}-solid', 'text-{family}', 'text-{family}-strong', 'border-{family}', 'border-{family}-strong'];
-  static const neutralOnlySlots = <String>['bg-base', 'bg-surface', 'bg-block', 'text-on-base', 'text-on-surface', 'text-on-block'];
-  static const all = <String>['bg-base', 'bg-surface', 'bg-block', 'bg-neutral-soft', 'bg-neutral-solid', 'text-on-base', 'text-on-surface', 'text-on-block', 'text-on-neutral-soft', 'text-on-neutral-solid', 'text-neutral', 'text-neutral-strong', 'border-neutral', 'border-neutral-strong', 'bg-primary-soft', 'bg-primary-solid', 'text-on-primary-soft', 'text-on-primary-solid', 'text-primary', 'text-primary-strong', 'border-primary', 'border-primary-strong', 'bg-secondary-soft', 'bg-secondary-solid', 'text-on-secondary-soft', 'text-on-secondary-solid', 'text-secondary', 'text-secondary-strong', 'border-secondary', 'border-secondary-strong', 'bg-tertiary-soft', 'bg-tertiary-solid', 'text-on-tertiary-soft', 'text-on-tertiary-solid', 'text-tertiary', 'text-tertiary-strong', 'border-tertiary', 'border-tertiary-strong', 'bg-success-soft', 'bg-success-solid', 'text-on-success-soft', 'text-on-success-solid', 'text-success', 'text-success-strong', 'border-success', 'border-success-strong', 'bg-warning-soft', 'bg-warning-solid', 'text-on-warning-soft', 'text-on-warning-solid', 'text-warning', 'text-warning-strong', 'border-warning', 'border-warning-strong', 'bg-danger-soft', 'bg-danger-solid', 'text-on-danger-soft', 'text-on-danger-solid', 'text-danger', 'text-danger-strong', 'border-danger', 'border-danger-strong', 'bg-info-soft', 'bg-info-solid', 'text-on-info-soft', 'text-on-info-solid', 'text-info', 'text-info-strong', 'border-info', 'border-info-strong'];
+
+  static const statusFamilies = <String>[
+    'success',
+    'warning',
+    'danger',
+    'info',
+  ];
+
+  static const families = <String>[
+    'neutral',
+    'primary',
+    'secondary',
+    'tertiary',
+    'success',
+    'warning',
+    'danger',
+    'info',
+  ];
+
+  static const familySlots = <String>[
+    'bg-base',
+    'bg-surface',
+    'bg-block',
+    'bg-{family}-soft',
+    'bg-{family}-solid',
+    'text-on-base',
+    'text-on-surface',
+    'text-on-block',
+    'text-on-{family}-soft',
+    'text-on-{family}-solid',
+    'text-{family}',
+    'text-{family}-strong',
+    'border-{family}',
+    'border-{family}-strong',
+  ];
+
+  static const neutralOnlySlots = <String>[
+    'bg-base',
+    'bg-surface',
+    'bg-block',
+    'text-on-base',
+    'text-on-surface',
+    'text-on-block',
+  ];
+
+  static const all = <String>[
+    'bg-base',
+    'bg-surface',
+    'bg-block',
+    'bg-neutral-soft',
+    'bg-neutral-solid',
+    'text-on-base',
+    'text-on-surface',
+    'text-on-block',
+    'text-on-neutral-soft',
+    'text-on-neutral-solid',
+    'text-neutral',
+    'text-neutral-strong',
+    'border-neutral',
+    'border-neutral-strong',
+    'bg-primary-soft',
+    'bg-primary-solid',
+    'text-on-primary-soft',
+    'text-on-primary-solid',
+    'text-primary',
+    'text-primary-strong',
+    'border-primary',
+    'border-primary-strong',
+    'bg-secondary-soft',
+    'bg-secondary-solid',
+    'text-on-secondary-soft',
+    'text-on-secondary-solid',
+    'text-secondary',
+    'text-secondary-strong',
+    'border-secondary',
+    'border-secondary-strong',
+    'bg-tertiary-soft',
+    'bg-tertiary-solid',
+    'text-on-tertiary-soft',
+    'text-on-tertiary-solid',
+    'text-tertiary',
+    'text-tertiary-strong',
+    'border-tertiary',
+    'border-tertiary-strong',
+    'bg-success-soft',
+    'bg-success-solid',
+    'text-on-success-soft',
+    'text-on-success-solid',
+    'text-success',
+    'text-success-strong',
+    'border-success',
+    'border-success-strong',
+    'bg-warning-soft',
+    'bg-warning-solid',
+    'text-on-warning-soft',
+    'text-on-warning-solid',
+    'text-warning',
+    'text-warning-strong',
+    'border-warning',
+    'border-warning-strong',
+    'bg-danger-soft',
+    'bg-danger-solid',
+    'text-on-danger-soft',
+    'text-on-danger-solid',
+    'text-danger',
+    'text-danger-strong',
+    'border-danger',
+    'border-danger-strong',
+    'bg-info-soft',
+    'bg-info-solid',
+    'text-on-info-soft',
+    'text-on-info-solid',
+    'text-info',
+    'text-info-strong',
+    'border-info',
+    'border-info-strong',
+  ];
 
   static const neutralScales = <IdsMode, List<Color>>{
     IdsMode.light: [
@@ -51,19 +164,23 @@ abstract final class IdsColorRoles {
     'text-neutral-strong': 9,
   };
 
-  static List<String> slotsOf(String family) => [
-    for (final slot in familySlots)
-      if (family == 'neutral' || !neutralOnlySlots.contains(slot))
-        slot.replaceAll('{family}', family),
-  ];
+  static List<String> slotsOf(String family) => familySlots
+      .where((slot) => family == 'neutral' || !neutralOnlySlots.contains(slot))
+      .map((slot) => slot.replaceAll('{family}', family))
+      .toList();
 }
 
 abstract final class IdsStateOpacity {
   static const double hover = 0.06;
+
   static const double press = 0.1;
+
   static const double tintHover = 0.08;
+
   static const double tintPress = 0.12;
+
   static const double fillHover = 0.1;
+
   static const double fillPress = 0.18;
 }
 
@@ -147,152 +264,222 @@ class IdsColors {
   });
 
   factory IdsColors.fromRoles(Map<String, Color> roles) {
-    Color role(String name) =>
-        roles[name] ?? (throw ArgumentError.value(name, 'roles', 'is missing'));
     return IdsColors(
-      bgBase: role('bg-base'),
-      bgSurface: role('bg-surface'),
-      bgBlock: role('bg-block'),
-      bgNeutralSoft: role('bg-neutral-soft'),
-      bgNeutralSolid: role('bg-neutral-solid'),
-      textOnBase: role('text-on-base'),
-      textOnSurface: role('text-on-surface'),
-      textOnBlock: role('text-on-block'),
-      textOnNeutralSoft: role('text-on-neutral-soft'),
-      textOnNeutralSolid: role('text-on-neutral-solid'),
-      textNeutral: role('text-neutral'),
-      textNeutralStrong: role('text-neutral-strong'),
-      borderNeutral: role('border-neutral'),
-      borderNeutralStrong: role('border-neutral-strong'),
-      bgPrimarySoft: role('bg-primary-soft'),
-      bgPrimarySolid: role('bg-primary-solid'),
-      textOnPrimarySoft: role('text-on-primary-soft'),
-      textOnPrimarySolid: role('text-on-primary-solid'),
-      textPrimary: role('text-primary'),
-      textPrimaryStrong: role('text-primary-strong'),
-      borderPrimary: role('border-primary'),
-      borderPrimaryStrong: role('border-primary-strong'),
-      bgSecondarySoft: role('bg-secondary-soft'),
-      bgSecondarySolid: role('bg-secondary-solid'),
-      textOnSecondarySoft: role('text-on-secondary-soft'),
-      textOnSecondarySolid: role('text-on-secondary-solid'),
-      textSecondary: role('text-secondary'),
-      textSecondaryStrong: role('text-secondary-strong'),
-      borderSecondary: role('border-secondary'),
-      borderSecondaryStrong: role('border-secondary-strong'),
-      bgTertiarySoft: role('bg-tertiary-soft'),
-      bgTertiarySolid: role('bg-tertiary-solid'),
-      textOnTertiarySoft: role('text-on-tertiary-soft'),
-      textOnTertiarySolid: role('text-on-tertiary-solid'),
-      textTertiary: role('text-tertiary'),
-      textTertiaryStrong: role('text-tertiary-strong'),
-      borderTertiary: role('border-tertiary'),
-      borderTertiaryStrong: role('border-tertiary-strong'),
-      bgSuccessSoft: role('bg-success-soft'),
-      bgSuccessSolid: role('bg-success-solid'),
-      textOnSuccessSoft: role('text-on-success-soft'),
-      textOnSuccessSolid: role('text-on-success-solid'),
-      textSuccess: role('text-success'),
-      textSuccessStrong: role('text-success-strong'),
-      borderSuccess: role('border-success'),
-      borderSuccessStrong: role('border-success-strong'),
-      bgWarningSoft: role('bg-warning-soft'),
-      bgWarningSolid: role('bg-warning-solid'),
-      textOnWarningSoft: role('text-on-warning-soft'),
-      textOnWarningSolid: role('text-on-warning-solid'),
-      textWarning: role('text-warning'),
-      textWarningStrong: role('text-warning-strong'),
-      borderWarning: role('border-warning'),
-      borderWarningStrong: role('border-warning-strong'),
-      bgDangerSoft: role('bg-danger-soft'),
-      bgDangerSolid: role('bg-danger-solid'),
-      textOnDangerSoft: role('text-on-danger-soft'),
-      textOnDangerSolid: role('text-on-danger-solid'),
-      textDanger: role('text-danger'),
-      textDangerStrong: role('text-danger-strong'),
-      borderDanger: role('border-danger'),
-      borderDangerStrong: role('border-danger-strong'),
-      bgInfoSoft: role('bg-info-soft'),
-      bgInfoSolid: role('bg-info-solid'),
-      textOnInfoSoft: role('text-on-info-soft'),
-      textOnInfoSolid: role('text-on-info-solid'),
-      textInfo: role('text-info'),
-      textInfoStrong: role('text-info-strong'),
-      borderInfo: role('border-info'),
-      borderInfoStrong: role('border-info-strong'),
+      bgBase: _role(roles, 'bg-base'),
+      bgSurface: _role(roles, 'bg-surface'),
+      bgBlock: _role(roles, 'bg-block'),
+      bgNeutralSoft: _role(roles, 'bg-neutral-soft'),
+      bgNeutralSolid: _role(roles, 'bg-neutral-solid'),
+      textOnBase: _role(roles, 'text-on-base'),
+      textOnSurface: _role(roles, 'text-on-surface'),
+      textOnBlock: _role(roles, 'text-on-block'),
+      textOnNeutralSoft: _role(roles, 'text-on-neutral-soft'),
+      textOnNeutralSolid: _role(roles, 'text-on-neutral-solid'),
+      textNeutral: _role(roles, 'text-neutral'),
+      textNeutralStrong: _role(roles, 'text-neutral-strong'),
+      borderNeutral: _role(roles, 'border-neutral'),
+      borderNeutralStrong: _role(roles, 'border-neutral-strong'),
+      bgPrimarySoft: _role(roles, 'bg-primary-soft'),
+      bgPrimarySolid: _role(roles, 'bg-primary-solid'),
+      textOnPrimarySoft: _role(roles, 'text-on-primary-soft'),
+      textOnPrimarySolid: _role(roles, 'text-on-primary-solid'),
+      textPrimary: _role(roles, 'text-primary'),
+      textPrimaryStrong: _role(roles, 'text-primary-strong'),
+      borderPrimary: _role(roles, 'border-primary'),
+      borderPrimaryStrong: _role(roles, 'border-primary-strong'),
+      bgSecondarySoft: _role(roles, 'bg-secondary-soft'),
+      bgSecondarySolid: _role(roles, 'bg-secondary-solid'),
+      textOnSecondarySoft: _role(roles, 'text-on-secondary-soft'),
+      textOnSecondarySolid: _role(roles, 'text-on-secondary-solid'),
+      textSecondary: _role(roles, 'text-secondary'),
+      textSecondaryStrong: _role(roles, 'text-secondary-strong'),
+      borderSecondary: _role(roles, 'border-secondary'),
+      borderSecondaryStrong: _role(roles, 'border-secondary-strong'),
+      bgTertiarySoft: _role(roles, 'bg-tertiary-soft'),
+      bgTertiarySolid: _role(roles, 'bg-tertiary-solid'),
+      textOnTertiarySoft: _role(roles, 'text-on-tertiary-soft'),
+      textOnTertiarySolid: _role(roles, 'text-on-tertiary-solid'),
+      textTertiary: _role(roles, 'text-tertiary'),
+      textTertiaryStrong: _role(roles, 'text-tertiary-strong'),
+      borderTertiary: _role(roles, 'border-tertiary'),
+      borderTertiaryStrong: _role(roles, 'border-tertiary-strong'),
+      bgSuccessSoft: _role(roles, 'bg-success-soft'),
+      bgSuccessSolid: _role(roles, 'bg-success-solid'),
+      textOnSuccessSoft: _role(roles, 'text-on-success-soft'),
+      textOnSuccessSolid: _role(roles, 'text-on-success-solid'),
+      textSuccess: _role(roles, 'text-success'),
+      textSuccessStrong: _role(roles, 'text-success-strong'),
+      borderSuccess: _role(roles, 'border-success'),
+      borderSuccessStrong: _role(roles, 'border-success-strong'),
+      bgWarningSoft: _role(roles, 'bg-warning-soft'),
+      bgWarningSolid: _role(roles, 'bg-warning-solid'),
+      textOnWarningSoft: _role(roles, 'text-on-warning-soft'),
+      textOnWarningSolid: _role(roles, 'text-on-warning-solid'),
+      textWarning: _role(roles, 'text-warning'),
+      textWarningStrong: _role(roles, 'text-warning-strong'),
+      borderWarning: _role(roles, 'border-warning'),
+      borderWarningStrong: _role(roles, 'border-warning-strong'),
+      bgDangerSoft: _role(roles, 'bg-danger-soft'),
+      bgDangerSolid: _role(roles, 'bg-danger-solid'),
+      textOnDangerSoft: _role(roles, 'text-on-danger-soft'),
+      textOnDangerSolid: _role(roles, 'text-on-danger-solid'),
+      textDanger: _role(roles, 'text-danger'),
+      textDangerStrong: _role(roles, 'text-danger-strong'),
+      borderDanger: _role(roles, 'border-danger'),
+      borderDangerStrong: _role(roles, 'border-danger-strong'),
+      bgInfoSoft: _role(roles, 'bg-info-soft'),
+      bgInfoSolid: _role(roles, 'bg-info-solid'),
+      textOnInfoSoft: _role(roles, 'text-on-info-soft'),
+      textOnInfoSolid: _role(roles, 'text-on-info-solid'),
+      textInfo: _role(roles, 'text-info'),
+      textInfoStrong: _role(roles, 'text-info-strong'),
+      borderInfo: _role(roles, 'border-info'),
+      borderInfoStrong: _role(roles, 'border-info-strong'),
     );
   }
 
   final Color bgBase;
+
   final Color bgSurface;
+
   final Color bgBlock;
+
   final Color bgNeutralSoft;
+
   final Color bgNeutralSolid;
+
   final Color textOnBase;
+
   final Color textOnSurface;
+
   final Color textOnBlock;
+
   final Color textOnNeutralSoft;
+
   final Color textOnNeutralSolid;
+
   final Color textNeutral;
+
   final Color textNeutralStrong;
+
   final Color borderNeutral;
+
   final Color borderNeutralStrong;
+
   final Color bgPrimarySoft;
+
   final Color bgPrimarySolid;
+
   final Color textOnPrimarySoft;
+
   final Color textOnPrimarySolid;
+
   final Color textPrimary;
+
   final Color textPrimaryStrong;
+
   final Color borderPrimary;
+
   final Color borderPrimaryStrong;
+
   final Color bgSecondarySoft;
+
   final Color bgSecondarySolid;
+
   final Color textOnSecondarySoft;
+
   final Color textOnSecondarySolid;
+
   final Color textSecondary;
+
   final Color textSecondaryStrong;
+
   final Color borderSecondary;
+
   final Color borderSecondaryStrong;
+
   final Color bgTertiarySoft;
+
   final Color bgTertiarySolid;
+
   final Color textOnTertiarySoft;
+
   final Color textOnTertiarySolid;
+
   final Color textTertiary;
+
   final Color textTertiaryStrong;
+
   final Color borderTertiary;
+
   final Color borderTertiaryStrong;
+
   final Color bgSuccessSoft;
+
   final Color bgSuccessSolid;
+
   final Color textOnSuccessSoft;
+
   final Color textOnSuccessSolid;
+
   final Color textSuccess;
+
   final Color textSuccessStrong;
+
   final Color borderSuccess;
+
   final Color borderSuccessStrong;
+
   final Color bgWarningSoft;
+
   final Color bgWarningSolid;
+
   final Color textOnWarningSoft;
+
   final Color textOnWarningSolid;
+
   final Color textWarning;
+
   final Color textWarningStrong;
+
   final Color borderWarning;
+
   final Color borderWarningStrong;
+
   final Color bgDangerSoft;
+
   final Color bgDangerSolid;
+
   final Color textOnDangerSoft;
+
   final Color textOnDangerSolid;
+
   final Color textDanger;
+
   final Color textDangerStrong;
+
   final Color borderDanger;
+
   final Color borderDangerStrong;
+
   final Color bgInfoSoft;
+
   final Color bgInfoSolid;
+
   final Color textOnInfoSoft;
+
   final Color textOnInfoSolid;
+
   final Color textInfo;
+
   final Color textInfoStrong;
+
   final Color borderInfo;
+
   final Color borderInfoStrong;
+
+  static Color _role(Map<String, Color> roles, String name) =>
+      roles[name] ?? (throw ArgumentError.value(name, 'roles', 'is missing'));
 
   Map<String, Color> get roles => {
     'bg-base': bgBase,
@@ -368,7 +555,8 @@ class IdsColors {
   };
 
   Color operator [](String role) =>
-      roles[role] ?? (throw ArgumentError.value(role, 'role', 'is not an IDS color role'));
+      roles[role] ??
+      (throw ArgumentError.value(role, 'role', 'is not an IDS color role'));
 
   @override
   bool operator ==(Object other) =>
