@@ -70,18 +70,12 @@ import { Field, Rating } from '@gsainfoteam/ids-react';
 - 채운 색은 `text-scheme` 이고 `scheme-primary` 입니다. 오류면 `scheme-danger` 입니다.
 - 아이콘은 `aria-hidden` 이고 `inert` 입니다. 이벤트 핸들러, `id`, 폼 컨트롤을 넣지 않습니다.
 
-## 상태와 스타일
+## 상태
 
-| 속성              | 붙는 곳 | 뜻                                           |
-| ----------------- | ------- | -------------------------------------------- |
-| `data-state`      | 자리    | `full` / `half` / `empty`. 미리보기를 따른다 |
-| `data-previewing` | 루트    | 마우스로 미리보는 중                         |
-| `data-disabled`   | 루트    | 비활성                                       |
-| `data-readonly`   | 루트    | 읽기 전용                                    |
-| `data-required`   | 루트    | 필수                                         |
-| `data-invalid`    | 루트    | 오류. 채운 색이 danger                       |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-- `Rating.State` 는 `value`, `previewValue`, `interactive`, `disabled`, `readOnly`, `required`, `invalid` 입니다.
+- 점수는 `value` / `defaultValue` / `onValueChange`, 마우스 미리보기 점수는 `onHover` 로 읽습니다.
+- 새 디자인(`custom-design`)에서만 루트의 `className`, `style` 에 `Rating.State`(`value`, `previewValue`, `interactive`, `disabled`, `readOnly`, `required`, `invalid`)를, `Rating.Item` 에 `Rating.ItemState`(더해서 `index`, `itemValue`, `fill`)를 받는 함수를 줍니다.
 
 ## 폼
 

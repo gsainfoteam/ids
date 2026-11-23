@@ -113,18 +113,12 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 - 모든 부분이 `asChild` 와 상태를 받는 `children` 을 받습니다.
 - 트랙에 색상 띠를 깔고 thumb 을 고른 색으로 칠하는 예는 `PaintTheTrack` 스토리(`custom-design`)에 있습니다.
 
-## 상태와 스타일
+## 상태
 
-| 속성               | 붙는 곳     | 뜻                               |
-| ------------------ | ----------- | -------------------------------- |
-| `data-orientation` | 루트, 트랙  | `horizontal` / `vertical`        |
-| `data-dragging`    | 루트, thumb | 끄는 중                          |
-| `data-disabled`    | 루트, thumb | 비활성                           |
-| `data-readonly`    | 루트        | 읽기 전용                        |
-| `data-invalid`     | 루트        | 오류. 채운 구간과 thumb이 danger |
-| `data-index`       | thumb       | thumb 순서                       |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-- `Slider.State` 는 `value`, `values`, `dragging`, `orientation`, `disabled`, `readOnly`, `invalid` 입니다. thumb은 `index`, `thumbValue`, `thumbDragging` 을 더 받습니다.
+- 값은 `value` / `defaultValue` / `onValueChange`, 끌기를 마친 값은 `onValueCommit` 으로 읽습니다.
+- 새 디자인(`custom-design`)에서만 각 부분의 `className`, `style` 에 `Slider.State`(`value`, `values`, `dragging`, `orientation`, `disabled`, `readOnly`, `invalid`)를 받는 함수를 줍니다. thumb 은 `Slider.ThumbState`(더해서 `index`, `thumbValue`, `thumbDragging`)를 받습니다.
 
 ## 폼
 

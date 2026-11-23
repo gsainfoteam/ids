@@ -121,18 +121,13 @@ type Skill = 'js' | 'ts' | 'py';
 
 - **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`).
 
-## 상태와 스타일
+## 상태
 
-그룹 상태가 루트에 `data-*` 로 붙습니다. 항목의 상태는 [Checkbox](../checkbox/README.md) 를 봅니다.
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-| 상태          | `data-*`                         | 뜻                          |
-| ------------- | -------------------------------- | --------------------------- |
-| `value`       |                                  | 고른 값                     |
-| `orientation` | `data-orientation`               | `vertical` / `horizontal`   |
-| `disabled`    | `data-disabled`, `aria-disabled` | 모든 항목이 비활성          |
-| `readOnly`    | `data-readonly`                  | 값을 바꿀 수 없다           |
-| `required`    | `data-required`                  | 하나 이상 골라야 한다       |
-| `invalid`     | `data-invalid`, `aria-invalid`   | 오류. 모든 항목이 danger 색 |
+- 고른 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 정합니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style` 에 `CheckboxGroup.State`(`value`, `orientation`, `disabled`, `readOnly`, `required`, `invalid`)를 받는 함수를 줍니다.
+- 항목의 상태는 [Checkbox](../checkbox/README.md) 를 봅니다.
 
 ## 폼
 

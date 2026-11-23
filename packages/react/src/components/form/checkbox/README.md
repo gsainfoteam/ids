@@ -97,26 +97,13 @@ import { Checkbox, Label } from '@gsainfoteam/ids-react';
 - 표시자는 꺼져 있을 때 투명해지고, 켜질 때 짧게 커지며 나타납니다. `prefers-reduced-motion` 이면 바로 바뀝니다.
 - 표시자에는 `aria-hidden` 이 붙습니다. 상태는 input이 읽힙니다.
 
-## 상태와 스타일
+## 상태
 
-`Checkbox.Indicator` 의 `children` 은 상태를 받는 함수도 됩니다. 같은 상태가 상자에 `data-*` 로 붙습니다.
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-| 상태            | `data-*`                     | 뜻                                |
-| --------------- | ---------------------------- | --------------------------------- |
-| `checked`       | `data-state="checked"`       | 켜짐                              |
-| `indeterminate` | `data-state="indeterminate"` | 일부 선택                         |
-|                 | `data-state="unchecked"`     | 꺼짐                              |
-| `disabled`      | `data-disabled`              | 비활성                            |
-| `readOnly`      | `data-readonly`              | 읽기 전용                         |
-| `required`      | `data-required`              | 필수                              |
-| `invalid`       | `data-invalid`               | 오류. danger 색                   |
-| `hovered`       | `data-hovered`               | 마우스가 올라가 있다              |
-| `active`        | `data-active`                | 누르고 있다                       |
-| `focused`       | `data-focused`               | 포커스                            |
-| `focusVisible`  | `data-focus-visible`         | 키보드 포커스. 포커스 링이 보인다 |
-
-- 체크 색은 scheme 의 `bg-scheme-solid`, 체크 표시 색은 `text-on-scheme-solid` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다. 다른 계열은 `scheme-*` 클래스로 바꿉니다.
-- `Checkbox.Indicator` 에도 `data-state` 가 붙습니다.
+- 켜짐과 일부 선택은 `checked` / `defaultChecked` / `onCheckedChange` 로 읽고 정합니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style`, `children` 에 `Checkbox.State` 를 받는 함수를 줍니다. `Checkbox.Indicator` 도 같습니다. `Checkbox.State` 는 `checked`, `indeterminate`, `disabled`, `readOnly`, `required`, `invalid`, `hovered`, `active`, `focused`, `focusVisible` 입니다.
+- 체크 색은 scheme 의 `bg-scheme-solid`, 체크 표시 색은 `text-on-scheme-solid` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다.
 
 ## 폼
 

@@ -191,13 +191,11 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 | Other                    | `TextField` 의 속성. `value`, `name`, `size` 는 Questionnaire 가 정한다 |
 | Submit `children`        | 마지막 버튼 글자. 기본 `보내기`. 그 밖의 속성은 `Button` 으로           |
 
-## 상태 속성
+## 상태
 
-| 속성                                         | 붙는 곳                         |
-| -------------------------------------------- | ------------------------------- |
-| `data-questionnaire`, `data-step`            | `<form>`. `data-step` 은 0부터  |
-| `data-questionnaire-question`, `data-active` | 질문 `<fieldset>`               |
-| `data-questionnaire-option`                  | 보기 `<label>`, 토글 `<button>` |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 답은 끝날 때 `onComplete` 로 받습니다. 지금 몇 번째 질문인지와 도중의 답을 읽는 런타임 방법은 없습니다.
 
 ## 알아둘 것
 

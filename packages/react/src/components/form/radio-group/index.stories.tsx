@@ -168,39 +168,47 @@ export const Gallery: Story = {
 export const ChooseAPlanFromCards: Story = {
   args: { onValueChange: fn() },
   tags: ['custom-design'],
-  render: (args) => (
-    <div className="w-full max-w-md">
-      <RadioGroup<Plan>
-        defaultValue="pro"
-        onValueChange={args.onValueChange}
-        aria-label="플랜 카드"
-      >
-        {({ Item }) =>
-          plans.map((plan) => (
-            <Label
-              key={plan.value}
-              className={cn(
-                'rounded-standard flex cursor-pointer items-start gap-3 p-4',
-                'inset-ring-neutral inset-ring-1',
-                'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
-              )}
-            >
-              <Item value={plan.value} className="mt-0.5" />
-              <span className="flex flex-col gap-1">
-                <span className="text-body-b3-medium">{plan.label}</span>
-                <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
-              </span>
-            </Label>
-          ))
-        }
-      </RadioGroup>
-    </div>
-  ),
+  render: function Render(args) {
+    const [plan, setPlan] = useState<Plan>('pro');
+
+    return (
+      <div className="w-full max-w-md">
+        <RadioGroup<Plan>
+          value={plan}
+          onValueChange={(next) => {
+            setPlan(next);
+            args.onValueChange?.(next);
+          }}
+          aria-label="플랜 카드"
+        >
+          {({ Item }) =>
+            plans.map((option) => (
+              <Label
+                key={option.value}
+                className={cn(
+                  'rounded-standard flex cursor-pointer items-start gap-3 p-4',
+                  option.value === plan
+                    ? 'bg-primary-soft inset-ring-primary-strong inset-ring-1'
+                    : 'inset-ring-neutral inset-ring-1',
+                )}
+              >
+                <Item value={option.value} className="mt-0.5" />
+                <span className="flex flex-col gap-1">
+                  <span className="text-body-b3-medium">{option.label}</span>
+                  <span className="text-caption-c1-regular text-neutral">{option.description}</span>
+                </span>
+              </Label>
+            ))
+          }
+        </RadioGroup>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          '카드형 선택지는 IDS 위에 새로 그린 디자인입니다(`custom-design`). `Label` 로 감싸면 카드 어디를 눌러도 선택되고, `has-data-[state=checked]:` 로 선택된 카드를 꾸밉니다.',
+          '카드형 선택지는 IDS 위에 새로 그린 디자인입니다(`custom-design`). `Label` 로 감싸면 카드 어디를 눌러도 선택되고, 제어하는 `value` 로 선택된 카드를 알아내 꾸밉니다.',
       },
     },
   },

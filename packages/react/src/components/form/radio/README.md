@@ -3,7 +3,7 @@
 여러 선택지 중 하나를 나타내는 라디오 버튼입니다. 보통은 `RadioGroup` 안에 넣어 씁니다.
 
 - **실제 라디오 하나.** 원은 그림이고 입력은 그 위를 덮은 `<input type="radio">` 가 받습니다. 같은 `name` 끼리 묶이고, 라벨 클릭과 폼 제출이 브라우저 그대로 동작합니다.
-- **그룹을 따라 바뀌는 상태.** 같은 `name` 의 다른 Radio를 고르면 이전 Radio의 `data-state` 도 바로 바뀝니다. native 라디오는 이때 이벤트를 보내지 않습니다.
+- **그룹을 따라 바뀌는 상태.** 같은 `name` 의 다른 Radio를 고르면 이전 Radio의 상태와 원도 바로 바뀝니다. native 라디오는 이때 이벤트를 보내지 않습니다.
 - **RadioGroup 안에서는 그룹이 결정.** `value` 만 주면 `name`, 선택 상태, 크기, 비활성, 필수가 그룹에서 옵니다.
 - **읽기 전용, 폼 초기화, react-hook-form.** `readOnly` 는 선택을 막고, reset은 처음 상태로 되돌리고, `register()` 가 input을 직접 바꿔도 원이 따라갑니다.
 
@@ -76,25 +76,13 @@ import { Label, Radio, RadioGroup } from '@gsainfoteam/ids-react';
 - 표시자는 선택되지 않으면 투명해지고, 선택되면 짧게 커지며 나타납니다. `prefers-reduced-motion` 이면 바로 바뀝니다.
 - 표시자 색은 `currentColor` 이고 기본은 `text-scheme` 입니다.
 
-## 상태와 스타일
+## 상태
 
-상태가 원에 `data-*` 로 붙습니다. `Radio.Indicator` 의 `children` 은 상태를 받는 함수도 됩니다.
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
+- 선택은 RadioGroup 의 `value` / `onValueChange` 로 읽습니다. 그룹 없이 쓰면 `checked` / `onCheckedChange` 입니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style`, `children` 에 `Radio.State`(`checked`, `disabled`, `readOnly`, `required`, `invalid`, `hovered`, `active`, `focused`, `focusVisible`)를 받는 함수를 줍니다. `Radio.Indicator` 도 같습니다.
 - 위를 덮은 input은 원의 모서리를 그대로 받아, 누를 수 있는 곳이 원과 같습니다.
-
-| 상태           | `data-*`                 | 뜻                                |
-| -------------- | ------------------------ | --------------------------------- |
-| `checked`      | `data-state="checked"`   | 선택됨                            |
-|                | `data-state="unchecked"` | 선택 안 됨                        |
-| `disabled`     | `data-disabled`          | 비활성                            |
-| `readOnly`     | `data-readonly`          | 읽기 전용                         |
-| `required`     | `data-required`          | 필수                              |
-| `invalid`      | `data-invalid`           | 오류. 테두리와 점이 danger 색     |
-| `hovered`      | `data-hovered`           | 마우스가 올라가 있다              |
-| `active`       | `data-active`            | 누르고 있다                       |
-| `focused`      | `data-focused`           | 포커스                            |
-| `focusVisible` | `data-focus-visible`     | 키보드 포커스. 포커스 링이 보인다 |
-
 - 선택 색은 `text-scheme` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다.
 
 ## react-hook-form

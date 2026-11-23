@@ -82,19 +82,15 @@ type Plan = 'free' | 'pro' | 'team';
 ```
 
 - **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`).
-- 카드형 선택지는 IDS 위에 새로 그린 디자인이라 README 에 두지 않습니다. `ChooseAPlanFromCards` 스토리(`custom-design`)를 봅니다. 선택된 항목의 원에 `data-state="checked"` 가 붙어 `has-data-[state=checked]:` 로 카드를 꾸밀 수 있습니다.
+- 카드형 선택지는 IDS 위에 새로 그린 디자인이라 README 에 두지 않습니다. `ChooseAPlanFromCards` 스토리(`custom-design`)를 봅니다. 선택된 카드는 `value` 로 알아냅니다.
 
-## 상태와 스타일
+## 상태
 
-그룹 루트에 붙는 속성입니다. 항목의 상태는 [Radio](../radio/README.md) 를 봅니다. `RadioGroup.State` 는 `value`, `orientation`, `disabled`, `readOnly`, `required`, `invalid` 입니다.
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-| 속성                              | 뜻                          |
-| --------------------------------- | --------------------------- |
-| `data-orientation`                | `vertical` / `horizontal`   |
-| `data-disabled` / `disabled`      | 모든 항목이 비활성          |
-| `data-readonly` / `aria-readonly` | 선택을 바꿀 수 없다         |
-| `data-required` / `aria-required` | 필수                        |
-| `data-invalid` / `aria-invalid`   | 오류. 모든 항목이 danger 색 |
+- 고른 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 정합니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style` 에 `RadioGroup.State`(`value`, `orientation`, `disabled`, `readOnly`, `required`, `invalid`)를 받는 함수를 줍니다.
+- 항목의 상태는 [Radio](../radio/README.md) 를 봅니다.
 
 ## 폼
 

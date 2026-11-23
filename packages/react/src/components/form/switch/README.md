@@ -68,23 +68,12 @@ import { Field, Switch } from '@gsainfoteam/ids-react';
 - `Switch.Thumb` 은 `asChild` 를 받습니다. 아이콘은 thumb의 3/4 크기로 그립니다.
 - thumb은 `--ids-motion-fast` 동안 미끄러집니다. `prefers-reduced-motion` 이면 바로 옮겨집니다.
 
-## 상태와 스타일
+## 상태
 
-상태가 트랙에 `data-*` 로 붙고, thumb에는 `data-state` 가 붙습니다. `Switch.Thumb` 의 `children` 은 상태를 받는 함수도 됩니다.
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-| 상태           | `data-*`                 | 뜻                                |
-| -------------- | ------------------------ | --------------------------------- |
-| `checked`      | `data-state="checked"`   | 켜짐                              |
-|                | `data-state="unchecked"` | 꺼짐                              |
-| `disabled`     | `data-disabled`          | 비활성                            |
-| `readOnly`     | `data-readonly`          | 읽기 전용                         |
-| `required`     | `data-required`          | 필수                              |
-| `invalid`      | `data-invalid`           | 오류. 켜진 트랙이 danger 색       |
-| `hovered`      | `data-hovered`           | 마우스가 올라가 있다              |
-| `active`       | `data-active`            | 누르고 있다                       |
-| `focused`      | `data-focused`           | 포커스                            |
-| `focusVisible` | `data-focus-visible`     | 키보드 포커스. 포커스 링이 보인다 |
-
+- 켜짐은 `checked` / `defaultChecked` / `onCheckedChange` 로 읽고 정합니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style`, `children` 에 `Switch.State`(`checked`, `disabled`, `readOnly`, `required`, `invalid`, `hovered`, `active`, `focused`, `focusVisible`)를 받는 함수를 줍니다. `Switch.Thumb` 도 같습니다.
 - 켜진 트랙 색은 `bg-scheme-solid`, 켜진 thumb 색은 `text-on-scheme-solid` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다.
 
 ## 폼
