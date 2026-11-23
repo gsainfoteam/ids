@@ -71,7 +71,7 @@ export const PC: Story = {
             <Menu>
               <Menu.Trigger asChild>
                 <Button variant="outline" className="-ms-2 min-w-0 flex-1">
-                  <Avatar name={active.name} shape="square" size="tiny" />
+                  <Avatar name={active.name} size="tiny" />
                   {active.name}
                   <Spacer />
                   <ChevronUpDownIcon />

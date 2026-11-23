@@ -88,7 +88,7 @@ export const PC: Story = {
           underline="none"
           className="text-body-b2-semibold flex items-center gap-2"
         >
-          <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+          <Avatar name="인포팀" size="tiny" aria-hidden>
             <Avatar.Fallback>
               <CubeTransparentIcon />
             </Avatar.Fallback>

@@ -109,7 +109,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Shape"
-        description="둥근 대상에는 원의 가장자리로 당겨 붙습니다. Avatar는 모양을 알아서 알려 줍니다."
+        description="둥근 대상에는 원의 가장자리로 당겨 붙습니다. Avatar에는 따로 정하지 않아도 그렇게 붙습니다."
       >
         <Showcase.Row label="avatar">
           <Badge content={3}>
@@ -117,9 +117,6 @@ export const Gallery: Story = {
           </Badge>
           <Badge dot colorScheme="success" placement="bottom-end" aria-label="온라인">
             <Avatar name="Bob Lee" />
-          </Badge>
-          <Badge dot colorScheme="success" placement="bottom-end" aria-label="온라인">
-            <Avatar name="Acme" shape="square" />
           </Badge>
         </Showcase.Row>
         <Showcase.Row label="circular">

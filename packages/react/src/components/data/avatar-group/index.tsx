@@ -4,7 +4,6 @@ import { type AvatarGroupLayout, type AvatarGroupStacking } from './arrange';
 import { AvatarGroupRoot, AvatarGroupOverflow } from './root';
 import { avatarGroupStyle } from './style';
 import { type StateValue } from '../../../internal/state-props';
-import { type AvatarShape } from '../avatar/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -22,7 +21,6 @@ export namespace AvatarGroup {
     layout: AvatarGroupLayout;
     stacking: AvatarGroupStacking;
     size: IdsSize;
-    shape: AvatarShape;
   };
 
   export type Props = Omit<ComponentProps<'ul'>, 'className' | 'style' | 'children'> & {
@@ -31,7 +29,6 @@ export namespace AvatarGroup {
     layout?: AvatarGroupLayout;
     stacking?: AvatarGroupStacking;
     size?: IdsSize;
-    shape?: AvatarShape;
     overflowLabel?: (count: number) => string;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;

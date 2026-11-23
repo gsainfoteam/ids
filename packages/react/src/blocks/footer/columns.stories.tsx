@@ -47,7 +47,7 @@ export const PC: Story = {
           <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
             <div className="flex flex-col gap-4">
               <div className="text-body-b2-semibold flex items-center gap-2">
-                <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+                <Avatar name="인포팀" size="tiny" aria-hidden>
                   <Avatar.Fallback>
                     <CubeTransparentIcon />
                   </Avatar.Fallback>

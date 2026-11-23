@@ -377,7 +377,7 @@ export const RouterLinks: Story = {
 
 const TREE_CODE = `<Sidebar aria-label="워크스페이스">
   <Sidebar.Header>
-    <Avatar name="GIST 인포팀" shape="square" size="tiny" aria-hidden>
+    <Avatar name="GIST 인포팀" size="tiny" aria-hidden>
       <Avatar.Fallback>
         <CubeTransparentIcon />
       </Avatar.Fallback>
@@ -510,7 +510,7 @@ export const Tree: Story = {
     <Sidebar.Provider>
       <Sidebar {...args} aria-label="워크스페이스">
         <Sidebar.Header>
-          <Avatar name="GIST 인포팀" shape="square" size="tiny" aria-hidden>
+          <Avatar name="GIST 인포팀" size="tiny" aria-hidden>
             <Avatar.Fallback>
               <CubeTransparentIcon />
             </Avatar.Fallback>

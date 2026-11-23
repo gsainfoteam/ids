@@ -243,7 +243,7 @@ export const PC: Story = {
                 {APPS.map((app) => (
                   <Item key={app.id}>
                     <Item.Media>
-                      <Avatar name={app.name} shape="square" />
+                      <Avatar name={app.name} />
                     </Item.Media>
                     <Item.Content>
                       <Item.Title>

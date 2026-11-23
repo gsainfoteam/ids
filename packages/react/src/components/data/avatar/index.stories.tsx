@@ -11,7 +11,6 @@ import { Avatar, initialsOf } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const shapes = ['circle', 'square'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 function photo(hue: number) {
@@ -27,10 +26,9 @@ const meta = {
   component: Avatar,
   tags: ['autodocs'],
   argTypes: {
-    shape: { control: 'radio', options: shapes },
     size: { control: 'radio', options: sizes },
   },
-  args: { src: PHOTO, name: 'Alice Kim', shape: 'circle', size: 'standard', onStatusChange: fn() },
+  args: { src: PHOTO, name: 'Alice Kim', size: 'standard', onStatusChange: fn() },
 } satisfies Meta<typeof Avatar>;
 
 export default meta;
@@ -38,27 +36,26 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <Avatar src={PHOTO} name="Alice Kim" />,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
-      <Showcase.Section title="Shape × Size">
-        <Showcase.Matrix
-          rows={sizes}
-          columns={shapes}
-          render={(size, shape) => (
-            <div className="flex items-center gap-2">
-              <Avatar
-                src={photo(shape === 'circle' ? 210 : 30)}
-                name="Alice Kim"
-                shape={shape}
-                size={size}
-              />
-              <Avatar name="Alice Kim" shape={shape} size={size} />
-              <Avatar name="류현승" shape={shape} size={size} />
-              <Avatar alt="이름 없음" shape={shape} size={size} />
-            </div>
-          )}
-        />
+      <Showcase.Section title="Size">
+        <Showcase.Row label="standard">
+          <Avatar src={PHOTO} name="Alice Kim" />
+          <Avatar name="Alice Kim" />
+          <Avatar name="류현승" />
+          <Avatar alt="이름 없음" />
+        </Showcase.Row>
+        <Showcase.Row label="tiny">
+          <Avatar src={PHOTO} name="Alice Kim" size="tiny" />
+          <Avatar name="Alice Kim" size="tiny" />
+          <Avatar name="류현승" size="tiny" />
+          <Avatar alt="이름 없음" size="tiny" />
+        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section
@@ -76,7 +73,7 @@ export const Gallery: Story = {
           <Avatar alt="알 수 없는 사용자" />
         </Showcase.Row>
         <Showcase.Row label="custom">
-          <Avatar name="Acme" shape="square">
+          <Avatar name="Acme">
             <Avatar.Fallback>
               <BuildingOffice2Icon />
             </Avatar.Fallback>
@@ -99,7 +96,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const LoadingStatus: Story = {
+export const ReactToImageLoading: Story = {
   render: function Render() {
     const [src, setSrc] = useState(PHOTO);
     const [log, setLog] = useState<string[]>([]);
@@ -153,7 +150,7 @@ export const LoadingStatus: Story = {
   },
 };
 
-export const Fallback: Story = {
+export const ShowInitialsWhenTheImageFails: Story = {
   args: { src: BROKEN, name: '류현승' },
   parameters: {
     docs: {
@@ -171,7 +168,7 @@ export const Fallback: Story = {
   },
 };
 
-export const Decorative: Story = {
+export const HideTheNameNextToIt: Story = {
   render: () => (
     <div className="flex items-center gap-2">
       <Avatar src={PHOTO} name="Alice Kim" alt="" size="tiny" />
@@ -207,6 +204,7 @@ const NAMES = [
 ];
 
 export const Initials: Story = {
+  tags: ['verification'],
   render: () => (
     <ul className="text-body-b3-regular flex flex-col gap-2">
       {NAMES.map((name) => (

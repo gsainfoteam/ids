@@ -30,7 +30,6 @@ export function AvatarGroupRoot({
   layout = 'stack',
   stacking = 'first-on-top',
   size = 'standard',
-  shape = 'circle',
   overflowLabel: overflowLabelProp,
   className,
   style,
@@ -57,11 +56,11 @@ export function AvatarGroupRoot({
       return node.props.name ?? node.props.alt ?? node.props['aria-label'];
     },
   });
-  const state: AvatarGroup.State = { visible: visibleCount, hidden, layout, stacking, size, shape };
+  const state: AvatarGroup.State = { visible: visibleCount, hidden, layout, stacking, size };
   const styles = avatarGroupStyle({ layout, size });
 
   return (
-    <AvatarGroupContext value={{ size, shape }}>
+    <AvatarGroupContext value={{ size }}>
       <OverflowContext
         value={{ count: hidden, label: overflowLabel(hidden), names: hiddenNames, styles }}
       >

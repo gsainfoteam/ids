@@ -236,7 +236,7 @@ export const PC: Story = {
                 <li key={file.id} className="flex">
                   <Card size="tiny" className="w-full">
                     <Card.Header>
-                      <Avatar name={file.name} shape="square" aria-hidden>
+                      <Avatar name={file.name} aria-hidden>
                         <Avatar.Fallback>{KIND_ICON[file.kind]}</Avatar.Fallback>
                       </Avatar>
                       <Card.Title>{file.name}</Card.Title>

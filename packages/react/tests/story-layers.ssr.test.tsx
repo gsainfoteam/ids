@@ -10,8 +10,6 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/action/toggle-group/index.stories.tsx',
   'components/action/toggle/index.stories.tsx',
   'components/data/accordion/index.stories.tsx',
-  'components/data/avatar-group/index.stories.tsx',
-  'components/data/avatar/index.stories.tsx',
   'components/data/badge/index.stories.tsx',
   'components/data/bubble/index.stories.tsx',
   'components/data/calendar/index.stories.tsx',
