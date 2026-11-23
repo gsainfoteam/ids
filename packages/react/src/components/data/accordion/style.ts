@@ -5,7 +5,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const accordionStyle = tv({
   slots: {
-    root: 'flex w-full flex-col',
+    root: 'flex w-full min-w-0 flex-col',
     item: '',
     heading: 'flex',
     trigger: [

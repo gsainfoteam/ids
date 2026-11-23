@@ -27,7 +27,6 @@ export namespace Card {
   export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
     variant?: CardVariant;
     size?: IdsSize;
-    interactive?: boolean;
     disabled?: boolean;
     asChild?: boolean;
     onInteractionChange?: (state: InteractiveState) => void;

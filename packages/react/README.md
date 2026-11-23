@@ -668,4 +668,4 @@ Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만
 
 ## Marquee
 
-로고, 공지, 숫자를 한 방향으로 끊김 없이 흘리는 CSS 애니메이션 띠입니다. 멈춤 버튼, 포인터와 포커스에 잠시 멈춤, 동작 줄이기, 오른쪽에서 왼쪽 문서를 챙깁니다. [Marquee API](./src/components/data/marquee/README.md).
+로고, 공지, 숫자를 한 방향으로 끊김 없이 흘리는 CSS 애니메이션 띠입니다. 넣으면 그려지는 멈춤 버튼(`Marquee.Pause`), 포인터와 포커스에 잠시 멈춤, 운영체제의 동작 줄이기, 오른쪽에서 왼쪽 문서를 챙깁니다. [Marquee API](./src/components/data/marquee/README.md).

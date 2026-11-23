@@ -7,7 +7,7 @@ import {
   type QRCodeModuleShape,
 } from './qr-path';
 import { QRCodeRoot } from './root';
-import { qrCodeStyle } from './style';
+import { qrCodeStyle, type QRCodeVariant } from './style';
 import { type StateValue } from '../../../internal/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -20,6 +20,7 @@ export namespace QRCode {
   export type ErrorCorrection = QRCodeErrorCorrection;
   export type Shape = QRCodeModuleShape;
   export type FinderShape = QRCodeFinderShape;
+  export type Variant = QRCodeVariant;
 
   export type State = {
     version: number | undefined;
@@ -30,12 +31,12 @@ export namespace QRCode {
 
   export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children' | 'role'> & {
     value: string;
+    variant?: QRCodeVariant;
     size?: IdsSize | number;
     errorCorrection?: QRCodeErrorCorrection;
     shape?: QRCodeModuleShape;
     finderShape?: QRCodeFinderShape;
     quietZone?: number;
-    inverted?: boolean;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;
     children?: ReactNode;

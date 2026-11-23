@@ -26,6 +26,10 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 </Empty>;
 ```
 
+## 크기
+
+- **fill.** 부모의 너비를 다 채웁니다. 너비는 감싸는 요소가 정합니다: `<div className="w-full max-w-md"><Empty /></div>`.
+
 ## 미디어
 
 ```tsx
@@ -93,13 +97,9 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 - 패딩은 `concentric-p-8`, `concentric-p-4` 라 모서리가 `container`(16px) 까지 따라 둥글어집니다.
 - 테두리와 배경은 중립색(`--ids-color-border-neutral`, `--ids-color-bg-neutral-soft`)입니다.
 
-## data 속성
+## 상태
 
-| 속성                                                      | 뜻        |
-| --------------------------------------------------------- | --------- |
-| `data-empty`, `data-variant`, `data-size`, `data-align`   | 루트      |
-| `data-empty-media` + `data-variant`                       | 미디어    |
-| `data-empty-title`, `-description`, `-actions`            | 각 부분   |
+- Empty 는 상태가 없습니다. 보여 줄지는 앱이 데이터를 보고 정합니다.
 
 ## 속성
 

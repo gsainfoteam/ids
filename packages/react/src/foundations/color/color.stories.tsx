@@ -607,22 +607,24 @@ export const Lab: Story = {
                 </div>
               </div>
               <div className="grid gap-6 md:grid-cols-2">
-                <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                <Chart config={LAB_CHART_CONFIG} className="w-full">
                   <Chart.Title>막대</Chart.Title>
                   <BarChart data={LAB_CHART_ROWS}>
                     <XAxis dataKey="day" tickLine={false} axisLine={false} />
                     <Bar dataKey="web" radius={4} />
                     <Bar dataKey="app" radius={4} />
                     <Bar dataKey="kiosk" radius={4} />
+                    <Chart.Legend />
                   </BarChart>
                 </Chart>
-                <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                <Chart config={LAB_CHART_CONFIG} className="w-full">
                   <Chart.Title>면</Chart.Title>
                   <AreaChart data={LAB_CHART_ROWS}>
                     <XAxis dataKey="day" tickLine={false} axisLine={false} />
                     <Area dataKey="web" type="monotone" />
                     <Area dataKey="app" type="monotone" />
                     <Area dataKey="kiosk" type="monotone" />
+                    <Chart.Legend />
                   </AreaChart>
                 </Chart>
               </div>

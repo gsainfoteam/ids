@@ -281,7 +281,8 @@ export const PC: Story = {
             <h2 id="embed" className="text-body-b3-semibold">
               사이트에 붙이기
             </h2>
-            <CodeBlock language="html" title="동아리 홈페이지의 </body> 앞에">
+            <CodeBlock language="html">
+              <CodeBlock.Title>{'동아리 홈페이지의 </body> 앞에'}</CodeBlock.Title>
               {EMBED}
             </CodeBlock>
           </section>

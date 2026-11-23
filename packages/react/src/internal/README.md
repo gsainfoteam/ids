@@ -1142,7 +1142,7 @@ onKeyDown={(event) => moveWithKeys(slides, event)}
 - **움직임.** Embla 의 `duration` 은 ms 가 아니라 물리 값입니다. 14 에서 1% 안쪽에 드는 데 약 270ms 로 `--ids-motion-normal`(250ms)에 가장 가깝습니다. 줄인 동작이면 버튼, 키, `scrollTo` 는 `jump` 로 바로 옮깁니다.
 - **`touch-action`.** 트랙에만 둡니다(가로 `pan-y pinch-zoom`, 세로 `pan-x pinch-zoom`). 장과 그 안에는 두지 않으므로 확대 영역이 `touch-none` 을 가질 수 있습니다. 브라우저는 조상과의 교집합으로 동작합니다.
 - **트랙 찾기.** Embla 의 `container` 를 `[data-slides-track]` 로 찾습니다. 그래서 트랙 앞뒤에 버튼을 둘 수 있습니다(Carousel 의 이전, 다음 버튼이 트랙 앞에 있어 Tab 순서가 화면과 같다).
-- **플러그인은 밖에서.** 이 폴더는 `embla-carousel-autoplay`, `embla-carousel-auto-scroll` 을 import 하지 않습니다. Carousel 의 `use-carousel-motion.ts` 가 불러 `plugins` 로 넘기므로, 이 엔진만 쓰는 번들은 두 플러그인을 싣지 않습니다. 모듈 최상위에는 부수 효과가 없습니다.
+- **플러그인은 밖에서.** 이 폴더는 `embla-carousel-autoplay`, `embla-carousel-auto-scroll` 을 import 하지 않습니다. Carousel 의 `useCarousel`(`use-carousel.ts`)이 불러 `plugins` 로 넘기므로, 이 엔진만 쓰는 번들과 `useCarousel` 을 부르지 않는 Carousel 은 두 플러그인을 싣지 않습니다. 모듈 최상위에는 부수 효과가 없습니다.
 
 ### 알아둘 것
 

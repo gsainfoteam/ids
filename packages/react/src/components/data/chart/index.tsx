@@ -37,10 +37,6 @@ export namespace Chart {
 
   export type Props = Omit<ComponentProps<'figure'>, 'children'> & {
     config: ChartConfig;
-    ratio?: number;
-    tooltip?: boolean;
-    legend?: boolean;
-    locale?: string;
     children?: ReactNode;
   };
 

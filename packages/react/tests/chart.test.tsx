@@ -18,7 +18,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Button, IdsProvider } from '../src';
+import { AspectRatio, Button, IdsProvider } from '../src';
 import { testTheme } from './theme';
 import { Chart } from '../src/chart';
 import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
@@ -31,10 +31,10 @@ const ROWS = [
 
 const CONFIG = { web: { label: '웹' }, app: { label: '앱' } } satisfies Chart.Config;
 
-const visits = (props: Partial<Chart.Props> = {}, inside: ReactNode = null) => (
-  <IdsProvider theme={testTheme}>
+const visits = (inside: ReactNode = <Chart.Tooltip />, locale?: string) => (
+  <IdsProvider theme={testTheme} locale={locale}>
     <div style={{ width: 400 }}>
-      <Chart config={CONFIG} {...props}>
+      <Chart config={CONFIG}>
         <Chart.Title>방문</Chart.Title>
         <BarChart data={ROWS}>
           <XAxis dataKey="day" />
@@ -50,13 +50,13 @@ const visits = (props: Partial<Chart.Props> = {}, inside: ReactNode = null) => (
 const pointAt = (element: Element, x: number, y: number) =>
   userEvent.hover(element, { position: { x, y } });
 
-test('the server HTML holds the caption and an empty box of the ratio, with no svg', () => {
-  const html = new DOMParser().parseFromString(renderToString(visits({ ratio: 2 })), 'text/html');
+test('the server HTML holds the caption and an empty 16:9 box, with no svg', () => {
+  const html = new DOMParser().parseFromString(renderToString(visits()), 'text/html');
   const figure = html.querySelector<HTMLElement>('figure[data-chart]')!;
   const frame = figure.querySelector<HTMLElement>('[data-chart-frame]')!;
 
   expect(figure.querySelector('figcaption')?.textContent).toBe('방문');
-  expect(frame.getAttribute('style')).toMatch(/aspect-ratio:\s*2/);
+  expect(frame.classList).toContain('aspect-video');
   expect(frame.querySelector('svg')).toBeNull();
   expect(figure.style.getPropertyValue('--chart-web')).toBe('var(--ids-color-bg-primary-solid)');
   expect(figure.style.getPropertyValue('--chart-app')).toBe('var(--ids-color-bg-secondary-solid)');
@@ -81,6 +81,71 @@ test('the graph follows the width of its parent', async () => {
   (document.querySelector('[data-chart]')!.parentElement as HTMLElement).style.width = '240px';
 
   await expect.element(graph).toHaveAttribute('width', '240');
+});
+
+test('a Chart fills the width of a flex row it sits in', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ display: 'flex', width: 400 }}>
+        <Chart config={CONFIG}>
+          <Chart.Title>방문</Chart.Title>
+          <BarChart data={ROWS}>
+            <Bar dataKey="web" />
+          </BarChart>
+        </Chart>
+      </div>
+    </IdsProvider>,
+  );
+
+  await expect.element(screen.getByRole('img', { name: '방문' })).toHaveAttribute('width', '400');
+});
+
+test('a Chart in a parent with a height lets the graph fill what the caption leaves', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ width: 400, height: 288 }}>
+        <Chart config={CONFIG}>
+          <Chart.Title>방문</Chart.Title>
+          <BarChart data={ROWS}>
+            <Bar dataKey="web" />
+          </BarChart>
+        </Chart>
+      </div>
+    </IdsProvider>,
+  );
+  const graph = screen.getByRole('img', { name: '방문' });
+  await expect.element(graph).toBeInTheDocument();
+
+  const figure = document.querySelector('[data-chart]')!.getBoundingClientRect();
+  const frame = document.querySelector('[data-chart-frame]')!.getBoundingClientRect();
+  expect(figure.height).toBe(288);
+  expect(frame.bottom).toBeCloseTo(figure.bottom, 0);
+  expect(graph.element().getAttribute('height')).toBe(String(Math.floor(frame.height)));
+});
+
+test('a Chart inside an AspectRatio fills it', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ width: 400 }}>
+        <AspectRatio ratio={1}>
+          <Chart config={CONFIG}>
+            <Chart.Title>방문</Chart.Title>
+            <BarChart data={ROWS}>
+              <Bar dataKey="web" />
+            </BarChart>
+          </Chart>
+        </AspectRatio>
+      </div>
+    </IdsProvider>,
+  );
+  const graph = screen.getByRole('img', { name: '방문' });
+  await expect.element(graph).toBeInTheDocument();
+
+  const figure = document.querySelector('[data-chart]')!.getBoundingClientRect();
+  const frame = document.querySelector('[data-chart-frame]')!.getBoundingClientRect();
+  expect(figure.height).toBe(400);
+  expect(frame.bottom).toBeCloseTo(figure.bottom, 0);
+  expect(graph.element().getAttribute('height')).toBe(String(Math.floor(frame.height)));
 });
 
 test('without a title the graph is named by the catalog and described by the description', async () => {
@@ -233,7 +298,7 @@ test('areas fade from their series color to transparent, and an own fill wins', 
   expect(document.querySelectorAll('linearGradient')).toHaveLength(1);
 });
 
-test('the default tooltip lists each series in config order with its label and value', async () => {
+test('Chart.Tooltip lists each series in config order with its label and value', async () => {
   const screen = await render(visits());
   const graph = screen.getByRole('img', { name: '방문' });
   await expect.element(graph).toBeInTheDocument();
@@ -260,6 +325,7 @@ test('the tooltip opens in the top layer beside the point, outside a clipping pa
           <BarChart data={ROWS}>
             <XAxis dataKey="day" />
             <Bar dataKey="web" />
+            <Chart.Tooltip />
           </BarChart>
         </Chart>
       </div>
@@ -332,8 +398,8 @@ test('focus that follows a click keeps the tooltip on the datum under the pointe
   expect(tooltipLabel()).toBe('수');
 });
 
-test('a locale on Chart formats the tooltip numbers', async () => {
-  const screen = await render(visits({ locale: 'de-DE' }));
+test('the IdsProvider locale formats the tooltip numbers', async () => {
+  const screen = await render(visits(<Chart.Tooltip />, 'de-DE'));
   const graph = screen.getByRole('img', { name: '방문' });
   await expect.element(graph).toBeInTheDocument();
 
@@ -344,8 +410,8 @@ test('a locale on Chart formats the tooltip numbers', async () => {
     .toBe('1.240');
 });
 
-test('tooltip and legend turn off, and an own Recharts Tooltip replaces the default', async () => {
-  const off = await render(visits({ tooltip: false, legend: false }));
+test('a tooltip and a legend are drawn only when placed, and a Recharts Tooltip draws its own', async () => {
+  const off = await render(visits(null));
   const graph = off.getByRole('img', { name: '방문' });
   await expect.element(graph).toBeInTheDocument();
   await pointAt(graph.element(), 60, 100);
@@ -354,7 +420,11 @@ test('tooltip and legend turn off, and an own Recharts Tooltip replaces the defa
   expect(document.querySelector('.recharts-tooltip-wrapper')).toBeNull();
   await off.unmount();
 
-  const own = await render(visits({}, <Tooltip />));
+  const legend = await render(visits(<Chart.Legend />));
+  await expect.poll(() => document.querySelector('[data-chart-legend]')?.textContent).toBe('웹앱');
+  await legend.unmount();
+
+  const own = await render(visits(<Tooltip />));
   const ownGraph = own.getByRole('img', { name: '방문' });
   await expect.element(ownGraph).toBeInTheDocument();
   await pointAt(ownGraph.element(), 60, 100);
@@ -404,6 +474,7 @@ test('a pie draws its table from the Pie data and names the rows by config', asy
               dataKey="visitors"
               nameKey="browser"
             />
+            <Chart.Legend />
           </PieChart>
         </Chart>
       </div>
@@ -416,6 +487,42 @@ test('a pie draws its table from the Pie data and names the rows by config', asy
   await expect
     .poll(() => document.querySelector('[data-chart-legend]')?.textContent)
     .toBe('ChromeSafari');
+});
+
+test('a pie tooltip has no label row, and labelFormatter is not called without a label', async () => {
+  const labelFormatter = vi.fn((label: unknown) => `${String(label)}!`);
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ width: 400 }}>
+        <Chart config={{ chrome: { label: 'Chrome' }, safari: { label: 'Safari' } }}>
+          <Chart.Title>브라우저</Chart.Title>
+          <PieChart>
+            <Pie
+              data={[
+                { browser: 'chrome', visitors: 275, fill: 'var(--chart-chrome)' },
+                { browser: 'safari', visitors: 200, fill: 'var(--chart-safari)' },
+              ]}
+              dataKey="visitors"
+              nameKey="browser"
+              isAnimationActive={false}
+            />
+            <Chart.Tooltip labelFormatter={labelFormatter} />
+          </PieChart>
+        </Chart>
+      </div>
+    </IdsProvider>,
+  );
+  const graph = screen.getByRole('img', { name: '브라우저' });
+  await expect.element(graph).toBeInTheDocument();
+  const box = graph.element().getBoundingClientRect();
+
+  await pointAt(graph.element(), box.width / 2, box.height * 0.3);
+
+  await expect
+    .poll(() => document.querySelector('[data-chart-tooltip] dt')?.textContent)
+    .toBe('Chrome');
+  expect(document.querySelector('[data-chart-tooltip] p')).toBeNull();
+  expect(labelFormatter).not.toHaveBeenCalled();
 });
 
 test('a vertical bar chart takes its rows from the category on the Y axis', async () => {

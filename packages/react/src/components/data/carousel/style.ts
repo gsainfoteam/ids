@@ -5,7 +5,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const carouselStyle = tv({
   slots: {
-    root: 'flex min-w-0 flex-col',
+    root: 'flex w-full min-w-0 flex-col',
     content: [slidesLayout.viewport, 'relative isolate focus-ring'],
     track: '',
     slide: slidesLayout.slide,
@@ -42,6 +42,8 @@ export const carouselStyle = tv({
         step: 'rtl:[&_svg]:-scale-x-100',
       },
       vertical: {
+        root: 'h-full min-h-0',
+        content: 'min-h-0 flex-auto',
         track: slidesLayout.track.vertical,
         edgePrev: 'top-2 left-1/2 -translate-x-1/2',
         edgeNext: 'bottom-2 left-1/2 -translate-x-1/2',
