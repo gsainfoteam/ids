@@ -71,7 +71,9 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
   <Bubble>...</Bubble>
 </div>
 
-<Bubble style={{ '--bubble-max-width': '24rem' } as CSSProperties}>...</Bubble>
+<div className="[--bubble-max-width:24rem]">  {/* 한 말풍선만 바꿀 때도 감싸는 요소에 */}
+  <Bubble>...</Bubble>
+</div>
 ```
 
 - 줄을 고르게 맞추는 일은 브라우저의 `text-wrap: balance` 가 합니다. Chrome 은 6줄, Firefox 는 10줄까지 맞추고, 그보다 긴 글은 평소처럼 접힌 상태에서 가장 긴 줄에 맞춰 줄입니다.
