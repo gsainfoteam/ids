@@ -110,10 +110,25 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 | 이전     | 첫 질문이 아닐 때                                                          |
 | 건너뛰기 | 지금 질문이 `optional`                                                     |
 | 다음     | 마지막 질문이 아닐 때. 답하지 않은 필수 질문에서는 꺼진다(포커스는 받는다) |
-| 보내기   | 마지막 질문. 글자는 `submitLabel` 로 바꾼다                                |
+| 보내기   | 마지막 질문. 글자는 `Questionnaire.Submit` 으로 바꾼다                     |
 
 - 다음과 보내기는 같은 submit 버튼입니다. 질문 안에서 form 이 제출되면 마지막이 아닐 때는 다음 질문으로 넘어갑니다.
 - 이동 버튼은 `ButtonGroup` 안의 레이아웃 div 로 띄워 묶이고 `aria-label="질문 이동"` 이 붙습니다.
+
+## 보내기 버튼
+
+```tsx
+<Questionnaire onComplete={plan}>
+  <Questionnaire.Question name="size">…</Questionnaire.Question>
+  <Questionnaire.Question name="goods">…</Questionnaire.Question>
+  <Questionnaire.Submit>계획 세우기</Questionnaire.Submit> {/* 마지막 질문의 버튼 글자 */}
+</Questionnaire>
+```
+
+- `Questionnaire.Submit` 은 다음과 보내기를 맡는 submit 버튼입니다. 쓰지 않으면 기본 버튼이 그려집니다.
+- 어디에 적어도 이동 버튼 묶음 안, 건너뛰기 뒤에 그려집니다.
+- `children` 은 마지막 질문에서만 보입니다. 기본은 `보내기`, 마지막이 아닐 때는 늘 `다음` 입니다.
+- 그 밖의 속성은 `Button` 으로 갑니다(`variant`, `colorScheme`). `type` 은 늘 `submit` 이고, 답하지 않은 필수 질문에서는 꺼집니다.
 
 ## 고르면 바로 넘어가기
 
@@ -154,6 +169,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 - 보기 카드의 가로 여백은 `standard` 12px, `tiny` 10px 로 직접 입력과 같아, 라디오와 입력 글자의 시작이 맞습니다.
 - 이동 버튼은 크기와 상관없이 `tiny` 입니다. 보기보다 눈에 띄지 않게 둡니다.
+- **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`).
 
 ## 속성
 
@@ -162,9 +178,8 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 | `defaultValue`           | `Record<string, string \| string[]>`, 기본 `{}`                         |
 | `onComplete`             | 마지막 질문에서 보낼 때 답을 받는다                                     |
 | `advanceOnSelect`        | `false`. 하나만 고르는 질문을 고르면 바로 넘어간다                      |
-| `submitLabel`            | 마지막 버튼 글자. 기본 `보내기`                                         |
 | `size`                   | `standard`(기본) / `tiny`                                               |
-| 그 외 속성               | `<form>` 으로 간다 (`id`, `aria-label`, `className` 등)                 |
+| 그 외 속성               | `<form>` 으로 간다 (`id`, `aria-label`)                 |
 | Question `name`          | 답의 키이자 FormData 이름                                               |
 | Question `selectionMode` | `single`(기본) / `multiple`                                             |
 | Question `optional`      | `false`. 켜면 건너뛰기 버튼                                             |
@@ -174,14 +189,13 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 | Option `description`     | 보기 둘째 줄                                                            |
 | Option `disabled`        | 그 보기만 끈다                                                          |
 | Other                    | `TextField` 의 속성. `value`, `name`, `size` 는 Questionnaire 가 정한다 |
+| Submit `children`        | 마지막 버튼 글자. 기본 `보내기`. 그 밖의 속성은 `Button` 으로           |
 
-## 상태 속성
+## 상태
 
-| 속성                                         | 붙는 곳                         |
-| -------------------------------------------- | ------------------------------- |
-| `data-questionnaire`, `data-step`            | `<form>`. `data-step` 은 0부터  |
-| `data-questionnaire-question`, `data-active` | 질문 `<fieldset>`               |
-| `data-questionnaire-option`                  | 보기 `<label>`, 토글 `<button>` |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 답은 끝날 때 `onComplete` 로 받습니다. 지금 몇 번째 질문인지와 도중의 답을 읽는 런타임 방법은 없습니다.
 
 ## 알아둘 것
 

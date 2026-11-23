@@ -48,9 +48,24 @@ function keepFocusOnThumb(event: PointerEvent<HTMLDivElement>) {
   event.preventDefault();
 }
 
-function toArray(value: SliderValue | undefined) {
+function toArray(value: SliderValue | undefined, range: boolean) {
   if (value === undefined) return undefined;
-  return typeof value === 'number' ? [value] : [...value];
+  if (range) return typeof value === 'number' ? [value, value] : [value[0], value[1]];
+  return [typeof value === 'number' ? value : value[0]];
+}
+
+export function useValueShape(first: SliderValue | undefined) {
+  const [range] = useState(() => Array.isArray(first));
+
+  const drifted = first !== undefined && Array.isArray(first) !== range;
+  useEffect(() => {
+    if (isDevelopment && drifted)
+      console.warn(
+        `[IDS] Slider: the value changed from ${range ? '[start, end]' : 'a number'} to ${range ? 'a number' : '[start, end]'}. A Slider keeps the shape of its first value; give it a new key to switch.`,
+      );
+  }, [drifted, range]);
+
+  return range;
 }
 
 export function useSlider({
@@ -71,9 +86,9 @@ export function useSlider({
 }: UseSliderOptions) {
   const output = (values: readonly number[]): SliderValue =>
     range ? [values[0]!, values[1]!] : values[0]!;
-  const initial = toArray(defaultValue) ?? (range ? [min, max] : [min]);
+  const initial = toArray(defaultValue, range) ?? (range ? [min, max] : [min]);
   const [stored, setStored] = useControllableState<readonly number[]>({
-    value: toArray(value),
+    value: toArray(value, range),
     defaultValue: initial,
     onValueChange: (next) => onValueChange?.(output(next)),
   });

@@ -6,7 +6,6 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Label } from '../../typography/label';
 import { Checkbox } from '../checkbox';
@@ -27,7 +26,6 @@ const skills: Array<{ value: Skill; label: string }> = [
 
 const orientations = ['vertical', 'horizontal'] as const;
 const sizes = ['standard', 'tiny'] as const;
-const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
 const meta = {
   title: 'Form/CheckboxGroup',
@@ -49,7 +47,7 @@ const meta = {
     onValueChange: fn(),
     children: ({ Item }) =>
       skills.map((skill) => (
-        <Label key={skill.value} className={row}>
+        <Label key={skill.value}>
           <Item value={skill.value} />
           {skill.label}
         </Label>
@@ -61,6 +59,21 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <CheckboxGroup aria-label="알림" defaultValue={['mail']}>
+      <Label>
+        <Checkbox value="mail" />
+        메일
+      </Label>
+      <Label>
+        <Checkbox value="push" />
+        푸시
+      </Label>
+    </CheckboxGroup>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -78,7 +91,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -107,7 +120,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -123,13 +136,13 @@ export const Gallery: Story = {
           <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['js']}>
             {({ All, Item }) => (
               <>
-                <Label className={row}>
+                <Label>
                   <All />
                   전체 선택
                 </Label>
                 <div className="flex flex-col gap-3 ps-6">
                   {skills.map((skill) => (
-                    <Label key={skill.value} className={row}>
+                    <Label key={skill.value}>
                       <Item value={skill.value} disabled={skill.value === 'rs'} />
                       {skill.label}
                       {skill.value === 'rs' && ' (준비 중)'}
@@ -141,20 +154,20 @@ export const Gallery: Story = {
           </CheckboxGroup>
         </Showcase.Row>
         <Showcase.Row label="grid">
-          <CheckboxGroup<Skill>
-            aria-label="관심 기술"
-            className="grid w-80 grid-cols-2"
-            defaultValue={['py']}
-          >
-            {({ Item }) =>
-              skills.map((skill) => (
-                <Label key={skill.value} className={row}>
-                  <Item value={skill.value} />
-                  {skill.label}
-                </Label>
-              ))
-            }
-          </CheckboxGroup>
+          <div className="w-80">
+            <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['py']}>
+              {({ Item }) => (
+                <div className="grid grid-cols-2 gap-3">
+                  {skills.map((skill) => (
+                    <Label key={skill.value}>
+                      <Item value={skill.value} />
+                      {skill.label}
+                    </Label>
+                  ))}
+                </div>
+              )}
+            </CheckboxGroup>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="Field">
           <Field>
@@ -163,7 +176,7 @@ export const Gallery: Story = {
             <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['js']}>
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -177,7 +190,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const SelectAll: Story = {
+export const AddASelectAllBox: Story = {
   args: { onValueChange: fn() },
   render: (args) => (
     <CheckboxGroup<Skill>
@@ -187,13 +200,13 @@ export const SelectAll: Story = {
     >
       {({ All, Item }) => (
         <>
-          <Label className={row}>
+          <Label>
             <All />
             전체 선택
           </Label>
           <div className="flex flex-col gap-3 ps-6">
             {skills.map((skill) => (
-              <Label key={skill.value} className={row}>
+              <Label key={skill.value}>
                 <Item value={skill.value} disabled={skill.value === 'rs'} />
                 {skill.label}
                 {skill.value === 'rs' && ' (준비 중)'}
@@ -226,27 +239,7 @@ export const SelectAll: Story = {
   },
 };
 
-export const Keyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story: '체크박스마다 Tab이 멈추고 Space로 켜고 끕니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.tab();
-    await expect(canvas.getByRole('checkbox', { name: 'JavaScript' })).toHaveFocus();
-    await userEvent.keyboard(' ');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js']);
-    await userEvent.tab();
-    await userEvent.tab();
-    await userEvent.keyboard(' ');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js', 'py']);
-  },
-};
-
-export const ReadOnly: Story = {
+export const ShowChoicesThatCannotChange: Story = {
   args: { readOnly: true },
   parameters: {
     docs: {
@@ -261,7 +254,7 @@ export const ReadOnly: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const RequireAtLeastOneInANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -278,7 +271,7 @@ export const NativeForm: Story = {
           <CheckboxGroup<Skill> aria-label="관심 기술" name="skills">
             {({ Item }) =>
               skills.map((skill) => (
-                <Label key={skill.value} className={row}>
+                <Label key={skill.value}>
                   <Item value={skill.value} />
                   {skill.label}
                 </Label>
@@ -321,7 +314,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ skills: Skill[] }>({ defaultValues: { skills: [] } });
     const [result, setResult] = useState('');
@@ -344,7 +337,7 @@ export const ReactHookForm: Story = {
             <CheckboxGroup<Skill> aria-label="관심 기술">
               {({ Item }) =>
                 skills.map((skill) => (
-                  <Label key={skill.value} className={row}>
+                  <Label key={skill.value}>
                     <Item value={skill.value} />
                     {skill.label}
                   </Label>
@@ -378,18 +371,18 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const PlainChildren: Story = {
+export const PlaceCheckboxesWithoutARenderFunction: Story = {
   render: () => (
     <CheckboxGroup aria-label="알림" defaultValue={['mail']}>
-      <Label className={row}>
+      <Label>
         <CheckboxGroup.All />
         모두
       </Label>
-      <Label className={row}>
+      <Label>
         <Checkbox value="mail" />
         메일
       </Label>
-      <Label className={row}>
+      <Label>
         <Checkbox value="push" />
         푸시
       </Label>
@@ -406,5 +399,26 @@ export const PlainChildren: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('checkbox', { name: '푸시' }));
     await expect(canvas.getByRole('checkbox', { name: '모두' })).toBeChecked();
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story: '체크박스마다 Tab이 멈추고 Space로 켜고 끕니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole('checkbox', { name: 'JavaScript' })).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js']);
+    await userEvent.tab();
+    await userEvent.tab();
+    await userEvent.keyboard(' ');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js', 'py']);
   },
 };

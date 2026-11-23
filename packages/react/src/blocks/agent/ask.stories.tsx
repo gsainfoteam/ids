@@ -104,7 +104,7 @@ export const PC: Story = {
             ) : (
               <Card>
                 <Card.Content>
-                  <Questionnaire submitLabel="계획 세우기" onComplete={setAnswers}>
+                  <Questionnaire onComplete={setAnswers}>
                     {QUESTIONS.map((question) => (
                       <Questionnaire.Question key={question.id} name={question.id} optional>
                         {question.title}
@@ -123,6 +123,7 @@ export const PC: Story = {
                         <Questionnaire.Other placeholder="다른 답이 있으면 적어 주세요" />
                       </Questionnaire.Question>
                     ))}
+                    <Questionnaire.Submit>계획 세우기</Questionnaire.Submit>
                   </Questionnaire>
                 </Card.Content>
               </Card>

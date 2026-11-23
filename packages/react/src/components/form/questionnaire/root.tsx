@@ -28,6 +28,7 @@ import { QuestionnaireOption, type QuestionnaireOptionProps } from './option';
 import { QuestionnaireOther } from './other';
 import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './question';
 import { questionnaireStyle } from './style';
+import { QuestionnaireSubmit } from './submit';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
@@ -53,7 +54,6 @@ export type QuestionnaireProps = Omit<ComponentProps<'form'>, 'defaultValue' | '
   defaultValue?: QuestionnaireAnswers;
   onComplete?: (answers: QuestionnaireAnswers) => void;
   advanceOnSelect?: boolean;
-  submitLabel?: ReactNode;
   size?: IdsSize;
   children: ReactNode;
 };
@@ -61,6 +61,7 @@ export type QuestionnaireProps = Omit<ComponentProps<'form'>, 'defaultValue' | '
 const QUESTION = new Set<unknown>([QuestionnaireQuestion]);
 const OPTION = new Set<unknown>([QuestionnaireOption]);
 const OTHER = new Set<unknown>([QuestionnaireOther]);
+const SUBMIT = new Set<unknown>([QuestionnaireSubmit]);
 
 function optionValuesIn(children: ReactNode): string[] {
   return flattenFragments(children).flatMap((node) => {
@@ -93,7 +94,6 @@ export function QuestionnaireRoot({
   defaultValue,
   onComplete,
   advanceOnSelect = false,
-  submitLabel,
   size,
   className,
   children,
@@ -183,6 +183,9 @@ export function QuestionnaireRoot({
   const showsPrevious = index > 0;
   const showsSkip = current?.optional === true;
   const showsForward = current !== undefined && !opensTheNextStepOnSelect;
+  const parts = flattenFragments(children);
+  const isSubmit = (node: ReactNode) => isValidElement(node) && SUBMIT.has(elementTypeOf(node));
+  const submit = parts.find(isSubmit) ?? <QuestionnaireSubmit />;
 
   return (
     <QuestionnaireContext.Provider
@@ -194,6 +197,8 @@ export function QuestionnaireRoot({
         draftOf,
         setDraft,
         advance,
+        last,
+        canLeaveCurrent: current !== undefined && canLeave(current, drafts),
       }}
     >
       <form
@@ -217,7 +222,7 @@ export function QuestionnaireRoot({
             <Progress.Track className={styles.progressTrack()} />
           </Progress>
         )}
-        {children}
+        {parts.filter((node) => !isSubmit(node))}
         {(showsPrevious || showsSkip || showsForward) && (
           <ButtonGroup
             size="tiny"
@@ -240,11 +245,7 @@ export function QuestionnaireRoot({
                   {t('questionnaire.skip')}
                 </Button>
               )}
-              {showsForward && (
-                <Button type="submit" focusableWhenDisabled disabled={!canLeave(current, drafts)}>
-                  {last ? (submitLabel ?? t('questionnaire.submit')) : t('questionnaire.next')}
-                </Button>
-              )}
+              {showsForward && submit}
             </div>
           </ButtonGroup>
         )}
