@@ -121,7 +121,9 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 <ToggleGroup aria-label="정렬" variant="outline" size="tiny">  {/* 안의 토글이 따른다 */}
 <ToggleGroup aria-label="보기" orientation="vertical">         {/* 세로. 화살표도 위아래 */}
 <ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 붙인 토글이 폭을 나눠 가진다 */}
-<ToggleGroup aria-label="시간" className="flex-wrap gap-2">   {/* gap 을 주면 띄운 토글이 제 너비로 줄을 넘긴다 */}
+<ToggleGroup aria-label="시간">                                {/* 띄우려면 앱의 div 로 감싼다 */}
+  <div className="flex flex-wrap gap-2">…</div>              {/* 띄운 토글은 제 너비로 줄을 넘긴다 */}
+</ToggleGroup>
 ```
 
 ## 속성
@@ -141,7 +143,7 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 
 ## 알아둘 것
 
-- 토글은 늘 이어 붙습니다. `className` 에 `gap-*` 가 있으면 붙이지 않고 그 간격으로 띄웁니다(ButtonGroup 과 같습니다).
+- 토글은 늘 이어 붙습니다. 띄우려면 앱의 레이아웃 div 로 감쌉니다(ButtonGroup 과 같습니다). 화살표 키, 선택, 폼 값은 div 를 건너 그대로 동작합니다.
 - 안의 Toggle 에는 `value` 가 필요하고, 그룹이 상태를 가지므로 `pressed` 류 prop 은 쓸 수 없습니다.
 - 어느 토글과도 맞지 않는 값, 모드와 맞지 않는 값 모양(single 에 배열), 이름 없는 그룹은 개발 모드에서 콘솔에 경고합니다. 값 모양이 틀리면 single 은 첫 값을, multiple 은 그 문자열 하나를 씁니다.
 - 라디오 그룹에서 화살표로 고를 때도 항목의 `onClick` 이 불립니다. 네이티브 라디오와 같습니다.

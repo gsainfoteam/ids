@@ -238,11 +238,10 @@ export function QuestionnaireQuestion({
                 size={questionnaire.size}
                 orientation={orientation}
                 aria-labelledby={legendId}
-                className={styles.toggles()}
                 value={draft.choices[0] ?? null}
                 onValueChange={toggleSingle}
               >
-                {options}
+                <div className={styles.toggles()}>{options}</div>
               </ToggleGroup>
             ) : (
               <ToggleGroup<string>
@@ -251,7 +250,6 @@ export function QuestionnaireQuestion({
                 size={questionnaire.size}
                 orientation={orientation}
                 aria-labelledby={legendId}
-                className={styles.toggles()}
                 value={draft.choices}
                 onValueChange={(choices) =>
                   questionnaire.setDraft(name, {
@@ -260,7 +258,7 @@ export function QuestionnaireQuestion({
                   })
                 }
               >
-                {options}
+                <div className={styles.toggles()}>{options}</div>
               </ToggleGroup>
             )}
             {others}

@@ -149,7 +149,7 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 </Message.Actions>
 ```
 
-- `Message.Actions` 는 `gap-2` 로 띄운 ButtonGroup 이고, `size="tiny"`, `variant="outline"` 을 안의 버튼에 줍니다. 이름은 `t('message.actions')`("메시지 동작") 입니다.
+- `Message.Actions` 는 ButtonGroup 이고, 안의 버튼을 레이아웃 div 로 8px 띄웁니다. `size="tiny"`, `variant="outline"` 을 안의 버튼에 줍니다. 이름은 `t('message.actions')`("메시지 동작") 입니다.
 - `Message.Copy` 는 `text` 가 없으면 본문(`Message.Content`)의 `innerText` 를 복사합니다. 본문에 둔 Marker 와 Accordion 의 글자도 들어가므로, 원문을 따로 가진 앱은 `text` 를 줍니다.
 - 복사하면 잠깐 체크로 바뀌고 `role="status"` 로 "복사했습니다" 를 알립니다. Clipboard API 가 없는 곳에서는 그리지 않습니다.
 - 동작 버튼은 평범한 버튼이라 Tab 으로 차례로 갑니다. 메시지 줄 자체는 포커스를 받지 않습니다.

@@ -1,15 +1,19 @@
 ---
-'@gsainfoteam/ids-react': major
+"@gsainfoteam/ids-react": major
 ---
 
-Group, ButtonGroup and ToggleGroup lose `attached`. A group always joins its items; a `gap-*` utility in its `className` spaces them apart instead (responsive and arbitrary values included, `gap-0` stays joined), with the short separator and per-item shadows the spaced group had before. Message.Actions, Questionnaire and the booking block use `gap-2`.
+Group, ButtonGroup and ToggleGroup lose `attached`. A group always joins its direct children, and `className` and `style` only style the group. To space items apart, wrap them in a layout `div` of the app's own inside the group: items there keep their corners and shadows, and size, variant, roving focus, selection and form values still reach them. A Separator among spaced items takes its length from its own `className`. Message.Actions, Questionnaire and the booking block wrap their items this way.
 
 ```tsx
 // before
-<ButtonGroup attached={false} aria-label="필터">…</ButtonGroup>
-<ToggleGroup attached={false} className="flex-wrap" aria-label="시간">…</ToggleGroup>
+<ToggleGroup attached={false} className="flex-wrap" aria-label="시간">
+  <Toggle value="09:00">09:00</Toggle>
+</ToggleGroup>
 
 // after
-<ButtonGroup className="gap-2" aria-label="필터">…</ButtonGroup>
-<ToggleGroup className="flex-wrap gap-2" aria-label="시간">…</ToggleGroup>
+<ToggleGroup aria-label="시간">
+  <div className="flex flex-wrap gap-2">
+    <Toggle value="09:00">09:00</Toggle>
+  </div>
+</ToggleGroup>
 ```

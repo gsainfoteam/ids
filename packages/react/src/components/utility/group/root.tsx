@@ -2,7 +2,7 @@
 
 import { createContext, use, useEffect } from 'react';
 
-import { groupStyle, spacesItsItems } from './style';
+import { groupStyle } from './style';
 import { invariant } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
@@ -15,7 +15,6 @@ export type GroupOrientation = 'horizontal' | 'vertical';
 
 export type GroupContextValue = {
   orientation: GroupOrientation;
-  attached: boolean;
   size?: IdsSize;
   variant?: SurfaceVariant;
   separator: 'semantic' | 'decorative';
@@ -53,10 +52,8 @@ export function GroupRoot({
   ...rest
 }: Group.Props) {
   const parent = useGroupContext();
-  const attached = !spacesItsItems(className);
   const context: GroupContextValue = {
     orientation,
-    attached,
     size: size ?? parent?.size,
     variant: variant ?? parent?.variant,
     separator,
@@ -69,7 +66,7 @@ export function GroupRoot({
         data-orientation={orientation}
         data-size={context.size}
         {...rest}
-        className={groupStyle({ orientation, attached }).root({ className })}
+        className={groupStyle({ orientation }).root({ className })}
       >
         {children}
       </div>
@@ -86,11 +83,7 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
       orientation={group.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
       decorative={group.separator === 'decorative'}
       data-group-separator=""
-      className={groupStyle({
-        orientation: group.orientation,
-        attached: group.attached,
-        size: group.size,
-      }).separator({ className })}
+      className={groupStyle({ orientation: group.orientation }).separator({ className })}
     />
   );
 }

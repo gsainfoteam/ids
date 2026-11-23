@@ -737,6 +737,13 @@ props an app has to remember stay few. A root takes only:
 - the accessible name it needs (`aria-label`, Image `alt`, Avatar `name`) and the input it draws
   when children cannot carry it (QRCode `value`, Highlight `query`, Chart `config`).
 
+**`className` and `style` are the app's design, never a signal.** A component merges them onto
+its element and never reads them to decide what it does or how its parts look: no `gap-*` test on
+`className` to stop joining a Group, no `min-width` read off `style` to bound a Resizable. A
+behaviour the app needs is a prop, a part or composition (a layout `<div>` inside a ButtonGroup
+spaces its buttons). An app may set a CSS variable the component's own CSS reads
+(`style={{ '--toaster-gap': '8px' }}`); the component's JS never reads it back.
+
 Every other prop is an option. The rules for options:
 
 - **No styling-only or one-flag props.** `striped`, `stickyHeader`, `highlightOnHover`,

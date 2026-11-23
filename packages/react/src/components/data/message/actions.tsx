@@ -20,7 +20,7 @@ export function MessageActions({ className, children, ...props }: MessageActions
       data-message-actions=""
       className={styles.actions({ className })}
     >
-      {children ?? <MessageCopy />}
+      <div className={styles.actionItems()}>{children ?? <MessageCopy />}</div>
     </ButtonGroup>
   );
 }

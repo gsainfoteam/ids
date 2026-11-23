@@ -153,17 +153,18 @@ export const Gallery: Story = {
             <Toggle value="comments">댓글 많은</Toggle>
           </ToggleGroup>
         </Showcase.Row>
-        <Showcase.Row label="gap-2">
+        <Showcase.Row label="spaced in a div">
           <ToggleGroup
             aria-label="태그"
             selectionMode="multiple"
             variant="outline"
             defaultValue={['react']}
-            className="gap-2"
           >
-            <Toggle value="react">React</Toggle>
-            <Toggle value="flutter">Flutter</Toggle>
-            <Toggle value="design">디자인</Toggle>
+            <div className="flex gap-2">
+              <Toggle value="react">React</Toggle>
+              <Toggle value="flutter">Flutter</Toggle>
+              <Toggle value="design">디자인</Toggle>
+            </div>
           </ToggleGroup>
         </Showcase.Row>
         <Showcase.Row label="in a ButtonGroup">
@@ -222,19 +223,20 @@ export const WrapSpacedToggles: Story = {
       variant="outline"
       defaultValue="10:00"
       onValueChange={args.onValueChange}
-      className="max-w-60 flex-wrap gap-2"
     >
-      <Toggle value="09:00">09:00</Toggle>
-      <Toggle value="10:00">10:00</Toggle>
-      <Toggle value="11:00">11:00</Toggle>
-      <Toggle value="13:00">13:00</Toggle>
+      <div className="flex max-w-60 flex-wrap gap-2">
+        <Toggle value="09:00">09:00</Toggle>
+        <Toggle value="10:00">10:00</Toggle>
+        <Toggle value="11:00">11:00</Toggle>
+        <Toggle value="13:00">13:00</Toggle>
+      </div>
     </ToggleGroup>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'className 에 gap 을 주면 토글이 떨어지고, 줄이 넘어가도 제 너비를 지킵니다. 붙인 그룹만 넓히면 토글이 폭을 나눠 가집니다.',
+          '토글을 띄우려면 그룹 안에 앱의 레이아웃 div 를 두고 간격과 줄바꿈을 줍니다. 그룹은 직계 자식만 이어 붙이므로 div 안의 토글은 각자 모서리를 지키고, 줄이 넘어가도 제 너비를 지킵니다. 화살표 키와 선택은 div 를 건너 그대로 동작합니다.',
       },
     },
   },

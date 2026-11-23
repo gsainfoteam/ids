@@ -144,13 +144,14 @@ export const PC: Story = {
                 aria-labelledby="slots"
                 value={slot}
                 onValueChange={setSlot}
-                className="flex-wrap gap-2"
               >
-                {SLOTS.map((option) => (
-                  <Toggle key={option} value={option} disabled={TAKEN.includes(option)}>
-                    {option}
-                  </Toggle>
-                ))}
+                <div className="flex flex-wrap gap-2">
+                  {SLOTS.map((option) => (
+                    <Toggle key={option} value={option} disabled={TAKEN.includes(option)}>
+                      {option}
+                    </Toggle>
+                  ))}
+                </div>
               </ToggleGroup>
               <p className="text-caption-c1-regular">흐린 시간은 이미 예약됐어요.</p>
             </section>

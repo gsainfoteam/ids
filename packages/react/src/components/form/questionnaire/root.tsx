@@ -224,26 +224,28 @@ export function QuestionnaireRoot({
             aria-label={t('questionnaire.navigation')}
             className={styles.navigation()}
           >
-            {showsPrevious && (
-              <Button
-                type="button"
-                variant="outline"
-                className={styles.previous()}
-                onClick={() => goTo(index - 1)}
-              >
-                {t('questionnaire.previous')}
-              </Button>
-            )}
-            {showsSkip && (
-              <Button type="button" variant="outline" onClick={skip}>
-                {t('questionnaire.skip')}
-              </Button>
-            )}
-            {showsForward && (
-              <Button type="submit" focusableWhenDisabled disabled={!canLeave(current, drafts)}>
-                {last ? (submitLabel ?? t('questionnaire.submit')) : t('questionnaire.next')}
-              </Button>
-            )}
+            <div className={styles.navigationItems()}>
+              {showsPrevious && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={styles.previous()}
+                  onClick={() => goTo(index - 1)}
+                >
+                  {t('questionnaire.previous')}
+                </Button>
+              )}
+              {showsSkip && (
+                <Button type="button" variant="outline" onClick={skip}>
+                  {t('questionnaire.skip')}
+                </Button>
+              )}
+              {showsForward && (
+                <Button type="submit" focusableWhenDisabled disabled={!canLeave(current, drafts)}>
+                  {last ? (submitLabel ?? t('questionnaire.submit')) : t('questionnaire.next')}
+                </Button>
+              )}
+            </div>
           </ButtonGroup>
         )}
       </form>

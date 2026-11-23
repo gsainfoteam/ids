@@ -178,32 +178,28 @@ export const Gallery: Story = {
             <Button variant="outline">이동</Button>
           </ButtonGroup>
         </Showcase.Row>
-        <Showcase.Row label="gap-2">
-          <ButtonGroup variant="outline" aria-label="필터" className="gap-2">
-            <Button>전체</Button>
-            <Button>읽지 않음</Button>
-            <Button>
-              <ArchiveBoxIcon />
-              보관함
-            </Button>
-          </ButtonGroup>
-        </Showcase.Row>
-        <Showcase.Row label="gap-2 + Separator">
-          <ButtonGroup variant="outline" aria-label="사진 넘기기" className="gap-2">
-            <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-            <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-            <ButtonGroup.Separator />
-            <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+        <Showcase.Row label="spaced in a div">
+          <ButtonGroup variant="outline" aria-label="필터">
+            <div className="flex gap-2">
+              <Button>전체</Button>
+              <Button>읽지 않음</Button>
+              <Button>
+                <ArchiveBoxIcon />
+                보관함
+              </Button>
+            </div>
           </ButtonGroup>
         </Showcase.Row>
         <Showcase.Row label="in a tray">
           <Card className="concentric-p-1 w-fit flex-row gap-0">
-            <ButtonGroup variant="ghost" aria-label="사진 보기" className="gap-1">
-              <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-              <Button className="tabular-nums">3 / 12</Button>
-              <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-              <ButtonGroup.Separator className="mx-1" />
-              <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+            <ButtonGroup variant="ghost" aria-label="사진 보기">
+              <div className="flex items-center gap-1">
+                <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+                <Button className="tabular-nums">3 / 12</Button>
+                <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+                <ButtonGroup.Separator className="mx-1 h-5 min-h-0 self-center" />
+                <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+              </div>
             </ButtonGroup>
           </Card>
         </Showcase.Row>
@@ -289,11 +285,13 @@ export const BuildASplitButton: Story = {
 export const BuildAToolbar: Story = {
   render: () => (
     <Card className="concentric-p-1 w-fit flex-row gap-0">
-      <ButtonGroup variant="ghost" aria-label="사진 보기" className="gap-1">
-        <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-        <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-        <ButtonGroup.Separator className="mx-1" />
-        <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+      <ButtonGroup variant="ghost" aria-label="사진 보기">
+        <div className="flex items-center gap-1">
+          <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+          <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+          <ButtonGroup.Separator className="mx-1 h-5 min-h-0 self-center" />
+          <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+        </div>
       </ButtonGroup>
     </Card>
   ),
@@ -301,7 +299,7 @@ export const BuildAToolbar: Story = {
     docs: {
       description: {
         story:
-          '띄운 그룹의 Separator는 버튼보다 짧게 가운데에 섭니다. 테두리 막대는 앱이 그리고, 그 안에 띄운 그룹을 넣으면 툴바가 됩니다.',
+          '버튼을 띄우려면 그룹 안에 앱의 레이아웃 div 를 두고 간격을 줍니다. 그룹은 직계 자식만 이어 붙이므로 div 안의 버튼은 각자 모서리를 지킵니다. 테두리 막대는 Card 로 그리고, 선의 길이와 여백은 Separator 의 className 으로 정합니다.',
       },
     },
   },
