@@ -1,3 +1,5 @@
+import { getCodeEditorStaticDirs } from 'storybook-addon-code-editor/getStaticDirs';
+
 import type { StorybookConfig } from '@storybook/react-vite';
 import type { Plugin } from 'vite';
 
@@ -34,4 +36,15 @@ const config: StorybookConfig = {
     return config;
   },
 };
+
+const liveCodeEditor = {
+  addon: 'storybook-addon-code-editor',
+  staticDirs: getCodeEditorStaticDirs(import.meta.filename),
+};
+config.addons = [...(config.addons ?? []), liveCodeEditor.addon];
+config.staticDirs = [
+  ...(Array.isArray(config.staticDirs) ? config.staticDirs : []),
+  ...liveCodeEditor.staticDirs,
+];
+
 export default config;

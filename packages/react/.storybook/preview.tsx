@@ -76,11 +76,33 @@ const withIdsTheme: Decorator = (Story, context) => {
 
 const hideSpyNames = () => '() => {}';
 
+type ElementType =
+  | string
+  | symbol
+  | {
+      displayName?: string;
+      name?: string;
+      render?: { displayName?: string; name?: string };
+      type?: { name?: string };
+    };
+
+const nameInShowCode = ({ type }: { type: ElementType }) => {
+  if (typeof type === 'string') return type;
+  if (typeof type === 'symbol') return type.description ?? 'Unknown';
+  return (
+    type.displayName ??
+    type.render?.displayName ??
+    type.render?.name ??
+    type.type?.name ??
+    (type.name || 'Unknown')
+  );
+};
+
 const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
     docs: { codePanel: true },
-    jsx: { showFunctions: true, functionValue: hideSpyNames },
+    jsx: { showFunctions: true, functionValue: hideSpyNames, displayName: nameInShowCode },
     backgrounds: { disable: true },
     a11y: {
       options: {
