@@ -9,7 +9,7 @@ Storybook `Blocks/FileManager/*`. 자료실 화면 두 가지입니다.
 
 - **쓰인 컴포넌트.** Breadcrumb, Button, IconButton, ToggleGroup, IconToggle, Item, Card, Avatar, Empty, Progress, FileDropzone, TextField, Select, Field, Dialog, Menu, Badge, toast
 - **알아둘 것.**
-  - 격자의 파일 아이콘은 `Avatar shape="square"` 에 아이콘을 넣은 것이고, 목록과 폴더의 아이콘은 `Item.Media variant="soft"` 타일입니다.
+  - 격자의 파일 아이콘은 `Avatar` 에 아이콘을 넣은 것이고, 목록과 폴더의 아이콘은 `Item.Media variant="soft"` 타일입니다.
   - 파일 메뉴는 렌더 안의 함수 하나로 만들어 격자와 목록에 함께 씁니다.
   - 보기 전환은 `IconToggle` 두 개를 담은 한 개만 고르는 `ToggleGroup` 입니다.
   - 올리는 중인 파일은 `Item.Content` 에 `Progress` 를 함께 둡니다. 진행 값은 정해 둔 숫자입니다.

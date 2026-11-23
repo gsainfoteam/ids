@@ -32,7 +32,6 @@ const meta = {
     layout: { control: 'radio', options: layouts },
     stacking: { control: 'radio', options: ['first-on-top', 'last-on-top'] },
     size: { control: 'radio', options: sizes },
-    shape: { control: 'radio', options: ['circle', 'square'] },
     max: { control: { type: 'number', min: 1 } },
     total: { control: { type: 'number', min: 0 } },
   },
@@ -42,7 +41,6 @@ const meta = {
     layout: 'stack',
     stacking: 'first-on-top',
     size: 'standard',
-    shape: 'circle',
   },
   render: (args) => (
     <AvatarGroup {...args}>
@@ -57,6 +55,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <AvatarGroup max={3} aria-label="회의 참석자">
+      <Avatar src={photo(210)} name="Alice Kim" />
+      <Avatar src={photo(30)} name="Bob Lee" />
+      <Avatar name="Carol Park" />
+      <Avatar name="Eve Choi" />
+    </AvatarGroup>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -90,18 +99,6 @@ export const Gallery: Story = {
             ))}
           </AvatarGroup>
         </Showcase.Row>
-        <Showcase.Row label="square">
-          <AvatarGroup shape="square" aria-label="square">
-            {MEMBERS.slice(0, 4).map((member) => (
-              <Avatar key={member.name} src={member.src} name={member.name} />
-            ))}
-          </AvatarGroup>
-          <AvatarGroup shape="square" size="tiny" aria-label="square tiny">
-            {MEMBERS.slice(0, 4).map((member) => (
-              <Avatar key={member.name} src={member.src} name={member.name} />
-            ))}
-          </AvatarGroup>
-        </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl" className="flex gap-6">
             <AvatarGroup max={3} aria-label="rtl">
@@ -109,7 +106,7 @@ export const Gallery: Story = {
                 <Avatar key={member.name} src={member.src} name={member.name} />
               ))}
             </AvatarGroup>
-            <AvatarGroup shape="square" stacking="last-on-top" aria-label="rtl square">
+            <AvatarGroup stacking="last-on-top" aria-label="rtl last-on-top">
               {MEMBERS.slice(0, 3).map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />
               ))}
@@ -185,7 +182,7 @@ const avatars = (element: HTMLElement) => [
   ...element.querySelectorAll<HTMLElement>('[data-avatar-group] > li > [data-avatar]'),
 ];
 
-export const Overflow: Story = {
+export const GatherTheRestIntoACount: Story = {
   parameters: {
     docs: {
       description: {
@@ -202,7 +199,7 @@ export const Overflow: Story = {
   },
 };
 
-export const Total: Story = {
+export const ShowATotalFromTheServer: Story = {
   args: { max: undefined, total: 128 },
   render: (args) => (
     <AvatarGroup {...args}>
@@ -224,7 +221,7 @@ export const Total: Story = {
   },
 };
 
-export const Stacking: Story = {
+export const ChooseWhichAvatarSitsOnTop: Story = {
   args: { max: 3 },
   parameters: {
     docs: {
@@ -244,25 +241,17 @@ export const Stacking: Story = {
   },
 };
 
-export const LastOnTop: Story = {
-  args: { max: 3, stacking: 'last-on-top' },
-  play: async ({ canvasElement }) => {
-    const cutouts = avatars(canvasElement).map((avatar) => avatar.dataset.cutout ?? 'none');
-    await expect(cutouts).toEqual(['end', 'end', 'end', 'none']);
-  },
-};
-
-export const SizeFromGroup: Story = {
+export const SetTheSizeForTheWholeGroup: Story = {
   render: () => (
-    <AvatarGroup size="tiny" shape="square" aria-label="크기 전파">
+    <AvatarGroup size="tiny" aria-label="크기 전파">
       <Avatar name="Alice Kim" />
-      <Avatar name="Bob Lee" size="standard" shape="circle" />
+      <Avatar name="Bob Lee" size="standard" />
     </AvatarGroup>
   ),
   parameters: {
     docs: {
       description: {
-        story: '그룹의 `size` 와 `shape` 를 아바타가 따르고, 아바타에 직접 준 값이 이깁니다.',
+        story: '그룹의 `size` 를 아바타가 따르고, 아바타에 직접 준 값이 이깁니다.',
       },
     },
   },
@@ -270,13 +259,11 @@ export const SizeFromGroup: Story = {
     const alice = canvas.getByRole('img', { name: 'Alice Kim' });
     const bob = canvas.getByRole('img', { name: 'Bob Lee' });
     await expect(alice).toHaveAttribute('data-size', 'tiny');
-    await expect(alice).toHaveAttribute('data-shape', 'square');
     await expect(bob).toHaveAttribute('data-size', 'standard');
-    await expect(bob).toHaveAttribute('data-shape', 'circle');
   },
 };
 
-export const CustomOverflow: Story = {
+export const PutTheCountFirst: Story = {
   render: () => (
     <AvatarGroup max={2} overflowLabel={(count) => `and ${count} more`} aria-label="Reviewers">
       <AvatarGroup.Overflow>{({ count }) => `${count}+`}</AvatarGroup.Overflow>
@@ -297,5 +284,14 @@ export const CustomOverflow: Story = {
     const overflow = canvas.getByRole('img', { name: 'and 3 more' });
     await expect(overflow).toHaveTextContent('3+');
     await expect(avatars(canvasElement)[0]).toBe(overflow);
+  },
+};
+
+export const LastOnTop: Story = {
+  tags: ['verification'],
+  args: { max: 3, stacking: 'last-on-top' },
+  play: async ({ canvasElement }) => {
+    const cutouts = avatars(canvasElement).map((avatar) => avatar.dataset.cutout ?? 'none');
+    await expect(cutouts).toEqual(['end', 'end', 'end', 'none']);
   },
 };

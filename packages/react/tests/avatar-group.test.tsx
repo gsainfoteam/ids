@@ -94,13 +94,12 @@ test('a declared Overflow keeps its place and renders from the count', () => {
   expect(cutouts(items)).toEqual(['none', 'start', 'start']);
 });
 
-test('size and shape come from the group unless an avatar sets its own', () => {
-  const { items } = renderGroup({ size: 'tiny', shape: 'square' }, [
+test('size comes from the group unless an avatar sets its own', () => {
+  const { items } = renderGroup({ size: 'tiny' }, [
     <Avatar key="a" name="Alice Kim" />,
-    <Avatar key="b" name="Bob Lee" size="standard" shape="circle" />,
+    <Avatar key="b" name="Bob Lee" size="standard" />,
   ]);
-  expect([items[0]!.dataset.size, items[0]!.dataset.shape]).toEqual(['tiny', 'square']);
-  expect([items[1]!.dataset.size, items[1]!.dataset.shape]).toEqual(['standard', 'circle']);
+  expect(items.map((item) => item.dataset.size)).toEqual(['tiny', 'standard']);
 });
 
 test('a wrapped avatar still counts as one item and gets its cut-out', () => {

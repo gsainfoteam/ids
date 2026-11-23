@@ -221,7 +221,7 @@ export const PC: Story = {
                 <Item key={club.id} asChild>
                   <a href={`#${club.id}`}>
                     <Item.Media>
-                      <Avatar name={club.name} shape="square" />
+                      <Avatar name={club.name} />
                     </Item.Media>
                     <Item.Content>
                       <Item.Title>

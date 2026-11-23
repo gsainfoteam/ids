@@ -19,7 +19,6 @@ export function AvatarRoot({
   src,
   name,
   alt,
-  shape,
   size,
   onStatusChange,
   className,
@@ -31,7 +30,6 @@ export function AvatarRoot({
 }: Avatar.Props) {
   const group = use(AvatarGroupContext);
   const cutout = use(AvatarCutoutContext);
-  const resolvedShape = shape ?? group?.shape ?? 'circle';
   const resolvedSize = size ?? group?.size ?? 'standard';
 
   const nodes = flattenFragments(children);
@@ -54,12 +52,8 @@ export function AvatarRoot({
       );
   }, [decorative, label]);
 
-  const state: Avatar.State = { status, shape: resolvedShape, size: resolvedSize };
-  const styles = avatarStyle({
-    shape: resolvedShape,
-    size: resolvedSize,
-    cutout: cutout ?? 'none',
-  });
+  const state: Avatar.State = { status, size: resolvedSize };
+  const styles = avatarStyle({ size: resolvedSize, cutout: cutout ?? 'none' });
 
   return (
     <AvatarContext value={{ state, name, imageSrc: imageSrc || undefined, report, styles }}>
@@ -68,7 +62,6 @@ export function AvatarRoot({
         {...rest}
         data-avatar=""
         data-status={status}
-        data-shape={resolvedShape}
         data-size={resolvedSize}
         data-cutout={cutout}
         className={styles.root({ className: resolveState(className, state) })}

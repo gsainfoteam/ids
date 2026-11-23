@@ -35,7 +35,7 @@ export const PC: Story = {
       <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
         <div className="flex w-full max-w-xs flex-col gap-8">
           <div className="flex flex-col items-center gap-4 text-center">
-            <Avatar name="인포팀" shape="square" aria-hidden>
+            <Avatar name="인포팀" aria-hidden>
               <Avatar.Fallback>
                 <CubeTransparentIcon />
               </Avatar.Fallback>

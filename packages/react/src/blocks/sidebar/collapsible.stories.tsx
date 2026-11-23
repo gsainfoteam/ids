@@ -98,7 +98,7 @@ export const PC: Story = {
       <Sidebar.Provider className="break-keep">
         <Sidebar value={current} collapsible aria-label="주 메뉴">
           <Sidebar.Header>
-            <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+            <Avatar name="인포팀" size="tiny" aria-hidden>
               <Avatar.Fallback>
                 <CubeTransparentIcon />
               </Avatar.Fallback>

@@ -60,7 +60,7 @@ export const PC: Story = {
         <Card variant="soft" className="flex-1">
           <div className="flex flex-1 flex-col justify-between gap-10 p-6">
             <div className="text-body-b2-semibold flex items-center gap-2">
-              <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+              <Avatar name="인포팀" size="tiny" aria-hidden>
                 <Avatar.Fallback>
                   <CubeTransparentIcon />
                 </Avatar.Fallback>
