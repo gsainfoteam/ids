@@ -61,14 +61,80 @@ test('opening focuses the first field, Tab stays inside, Escape closes and retur
   await userEvent.keyboard('{Tab}');
   await expect.element(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
   await userEvent.keyboard('{Tab}');
-  await expect.element(screen.getByRole('button', { name: '닫기' })).toHaveFocus();
-  await userEvent.keyboard('{Tab}');
   await expect.element(screen.getByRole('textbox', { name: 'Name' })).toHaveFocus();
 
   await userEvent.keyboard('{Escape}');
   await expect.element(dialog).not.toBeInTheDocument();
   await expect.element(trigger).toHaveFocus();
   expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+});
+
+const cornerCloses = () => document.querySelectorAll('[data-dialog-content] [aria-label="닫기"]');
+
+test('Content draws the corner close button only when it writes no Dialog.Close', async () => {
+  const plain = await render(
+    <IdsProvider theme={testTheme}>
+      <Dialog defaultOpen>
+        <Dialog.Content>
+          <Dialog.Title>Plain</Dialog.Title>
+          <Dialog>
+            <Dialog.Trigger>Open inner</Dialog.Trigger>
+            <Dialog.Content>
+              <Dialog.Title>Inner</Dialog.Title>
+              <Dialog.Close>Done</Dialog.Close>
+            </Dialog.Content>
+          </Dialog>
+        </Dialog.Content>
+      </Dialog>
+    </IdsProvider>,
+  );
+  await expect.element(plain.getByRole('dialog', { name: 'Plain' })).toBeInTheDocument();
+  expect(cornerCloses()).toHaveLength(1);
+  await plain.unmount();
+
+  const footed = await render(
+    <IdsProvider theme={testTheme}>
+      <Dialog defaultOpen>
+        <Dialog.Content>
+          <Dialog.Title>Footed</Dialog.Title>
+          <Dialog.Footer>
+            <div>
+              <Dialog.Close asChild>
+                <Button>OK</Button>
+              </Dialog.Close>
+            </div>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
+    </IdsProvider>,
+  );
+  await expect.element(footed.getByRole('dialog', { name: 'Footed' })).toBeInTheDocument();
+  expect(cornerCloses()).toHaveLength(0);
+  await footed.unmount();
+
+  const both = await render(
+    <IdsProvider theme={testTheme}>
+      <Dialog defaultOpen>
+        <Dialog.Content>
+          <Dialog.Close />
+          <Dialog.Title>Both</Dialog.Title>
+          <Dialog.Footer>
+            <Dialog.Close>Cancel</Dialog.Close>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
+    </IdsProvider>,
+  );
+  const dialog = both.getByRole('dialog', { name: 'Both' });
+  await expect.element(dialog).toBeInTheDocument();
+  expect(cornerCloses()).toHaveLength(1);
+  const corner = both.getByRole('button', { name: '닫기' });
+  expect(
+    corner.element().closest('[data-dialog-body]'),
+    'the written X sits outside the scrolling body',
+  ).toBeNull();
+  await userEvent.click(corner);
+  await expect.element(dialog).not.toBeInTheDocument();
 });
 
 test('a backdrop click closes once and the content does not', async () => {
