@@ -119,7 +119,7 @@ const schema = z.object({
 ## 합성과 상태
 
 - `DateTimeField.Trigger`, `Value`, `Clear`, `Content` 와 부분 규칙은 [DateField](../date-field/README.md#합성) 와 같습니다. `Content` 의 기본은 `DateTimeField.Calendar` 와 `DateTimeField.TimePicker` 입니다.
-- `DateTimeField.State` 와 `data-*` 는 [DateField](../date-field/README.md#상태) 와 같습니다.
+- 상태를 읽는 방법과 `DateTimeField.State` 는 [DateField](../date-field/README.md#상태) 와 같습니다.
 
 ## 크기
 

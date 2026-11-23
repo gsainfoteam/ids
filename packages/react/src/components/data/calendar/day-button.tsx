@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 
-import { kebabCase } from 'es-toolkit';
 import { type DayButtonProps } from 'react-day-picker';
 
 import { useCalendarContext } from './context';
@@ -50,14 +49,10 @@ export function CalendarDayButton({
     rangeEnd: !!modifiers.range_end,
     modifiers: Object.fromEntries(modifierNames.map((name) => [name, !!modifiers[name]])),
   };
-  const modifierAttributes = Object.fromEntries(
-    modifierNames.map((name) => [`data-${kebabCase(name)}`, flag(modifiers[name])]),
-  );
 
   return (
     <button
       {...props}
-      {...modifierAttributes}
       ref={own}
       data-calendar-day={dayKey(date)}
       data-selected={flag(modifiers.selected)}

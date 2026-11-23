@@ -113,8 +113,11 @@ const schema = z.object({
 
 ## 상태
 
-- `TimeField.State` 는 `value`, `open`, `empty`, `invalid`, `disabled`, `readOnly`, `required` 입니다. `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
-- 필드 표면에는 `data-open`, `data-empty`, `data-invalid`, `data-disabled`, `data-readonly`, `data-required`, `data-size`, `data-variant` 가 붙습니다.
+앱은 상태를 값으로 읽습니다.
+
+- 값: `value` / `onValueChange`. 팝업: `open` / `onOpenChange`.
+- 필드 표면의 `className` 과 `style` 은 `TimeField.State` 를 받는 함수도 됩니다. `className` 처럼 IDS 위에 새 디자인을 지을 때만 씁니다.
+- `TimeField.State` 는 `value`, `open`, `empty`, `invalid`, `disabled`, `readOnly`, `required` 입니다.
 
 ## 크기
 

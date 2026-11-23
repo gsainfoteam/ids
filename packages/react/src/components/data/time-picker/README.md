@@ -122,8 +122,13 @@ const [time, setTime] = useState<Time | null>(null);
 | `active`                 | 키보드가 가리키는 옵션                  |
 | `disabled`               | 범위 밖                                 |
 
-- 옵션에는 같은 상태가 `data-selected`, `data-active`, `data-disabled` 로 붙고, 컬럼에는 `data-time-column` 이 붙습니다.
-- 루트에는 `data-hour-cycle`, `data-variant`, `data-size`, `data-empty`, `data-disabled`, `data-readonly` 가 붙고, `className` 과 `style` 은 `TimePicker.State`(`value`, `hourCycle`, `precision`, `step`, `disabled`, `readOnly`)를 받는 함수도 됩니다. `hourCycle` 은 locale 에서 풀이한 시간제입니다.
+## 상태
+
+앱은 상태를 값으로 읽습니다.
+
+- 고른 시각: `value` / `onValueChange`.
+- 옵션 하나의 상태: `Column` 의 children 함수가 받는 `TimePicker.OptionState`.
+- 루트의 `className` 과 `style` 은 `TimePicker.State`(`value`, `hourCycle`, `precision`, `step`, `disabled`, `readOnly`)를 받는 함수도 됩니다. `hourCycle` 은 locale 에서 풀이한 시간제입니다. `className` 처럼 IDS 위에 새 디자인을 지을 때만 씁니다.
 
 ## 크기
 

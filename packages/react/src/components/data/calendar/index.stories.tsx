@@ -290,7 +290,6 @@ export const BlockDaysOutsideLimits: Story = {
 };
 
 export const MarkDaysWithEvents: Story = {
-  tags: ['custom-design'],
   render: function Render() {
     const [date, setDate] = useState<CalendarDate | null>(null);
 
@@ -304,10 +303,19 @@ export const MarkDaysWithEvents: Story = {
 
     return (
       <Calendar value={date} onValueChange={setDate} today={new CalendarDate(2026, 9, 15)}>
-        <Calendar.Day
-          modifiers={{ event: events }}
-          className="data-event:after:bg-primary-solid after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:size-1 after:rounded-full data-event:data-selected:after:bg-current"
-        />
+        <Calendar.Day modifiers={{ event: events }}>
+          {(day, state) => (
+            <>
+              {day.day}
+              {state.modifiers.event && (
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 bottom-1 mx-auto size-1 rounded-full bg-current"
+                />
+              )}
+            </>
+          )}
+        </Calendar.Day>
         <Calendar.Footer>
           {date ? (busy ? '일정이 있는 날입니다.' : '일정이 없습니다.') : '날짜를 고르세요.'}
         </Calendar.Footer>
@@ -318,14 +326,14 @@ export const MarkDaysWithEvents: Story = {
     docs: {
       description: {
         story:
-          'Calendar.Day 의 modifiers 는 날짜에 이름을 붙이고, 이름마다 날짜 버튼에 data-<이름> 속성이 붙습니다(event 는 data-event, bookedOut 은 data-booked-out). Calendar.Day 의 className 이 그 속성으로 점을 그립니다. Calendar.Footer 는 화면 읽기 프로그램이 읽는 알림 영역입니다.',
+          'Calendar.Day 의 modifiers 는 날짜에 이름을 붙이고, children 함수는 그 날의 상태(state.modifiers.event)를 받아 날짜 버튼의 내용을 그립니다. 여기서는 일정이 있는 날 숫자 아래에 점을 그립니다. 버튼 모양과 포커스, 이름은 IDS 가 그대로 그립니다. Calendar.Footer 는 화면 읽기 프로그램이 읽는 알림 영역입니다.',
       },
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     await expect(canvas.getByText('날짜를 고르세요.')).toHaveAttribute('role', 'status');
-    await expect(day(canvasElement, '2026-09-22')).toHaveAttribute('data-event');
-    await expect(day(canvasElement, '2026-09-21')).not.toHaveAttribute('data-event');
+    expect(day(canvasElement, '2026-09-22').querySelector('[aria-hidden]')).not.toBeNull();
+    expect(day(canvasElement, '2026-09-21').querySelector('[aria-hidden]')).toBeNull();
     await userEvent.click(day(canvasElement, '2026-09-22'));
     await expect(canvas.getByText('일정이 있는 날입니다.')).toBeInTheDocument();
     await expect(day(canvasElement, '2026-09-22')).toHaveTextContent('22');

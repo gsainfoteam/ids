@@ -1,5 +1,5 @@
 ---
-'@gsainfoteam/ids-react': major
+"@gsainfoteam/ids-react": major
 ---
 
 Calendar follows the props rule: options that only set a look or belong to one screen element
@@ -11,8 +11,8 @@ move to parts, and the locale comes from `IdsProvider`.
 - `captionLayout="dropdown"` is `<Calendar.Caption layout="dropdown" />`.
 - `showWeekNumber` is `<Calendar.WeekNumber />`; its `className` styles the week number cells.
 - `modifiers` and `renderDay` are `<Calendar.Day modifiers={…}>{(day, state) => …}</Calendar.Day>`.
-  Each modifier name also sets `data-<name>` on the day button, so `modifiersClassNames` is gone:
-  style the days with `className` on `Calendar.Day` (`data-event:font-bold`).
+  `modifiersClassNames` is gone: the children function reads `state.modifiers` and draws the day's
+  content.
 - `footer` is `<Calendar.Footer>…</Calendar.Footer>`, a `role="status"` `div` that takes `asChild`.
 - `showOutsideDays` and `fixedWeeks` are gone. The calendar always draws six weeks, and shows the
   days of the next and previous month only when it shows one month.

@@ -50,7 +50,7 @@ const [range, setRange] = useState<DateRange | null>(null);
 ```
 
 - 기간 안의 날은 `bg-primary-soft` 위에 `text-on-primary-soft` 입니다. 끝을 고르기 전 미리 보기는 `bg-neutral-soft` 이라 확정된 기간과 구분됩니다.
-- 미리 보기 중인 날에는 `data-range-preview` 가 붙습니다. 포인터가 달력을 벗어나면 키보드 포커스가 있는 날까지 보여 줍니다.
+- 미리 보기는 포인터가 가리키는 날까지이고, 포인터가 달력을 벗어나면 키보드 포커스가 있는 날까지입니다.
 - 기간은 양 끝만 검사합니다. 사이에 막힌 날이 있어도 기간을 만들 수 있습니다.
 
 ## 월과 연도 이동
@@ -100,7 +100,7 @@ const [range, setRange] = useState<DateRange | null>(null);
 | `true` / `false`                            | 모두 / 없음                                 |
 
 - `disabled` 는 `DateMatcher` 하나나 배열입니다. 배열이면 하나라도 맞는 날을 막습니다.
-- 막힌 날은 native `disabled` 버튼이라 클릭도 키보드도 닿지 않습니다. 날짜 버튼에 `data-disabled` 가 붙습니다.
+- 막힌 날은 native `disabled` 버튼이라 클릭도 키보드도 닿지 않습니다.
 
 ## 키보드
 
@@ -153,18 +153,15 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 
 ## 날짜 칸 꾸미기
 
-`Calendar.Day` 의 `className` 은 IDS 위에 새 디자인을 지을 때만 씁니다. 앱 화면에서는 `modifiers` 와 children 함수로 충분합니다.
+날짜에 이름을 붙이고(`modifiers`), 그 이름으로 날짜 버튼의 내용을 그립니다(children 함수).
 
 ```tsx
 <Calendar>
-  <Calendar.Day
-    modifiers={{ event: eventDates, weekend: { dayOfWeek: [0, 6] } }} // 이름: DateMatcher
-    className="data-event:font-bold"                                    // 날짜 버튼에 붙는다
-  >
+  <Calendar.Day modifiers={{ event: eventDates, weekend: { dayOfWeek: [0, 6] } }}>
     {(day, state) => (
       <>
         {day.day}
-        {state.modifiers.event && <span className="size-1 rounded-full bg-current" />}
+        {state.modifiers.event && <span aria-hidden className="size-1 rounded-full bg-current" />}
       </>
     )}
   </Calendar.Day>
@@ -174,8 +171,8 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 ```
 
 - `Calendar.Day` 는 날짜 버튼 하나하나의 틀입니다. 그 자리에 그려지지 않고, 달력이 날마다 읽습니다.
-- `modifiers` 의 이름마다 날짜 버튼에 `data-<이름>`(kebab-case)이 붙습니다. 모양은 `className` 의 `data-*` variant 로 바꿉니다.
-- children 함수는 날짜 버튼의 내용만 바꿉니다. 버튼 모양, 포커스 이동, `data-*` 상태, 이름(`aria-label`)은 IDS 가 그대로 그립니다. 함수를 주면 날짜 숫자도 직접 그립니다. 숫자 체계를 따르려면 `Intl.NumberFormat(locale)` 로 씁니다.
+- `modifiers` 는 이름마다 `DateMatcher` 하나나 배열입니다. 그 날이 맞는지는 `state.modifiers.<이름>` 으로 읽습니다.
+- children 함수는 날짜 버튼의 내용만 바꿉니다. 버튼 모양, 포커스 이동, 이름(`aria-label`)은 IDS 가 그대로 그립니다. 함수를 주면 날짜 숫자도 직접 그립니다. 숫자 체계를 따르려면 `Intl.NumberFormat(locale)` 로 씁니다.
 - `Calendar.WeekNumber` 의 `className` 은 주차 칸과 머리글에 붙습니다.
 - `Calendar.Footer` 는 `role="status"` 인 `div` 이고 `asChild` 를 받습니다.
 
@@ -190,19 +187,11 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 
 ## 상태
 
-| 날짜 버튼                                                   | 뜻                              |
-| ----------------------------------------------------------- | ------------------------------- |
-| `data-calendar-day`                                         | 그 날의 ISO 로컬 날짜           |
-| `data-selected`                                             | 선택됨. 기간의 가운데 날도 포함 |
-| `data-today`                                                | 오늘                            |
-| `data-disabled`                                             | 고를 수 없음                    |
-| `data-outside`                                              | 앞뒤 달의 날                    |
-| `data-range-start` / `data-range-middle` / `data-range-end` | 기간의 시작 / 가운데 / 끝       |
-| `data-range-preview`                                        | 끝을 고르기 전 미리 보기 안     |
-| `data-<modifier>`                                           | `Calendar.Day` 의 `modifiers` 이름에 맞는 날 |
+앱은 상태를 값으로 읽습니다.
 
-- 날짜 칸(`td`)에는 react-day-picker 의 `data-day`, `data-selected`, `data-today`, `data-outside` 가 붙습니다.
-- 루트의 `className` 과 `style` 은 `Calendar.State`(`value`, `month`, `disabled`, `readOnly`, `selectionMode`)를 받는 함수도 됩니다. 루트에는 `data-disabled`, `data-readonly`, `data-size`, `data-selection-mode` 가 붙습니다.
+- 고른 날: `value` / `onValueChange`. 보이는 달: `month` / `onMonthChange`.
+- 날짜 하나의 상태: `Calendar.Day` 의 children 함수가 받는 `Calendar.DayState`([날짜 칸 꾸미기](#날짜-칸-꾸미기)).
+- 루트의 `className` 과 `style` 은 `Calendar.State`(`value`, `month`, `disabled`, `readOnly`, `selectionMode`)를 받는 함수도 됩니다. `className` 처럼 IDS 위에 새 디자인을 지을 때만 씁니다.
 
 ## 크기
 

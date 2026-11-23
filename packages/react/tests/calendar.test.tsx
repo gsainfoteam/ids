@@ -474,7 +474,7 @@ test('Calendar.Day children replace only the content and get the day state; modi
   expect(states['2026-09-10'].selected).toBe(true);
 });
 
-test('parts: Day modifiers become data attributes; WeekNumber, a dropdown Caption and Footer render', () => {
+test('parts: Day modifiers reach the day state; WeekNumber, a dropdown Caption and Footer render', () => {
   const doc = ssr({
     today: d(2026, 9, 15),
     children: (
@@ -482,7 +482,15 @@ test('parts: Day modifiers become data attributes; WeekNumber, a dropdown Captio
         <Calendar.Day
           modifiers={{ bookedOut: [d(2026, 9, 9)], weekend: { dayOfWeek: [0, 6] } }}
           className="custom-day"
-        />
+        >
+          {(day, state) => (
+            <>
+              {day.day}
+              {state.modifiers.bookedOut && <i data-booked-mark="" />}
+              {state.modifiers.weekend && <i data-weekend-mark="" />}
+            </>
+          )}
+        </Calendar.Day>
         <Calendar.WeekNumber className="custom-week" />
         <Calendar.Caption layout="dropdown" className="custom-caption" />
         <Calendar.Footer asChild>
@@ -492,12 +500,12 @@ test('parts: Day modifiers become data attributes; WeekNumber, a dropdown Captio
     ),
   });
   const booked = doc.querySelector('[data-calendar-day="2026-09-09"]')!;
-  expect(booked.hasAttribute('data-booked-out')).toBe(true);
-  expect(booked.hasAttribute('data-weekend')).toBe(false);
+  expect(booked.querySelector('[data-booked-mark]')).not.toBeNull();
+  expect(booked.querySelector('[data-weekend-mark]')).toBeNull();
   expect(booked.classList.contains('custom-day')).toBe(true);
   const saturday = doc.querySelector('[data-calendar-day="2026-09-12"]')!;
-  expect(saturday.hasAttribute('data-weekend')).toBe(true);
-  expect(saturday.hasAttribute('data-booked-out')).toBe(false);
+  expect(saturday.querySelector('[data-weekend-mark]')).not.toBeNull();
+  expect(saturday.querySelector('[data-booked-mark]')).toBeNull();
   expect(doc.querySelectorAll('[role=rowheader]')).toHaveLength(6);
   expect(doc.querySelector('[role=rowheader]')!.classList.contains('custom-week')).toBe(true);
   expect(doc.querySelector('th[scope=col]')!.getAttribute('aria-label')).toBe('주차');
