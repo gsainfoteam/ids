@@ -12,7 +12,6 @@ import type { Breadcrumb } from '.';
 
 export function BreadcrumbRoot({
   size = 'standard',
-  separator,
   maxItems,
   className,
   children,
@@ -26,7 +25,7 @@ export function BreadcrumbRoot({
   );
 
   return (
-    <BreadcrumbContext value={{ styles, separator, maxItems }}>
+    <BreadcrumbContext value={{ styles, maxItems }}>
       <nav
         aria-label={t('breadcrumb.label')}
         {...props}

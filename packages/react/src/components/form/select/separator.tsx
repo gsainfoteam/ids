@@ -14,7 +14,7 @@ export function SelectSeparator({ className, ...props }: SelectSeparatorProps) {
   return (
     <Divider
       {...props}
-      decorative
+      aria-hidden
       data-select-separator=""
       className={c.styles.separator({ className })}
     />

@@ -62,6 +62,24 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Stepper defaultValue={1}>
+      <Stepper.Item>
+        <Stepper.Title>계정</Stepper.Title>
+        <Stepper.Description>이메일과 비밀번호</Stepper.Description>
+      </Stepper.Item>
+      <Stepper.Item>
+        <Stepper.Title>프로필</Stepper.Title>
+        <Stepper.Description>이름과 사진</Stepper.Description>
+      </Stepper.Item>
+      <Stepper.Item>
+        <Stepper.Title>확인</Stepper.Title>
+      </Stepper.Item>
+    </Stepper>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -188,20 +206,6 @@ export const Gallery: Story = {
             </Stepper>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="dots">
-          <div className="w-72">
-            <Stepper value={1} size="tiny">
-              {[0, 1, 2, 3].map((step) => (
-                <Stepper.Item key={step}>
-                  <Stepper.Indicator className="size-2.5 ring-0 data-current:ring-0">
-                    {null}
-                  </Stepper.Indicator>
-                  <Stepper.Title className="sr-only">{`${step + 1}단계`}</Stepper.Title>
-                </Stepper.Item>
-              ))}
-            </Stepper>
-          </div>
-        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section
@@ -313,7 +317,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Linear: Story = {
+export const StepForwardOneAtATime: Story = {
   args: { defaultValue: 0 },
   parameters: {
     docs: {
@@ -337,7 +341,7 @@ export const Linear: Story = {
   },
 };
 
-export const NonLinear: Story = {
+export const JumpToAnyStep: Story = {
   args: { defaultValue: 0, linear: false },
   parameters: {
     docs: {
@@ -356,38 +360,12 @@ export const NonLinear: Story = {
   },
 };
 
-export const Keyboard: Story = {
-  args: { linear: false },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '단계 목록은 Tab 한 칸이고, 현재 단계에서 멈춥니다. 방향키로 단계 사이를 오가고 `Home` `End` 로 끝까지 갑니다. `Enter` 나 `Space` 가 그 단계로 옮깁니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const step = (name: RegExp) => canvas.getByRole('button', { name });
-    await expect(step(/프로필/)).toHaveAttribute('tabindex', '0');
-    await expect(step(/계정/)).toHaveAttribute('tabindex', '-1');
-    step(/프로필/).focus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(step(/확인/)).toHaveFocus();
-    await userEvent.keyboard('{Home}');
-    await expect(step(/계정/)).toHaveFocus();
-    await userEvent.keyboard('{End}');
-    await expect(step(/확인/)).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    await expect(step(/확인/)).toHaveAttribute('aria-current', 'step');
-  },
-};
-
-export const Wizard: Story = {
+export const ShowEachStepsPanel: Story = {
   render: function Render() {
     const [step, setStep] = useState(0);
 
     return (
-      <div className="w-full max-w-md">
+      <div className="flex w-full max-w-md flex-col gap-4">
         <Stepper orientation="vertical" value={step} onValueChange={setStep}>
           <Stepper.Item>
             <Stepper.Title>계정</Stepper.Title>
@@ -406,7 +384,7 @@ export const Wizard: Story = {
           <Stepper.Content value={2}>입력한 내용을 검토합니다.</Stepper.Content>
           <Stepper.Content value={3}>가입이 끝났습니다.</Stepper.Content>
         </Stepper>
-        <div className="mt-4 flex justify-between">
+        <div className="flex justify-between">
           <Button
             variant="outline"
             disabled={step === 0}
@@ -441,7 +419,7 @@ export const Wizard: Story = {
   },
 };
 
-export const DisplayOnly: Story = {
+export const ShowProgressWithoutButtons: Story = {
   render: () => (
     <div className="w-full max-w-2xl">
       <Stepper value={1} aria-label="주문 진행">
@@ -475,7 +453,7 @@ export const DisplayOnly: Story = {
   },
 };
 
-export const ErrorStep: Story = {
+export const MarkAFailedStep: Story = {
   render: (args) => (
     <div className="w-full max-w-2xl">
       <Stepper defaultValue={1} onValueChange={args.onValueChange}>
@@ -509,7 +487,7 @@ export const ErrorStep: Story = {
   },
 };
 
-export const ActivityLog: Story = {
+export const ListRecentActivity: Story = {
   render: () => (
     <div className="w-full max-w-md">
       <Stepper progress={false} orientation="vertical" aria-label="최근 활동">
@@ -575,7 +553,7 @@ export const ActivityLog: Story = {
   },
 };
 
-export const DeployLog: Story = {
+export const TrackAPipeline: Story = {
   render: () => (
     <div className="w-full max-w-md">
       <Stepper value={2} orientation="vertical" size="tiny" aria-label="배포">
@@ -631,7 +609,7 @@ export const DeployLog: Story = {
   },
 };
 
-export const OrderStatus: Story = {
+export const TrackAnOrder: Story = {
   render: () => (
     <div className="w-full max-w-sm">
       <Stepper value={2} orientation="vertical" aria-label="주문 진행">
@@ -679,5 +657,32 @@ export const OrderStatus: Story = {
     const paid = canvas.getByText('9월 28일 오후 2:06');
     await expect(paid.tagName).toBe('TIME');
     await expect(paid).toHaveAttribute('datetime', '2026-09-28T14:06');
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { linear: false },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '단계 목록은 Tab 한 칸이고, 현재 단계에서 멈춥니다. 방향키로 단계 사이를 오가고 `Home` `End` 로 끝까지 갑니다. `Enter` 나 `Space` 가 그 단계로 옮깁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const step = (name: RegExp) => canvas.getByRole('button', { name });
+    await expect(step(/프로필/)).toHaveAttribute('tabindex', '0');
+    await expect(step(/계정/)).toHaveAttribute('tabindex', '-1');
+    step(/프로필/).focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(step(/확인/)).toHaveFocus();
+    await userEvent.keyboard('{Home}');
+    await expect(step(/계정/)).toHaveFocus();
+    await userEvent.keyboard('{End}');
+    await expect(step(/확인/)).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(step(/확인/)).toHaveAttribute('aria-current', 'step');
   },
 };

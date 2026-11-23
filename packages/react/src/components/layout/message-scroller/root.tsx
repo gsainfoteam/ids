@@ -41,16 +41,17 @@ function arrange(children: ReactNode) {
 
 export function MessageScrollerRoot({
   onReachStart,
-  loading = false,
   stickToBottom = true,
   scrollOnAppend = 'end',
   className,
   children,
   'aria-label': label,
   'aria-labelledby': labelledBy,
+  'aria-busy': ariaBusy,
   ...props
 }: MessageScroller.Props) {
   const t = useTranslate();
+  const loading = ariaBusy === true || ariaBusy === 'true';
   const { scroll, viewportProps, atEnd, unseen } = useMessageScroller({
     onReachStart,
     loading,

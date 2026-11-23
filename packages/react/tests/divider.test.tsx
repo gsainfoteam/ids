@@ -60,8 +60,8 @@ test('aria-label and aria-labelledby win over the label', () => {
   );
 });
 
-test('decorative dividers leave the accessibility tree', () => {
-  const line = divider(<Divider decorative>or</Divider>);
+test('aria-hidden dividers leave the accessibility tree', () => {
+  const line = divider(<Divider aria-hidden>or</Divider>);
   expect(line.hasAttribute('role')).toBe(false);
   expect(line.getAttribute('aria-hidden')).toBe('true');
   expect(line.hasAttribute('aria-labelledby')).toBe(false);
@@ -82,7 +82,7 @@ test('className and style may read the state', () => {
 test('asChild draws the line as the child element, without a label', () => {
   const line = parse(
     <ul>
-      <Divider asChild decorative>
+      <Divider asChild aria-hidden>
         <li />
       </Divider>
     </ul>,

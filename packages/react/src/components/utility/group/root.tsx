@@ -84,7 +84,7 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
     <Divider
       {...props}
       orientation={group.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
-      decorative={group.separator === 'decorative'}
+      aria-hidden={group.separator === 'decorative'}
       data-group-separator=""
       className={groupStyle({
         orientation: group.orientation,

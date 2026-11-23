@@ -11,7 +11,7 @@ import { keyHandler } from '../../../internal/keys';
 import { readingDirection } from '../../../internal/resize-handle';
 import { useTranslate } from '../../../internal/translate';
 import { invariant, mergeRefs } from '../../../utils';
-import { Resizable } from '../../layout/resizable';
+import { Resizable, useResizable } from '../../layout/resizable';
 
 import type { CalendarDate } from '@internationalized/date';
 
@@ -61,6 +61,17 @@ export function SchedulerMovable({
   const dragging = draggable.isDragging || grabbed !== null;
   const { hourHeight } = drag;
   const resizable = segment.endsHere && hourHeight !== undefined;
+  const pixelsPerHour = hourHeight ?? 0;
+  const sizing = useResizable({
+    height: {
+      value: segment.hours * pixelsPerHour,
+      onValueChange: (height) => drag.resize(segment, height),
+      min: SHORTEST_SHOWN_HOURS * pixelsPerHour,
+      max: (HOURS_IN_DAY - segment.startHour) * pixelsPerHour,
+    },
+    step: (pixelsPerHour * SNAP_MINUTES) / MINUTES_IN_HOUR,
+    getValueLabel: (height) => drag.endLabel(segment, day, height),
+  });
 
   const listeners = Object.fromEntries(
     Object.entries(draggable.listeners ?? {}).map(([name, listener]) => [
@@ -125,16 +136,7 @@ export function SchedulerMovable({
   if (!resizable) return slotElement;
 
   return (
-    <Resizable
-      asChild
-      direction="vertical"
-      step={(hourHeight * SNAP_MINUTES) / MINUTES_IN_HOUR}
-      height={segment.hours * hourHeight}
-      minHeight={SHORTEST_SHOWN_HOURS * hourHeight}
-      maxHeight={(HOURS_IN_DAY - segment.startHour) * hourHeight}
-      getValueLabel={(height) => drag.endLabel(segment, day, height)}
-      onHeightChange={(height) => drag.resize(segment, height)}
-    >
+    <Resizable asChild direction="vertical" resizable={sizing}>
       {slotElement}
     </Resizable>
   );

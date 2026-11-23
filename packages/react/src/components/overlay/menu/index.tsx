@@ -70,7 +70,7 @@ export namespace Menu {
   export type LabelProps = ComponentProps<'div'> & { asChild?: boolean };
   export type SeparatorProps = Omit<
     Divider.Props,
-    'orientation' | 'align' | 'decorative' | 'asChild' | 'children' | 'className'
+    'orientation' | 'align' | 'aria-hidden' | 'asChild' | 'children' | 'className'
   > & { className?: string };
   export type ShortcutProps = Omit<Kbd.Props, 'className'> & { className?: string };
   export type SearchProps = Omit<

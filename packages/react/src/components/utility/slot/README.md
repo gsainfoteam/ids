@@ -9,10 +9,14 @@ IDS의 `asChild` 를 움직이는 부품입니다. 감싸는 요소를 하나 �
 ```tsx
 import { Slot } from '@gsainfoteam/ids-react';
 
-<Slot className="rounded-standard px-4 py-2" onClick={track}>
+<Slot aria-current="page" onClick={track}>
   <a href="/dashboard">대시보드</a>
 </Slot>;
 ```
+
+## 크기
+
+- 자기 요소를 그리지 않으므로 크기가 없습니다. 크기와 자리는 자식 요소가 정합니다.
 
 ## asChild 만들기
 

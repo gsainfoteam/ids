@@ -64,7 +64,6 @@ const [step, setStep] = useState(0);
 <Stepper disabled />         // 모든 단계
 ```
 
-- 상태는 `data-state` 하나(`completed` `current` `upcoming` `error`, 기록의 `neutral`)와 같은 이름의 플래그(`data-completed`, `data-current`, ...)로 모든 파트에 붙습니다. `data-current:` 처럼 씁니다.
 - 오류인 현재 단계도 `aria-current="step"` 은 그대로입니다.
 
 ## 기록
@@ -105,7 +104,6 @@ const [step, setStep] = useState(0);
 - 늘 표시 전용이라 버튼이 없습니다. `value`, `defaultValue`, `onValueChange`, `linear` 는 쓰지 않고, 주면 개발 모드에서 경고합니다.
 - 목록 이름의 기본값이 없습니다. "진행 단계" 는 기록의 이름이 아니므로 `aria-label` 이나 `aria-labelledby` 를 줍니다. 없으면 개발 모드에서 경고합니다.
 - 진행 중인 일(도는 빌드)은 `<Stepper.Indicator><Spinner decorative /></Stepper.Indicator>` 와 제목의 글로 알립니다. 한 단계씩 나아가는 파이프라인이면 기록 대신 `value` 만 준 표시 전용 진행을 씁니다. 도는 단계에 `aria-current="step"` 이 붙습니다.
-- 루트의 `className`, `style`, `children` 함수는 `{ value, orientation, disabled, progress }` 를 받습니다. 기록에서 `value` 는 `-1` 입니다.
 
 ## Body
 
@@ -150,7 +148,7 @@ const [step, setStep] = useState(0);
 - Content 는 단계 목록 아래에 그려집니다. `Stepper.Item` 안에 두지 않습니다. 단계 옆에 둘 내용은 `Stepper.Body` 입니다.
 - 이전, 다음 버튼은 앱이 둡니다: `setStep((step) => step + 1)`.
 
-## 파트 꾸미기
+## 파트 바꾸기
 
 ```tsx
 <Stepper.Item>
@@ -167,10 +165,7 @@ const [step, setStep] = useState(0);
     <Stepper.Indicator>{(step) => (step.status === 'completed' ? '✓' : step.index + 1)}</Stepper.Indicator>
     <Stepper.Title>결제</Stepper.Title>
   </Stepper.Trigger>
-  <Stepper.Separator className="bg-(--ids-color-border-primary-strong)" />
 </Stepper.Item>
-
-<Stepper.Indicator className="size-2.5">{null}</Stepper.Indicator>  {/* 빈 점 */}
 
 <Stepper.Indicator asChild>
   <Avatar name="김지우" />                      {/* 표시 크기(32px, tiny 24px)의 아바타 */}
@@ -190,7 +185,7 @@ const [step, setStep] = useState(0);
 - 시각은 새 파트 없이 `Stepper.Description` 안에 `<time dateTime>` 으로 적습니다. 기계가 읽는 값과 사람이 읽는 글이 함께 남습니다.
 - `Trigger` 를 생략하면 Item 의 내용이 기본 Trigger 에 들어갑니다. `Separator` 를 생략하면 마지막이 아닌 단계 끝에 연결선(장식용 `Divider`, `<hr aria-hidden>`)이 붙습니다.
 - `Indicator`, `Title`, `Description`, `Body` 는 `asChild` 로 자식 요소에 속성을 합칩니다.
-- 모든 파트의 `className`, `style`, `children`(Separator 는 `children` 없음) 은 단계 상태 `{ index, status, current, disabled, last }` 를 받는 함수도 됩니다. `Trigger` 는 `hovered`, `focusVisible` 같은 인터랙션 상태도 받습니다.
+- `Indicator` 의 `children` 은 단계 상태를 받는 함수도 됩니다. 받는 필드는 상태 절에 있습니다.
 - `Stepper.Item` 은 `Stepper` 의 바로 아래 자식이어야 합니다. 직접 만든 컴포넌트로 감싸면 단계로 세지 않고, 개발 모드에서 경고합니다.
 
 ## 키보드
@@ -206,26 +201,41 @@ const [step, setStep] = useState(0);
 - `dir="rtl"` 에서는 `←` `→` 가 뒤집힙니다.
 - 표시 전용과 기록은 키보드로 들르지 않습니다. `Stepper.Body` 안의 링크와 버튼은 순서대로 Tab 이 멈춥니다.
 
-## 방향과 크기
+## 방향
 
 ```tsx
 <Stepper orientation="horizontal" />  // 기본. 단계 사이를 가로선이 잇는다
 <Stepper orientation="vertical" />    // 세로. 표시 아래로 선이 내려간다
-<Stepper size="tiny" />               // standard(기본) / tiny
 ```
 
 - 세로에서 제목의 첫 줄은 표시의 가운데에 맞춥니다. 제목이 여러 줄이어도 첫 줄이 표시 옆에 옵니다.
 
-## 상태와 data 속성
+## 크기
 
-| 요소                                                             | 속성                                                                                               |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| 루트                                                             | `data-stepper`, `data-orientation`, `data-size`, `data-disabled`                                   |
-| `Item`, `Indicator`, `Title`, `Description`, `Body`, `Separator` | `data-state`, `data-completed`, `data-current`, `data-upcoming`, `data-error`, `data-neutral`      |
-| `Item`                                                           | 위에 더해 `data-disabled`                                                                          |
-| `Trigger`                                                        | 위에 더해 `data-disabled`, `data-unreachable`(linear 에서 먼 단계), `data-hovered`, `data-focus-visible` |
-| `Body`                                                           | 위에 더해 `data-stepper-body`                                                                      |
-| `Content`                                                        | `data-current`                                                                                     |
+```tsx
+<Stepper size="tiny" />               // standard(기본) / tiny
+
+<div className="w-80">
+  <Stepper>...</Stepper>              {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
+</div>
+```
+
+- 가로든 세로든 부모의 너비를 다 채웁니다. 가로에서는 단계와 연결선이 그 너비를 나눠 갖습니다.
+- 높이는 내용만큼입니다.
+- 너비와 자리는 부모가 정합니다. Stepper 에는 `className` 으로 너비나 바깥 여백을 주지 않고, 간격은 부모의 `gap` 으로 둡니다.
+
+## 상태
+
+- 현재 단계는 `value` / `defaultValue` 와 `onValueChange(value)` 로 읽고 바꿉니다.
+- 단계의 `completed`, `error`, `disabled` 는 앱이 `Stepper.Item` 에 줍니다. 나머지는 순서로 정해집니다.
+- 새 디자인을 그릴 때만 상태를 받는 함수를 씁니다. `className`, `style`, `children` 이 함수를 받습니다.
+
+| 받는 곳                                                                         | 필드                                                                                    |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 루트                                                                            | `value`(기록은 `-1`), `orientation`, `disabled`, `progress`                             |
+| `Item`, `Indicator`, `Title`, `Description`, `Body`, `Separator`(children 없음) | `index`, `status`(`completed` `current` `upcoming` `error` `neutral`), `current`, `disabled`, `last` |
+| `Trigger`                                                                       | 위에 더해 `hovered`, `active`, `focused`, `focusVisible`                                |
+| `Content`                                                                       | `value`, `current`                                                                      |
 
 ## 속성
 

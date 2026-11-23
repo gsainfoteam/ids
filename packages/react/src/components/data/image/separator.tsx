@@ -5,7 +5,7 @@ import { Divider } from '../../layout/divider';
 
 export type ImageViewerSeparatorProps = Omit<
   Divider.Props,
-  'orientation' | 'decorative' | 'className' | 'children'
+  'orientation' | 'aria-hidden' | 'className' | 'children'
 > & { className?: string };
 
 export function ImageViewerSeparator({ className, ...rest }: ImageViewerSeparatorProps) {
@@ -15,7 +15,7 @@ export function ImageViewerSeparator({ className, ...rest }: ImageViewerSeparato
     <Divider
       {...rest}
       orientation="vertical"
-      decorative
+      aria-hidden
       data-image-viewer-separator=""
       className={viewer.styles.separator({ className })}
     />

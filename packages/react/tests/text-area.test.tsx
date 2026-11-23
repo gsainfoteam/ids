@@ -504,10 +504,8 @@ test.each(['ltr', 'rtl'] as const)(
             </div>
             <Resizable
               direction={mode}
-              defaultWidth={288}
-              defaultHeight={80}
               data-testid={mode}
-              className="rounded-standard inset-ring-neutral inset-ring-1"
+              className="rounded-standard inset-ring-neutral h-20 w-72 inset-ring-1"
             >
               내용
             </Resizable>
@@ -736,7 +734,7 @@ test('focus: the edge handle rings like Resizable edge handle, the field keeps i
           <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
         </TextArea>
       </div>
-      <Resizable direction="vertical" defaultWidth={288} defaultHeight={80} data-testid="box">
+      <Resizable direction="vertical" data-testid="box" className="h-20 w-72">
         내용
       </Resizable>
       <div className="w-72">

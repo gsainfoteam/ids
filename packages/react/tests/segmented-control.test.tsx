@@ -245,12 +245,8 @@ test('light: the selected segment is a card on a neutral track as tall as a cont
   await expect
     .poll(() => getComputedStyle(track).backgroundColor)
     .toBe(colorOf('--ids-color-bg-neutral-soft'));
-  expect(getComputedStyle(selected).backgroundColor).toBe(
-    colorOf('--ids-color-bg-segment'),
-  );
-  expect(getComputedStyle(selected).backgroundColor).toBe(
-    colorOf('--ids-color-bg-base'),
-  );
+  expect(getComputedStyle(selected).backgroundColor).toBe(colorOf('--ids-color-bg-segment'));
+  expect(getComputedStyle(selected).backgroundColor).toBe(colorOf('--ids-color-bg-base'));
   expect(getComputedStyle(selected).boxShadow).not.toBe('none');
   expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-text-neutral-strong'));
   expect(getComputedStyle(other).color).toBe(colorOf('--ids-color-text-neutral'));
@@ -311,11 +307,15 @@ test('an unstretched control keeps its width and follows the parent alignment', 
   expect(box.left - parent.left, 'centred by the parent').toBeCloseTo(parent.right - box.right, 0);
 });
 
-test('stretch shares the width; keyboard focus rings the segment label', async () => {
+test('w-full *:flex-1 shares the width; keyboard focus rings the segment label', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <div style={{ width: 300 }}>
-        <SegmentedControl<string> aria-label="Period" stretch defaultValue="day">
+        <SegmentedControl<string>
+          aria-label="Period"
+          className="w-full *:flex-1"
+          defaultValue="day"
+        >
           {items}
         </SegmentedControl>
       </div>

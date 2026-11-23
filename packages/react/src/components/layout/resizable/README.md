@@ -11,12 +11,16 @@
 - 여러 패널을 나누는 경계는 이 컴포넌트가 아니라 `Splitter` 입니다.
 
 ```tsx
-import { Resizable } from '@gsainfoteam/ids-react';
+import { Card, Resizable, useResizable } from '@gsainfoteam/ids-react';
 
-<Resizable defaultWidth={400} defaultHeight={240} minWidth={240} className="concentric-p-4 border">
-  내용
+const resizable = useResizable({ width: { defaultValue: 320 }, height: { defaultValue: 180 } });
+
+<Resizable resizable={resizable} asChild>
+  <Card>내용</Card>
 </Resizable>;
 ```
+
+- Resizable 은 모양이 없습니다. 테두리와 면은 크기를 바꿀 요소(`Card` 나 앱의 요소)가 그립니다.
 
 ## 방향
 
@@ -35,9 +39,9 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ## 모서리 손잡이
 
 ```tsx
-<Resizable className="rounded-none border" />           // 반지름 0: 끝이 살짝 둥근 ㄴ 자
-<Resizable className="concentric-p-4 border" />         // 16px 모서리와 같은 중심의 호
-<Resizable className="rounded-full border" />           // 알약 모양이면 높이의 절반 반지름의 호
+<Resizable asChild><div className="rounded-none border" /></Resizable>    // 반지름 0: 끝이 살짝 둥근 ㄴ 자
+<Resizable asChild><Card /></Resizable>                                   // 16px 모서리와 같은 중심의 호
+<Resizable asChild><div className="rounded-full border" /></Resizable>    // 알약 모양이면 높이의 절반 반지름의 호
 ```
 
 - 아래 가장자리를 따라 짧게 오다가, 모서리와 같은 중심의 4분의 1 원을 돌아, 끝 가장자리를 따라 짧게 올라가는 선입니다. 두께는 가장자리 막대와 같은 4px 이고 양 끝이 둥급니다.
@@ -50,57 +54,62 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 ## 크기
 
+- `asChild` 가 없으면 부모가 준 너비와 높이를 채우고, 부모보다 작아질 수 있습니다(`min-h-0 min-w-0`).
+- `asChild` 면 자식 요소의 크기를 그대로 씁니다.
+- 처음 크기, 한계, 칸 단위는 `useResizable()` 의 데이터입니다. 한 번 바꾸면 그때부터 px 크기가 부모와 CSS 의 크기를 이깁니다.
+
 ```tsx
-<Resizable defaultWidth={400} defaultHeight={240} />             // 비제어
-<Resizable width={width} onWidthChange={setWidth} />             // 제어. px 숫자
-<Resizable height={height} onHeightChange={setHeight} />
-<Resizable direction="horizontal" className="w-full" />          // 크기를 주지 않으면 CSS 크기에서 시작
+<div className="h-60 w-100">
+  <Resizable>내용</Resizable>                            {/* 처음 크기는 부모의 크기 */}
+</div>
+
+const resizable = useResizable({
+  width: { defaultValue: 400 },                          // 비제어. px 숫자
+  height: { value: height, onValueChange: setHeight },   // 제어
+});
+<Resizable resizable={resizable} />
 ```
 
-- 크기는 px 숫자이고 요소의 `style.width` `style.height` 로 들어갑니다. `className` 의 너비보다 우선합니다.
-- 크기를 주지 않으면 처음에는 CSS 크기(`w-full` 등)를 따르고, 처음 바꿀 때부터 px 크기를 가집니다.
-- `onWidthChange` `onHeightChange` 는 끌기가 끝날 때 한 번, 키를 누를 때마다 부릅니다. 끄는 도중에는 부르지 않습니다.
-- `Enter` 와 손잡이 두 번 누르기는 처음 크기로 돌아갑니다: `defaultWidth`, 없으면 처음 받은 `width`, 둘 다 없으면 CSS 크기. CSS 크기로 돌아갈 때는 그 크기를 잰 값을 알립니다.
+- 크기 말고 다른 것이 필요 없으면 훅 없이 씁니다. 처음에는 부모의 크기(`asChild` 면 자식의 CSS 크기)를 따르고, 처음 바꿀 때부터 px 크기를 가집니다.
+- 처음 크기를 숫자로 정하거나, 크기를 앱 상태로 들거나, 한계와 칸 단위를 줄 때는 `useResizable()` 의 결과를 `resizable` 로 넘깁니다. 축마다 `{ value, defaultValue, onValueChange, min, max }` 입니다.
+- 크기는 px 숫자이고 요소의 `style.width` `style.height` 로 들어갑니다.
+- `onValueChange` 는 끌기가 끝날 때 한 번, 키를 누를 때마다 부릅니다. 끄는 도중에는 부르지 않습니다.
+- `Enter` 와 손잡이 두 번 누르기는 처음 크기로 돌아갑니다: `defaultValue`, 없으면 처음 받은 `value`, 둘 다 없으면 CSS 크기. CSS 크기로 돌아갈 때는 그 크기를 잰 값을 알립니다.
 
 ## 한계
 
 ```tsx
-<Resizable minWidth={240} maxWidth={640} minHeight={120} maxHeight={480} />
-<Resizable direction="vertical" className="min-h-20 max-h-96" />   // px 인 CSS 한계도 지킨다
+const resizable = useResizable({
+  width: { min: 240, max: 640 },
+  height: { min: 120, max: 480 },
+});
+<Resizable resizable={resizable} />
 ```
 
-- 기본은 `min*` 0, `max*` 없음입니다.
-- 요소의 CSS `min-width` `max-width` `min-height` `max-height` 가 px 이면 props 한계와 함께 지킵니다. `%` 나 `min-content` 는 읽지 못하므로 props 로 줍니다.
-- `max*` 가 없으면 `End` 키는 동작하지 않고 `aria-valuemax` 도 붙지 않습니다.
+- 한계는 축마다 `min` `max`(px)입니다. 기본은 최소 0, 최대 없음입니다.
+- Resizable 은 CSS `min-width` 같은 크기 제한을 읽지 않습니다. 한계는 `useResizable()` 에만 적습니다. CSS 로 막으면 화면의 크기는 멈추지만 손잡이의 값과 `aria-valuemin` `aria-valuemax` 는 모릅니다.
+- 한계는 서버 HTML 의 `aria-valuemin` `aria-valuemax` 에도 그대로 들어갑니다.
+- 최대가 없으면 `End` 키는 동작하지 않고 `aria-valuemax` 도 붙지 않습니다.
+- 개발 중에 최소가 최대보다 크면 경고하고, 최대가 이깁니다.
 
 ## 칸 단위와 값 글자
 
 ```tsx
-<Resizable direction="vertical" step={12} />              // 높이가 12px 의 배수에 맞는다
-<Resizable
-  direction="vertical"
-  step={12}
-  getValueLabel={(size) => `${size / 48}시간`}            // aria-valuetext 를 "1.5시간"으로
-/>
+const resizable = useResizable({
+  height: { defaultValue: 96 },
+  step: 12,                                     // 높이가 12px 의 배수에 맞는다
+  getValueLabel: (size) => `${size / 48}시간`,  // aria-valuetext 를 "1.5시간"으로
+});
+<Resizable resizable={resizable} direction="vertical" />
 ```
 
 - `step` 을 주면 끄는 크기가 가장 가까운 `step` 의 배수에 맞춰집니다. 방향키는 다음 배수로, `Shift` 와 함께면 네 칸을 옮깁니다. 없으면 1px 단위로 끌고 방향키는 16px, 64px 입니다.
-- `min*` `max*` 가 배수가 아니면 한계가 이깁니다. 한계 바로 앞의 배수에서 한계로 갑니다.
+- `min` `max` 가 배수가 아니면 한계가 이깁니다. 한계 바로 앞의 배수에서 한계로 갑니다.
 - `getValueLabel(size, dimension)` 이 separator 의 `aria-valuetext` 가 됩니다. 없으면 "416px" 입니다. `aria-valuenow` 는 늘 px 입니다.
 
 ## 손잡이 바꾸기
 
 ```tsx
-<Resizable direction="horizontal">
-  내용
-  <Resizable.Handle className="inset-y-3 w-1 bg-primary-solid before:hidden" />
-</Resizable>
-
-<Resizable>
-  내용
-  <Resizable.Handle className="text-primary" />   {/* 호의 색은 글자색 */}
-</Resizable>
-
 <Resizable>
   내용
   <Resizable.Handle>
@@ -108,25 +117,22 @@ import { Resizable } from '@gsainfoteam/ids-react';
   </Resizable.Handle>
 </Resizable>
 
-<Resizable direction="vertical">
+<Resizable>
   내용
-  <Resizable.Handle asChild>
-    <div className="bg-neutral-soft" />   {/* 자식 요소가 손잡이가 된다 */}
-  </Resizable.Handle>
+  <Resizable.Handle aria-label="창 크기" />
 </Resizable>
 ```
 
 - `Resizable.Handle` 을 적으면 기본 손잡이를 그리지 않습니다. 손잡이의 종류는 `direction` 이 정합니다.
-- 모서리 손잡이의 호는 글자색(`currentColor`)으로 그립니다. `text-*` 로 쉬는 때의 색을 바꾸고, 올렸을 때와 끄는 동안은 손잡이 색(`text-neutral`)을 따릅니다.
 - 모서리 손잡이에 `children` 이나 `asChild` 를 주면 호 대신 그 표시를 모서리 안쪽 16px 상자에 그리고, 누를 영역은 그 상자 둘레 24px 입니다.
-- 가장자리 손잡이의 보이는 막대는 `before:` 로 그립니다. 막대를 지우려면 `before:hidden` 입니다.
-- `asChild` 로 합칠 때 겹치는 클래스(위치, 크기)는 손잡이 쪽이 이깁니다. 위치와 크기는 `Resizable.Handle` 의 `className` 으로 바꿉니다.
+- 모서리 손잡이의 호는 글자색(`currentColor`)으로 그립니다. 올렸을 때와 끄는 동안은 손잡이 색(`text-neutral`)을 따릅니다.
 - `aria-label` 을 주면 기본 이름("너비", "높이", "크기 조절") 대신 씁니다.
+- 손잡이의 자리, 색, 막대 모양을 바꾸는 것은 IDS 밖의 디자인입니다. 스토리 `DesignYourOwnHandle`(`custom-design`)이 그 예입니다.
 
 ## 다른 요소를 그대로
 
 ```tsx
-<Resizable asChild defaultWidth={320}>
+<Resizable resizable={resizable} asChild>
   <Card>
     <Card.Title>제목</Card.Title>
   </Card>
@@ -161,20 +167,16 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-```tsx
-<Resizable className={(state) => (state.dragging ? 'ring-2' : undefined)} />
-```
+- 크기는 `useResizable()` 의 축마다 `value` 와 `onValueChange` 로 읽습니다. 끌기가 끝날 때와 키를 누를 때 알립니다.
+- `className` 과 `style` 은 아래 상태를 받는 함수도 됩니다. IDS 밖의 디자인에만 씁니다.
 
-| 상태        | 뜻                                                 |
-| ----------- | -------------------------------------------------- |
-| `direction` | 넘긴 방향                                          |
+| 상태        | 뜻                                                     |
+| ----------- | ------------------------------------------------------ |
+| `direction` | 넘긴 방향                                              |
 | `width`     | 지금 너비(px). 서버 렌더에서 크기가 없으면 `undefined` |
-| `height`    | 지금 높이(px)                                      |
-| `dragging`  | 포인터로 끄는 중                                   |
-| `disabled`  | 비활성                                             |
-
-- 요소에는 `data-resizable`, `data-direction`, 끄는 동안 `data-dragging`, 비활성이면 `data-disabled` 가 붙습니다.
-- 손잡이에는 `data-resize-handle`, 끄는 동안 `data-dragging` 이 붙습니다.
+| `height`    | 지금 높이(px)                                          |
+| `dragging`  | 포인터로 끄는 중                                       |
+| `disabled`  | 비활성                                                 |
 
 ## 색
 
@@ -188,24 +190,24 @@ import { Resizable } from '@gsainfoteam/ids-react';
 | 속성                                  | 기본 / 동작                                           |
 | ------------------------------------- | ----------------------------------------------------- |
 | `direction`                           | `both`(기본) / `horizontal` / `vertical`              |
-| `width` / `defaultWidth`              | px. 없으면 CSS 너비                                   |
-| `height` / `defaultHeight`            | px. 없으면 CSS 높이                                   |
-| `onWidthChange` / `onHeightChange`    | `(size: number) => void`                              |
-| `minWidth` `maxWidth` `minHeight` `maxHeight` | px. 기본 0 과 없음                            |
-| `step`                                | px. 끌기와 방향키가 이 배수에 맞는다                  |
-| `getValueLabel`                       | `(size, dimension) => string`. `aria-valuetext`       |
+| `resizable`                           | `useResizable()` 의 결과. 없으면 CSS 크기, 한계 없음  |
 | `disabled`                            | 손잡이가 흐려지고 Tab 과 포인터에서 빠진다            |
 | `asChild`                             | 자식 요소 하나의 크기를 바꾼다                        |
-| `className` / `style`                 | 상태를 받는 함수도 된다                               |
+| `className` / `style`                 | 모양에만 쓴다. 상태를 받는 함수도 된다                |
 | 그 외 속성, `ref`                      | 요소로 간다. `id` 가 없으면 만들어 `aria-controls` 에 쓴다 |
 | `Resizable.Handle`                    | `asChild`, `className`, `children`, 그 외 div 속성     |
 
+| `useResizable` 옵션        | 뜻                                                        |
+| -------------------------- | --------------------------------------------------------- |
+| `width` / `height`         | `{ value, defaultValue, onValueChange, min, max }`, px    |
+| `step`                     | px. 끌기와 방향키가 이 배수에 맞는다                      |
+| `getValueLabel`            | `(size, dimension) => string`. `aria-valuetext`           |
+
 ## 알아둘 것
 
-- `min*` 이 `max*` 보다 크면 개발 빌드에서 경고하고 최댓값을 씁니다.
 - `Resizable.Handle` 을 Resizable 밖에 두면 오류입니다.
 - 요소에 `overflow-hidden` 을 주면 끝 밖으로 나온 손잡이의 절반이 잘립니다. 누를 영역이 줄고 가장자리 막대와 모서리의 호가 반만 보입니다.
-- 가장자리 손잡이의 누를 영역은 끝 선 안팎으로 12px 씩입니다. 끝에 붙은 안쪽 컨트롤(스크롤 막대 등)이 있으면 `Resizable.Handle` 의 `className` 으로 영역을 바꿉니다.
+- 가장자리 손잡이의 누를 영역은 끝 선 안팎으로 12px 씩입니다. 끝에 붙은 안쪽 컨트롤(스크롤 막대 등)과 겹칩니다.
 - 손잡이는 끌기가 필요합니다. 끌지 못하는 포인터 사용자를 위한 한 번 누르기 방법은 없습니다(WCAG 2.5.7). 키보드 조작은 있습니다.
 - 모바일 스크린 리더는 separator 값을 쓸어서 바꾸지 못합니다.
 - Resizable 안에 다른 Resizable 을 두고 안쪽에 `Resizable.Handle` 을 적으면, 바깥쪽도 손잡이가 적혀 있다고 보고 기본 손잡이를 그리지 않습니다. 바깥쪽에도 `Resizable.Handle` 을 적습니다.

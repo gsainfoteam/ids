@@ -137,6 +137,18 @@ import { Link } from '@tanstack/react-router';
 - 현재 페이지는 기본으로 `bg-primary-soft` 과 `text-on-primary-soft` 입니다. DataTable 의 선택한 행과 같은 색입니다.
 - `variant` 는 현재 페이지에만 입힙니다. `ghost` 는 채우지 않고 press 층(`state-press`)에 글자를 `text-primary` 로 바꿉니다.
 
+## 크기
+
+```tsx
+<div className="w-80">
+  <Pagination pageCount={20} />  {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
+</div>
+```
+
+- 부모의 너비를 다 채웁니다. 버튼은 시작 쪽부터 놓이고, 자리가 모자라면 다음 줄로 넘어갑니다.
+- 버튼 크기는 `size`(`standard` / `tiny`)가 정합니다.
+- 너비와 자리는 부모가 정합니다. 바깥 여백은 주지 않고, 간격은 부모의 `gap` 으로 둡니다.
+
 ## 키보드
 
 | 키              | 동작                              |

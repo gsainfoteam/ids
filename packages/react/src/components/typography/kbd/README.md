@@ -57,8 +57,22 @@ import { Kbd } from '@gsainfoteam/ids-react';
 ```tsx
 <Kbd keys="Mod+K" />                  // 방문자의 기기를 따른다
 <Kbd keys="Mod+K" platform="mac" />   // 고정. 'mac' | 'windows' | 'linux'
-<Kbd keys="Mod+K" separator=" " />    // 키 사이 표시 바꾸기. null이면 없음
 ```
+
+## 키 사이 표시
+
+```tsx
+<Kbd keys="Mod+K">
+  <Kbd.Separator>then</Kbd.Separator>
+</Kbd>
+<Kbd keys="Mod+Shift+K">
+  <Kbd.Separator />
+</Kbd>
+```
+
+- 기본은 Mac 에서 없음, 그 밖에서 `+` 입니다.
+- `keys` 가 키 여럿일 때 `Kbd.Separator` 를 자식으로 두면 키 사이마다 그것을 그립니다. 글자를 비우면 `+` 이고, Mac 에서도 그립니다.
+- 표시를 없애려면 `<Kbd.Separator hidden />` 을 둡니다.
 
 - 기기는 TanStack Hotkeys 의 `detectPlatform()` 으로 알아냅니다. `Mod` 를 푸는 기준과 같습니다.
 
@@ -75,6 +89,7 @@ import { Kbd } from '@gsainfoteam/ids-react';
 ```
 
 - 크기를 주지 않으면 `KbdGroup`, 그다음 `Field` 의 크기를 따릅니다.
+- 너비는 키 글자만큼입니다(`inline-flex`, `w-fit`). 부모를 채우지 않고, 글자 한 칸짜리 키도 높이만큼의 정사각형보다 좁아지지 않습니다.
 
 ## 읽는 이름 바꾸기
 
@@ -86,13 +101,13 @@ import { Kbd } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-| 상태          | 뜻                                       |
+- 새 디자인을 그릴 때만 `className` 에 상태를 받는 함수(`(state) => string`)를 줍니다. 받는 필드는 아래와 같습니다.
+
+| 필드          | 뜻                                       |
 | ------------- | ---------------------------------------- |
 | `size`        | 적용된 크기                              |
 | `platform`    | 그린 플랫폼. `mac` / `windows` / `linux` |
 | `combination` | 키 여러 개를 묶어 그렸다                 |
-
-- 키 칸에는 `data-kbd`, 묶음에는 `data-kbd-group`, 둘 다 `data-size` 와 `data-platform` 이 붙습니다. `+` 표시에는 `data-kbd-separator` 가 붙습니다.
 
 ## 속성
 
@@ -101,10 +116,13 @@ import { Kbd } from '@gsainfoteam/ids-react';
 | `keys`      | 단축키 문자열(`Kbd.Keys`). 없으면 `children` 을 그린다         |
 | `size`      | `standard` / `tiny`. 생략하면 KbdGroup → Field → `standard`     |
 | `platform`  | `mac` / `windows` / `linux`. 생략하면 기기를 따른다            |
-| `separator` | 키 사이 표시. Mac은 없음, 그 밖은 `+`                          |
 | `labels`    | 스크린 리더가 읽을 키 이름                                     |
 | `className` | 키 칸(묶음이면 바깥 `<kbd>`)으로 간다. 상태를 받는 함수도 된다 |
 | 그 외 속성  | `<kbd>` 로 간다                                                |
+
+| 파트            | 기본 / 동작                                              |
+| --------------- | -------------------------------------------------------- |
+| `Kbd.Separator` | `<span>`. 키 사이 표시. 글자를 비우면 `+`. 그 외 span 속성 |
 
 ## 알아둘 것
 
