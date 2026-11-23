@@ -398,7 +398,7 @@ story file adds nothing for it.
 
   `live-module.ts` turns the code into `export default function Example()`: a JSX tree becomes its
   return value, and a `render` with no parameters becomes its body. It imports each free name
-  from `@gsainfoteam/ids-react` (and its `chart`, `editor` and `rich-text` entries), `react`, the
+  from `@gsainfoteam/ids-react` (and its `chart`, `editor`, `rich-text`, `locales/ko` and `locales/en` entries), `react`, the
   four `@heroicons/react` sets, `recharts` and `@internationalized/date`, in that order; the
   last two give only PascalCase names, so a story constant named `today` is not taken for the
   function of that name. A name found in none of them (module-level data, a demo component,

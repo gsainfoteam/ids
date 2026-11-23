@@ -10,6 +10,7 @@ import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Menu, Scheduler } from '../src';
 import { skipWithoutCdp } from './engines';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import {
   allDayBarsIn,
@@ -50,8 +51,8 @@ const EVENTS: Scheduler.EventData[] = [
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
-const inProvider = (props: Partial<Scheduler.Props>) => (
-  <IdsProvider theme={testTheme}>
+const inProvider = ({ locale, ...props }: Partial<Scheduler.Props> & { locale?: string } = {}) => (
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     <Scheduler
       {...({
         'aria-label': '일정표',
@@ -985,7 +986,7 @@ test('no event box covers another, so every end handle can be grabbed', async ()
 
 test('the date popup opens under a locale whose only -u- keyword is the week start', async () => {
   const screen = await render(
-    <IdsProvider theme={testTheme} locale="ko-KR-u-fw-mon">
+    <IdsProvider theme={testTheme} locale={koreanTextIn('ko-KR-u-fw-mon')}>
       <Scheduler aria-label="일정표" events={EVENTS} defaultDate={on(17)} now={NOW} />
     </IdsProvider>,
   );

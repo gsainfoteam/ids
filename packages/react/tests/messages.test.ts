@@ -1,11 +1,14 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { IntlMessageFormat } from 'intl-messageformat';
 import { expect, test } from 'vitest';
 
-import { everyMessage } from '../src/internal/every-message';
-import { formatDefaultMessage } from '../src/internal/messages';
+import { editorMessages } from '../src/components/form/editor/messages-catalog';
+import { defineIdsLocale } from '../src/internal/locale';
+import { messageArguments } from '../src/internal/message-arguments';
+import { formatDefaultMessage, formatLocaleMessage, messages } from '../src/internal/messages';
+import { en } from '../src/locales/en';
+import { ko } from '../src/locales/ko';
 
 type Catalog = { [name: string]: string | Catalog };
 
@@ -28,57 +31,43 @@ const sortedDeep = (catalog: Catalog): Catalog =>
 
 const PACKAGE = fileURLToPath(new URL('../', import.meta.url));
 const SRC = `${PACKAGE}src/`;
+const GENERATED = ['internal/messages.ts', 'messages-catalog.ts', 'message-arguments.ts'];
+const isComponentCode = (file: string) =>
+  /\.tsx?$/.test(file) &&
+  !/\.stories\.tsx?$/.test(file) &&
+  !file.startsWith('locales/') &&
+  !GENERATED.some((generated) => file.endsWith(generated));
 
-const catalog = (file: string) =>
-  JSON.parse(readFileSync(`${PACKAGE}dist/messages/${file}`, 'utf8')) as Catalog;
-
-const koreanCatalog = catalog('ko.json');
-const englishCatalog = catalog('en.json');
+const koreanCatalog = ko.messages as Catalog;
+const englishCatalog = en.messages as Catalog;
 const korean = Object.fromEntries(leaves(koreanCatalog));
 const english = Object.fromEntries(leaves(englishCatalog));
-const keys = leaves(everyMessage).map(([key]) => key);
+const keys = Object.keys(korean);
+const ARGUMENT = /\{(\w+)\}/g;
+const argumentsOf = (message: string) => new Set([...message.matchAll(ARGUMENT)].map(([, n]) => n));
 
-const SIMPLE_ARGUMENT = 1;
-const LITERAL = 0;
-
-type Element = { type: number; value?: string; options?: Record<string, { value: Element[] }> };
-
-const argumentNames = (elements: Element[]): string[] =>
-  elements.flatMap((element) => [
-    ...(element.type !== LITERAL && element.value !== undefined ? [element.value] : []),
-    ...Object.values(element.options ?? {}).flatMap((option) => argumentNames(option.value)),
-  ]);
-
-const parse = (pattern: string, locale: string) =>
-  new IntlMessageFormat(pattern, locale).getAst() as Element[];
-
-test('ko.json is the defaults the code falls back to', () => {
-  expect(koreanCatalog).toEqual(everyMessage);
+test('the ko locale is the defaults the code falls back to', () => {
+  expect(sortedDeep(koreanCatalog)).toEqual(sortedDeep({ ...messages, ...editorMessages }));
+  expect(ko).toMatchObject({ language: 'ko', tag: 'ko-KR' });
+  expect(en).toMatchObject({ language: 'en', tag: 'en-US' });
 });
 
-test('en.json has exactly the leaf paths of the code', () => {
+test('the en locale has exactly the leaf paths of the code', () => {
   expect(Object.keys(english).sort()).toEqual([...keys].sort());
 });
 
-test('the defaults and both catalogs are sorted by group and key', () => {
-  for (const tree of [everyMessage, koreanCatalog, englishCatalog])
+test('both locales are sorted by group and key', () => {
+  for (const tree of [koreanCatalog, englishCatalog])
     expect(JSON.stringify(tree)).toBe(JSON.stringify(sortedDeep(tree)));
 });
 
-test('every string is an ICU message, and a translation takes the same arguments', () => {
+test('messages take plain arguments only, the same in every locale and in their types', () => {
   for (const key of keys) {
-    const koreanArguments = argumentNames(parse(korean[key], 'ko-KR'));
-    const englishArguments = argumentNames(parse(english[key], 'en-US'));
-    expect(new Set(englishArguments), key).toEqual(new Set(koreanArguments));
-  }
-});
-
-test('both catalogs use only plain arguments, which formatDefaultMessage fills', () => {
-  for (const key of keys) {
-    for (const element of parse(korean[key], 'ko-KR'))
-      expect([LITERAL, SIMPLE_ARGUMENT], key).toContain(element.type);
-    for (const element of parse(english[key], 'en-US'))
-      expect([LITERAL, SIMPLE_ARGUMENT], key).toContain(element.type);
+    for (const message of [korean[key], english[key]])
+      expect(message.replace(ARGUMENT, ''), key).not.toMatch(/[{}]/);
+    expect(argumentsOf(english[key]), key).toEqual(argumentsOf(korean[key]));
+    const declared = (messageArguments as Record<string, Record<string, string>>)[key] ?? {};
+    expect(argumentsOf(korean[key]), key).toEqual(new Set(Object.keys(declared)));
   }
 
   expect(formatDefaultMessage('rating.valueLabel', { value: 1200, max: 2000 })).toBe(
@@ -87,12 +76,29 @@ test('both catalogs use only plain arguments, which formatDefaultMessage fills',
   expect(formatDefaultMessage('common.removeItem', { label: '사과' })).toBe('사과 삭제');
 });
 
+test('a locale formats numbers with its tag and calls message functions with the values', () => {
+  expect(formatLocaleMessage(en, 'rating.valueLabel', { value: 1200, max: 2000 })).toBe(
+    '1,200 out of 2,000',
+  );
+  expect(formatLocaleMessage(en, 'avatarGroup.overflow', { count: 1200 }, 'de-DE')).toBe(
+    '1.200 more',
+  );
+
+  const counted = defineIdsLocale({
+    language: 'en',
+    tag: 'en-US',
+    messages: {
+      avatarGroup: { overflow: ({ count }) => (count === 1 ? 'one more' : `${count} more`) },
+    },
+    base: en,
+  });
+  expect(formatLocaleMessage(counted, 'avatarGroup.overflow', { count: 1 })).toBe('one more');
+  expect(formatLocaleMessage(counted, 'common.close')).toBe(en.messages.common.close);
+});
+
 test('every key is used by the code', () => {
   const source = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
-    .filter((file) => /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file))
-    .filter(
-      (file) => !file.endsWith('internal/messages.ts') && !file.endsWith('messages-catalog.ts'),
-    )
+    .filter(isComponentCode)
     .map((file) => readFileSync(SRC + file, 'utf8'))
     .join('\n');
 
@@ -107,10 +113,7 @@ test('every key is used by the code', () => {
 test('no Korean string is written into a component outside the defaults', () => {
   const KOREAN_STRING = /(['"`])[^'"`\n]*[ㄱ-힝][^'"`\n]*\1/;
   const withKorean = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
-    .filter((file) => /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file))
-    .filter(
-      (file) => !file.endsWith('internal/messages.ts') && !file.endsWith('messages-catalog.ts'),
-    )
+    .filter(isComponentCode)
     .filter((file) => KOREAN_STRING.test(readFileSync(SRC + file, 'utf8')));
 
   expect(withKorean).toEqual([]);

@@ -22,7 +22,6 @@ export namespace Message {
     name?: string;
     avatar?: string | ReactNode;
     time?: Date;
-    locale?: string;
     status?: MessageStatus;
     unread?: number | boolean;
     onRetry?: () => void;

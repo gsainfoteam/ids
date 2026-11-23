@@ -189,5 +189,5 @@ import { Link } from '@tanstack/react-router';
 
 - `getHref` 와 `Pagination.List` 의 함수는 함수라서 Server Component 에서 넘길 수 없습니다. 서버에서 그리는 페이지는 이 부분만 클라이언트 컴포넌트로 둡니다.
 - `aria-label` 은 필수입니다(`aria-label="페이지 탐색"`). 보이는 제목이 이름이면 그 `id` 를 `aria-labelledby` 로 줍니다. 한 화면에 페이지네이션이 둘이면 서로 다른 이름을 줍니다. 이름이 없으면 개발 모드에서 경고합니다.
-- 버튼 이름("3페이지", "이전", "다음", "첫 페이지", "마지막 페이지")은 `IdsProvider translate` 의 `pagination.page`, `common.previous`, `common.next`, `pagination.first`, `pagination.last` 키로 바꿉니다.
+- 버튼 이름("3페이지", "이전", "다음", "첫 페이지", "마지막 페이지")은 `IdsProvider locale` 의 `pagination.page`, `common.previous`, `common.next`, `pagination.first`, `pagination.last` 키로 바꿉니다.
 - 항목 수로 "41-60 / 1,000" 같은 안내를 적는 파트는 없습니다. 옆에 글자로 둡니다.

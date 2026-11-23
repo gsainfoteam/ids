@@ -324,95 +324,105 @@ function ThemeToggle() {
 
 ## 문구와 언어
 
-IDS 가 스스로 그리는 문구는 아이콘만 있는 버튼의 이름(닫기, 확대, 보내기)과 스크린 리더 안내(`3개 선택됨`, 끌기 안내)뿐이고, 기본이 한국어다. 앱의 i18n 라이브러리를 `IdsProvider` 에 한 번 꽂으면 그 언어로 바뀐다.
+IDS 가 스스로 그리는 문구는 아이콘만 있는 버튼의 이름(닫기, 확대, 보내기)과 스크린 리더 안내(`3개 선택됨`, 끌기 안내)뿐이고, 기본이 한국어다. 다른 언어는 `IdsProvider` 의 `locale` 에 locale 객체 하나를 준다.
 
 - 화면에 보이는 글(placeholder, 빈 결과, 검증 문구, 버튼 글)은 IDS 에 기본값이 없다. 앱이 part 의 children 이나 `placeholder` 로 쓴다(`<Select.Empty>검색 결과가 없습니다.</Select.Empty>`).
-- 오늘, 다음 달, 시, 분, `42%` 같은 낱말은 `locale` 로 Intl 이 만든다.
+- 오늘, 다음 달, 시, 분, `42%` 같은 낱말은 locale 의 `tag` 로 Intl 이 만든다.
 - 영역의 이름(달력, 차트, 사이드바, 일정표, 페이지 탐색)은 앱이 `aria-label` 로 준다. 주지 않으면 개발 중에 경고한다.
 
 ```tsx
-<IdsProvider translate={(key, values) => myT(`ids.${key}`, values)} locale="en-US">
+import { en } from '@gsainfoteam/ids-react/locales/en';
+
+<IdsProvider theme={theme} locale={en}>
   <App />
 </IdsProvider>
 ```
 
-- `translate(key, values)` 는 문구 하나를 돌려준다. `undefined` 나 키 그대로를 돌려주면 그 문구는 한국어 기본값으로 돌아간다.
-- `key` 는 점으로 이은 경로(`'dialog.close'`, `'textArea.remaining'`)다. 타입은 `IdsMessageKey` 로 가져온다.
-- `values` 는 문구에 끼울 값(`{ count: 3 }`)이다. 문구는 `{name}` 자리만 쓰고 복수형이 없어서, ICU 를 읽지 못하는 라이브러리도 그대로 포맷한다.
-- `locale` 은 날짜, 시간, 숫자, 국가 이름 형식에만 쓴다. 컴포넌트에 준 `locale` 이 이긴다.
-- 안쪽 `IdsProvider` 는 `translate`, `locale` 을 주지 않으면 바깥 것을 물려받고, 주면 그 안에서 바꾼다.
-- `translate` 는 함수라서, Next.js App Router 에서는 `IdsProvider` 를 감싼 클라이언트 컴포넌트에서 넘긴다.
+- locale 객체는 `{ language, tag, messages }` 다. `language` 는 문구의 언어(`'en'`), `tag` 는 날짜, 시간, 숫자, 국가 이름 형식을 정하는 BCP 47 태그(`'en-US'`, `'en-GB'`, `'ko-KR-u-fw-mon'`)다.
+- `tag` 는 `language` 로 시작해야 한다. 타입이 막고, 다른 언어의 태그면 개발 중에 한 번 경고한다.
+- IDS 는 `ko`(기본값)와 `en` 을 내보낸다(`@gsainfoteam/ids-react/locales/ko`, `/locales/en`).
+- `locale` 을 주지 않으면 한국어 문구와 `ko-KR` 형식을 쓴다.
+- 안쪽 `IdsProvider` 와 `IdsProvider.Scope` 는 `locale` 을 주면 객체 전체를 바꾸고, 주지 않으면 바깥 것을 물려받는다.
+- 형식만 바꿀 때는 객체를 펼친다. `{ ...ko, tag: 'ko-KR-u-fw-mon' }` 은 월요일에 시작하는 한국어이고, `{ ...en, language: 'de', tag: 'de-DE' }` 는 영어 문구에 독일어 날짜, 숫자 형식이다.
 
-### 카탈로그
+### 문구 값
 
-패키지가 중첩 JSON 카탈로그 두 개를 내보낸다. 앱 번역 파일의 시작점이다.
+```tsx
+const english = defineIdsLocale({
+  language: 'en',
+  tag: 'en-US',
+  messages: {
+    ...
+    avatarGroup: { overflow: ({ count }) => (count === 1 ? 'one more' : `${count} more`) },
+  },
+});
+```
+
+- 문구는 `{name}` 자리만 채우는 문자열이다. 숫자 인자는 `tag` 형식으로 쓴다(`1,200`).
+- 인자를 받는 문구는 함수여도 된다. 인자 타입이 정해져 있다(`{ count: number }`, `{ label: string }`).
+- 함수가 든 locale 은 직렬화되지 않는다. Next.js App Router 의 Server Component 에서 넘기려면 문자열만 쓴다.
+
+### 새 언어
 
 ```ts
-import ko from '@gsainfoteam/ids-react/messages/ko.json'; // 한국어 기본값과 같다
-import en from '@gsainfoteam/ids-react/messages/en.json';
+import { defineIdsLocale, type IdsMessages } from '@gsainfoteam/ids-react';
+
+const messages = {
+  common: { close: 'Fermer', ... },
+  ...
+} satisfies IdsMessages;
+
+export const fr = defineIdsLocale({ language: 'fr', tag: 'fr-FR', messages });
 ```
 
-```json
-{ "common": { "close": "Close", "removeItem": "Remove {label}" }, "dataTable": { "selected": "{count} selected" } }
+- `satisfies IdsMessages` 가 빠진 문구와 틀린 인자를 컴파일할 때 알려 준다.
+- 새 버전에서 문구가 늘면 타입 오류가 난다. 한국어로 몰래 돌아가지 않는다.
+
+### 일부만 바꾸기
+
+```ts
+import { en } from '@gsainfoteam/ids-react/locales/en';
+
+const britishEnglish = defineIdsLocale({
+  language: 'en',
+  tag: 'en-GB',
+  messages: { textArea: { remaining: 'Characters remaining: {remaining}' } },
+  base: en,
+});
 ```
 
-- 앱 카탈로그의 `ids` 아래에 그대로 붙이면 `ids.dialog.close` 로 읽힌다. 바꾸고 싶은 문구만 고친다.
-- 빠진 키는 한국어 기본값으로 나온다. 새 버전에서 문구가 늘어도 깨지지 않는다.
+- `messages` 가 일부뿐이면 `base` 가 필수다. 없는 문구는 `base` 에서, `base` 에도 없으면 그 `base` 에서 읽는다.
 
 ### next-intl
 
 ```tsx
-'use client';
+import { useLocale, useMessages } from 'next-intl';
+import { en } from '@gsainfoteam/ids-react/locales/en';
 
 export function IdsWithIntl({ children }: { children: React.ReactNode }) {
-  const t = useTranslations('ids');
-  const locale = useLocale();
-  return (
-    <IdsProvider translate={(key, values) => (t.has(key) ? t(key, values) : undefined)} locale={locale}>
-      {children}
-    </IdsProvider>
-  );
+  const tag = useLocale();
+  const { ids } = useMessages();
+  const locale = defineIdsLocale({ language: new Intl.Locale(tag).language, tag, messages: ids, base: en });
+  return <IdsProvider theme={theme} locale={locale}>{children}</IdsProvider>;
 }
 ```
 
-- `messages/en.json` 을 앱 카탈로그의 `"ids"` 아래에 둔다.
+- 앱 메시지 파일의 `"ids"` 아래에 `en.messages` 를 복사해 두고 번역한다.
+- 문구는 `{name}` 자리만 쓰므로 next-intl 의 ICU 와 같은 문법이다.
 
 ### i18next
 
 ```tsx
 export function IdsWithI18next({ children }: { children: React.ReactNode }) {
-  const { t, i18n } = useTranslation();
-  const translate: IdsTranslate = (key, values) =>
-    i18n.exists(`ids.${key}`) ? t(`ids.${key}`, values) : undefined;
-  return <IdsProvider translate={translate} locale={i18n.language}>{children}</IdsProvider>;
+  const { i18n } = useTranslation();
+  const tag = i18n.resolvedLanguage ?? 'ko-KR';
+  const messages = i18n.getResourceBundle(tag, 'ids') ?? {};
+  const locale = defineIdsLocale({ language: new Intl.Locale(tag).language, tag, messages, base: en });
+  return <IdsProvider theme={theme} locale={locale}>{children}</IdsProvider>;
 }
 ```
 
-- 리소스의 `ids` 아래에 카탈로그를 둔다. i18next 는 `{{count}}` 를 읽으므로 `interpolation: { prefix: '{', suffix: '}' }` 를 준다.
-
-### react-intl
-
-FormatJS 는 평평한 id 를 쓰므로 카탈로그를 한 번 펼친다.
-
-```tsx
-const flatten = (tree: object, prefix = ''): Record<string, string> =>
-  Object.fromEntries(
-    Object.entries(tree).flatMap(([key, value]) =>
-      typeof value === 'string' ? [[prefix + key, value]] : Object.entries(flatten(value, `${prefix}${key}.`)),
-    ),
-  );
-
-<IntlProvider locale="en" messages={{ ...flatten(en, 'ids.'), ...appMessages }}>
-  <IdsWithIntl>{children}</IdsWithIntl>
-</IntlProvider>;
-
-function IdsWithIntl({ children }: { children: React.ReactNode }) {
-  const intl = useIntl();
-  const translate: IdsTranslate = (key, values) =>
-    intl.messages[`ids.${key}`] ? intl.formatMessage({ id: `ids.${key}` }, values) : undefined;
-  return <IdsProvider translate={translate} locale={intl.locale}>{children}</IdsProvider>;
-}
-```
+- `ids` 네임스페이스에 문구를 둔다. IDS 가 직접 `{name}` 을 채우므로 i18next 의 `{{name}}` 설정은 필요 없다.
 
 ## 인터랙션 state
 

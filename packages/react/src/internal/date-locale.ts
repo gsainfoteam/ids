@@ -4,6 +4,9 @@ import { memoize, range } from 'es-toolkit';
 
 import { DEFAULT_LOCALE } from './messages';
 import { invariant } from '../utils';
+import { isDevelopment } from '../utils/dev';
+
+import type { IdsLocale } from './locale';
 
 export type HourCycle = '12h' | '24h';
 export type DatePart = 'y' | 'M' | 'd';
@@ -30,6 +33,18 @@ export function resolveLocale(locale: string = DEFAULT_LOCALE): string {
   );
 
   return canonical;
+}
+
+const reportedTags = new Set<string>();
+
+export function warnWhenTagLeavesLanguage({ language, tag }: IdsLocale) {
+  if (!isDevelopment || reportedTags.has(`${language}:${tag}`)) return;
+  reportedTags.add(`${language}:${tag}`);
+  const tagLanguage = new Intl.Locale(resolveLocale(tag)).language;
+  if (tagLanguage !== language)
+    console.warn(
+      `[IDS] IdsProvider locale: the tag "${tag}" is ${tagLanguage}, but the locale's messages are "${language}". Dates and numbers follow the tag and text follows the messages, so set both to one language.`,
+    );
 }
 
 export const dateFormatter = (locale: string, options: Intl.DateTimeFormatOptions = {}) =>

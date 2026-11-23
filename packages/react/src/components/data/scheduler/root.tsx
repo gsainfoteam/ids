@@ -48,7 +48,6 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
     date?: CalendarDate;
     defaultDate?: CalendarDate;
     onDateChange?: (date: CalendarDate) => void;
-    locale?: string;
     weekStartsOn?: WeekDay;
     now?: CalendarDateTime;
     onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
@@ -71,7 +70,6 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   date: dateProp,
   defaultDate,
   onDateChange,
-  locale,
   weekStartsOn,
   now: nowProp,
   onEventChange,
@@ -91,7 +89,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   });
 
   const providerLocale = useProviderLocale();
-  const resolvedLocale = resolveLocale(locale ?? providerLocale);
+  const resolvedLocale = resolveLocale(providerLocale);
   const weekStart = weekStartsOn ?? weekStartOf(resolvedLocale);
   const now = useNow(nowProp);
   const [firstShownDate] = useState(() => defaultDate ?? todayIn(getLocalTimeZone()));

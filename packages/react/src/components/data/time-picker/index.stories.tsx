@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { IdsProvider } from '../../utility/ids-provider';
 
 import { TimePicker } from '.';
@@ -87,7 +88,7 @@ export const Gallery: Story = {
           />
         </Showcase.Row>
         <Showcase.Row label="hour · en-US">
-          <IdsProvider.Scope locale="en-US">
+          <IdsProvider.Scope locale={en}>
             <TimePicker precision="hour" defaultValue={at(14)} aria-label="Hour only" />
           </IdsProvider.Scope>
         </Showcase.Row>
@@ -213,13 +214,13 @@ export const FollowTheLocale: Story = {
     <div className="flex flex-wrap gap-8">
       <TimePicker defaultValue={new Time(14, 30)} aria-label="한국어" />
       <TimePicker hourCycle="24h" defaultValue={new Time(14, 30)} aria-label="한국어 24시간" />
-      <IdsProvider.Scope locale="en-US">
+      <IdsProvider.Scope locale={en}>
         <TimePicker defaultValue={new Time(14, 30)} aria-label="English" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="de-DE">
+      <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
         <TimePicker defaultValue={new Time(14, 30)} aria-label="Deutsch" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="ja-JP">
+      <IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}>
         <TimePicker hourCycle="12h" defaultValue={new Time(14, 30)} aria-label="日本語" />
       </IdsProvider.Scope>
     </div>

@@ -8,6 +8,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, TimeField } from '../src';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
@@ -18,7 +19,7 @@ const option = (unit: string, n: number) =>
   col(unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
 const d = (hour = 9, minute = 30, second = 0) => new Time(hour, minute, second);
 const inLocale = (locale: string | undefined, children: ReactNode) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     {children}
   </IdsProvider>
 );

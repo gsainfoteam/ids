@@ -1,5 +1,6 @@
 import { act } from 'react';
 
+import { noop } from 'es-toolkit';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
@@ -9,6 +10,7 @@ import { render } from 'vitest-browser-react';
 import {
   Calendar,
   DateField,
+  defineIdsLocale,
   Dialog,
   IdsProvider,
   PasswordField,
@@ -17,11 +19,11 @@ import {
   TextArea,
   TimePicker,
   toast,
-  type IdsMessageKey,
-  type IdsTranslate,
+  type IdsLocale,
 } from '../src';
 import { testTheme } from './theme';
-import { english, inEnglish } from './translation-checks';
+import { inEnglish } from './translation-checks';
+import { en } from '../src/locales/en';
 
 test('open popups, fields and live regions speak the translation', async () => {
   const screen = await render(
@@ -96,13 +98,16 @@ test('ICU plurals come from the app formatter', async () => {
   await expect.element(screen.getByRole('status')).toHaveTextContent('Characters left: 2');
 });
 
-test('a key the app does not translate falls back to Korean', async () => {
-  const missing = new Set<IdsMessageKey>(['common.close', 'passwordField.show']);
-  const partial: IdsTranslate = (key, values) =>
-    key === 'passwordField.show' ? key : missing.has(key) ? undefined : english(key, values);
+test('a partial locale reads the rest from its base, not from Korean', async () => {
+  const partial = defineIdsLocale({
+    language: 'en',
+    tag: 'en-GB',
+    messages: { passwordField: { show: 'Reveal password' } },
+    base: en,
+  });
 
   const screen = await render(
-    <IdsProvider theme={testTheme} translate={partial}>
+    <IdsProvider theme={testTheme} locale={partial}>
       <Dialog defaultOpen>
         <Dialog.Content>
           <Dialog.Title>Profile</Dialog.Title>
@@ -112,16 +117,21 @@ test('a key the app does not translate falls back to Korean', async () => {
     </IdsProvider>,
   );
 
-  await expect.element(screen.getByRole('button', { name: '닫기' })).toBeInTheDocument();
-  await expect.element(screen.getByRole('button', { name: '비밀번호 표시' })).toBeInTheDocument();
+  await expect.element(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+  await expect.element(screen.getByRole('button', { name: 'Reveal password' })).toBeInTheDocument();
 });
 
-test('the nearest provider translates, and one without translate inherits it', async () => {
-  const shouting: IdsTranslate = (key, values) => english(key, values)?.toUpperCase();
+test('a nested locale replaces the whole locale, and a provider without one inherits it', async () => {
+  const shouting = defineIdsLocale({
+    language: 'en',
+    tag: 'en-US',
+    messages: { passwordField: { show: 'SHOW PASSWORD' } },
+    base: en,
+  });
 
   const screen = await render(
-    <IdsProvider theme={testTheme} translate={english}>
-      <IdsProvider theme={testTheme} translate={shouting}>
+    <IdsProvider theme={testTheme} locale={en}>
+      <IdsProvider theme={testTheme} locale={shouting}>
         <div data-testid="shouting">
           <PasswordField aria-label="Shouting" />
         </div>
@@ -142,11 +152,12 @@ test('the nearest provider translates, and one without translate inherits it', a
     .toBeInTheDocument();
 });
 
-test('the provider locale formats dates, and a nested provider locale overrides it', async () => {
+test('the locale tag formats dates, and a nested locale overrides it', async () => {
+  const german = defineIdsLocale({ language: 'de', tag: 'de-DE', messages: {}, base: en });
   const screen = await render(
-    <IdsProvider theme={testTheme} locale="en-US">
+    <IdsProvider theme={testTheme} locale={en}>
       <Calendar aria-label="Outer" />
-      <IdsProvider.Scope locale="de-DE">
+      <IdsProvider.Scope locale={german}>
         <Calendar aria-label="Nested" />
         <TimePicker aria-label="Nested time" />
       </IdsProvider.Scope>
@@ -164,6 +175,24 @@ test('the provider locale formats dates, and a nested provider locale overrides 
   await expect
     .element(screen.getByRole('group', { name: 'Nested time' }))
     .toHaveAttribute('data-hour-cycle', '24h');
+});
+
+test('a tag of another language than the messages warns once in development', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(noop);
+  const mixed = { ...en, tag: 'fr-FR' } as IdsLocale;
+
+  await render(
+    <IdsProvider theme={testTheme} locale={mixed}>
+      <PasswordField aria-label="Password" />
+      <IdsProvider.Scope locale={mixed}>
+        <PasswordField aria-label="Again" />
+      </IdsProvider.Scope>
+    </IdsProvider>,
+  );
+
+  const mismatches = warn.mock.calls.filter(([message]) => String(message).includes('"fr-FR"'));
+  expect(mismatches).toHaveLength(1);
+  warn.mockRestore();
 });
 
 test('server HTML under a translation hydrates without a mismatch', async () => {

@@ -5,8 +5,9 @@ import { expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Pagination } from '../src';
+import { defineIdsLocale, IdsProvider, Pagination } from '../src';
 import { testTheme } from './theme';
+import { en } from '../src/locales/en';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -377,17 +378,17 @@ test('out-of-range pages clamp and warn in development', async () => {
 });
 
 test('the app names the landmark and the parts follow the provider translation', async () => {
-  const english: Record<string, string> = {
-    'common.previous': 'Previous page',
-    'common.next': 'Next page',
-  };
+  const english = defineIdsLocale({
+    language: 'en',
+    tag: 'en-US',
+    messages: {
+      common: { previous: 'Previous page', next: 'Next page' },
+      pagination: { page: ({ page }) => `Page ${page}` },
+    },
+    base: en,
+  });
   await render(
-    <IdsProvider
-      theme={testTheme}
-      translate={(key, values) =>
-        key === 'pagination.page' ? `Page ${values?.page}` : english[key]
-      }
-    >
+    <IdsProvider theme={testTheme} locale={english}>
       <Pagination aria-label="Pagination" defaultPage={1} pageCount={3} />
     </IdsProvider>,
   );

@@ -11,7 +11,9 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { Menu } from '../../overlay/menu';
+import { IdsProvider } from '../../utility/ids-provider';
 import { Item } from '../item';
 
 import { Scheduler } from '.';
@@ -244,7 +246,6 @@ const meta = {
   argTypes: {
     defaultView: { control: 'radio', options: ['month', 'week', 'days', 'day'] },
     defaultDayCount: { control: { type: 'number', min: 2, max: 14 } },
-    locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP'] },
     weekStartsOn: { control: { type: 'number', min: 0, max: 6 } },
   },
   args: {
@@ -354,24 +355,26 @@ export const Gallery: Story = {
         description="요일, 날짜, 시각과 첫 요일을 locale에서 읽습니다."
       >
         <Showcase.Row label="en-US">
-          <Scheduler
-            events={EVENTS}
-            defaultDate={TODAY}
-            now={NOW}
-            locale="en-US"
-            aria-label="en-US"
-            className="h-96"
-          />
+          <IdsProvider.Scope locale={en}>
+            <Scheduler
+              events={EVENTS}
+              defaultDate={TODAY}
+              now={NOW}
+              aria-label="en-US"
+              className="h-96"
+            />
+          </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="de-DE">
-          <Scheduler
-            events={EVENTS}
-            defaultDate={TODAY}
-            now={NOW}
-            locale="de-DE"
-            aria-label="de-DE"
-            className="h-96"
-          />
+          <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
+            <Scheduler
+              events={EVENTS}
+              defaultDate={TODAY}
+              now={NOW}
+              aria-label="de-DE"
+              className="h-96"
+            />
+          </IdsProvider.Scope>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -968,12 +971,18 @@ export const ControlTheDateAndView: Story = {
 };
 
 export const ShowDatesInAnotherLocale: Story = {
-  args: { locale: 'en-US' },
+  decorators: [
+    (Story) => (
+      <IdsProvider.Scope locale={en}>
+        <Story />
+      </IdsProvider.Scope>
+    ),
+  ],
   parameters: {
     docs: {
       description: {
         story:
-          '`locale` 이 없으면 IdsProvider 의 locale 을 씁니다. 첫 요일은 locale 을 따르고 `weekStartsOn` 으로 바꿉니다.',
+          '요일, 날짜, 시각은 가장 가까운 IdsProvider 의 locale 을 따릅니다. 첫 요일은 locale 을 따르고 `weekStartsOn` 으로 바꿉니다.',
       },
     },
   },

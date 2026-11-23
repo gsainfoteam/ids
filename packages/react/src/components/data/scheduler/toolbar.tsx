@@ -95,7 +95,7 @@ export function SchedulerToolbar({
           align="start"
           className={styles.datePopup()}
         >
-          <LanguageContext value={{ ...language, locale: withWeekStart(locale, weekStartsOn) }}>
+          <LanguageContext value={{ ...language, tag: withWeekStart(locale, weekStartsOn) }}>
             <Calendar
               aria-label={t('scheduler.goToDate')}
               value={date}

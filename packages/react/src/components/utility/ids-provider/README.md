@@ -419,8 +419,7 @@ function ThemeMenu() {
 | `theme`                               | `IdsProvider` 는 필수(`IdsTheme`), `IdsProvider.Scope` 는 선택(`IdsThemeOverrides`)                  |
 | `mode` / `defaultMode`                | `light` / `dark` / `system`. 둘 다 없으면 바깥을 물려받고, 가장 바깥은 `light`                       |
 | `onModeChange`                        | 모드를 바꾸려 할 때                                                                                  |
-| `translate`                           | `(key, values) => string \| undefined`. IDS 문구를 앱의 i18n 으로 바꾼다. 없으면 바깥을 물려받는다   |
-| `locale`                              | 날짜, 시간, 숫자, 국가 이름의 BCP 47 locale. 없으면 바깥을 물려받는다. 컴포넌트의 `locale` 이 이긴다 |
+| `locale`                              | `IdsLocale` (`{ language, tag, messages }`). 문구와 날짜, 시간, 숫자 형식. 없으면 바깥을 물려받는다 |
 | `asChild`                             | 자식 요소에 속성을 붙인다                                                                            |
 | `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
@@ -429,7 +428,7 @@ function ThemeMenu() {
   - 색 키를 준 Scope 는 바깥 테마와 합친 모든 계열을 다시 씁니다
   - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
   - corner shape: `--ids-corner-shape`, `--ids-theme-corner-radius-scale`
-- `translate` 와 `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.
+- `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.
 
 ## 알아둘 것
 
