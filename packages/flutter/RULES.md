@@ -22,6 +22,8 @@ Components                     Checks
   `Navigation` `Overlay` `Typography` `Utility`.
 - 컴포넌트 노드 이름은 React 이름이다. `Divider`이고 `IdsDivider`가 아니다. React에서도
   `IdsProvider`인 것만 `IdsProvider`다.
+- `Checks`는 `isInitiallyExpanded: false`로 접힌 채 시작한다. Storybook은 검증 스토리를 태그
+  필터로 기본 숨기지만 Widgetbook에는 태그 필터가 없어서, 카테고리를 접어 두는 것으로 대신한다.
 - 파일은 `example/lib/components/<category>/<name>.dart` 하나다. 문서 트리용 컴포넌트와 검증용
   컴포넌트를 함께 내보내고, `lib/main.dart`의 `directories`에 등록한다.
 
