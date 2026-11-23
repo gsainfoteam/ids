@@ -78,18 +78,7 @@ export const Gallery: Story = {
               <BuildingOffice2Icon />
             </Avatar.Fallback>
           </Avatar>
-          <Avatar name="Design Team" className="bg-primary-solid text-on-primary-solid" />
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Custom size"
-        description="크기를 바꿔도 이니셜이 비율에 맞게 커집니다."
-      >
-        <Showcase.Row label="className">
-          <Avatar name="Alice Kim" className="size-16" />
-          <Avatar name="류현승" className="size-20" />
-          <Avatar src={PHOTO} name="Alice Kim" className="size-20" />
+          <Avatar name="Design Team" />
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -106,9 +95,6 @@ export const ReactToImageLoading: Story = {
         <Avatar
           src={src}
           name="Alice Kim"
-          className={(state) =>
-            state.status === 'loaded' ? 'ring-success-strong ring-2' : undefined
-          }
           onStatusChange={(status) => setLog((prev) => [...prev, status])}
         />
         <div className="flex gap-2">
@@ -129,7 +115,7 @@ export const ReactToImageLoading: Story = {
     docs: {
       description: {
         story:
-          '이미지 상태는 `loading` / `loaded` / `error` 입니다. 루트의 `data-status` 와 `onStatusChange`, 상태를 받는 `className` 으로 쓸 수 있습니다.',
+          '이미지 상태는 `loading` / `loaded` / `error` 입니다. `onStatusChange` 가 바뀔 때마다 알려 줍니다.',
       },
     },
   },

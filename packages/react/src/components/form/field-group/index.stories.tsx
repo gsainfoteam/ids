@@ -21,16 +21,18 @@ const meta = {
   },
   args: { orientation: 'horizontal' },
   render: (args) => (
-    <FieldGroup {...args} className="w-96">
-      <Field>
-        <Field.Label>이름</Field.Label>
-        <TextField defaultValue="김지수" />
-      </Field>
-      <Field>
-        <Field.Label>GIST 메일</Field.Label>
-        <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
-      </Field>
-    </FieldGroup>
+    <div className="w-96">
+      <FieldGroup {...args}>
+        <Field>
+          <Field.Label>이름</Field.Label>
+          <TextField defaultValue="김지수" />
+        </Field>
+        <Field>
+          <Field.Label>GIST 메일</Field.Label>
+          <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
+        </Field>
+      </FieldGroup>
+    </div>
   ),
 } satisfies Meta<typeof FieldGroup>;
 
@@ -41,16 +43,18 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <FieldGroup className="w-96">
-      <Field>
-        <Field.Label>이름</Field.Label>
-        <TextField defaultValue="김지수" />
-      </Field>
-      <Field>
-        <Field.Label>GIST 메일</Field.Label>
-        <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
-      </Field>
-    </FieldGroup>
+    <div className="w-96">
+      <FieldGroup>
+        <Field>
+          <Field.Label>이름</Field.Label>
+          <TextField defaultValue="김지수" />
+        </Field>
+        <Field>
+          <Field.Label>GIST 메일</Field.Label>
+          <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
+        </Field>
+      </FieldGroup>
+    </div>
   ),
 };
 
@@ -63,17 +67,19 @@ export const Gallery: Story = {
       >
         {orientations.map((orientation) => (
           <Showcase.Row key={orientation} label={orientation}>
-            <FieldGroup orientation={orientation} className="w-96">
-              <Field>
-                <Field.Label>이름</Field.Label>
-                <TextField defaultValue="김지수" />
-              </Field>
-              <Field>
-                <Field.Label>GIST 메일</Field.Label>
-                <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
-                <Field.Description>학교 메일로 알림을 받습니다.</Field.Description>
-              </Field>
-            </FieldGroup>
+            <div className="w-96">
+              <FieldGroup orientation={orientation}>
+                <Field>
+                  <Field.Label>이름</Field.Label>
+                  <TextField defaultValue="김지수" />
+                </Field>
+                <Field>
+                  <Field.Label>GIST 메일</Field.Label>
+                  <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
+                  <Field.Description>학교 메일로 알림을 받습니다.</Field.Description>
+                </Field>
+              </FieldGroup>
+            </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>
@@ -83,16 +89,18 @@ export const Gallery: Story = {
         description="가로 그룹 안의 세로 Field 는 두 열을 다 차지합니다."
       >
         <Showcase.Row label="vertical inside horizontal">
-          <FieldGroup orientation="horizontal" className="w-96">
-            <Field>
-              <Field.Label>이름</Field.Label>
-              <TextField defaultValue="김지수" />
-            </Field>
-            <Field orientation="vertical">
-              <Field.Label>자기소개</Field.Label>
-              <TextArea defaultValue="인포팀에서 프론트엔드를 맡고 있습니다." />
-            </Field>
-          </FieldGroup>
+          <div className="w-96">
+            <FieldGroup orientation="horizontal">
+              <Field>
+                <Field.Label>이름</Field.Label>
+                <TextField defaultValue="김지수" />
+              </Field>
+              <Field orientation="vertical">
+                <Field.Label>자기소개</Field.Label>
+                <TextArea defaultValue="인포팀에서 프론트엔드를 맡고 있습니다." />
+              </Field>
+            </FieldGroup>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -101,20 +109,22 @@ export const Gallery: Story = {
 
 export const LineUpInputsBesideTheirLabels: Story = {
   render: () => (
-    <FieldGroup orientation="horizontal" className="w-96">
-      <Field>
-        <Field.Label>이름</Field.Label>
-        <TextField defaultValue="김지수" />
-      </Field>
-      <Field>
-        <Field.Label>GIST 메일</Field.Label>
-        <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
-      </Field>
-      <Field>
-        <Field.Label>학번</Field.Label>
-        <TextField defaultValue="20250001" />
-      </Field>
-    </FieldGroup>
+    <div className="w-96">
+      <FieldGroup orientation="horizontal">
+        <Field>
+          <Field.Label>이름</Field.Label>
+          <TextField defaultValue="김지수" />
+        </Field>
+        <Field>
+          <Field.Label>GIST 메일</Field.Label>
+          <TextField defaultValue="jisu@gm.gist.ac.kr" readOnly />
+        </Field>
+        <Field>
+          <Field.Label>학번</Field.Label>
+          <TextField defaultValue="20250001" />
+        </Field>
+      </FieldGroup>
+    </div>
   ),
   parameters: {
     docs: {

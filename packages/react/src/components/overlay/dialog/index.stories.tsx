@@ -5,7 +5,6 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { overlay } from '../../../internal/overlay';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { TextField } from '../../form/text-field';
 
@@ -31,17 +30,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-const contentWidths = {
-  sm: undefined,
-  lg: cn('max-w-lg'),
-  '2xl': cn('max-w-2xl'),
-};
-
-const contentPlacements = {
-  center: undefined,
-  top: cn('mt-16 mb-auto'),
-};
 
 const bodies = {
   form: <TextField aria-label="이름" defaultValue="김지스트" />,
@@ -81,8 +69,6 @@ const footers = {
 
 type DialogPlaygroundArgs = Dialog.Props & {
   triggerLabel?: string;
-  contentWidth?: string;
-  contentPlacement?: string;
   titleText?: string;
   descriptionText?: string;
   body?: ReactNode;
@@ -94,8 +80,6 @@ export const Playground: StoryObj<DialogPlaygroundArgs> = {
   args: {
     defaultOpen: false,
     triggerLabel: '프로필 수정',
-    contentWidth: 'sm',
-    contentPlacement: 'center',
     titleText: '프로필 수정',
     descriptionText: '바꾼 내용은 저장을 눌러야 반영됩니다.',
     body: 'form',
@@ -114,20 +98,6 @@ export const Playground: StoryObj<DialogPlaygroundArgs> = {
       control: 'text',
       description: 'Dialog.Trigger 로 감싼 Button 의 글자.',
       table: { category: 'Dialog.Trigger' },
-    },
-    contentWidth: {
-      control: 'inline-radio',
-      options: Object.keys(contentWidths),
-      mapping: contentWidths,
-      description: 'Dialog.Content 의 className 으로 폭을 바꿉니다. 기본은 max-w-sm 입니다.',
-      table: { category: 'Dialog.Content' },
-    },
-    contentPlacement: {
-      control: 'inline-radio',
-      options: Object.keys(contentPlacements),
-      mapping: contentPlacements,
-      description: 'Dialog.Content 의 className 으로 위쪽에 붙입니다.',
-      table: { category: 'Dialog.Content' },
     },
     body: {
       control: 'select',
@@ -165,25 +135,12 @@ export const Playground: StoryObj<DialogPlaygroundArgs> = {
   parameters: {
     controls: { exclude: ['open', 'children'] },
   },
-  render: ({
-    triggerLabel,
-    contentWidth,
-    contentPlacement,
-    titleText,
-    descriptionText,
-    body,
-    closeButton,
-    footer,
-    ...args
-  }) => (
+  render: ({ triggerLabel, titleText, descriptionText, body, closeButton, footer, ...args }) => (
     <Dialog {...args}>
       <Dialog.Trigger asChild>
         <Button variant="outline">{triggerLabel}</Button>
       </Dialog.Trigger>
-      <Dialog.Content
-        className={cn(contentWidth, contentPlacement) || undefined}
-        aria-label={titleText ? undefined : triggerLabel}
-      >
+      <Dialog.Content aria-label={titleText ? undefined : triggerLabel}>
         {(titleText || descriptionText) && (
           <Dialog.Header>
             {titleText && <Dialog.Title>{titleText}</Dialog.Title>}
@@ -315,21 +272,8 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Size"
-        description="크기 prop 은 없습니다. 기본은 max-w-sm(384px) 이고, 폭과 높이는 className 으로 바꿉니다. 화면보다 긴 본문은 대화상자 안에서 스크롤하고, Footer 띠는 바닥에 남습니다."
+        description="크기 prop 은 없습니다. 폭은 IDS 가 정합니다(max-w-sm, 384px). 화면보다 긴 본문은 대화상자 안에서 스크롤하고, Footer 띠는 바닥에 남습니다."
       >
-        <Showcase.Row label="className">
-          <Dialog>
-            <Dialog.Trigger asChild>
-              <Button variant="outline">넓게</Button>
-            </Dialog.Trigger>
-            <Dialog.Content className="max-w-2xl">
-              <Dialog.Header>
-                <Dialog.Title>넓은 대화상자</Dialog.Title>
-                <Dialog.Description>max-w-2xl 을 줬습니다.</Dialog.Description>
-              </Dialog.Header>
-            </Dialog.Content>
-          </Dialog>
-        </Showcase.Row>
         <Showcase.Row label="긴 본문">
           <Dialog>
             <Dialog.Trigger asChild>

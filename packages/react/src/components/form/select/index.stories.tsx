@@ -307,25 +307,29 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
 
     if (!wrapInField) return <div className="w-64">{select}</div>;
     return (
-      <Field className="w-64">
-        <Field.Label>{fieldLabel}</Field.Label>
-        {select}
-        {fieldDescription && <Field.Description>{fieldDescription}</Field.Description>}
-      </Field>
+      <div className="w-64">
+        <Field>
+          <Field.Label>{fieldLabel}</Field.Label>
+          {select}
+          {fieldDescription && <Field.Description>{fieldDescription}</Field.Description>}
+        </Field>
+      </div>
     );
   },
 };
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-64">
-      <Field.Label>과일</Field.Label>
-      <Select placeholder="과일 선택">
-        <Select.Item value="apple">사과</Select.Item>
-        <Select.Item value="banana">바나나</Select.Item>
-        <Select.Item value="cherry">체리</Select.Item>
-      </Select>
-    </Field>
+    <div className="w-64">
+      <Field>
+        <Field.Label>과일</Field.Label>
+        <Select placeholder="과일 선택">
+          <Select.Item value="apple">사과</Select.Item>
+          <Select.Item value="banana">바나나</Select.Item>
+          <Select.Item value="cherry">체리</Select.Item>
+        </Select>
+      </Field>
+    </div>
   ),
 };
 
@@ -562,7 +566,7 @@ export const SubmitWithANativeForm: Story = {
           setSubmitted(JSON.stringify({ fruit: data.get('fruit'), tags: data.getAll('tags') }));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>과일</Field.Label>
           <Select name="fruit" required>
             {fruits.map(([value, label]) => (
@@ -572,7 +576,7 @@ export const SubmitWithANativeForm: Story = {
             ))}
           </Select>
         </Field>
-        <Field className="w-full">
+        <Field>
           <Field.Label>태그</Field.Label>
           <Select name="tags" selectionMode="multiple" defaultValue={['apple']}>
             {fruits.map(([value, label]) => (
@@ -721,6 +725,7 @@ const statuses = [
 ] as const;
 
 export const DrawCustomOptions: Story = {
+  tags: ['custom-design'],
   args: {
     defaultValue: 'doing',
     children: statuses.map(([value, label, dot]) => (
@@ -742,7 +747,7 @@ export const DrawCustomOptions: Story = {
     docs: {
       description: {
         story:
-          'Item 의 className 과 children 은 { selected, highlighted, disabled } 상태를 받는 함수도 됩니다. ItemIndicator 를 직접 두면 기본 체크 대신 그것을 그립니다. label 은 트리거에 보일 글자입니다.',
+          'IDS 위에 새로 그린 디자인입니다(`custom-design`). Item 의 className 과 children 은 { selected, highlighted, disabled } 상태를 받는 함수도 됩니다. ItemIndicator 를 직접 두면 기본 체크 대신 그것을 그립니다. label 은 트리거에 보일 글자입니다.',
       },
     },
   },

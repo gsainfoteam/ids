@@ -282,7 +282,7 @@ export default async function Layout({ children }) {
 
 - `inset` 은 본문을 `Sidebar.Inset` 이 그리므로 `Sidebar.Provider` 가 필요합니다. 없으면 개발 모드에서 경고합니다.
 - Provider 는 자식 JSX 에서 `Sidebar` 를 찾아 `variant` 를 읽으므로, 서버 HTML 부터 본문이 Card 입니다. `Sidebar` 를 앱의 컴포넌트로 감싸 Provider 가 찾지 못하면, 마운트 뒤 Sidebar 가 알려 준 `variant` 로 본문을 Card 로 바꿉니다.
-- 사이드바는 `sticky top-0 h-dvh` 로 화면 높이를 채우고 본문과 함께 스크롤되지 않습니다. 다른 높이는 새 디자인에서 `className` 으로 줍니다.
+- 사이드바는 `sticky top-0` 으로 화면 높이(`100dvh`)를 채우고 본문과 함께 스크롤되지 않습니다. 화면보다 작은 틀 안에 둘 때는 감싸는 요소에 `--sidebar-height` 를 줍니다(`<div className="h-80 [--sidebar-height:--spacing(80)]">`). Provider 의 최소 높이도 이 값을 따릅니다.
 - 폭은 `--sidebar-width`(기본 15rem)입니다. 사이드바가 이 값을 정하므로, 바꾸는 것은 새 디자인이고 `className` 으로 줍니다(`[--sidebar-width:18rem]`).
 
 ## Provider 와 Inset
@@ -303,7 +303,7 @@ export default async function Layout({ children }) {
 
 - Provider 는 선택입니다. 없으면 Sidebar 가 자기 상태를 갖고, 있으면 그 안 어디의 `Sidebar.Trigger` 든 같은 사이드바를 접고 엽니다.
 - 상태 prop(`collapsed`, `defaultCollapsed`, `persist`, `shortcut`)은 Provider 가 있어도 `Sidebar` 에 줍니다.
-- Provider 는 `flex min-h-dvh w-full` 인 `<div>` 입니다. 사이드바와 본문을 나란히 놓습니다.
+- Provider 는 `flex w-full` 이고 최소 높이가 `--sidebar-height`(기본 `100dvh`)인 `<div>` 입니다. 사이드바와 본문을 나란히 놓습니다.
 - 640px 아래에서 Provider 가 있으면 사이드바는 숨고, 본문의 `Sidebar.Trigger` 가 Drawer 를 엽니다. Provider 가 없으면 사이드바 자리에 Drawer 를 여는 메뉴 버튼만 남습니다.
 
 ## 좁은 화면

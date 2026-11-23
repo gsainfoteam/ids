@@ -56,10 +56,12 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-80">
-      <Field.Label>첨부 파일</Field.Label>
-      <FileDropzone />
-    </Field>
+    <div className="w-80">
+      <Field>
+        <Field.Label>첨부 파일</Field.Label>
+        <FileDropzone />
+      </Field>
+    </div>
   ),
 };
 
@@ -133,10 +135,12 @@ export const LimitTypeSizeAndCount: Story = {
     maxCount: 2,
   },
   render: (args) => (
-    <Field className="w-96">
-      <Field.Label>증빙 자료</Field.Label>
-      <FileDropzone {...args} />
-    </Field>
+    <div className="w-96">
+      <Field>
+        <Field.Label>증빙 자료</Field.Label>
+        <FileDropzone {...args} />
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {

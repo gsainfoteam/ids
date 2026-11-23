@@ -49,7 +49,6 @@ import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
 import { Card } from '../../data/card';
 import { Chip } from '../../data/chip';
-import { Item } from '../../data/item';
 import { Skeleton } from '../../feedback/skeleton';
 import { ScrollArea } from '../../layout/scroll-area';
 import { Dialog } from '../../overlay/dialog';
@@ -82,9 +81,7 @@ const meta = {
       <Sidebar {...args}>
         <Sidebar.Header>
           <CubeTransparentIcon className="size-6 shrink-0" />
-          <span className="text-body-b2-semibold truncate in-data-collapsed:hidden">
-            GIST 인포팀
-          </span>
+          <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
         </Sidebar.Header>
         <Sidebar.Group label="둘러보기">
           <Sidebar.Item value="/" href="#home">
@@ -113,32 +110,32 @@ const meta = {
           </Sidebar.Item>
         </Sidebar.Group>
         <Sidebar.Footer>
-          <Item size="tiny" variant="outline" className="in-data-collapsed:p-0">
-            <Item.Media>
-              <Avatar name="김지수" size="tiny" />
-            </Item.Media>
-            <Item.Content className="in-data-collapsed:sr-only">
-              <Item.Title>김지수</Item.Title>
-            </Item.Content>
-          </Item>
+          <Sidebar.Item href="#profile">
+            <Avatar name="김지수" size="tiny" />
+            김지수
+          </Sidebar.Item>
         </Sidebar.Footer>
       </Sidebar>
-      <Sidebar.Inset className="gap-6 p-6">
-        <div className="flex items-center gap-3">
-          <Sidebar.Trigger />
-          <h1 className="text-headline-h3-bold">게시판</h1>
+      <Sidebar.Inset>
+        <div className="flex min-h-0 flex-1 flex-col gap-6 p-6">
+          <div className="flex items-center gap-3">
+            <Sidebar.Trigger />
+            <h1 className="text-headline-h3-bold">게시판</h1>
+          </div>
+          <Skeleton loading>
+            <p className="text-body-b3-regular">
+              수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
+              시간표가 겹치지 않는지 미리 살펴 두세요.
+            </p>
+          </Skeleton>
+          <div className="grid h-64">
+            <Skeleton loading asChild>
+              <Card>
+                <Card.Title>본문</Card.Title>
+              </Card>
+            </Skeleton>
+          </div>
         </div>
-        <Skeleton loading>
-          <p className="text-body-b3-regular">
-            수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
-            시간표가 겹치지 않는지 미리 살펴 두세요.
-          </p>
-        </Skeleton>
-        <Skeleton loading asChild>
-          <Card className="h-64">
-            <Card.Title>본문</Card.Title>
-          </Card>
-        </Skeleton>
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),
@@ -164,10 +161,12 @@ export const Usage: Story = {
           </Sidebar.Item>
         </Sidebar.Group>
       </Sidebar>
-      <Sidebar.Inset className="gap-4 p-6">
-        <div className="flex items-center gap-3">
-          <Sidebar.Trigger />
-          <h1 className="text-headline-h3-bold">받은 소식</h1>
+      <Sidebar.Inset>
+        <div className="flex min-h-0 flex-1 flex-col gap-4 p-6">
+          <div className="flex items-center gap-3">
+            <Sidebar.Trigger />
+            <h1 className="text-headline-h3-bold">받은 소식</h1>
+          </div>
         </div>
       </Sidebar.Inset>
     </Sidebar.Provider>
@@ -182,91 +181,97 @@ export const Gallery: Story = {
         description="sidebar 는 가장자리에 붙고 선 하나로 나뉩니다. floating 은 사이드바가 카드로 뜨고, inset 은 본문이 카드로 뜹니다."
       >
         <Showcase.Row label="sidebar">
-          <Sidebar.Provider className="h-80 min-h-0 overflow-hidden">
-            <Sidebar value="/" shortcut={false} aria-label="sidebar 메뉴" className="h-full">
-              <Sidebar.Item value="/" href="#home">
-                <HomeIcon />홈
-              </Sidebar.Item>
-              <Sidebar.Item href="#inbox">
-                <InboxIcon />
-                받은 소식
-                <Chip variant="soft">{3}</Chip>
-              </Sidebar.Item>
-              <Sidebar.Item href="#bookmarks">
-                <BookmarkIcon />
-                북마크
-              </Sidebar.Item>
-            </Sidebar>
-            <Sidebar.Inset className="p-4">
-              <Skeleton loading asChild>
-                <Card className="h-full">
-                  <Card.Title>본문</Card.Title>
-                </Card>
-              </Skeleton>
-            </Sidebar.Inset>
-          </Sidebar.Provider>
+          <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
+            <Sidebar.Provider>
+              <Sidebar value="/" shortcut={false} aria-label="sidebar 메뉴">
+                <Sidebar.Item value="/" href="#home">
+                  <HomeIcon />홈
+                </Sidebar.Item>
+                <Sidebar.Item href="#inbox">
+                  <InboxIcon />
+                  받은 소식
+                  <Chip variant="soft">{3}</Chip>
+                </Sidebar.Item>
+                <Sidebar.Item href="#bookmarks">
+                  <BookmarkIcon />
+                  북마크
+                </Sidebar.Item>
+              </Sidebar>
+              <Sidebar.Inset>
+                <div className="flex min-h-0 flex-1 flex-col p-4">
+                  <div className="grid flex-1">
+                    <Skeleton loading asChild>
+                      <Card>
+                        <Card.Title>본문</Card.Title>
+                      </Card>
+                    </Skeleton>
+                  </div>
+                </div>
+              </Sidebar.Inset>
+            </Sidebar.Provider>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="floating">
-          <Sidebar.Provider className="h-80 min-h-0 overflow-hidden">
-            <Sidebar
-              value="/"
-              variant="floating"
-              shortcut={false}
-              aria-label="floating 메뉴"
-              className="h-full"
-            >
-              <Sidebar.Item value="/" href="#home">
-                <HomeIcon />홈
-              </Sidebar.Item>
-              <Sidebar.Item href="#inbox">
-                <InboxIcon />
-                받은 소식
-                <Chip variant="soft">{3}</Chip>
-              </Sidebar.Item>
-              <Sidebar.Item href="#bookmarks">
-                <BookmarkIcon />
-                북마크
-              </Sidebar.Item>
-            </Sidebar>
-            <Sidebar.Inset className="p-4">
-              <Skeleton loading asChild>
-                <Card className="h-full">
-                  <Card.Title>본문</Card.Title>
-                </Card>
-              </Skeleton>
-            </Sidebar.Inset>
-          </Sidebar.Provider>
+          <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
+            <Sidebar.Provider>
+              <Sidebar value="/" variant="floating" shortcut={false} aria-label="floating 메뉴">
+                <Sidebar.Item value="/" href="#home">
+                  <HomeIcon />홈
+                </Sidebar.Item>
+                <Sidebar.Item href="#inbox">
+                  <InboxIcon />
+                  받은 소식
+                  <Chip variant="soft">{3}</Chip>
+                </Sidebar.Item>
+                <Sidebar.Item href="#bookmarks">
+                  <BookmarkIcon />
+                  북마크
+                </Sidebar.Item>
+              </Sidebar>
+              <Sidebar.Inset>
+                <div className="flex min-h-0 flex-1 flex-col p-4">
+                  <div className="grid flex-1">
+                    <Skeleton loading asChild>
+                      <Card>
+                        <Card.Title>본문</Card.Title>
+                      </Card>
+                    </Skeleton>
+                  </div>
+                </div>
+              </Sidebar.Inset>
+            </Sidebar.Provider>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="inset">
-          <Sidebar.Provider className="h-80 min-h-0 overflow-hidden">
-            <Sidebar
-              value="/"
-              variant="inset"
-              shortcut={false}
-              aria-label="inset 메뉴"
-              className="h-full"
-            >
-              <Sidebar.Item value="/" href="#home">
-                <HomeIcon />홈
-              </Sidebar.Item>
-              <Sidebar.Item href="#inbox">
-                <InboxIcon />
-                받은 소식
-                <Chip variant="soft">{3}</Chip>
-              </Sidebar.Item>
-              <Sidebar.Item href="#bookmarks">
-                <BookmarkIcon />
-                북마크
-              </Sidebar.Item>
-            </Sidebar>
-            <Sidebar.Inset className="p-4">
-              <Skeleton loading asChild>
-                <Card className="h-full">
-                  <Card.Title>본문</Card.Title>
-                </Card>
-              </Skeleton>
-            </Sidebar.Inset>
-          </Sidebar.Provider>
+          <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
+            <Sidebar.Provider>
+              <Sidebar value="/" variant="inset" shortcut={false} aria-label="inset 메뉴">
+                <Sidebar.Item value="/" href="#home">
+                  <HomeIcon />홈
+                </Sidebar.Item>
+                <Sidebar.Item href="#inbox">
+                  <InboxIcon />
+                  받은 소식
+                  <Chip variant="soft">{3}</Chip>
+                </Sidebar.Item>
+                <Sidebar.Item href="#bookmarks">
+                  <BookmarkIcon />
+                  북마크
+                </Sidebar.Item>
+              </Sidebar>
+              <Sidebar.Inset>
+                <div className="flex min-h-0 flex-1 flex-col p-4">
+                  <div className="grid flex-1">
+                    <Skeleton loading asChild>
+                      <Card>
+                        <Card.Title>본문</Card.Title>
+                      </Card>
+                    </Skeleton>
+                  </div>
+                </div>
+              </Sidebar.Inset>
+            </Sidebar.Provider>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -276,39 +281,44 @@ export const Gallery: Story = {
       >
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
-            <Sidebar.Provider className="h-80 min-h-0 overflow-hidden">
-              <Sidebar
-                value="/"
-                variant={variant}
-                collapsible="icon"
-                defaultCollapsed
-                shortcut={false}
-                aria-label={`접힌 ${variant} 메뉴`}
-                className="h-full"
-              >
-                <Sidebar.Item value="/" href="#home">
-                  <HomeIcon />홈
-                </Sidebar.Item>
-                <Sidebar.Item href="#inbox">
-                  <InboxIcon />
-                  받은 소식
-                  <Chip variant="soft">{3}</Chip>
-                </Sidebar.Item>
-                <Sidebar.Item>
-                  <Cog6ToothIcon />
-                  설정
-                  <Sidebar.Item href="#account">계정</Sidebar.Item>
-                  <Sidebar.Item href="#alerts">알림</Sidebar.Item>
-                </Sidebar.Item>
-              </Sidebar>
-              <Sidebar.Inset className="p-4">
-                <Skeleton loading asChild>
-                  <Card className="h-full">
-                    <Card.Title>본문</Card.Title>
-                  </Card>
-                </Skeleton>
-              </Sidebar.Inset>
-            </Sidebar.Provider>
+            <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
+              <Sidebar.Provider>
+                <Sidebar
+                  value="/"
+                  variant={variant}
+                  collapsible="icon"
+                  defaultCollapsed
+                  shortcut={false}
+                  aria-label={`접힌 ${variant} 메뉴`}
+                >
+                  <Sidebar.Item value="/" href="#home">
+                    <HomeIcon />홈
+                  </Sidebar.Item>
+                  <Sidebar.Item href="#inbox">
+                    <InboxIcon />
+                    받은 소식
+                    <Chip variant="soft">{3}</Chip>
+                  </Sidebar.Item>
+                  <Sidebar.Item>
+                    <Cog6ToothIcon />
+                    설정
+                    <Sidebar.Item href="#account">계정</Sidebar.Item>
+                    <Sidebar.Item href="#alerts">알림</Sidebar.Item>
+                  </Sidebar.Item>
+                </Sidebar>
+                <Sidebar.Inset>
+                  <div className="flex min-h-0 flex-1 flex-col p-4">
+                    <div className="grid flex-1">
+                      <Skeleton loading asChild>
+                        <Card>
+                          <Card.Title>본문</Card.Title>
+                        </Card>
+                      </Skeleton>
+                    </div>
+                  </div>
+                </Sidebar.Inset>
+              </Sidebar.Provider>
+            </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>
@@ -318,64 +328,65 @@ export const Gallery: Story = {
         description="Header 끝에 접기 버튼이 붙고, Group 은 라벨과 목록을 묶습니다. Item 안의 Item 은 하위 메뉴, Footer 는 아래 끝에 붙습니다."
       >
         <Showcase.Row label="states">
-          <Sidebar.Provider className="h-[30rem] min-h-0 overflow-hidden">
-            <Sidebar
-              value="/settings/alerts"
-              collapsible="icon"
-              shortcut={false}
-              aria-label="파트 메뉴"
-              className="h-full"
-            >
-              <Sidebar.Header>
-                <CubeTransparentIcon className="size-6 shrink-0" />
-                <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
-              </Sidebar.Header>
-              <Sidebar.Group label="둘러보기">
-                <Sidebar.Item href="#home">
-                  <HomeIcon />홈
-                </Sidebar.Item>
-                <Sidebar.Item href="#notice" disabled>
-                  <BellIcon />
-                  알림(disabled)
-                </Sidebar.Item>
-              </Sidebar.Group>
-              <Sidebar.Group label="접히는 그룹" collapsible>
-                <Sidebar.Item href="#bookmarks">
-                  <BookmarkIcon />
-                  북마크
-                </Sidebar.Item>
-              </Sidebar.Group>
-              <Sidebar.Group label="설정">
-                <Sidebar.Item>
-                  <Cog6ToothIcon />
-                  설정
-                  <Sidebar.Item value="/settings/account" href="#account">
-                    계정
+          <div className="h-[30rem] w-full overflow-hidden [--sidebar-height:30rem]">
+            <Sidebar.Provider>
+              <Sidebar
+                value="/settings/alerts"
+                collapsible="icon"
+                shortcut={false}
+                aria-label="파트 메뉴"
+              >
+                <Sidebar.Header>
+                  <CubeTransparentIcon className="size-6 shrink-0" />
+                  <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
+                </Sidebar.Header>
+                <Sidebar.Group label="둘러보기">
+                  <Sidebar.Item href="#home">
+                    <HomeIcon />홈
                   </Sidebar.Item>
-                  <Sidebar.Item value="/settings/alerts" href="#alerts">
-                    알림
+                  <Sidebar.Item href="#notice" disabled>
+                    <BellIcon />
+                    알림(disabled)
                   </Sidebar.Item>
-                </Sidebar.Item>
-              </Sidebar.Group>
-              <Sidebar.Footer>
-                <Item size="tiny" variant="outline">
-                  <Item.Media>
+                </Sidebar.Group>
+                <Sidebar.Group label="접히는 그룹" collapsible>
+                  <Sidebar.Item href="#bookmarks">
+                    <BookmarkIcon />
+                    북마크
+                  </Sidebar.Item>
+                </Sidebar.Group>
+                <Sidebar.Group label="설정">
+                  <Sidebar.Item>
+                    <Cog6ToothIcon />
+                    설정
+                    <Sidebar.Item value="/settings/account" href="#account">
+                      계정
+                    </Sidebar.Item>
+                    <Sidebar.Item value="/settings/alerts" href="#alerts">
+                      알림
+                    </Sidebar.Item>
+                  </Sidebar.Item>
+                </Sidebar.Group>
+                <Sidebar.Footer>
+                  <Sidebar.Item href="#profile">
                     <Avatar name="김지수" size="tiny" />
-                  </Item.Media>
-                  <Item.Content>
-                    <Item.Title>김지수</Item.Title>
-                  </Item.Content>
-                </Item>
-              </Sidebar.Footer>
-            </Sidebar>
-            <Sidebar.Inset className="p-4">
-              <Skeleton loading asChild>
-                <Card className="h-full">
-                  <Card.Title>본문</Card.Title>
-                </Card>
-              </Skeleton>
-            </Sidebar.Inset>
-          </Sidebar.Provider>
+                    김지수
+                  </Sidebar.Item>
+                </Sidebar.Footer>
+              </Sidebar>
+              <Sidebar.Inset>
+                <div className="flex min-h-0 flex-1 flex-col p-4">
+                  <div className="grid flex-1">
+                    <Skeleton loading asChild>
+                      <Card>
+                        <Card.Title>본문</Card.Title>
+                      </Card>
+                    </Skeleton>
+                  </div>
+                </div>
+              </Sidebar.Inset>
+            </Sidebar.Provider>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -417,16 +428,20 @@ export const UseRouterLinks: Story = {
             </Sidebar.Item>
           </Sidebar.Group>
         </Sidebar>
-        <Sidebar.Inset className="gap-4 p-6">
-          <div className="flex items-center gap-3">
-            <Sidebar.Trigger />
-            <h1 className="text-headline-h3-bold">{pathname}</h1>
+        <Sidebar.Inset>
+          <div className="flex min-h-0 flex-1 flex-col gap-4 p-6">
+            <div className="flex items-center gap-3">
+              <Sidebar.Trigger />
+              <h1 className="text-headline-h3-bold">{pathname}</h1>
+            </div>
+            <div className="grid h-64">
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>본문</Card.Title>
+                </Card>
+              </Skeleton>
+            </div>
           </div>
-          <Skeleton loading asChild>
-            <Card className="h-64">
-              <Card.Title>본문</Card.Title>
-            </Card>
-          </Skeleton>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -715,14 +730,16 @@ export const BuildAWorkspaceTree: Story = {
           </Sidebar.Item>
         </Sidebar.Footer>
       </Sidebar>
-      <Sidebar.Inset className="p-6">
-        <Card>
-          <ScrollArea orientation="horizontal">
-            <pre className="text-body-b3-regular font-mono">
-              <code>{TREE_CODE}</code>
-            </pre>
-          </ScrollArea>
-        </Card>
+      <Sidebar.Inset>
+        <div className="flex min-h-0 flex-1 flex-col p-6">
+          <Card>
+            <ScrollArea orientation="horizontal">
+              <pre className="text-body-b3-regular font-mono">
+                <code>{TREE_CODE}</code>
+              </pre>
+            </ScrollArea>
+          </Card>
+        </div>
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),
@@ -798,14 +815,16 @@ export const ReorderFavorites: Story = {
             )}
           </Sidebar.Group>
         </Sidebar>
-        <Sidebar.Inset className="p-6">
-          <Card>
-            <ScrollArea orientation="horizontal">
-              <pre className="text-body-b3-regular font-mono">
-                <code>{FAVORITES_CODE}</code>
-              </pre>
-            </ScrollArea>
-          </Card>
+        <Sidebar.Inset>
+          <div className="flex min-h-0 flex-1 flex-col p-6">
+            <Card>
+              <ScrollArea orientation="horizontal">
+                <pre className="text-body-b3-regular font-mono">
+                  <code>{FAVORITES_CODE}</code>
+                </pre>
+              </ScrollArea>
+            </Card>
+          </div>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -915,14 +934,16 @@ export const MoveChannelsBetweenCategories: Story = {
             }
           </Sidebar.Group>
         </Sidebar>
-        <Sidebar.Inset className="p-6">
-          <Card>
-            <ScrollArea orientation="horizontal">
-              <pre className="text-body-b3-regular font-mono">
-                <code>{CHANNELS_CODE}</code>
-              </pre>
-            </ScrollArea>
-          </Card>
+        <Sidebar.Inset>
+          <div className="flex min-h-0 flex-1 flex-col p-6">
+            <Card>
+              <ScrollArea orientation="horizontal">
+                <pre className="text-body-b3-regular font-mono">
+                  <code>{CHANNELS_CODE}</code>
+                </pre>
+              </ScrollArea>
+            </Card>
+          </div>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -1042,21 +1063,23 @@ export const ConfirmBeforeMovingAPage: Story = {
             onItemsChange={async (next, { item, to }) => {
               const place = to.parent ? `"${to.parent.label}" 안` : '맨 위';
               const confirmed = await overlay.open<boolean>(({ close }) => (
-                <Dialog>
-                  <Dialog.Content className="break-keep">
-                    <Dialog.Header>
-                      <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
-                      <Dialog.Description>
-                        &quot;{item.label}&quot; 페이지가 {place}의 {to.index + 1}번째 자리로
-                        옮겨집니다.
-                      </Dialog.Description>
-                    </Dialog.Header>
-                    <Dialog.Footer>
-                      <Dialog.Close>취소</Dialog.Close>
-                      <Button onClick={() => close(true)}>옮기기</Button>
-                    </Dialog.Footer>
-                  </Dialog.Content>
-                </Dialog>
+                <div className="break-keep">
+                  <Dialog>
+                    <Dialog.Content>
+                      <Dialog.Header>
+                        <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
+                        <Dialog.Description>
+                          &quot;{item.label}&quot; 페이지가 {place}의 {to.index + 1}번째 자리로
+                          옮겨집니다.
+                        </Dialog.Description>
+                      </Dialog.Header>
+                      <Dialog.Footer>
+                        <Dialog.Close>취소</Dialog.Close>
+                        <Button onClick={() => close(true)}>옮기기</Button>
+                      </Dialog.Footer>
+                    </Dialog.Content>
+                  </Dialog>
+                </div>
               ));
               if (confirmed) setPages(next);
             }}
@@ -1070,14 +1093,16 @@ export const ConfirmBeforeMovingAPage: Story = {
             )}
           </Sidebar.Group>
         </Sidebar>
-        <Sidebar.Inset className="p-6">
-          <Card>
-            <ScrollArea orientation="horizontal">
-              <pre className="text-body-b3-regular font-mono">
-                <code>{PAGES_CODE}</code>
-              </pre>
-            </ScrollArea>
-          </Card>
+        <Sidebar.Inset>
+          <div className="flex min-h-0 flex-1 flex-col p-6">
+            <Card>
+              <ScrollArea orientation="horizontal">
+                <pre className="text-body-b3-regular font-mono">
+                  <code>{PAGES_CODE}</code>
+                </pre>
+              </ScrollArea>
+            </Card>
+          </div>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -1169,14 +1194,16 @@ export const BuildAFileTree: Story = {
             }
           </Sidebar.Group>
         </Sidebar>
-        <Sidebar.Inset className="p-6">
-          <Card>
-            <ScrollArea orientation="horizontal">
-              <pre className="text-body-b3-regular font-mono">
-                <code>{FILES_CODE}</code>
-              </pre>
-            </ScrollArea>
-          </Card>
+        <Sidebar.Inset>
+          <div className="flex min-h-0 flex-1 flex-col p-6">
+            <Card>
+              <ScrollArea orientation="horizontal">
+                <pre className="text-body-b3-regular font-mono">
+                  <code>{FILES_CODE}</code>
+                </pre>
+              </ScrollArea>
+            </Card>
+          </div>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -1204,16 +1231,20 @@ export const OpenAsADrawerOnPhones: Story = {
           게시판
         </Sidebar.Item>
       </Sidebar>
-      <Sidebar.Inset className="gap-4 p-4">
-        <div className="flex items-center gap-3">
-          <Sidebar.Trigger />
-          <h1 className="text-headline-h3-bold">홈</h1>
+      <Sidebar.Inset>
+        <div className="flex min-h-0 flex-1 flex-col gap-4 p-4">
+          <div className="flex items-center gap-3">
+            <Sidebar.Trigger />
+            <h1 className="text-headline-h3-bold">홈</h1>
+          </div>
+          <div className="grid h-64">
+            <Skeleton loading asChild>
+              <Card>
+                <Card.Title>본문</Card.Title>
+              </Card>
+            </Skeleton>
+          </div>
         </div>
-        <Skeleton loading asChild>
-          <Card className="h-64">
-            <Card.Title>본문</Card.Title>
-          </Card>
-        </Skeleton>
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),
