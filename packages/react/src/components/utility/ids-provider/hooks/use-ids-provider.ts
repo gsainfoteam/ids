@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  use,
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { createContext, use, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { noop } from 'es-toolkit';
 
@@ -112,7 +105,9 @@ export function useInternalIdsProvider({
     setInherited: parent.setMode,
   });
 
-  const prefersDark = useInternalMediaQuery(ownsMode && currentMode === 'system' ? DARK_QUERY : null);
+  const prefersDark = useInternalMediaQuery(
+    ownsMode && currentMode === 'system' ? DARK_QUERY : null,
+  );
   const resolvedMode: IdsMode = !ownsMode
     ? parent.resolvedMode
     : currentMode === 'system'

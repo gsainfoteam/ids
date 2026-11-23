@@ -2,7 +2,6 @@ import type { KeyboardEvent } from 'react';
 
 import { isComposingKey } from '../../../../internal/lib/keys';
 
-
 const HAS_SCHEME = /^[a-z][a-z\d+.-]*:/i;
 const STAYS_ON_THIS_SITE = /^[/#?]/;
 
