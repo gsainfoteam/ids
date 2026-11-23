@@ -1,11 +1,11 @@
 'use client';
 
-import { use, useEffect } from 'react';
+import { use } from 'react';
 
 import { useInternalTranslate } from '../../../../internal/translate';
-import { isDevelopment } from '../../../../utils/dev';
 import { Slider } from '../../../form/slider';
 import { PickerDefaultsContext, useInternalPicker } from '../context';
+import { useInternalAlphaSliderPlacementWarning } from '../hooks/use-alpha-slider-placement-warning';
 import { cssColor } from '../lib/color';
 import { CHECKER, GRADIENT_DIRECTION, overChecker } from '../lib/gradient';
 
@@ -17,12 +17,7 @@ export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.Slid
   const c = useInternalPicker('ColorPicker.AlphaSlider');
   const hiddenFromTheRoot = !c.alpha && use(PickerDefaultsContext).alpha === undefined;
 
-  useEffect(() => {
-    if (!isDevelopment || !hiddenFromTheRoot) return;
-    console.warn(
-      '[IDS] ColorPicker.AlphaSlider: ColorPicker turns the alpha channel on when it finds an AlphaSlider among its children, and it cannot see one rendered inside your own component. Write <ColorPicker.AlphaSlider /> in the JSX under <ColorPicker>.',
-    );
-  }, [hiddenFromTheRoot]);
+  useInternalAlphaSliderPlacementWarning(hiddenFromTheRoot);
 
   if (!c.alpha) return null;
   const { color, rgba } = c.picker.state;
