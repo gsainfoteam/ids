@@ -306,7 +306,7 @@ const stop = onViewportChange(win, () => {
 
 ### 왜 이렇게
 
-- `max-width` 는 경계값을 포함하므로 media query 는 `DRAWER_BELOW - 0.02`(`639.98px`)로 적어 640px 을 뺍니다.
+- `max-width` 는 경계값을 포함하므로 media query 는 `DRAWER_BELOW - 0.02`(`639.98px`)로 적어 640px 을 뺍니다. `matchMedia` 가 없으면 `false` 로 보고 popover 를 씁니다.
 - 화면 키보드는 visual viewport 만 줄이고 fixed 요소가 쓰는 layout viewport 는 그대로 둡니다. 키보드가 덮는 만큼(`coveredByKeyboard`) sheet 를 올립니다.
 
 ## hooks/use-drawer-presentation.ts
