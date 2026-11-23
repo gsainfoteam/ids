@@ -11,7 +11,7 @@ export function ItemSeparator({ className, ...props }: ItemSeparatorProps) {
   const inGroup = use(ItemGroupContext) !== null;
   if (inGroup)
     return (
-      <Divider asChild decorative data-item-separator="" className={className}>
+      <Divider asChild aria-hidden data-item-separator="" className={className}>
         <li />
       </Divider>
     );

@@ -97,7 +97,7 @@ export function SidebarAccordionSubmenu({
         </Accordion.Header>
         <Accordion.Content className="p-0">
           <div className={sidebar.styles.subTree()}>
-            <Divider orientation="vertical" decorative />
+            <Divider orientation="vertical" aria-hidden />
             <SidebarFoldedContext value={folded || !open}>
               <SidebarListContext value>
                 <ul className={sidebar.styles.subList()}>{parts.subItems}</ul>

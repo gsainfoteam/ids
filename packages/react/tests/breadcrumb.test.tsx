@@ -94,12 +94,17 @@ test('puts a hidden separator between crumbs and none after the last', async () 
     .forEach((separator) => expect(separator).toHaveAttribute('aria-hidden', 'true'));
 });
 
-test('separator replaces the chevron, and written Separators turn the automatic ones off', async () => {
+const slashed = (labels: string[]) =>
+  crumbs(labels).flatMap((crumb, index) =>
+    index === 0
+      ? [crumb]
+      : [<Breadcrumb.Separator key={`/${index}`}>/</Breadcrumb.Separator>, crumb],
+  );
+
+test('written Separators replace the chevron and turn the automatic ones off', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb separator="/" aria-label="slashes">
-        {crumbs(['Home', 'Docs', 'Page'])}
-      </Breadcrumb>
+      <Breadcrumb aria-label="slashes">{slashed(['Home', 'Docs', 'Page'])}</Breadcrumb>
       <Breadcrumb aria-label="written">
         <Breadcrumb.List>
           <Breadcrumb.Item>
@@ -195,6 +200,22 @@ test('maxItems keeps the first and the last maxItems - 1 crumbs and folds the re
   expect(navigate).toHaveBeenCalledExactlyOnceWith('/components');
   await expect.element(screen.getByRole('menu')).not.toBeInTheDocument();
   await expect.element(more).toHaveFocus();
+});
+
+test('maxItems folds a trail with written Separators and drops the separators of hidden crumbs', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Breadcrumb maxItems={3}>
+        {slashed(['Home', 'Docs', 'Components', 'Navigation', 'Page'])}
+      </Breadcrumb>
+    </IdsProvider>,
+  );
+
+  const nav = screen.getByRole('navigation').element();
+  expect(visibleTrail(nav)).toEqual(['Home', '>', '...', '>', 'Navigation', '>', 'Page']);
+  expect(
+    [...nav.querySelectorAll('ol > [data-breadcrumb-separator]')].map((item) => item.textContent),
+  ).toEqual(['/', '/', '/']);
 });
 
 test('maxItems leaves a trail that already fits, and an Ellipsis written by hand', async () => {

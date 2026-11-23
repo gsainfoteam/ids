@@ -19,23 +19,8 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/feedback/spinner/index.stories.tsx',
   'components/feedback/toast/index.stories.tsx',
   'components/form/editor/index.stories.tsx',
-  'components/layout/aspect-ratio/index.stories.tsx',
-  'components/layout/divider/index.stories.tsx',
-  'components/layout/message-scroller/index.stories.tsx',
-  'components/layout/resizable/index.stories.tsx',
   'components/layout/scroll-area/index.stories.tsx',
-  'components/layout/spacer/index.stories.tsx',
-  'components/layout/splitter/index.stories.tsx',
-  'components/navigation/breadcrumb/index.stories.tsx',
-  'components/navigation/pagination/index.stories.tsx',
-  'components/navigation/stepper/index.stories.tsx',
-  'components/navigation/tabs/index.stories.tsx',
-  'components/typography/highlight/index.stories.tsx',
-  'components/typography/kbd/index.stories.tsx',
-  'components/typography/label/index.stories.tsx',
-  'components/typography/link/index.stories.tsx',
   'components/utility/ids-provider/index.stories.tsx',
-  'components/utility/slot/index.stories.tsx',
 ]);
 
 const BASIC = ['Playground', 'Usage', 'Gallery'];

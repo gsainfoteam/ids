@@ -325,10 +325,10 @@ test('development warnings name a trigger without content, content without a tri
     ]);
 });
 
-test('a stretched list shares its width between horizontal tabs', async () => {
+test('*:flex-1 on the list shares its width between horizontal tabs', async () => {
   const screen = await render(
     <Tabs defaultValue="a" className="w-80">
-      <Tabs.List aria-label="Sort" stretch>
+      <Tabs.List aria-label="Sort" className="*:flex-1">
         <Tabs.Trigger value="a">A</Tabs.Trigger>
         <Tabs.Trigger value="b">Longer label</Tabs.Trigger>
       </Tabs.List>

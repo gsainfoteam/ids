@@ -27,12 +27,16 @@ function collapseMiddle(nodes: ReactNode[], maxItems: number) {
   if (items.length <= maxItems || hidden.length === 0) return nodes;
 
   const hiddenSet = new Set(hidden);
+  const dropped = new Set(
+    nodes.filter((node, index) => hiddenSet.has(nodes[index + 1]) && isSeparator(node)),
+  );
+  dropped.delete(nodes[nodes.indexOf(hidden[0]) - 1]);
 
   return nodes.flatMap<ReactNode>((node) => {
     if (node === hidden[0])
       return [<BreadcrumbEllipsis key="collapsed">{hidden}</BreadcrumbEllipsis>];
 
-    return hiddenSet.has(node) ? [] : [node];
+    return hiddenSet.has(node) || dropped.has(node) ? [] : [node];
   });
 }
 
@@ -50,11 +54,10 @@ function separateCrumbs(nodes: ReactNode[]) {
 }
 
 function arrange(nodes: ReactNode[], maxItems: number | undefined) {
-  if (nodes.some(isSeparator)) return nodes;
-
   const collapses = maxItems !== undefined && !nodes.some(isEllipsis);
+  const collapsed = collapses ? collapseMiddle(nodes, maxItems) : nodes;
 
-  return separateCrumbs(collapses ? collapseMiddle(nodes, maxItems) : nodes);
+  return nodes.some(isSeparator) ? collapsed : separateCrumbs(collapsed);
 }
 
 export function BreadcrumbList({ className, children, ...props }: BreadcrumbListProps) {

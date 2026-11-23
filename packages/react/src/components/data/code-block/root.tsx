@@ -98,7 +98,7 @@ export function CodeBlockRoot({
             {showLanguage && <span className={styles.language()}>{language}</span>}
           </figcaption>
         )}
-        {hasCaption && <Divider decorative className={styles.divider()} />}
+        {hasCaption && <Divider aria-hidden className={styles.divider()} />}
         {copy ?? <CodeBlockCopy />}
         <ScrollArea orientation="horizontal" className={styles.scroller()}>
           <ScrollArea.Viewport asChild>

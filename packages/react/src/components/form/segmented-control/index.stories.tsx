@@ -31,7 +31,6 @@ const meta = {
   argTypes: {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
-    stretch: { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     required: { control: 'boolean' },
@@ -92,7 +91,7 @@ export const Gallery: Story = {
         />
       </Showcase.Section>
 
-      <Showcase.Section title="Content">
+      <Showcase.Section title="Content" description="트랙은 칸 내용 폭만큼만 차지합니다.">
         <Showcase.Row label="icon + text">
           <SegmentedControl defaultValue="list" aria-label="보기">
             <SegmentedControl.Item value="list">
@@ -121,19 +120,6 @@ export const Gallery: Story = {
               <CalendarDaysIcon />
             </SegmentedControl.Item>
           </SegmentedControl>
-        </Showcase.Row>
-        <Showcase.Row label="stretch">
-          <div className="w-80">
-            <SegmentedControl<Period> stretch defaultValue="day" aria-label="늘인 기간">
-              {({ Item }) =>
-                periods.map((period) => (
-                  <Item key={period.value} value={period.value}>
-                    {period.label}
-                  </Item>
-                ))
-              }
-            </SegmentedControl>
-          </div>
         </Showcase.Row>
       </Showcase.Section>
 

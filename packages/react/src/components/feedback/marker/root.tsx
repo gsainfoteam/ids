@@ -55,18 +55,18 @@ export function MarkerRoot({
   const drawn =
     variant === 'separator' ? (
       <>
-        <Divider asChild decorative className={line()}>
+        <Divider asChild aria-hidden className={line()}>
           <span />
         </Divider>
         {body}
-        <Divider asChild decorative className={line()}>
+        <Divider asChild aria-hidden className={line()}>
           <span />
         </Divider>
       </>
     ) : variant === 'underline' ? (
       <>
         {body}
-        <Divider asChild decorative>
+        <Divider asChild aria-hidden>
           <span />
         </Divider>
       </>

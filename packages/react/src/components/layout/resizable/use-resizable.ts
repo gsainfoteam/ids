@@ -2,43 +2,41 @@
 
 import { useEffect, useState } from 'react';
 
-import { flushSync } from 'react-dom';
-
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import {
-  measureAxis,
-  useMeasuredAxes,
-  type ResizeAxis,
-  type ResizeDimension,
-} from '../../../internal/resize-handle';
 import { isDevelopment } from '../../../utils/dev';
 
-type SizeOptions = {
-  value: number | undefined;
-  defaultValue: number | undefined;
-  onChange: ((size: number) => void) | undefined;
-  min: number;
-  max: number;
+import type { ResizeDimension } from '../../../internal/resize-handle';
+
+export type ResizableAxisOptions = {
+  value?: number;
+  defaultValue?: number;
+  onValueChange?: (size: number) => void;
+  min?: number;
+  max?: number;
 };
 
 export type UseResizableOptions = {
-  width: SizeOptions;
-  height: SizeOptions;
-  step: number | undefined;
-  getValueLabel: ((size: number, dimension: ResizeDimension) => string) | undefined;
-  controls: string;
+  width?: ResizableAxisOptions;
+  height?: ResizableAxisOptions;
+  step?: number;
+  getValueLabel?: (size: number, dimension: ResizeDimension) => string;
 };
 
-function useSize({ value, defaultValue, onChange }: SizeOptions) {
-  const [size, setSize] = useControllableState<number | undefined>({
-    value,
-    defaultValue,
-    onValueChange: onChange as ((size: number | undefined) => void) | undefined,
-  });
-  const [resetTo] = useState(defaultValue ?? value);
+export type ResizableAxis = {
+  size: number | undefined;
+  setSize: (size: number | undefined, options?: { silent?: boolean }) => void;
+  resetTo: number | undefined;
+  min: number;
+  max: number;
+  onValueChange: ((size: number) => void) | undefined;
+};
 
-  return { size, setSize, resetTo };
-}
+export type ResizableInstance = {
+  width: ResizableAxis;
+  height: ResizableAxis;
+  step: number | undefined;
+  getValueLabel: ((size: number, dimension: ResizeDimension) => string) | undefined;
+};
 
 function useWarnWhenBoundsCross(dimension: ResizeDimension, min: number, max: number) {
   useEffect(() => {
@@ -49,49 +47,32 @@ function useWarnWhenBoundsCross(dimension: ResizeDimension, min: number, max: nu
   }, [dimension, min, max]);
 }
 
+function useAxis(
+  dimension: ResizeDimension,
+  { value, defaultValue, onValueChange, min = 0, max = Infinity }: ResizableAxisOptions = {},
+): ResizableAxis {
+  const [size, setSize] = useControllableState<number | undefined>({
+    value,
+    defaultValue,
+    onValueChange: onValueChange as ((size: number | undefined) => void) | undefined,
+  });
+  const [resetTo] = useState(defaultValue ?? value);
+
+  useWarnWhenBoundsCross(dimension, min, max);
+
+  return { size, setSize, resetTo, min, max, onValueChange };
+}
+
 export function useResizable({
   width,
   height,
   step,
   getValueLabel,
-  controls,
-}: UseResizableOptions) {
-  const [element, setElement] = useState<HTMLElement | null>(null);
-  const sizes = { width: useSize(width), height: useSize(height) };
-  const measured = useMeasuredAxes({ width: element, height: element });
-
-  useWarnWhenBoundsCross('width', width.min, width.max);
-  useWarnWhenBoundsCross('height', height.min, height.max);
-
-  const axisOf = (dimension: ResizeDimension, options: SizeOptions): ResizeAxis => {
-    const { size, setSize, resetTo } = sizes[dimension];
-    const drawn = measured[dimension];
-
-    return {
-      dimension,
-      target: element,
-      size: size ?? drawn?.size,
-      min: Math.max(options.min, drawn?.min ?? 0),
-      max: Math.min(options.max, drawn?.max ?? Infinity),
-      controls,
-      step,
-      valueLabel: getValueLabel && ((value) => getValueLabel(value, dimension)),
-      resize: (next) => setSize(next),
-      reset: () => {
-        if (resetTo !== undefined) return setSize(resetTo);
-        if (size === undefined || !element) return;
-
-        flushSync(() => setSize(undefined, { silent: true }));
-        options.onChange?.(measureAxis(element, dimension).size);
-      },
-    };
-  };
-
+}: UseResizableOptions = {}): ResizableInstance {
   return {
-    element,
-    setElement,
-    width: sizes.width.size,
-    height: sizes.height.size,
-    axes: { width: axisOf('width', width), height: axisOf('height', height) },
+    width: useAxis('width', width),
+    height: useAxis('height', height),
+    step,
+    getValueLabel,
   };
 }

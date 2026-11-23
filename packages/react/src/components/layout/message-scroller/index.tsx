@@ -15,7 +15,6 @@ export namespace MessageScroller {
 
   export type Props = ComponentProps<'div'> & {
     onReachStart?: () => void;
-    loading?: boolean;
     stickToBottom?: boolean;
     scrollOnAppend?: ScrollOnAppend;
   };
