@@ -24,8 +24,8 @@ package.json, pubspec.yaml   ─┘   (valibot 검사)   (IR + ir.schema.json)
   - `src/targets/ts/emit.ts`: `react/src/tokens` 의 `types.ts`, `color-roles.ts`, `component-tokens.ts`, `palette-model.ts`(아래 "TS 타깃").
   - `src/targets/ts/foundations.ts`: 스토리가 읽는 `react/src/tokens/foundations.json`. JSON 을 Prettier 로 정리해 쓴다.
   - `src/targets/output.ts`: `targets.json` 의 `outputs` 에서 출력 경로를 찾고, 그 파일 자리의 Prettier 설정으로 정리해 쓴다.
+  - `dart/`: `flutter/lib/tokens/*.dart`(아래 "Dart 타깃"). `src/targets/dart/run.ts` 가 `dart run` 으로 부른다.
   - `src/fonts/copy.ts`: IR 의 `fonts.bundled` 대로 Flutter 글꼴을 복사한다.
-  - `src/legacy/`: 이전 Style Dictionary 포매터를 IR 에서 먹인다. `from-ir.ts` 가 IR 을 이전 입력 모양으로 바꾸고, 출력은 이전 파이프라인과 바이트가 같다. Dart emitter 가 이 폴더를 대신한다.
 - 문구는 아직 `messages.build.mjs` 가 따로 만든다(아래 "문구 카탈로그").
 
 ## 원본
@@ -87,6 +87,7 @@ tests/fixtures/theme-roles.json  ids-react 가 쓴 역할 색. Flutter 테스트
 | `react/src/tokens/palette-model.ts` | palette-model, palette 의 상태 색 |
 | `react/src/tokens/foundations.json` | spacing, size, radius, motion, typography. Foundations 스토리가 읽는다 |
 | `flutter/lib/tokens/*.dart` | 위와 같은 표의 Dart 판(`IdsColors`, `IdsStateOpacity`, `IdsComponentColors`, `IdsTypography`, `IdsPaletteModel` …) |
+| `core/dart/lib/src/ir_model.dart` | `ir.schema.json`. Dart emitter 가 읽는 IR 모델 |
 | `flutter/fonts/*` | fonts, `node_modules` 의 글꼴 패키지 |
 | `core/ir.schema.json` | IR 스키마 |
 
@@ -211,6 +212,30 @@ src/targets/css/
 - 그림자 문자열(`0 1px 2px 0 #0000000d`)은 CSS 타깃의 값 노드(`shadowValue`)를 그대로 직렬화한다.
 - 출력 경로는 `targets.ts.outputs` 의 `types`, `colorRoles`, `componentTokens`, `paletteModel` 이다.
 
+## Dart 타깃
+
+`dart/` 는 Dart 패키지(`ids_codegen`, 배포하지 않음)다. `code_builder` 로 선언 노드를 만들고 `dart_style` 로 정리한다.
+
+```
+dart/
+  bin/model.dart          ir.schema.json → lib/src/ir_model.dart
+  bin/emit.dart           out/ir.json → flutter/lib/tokens/*.dart
+  lib/src/model/          JSON Schema 를 읽어 Dart 클래스로 바꾼다
+  lib/src/targets/        출력 파일마다 emitter 하나(enums, color_roles, motion, component_tokens, typography, palette_model)
+  lib/src/targets/literals.dart  Dart 가 적는 값의 철자(Color(0xAARRGGBB), 정수로 떨어지는 숫자)
+```
+
+- 한 번의 `pnpm codegen` 이 두 단계를 차례로 부른다. 모델을 먼저 다시 쓰므로 IR 스키마가 바뀌면 emitter 는 새 모델로 컴파일된다.
+- IR 모델은 `ir.schema.json` 에서 만든다.
+  - 객체는 `final class` 와 `fromJson`, `$defs` 는 그 이름(`Name`, `Role`), 안쪽 객체는 경로 이름(`IrColorFamilyGroupsItem`)이다.
+  - `oneOf` 는 `kind` 로 고르는 `sealed class` 와 변형(`LineHeightLength`, `LineHeightMultiplier`)이다. emitter 는 `switch` 패턴으로 읽는다.
+  - 문자열 `enum` 은 Dart `enum`, `anyOf [X, null]` 과 `required` 에 없는 속성은 nullable, `additionalProperties` 는 `Map<String, X>` 다.
+  - 스키마에 Dart 모델로 옮길 수 없는 모양이 오면 생성이 실패한다.
+- 클래스와 멤버 이름은 `targets.dart.symbols` 에서 IR 이 만든 `dart.type`, `dart.member` 다. 출력 경로는 `targets.dart.outputs` 다.
+- 파일 사이 import 는 출력 경로로 계산하고, 정리 규칙의 언어 버전은 `flutter/pubspec.yaml` 의 `environment.sdk` 하한이다.
+- 이름이나 값을 문자열로 잇지 않는다. 철자는 `literals.dart` 에만 둔다. 오류 메시지는 예외다.
+- Dart SDK 가 필요하다. CI 는 `dart-lang/setup-dart` 로 Flutter 3.44.0 과 같은 Dart 3.12.0 을 쓰고, `dart analyze --fatal-infos` 로 이 패키지를 검사한다.
+
 ## 토큰 종류 더하기
 
 1. `tokens/<종류>.tokens.json` 을 DTCG 로 쓴다. 그룹에 `$type` 을 둔다.
@@ -223,7 +248,7 @@ src/targets/css/
 
 1. `config/targets.json` 의 `targets` 에 manifest 경로, `names`(쓰임마다 `case`, `prefixed`), `symbols`, `outputs` 를 적는다.
 2. `src/sources/config.ts` 의 `TargetsConfigSchema` 와 `src/ir/schema.ts` 의 `NameSchema`, `TargetsSchema`, `PackagesSchema` 에 그 타깃을 더한다.
-3. `src/targets/<타깃>/` 에 emitter 를 둔다. IR 만 읽고, 문자열을 이어 붙이지 않고 그 언어의 AST 나 builder 로 만든다.
+3. `src/targets/<타깃>/` 에 emitter 를 둔다. IR 만 읽고, 문자열을 이어 붙이지 않고 그 언어의 AST 나 builder 로 만든다. 그 언어로 쓴 emitter 는 Dart 타깃처럼 `out/ir.json` 을 읽는다.
 4. `src/codegen.ts` 에서 부르고, CI 의 생성 파일 diff 목록에 출력 경로를 더한다.
 
 ## 테스트
@@ -235,7 +260,7 @@ pnpm --filter @gsainfoteam/ids-core typecheck  # tsc6
 
 - `tests/ir.test.ts`:
   - IR 이 커밋된 `ir.schema.json` 과 같은 스키마로 만들어지고, `ir.json` 이 그 JSON Schema 를 통과하는지(ajv) 본다.
-  - IR 에서 만든 모든 생성 파일이 커밋된 파일과 바이트가 같은지 본다.
+  - IR 에서 만든 모든 생성 파일이 커밋된 파일과 바이트가 같은지 본다. Dart 출력과 IR 모델은 `dart run … --print` 로 받는다.
   - 원본 오류가 파일과 키, 토큰을 짚는지 본다.
 - `tests/css.test.ts`:
   - 생성된 `ids.css` 를 Tailwind(`@tailwindcss/node`, 버전 고정)로 컴파일한 결과가 `tests/__snapshots__/ids.compiled.css` 와 같은지 본다. utility 목록은 테스트와 IR(scheme, concentric)에서 온다.
@@ -246,8 +271,10 @@ pnpm --filter @gsainfoteam/ids-core typecheck  # tsc6
 
 ```bash
 pnpm codegen                                    # 루트에서
-pnpm --filter @gsainfoteam/ids-core build       # 이 패키지만
+pnpm --filter @gsainfoteam/ids-core codegen     # 이 패키지만
 ```
+
+- `pnpm build` 는 codegen 을 돌리지 않는다. 생성 파일은 커밋되어 있고, CI 가 `pnpm codegen` 뒤 diff 로 확인한다.
 
 ## 데모 팔레트
 

@@ -28,6 +28,9 @@ every emitter, then the message generation). Edits will be overwritten.
 - `packages/react/src/tokens/types.ts` (with `color-roles.ts`, `component-tokens.ts` and `palette-model.ts`, built as TypeScript factory nodes by `packages/core/src/targets/ts`)
 - `packages/react/src/tokens/palette-model.ts` and
   `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/config/palette-model.json`)
+- `packages/flutter/lib/tokens/*.dart`, built with `code_builder` by the Dart package
+  `packages/core/dart` from `out/ir.json`, and that package's own IR model
+  `packages/core/dart/lib/src/ir_model.dart`, generated from `packages/core/ir.schema.json`
 - `packages/react/src/tokens/component-tokens.ts` and
   `packages/flutter/lib/tokens/ids_component_tokens.dart` (`IdsComponentColors`,
   `IdsComponentShadows`), written from `packages/core/config/component-tokens.json` and
@@ -73,7 +76,9 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 **core** — Token source of truth. `src/sources` reads the DTCG tokens (`@terrazzo/parser`) and the
 `config/*.json` tables (valibot), `src/ir` builds one typed IR, and the emitters read only the IR
 and spell names as the IR gives them. Output goes directly to sibling packages. No build artifact.
-`pnpm build` in core = `tsx src/codegen.ts` and the message generation.
+`pnpm codegen` = `tsx src/codegen.ts` and the message generation; `pnpm build` does not run it,
+since every generated file is committed. The Dart target is a Dart package (`packages/core/dart`)
+that `codegen.ts` runs with `dart run`, so codegen and the core tests need the Dart SDK.
 
 **css** — Pure CSS package. No React dependency. Consumers import `@gsainfoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
 
