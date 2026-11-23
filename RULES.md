@@ -254,33 +254,29 @@ tests and maintainers. ids_flutter's Widgetbook carries the same layers over to 
 (`packages/flutter/RULES.md`), so a change to a layer here changes it there in the same commit.
 
 1. **Basic**, first in the file and in exactly this order:
-   - `Playground`: every prop and part a reader would try, as a control (draft, prototyped on
-     Button, Select and Dialog):
-     - `render` takes the args and writes the tree out, so Show code and the Code tab print the
-       exact composition the controls picked. It adds no `key` and no Fragment of its own:
-       Show code prints a top-level `key` and every Fragment as `<React.Fragment>`. A value a
-       mapping gives as several elements is an array.
+   - `Playground`: the root's props as controls, so a reader can try each value. Every Docs
+     page opens with a live editor (see Live code), so a control Playground is not required to
+     show every composition. Button, Select and Dialog go further, and a file may follow them:
+     - `render` takes the args and writes the tree out, so Show code prints the exact
+       composition the controls picked. It adds no `key` and no Fragment of its own: Show code
+       prints a top-level `key` and every Fragment as `<React.Fragment>`. The one `key` is for a
+       control that switches a prop the root reads only on mount (Select's `selectionMode`,
+       whose value type changes with it): it remounts on that prop alone (`key="multiple"`). A
+       value a mapping gives as several elements is an array.
      - A value a control cannot type (an icon, children, a set of parts, a `className`) is a
-       string option `mapping`ed to the JSX or class (`leadingIcon: PlusIcon`, `items: groups`,
-       `contentWidth: lg`). The JSX keeps the names a reader writes (`<PlusIcon />`, not
-       `React.forwardRef`), which `.storybook/preview.tsx` resolves for Show code.
-     - An arg that goes to a part, not the root, is named for the part (`titleText`,
-       `contentPlacement`, `fieldLabel`) and every arg sits under `table.category`: the root's
-       props by kind (`Look`, `State`, `Value`), a part's by the part (`Dialog.Content`).
-     - `controls.include` (or `exclude`) leaves out what a reader cannot set from a control, and
-       a control that only matters with another one shows with `if` (`href` with `asChild`,
-       `defaultValue` with `selectionMode`). Callbacks stay `fn()` so they reach Actions.
+       string option `mapping`ed to the JSX or class (`leadingIcon: PlusIcon`, `items: groups`).
+       Show code prints the names a reader writes (`<PlusIcon />`, not `React.forwardRef`).
+     - An arg that goes to a part is named for the part (`titleText`, `fieldLabel`) and sits under
+       that part's `table.category` (`Dialog.Content`).
+     - `controls.include` leaves out what a control cannot set, and `if` shows a control only
+       with the one it depends on (`href` with `asChild`). Callbacks stay `fn()`.
      - A `default*` prop takes effect on the next mount: the reader presses Remount. Storybook's
        `jsx.skip`, which would hide a remounting wrapper, prints the wrapper anyway (10.3.1).
    - `Usage`: the smallest real use, written inline in `render` with no `args` (a Select inside a
-     `Field` with its label, a ButtonGroup of three buttons). It may carry a `play`.
+     `Field` with its label, a ButtonGroup of three buttons). It may carry a `play`. The Docs
+     page's live editor starts from it, so it reads only names it can import (see Live code).
    - `Gallery`: **required.** Every variant, size and state on one screen, built from the
      `Showcase` kit so all galleries read alike. Import it as `~story-kit`.
-   - `LiveCode` (draft, optional, right after `Gallery`): `liveCodeStory({ id, code,
-     description })` from `~live-code`. `code` is a Usage-sized module with real imports from
-     `@gsainfoteam/ids-react` and `@heroicons/react/*`; the reader edits it in the
-     Live code editor panel, and `LiveCodeDocsPage` puts the same editor at the top of the Docs
-     page (see Live code).
 2. **Examples**: one story per task a reader wants to do, named for that task
    (`ShowProgressWhileSaving`, `BuildASplitButton`, `GroupTogglesInAToolbar`; not `Loading`,
    `Separator` or `Mixed`). Each sets `parameters.docs.description.story`, which says what the
@@ -294,26 +290,8 @@ tests and maintainers. ids_flutter's Widgetbook carries the same layers over to 
 ```tsx
 import { Showcase } from '~story-kit';
 
-const leadingIcons = { none: undefined, PlusIcon: <PlusIcon />, TrashIcon: <TrashIcon /> };
-
-export const Playground: StoryObj<Button.Props & { leadingIcon?: ReactNode }> = {
-  args: { leadingIcon: 'none' },
-  argTypes: {
-    leadingIcon: {
-      control: 'select',
-      options: Object.keys(leadingIcons),
-      mapping: leadingIcons,
-      table: { category: 'Content' },
-    },
-    focusableWhenDisabled: { if: { arg: 'disabled' }, table: { category: 'State' } },
-  },
-  parameters: { controls: { include: ['children', 'leadingIcon', 'variant', 'disabled'] } },
-  render: ({ leadingIcon, children, ...args }) => (
-    <Button {...args}>
-      {leadingIcon}
-      {children}
-    </Button>
-  ),
+export const Playground: Story = {
+  args: { children: '저장' },
 };
 
 export const Usage: Story = {
@@ -398,35 +376,54 @@ alone when no icon fits it. The icon comes from the set the file already imports
 `Menu.CheckboxItem` in a group of such items takes an icon too; a menu of only checkbox and radio
 items stays bare, since their check or dot sits at the end and marks them already.
 
-## Live code (draft)
+## Live code
 
-`LiveCode` stories let a reader edit a Usage-sized module and see it render, prototyped on Button,
-Select and Dialog.
+Every component's Docs page opens with a live editor: the reader edits a module and sees it render
+above the code. `.storybook/preview.tsx` sets `parameters.docs.page` to `LiveCodeDocsPage`, so a
+story file adds nothing for it.
 
 - **Editor.** `storybook-addon-code-editor` (Monaco, with Babel standalone evaluating the module),
   a devDependency used only by `.storybook`, so `dist` and `.size-limit.json` do not change.
-  Monaco's files are served from `staticDirs` and load only when an editor opens.
-- **Two places.** The story's Live code editor panel, beside Controls, and the top of the Docs
-  page (`LiveCodeDocsPage` as `parameters.docs.page`): the story's canvas, then the editor. Both
-  share the code by `id`, and both preview under the theme decorator, so the toolbar's theme and
-  mode apply. A `LiveCode` story carries `tags: ['!autodocs']`, so the Docs page's Stories list
-  leaves it out.
-- **Imports.** The module imports from `@gsainfoteam/ids-react` (every export of `src/index.ts`)
-  and the four `@heroicons/react` sets, and default-exports the component to render.
-- **Types.** Monaco reads `dist/**/*.d.ts` when `pnpm build` ran before Storybook started:
-  completion lists prop values and a wrong one is an error. Without `dist`, it checks syntax only.
+  Monaco's files are served from `staticDirs` and load only when a Docs page opens. Storybook's
+  addon panel is not used: it needs a `liveCodeEditor` parameter in every story file.
+- **Starter code.** `live-code-docs.tsx` takes the first of these that becomes a module, and keeps
+  it while the page stays open:
+  1. the `Usage` story's Show code;
+  2. the first story's Show code, which for an args `Playground` is the tree the controls drew;
+  3. each example's source, in file order, verification stories left out.
+
+  `live-module.ts` turns the code into `export default function Example()`: a JSX tree becomes its
+  return value, and a `render` with no parameters becomes its body. It imports each free name
+  from `@gsainfoteam/ids-react` (and its `chart`, `editor` and `rich-text` entries), `react`, the
+  four `@heroicons/react` sets, `recharts` and `@internationalized/date`, in that order; the
+  last two give only PascalCase names, so a story constant named `today` is not taken for the
+  function of that name. A name found in none of them (module-level data, a demo component,
+  `useForm`) rules that candidate out. A Docs page with no candidate left has no editor: today
+  Field's zod page, Scheduler, Splitter and IdsProvider.
+
+- **Usage is the starter.** Write `Usage` with literal values and imported names only, so the
+  editor starts from the smallest real use. `tests/live-code.ssr.test.tsx` turns every `Usage`
+  into its module and renders it on the server; one that reads a module-level name is skipped with
+  that reason, and its Docs page starts from the next candidate.
+- **Theme.** The preview renders inside the same `IdsStoryFrame` as the theme decorator, with the
+  toolbar's globals read from the Docs context, so palette and mode apply.
+- **Types.** `pnpm storybook` runs `tsc -p tsconfig.build.json` first, so Monaco reads
+  `dist/**/*.d.ts`: completion lists prop values and a wrong one is an error. `recharts` and
+  `@internationalized/date` are typed `any` in the editor.
 - **Server-safe.** The addon reads `window` and the docs blocks read `document` when imported, so
-  `live-code.tsx` loads the addon with `import()` and the blocks through `lazy`. A `LiveCode`
-  story renders nothing on the server and then its preview on the client, so the SSR, hydration and
-  translation checks run it like any story; no tag excludes it.
-- **Tailwind.** The preview starts `@tailwindcss/browser` (pinned to the `tailwindcss` version)
+  `live-code.tsx` loads the page through `lazy`, and the addon loads with `import()`. Story
+  rendering does not change, so the SSR, hydration and translation checks are unaffected.
+- **Tailwind.** The Docs page starts `@tailwindcss/browser` (pinned to the `tailwindcss` version)
   on `tailwindcss/theme.css`, `tailwindcss/utilities.css` and `@gsainfoteam/ids-css/no-fonts.css`,
   with no preflight, so a class the reader types (`w-[333px]`, `-rotate-2`) and an IDS utility the
-  build never saw both get CSS. It stays on until the preview reloads and builds every class in the
-  page again, in the same layers: on the Button, Select, Dialog and Card galleries, light and dark,
-  no computed style changed.
-- **Known gaps.** Opening the panel before the addon has loaded leaves it blank until another tab
-  is opened and closed. Edits live until the page reloads.
+  build never saw (`concentric-p-7`) both get CSS. It stays on until the page reloads and builds
+  every class in the page again, in the same layers: on the Button, Select, Dialog and Card
+  galleries, light and dark, no computed style changed.
+- **Limits.** Edits live until the page reloads. A value Show code cannot print as code (a
+  `CalendarDate` prints as `{2026-09-15}`) makes that candidate fail to parse.
+- **Storybook only.** The live editor and the richer control Playground are Storybook's Docs
+  page. ids_flutter's Widgetbook keeps its use case order (`packages/flutter/RULES.md`) and has
+  no live editor, so a change here changes nothing there.
 
 ## Blocks
 
