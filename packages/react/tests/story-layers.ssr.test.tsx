@@ -32,7 +32,6 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/feedback/alert/index.stories.tsx',
   'components/feedback/marker/index.stories.tsx',
   'components/feedback/progress/index.stories.tsx',
-  'components/feedback/skeleton/index.stories.tsx',
   'components/feedback/spinner/index.stories.tsx',
   'components/feedback/toast/index.stories.tsx',
   'components/form/checkbox-group/index.stories.tsx',
@@ -165,9 +164,6 @@ for (const file of files) {
   }
 
   test(`${file} is on the three layers`, () => {
-    expect(
-      layerProblems(module, source),
-      `${file} breaks the story layers`,
-    ).toEqual([]);
+    expect(layerProblems(module, source), `${file} breaks the story layers`).toEqual([]);
   });
 }

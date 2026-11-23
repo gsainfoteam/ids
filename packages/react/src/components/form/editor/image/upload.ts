@@ -16,7 +16,7 @@ export type StartUploads = (editor: TiptapEditor, files: File[], at: number) => 
 
 const uploads = new PluginKey<DecorationSet>('idsImageUploads');
 
-const skeleton = skeletonStyle({ shape: 'rect', animation: 'pulse' });
+const skeleton = skeletonStyle({ animation: 'pulse', wrapping: 'div', loading: true });
 const UPLOAD_PLACEHOLDER = skeleton.root({
   className: cn(skeleton.paint(), editorStyle().uploadPlaceholder()),
 });

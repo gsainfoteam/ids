@@ -128,8 +128,17 @@ const meta = {
           <Sidebar.Trigger />
           <h1 className="text-headline-h3-bold">게시판</h1>
         </div>
-        <Skeleton shape="text" lines={3} />
-        <Skeleton className="h-64" />
+        <Skeleton loading>
+          <p className="text-body-b3-regular">
+            수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
+            시간표가 겹치지 않는지 미리 살펴 두세요.
+          </p>
+        </Skeleton>
+        <Skeleton loading asChild>
+          <Card className="h-64">
+            <Card.Title>본문</Card.Title>
+          </Card>
+        </Skeleton>
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),
@@ -164,7 +173,11 @@ export const Gallery: Story = {
               </Sidebar.Item>
             </Sidebar>
             <Sidebar.Inset className="p-4">
-              <Skeleton className="h-full" />
+              <Skeleton loading asChild>
+                <Card className="h-full">
+                  <Card.Title>본문</Card.Title>
+                </Card>
+              </Skeleton>
             </Sidebar.Inset>
           </Sidebar.Provider>
         </Showcase.Row>
@@ -191,7 +204,11 @@ export const Gallery: Story = {
               </Sidebar.Item>
             </Sidebar>
             <Sidebar.Inset className="p-4">
-              <Skeleton className="h-full" />
+              <Skeleton loading asChild>
+                <Card className="h-full">
+                  <Card.Title>본문</Card.Title>
+                </Card>
+              </Skeleton>
             </Sidebar.Inset>
           </Sidebar.Provider>
         </Showcase.Row>
@@ -218,7 +235,11 @@ export const Gallery: Story = {
               </Sidebar.Item>
             </Sidebar>
             <Sidebar.Inset className="p-4">
-              <Skeleton className="h-full" />
+              <Skeleton loading asChild>
+                <Card className="h-full">
+                  <Card.Title>본문</Card.Title>
+                </Card>
+              </Skeleton>
             </Sidebar.Inset>
           </Sidebar.Provider>
         </Showcase.Row>
@@ -256,7 +277,11 @@ export const Gallery: Story = {
                 </Sidebar.Item>
               </Sidebar>
               <Sidebar.Inset className="p-4">
-                <Skeleton className="h-full" />
+                <Skeleton loading asChild>
+                  <Card className="h-full">
+                    <Card.Title>본문</Card.Title>
+                  </Card>
+                </Skeleton>
               </Sidebar.Inset>
             </Sidebar.Provider>
           </Showcase.Row>
@@ -319,7 +344,11 @@ export const Gallery: Story = {
               </Sidebar.Footer>
             </Sidebar>
             <Sidebar.Inset className="p-4">
-              <Skeleton className="h-full" />
+              <Skeleton loading asChild>
+                <Card className="h-full">
+                  <Card.Title>본문</Card.Title>
+                </Card>
+              </Skeleton>
             </Sidebar.Inset>
           </Sidebar.Provider>
         </Showcase.Row>
@@ -368,7 +397,11 @@ export const RouterLinks: Story = {
             <Sidebar.Trigger />
             <h1 className="text-headline-h3-bold">{pathname}</h1>
           </div>
-          <Skeleton className="h-64" />
+          <Skeleton loading asChild>
+            <Card className="h-64">
+              <Card.Title>본문</Card.Title>
+            </Card>
+          </Skeleton>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -1080,7 +1113,11 @@ export const MobileDrawer: Story = {
           <Sidebar.Trigger />
           <h1 className="text-headline-h3-bold">홈</h1>
         </div>
-        <Skeleton className="h-64" />
+        <Skeleton loading asChild>
+          <Card className="h-64">
+            <Card.Title>본문</Card.Title>
+          </Card>
+        </Skeleton>
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),

@@ -6,6 +6,7 @@ import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
+import { Badge } from '../../data/badge';
 import { Card } from '../../data/card';
 import { Item } from '../../data/item';
 import { ItemGroup } from '../../data/item-group';
@@ -14,22 +15,37 @@ import { Skeleton } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const shapes = ['rect', 'circle', 'text'] as const;
 const animations = ['pulse', 'wave', 'none'] as const;
-const members = ['김지스트', '이인포', '박팀장'];
+const wrappings = ['div', 'asChild'] as const;
+const members = [
+  { name: '김지스트', team: '인포팀 프론트엔드' },
+  { name: '이인포', team: '인포팀 디자인' },
+  { name: '박팀장', team: '인포팀 팀장' },
+];
 
 const meta = {
   title: 'Feedback/Skeleton',
   component: Skeleton,
   tags: ['autodocs'],
   argTypes: {
-    shape: { control: 'radio', options: shapes },
-    lines: { control: { type: 'number', min: 1, max: 6 } },
     animation: { control: 'radio', options: animations },
-    loading: { control: false },
+    loading: { control: 'boolean' },
     asChild: { control: false },
+    children: { control: false },
   },
-  args: { shape: 'text', lines: 3, animation: 'pulse' },
+  args: {
+    loading: true,
+    animation: 'pulse',
+    className: 'max-w-sm',
+    children: (
+      <Card>
+        <Card.Header>
+          <Card.Title>2026 가을 학기 공지</Card.Title>
+          <Card.Description>수강 신청 일정과 유의 사항을 확인하세요.</Card.Description>
+        </Card.Header>
+      </Card>
+    ),
+  },
 } satisfies Meta<typeof Skeleton>;
 
 export default meta;
@@ -37,136 +53,93 @@ type Story = StoryObj<typeof meta>;
 
 const heightOf = (element: Element) => element.getBoundingClientRect().height;
 
-export const Playground: Story = {
-  render: (args) => <Skeleton {...args} className="text-body-b3-regular max-w-sm" />,
+export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Skeleton loading className="max-w-sm">
+      <Card>
+        <Card.Header>
+          <Card.Title>2026 가을 학기 공지</Card.Title>
+          <Card.Description>수강 신청 일정과 유의 사항을 확인하세요.</Card.Description>
+        </Card.Header>
+      </Card>
+    </Skeleton>
+  ),
 };
 
 export const Gallery: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
-        title="Shape × Animation"
-        description="rect 는 16px 높이에 너비를 채우고, circle 은 Avatar 와 같은 40px, text 는 글자 스타일의 줄 높이를 따릅니다."
+        title="Wrapping × Animation"
+        description="div 는 감싼 자식의 크기 그대로 standard 모서리로 칠하고, asChild 는 자식 요소를 직접 칠해 그 모서리를 지킵니다."
       >
         <Showcase.Matrix
-          rows={shapes}
+          rows={wrappings}
           columns={animations}
-          render={(shape, animation) =>
-            shape === 'circle' ? (
-              <Skeleton shape="circle" animation={animation} />
-            ) : (
-              <Skeleton
-                shape={shape}
-                animation={animation}
-                lines={2}
-                className="text-body-b3-regular w-40"
-              />
-            )
-          }
+          render={(wrapping, animation) => (
+            <Skeleton loading animation={animation} asChild={wrapping === 'asChild'}>
+              <Card className="w-48">
+                <Card.Title>학기 공지</Card.Title>
+                <Card.Description>9월 1일 오전 10시</Card.Description>
+              </Card>
+            </Skeleton>
+          )}
         />
         <Showcase.Row label="wave, rtl">
-          <div dir="rtl" className="w-40">
-            <Skeleton animation="wave" />
+          <div dir="rtl" className="w-48">
+            <Skeleton loading animation="wave">
+              <p className="text-body-b3-regular">수강 신청은 9월 1일에 열립니다.</p>
+            </Skeleton>
           </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section
-        title="Text"
-        description="줄마다 그 글자 스타일의 줄 높이 한 칸에 1em 막대를 그립니다. 여러 줄이면 마지막 줄은 60% 입니다."
+        title="Loading"
+        description="끝나면 속성과 클래스만 빠지고 같은 구조에서 자식이 보입니다."
       >
-        <Showcase.Row label="body-b2 semibold" className="items-start">
-          <Skeleton shape="text" className="text-body-b2-semibold w-48" />
-          <p className="text-body-b2-semibold w-48">학기 공지</p>
+        <Showcase.Row label="loading" className="items-start">
+          <Skeleton loading className="w-48">
+            <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+          </Skeleton>
         </Showcase.Row>
-        <Showcase.Row label="body-b3 × 3" className="items-start">
-          <Skeleton shape="text" lines={3} className="text-body-b3-regular w-48" />
-          <p className="text-body-b3-regular w-48">
-            수강 신청은
-            <br />
-            9월 1일 오전 10시에
-            <br />
-            열립니다.
-          </p>
-        </Showcase.Row>
-        <Showcase.Row label="caption-c1 × 2" className="items-start">
-          <Skeleton shape="text" lines={2} className="text-caption-c1-regular w-48" />
-          <p className="text-caption-c1-regular w-48">
-            인포팀
-            <br />
-            3분 전
-          </p>
+        <Showcase.Row label="loading={false}" className="items-start">
+          <Skeleton loading={false} className="w-48">
+            <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+          </Skeleton>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section
-        title="Composition"
-        description="카드와 행 모양은 모양을 합성해서 만듭니다. 불러오는 영역에는 앱이 aria-busy 를 둡니다."
+        title="Components"
+        description="인라인 컴포넌트는 asChild 로 칠해서 그 크기와 모서리를 그대로 씁니다."
       >
-        <Showcase.Row label="Card" className="items-start">
-          <Card className="w-80">
-            <div className="flex items-center gap-3">
-              <Skeleton shape="circle" />
-              <Skeleton shape="text" lines={2} className="text-body-b3-regular flex-1" />
-            </div>
-            <Skeleton className="aspect-video" />
-          </Card>
-        </Showcase.Row>
-        <Showcase.Row label="ItemGroup" className="items-start">
-          <ItemGroup aria-label="멤버" aria-busy className="w-80">
-            {[0, 1, 2].map((index) => (
-              <Item key={index}>
-                <Item.Media>
-                  <Skeleton shape="circle" />
-                </Item.Media>
-                <Item.Content>
-                  <Skeleton shape="text" className="text-body-b3-medium w-1/3" />
-                  <Skeleton shape="text" className="text-body-b3-regular w-1/2" />
-                </Item.Content>
-              </Item>
-            ))}
-          </ItemGroup>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Wrapping"
-        description="loading 이면 자식의 크기 그대로 칠하고, 끝나면 같은 구조에서 자식이 보입니다. asChild 는 자식 요소를 직접 칠해 그 모서리를 지킵니다."
-      >
-        <Showcase.Row label="div" className="items-start">
-          <Skeleton loading className="w-64">
-            <Card>
-              <Card.Title>2026 가을 학기 공지</Card.Title>
-              <Card.Description>수강 신청 일정을 확인하세요.</Card.Description>
-            </Card>
-          </Skeleton>
-          <Skeleton loading={false} className="w-64">
-            <Card>
-              <Card.Title>2026 가을 학기 공지</Card.Title>
-              <Card.Description>수강 신청 일정을 확인하세요.</Card.Description>
-            </Card>
-          </Skeleton>
-        </Showcase.Row>
-        <Showcase.Row label="asChild" className="items-start">
-          <Skeleton loading asChild>
-            <Card className="w-64">
-              <Card.Title>2026 가을 학기 공지</Card.Title>
-              <Card.Description>수강 신청 일정을 확인하세요.</Card.Description>
-            </Card>
-          </Skeleton>
-          <Skeleton loading={false} asChild>
-            <Card className="w-64">
-              <Card.Title>2026 가을 학기 공지</Card.Title>
-              <Card.Description>수강 신청 일정을 확인하세요.</Card.Description>
-            </Card>
-          </Skeleton>
-        </Showcase.Row>
         <Showcase.Row label="Avatar">
           <Skeleton loading asChild>
             <Avatar name="김지스트" />
           </Skeleton>
-          <Skeleton loading={false} asChild>
-            <Avatar name="김지스트" />
+          <Skeleton loading asChild>
+            <Avatar name="김지스트" size="tiny" />
+          </Skeleton>
+        </Showcase.Row>
+        <Showcase.Row label="Badge">
+          <Skeleton loading asChild>
+            <Badge>새 글</Badge>
+          </Skeleton>
+        </Showcase.Row>
+        <Showcase.Row label="Button">
+          <Skeleton loading asChild>
+            <Button>자세히 보기</Button>
+          </Skeleton>
+        </Showcase.Row>
+        <Showcase.Row label="Text" className="items-start">
+          <Skeleton loading className="w-fit">
+            <p className="text-body-b2-semibold">학기 공지</p>
+          </Skeleton>
+          <Skeleton loading className="w-fit">
+            <p className="text-caption-c1-regular">인포팀 · 3분 전</p>
           </Skeleton>
         </Showcase.Row>
       </Showcase.Section>
@@ -174,7 +147,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Wrapping: Story = {
+export const ShowACardWhileItLoads: Story = {
   render: function Render() {
     const [loading, setLoading] = useState(true);
 
@@ -201,7 +174,7 @@ export const Wrapping: Story = {
     docs: {
       description: {
         story:
-          'loading 이면 감싼 div 에 aria-busy 가 붙고, 자식은 보이지 않고 inert 라 Tab 과 스크린 리더가 들어가지 않습니다. 끝나면 속성과 클래스만 빠지고 구조는 그대로라 화면이 밀리지 않고 자식이 다시 마운트되지 않습니다.',
+          '`loading` 이면 감싼 div 에 aria-busy 가 붙고, 자식은 보이지 않고 inert 라 Tab 과 스크린 리더가 들어가지 않습니다. 끝나면 속성과 클래스만 빠지고 구조는 그대로라 화면이 밀리지 않고 자식이 다시 마운트되지 않습니다.',
       },
     },
   },
@@ -226,7 +199,7 @@ export const Wrapping: Story = {
   },
 };
 
-export const AsChild: Story = {
+export const KeepTheShapeOfAnAvatarOrCard: Story = {
   render: function Render() {
     const [loading, setLoading] = useState(true);
 
@@ -253,7 +226,7 @@ export const AsChild: Story = {
     docs: {
       description: {
         story:
-          'asChild 면 감싸는 div 없이 자식 요소를 직접 칠합니다. Avatar 는 원, Card 는 concentric 모서리를 그대로 지킵니다. 칠하는 동안 그 요소가 inert 라 사진 이름이나 카드 제목을 읽지 않습니다.',
+          '`asChild` 면 감싸는 div 없이 자식 요소를 직접 칠합니다. Avatar 는 원, Card 는 concentric 모서리를 그대로 지킵니다. 칠하는 동안 그 요소가 inert 라 사진 이름이나 카드 제목을 읽지 않습니다.',
       },
     },
   },
@@ -276,54 +249,33 @@ export const AsChild: Story = {
   },
 };
 
-export const TextHeight: Story = {
+export const HoldTheHeightOfText: Story = {
   render: () => (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-start gap-4">
-        <Skeleton
-          data-testid="body-skeleton"
-          shape="text"
-          lines={3}
-          className="text-body-b3-regular w-40"
-        />
-        <p data-testid="body-text" className="text-body-b3-regular">
-          수강 신청은
-          <br />
-          9월 1일에
-          <br />
-          열립니다.
-        </p>
-      </div>
-      <div className="flex items-start gap-4">
-        <Skeleton
-          data-testid="title-skeleton"
-          shape="text"
-          className="text-body-b2-semibold w-40"
-        />
-        <p data-testid="title-text" className="text-body-b2-semibold">
-          학기 공지
-        </p>
-      </div>
+    <div className="flex items-start gap-4">
+      <Skeleton loading data-testid="loading" className="w-40">
+        <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+      </Skeleton>
+      <Skeleton loading={false} data-testid="loaded" className="w-40">
+        <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+      </Skeleton>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'text 모양은 줄마다 className 에 준 글자 스타일의 줄 높이(1lh)를 씁니다. 실제 글과 높이가 같아 내용이 들어와도 아래가 밀리지 않습니다.',
+          '글 자리는 실제 글자 스타일의 `<p>` 를 placeholder 글과 함께 감쌉니다. 칠한 상자는 그 글의 높이 그대로라 내용이 들어와도 아래가 밀리지 않습니다.',
       },
     },
   },
   play: async ({ canvas }) => {
-    for (const part of ['body', 'title']) {
-      const skeleton = heightOf(canvas.getByTestId(`${part}-skeleton`));
-      const text = heightOf(canvas.getByTestId(`${part}-text`));
-      await expect(Math.abs(skeleton - text)).toBeLessThan(0.5);
-    }
+    const loading = heightOf(canvas.getByTestId('loading'));
+    const loaded = heightOf(canvas.getByTestId('loaded'));
+    await expect(Math.abs(loading - loaded)).toBeLessThan(0.5);
   },
 };
 
-export const BusyRegion: Story = {
+export const LoadAList: Story = {
   render: function Render() {
     const [loading, setLoading] = useState(true);
 
@@ -333,29 +285,23 @@ export const BusyRegion: Story = {
           {loading ? '불러오기 끝내기' : '다시 불러오기'}
         </Button>
         <ItemGroup aria-label="멤버" aria-busy={loading} className="w-full">
-          {loading
-            ? members.map((name) => (
-                <Item key={name}>
-                  <Item.Media>
-                    <Skeleton shape="circle" />
-                  </Item.Media>
-                  <Item.Content>
-                    <Skeleton shape="text" className="text-body-b3-medium w-1/3" />
-                    <Skeleton shape="text" className="text-body-b3-regular w-1/2" />
-                  </Item.Content>
-                </Item>
-              ))
-            : members.map((name) => (
-                <Item key={name}>
-                  <Item.Media>
-                    <Avatar name={name} />
-                  </Item.Media>
-                  <Item.Content>
-                    <Item.Title>{name}</Item.Title>
-                    <Item.Description>인포팀</Item.Description>
-                  </Item.Content>
-                </Item>
-              ))}
+          {members.map((member) => (
+            <Item key={member.name}>
+              <Item.Media>
+                <Skeleton loading={loading} asChild>
+                  <Avatar name={member.name} />
+                </Skeleton>
+              </Item.Media>
+              <Item.Content>
+                <Skeleton loading={loading} asChild className="w-fit">
+                  <Item.Title>{member.name}</Item.Title>
+                </Skeleton>
+                <Skeleton loading={loading} asChild className="w-fit">
+                  <Item.Description>{member.team}</Item.Description>
+                </Skeleton>
+              </Item.Content>
+            </Item>
+          ))}
         </ItemGroup>
       </div>
     );
@@ -364,20 +310,21 @@ export const BusyRegion: Story = {
     docs: {
       description: {
         story:
-          '모양만 여러 개 쓰는 영역은 앱이 그 영역에 aria-busy 를 둡니다. 모양은 aria-hidden 이라 스크린 리더가 읽지 않습니다. "불러오는 중" 알림은 Spinner 나 앱의 상태 문구가 한 번 맡습니다.',
+          '목록은 placeholder 데이터로 실제 Item 을 그리고 그 부분을 `asChild` 로 칠합니다. 칠한 요소는 inert 라 스크린 리더가 읽지 않고, 목록의 `aria-busy` 는 앱이 둡니다. "불러오는 중" 알림은 Spinner 나 앱의 상태 문구가 한 번 맡습니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     const list = canvas.getByRole('list', { name: '멤버' });
     await expect(list).toHaveAttribute('aria-busy', 'true');
-    for (const shape of list.querySelectorAll('[data-skeleton]'))
-      await expect(shape).toHaveAttribute('aria-hidden', 'true');
+    const painted = list.querySelectorAll('[data-skeleton]');
+    await expect(painted).toHaveLength(members.length * 3);
+    for (const element of painted) await expect(element).toHaveAttribute('inert');
 
     await userEvent.click(canvas.getByRole('button', { name: '불러오기 끝내기' }));
     const loaded = canvas.getByRole('list', { name: '멤버' });
     await expect(loaded).toHaveAttribute('aria-busy', 'false');
-    await expect(loaded.querySelector('[data-skeleton]')).toBeNull();
+    await expect(loaded.querySelector('[data-loading]')).toBeNull();
     await expect(within(loaded).getAllByRole('img')).toHaveLength(members.length);
   },
 };
