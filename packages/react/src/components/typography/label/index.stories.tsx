@@ -39,6 +39,20 @@ export const Playground: Story = {
   ),
 };
 
+export const Usage: Story = {
+  render: () => (
+    <div className="flex max-w-xs flex-col gap-2">
+      <Label htmlFor="label-email">이메일</Label>
+      <TextField id="label-email" type="email" />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('textbox', { name: '이메일' });
+    await userEvent.click(canvas.getByText('이메일'));
+    await expect(input).toHaveFocus();
+  },
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -114,29 +128,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const HtmlFor: Story = {
-  render: () => (
-    <div className="flex max-w-xs flex-col gap-2">
-      <Label htmlFor="label-email">이메일</Label>
-      <TextField id="label-email" type="email" />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'htmlFor와 id로 연결하면 라벨이 입력의 이름이 되고, 라벨을 누르면 입력으로 포커스가 갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('textbox', { name: '이메일' });
-    await userEvent.click(canvas.getByText('이메일'));
-    await expect(input).toHaveFocus();
-  },
-};
-
-export const WrapsControl: Story = {
+export const LabelACheckboxByWrappingIt: Story = {
   render: () => (
     <Label>
       <Checkbox />
@@ -146,7 +138,8 @@ export const WrapsControl: Story = {
   parameters: {
     docs: {
       description: {
-        story: '컨트롤을 감싸면 글자를 눌러도 체크박스가 바뀝니다.',
+        story:
+          '`Label` 로 컨트롤을 감싸면 `htmlFor` 없이 이름이 붙고, 글자를 눌러도 체크박스가 바뀝니다.',
       },
     },
   },
@@ -157,7 +150,7 @@ export const WrapsControl: Story = {
   },
 };
 
-export const MirrorsControl: Story = {
+export const FollowTheControlsState: Story = {
   render: function Render() {
     const [disabled, setDisabled] = useState(false);
     const [required, setRequired] = useState(false);
@@ -183,7 +176,7 @@ export const MirrorsControl: Story = {
     docs: {
       description: {
         story:
-          '라벨은 연결된 컨트롤의 disabled와 required를 따라갑니다. 컨트롤이 바뀌면 라벨도 바로 흐려지거나 * 가 붙습니다.',
+          '라벨은 연결된 컨트롤의 `disabled` 와 `required` 를 따라갑니다. 라벨에 따로 주지 않아도, 컨트롤이 바뀌면 라벨도 바로 흐려지거나 * 가 붙습니다.',
       },
     },
   },
@@ -201,7 +194,7 @@ export const MirrorsControl: Story = {
   },
 };
 
-export const CustomControl: Story = {
+export const NameACustomWidget: Story = {
   render: () => (
     <div className="flex w-64 flex-col gap-3">
       <Label htmlFor="label-volume">볼륨</Label>
@@ -212,7 +205,7 @@ export const CustomControl: Story = {
     docs: {
       description: {
         story:
-          '<div role="slider">처럼 브라우저가 라벨로 인식하지 않는 위젯도 이름이 붙고, 라벨을 누르면 포커스가 갑니다.',
+          '`<div role="slider">` 처럼 브라우저가 라벨로 인식하지 않는 위젯도 `htmlFor` 로 이름이 붙고, 라벨을 누르면 포커스가 갑니다.',
       },
     },
   },
@@ -223,7 +216,7 @@ export const CustomControl: Story = {
   },
 };
 
-export const AsChild: Story = {
+export const DrawTheLabelAsAnotherElement: Story = {
   render: () => (
     <div className="flex w-64 flex-col gap-3">
       <Label asChild htmlFor="label-as-child" required>
@@ -236,7 +229,7 @@ export const AsChild: Story = {
     docs: {
       description: {
         story:
-          'asChild로 자식 요소를 라벨로 그립니다. 자식의 id를 그대로 쓰고, label이 아닌 요소도 컨트롤의 이름이 되며 누르면 포커스가 갑니다.',
+          '`asChild` 로 자식 요소를 라벨로 그립니다. 자식의 `id` 를 그대로 쓰고, `<label>` 이 아닌 요소도 컨트롤의 이름이 되며 누르면 포커스가 갑니다.',
       },
     },
   },

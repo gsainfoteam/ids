@@ -271,7 +271,7 @@ test('onReachStart fires once on reaching the top, and not while loading', async
   await expect.poll(() => viewport().scrollTop).toBe(0);
   expect(onReachStart).toHaveBeenCalledTimes(1);
 
-  await screen.rerender(<Chat onReachStart={onReachStart} loading />);
+  await screen.rerender(<Chat onReachStart={onReachStart} aria-busy />);
   await expect.element(page.getByRole('log')).toHaveAttribute('aria-busy', 'true');
   viewport().scrollTop = START_ZONE_PX + 40;
   viewport().scrollTop = 0;

@@ -10,20 +10,17 @@
 - **시멘틱 구성.** 스크롤 영역이 `role="log"` 이고 그 안이 `<ol>`, 자식마다 `<li>` 입니다. 스크롤은 `ScrollArea` 위에서 합니다.
 
 ```tsx
-import { Bubble, MessageScroller } from '@gsainfoteam/ids-react';
+import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 
-<MessageScroller className="h-96">
-  {messages.map((message) => (
-    <Bubble
-      key={message.id}
-      align={message.mine ? 'end' : 'start'}
-      variant={message.mine ? 'solid' : 'soft'}
-      className={message.mine ? 'self-end' : 'self-start'}
-    >
-      {message.text}
-    </Bubble>
-  ))}
-</MessageScroller>;
+<div className="h-96">
+  <MessageScroller>
+    {messages.map((message) => (
+      <Message key={message.id} align={message.mine ? 'end' : 'start'}>
+        <Bubble variant={message.mine ? 'solid' : 'soft'}>{message.text}</Bubble>
+      </Message>
+    ))}
+  </MessageScroller>
+</div>;
 ```
 
 ## 새 메시지가 붙을 때
@@ -59,15 +56,15 @@ import { Bubble, MessageScroller } from '@gsainfoteam/ids-react';
 ## 앞 기록 불러오기
 
 ```tsx
-<MessageScroller onReachStart={loadOlder} loading={loadingOlder}>
+<MessageScroller onReachStart={loadOlder} aria-busy={loadingOlder}>
   {messages.map(...)}
 </MessageScroller>
 ```
 
 - 위로 스크롤해 맨 위에서 48px 안에 들어오면 `onReachStart` 를 한 번 부릅니다. 48px 밖으로 나갔다가 다시 들어오거나 앞에 메시지가 붙으면 다시 부를 수 있습니다.
-- `loading` 인 동안은 부르지 않습니다. 더 불러올 기록이 없으면 `onReachStart` 를 넘기지 않거나 함수 안에서 그냥 돌아옵니다.
+- `aria-busy` 인 동안은 부르지 않습니다. 더 불러올 기록이 없으면 `onReachStart` 를 넘기지 않거나 함수 안에서 그냥 돌아옵니다.
 - 처음부터 넘치지 않는 짧은 목록은 스크롤이 없어 부르지 않습니다. 첫 화면을 채울 만큼은 앱이 먼저 불러옵니다.
-- `loading` 이면 위쪽 가운데에 Spinner 가 내용 위로 뜨고, 스크롤 영역에 `aria-busy` 가 붙습니다. 목록을 밀지 않습니다.
+- `aria-busy` 면 위쪽 가운데에 Spinner 가 내용 위로 뜨고, `aria-busy` 는 root 가 아니라 스크롤 영역(`role="log"`)에 붙습니다. 목록을 밀지 않습니다.
 - 앞에 붙은 메시지는 화면 위쪽 밖에 생깁니다. 화면에 보이던 첫 메시지가 같은 자리에 남도록 스크롤을 옮깁니다.
 
 ## 아래로 가기 버튼
@@ -94,16 +91,17 @@ import { Bubble, MessageScroller } from '@gsainfoteam/ids-react';
 ## 목록
 
 ```tsx
-<MessageScroller className="h-dvh">
-  <MessageScroller.List className="mx-auto w-full max-w-3xl gap-8 px-4 py-6">
+<MessageScroller>
+  <MessageScroller.List>
     {messages.map(...)}
   </MessageScroller.List>
 </MessageScroller>
 ```
 
-- 목록의 간격, 폭, padding 을 바꿀 때만 `MessageScroller.List` 로 감쌉니다. 기본은 `flex flex-col gap-4 p-4` 입니다.
+- 목록은 `<ol>` 이고 간격과 여백은 `gap-4 p-4` 입니다. `MessageScroller.List` 는 그 `<ol>` 을 직접 적는 파트입니다.
+- 목록의 간격과 폭을 바꾸는 것은 IDS 밖의 디자인입니다. 스토리 `NarrowTheListInAWideChat`(`custom-design`)이 그 예입니다.
 - 메시지는 `List` 안이나 MessageScroller 바로 아래 중 한쪽에만 둡니다. 둘 다면 오류입니다.
-- 자식마다 `<li>` 로 감쌉니다. `<li>` 는 `flex flex-col` 이라 자식에 `self-end` 를 주면 오른쪽(끝)으로 붙습니다.
+- 자식마다 `<li>` 로 감쌉니다. `<li>` 는 `flex flex-col` 입니다. 메시지를 끝 쪽에 붙이려면 `<Message align="end">` 로 감쌉니다.
 - Fragment 는 펼쳐서 그 안의 자식마다 `<li>` 를 줍니다. `null`, `false` 는 빠집니다.
 
 ## AI SDK
@@ -131,17 +129,19 @@ export function Chat() {
   const { messages, sendMessage } = useChat();
 
   return (
-    <MessageScroller scrollOnAppend="start" className="min-h-0 flex-1">
-      {turnsOf(messages).map((turn) => (
-        <div key={turn[0].id} className="flex flex-col gap-4">
-          {turn.map((message) => (
-            <Message key={message.id} align={message.role === 'user' ? 'end' : 'start'}>
-              {message.role === 'user' ? <Bubble>{textOf(message)}</Bubble> : textOf(message)}
-            </Message>
-          ))}
-        </div>
-      ))}
-    </MessageScroller>
+    <div className="min-h-0 flex-1">
+      <MessageScroller scrollOnAppend="start">
+        {turnsOf(messages).map((turn) => (
+          <div key={turn[0].id} className="flex flex-col gap-4">
+            {turn.map((message) => (
+              <Message key={message.id} align={message.role === 'user' ? 'end' : 'start'}>
+                {message.role === 'user' ? <Bubble>{textOf(message)}</Bubble> : textOf(message)}
+              </Message>
+            ))}
+          </div>
+        ))}
+      </MessageScroller>
+    </div>
   );
 }
 ```
@@ -149,10 +149,11 @@ export function Chat() {
 - 스트리밍으로 자라는 답은 MessageScroller 가 크기 변화로 봅니다. 따로 알릴 것이 없습니다.
 - 사람끼리의 채팅은 메시지 하나를 자식 하나로 두고 기본 `scrollOnAppend="end"` 를 씁니다.
 
-## 높이
+## 크기
 
-- 높이는 root 에 줍니다(`h-96`, 부모가 flex 면 `min-h-0 flex-1`). 높이가 없으면 내용만큼 자라 스크롤하지 않습니다.
-- root 에 준 테두리와 둥근 모서리는 안쪽 ScrollArea 가 `rounded-[inherit]` 로 이어받아 막대가 모서리를 넘지 않습니다.
+- 부모가 준 너비와 높이를 채우고, 부모보다 작아질 수 있습니다(`size-full min-h-0 min-w-0`).
+- 높이는 부모가 정합니다(`<div className="h-96">`, flex 안이면 `<div className="min-h-0 flex-1">`). 부모에 높이가 없으면 내용만큼 자라 스크롤하지 않습니다.
+- 테두리와 둥근 모서리도 부모가 그립니다. 스크롤 막대가 모서리를 넘지 않게 부모에 `overflow-hidden` 을 줍니다.
 
 ## 접근성
 
@@ -162,15 +163,8 @@ export function Chat() {
 
 ## 상태
 
-| 속성                                      | 붙는 곳         | 뜻                     |
-| ----------------------------------------- | --------------- | ---------------------- |
-| `data-at-end`                             | root            | 맨 아래에 있다         |
-| `data-loading`                            | root            | `loading`              |
-| `data-hidden`                             | Jump            | 맨 아래라 숨었다       |
-| `data-message-scroller`                   | root            |                        |
-| `data-message-scroller-list` / `-item`    | `<ol>` / `<li>` |                        |
-| `data-message-scroller-loader`            | Spinner 를 담은 층 |                     |
-| `data-message-scroller-jump`              | 아래로 가기 버튼 |                       |
+- 앞 기록을 불러올 때는 `onReachStart` 가 알리고, 불러오는 중인지는 앱이 `aria-busy` 로 넘깁니다.
+- 맨 아래에 있는지, 새 메시지가 몇 개 쌓였는지 읽는 값은 없습니다. 아래로 가기 버튼이 보여 줍니다.
 
 ## 속성
 
@@ -179,13 +173,13 @@ export function Chat() {
 | `stickToBottom`  | `true`. 맨 아래에 있으면 새 메시지와 자라는 메시지를 따라간다       |
 | `scrollOnAppend` | `'end'`(기본) / `'start'`. 새로 붙은 첫 자식을 위쪽에 맞출지        |
 | `onReachStart`   | 위로 스크롤해 맨 위에 닿으면 부른다                                 |
-| `loading`        | `false`. 위쪽에 Spinner, 스크롤 영역에 `aria-busy`                  |
+| `aria-busy`      | 위쪽에 Spinner. root 가 아니라 스크롤 영역에 붙는다                 |
 | `aria-label`     | 스크롤 영역(`role="log"`)의 이름. 기본 "메시지"                     |
 | 그 외            | root `<div>` 로 간다                                               |
 
 | 파트             | 기본 / 동작                                                  |
 | ---------------- | ------------------------------------------------------------ |
-| `List`           | `<ol>`. 간격과 폭을 바꿀 때만 둔다                            |
+| `List`           | `<ol>`. 목록을 직접 적을 때만 둔다                            |
 | `Jump`           | Button. 없으면 기본 버튼이 붙는다                             |
 
 ## 알아둘 것

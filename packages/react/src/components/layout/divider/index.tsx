@@ -20,12 +20,11 @@ export namespace Divider {
 
   export type Props = Omit<
     HTMLAttributes<HTMLElement>,
-    'role' | 'aria-orientation' | 'aria-hidden' | 'tabIndex' | 'className' | 'style'
+    'role' | 'aria-orientation' | 'tabIndex' | 'className' | 'style'
   > & {
     ref?: Ref<HTMLElement>;
     orientation?: Orientation;
     align?: Align;
-    decorative?: boolean;
     asChild?: boolean;
     className?: string | ((state: State) => string | undefined);
     style?: CSSProperties | ((state: State) => CSSProperties | undefined);

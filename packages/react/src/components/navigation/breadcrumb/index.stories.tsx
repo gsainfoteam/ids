@@ -65,6 +65,22 @@ function RouterLink({
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Breadcrumb>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#products">상품</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Item>
+        <Breadcrumb.Page>노트북</Breadcrumb.Page>
+      </Breadcrumb.Item>
+    </Breadcrumb>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -91,7 +107,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Separator"
-        description="구분자는 기본이 chevron이고, separator로 글자나 아이콘을 줍니다. 스크린 리더는 읽지 않습니다."
+        description="구분자는 기본이 chevron입니다. Item 사이에 Breadcrumb.Separator를 직접 쓰면 그 글자나 아이콘이 구분자가 됩니다. 스크린 리더는 읽지 않습니다."
       >
         <Showcase.Row label="chevron">
           <Breadcrumb aria-label="chevron 구분자">
@@ -104,20 +120,22 @@ export const Gallery: Story = {
           </Breadcrumb>
         </Showcase.Row>
         <Showcase.Row label="/">
-          <Breadcrumb separator="/" aria-label="빗금 구분자">
+          <Breadcrumb aria-label="빗금 구분자">
             <Breadcrumb.Item>
               <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
             </Breadcrumb.Item>
+            <Breadcrumb.Separator>/</Breadcrumb.Separator>
             <Breadcrumb.Item>
               <Breadcrumb.Page>설정</Breadcrumb.Page>
             </Breadcrumb.Item>
           </Breadcrumb>
         </Showcase.Row>
         <Showcase.Row label="|">
-          <Breadcrumb separator="|" aria-label="세로선 구분자">
+          <Breadcrumb aria-label="세로선 구분자">
             <Breadcrumb.Item>
               <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
             </Breadcrumb.Item>
+            <Breadcrumb.Separator>|</Breadcrumb.Separator>
             <Breadcrumb.Item>
               <Breadcrumb.Page>설정</Breadcrumb.Page>
             </Breadcrumb.Item>
@@ -127,7 +145,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Composition"
-        description="긴 경로는 가운데를 Ellipsis 메뉴로 접습니다. 아이콘은 링크 안에 글자와 함께 씁니다."
+        description="긴 경로는 가운데를 Ellipsis 메뉴로 접습니다. 직접 쓴 구분자도 함께 접힙니다. 아이콘은 링크 안에 글자와 함께 씁니다."
       >
         <Showcase.Row label="maxItems=3">
           <Breadcrumb maxItems={3} aria-label="접힌 경로">
@@ -143,6 +161,29 @@ export const Gallery: Story = {
             <Breadcrumb.Item>
               <Breadcrumb.Link href="#navigation">내비게이션</Breadcrumb.Link>
             </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <Breadcrumb.Page>Breadcrumb</Breadcrumb.Page>
+            </Breadcrumb.Item>
+          </Breadcrumb>
+        </Showcase.Row>
+        <Showcase.Row label="maxItems=3, /">
+          <Breadcrumb maxItems={3} aria-label="빗금으로 접힌 경로">
+            <Breadcrumb.Item>
+              <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Separator>/</Breadcrumb.Separator>
+            <Breadcrumb.Item>
+              <Breadcrumb.Link href="#docs">문서</Breadcrumb.Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Separator>/</Breadcrumb.Separator>
+            <Breadcrumb.Item>
+              <Breadcrumb.Link href="#components">컴포넌트</Breadcrumb.Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Separator>/</Breadcrumb.Separator>
+            <Breadcrumb.Item>
+              <Breadcrumb.Link href="#navigation">내비게이션</Breadcrumb.Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Separator>/</Breadcrumb.Separator>
             <Breadcrumb.Item>
               <Breadcrumb.Page>Breadcrumb</Breadcrumb.Page>
             </Breadcrumb.Item>
@@ -166,27 +207,12 @@ export const Gallery: Story = {
             </Breadcrumb.Item>
           </Breadcrumb>
         </Showcase.Row>
-        <Showcase.Row label="rtl">
-          <div dir="rtl">
-            <Breadcrumb aria-label="오른쪽에서 왼쪽 경로">
-              <Breadcrumb.Item>
-                <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
-              </Breadcrumb.Item>
-              <Breadcrumb.Item>
-                <Breadcrumb.Link href="#products">상품</Breadcrumb.Link>
-              </Breadcrumb.Item>
-              <Breadcrumb.Item>
-                <Breadcrumb.Page>노트북</Breadcrumb.Page>
-              </Breadcrumb.Item>
-            </Breadcrumb>
-          </div>
-        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const RouterLinks: Story = {
+export const LinkWithYourRouter: Story = {
   render: function Render() {
     const [path, setPath] = useState('/products/electronics');
 
@@ -219,7 +245,7 @@ export const RouterLinks: Story = {
     docs: {
       description: {
         story:
-          '라우터의 Link는 asChild로 감쌉니다. Breadcrumb.Link의 스타일과 속성이 Link가 그리는 <a>에 붙고, 이동은 라우터가 맡습니다. 여기서는 onNavigate로 흉내 낸 Link를 씁니다.',
+          '라우터의 Link는 Breadcrumb.Link의 asChild로 감쌉니다. Breadcrumb.Link의 스타일과 속성이 Link가 그리는 <a>에 붙고, 이동은 라우터가 맡습니다. 여기서는 onNavigate로 흉내 낸 Link를 씁니다.',
       },
     },
   },
@@ -233,7 +259,7 @@ export const RouterLinks: Story = {
   },
 };
 
-export const MaxItems: Story = {
+export const CollapseALongTrail: Story = {
   render: () => (
     <Breadcrumb maxItems={3}>
       <Breadcrumb.Item>
@@ -257,7 +283,7 @@ export const MaxItems: Story = {
     docs: {
       description: {
         story:
-          '항목이 maxItems보다 많으면 첫 항목과 마지막 maxItems - 1개만 남기고 가운데를 Ellipsis 메뉴로 접습니다. 메뉴는 Enter나 Space로 열고 화살표로 오갑니다.',
+          '`maxItems`를 주면 항목이 그보다 많을 때 첫 항목과 마지막 maxItems - 1개만 남기고 가운데를 Ellipsis 메뉴로 접습니다. 메뉴는 Enter나 Space로 열고 화살표로 오갑니다.',
       },
     },
   },
@@ -276,7 +302,7 @@ export const MaxItems: Story = {
   },
 };
 
-export const Ellipsis: Story = {
+export const PickWhichCrumbsFold: Story = {
   render: function Render() {
     const [path, setPath] = useState('/docs/components/navigation');
 
@@ -318,7 +344,7 @@ export const Ellipsis: Story = {
     docs: {
       description: {
         story:
-          'Breadcrumb.Ellipsis 안에 접을 항목을 직접 씁니다. 메뉴 안의 링크도 asChild로 감싼 라우터 Link이고, 고르면 메뉴가 닫힙니다.',
+          '접을 항목을 직접 고르려면 Breadcrumb.Ellipsis 안에 그 Item을 씁니다. 메뉴 안의 링크도 asChild로 감싼 라우터 Link이고, 고르면 메뉴가 닫힙니다.',
       },
     },
   },
@@ -332,29 +358,27 @@ export const Ellipsis: Story = {
   },
 };
 
-export const CustomSeparator: Story = {
+export const ChangeTheSeparator: Story = {
   render: () => (
     <Breadcrumb>
-      <Breadcrumb.List>
-        <Breadcrumb.Item>
-          <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Separator>/</Breadcrumb.Separator>
-        <Breadcrumb.Item>
-          <Breadcrumb.Link href="#settings">설정</Breadcrumb.Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Separator>·</Breadcrumb.Separator>
-        <Breadcrumb.Item>
-          <Breadcrumb.Page>알림</Breadcrumb.Page>
-        </Breadcrumb.Item>
-      </Breadcrumb.List>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Separator>/</Breadcrumb.Separator>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#settings">설정</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Separator>·</Breadcrumb.Separator>
+      <Breadcrumb.Item>
+        <Breadcrumb.Page>알림</Breadcrumb.Page>
+      </Breadcrumb.Item>
     </Breadcrumb>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'Breadcrumb.Separator를 하나라도 직접 쓰면 자동 구분자는 빠지고 쓴 자리에만 구분자가 섭니다. 모든 구분자를 같은 모양으로 바꿀 때는 Breadcrumb의 separator가 더 짧습니다.',
+          'Item 사이에 Breadcrumb.Separator를 쓰면 그 children이 구분자가 됩니다. 하나라도 직접 쓰면 자동 chevron은 모두 빠지고 쓴 자리에만 구분자가 섭니다. 구분자는 aria-hidden이라 스크린 리더가 읽지 않습니다.',
       },
     },
   },
@@ -362,5 +386,76 @@ export const CustomSeparator: Story = {
     const separators = canvasElement.querySelectorAll('[data-breadcrumb-separator]');
     await expect([...separators].map((separator) => separator.textContent)).toEqual(['/', '·']);
     separators.forEach((separator) => expect(separator).toHaveAttribute('aria-hidden', 'true'));
+  },
+};
+
+export const RightToLeft: Story = {
+  tags: ['verification'],
+  render: () => (
+    <div dir="rtl">
+      <Breadcrumb aria-label="오른쪽에서 왼쪽 경로">
+        <Breadcrumb.Item>
+          <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Breadcrumb.Link href="#products">상품</Breadcrumb.Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Breadcrumb.Page>노트북</Breadcrumb.Page>
+        </Breadcrumb.Item>
+      </Breadcrumb>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '오른쪽에서 왼쪽으로 쓰는 화면에서는 항목이 오른쪽부터 놓이고 chevron이 뒤집힙니다.',
+      },
+    },
+  },
+};
+
+export const CollapseWrittenSeparators: Story = {
+  tags: ['verification'],
+  render: () => (
+    <Breadcrumb maxItems={3}>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Separator>/</Breadcrumb.Separator>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#docs">문서</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Separator>/</Breadcrumb.Separator>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#components">컴포넌트</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Separator>/</Breadcrumb.Separator>
+      <Breadcrumb.Item>
+        <Breadcrumb.Link href="#navigation">내비게이션</Breadcrumb.Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Separator>/</Breadcrumb.Separator>
+      <Breadcrumb.Item>
+        <Breadcrumb.Page>Breadcrumb</Breadcrumb.Page>
+      </Breadcrumb.Item>
+    </Breadcrumb>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '직접 쓴 구분자와 `maxItems`를 함께 쓰면 접힌 항목 앞의 구분자도 빠져, Ellipsis 양옆에 하나씩만 남습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.queryByRole('link', { name: '문서' })).not.toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: '숨은 경로 보기' })).toBeVisible();
+    const separators = canvasElement.querySelectorAll('[data-breadcrumb-separator]');
+    await expect([...separators].map((separator) => separator.textContent)).toEqual([
+      '/',
+      '/',
+      '/',
+    ]);
   },
 };

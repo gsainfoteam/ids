@@ -1,4 +1,4 @@
-import { type ComponentProps, type ReactNode } from 'react';
+import { type ComponentProps } from 'react';
 
 import { BreadcrumbEllipsis, type BreadcrumbEllipsisProps } from './ellipsis';
 import { BreadcrumbItem, type BreadcrumbItemProps } from './item';
@@ -18,7 +18,6 @@ export function Breadcrumb(props: Breadcrumb.Props) {
 export namespace Breadcrumb {
   export type Props = ComponentProps<'nav'> & {
     size?: IdsSize;
-    separator?: ReactNode;
     maxItems?: number;
   };
 

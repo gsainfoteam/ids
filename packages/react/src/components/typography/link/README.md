@@ -131,7 +131,7 @@ export function AppLink({ colorScheme, underline, ...props }: AppLinkProps) {
 }
 
 <AppLink to="/notices">공지</AppLink>
-<AppLink to="/posts" className={({ isActive }) => (isActive ? 'font-bold' : undefined)}>
+<AppLink to="/posts">
   {({ isActive }) => (isActive ? '글 목록 (지금)' : '글 목록')}
 </AppLink>
 ```
@@ -150,7 +150,7 @@ export function AppLink({ colorScheme, underline, ...props }: AppLinkProps) {
 - 자식 요소 하나에 Link 의 class 와 속성을 합칩니다. 새 탭 아이콘은 자식 안 끝에 붙습니다.
 - 자식은 `<a>` 를 그리는 컴포넌트여야 합니다.
 - 자식이 함수로 받는 `children`, `className`, `style` (`NavLink` 의 `({ isActive }) => ...`) 은 함수인 채로 넘기고, IDS 의 class 는 그 결과에 합칩니다.
-- 라우터가 붙이는 `aria-current="page"`, `data-status` 는 그대로 남습니다.
+- 라우터가 붙이는 `aria-current="page"` 같은 속성은 그대로 남습니다.
 
 ### 내부 링크와 외부 링크
 
@@ -164,6 +164,11 @@ export function AppLink({ colorScheme, underline, ...props }: AppLinkProps) {
 - 새 탭 아이콘과 `rel` 은 외부인지가 아니라 `target="_blank"` 로 정합니다. 같은 탭에서 여는 외부 링크에는 붙지 않습니다.
 - `href` 문자열을 보고 둘을 고르는 공용 컴포넌트는 만들지 않습니다. `to` 가 `string` 이 되어 경로의 타입 검사가 사라집니다.
 
+## 크기
+
+- 글자만큼만 차지하는 인라인 `<a>` 입니다. 줄이 바뀌면 두 줄에 걸쳐 그려집니다.
+- 글자 크기는 둘레를 따릅니다. 크기를 바꾸려면 감싼 문단의 글자 크기를 바꿉니다.
+
 ## 속성
 
 | 속성          | 기본 / 동작                                                   |
@@ -174,6 +179,3 @@ export function AppLink({ colorScheme, underline, ...props }: AppLinkProps) {
 | `target`      | `_blank` 면 새 탭 아이콘과 안내가 붙는다                      |
 | `rel`         | 생략하고 `target="_blank"` 면 `noopener noreferrer`           |
 | 그 외 속성    | `<a>` 로, `asChild` 면 자식 요소로 간다                       |
-
-- 요소에는 `data-link`, `data-color-scheme`, `data-underline` 이, 새 탭 아이콘에는 `data-link-new-tab` 이 붙습니다.
-- 글자 크기는 둘레를 따릅니다. 크기를 바꾸려면 감싼 문단의 글자 크기를 바꿉니다.

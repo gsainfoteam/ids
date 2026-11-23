@@ -4,7 +4,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const paginationStyle = tv({
   slots: {
-    root: 'flex min-w-0',
+    root: 'flex w-full min-w-0',
     list: 'flex flex-wrap items-center gap-1',
     item: 'flex',
     link: 'tabular-nums aria-[current=page]:data-[variant=ghost]:text-primary aria-[current=page]:data-[variant=ghost]:state-press',

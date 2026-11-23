@@ -58,6 +58,8 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 <Label size="tiny" />       // 12px medium
 ```
 
+- 글자(와 감싼 컨트롤)만큼만 차지하는 `inline-flex` 입니다. 컨트롤 위에 줄로 놓으려면 부모가 `flex flex-col` 로 쌓습니다.
+
 ## asChild
 
 ```tsx
@@ -72,17 +74,13 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-| 상태       | 뜻                            |
+- 앱이 상태를 읽는 길은 `className` / `style` 에 주는 함수 하나입니다. 함수는 아래 필드를 받습니다. 새 디자인을 입힐 때만 씁니다.
+
+| 필드       | 뜻                            |
 | ---------- | ----------------------------- |
 | `disabled` | 비활성이다 (직접 또는 컨트롤) |
 | `required` | 필수다 (직접 또는 컨트롤)     |
 | `invalid`  | 오류다 (직접)                 |
-
-```tsx
-<Label className={(state) => (state.required ? 'font-semibold' : undefined)} />
-```
-
-- 요소에는 `data-label`, `data-disabled`, `data-required`, `data-invalid` 가, `*` 에는 `data-label-required` 가 붙습니다.
 
 ## 속성
 

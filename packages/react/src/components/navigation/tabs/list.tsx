@@ -5,11 +5,9 @@ import { useCallback, type ComponentProps } from 'react';
 import { useTabsContext } from './context';
 import { mergeRefs } from '../../../utils';
 
-export type TabsListProps = Omit<ComponentProps<'div'>, 'role' | 'aria-orientation'> & {
-  stretch?: boolean;
-};
+export type TabsListProps = Omit<ComponentProps<'div'>, 'role' | 'aria-orientation'>;
 
-export function TabsList({ stretch = false, className, ref, children, ...rest }: TabsListProps) {
+export function TabsList({ className, ref, children, ...rest }: TabsListProps) {
   const tabs = useTabsContext('Tabs.List');
   const { listRef } = tabs;
   const mergedRef = useCallback(
@@ -24,8 +22,7 @@ export function TabsList({ stretch = false, className, ref, children, ...rest }:
       role="tablist"
       aria-orientation={tabs.orientation}
       data-orientation={tabs.orientation}
-      data-stretch={stretch ? '' : undefined}
-      className={tabs.styles.list({ stretch, className })}
+      className={tabs.styles.list({ className })}
     >
       {children}
     </div>

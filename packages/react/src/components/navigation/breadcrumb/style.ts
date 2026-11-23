@@ -4,7 +4,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const breadcrumbStyle = tv({
   slots: {
-    root: 'min-w-0',
+    root: 'w-full min-w-0',
     list: 'm-0 flex list-none flex-wrap items-center p-0 break-words text-neutral',
     item: 'inline-flex min-w-0 items-center',
     link: [

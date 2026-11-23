@@ -150,12 +150,24 @@ test('glyphs written as children are hidden and named', () => {
   expect(plain.firstElementChild!.innerHTML, 'text without glyphs stays as it is').toBe('Ctrl+C');
 });
 
-test('labels override the spoken names, separator overrides the joiner', () => {
+test('labels override the spoken names, a Kbd.Separator replaces the joiner', () => {
   const kbd = doc(
-    <Kbd keys="Mod+K" platform="windows" separator={null} labels={{ control: 'Control' }} />,
+    <Kbd keys="Mod+K" platform="windows" labels={{ control: 'Control' }}>
+      <Kbd.Separator>then</Kbd.Separator>
+    </Kbd>,
   ).querySelector('[data-kbd-group]')!;
-  expect(spoken(kbd)).toBe('Control K');
-  expect(kbd.querySelector('[data-kbd-separator]')).toBeNull();
+  expect(spoken(kbd)).toBe('Control then K');
+  expect(kbd.querySelectorAll('[data-kbd-separator]')).toHaveLength(1);
+
+  const mac = doc(
+    <Kbd keys="Mod+Shift+K" platform="mac">
+      <Kbd.Separator />
+    </Kbd>,
+  ).querySelector('[data-kbd-group]')!;
+  expect(
+    [...mac.querySelectorAll('[data-kbd-separator]')].map((separator) => separator.textContent),
+    'a Mac combination draws the separator it is given',
+  ).toEqual(['+', '+']);
 });
 
 test('size comes from the prop, then the group, then a Field', () => {

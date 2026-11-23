@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { expect, userEvent, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
@@ -38,6 +38,14 @@ const marksIn = (element: HTMLElement) =>
   Array.from(element.querySelectorAll('mark'), (mark) => mark.textContent);
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <p className="text-body-b3-regular">
+      <Highlight query="셔틀">2학기 셔틀 시간표가 나왔어요.</Highlight>
+    </p>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -99,7 +107,7 @@ export const Gallery: Story = {
         <Showcase.Row label="custom">
           <Highlight query="셔틀">
             셔틀 막차는 밤 11시예요.
-            <Highlight.Mark className="font-semibold" />
+            <Highlight.Mark variant="solid" />
           </Highlight>
         </Showcase.Row>
         <Showcase.Row label="alone">
@@ -112,19 +120,30 @@ export const Gallery: Story = {
   ),
 };
 
-const POSTS = [
-  {
-    id: 'timetable',
-    title: '2학기 셔틀 시간표',
-    description: '평일과 주말, 광주송정역과 교내 순환',
+export const HighlightSearchResults: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '검색어를 결과의 제목과 설명마다 `Highlight` 의 `query` 로 넘기면, 찾은 낱말이 `<mark>` 로 표시됩니다. 검색어를 지우면 표시도 사라집니다.',
+      },
+    },
   },
-  { id: 'holiday', title: '개천절 셔틀은 주말 시간표로 다녀요', description: '광주송정역 노선' },
-  { id: 'stop', title: '학생회관 정류장', description: '모든 셔틀이 서요' },
-];
-
-export const SearchResults: Story = {
   render: function Render() {
     const [query, setQuery] = useState('셔틀');
+    const posts = [
+      {
+        id: 'timetable',
+        title: '2학기 셔틀 시간표',
+        description: '평일과 주말, 광주송정역과 교내 순환',
+      },
+      {
+        id: 'holiday',
+        title: '개천절 셔틀은 주말 시간표로 다녀요',
+        description: '광주송정역 노선',
+      },
+      { id: 'stop', title: '학생회관 정류장', description: '모든 셔틀이 서요' },
+    ];
 
     return (
       <div className="flex max-w-md flex-col gap-4">
@@ -138,7 +157,7 @@ export const SearchResults: Story = {
         />
         <Card size="tiny">
           <ItemGroup aria-label="검색 결과">
-            {POSTS.map((post) => (
+            {posts.map((post) => (
               <Item key={post.id}>
                 <Item.Content>
                   <Item.Title>
@@ -155,8 +174,7 @@ export const SearchResults: Story = {
       </div>
     );
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+  play: async ({ canvas, userEvent }) => {
     const results = () => canvas.getByRole('list', { name: '검색 결과' });
 
     await expect(marksIn(results())).toEqual(['셔틀', '셔틀', '셔틀']);
@@ -170,28 +188,38 @@ export const SearchResults: Story = {
   },
 };
 
-export const SeveralQueries: Story = {
-  args: {
-    query: ['react', 'flutter', 'act'],
-    children: 'React and Flutter share one design system.',
+export const MarkSeveralWords: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`query` 에 배열을 주면 낱말마다 표시합니다. 겹치거나 맞닿은 구간은 한 `<mark>` 로 합치므로, `act` 는 `React` 의 표시에 들어갑니다.',
+      },
+    },
   },
+  render: () => (
+    <Highlight query={['react', 'flutter', 'act']}>
+      React and Flutter share one design system.
+    </Highlight>
+  ),
   play: async ({ canvasElement }) => {
     await expect(marksIn(canvasElement)).toEqual(['React', 'Flutter']);
   },
 };
 
-export const FoldedMatching: Story = {
-  args: { query: 'cafe gist', children: 'Café ＧＩＳＴ, CAFE gist' },
-  play: async ({ canvasElement }) => {
-    await expect(marksIn(canvasElement)).toEqual(['Café ＧＩＳＴ', 'CAFE gist']);
+export const StyleTheMarks: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Highlight.Mark` 를 children 에 넣으면 그 props(`variant`, `data-*`)가 모든 표시에 입혀집니다.',
+      },
+    },
   },
-};
-
-export const CustomMark: Story = {
-  render: (args) => (
-    <Highlight {...args}>
-      {args.children}
-      <Highlight.Mark variant="solid" className="font-semibold" />
+  render: () => (
+    <Highlight query="셔틀">
+      개천절 셔틀은 주말 시간표로 다녀요. 셔틀 막차는 밤 11시예요.
+      <Highlight.Mark variant="solid" data-match="shuttle" />
     </Highlight>
   ),
   play: async ({ canvasElement }) => {
@@ -200,7 +228,15 @@ export const CustomMark: Story = {
     await expect(marks).toHaveLength(2);
     for (const mark of marks) {
       await expect(mark).toHaveAttribute('data-variant', 'solid');
-      await expect(mark).toHaveClass('font-semibold');
+      await expect(mark).toHaveAttribute('data-match', 'shuttle');
     }
+  },
+};
+
+export const FoldedMatching: Story = {
+  tags: ['verification'],
+  render: () => <Highlight query="cafe gist">Café ＧＩＳＴ, CAFE gist</Highlight>,
+  play: async ({ canvasElement }) => {
+    await expect(marksIn(canvasElement)).toEqual(['Café ＧＩＳＴ', 'CAFE gist']);
   },
 };

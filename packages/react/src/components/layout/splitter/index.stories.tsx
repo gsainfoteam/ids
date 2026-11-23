@@ -65,6 +65,25 @@ export const Playground: Story = {
   ),
 };
 
+export const Usage: Story = {
+  render: () => (
+    <div className="rounded-standard border-neutral h-48 w-full overflow-hidden border">
+      <Splitter>
+        <Splitter.Panel defaultSize={30} minSize={20}>
+          <div className="text-body-b3-medium text-neutral flex h-full items-center justify-center p-3">
+            사이드바
+          </div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div className="text-body-b3-medium text-neutral flex h-full items-center justify-center p-3">
+            편집기
+          </div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -215,44 +234,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  decorators: [framed],
-  render: (args) => (
-    <Splitter {...args}>
-      <Splitter.Panel defaultSize={50} minSize={20} maxSize={80}>
-        <Pane>20% 에서 80% 까지</Pane>
-      </Splitter.Panel>
-      <Splitter.Panel>
-        <Pane>나머지</Pane>
-      </Splitter.Panel>
-    </Splitter>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '핸들에 포커스를 두고 방향키로 16px, Shift 와 함께 64px 씩 옮깁니다. Home 과 End 는 앞 패널을 가장 작게, 가장 크게 만듭니다. 키를 놓으면 `onValueCommit` 이 한 번 불립니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, userEvent, args }) => {
-    const [handle] = handlesIn(canvasElement);
-    await userEvent.tab();
-    await expect(handle).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
-    await waitFor(() => expect(valueOf(handle!)).toBeGreaterThan(50));
-    const afterOneStep = valueOf(handle!);
-    await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
-    await waitFor(() => expect(valueOf(handle!)).toBeGreaterThan(afterOneStep + 5));
-    await userEvent.keyboard('{End}');
-    await waitFor(() => expect(valueOf(handle!)).toBe(80));
-    await userEvent.keyboard('{Home}');
-    await waitFor(() => expect(valueOf(handle!)).toBe(20));
-    await expect(args.onValueCommit).toHaveBeenLastCalledWith([20, 80]);
-  },
-};
-
-export const CollapseAndExpand: Story = {
+export const CollapseASidebar: Story = {
   decorators: [framed],
   render: (args) => (
     <Splitter {...args}>
@@ -268,7 +250,7 @@ export const CollapseAndExpand: Story = {
     docs: {
       description: {
         story:
-          '`collapsible` 패널은 끝까지 끌면 접힙니다. 끌지 않고도 핸들 위 버튼을 누르거나, 핸들에서 Enter 를 누르면 접고 다시 펼칩니다. 펼치면 접기 전 크기로 돌아갑니다.',
+          '접을 수 있는 사이드바는 `Splitter.Panel` 에 `collapsible` 과 `minSize` 를 줍니다. `collapsible` 패널은 끝까지 끌면 접힙니다. 끌지 않고도 핸들 위 버튼을 누르거나, 핸들에서 Enter 를 누르면 접고 다시 펼칩니다. 펼치면 접기 전 크기로 돌아갑니다.',
       },
     },
   },
@@ -290,7 +272,7 @@ export const CollapseAndExpand: Story = {
   },
 };
 
-export const Controlled: Story = {
+export const SetTheLayoutFromTheApp: Story = {
   render: function Render() {
     const [layout, setLayout] = useState([30, 70]);
 
@@ -324,7 +306,7 @@ export const Controlled: Story = {
     docs: {
       description: {
         story:
-          '`value` 와 `onValueChange` 로 크기를 앱이 쥡니다. 값은 패널마다 퍼센트이고 합이 100 입니다.',
+          '`value` 와 `onValueChange` 로 크기를 앱이 쥐면 버튼 하나로 레이아웃을 바꿀 수 있습니다. 값은 패널마다 퍼센트이고 합이 100 입니다.',
       },
     },
   },
@@ -337,7 +319,7 @@ export const Controlled: Story = {
   },
 };
 
-export const PersistLayout: Story = {
+export const RememberTheLayoutInACookie: Story = {
   render: function Render() {
     const [saved, setSaved] = useState<number[] | null>(null);
 
@@ -387,7 +369,46 @@ export const PersistLayout: Story = {
   },
 };
 
+export const Keyboard: Story = {
+  tags: ['verification'],
+  decorators: [framed],
+  render: (args) => (
+    <Splitter {...args}>
+      <Splitter.Panel defaultSize={50} minSize={20} maxSize={80}>
+        <Pane>20% 에서 80% 까지</Pane>
+      </Splitter.Panel>
+      <Splitter.Panel>
+        <Pane>나머지</Pane>
+      </Splitter.Panel>
+    </Splitter>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '핸들에 포커스를 두고 방향키로 16px, Shift 와 함께 64px 씩 옮깁니다. Home 과 End 는 앞 패널을 가장 작게, 가장 크게 만듭니다. 키를 놓으면 `onValueCommit` 이 한 번 불립니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent, args }) => {
+    const [handle] = handlesIn(canvasElement);
+    await userEvent.tab();
+    await expect(handle).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(valueOf(handle!)).toBeGreaterThan(50));
+    const afterOneStep = valueOf(handle!);
+    await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
+    await waitFor(() => expect(valueOf(handle!)).toBeGreaterThan(afterOneStep + 5));
+    await userEvent.keyboard('{End}');
+    await waitFor(() => expect(valueOf(handle!)).toBe(80));
+    await userEvent.keyboard('{Home}');
+    await waitFor(() => expect(valueOf(handle!)).toBe(20));
+    await expect(args.onValueCommit).toHaveBeenLastCalledWith([20, 80]);
+  },
+};
+
 export const RightToLeft: Story = {
+  tags: ['verification'],
   decorators: [
     (Story) => (
       <div dir="rtl" className={frame}>

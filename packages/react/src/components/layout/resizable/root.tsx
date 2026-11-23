@@ -15,6 +15,7 @@ import { ResizableContext } from './context';
 import { ResizableHandle } from './handle';
 import { resizableStyle } from './style';
 import { useResizable } from './use-resizable';
+import { useResizableElement } from './use-resizable-element';
 import { resolveState } from '../../../internal/state-props';
 import { containsElementOfType, invariant, mergeProps, mergeRefs } from '../../../utils';
 
@@ -27,19 +28,8 @@ const HANDLE = new Set<unknown>([ResizableHandle]);
 const pixels = (size: number | undefined) => (size === undefined ? undefined : `${size}px`);
 
 export function ResizableRoot({
+  resizable: given,
   direction = 'both',
-  width,
-  defaultWidth,
-  onWidthChange,
-  height,
-  defaultHeight,
-  onHeightChange,
-  minWidth = 0,
-  maxWidth = Infinity,
-  minHeight = 0,
-  maxHeight = Infinity,
-  step,
-  getValueLabel,
   disabled = false,
   asChild = false,
   id,
@@ -59,26 +49,8 @@ export function ResizableRoot({
   const rootId = child?.props.id ?? id ?? `ids-resizable-${generatedId}`;
   const content = child ? child.props.children : children;
   const [dragging, setDragging] = useState(false);
-
-  const resizable = useResizable({
-    width: {
-      value: width,
-      defaultValue: defaultWidth,
-      onChange: onWidthChange,
-      min: minWidth,
-      max: maxWidth,
-    },
-    height: {
-      value: height,
-      defaultValue: defaultHeight,
-      onChange: onHeightChange,
-      min: minHeight,
-      max: maxHeight,
-    },
-    step,
-    getValueLabel,
-    controls: rootId,
-  });
+  const own = useResizable();
+  const resizable = useResizableElement(given ?? own, rootId);
 
   const state: Resizable.State = {
     direction,
@@ -87,7 +59,7 @@ export function ResizableRoot({
     dragging,
     disabled,
   };
-  const styles = resizableStyle();
+  const styles = resizableStyle({ asChild });
   const size: CSSProperties = {
     ...(resizable.width !== undefined && { width: pixels(resizable.width) }),
     ...(resizable.height !== undefined && { height: pixels(resizable.height) }),

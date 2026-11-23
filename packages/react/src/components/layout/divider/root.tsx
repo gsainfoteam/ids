@@ -15,7 +15,6 @@ function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
 export function DividerRoot({
   orientation = 'horizontal',
   align = 'center',
-  decorative = false,
   asChild = false,
   ref,
   className,
@@ -23,6 +22,7 @@ export function DividerRoot({
   children,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
+  'aria-hidden': ariaHidden,
   ...rest
 }: Divider.Props) {
   const labelId = useId();
@@ -31,6 +31,7 @@ export function DividerRoot({
     !asChild || isValidElement(children),
     '`Divider asChild` requires one element to render as, such as an `li` or `hr`.',
   );
+  const decorative = ariaHidden === true || ariaHidden === 'true';
   const state: Divider.State = { orientation, labelled, align, decorative };
   const { root, label } = dividerStyle({ orientation, labelled, align });
 

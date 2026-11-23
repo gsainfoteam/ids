@@ -49,9 +49,17 @@ const visible = (element: Element) => {
   return copy.textContent;
 };
 
+const shortcuts = ['Mod+K', 'Mod+Shift+P', 'Alt+Enter', 'Control+Alt+Delete', 'Meta+E'] as const;
+
 export const Playground: Story = {};
 
-const shortcuts = ['Mod+K', 'Mod+Shift+P', 'Alt+Enter', 'Control+Alt+Delete', 'Meta+E'] as const;
+export const Usage: Story = {
+  render: () => (
+    <p className="text-body-b3-regular">
+      검색을 열려면 <Kbd keys="Mod+K" /> 를 누르세요.
+    </p>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -105,11 +113,28 @@ export const Gallery: Story = {
           <Kbd>Ctrl+C</Kbd>
         </Showcase.Row>
       </Showcase.Section>
+
+      <Showcase.Section
+        title="Separator"
+        description="Mac은 키 사이에 아무것도 그리지 않고, 그 밖은 +를 그립니다. Kbd.Separator를 넣으면 어느 플랫폼에서나 그 표시를 그립니다."
+      >
+        {platforms.map((platform) => (
+          <Showcase.Row key={platform} label={platform}>
+            <Kbd keys="Mod+Shift+P" platform={platform} />
+            <Kbd keys="Mod+Shift+P" platform={platform}>
+              <Kbd.Separator />
+            </Kbd>
+            <Kbd keys="Mod+Shift+P" platform={platform}>
+              <Kbd.Separator>-</Kbd.Separator>
+            </Kbd>
+          </Showcase.Row>
+        ))}
+      </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const PlatformAware: Story = {
+export const ShowTheShortcutForTheVisitorsPlatform: Story = {
   render: () => (
     <div className="flex items-center gap-6">
       <Kbd keys="Mod+K" platform="mac" data-testid="mac" />
@@ -121,7 +146,7 @@ export const PlatformAware: Story = {
     docs: {
       description: {
         story:
-          '단축키를 TanStack Hotkeys와 같은 문자열(Mod+K)로 적으면 방문자의 플랫폼에 맞춰 그립니다. platform으로 고정할 수도 있습니다.',
+          '`keys` 에 단축키를 TanStack Hotkeys와 같은 문자열(`Mod+K`)로 적으면 방문자의 플랫폼에 맞춰 그립니다. `platform` 으로 고정할 수도 있습니다.',
       },
     },
   },
@@ -137,7 +162,58 @@ export const PlatformAware: Story = {
   },
 };
 
+export const ChangeTheMarkBetweenKeys: Story = {
+  render: () => (
+    <div className="flex items-center gap-6">
+      <Kbd keys="Mod+K" platform="mac" data-testid="plus">
+        <Kbd.Separator />
+      </Kbd>
+      <Kbd keys="Mod+Shift+K" platform="windows" data-testid="dash">
+        <Kbd.Separator>-</Kbd.Separator>
+      </Kbd>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Kbd.Separator` 를 children 으로 넣으면 키 사이마다 그 표시를 그립니다. children 이 없으면 `+` 이고, 아무것도 그리지 않던 Mac에서도 그립니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(visible(canvas.getByTestId('plus'))).toBe('⌘+K');
+    await expect(visible(canvas.getByTestId('dash'))).toBe('Ctrl-Shift-K');
+  },
+};
+
+export const WriteTheKeysAsSymbols: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Kbd data-testid="command">⌘</Kbd>
+      <Kbd data-testid="combo">⇧⌘P</Kbd>
+      <Kbd keys="ArrowLeft" data-testid="arrow" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '⌘ ⇧ ← 같은 기호는 스크린 리더가 제대로 읽지 못합니다. children 으로 적은 기호도 `keys` 로 그린 기호처럼 숨기고 "커맨드" 같은 이름을 대신 읽게 합니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(spoken(canvas.getByTestId('command'))).toBe('커맨드');
+    await expect(spoken(canvas.getByTestId('combo'))).toBe('시프트 커맨드 P');
+    await expect(spoken(canvas.getByTestId('arrow'))).toBe('왼쪽 화살표');
+    const glyph = canvas.getByTestId('command').querySelector('[data-kbd-glyph="⌘"]');
+    await expect(glyph).toHaveAttribute('aria-hidden', 'true');
+  },
+};
+
 export const ModifierOrder: Story = {
+  tags: ['verification'],
   render: () => (
     <div className="flex items-center gap-6">
       <Kbd keys="Control+Alt+Shift+Meta+K" platform="mac" data-testid="mac" />
@@ -157,30 +233,5 @@ export const ModifierOrder: Story = {
     await expect(visible(canvas.getByTestId('mac'))).toBe('⌃⌥⇧⌘K');
     await expect(visible(canvas.getByTestId('windows'))).toBe('Win+Ctrl+Alt+Shift+K');
     await expect(visible(canvas.getByTestId('linux'))).toBe('Super+Ctrl+Alt+Shift+K');
-  },
-};
-
-export const SymbolNames: Story = {
-  render: () => (
-    <div className="flex items-center gap-3">
-      <Kbd data-testid="command">⌘</Kbd>
-      <Kbd data-testid="combo">⇧⌘P</Kbd>
-      <Kbd keys="ArrowLeft" data-testid="arrow" />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '⌘ ⇧ ← 같은 기호는 스크린 리더가 제대로 읽지 못합니다. 기호는 숨기고 "커맨드" 같은 이름을 대신 읽게 합니다. children으로 적은 기호에도 적용됩니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    await expect(spoken(canvas.getByTestId('command'))).toBe('커맨드');
-    await expect(spoken(canvas.getByTestId('combo'))).toBe('시프트 커맨드 P');
-    await expect(spoken(canvas.getByTestId('arrow'))).toBe('왼쪽 화살표');
-    const glyph = canvas.getByTestId('command').querySelector('[data-kbd-glyph="⌘"]');
-    await expect(glyph).toHaveAttribute('aria-hidden', 'true');
   },
 };

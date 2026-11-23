@@ -26,6 +26,12 @@ import { Splitter } from '@gsainfoteam/ids-react';
 
 ## 크기
 
+- 부모가 준 너비와 높이를 채우고, 부모보다 작아질 수 있습니다(`size-full min-h-0 min-w-0`).
+- 크기는 부모가 정합니다. 높이가 정해진 부모(`h-screen`, `grid h-96`, flex 안의 `flex-1`) 안에 둡니다.
+- 테두리와 모서리도 부모가 그립니다(`<div className="h-96 overflow-hidden rounded-standard border">`).
+
+## 패널 크기
+
 ```tsx
 <Splitter defaultValue={[20, 50, 30]}>...</Splitter>    // 루트에서 한 번에
 <Splitter.Panel defaultSize={30} />                      // 패널마다. 적지 않은 패널은 남은 크기를 똑같이 나눈다
@@ -47,7 +53,7 @@ import { Splitter } from '@gsainfoteam/ids-react';
 ```
 
 - 옆 패널이 최소 크기에 닿아도 계속 끌면 그다음 패널까지 밀어 냅니다. 같은 끌기 안에서 되돌리면 밀린 패널도 돌아옵니다.
-- 접힌 패널에는 `data-collapsed` 가 붙습니다. 크기가 0 인 패널은 `inert` 라서 안의 요소가 Tab 에 걸리지 않습니다.
+- 크기가 0 인 패널은 `inert` 라서 안의 요소가 Tab 에 걸리지 않습니다.
 
 ## 접기와 펼치기
 
@@ -56,7 +62,6 @@ import { Splitter } from '@gsainfoteam/ids-react';
 - 키보드는 핸들의 `Enter` 가 같은 일을 하므로 버튼은 Tab 순서에 없습니다.
 - 핸들 앞 패널이 접을 수 있으면 그 패널을, 아니면 뒤 패널을 접습니다.
 - 펼치면 버튼이나 `Enter` 로 접기 전의 크기로, 끌어서 접었으면 최소 크기로 돌아갑니다.
-- 앱에 따로 접기 버튼이 있으면 `className="[&_[data-splitter-toggle]]:hidden"` 으로 숨깁니다.
 
 ## 키보드
 
@@ -128,14 +133,12 @@ export function Workspace({ layout }: { layout?: number[] }) {
   </Splitter.Panel>
 </Splitter>
 
-<Splitter.Handle className="w-1 bg-neutral-soft" />   {/* 모양은 className 으로 */}
-
 <Splitter.Handle asChild>
   <hr />                                                    {/* 자식 요소 하나가 핸들이 된다 */}
 </Splitter.Handle>
 ```
 
-- 모양을 바꾸는 클래스는 `Splitter.Handle` 의 `className` 에 줍니다. `asChild` 자식의 클래스는 기본 클래스와 겹치면 집니다.
+- `asChild` 자식의 클래스는 핸들의 기본 클래스와 겹치면 집니다. 핸들의 모양을 바꾸는 것은 IDS 밖의 디자인입니다.
 - `Splitter.Handle` 은 두 패널 사이에 하나만 둡니다. 처음이나 끝, 같은 사이의 두 번째 핸들은 그리지 않고 개발 빌드에서 경고합니다.
 - 패널과 핸들은 `Splitter` 의 바로 아래 자식입니다. Fragment 는 괜찮지만 다른 컴포넌트로 감싸면 찾지 못하고 오류가 납니다.
 - 패널이 하나뿐이면 개발 빌드에서 경고합니다.
@@ -165,21 +168,15 @@ export function Workspace({ layout }: { layout?: number[] }) {
 - `aria-controls` 는 앞 패널 하나를 가리킵니다(APG Window Splitter).
 - 이름은 기본 "패널 크기 조절" 입니다. 무엇을 나누는지 `aria-label` 로 알려 줍니다.
 
-## 상태와 스타일
+## 상태
 
-| 속성                   | 붙는 곳              | 뜻                        |
-| ---------------------- | -------------------- | ------------------------- |
-| `data-orientation`     | 루트, 패널, 핸들     | `horizontal` / `vertical` |
-| `data-dragging`        | 루트, 패널, 끄는 핸들 | 끄는 중                   |
-| `data-collapsed`       | 패널                 | 접힘                      |
-| `data-splitter`        | 루트                 | 선택자                    |
-| `data-splitter-panel`  | 패널                 | 선택자                    |
-| `data-splitter-handle` | 핸들                 | 선택자                    |
-| `data-splitter-toggle` | 접기 버튼            | 선택자                    |
-| `data-resize-handle`   | 핸들                 | 크기 조절 손잡이 선택자   |
+- 레이아웃은 `value` 와 `onValueChange`(움직이는 동안), `onValueCommit`(끝날 때)로 읽습니다.
+- 접힘은 값에서 읽습니다. 접을 수 있는 패널의 크기가 `collapsedSize`(기본 0)이면 접힌 것입니다.
+- 끄는 중인지 알리는 값은 없습니다.
+
+## 색과 포인터
 
 - 선은 `--ids-color-border-neutral`, 올리거나 끄는 동안 `--ids-color-text-neutral` 입니다. 1px 선에서는 글자색 층이 보이지 않아 색 자체를 바꿉니다.
-- 루트는 부모를 채웁니다(`size-full`). 가로 분할은 부모에 높이가 있어야 합니다.
 - 패널은 `overflow: hidden` 입니다. 넘치는 내용은 패널 안에 `ScrollArea` 를 둡니다.
 - 끄는 동안 패널이 포인터를 받지 않아서 iframe 위를 지나도 끌기가 끊기지 않습니다.
 

@@ -24,7 +24,7 @@ export function EditorCodeBlockView({ node, editor, updateAttributes }: ReactNod
             onLanguageChange={(language) => updateAttributes({ language })}
           />
         </figcaption>
-        <Divider decorative className={styles.divider()} />
+        <Divider aria-hidden className={styles.divider()} />
         <div contentEditable={false}>
           <CodeBlockCopy />
         </div>

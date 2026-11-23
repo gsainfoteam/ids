@@ -159,8 +159,13 @@ export { Spacer } from './components/layout/spacer';
 export { AspectRatio } from './components/layout/aspect-ratio';
 export { ScrollArea } from './components/layout/scroll-area';
 export { MessageScroller } from './components/layout/message-scroller';
-export { Resizable } from './components/layout/resizable';
-export type { ResizableProps } from './components/layout/resizable';
+export { Resizable, useResizable } from './components/layout/resizable';
+export type {
+  ResizableAxisOptions,
+  ResizableInstance,
+  ResizableProps,
+  UseResizableOptions,
+} from './components/layout/resizable';
 export { Splitter } from './components/layout/splitter';
 export type {
   SplitterProps,

@@ -9,7 +9,7 @@ import { CollapsedContext, useBreadcrumbContext } from './context';
 export type BreadcrumbSeparatorProps = ComponentProps<'li'>;
 
 export function BreadcrumbSeparator({ className, children, ...props }: BreadcrumbSeparatorProps) {
-  const { styles, separator } = useBreadcrumbContext('Breadcrumb.Separator');
+  const { styles } = useBreadcrumbContext('Breadcrumb.Separator');
   const collapsed = use(CollapsedContext);
 
   if (collapsed) return null;
@@ -21,7 +21,7 @@ export function BreadcrumbSeparator({ className, children, ...props }: Breadcrum
       data-breadcrumb-separator=""
       className={styles.separator({ className })}
     >
-      {children ?? separator ?? <ChevronRightIcon />}
+      {children ?? <ChevronRightIcon />}
     </li>
   );
 }

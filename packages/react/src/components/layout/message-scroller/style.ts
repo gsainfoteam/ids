@@ -2,7 +2,7 @@ import { tv } from '../../../utils';
 
 export const messageScrollerStyle = tv({
   slots: {
-    root: 'relative flex min-h-0 min-w-0 flex-col',
+    root: 'relative flex size-full min-h-0 min-w-0 flex-col rounded-[inherit]',
     area: 'min-h-0 flex-1 rounded-[inherit]',
     viewport: '[overflow-anchor:none]',
     list: 'flex flex-col gap-4 p-4',
