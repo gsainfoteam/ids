@@ -8,15 +8,12 @@ import { orderedKeys, splitGlyphs, type KbdLabel, type ResolvedKey } from './lib
 import { GLYPH_ICONS } from './parts/glyph-icons';
 import { KbdSeparator, type KbdSeparatorProps } from './parts/separator';
 import { kbdStyle } from './style';
+import { resolveState } from '../../../internal/lib/state-props';
 import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { kbdGroupStyle } from '../kbd-group/style';
 
 import type { Kbd } from '.';
-
-function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
 
 const separatorIn = (children: ReactNode) =>
   flattenFragments(children).find(
@@ -81,7 +78,7 @@ export function KbdRoot({ keys, size, platform, labels, className, children, ...
           data-kbd-group=""
           data-size={kbd.size}
           data-platform={kbd.platform}
-          className={kbdGroupStyle({ size: kbd.size, className: resolve(className, state) })}
+          className={kbdGroupStyle({ size: kbd.size, className: resolveState(className, state) })}
         >
           {ordered.map((keyInfo, index) => (
             <Fragment key={`${index}:${keyInfo.id}`}>
@@ -124,7 +121,7 @@ export function KbdRoot({ keys, size, platform, labels, className, children, ...
       data-kbd=""
       data-size={kbd.size}
       data-platform={kbd.platform}
-      className={styles.root({ className: resolve(className, state) })}
+      className={styles.root({ className: resolveState(className, state) })}
     >
       <span className={styles.face()}>{content}</span>
     </kbd>
