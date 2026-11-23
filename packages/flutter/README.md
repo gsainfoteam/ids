@@ -66,7 +66,7 @@ final theme = IdsTheme(
 - 모드마다 값을 직접 고르려면 `IdsPalette(light: [...], dark: [...])` 로 9단계 스케일 둘을 준다. 번호가 클수록 페이지에서 멀다: 1 base, 2 surface, 3 block, 4 soft, 5 선, 6 진한 선, 7 solid, 8 글자, 9 진한 글자. 1~3단계는 neutral 만 역할로 읽는다.
 - 브랜드와 상태 계열의 스케일 규칙과 `textOn*` 계산은 ids-react 와 같다. [IdsProvider README](../react/src/components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 를 본다.
 - `IdsRamp.fromSeed(color)` 와 `IdsPalette.fromSeed(color)` 는 seed 로 만든 램프와 스케일을 직접 읽을 때 쓴다.
-- seed 모델은 ids-react 의 `createIdsRamp`, `createIdsPalette` 와 같아 같은 8비트 색을 낸다. 계수는 `packages/core/palette-model.json` 에 고정돼 있고 `pnpm codegen` 이 `lib/tokens/ids_palette_model.dart` 로 옮긴다.
+- seed 모델은 ids-react 의 `createIdsRamp`, `createIdsPalette` 와 같아 같은 8비트 색을 낸다. 계수는 `packages/core/config/palette-model.json` 에 고정돼 있고 `pnpm codegen` 이 `lib/tokens/ids_palette_model.dart` 로 옮긴다.
 - 상태 팔레트는 `IdsStatusPalettes.red` `yellow` `green` `sky` 에 있다.
 - 입력 색은 불투명 sRGB 로 맞춘다. 알파와 Display P3 는 버린다.
 
@@ -165,7 +165,7 @@ DecoratedBox(
 - `bgControlOutline` 과 `borderControlOutline` 은 outline 컨트롤, `bgFieldOutline` 과 `borderFieldOutline` 은 outline 입력 상자다. 다크에서는 `bgBlock` 바탕에 `borderNeutralStrong` 테두리다.
 - 카드의 면 `bgSurface` 와 면 안의 구역 `bgBlock` 은 컴포넌트 토큰이 아니라 `colors` 의 역할이다.
 - 그림자는 `IdsShadows.steps` 의 단계 `0`, `1`, `2` 이고, `componentShadows.shadowSurface`(라이트 1, 다크 0)처럼 토큰이 단계를 고른다.
-- 원본은 `packages/core/tokens/component.json` 과 `shadow.json` 이고, `pnpm codegen` 이 `lib/tokens/ids_component_tokens.dart` 를 쓴다. `test/theme_roles_parity_test.dart` 가 17개 팔레트에서 ids-react 와 같은 색인지 확인한다.
+- 원본은 `packages/core/config/component-tokens.json` 과 `tokens/shadow.tokens.json` 이고, `pnpm codegen` 이 `lib/tokens/ids_component_tokens.dart` 를 쓴다. `test/theme_roles_parity_test.dart` 가 17개 팔레트에서 ids-react 와 같은 색인지 확인한다.
 
 ## radius 와 글자
 
@@ -188,7 +188,7 @@ DecoratedBox(
 - `ids.shape()` 는 round 면 `RoundedRectangleBorder`, squircle 이면 `RoundedSuperellipseBorder` 다.
 - 글자 스타일 이름은 CSS 와 같다. `text-body-b3-medium` 은 `IdsTypography.bodyB3Medium` 이다.
 - `textStyle(..., mono: true)` 는 패키지에 든 Geist Mono 로 그린다. Geist Mono 에 없는 글자(한글 등)는 Pretendard GOV 로 그린다.
-- 두 글꼴 파일은 `pnpm codegen` 이 npm 패키지(`pretendard-gov`, Vercel 의 `geist`)에서 `fonts/` 로 복사한다. 버전은 `packages/core/package.json` 이 정한다. 라이선스(SIL OFL 1.1)는 `fonts/*-LICENSE.txt` 에 있다.
+- 두 글꼴 파일은 `pnpm codegen` 이 npm 패키지(`pretendard-gov`, Vercel 의 `geist`)에서 `fonts/` 로 복사한다. 버전은 `packages/core/package.json` 이, 파일 목록은 `packages/core/config/fonts.json` 이 정한다. 라이선스(SIL OFL 1.1)는 `fonts/*-LICENSE.txt` 에 있다.
 - `textStyle` 은 `inherit: false` 스타일을 돌려준다. 색은 `color` 로 준다.
 
 ## IDS 문구와 slang

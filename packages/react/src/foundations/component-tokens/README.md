@@ -11,7 +11,7 @@
 - 이름은 `{속성}-{그룹}[-{부분}][-{변형}]` 입니다. 속성은 `bg`, `text`, `border`, `shadow` 입니다.
 - 그룹 이름은 계열(`primary`, `neutral` …), `scheme`, 쓰임새(`base`, `surface`, `block`, `soft`, `solid`), 세기(`strong`)와 겹치지 않습니다.
 - `fill`, `tint`, `strong`, `accent`, `on`, `line`, `quiet`, `glyph`, `foreground`, `background` 는 이름에 쓰지 않습니다. `soft` 는 변형 자리에만 옵니다.
-- 원본은 `packages/core/tokens/component.json` 과 `shadow.json` 이고, `pnpm codegen` 이 `ids.css`, `src/tokens/component-tokens.ts`, Flutter 의 `IdsComponentColors`, `IdsComponentShadows` 를 씁니다.
+- 원본은 `packages/core/config/component-tokens.json` 과 `tokens/shadow.tokens.json` 이고, `pnpm codegen` 이 `ids.css`, `src/tokens/component-tokens.ts`, Flutter 의 `IdsComponentColors`, `IdsComponentShadows` 를 씁니다.
 - CSS 변수는 `--ids-color-{토큰}`, `--ids-shadow-{토큰}` 이고, Tailwind 유틸리티는 속성의 namespace 에 붙습니다(`inset-ring-control-outline`, `fill-qr-code`, `shadow-surface`).
 - 카드와 팝업의 면(`bg-surface`), 면 안의 구역(`bg-block`)은 컴포넌트 토큰이 아니라 시맨틱 역할입니다. 두 모드가 같은 단계를 읽어서 토큰이 필요 없습니다. [Color](../color/README.md#역할) 를 봅니다.
 
@@ -43,7 +43,7 @@
 
 ## 그림자
 
-`shadow.json` 은 단계 세 개(`0`, `1`, `2`)만 둡니다. `sm`, `md` 같은 이름은 없고, 컴포넌트는 `shadow-surface` 같은 토큰으로 단계를 고릅니다. `0` 은 `0 0 #0000` 이라 Tailwind 의 그림자 목록 안에서도 그대로 합쳐집니다.
+`shadow.tokens.json` 은 단계 세 개(`0`, `1`, `2`)만 둡니다. `sm`, `md` 같은 이름은 없고, 컴포넌트는 `shadow-surface` 같은 토큰으로 단계를 고릅니다. `0` 은 `0 0 #0000` 이라 Tailwind 의 그림자 목록 안에서도 그대로 합쳐집니다.
 
 ## 테스트
 

@@ -6,7 +6,7 @@ Monorepo (`gsainfoteam/ids`). pnpm workspace + Turborepo.
 
 ```
 packages/
-  core/     tokens + Style Dictionary codegen. Private — not published.
+  core/     token sources (DTCG), the typed IR and the codegen built on it. Private — not published.
   css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
   react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + IdsProvider.
   flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + IdsProvider.
@@ -20,32 +20,41 @@ stylesheet holds a class only `@source` on `ids-react/dist` produces. Changesets
 
 ## Generated files — do not edit manually
 
-These files are written by `pnpm codegen` (Style Dictionary, message generation and the font copy). Edits will be overwritten.
+These files are written by `pnpm codegen` (`packages/core/src/codegen.ts`, which builds the IR and runs
+every emitter, then the message generation). Edits will be overwritten.
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
 - `packages/react/src/tokens/palette-model.ts` and
-  `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/palette-model.js`)
+  `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/config/palette-model.json`)
 - `packages/react/src/tokens/component-tokens.ts` and
   `packages/flutter/lib/tokens/ids_component_tokens.dart` (`IdsComponentColors`,
-  `IdsComponentShadows`), written from `packages/core/tokens/component.json` and `shadow.json`
+  `IdsComponentShadows`), written from `packages/core/config/component-tokens.json` and
+  `tokens/shadow.tokens.json`
+- `packages/react/src/tokens/foundations.json`, the spacing, size, radius, motion and typography
+  tokens the Foundations stories read
 - `packages/react/src/internal/messages-catalog.ts` and
   `packages/react/src/components/form/editor/messages-catalog.ts` (the `editor` group, kept out of the
   shared catalog every component loads)
 - `packages/react/messages/en.json`
 - `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
-  `packages/core/color-roles.json`)
+  `packages/core/config/color-roles.json`)
 - `packages/flutter/lib/messages/ids_messages.dart`
 - `packages/flutter/messages/ko.i18n.json`
-- `packages/flutter/fonts/*` (`packages/core/fonts.build.mjs` copies them from the `pretendard-gov` and
-  `geist` npm packages, so the Flutter fonts move with the versions in `packages/core/package.json`)
+- `packages/flutter/fonts/*` (copied from the `pretendard-gov` and `geist` npm packages as
+  `packages/core/config/fonts.json` lists them, so the Flutter fonts move with the versions in
+  `packages/core/package.json`)
+- `packages/core/ir.schema.json`, the JSON Schema of the IR (`out/ir.json`, not committed)
 
-To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
+To change tokens: edit the DTCG files under `packages/core/tokens/` or the tables under
+`packages/core/config/`, then run `pnpm codegen`. `packages/core/README.md` says how to add a token
+kind or a target.
 
 ## Common commands
 
 ```bash
-pnpm codegen          # Run Style Dictionary: core → css/react/flutter
+pnpm codegen          # Build the IR from packages/core and write css/react/flutter from it
+pnpm --filter @gsainfoteam/ids-core test  # IR schema, source errors, generated files equal to the committed ones
 pnpm build            # Build all packages (turbo, css before react)
 pnpm typecheck        # TypeScript check all packages
 pnpm lint             # ESLint all packages
@@ -60,7 +69,10 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 ## Package responsibilities
 
-**core** — Token source of truth. `sd.config.js` defines all formatters. Output goes directly to sibling packages. No build artifact. `pnpm build` in core = `style-dictionary build`.
+**core** — Token source of truth. `src/sources` reads the DTCG tokens (`@terrazzo/parser`) and the
+`config/*.json` tables (valibot), `src/ir` builds one typed IR, and the emitters read only the IR
+and spell names as the IR gives them. Output goes directly to sibling packages. No build artifact.
+`pnpm build` in core = `tsx src/codegen.ts` and the message generation.
 
 **css** — Pure CSS package. No React dependency. Consumers import `@gsainfoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
 
@@ -583,12 +595,12 @@ mode. No layer mixes two tokens with `color-mix`.
   IdsProvider root carries `scheme-primary`; a component with `colorScheme` always writes its own
   `scheme-X`, so a Button inside a danger Alert stays primary. Choices that depend on another prop
   (a status family's outline text) are `tv` compoundVariants.
-- **Component tokens.** `packages/core/tokens/component.json` names them
+- **Component tokens.** `packages/core/config/component-tokens.json` names them
   `{property}-{group}[-{part}][-{variant}]`: property `bg`, `text`, `border` or `shadow`; a group
   that is no family, `scheme`, use word (`base`, `surface`, `block`, `soft`, `solid`) or `strong`;
   never `fill`, `tint`, `strong`, `accent`, `on`, `line`, `quiet`, `glyph`, `foreground` or
   `background`; `soft` only as the variant. Each token points to a role in light and in dark, and
-  `shadow-*` to a raw step of `shadow.json` (`0`, `1`, `2`, no `sm`/`md`). A surface whose role
+  `shadow-*` to a raw step of `shadow.tokens.json` (`0`, `1`, `2`, no `sm`/`md`). A surface whose role
   differs by mode uses a component token, never `dark:`:
 
   | Token | light | dark | Used by |
@@ -629,9 +641,10 @@ mode. No layer mixes two tokens with `color-mix`.
   exception. `text-neutral-strong` and `text-neutral` are body and secondary text that read on
   every neutral background.
 - There is no hover or active role. States are component code, see the state layer below.
-- The table lives in `packages/core/color-roles.json` (`slots`, `neutralOnly`, `scheme`); the
-  neutral scales in `packages/core/tokens/palette.json` and the step each neutral role reads in
-  `packages/core/neutral-roles.json`, the same step in both modes. `text-on-*` roles read no step,
+- The table lives in `packages/core/config/color-roles.json` (`slots`, where a slot without
+  `$family` is neutral only, and `scheme`); the neutral scales in
+  `packages/core/tokens/palette.tokens.json` and the step each neutral role reads in
+  `packages/core/config/neutral-roles.json`, the same step in both modes. `text-on-*` roles read no step,
   are absent from `neutral-roles.json` and have no CSS fallback.
 
 Every scale has nine steps, read by the same roles in both modes:
@@ -725,7 +738,7 @@ utility paints a `background-image` of `--ids-state-color` (the element's `curre
 set) at `--ids-state-opacity`, over whatever background the element has. `state-hover` sets the
 opacity to `--ids-state-layer-hover` and `state-press` to `--ids-state-layer-press`, which fall back
 to `--ids-state-hover` (6%) and `--ids-state-press` (10%), all from
-`packages/core/tokens/state.json`. A component writes
+`packages/core/tokens/state.tokens.json`. A component writes
 `state-layer data-hovered:state-hover data-active:state-press` (`pressStates` in
 `internal/surfaces/control-surface.ts`), and a selected, current or pressed item that should read as
 pressed takes `state-press` (a ghost or outline Toggle, a selected Table row or Item, the current
@@ -1256,16 +1269,16 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 
 ## Palettes in core
 
-IDS ships no brand palette. `packages/core/tokens/palette.json` holds the neutral light and dark
+IDS ships no brand palette. `packages/core/tokens/palette.tokens.json` holds the neutral light and dark
 scales and the four status ramps (red, yellow, green, sky). The one-color palette builder evaluates a model whose
-coefficients live in `packages/core/palette-model.json` (Fourier series of the 500 hue per step,
+coefficients live in `packages/core/config/palette-model.json` (Fourier series of the 500 hue per step,
 fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
 palettes to `src/tokens/palette-model.ts` and to `packages/flutter/lib/tokens/ids_palette_model.dart`,
 which `IdsRamp.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
 palettes from seed hex values in `.storybook/palettes.ts`. There are no per-hue role tables: every
 platform picks the roles from the app's palette at runtime. The neutral scales hold nine steps per
-mode, and `packages/core/neutral-roles.json` names the step each neutral role reads (`text-on-*`
-roles read none). `packages/core/color-roles.json` names the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
+mode, and `packages/core/config/neutral-roles.json` names the step each neutral role reads (`text-on-*`
+roles read none). `packages/core/config/color-roles.json` names the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
 
 ## Versioning — Changesets (fixed mode)
 

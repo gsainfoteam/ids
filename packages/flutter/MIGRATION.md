@@ -32,9 +32,9 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - **hover·press는 state layer다.** 배경 위에 전경색(React의 `currentColor`)을 `IdsStateOpacity.hover`(0.06), `.press`(0.1)로 덮는다. React `state-layer`와 같은 계산이다. 별도 StateMask 위젯은 만들지 않는다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
 - **`IdsInteractive`는 그리지 않는다.** 상태만 내보내고 배경 알파·scale·focus ring·disabled는 control surface 값 파일이 정한다. React의 `useInteractive` / `control-surface.ts` 분리와 같다. 그래서 Figma를 보지 않는다.
 - **`IdsTextField`도 `IdsInteractive`를 쓴다.** React는 `Button`·`Toggle`만 쓰고 `TextField`는 네이티브 `:focus-visible`로 처리한다. Flutter엔 의사클래스가 없다.
-- **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
-- **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. core에 `radius.json`·`size.json`은 있으나 dart formatter가 없어 `lib/tokens/`로 나오지 않는다. 상태 알파는 core의 `tokens/state.json`에 있고 `pnpm codegen`이 `lib/tokens/ids_color_roles.dart`의 `IdsStateOpacity`로 쓴다. 손으로 적지 않는다.
-- **컴포넌트 색은 `colorScheme` prop이다.** FE의 Button, IconButton, Toggle, IconToggle, FloatingButton, Badge, Chip, Alert, Progress에 있다. 컨트롤의 값은 `primary` `neutral` `danger` `success` `warning` `info`. `enums.json`에는 아직 없고 React의 TS 타입(`ControlColorScheme`)이다. 옮기는 컴포넌트에서 쓰일 때 `enums.json`에 올린다.
+- **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/config/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
+- **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. core에 `radius.tokens.json`·`size.tokens.json`은 있으나 dart formatter가 없어 `lib/tokens/`로 나오지 않는다. 상태 알파는 core의 `tokens/state.tokens.json`에 있고 `pnpm codegen`이 `lib/tokens/ids_color_roles.dart`의 `IdsStateOpacity`로 쓴다. 손으로 적지 않는다.
+- **컴포넌트 색은 `colorScheme` prop이다.** FE의 Button, IconButton, Toggle, IconToggle, FloatingButton, Badge, Chip, Alert, Progress에 있다. 컨트롤의 값은 `primary` `neutral` `danger` `success` `warning` `info`. `config/enums.json`에는 아직 없고 React의 TS 타입(`ControlColorScheme`)이다. 옮기는 컴포넌트에서 쓰일 때 `config/enums.json`에 올린다.
 - **설계 문서(Notion, `IDS Architecture.md`)와 다른 곳.** 시각값은 Figma를 보고 닫는다. 나머지는 코드를 따르고 미결로 둔다.
 
   시각값 — 그 컴포넌트를 만들 때 Figma에서 확인하고 아래 control surface 절에 값을 적는다.
@@ -46,7 +46,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
   - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
   - `Ids` prefix: codegen과 `IdsScope`·`IdsTheme`에 있음. 문서는 prefix 없음
-  - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
+  - size / variant: `config/enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
   - spacing: core에 `spacing.json`은 있으나 `ids_spacing.dart`가 없다. 위 dart formatter 건과 같다
 
 이전 기록에서 참조하는 것: 컴포넌트 목록, 서브컴포넌트 조립 구조, 다뤘던 기능·상태.
@@ -83,7 +83,7 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 
 ## 색 역할 이름 변경
 
-React와 같은 문법으로 바뀌었다. 배경은 쓰임새(`bgBase`, `bgSurface`, `bgBlock`, `bgXSoft`, `bgXSolid`), 선과 글자는 세기(`borderX`, `borderXStrong`, `textX`, `textXStrong`), 배경 위 글자는 `textOn{배경}`이다. `IdsColors` 필드는 `lib/tokens/ids_color_roles.dart`가 `packages/core/color-roles.json`에서 만든다.
+React와 같은 문법으로 바뀌었다. 배경은 쓰임새(`bgBase`, `bgSurface`, `bgBlock`, `bgXSoft`, `bgXSolid`), 선과 글자는 세기(`borderX`, `borderXStrong`, `textX`, `textXStrong`), 배경 위 글자는 `textOn{배경}`이다. `IdsColors` 필드는 `lib/tokens/ids_color_roles.dart`가 `packages/core/config/color-roles.json`에서 만든다.
 
 | 예전 | 지금 |
 | --- | --- |

@@ -1,6 +1,6 @@
 # Spacing
 
-`packages/core/tokens/spacing.json` 의 이름 붙은 간격입니다. 모두 Tailwind 의 4px 눈금 위에 있습니다.
+`packages/core/tokens/spacing.tokens.json` 의 이름 붙은 간격입니다. 모두 Tailwind 의 4px 눈금 위에 있습니다.
 
 - **Tailwind 단계로 씁니다.** CSS 변수로 나가지 않으므로 `p-4`, `gap-2` 처럼 씁니다.
 - **이름은 설계 용어.** 스펙과 리뷰에서 `md 여백` 처럼 부를 때 씁니다.
