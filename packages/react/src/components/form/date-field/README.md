@@ -5,7 +5,7 @@
 - **하루, 기간, 여러 날.** `selectionMode` 로 고르고, 값은 `@internationalized/date` 의 `CalendarDate` 입니다. 시간대가 없어서 로컬 시간대가 날짜를 밀지 못합니다.
 - **키보드 그대로.** Trigger에서 `↓` 로 열면 고른 날(없으면 오늘)에 포커스가 가고, 하루를 고르면 닫히며 포커스가 Trigger로 돌아옵니다.
 - **글자로 입력.** `DateField.Input` 을 넣으면 `2026. 09. 15.`, `2026년 9월 15일`, `20260915` 처럼 쳐서 넣을 수 있습니다. 읽고 쓰는 일은 브라우저의 `Intl` 이 합니다.
-- **어떤 locale 이든.** `locale` 은 BCP 47 태그(`'ja-JP'`, `'de-DE'`)이고 import 할 locale 데이터가 없습니다.
+- **어떤 locale 이든.** `IdsProvider` 의 `locale`(`'ja-JP'`, `'de-DE'` 같은 BCP 47 태그)을 따르고 import 할 locale 데이터가 없습니다.
 - **폼.** `name` 을 주면 ISO 날짜가 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막고 Trigger로 포커스를 옮깁니다. `reset` 은 `defaultValue` 로 되돌립니다.
 - **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 `CalendarDate` 값을 그대로 주고받습니다.
 - **달력 기능 그대로.** 제한, 연월 목록, 여러 달, locale, 기간 미리 보기는 [Calendar](../../data/calendar/README.md) 와 같습니다.
@@ -36,8 +36,8 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 
 ```tsx
 <DateField />                                         // 2026. 09. 15. (locale 의 두 자리 숫자 날짜)
-<DateField locale="en-US" />                          // 09/15/2026
-<DateField locale="de-DE" />                          // 15.09.2026
+<IdsProvider.Scope locale="en-US"><DateField /></IdsProvider.Scope>  // 09/15/2026
+<IdsProvider.Scope locale="de-DE"><DateField /></IdsProvider.Scope>  // 15.09.2026
 <DateField format={{ dateStyle: 'long' }} />          // 2026년 9월 15일
 <DateField format={{ month: 'long', day: 'numeric', weekday: 'long' }} />  // 9월 15일 화요일
 <DateField format={(date, locale) => `${date.month}/${date.day}`} />  // 9/15. 함수는 CalendarDate 를 받는다
@@ -55,16 +55,17 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
   min={new CalendarDate(2026, 1, 1)}
   max={new CalendarDate(2026, 12, 31)}
   disabled={{ dayOfWeek: 0 }} // 날짜별로 막는다. true 면 필드 전체를 막는다
-  captionLayout="dropdown" // 연도와 월을 목록에서 고른다. 생년월일에
-  monthsToShow={2} // 기간은 두 달을 나란히
-  weekStartsOn={1}
-  locale="en-US" // 달력과 표시 형식의 언어. BCP 47 태그. 기본 ko-KR
-  today={new CalendarDate(2026, 9, 15)}
-/>
+>
+  <DateField.Calendar monthsToShow={2} today={new CalendarDate(2026, 9, 15)}>
+    <Calendar.Caption layout="dropdown" /> {/* 연도와 월을 목록에서 고른다. 생년월일에 */}
+  </DateField.Calendar>
+</DateField>
 ```
 
-- `disabled` 는 [Calendar](../../data/calendar/README.md#제한) 의 `DateMatcher` 를 그대로 받습니다.
-- `month` / `defaultMonth` / `onMonthChange`, `modifiers`, `renderDay` 같은 달력 속성도 달력으로 갑니다. 팝업을 열 때마다 고른 날의 달에서 시작합니다.
+- `min`, `max`, `disabled` 는 필드의 것입니다. 달력과 글자 입력이 함께 씁니다. `disabled` 는 [Calendar](../../data/calendar/README.md#제한) 의 `DateMatcher` 를 그대로 받습니다.
+- 나머지 달력 속성은 `DateField.Calendar` 가 받습니다: `monthsToShow`, `today`, `month` / `defaultMonth` / `onMonthChange`, 그리고 `Calendar.Day`, `Calendar.Caption`, `Calendar.WeekNumber`, `Calendar.Footer` part. 값, `selectionMode`, 크기는 필드가 넘깁니다.
+- `DateField.Calendar` 는 필드의 자식으로 적고, 팝업 안에 그려집니다. 없으면 기본 달력을 그립니다. 팝업을 열 때마다 고른 날의 달에서 시작합니다.
+- 주 시작과 숫자 체계는 `IdsProvider` locale 의 `-u-fw-`, `-u-nu-` 확장을 따릅니다.
 
 ## 열기와 닫기
 
@@ -78,8 +79,12 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 
 ```tsx
 <DateField open={open} onOpenChange={setOpen} />   // 열림도 제어할 수 있다
-<DateField mobileVariant="drawer" />              // 640px 보다 좁으면 아래에서 올라오는 판
+<DateField>
+  <DateField.Content mobileVariant="drawer" />    // 640px 보다 좁으면 아래에서 올라오는 판
+</DateField>
 ```
+
+- `DateField.Content` 는 팝업입니다. `mobileVariant` 는 `popover`(기본) / `drawer` 이고, 나머지 속성은 팝업 안 내용 상자에 붙습니다.
 
 - 달력 안의 키보드는 [Calendar](../../data/calendar/README.md#키보드) 와 같습니다.
 - `onBlur` 는 포커스가 필드와 팝업을 모두 벗어날 때만 부릅니다.
@@ -174,20 +179,27 @@ const schema = z.object({
 ```tsx
 <DateField value={date} onValueChange={setDate}>
   <DateField.Trigger>
-    <DateField.Value className="font-medium" /> {/* 값이나 placeholder */}
+    <DateField.Value /> {/* 값이나 placeholder */}
   </DateField.Trigger>
   <DateField.Clear aria-label="마감일 지우기" /> {/* 값이 없으면 그리지 않는다 */}
-  <DateField.Content>{/* 기본은 Calendar */}</DateField.Content>
+  <DateField.Calendar monthsToShow={2} /> {/* 기본 달력의 속성 */}
+  <DateField.Content>{/* 기본은 DateField.Calendar */}</DateField.Content>
 </DateField>
 ```
 
 - 부분을 하나도 주지 않으면 Trigger 와 Clear 를 그립니다. 하나라도 주면 준 것만 그리고, Trigger 가 없으면 Trigger 만 채웁니다.
+- `Calendar` 와 `Content` 는 부분 수에 들지 않습니다. `Content` 에 children 을 주면 기본 달력 대신 그리고, 그 안에 `DateField.Calendar` 를 둘 수도 있습니다.
 - `Trigger`, `Value`, `Clear`, `Content`, `Input` 은 `asChild` 를 받습니다. Clear 는 Trigger 안에 둘 수 없습니다.
 - `Input` 이 있으면 Trigger 는 달력 아이콘 버튼이 되고, 주지 않으면 끝에 붙습니다. [글자로 입력](#글자로-입력) 을 봅니다.
 - Clear 와 `Input` 옆의 달력 버튼은 ghost [IconButton](../../action/icon-button/README.md) 입니다. 필드 크기를 따르고 테두리에서 4px 안쪽에 놓입니다. `children` 에 아이콘 하나를 주면 기본 아이콘 대신 그리고, `asChild` 면 자식 요소가 IconButton 이 됩니다.
 - Clear 는 Tab 순서에 남습니다. `Input` 이 없는 필드에는 지울 글자가 없고, 달력에는 값을 비우는 키가 없습니다.
 
 ## 상태
+
+앱은 상태를 값으로 읽습니다.
+
+- 값: `value` / `onValueChange`. 팝업: `open` / `onOpenChange`.
+- 필드 표면의 `className` 과 `style` 은 `DateField.State` 를 받는 함수도 됩니다. `className` 처럼 IDS 위에 새 디자인을 지을 때만 씁니다.
 
 | `DateField.State`                    | 뜻                            |
 | ------------------------------------ | ----------------------------- |
@@ -197,8 +209,19 @@ const schema = z.object({
 | `invalid`                            | `invalid` 또는 `aria-invalid` |
 | `disabled` / `readOnly` / `required` | 같은 이름의 속성              |
 
-- 필드 표면에는 `data-open`, `data-empty`, `data-invalid`, `data-disabled`, `data-readonly`, `data-required`, `data-size`, `data-variant` 가 붙고, `className` 과 `style` 은 상태를 받는 함수도 됩니다.
-- Value 는 비어 있을 때 `data-placeholder` 가 붙습니다.
+## 크기
+
+- 부모 너비를 다 채웁니다(fill). 블록 요소이고 `min-w-0` 이라 flex 와 grid 안에서도 줄어듭니다.
+- 너비와 자리는 부모가 정합니다. 필드에 `className` 으로 너비나 여백을 주지 않습니다.
+
+```tsx
+<form className="grid w-80 gap-4">
+  <Field>
+    <Field.Label>날짜</Field.Label>
+    <DateField />
+  </Field>
+</form>
+```
 
 ## 속성
 
@@ -210,18 +233,19 @@ const schema = z.object({
 | `format`                                                              | locale 숫자 날짜. Intl 옵션이나 `(date, locale) => string` |
 | `placeholder`                                                         | `날짜 선택`, 기간은 `기간 선택`                          |
 | `min` / `max` / `disabled`                                            | 달력으로 간다. `disabled={true}` 는 필드 전체            |
-| `captionLayout` / `monthsToShow` / `weekStartsOn` / `month` / `today` | 달력으로 간다                                            |
-| `modifiers` / `modifiersClassNames` / `renderDay` / `footer`          | 달력으로 간다                                            |
-| `locale`                                                              | `ko-KR`. BCP 47 태그. 달력과 표시 형식, 입력 해석        |
 | `name` / `form` / `required`                                          | 숨은 값 입력과 브라우저 검증                             |
 | `readOnly`                                                            | 열리지 않고 Clear 도 막힌다                              |
 | `invalid`                                                             | danger 테두리와 링. Field 의 `aria-invalid` 가 우선      |
 | `variant`                                                             | `outline`(기본) / `soft` / `ghost`                       |
 | `size`                                                                | `standard` / `tiny`. 생략하면 `Field` 크기               |
-| `mobileVariant`                                                       | `popover`(기본) / `drawer`                               |
 | `className` / `style`                                                 | 필드 표면. 상태를 받는 함수도 된다                       |
 | `autoComplete`                                                        | `Input` 이 있을 때 쓴다. 기본 `off`                      |
 | 그 외 native 속성, `ref`                                              | Trigger `button`, `Input` 이 있으면 그 `input` 으로 간다 |
+
+| part                 | 받는 것                                                                    |
+| -------------------- | -------------------------------------------------------------------------- |
+| `DateField.Calendar` | `monthsToShow`, `today`, `month` 셋, `Calendar.*` part. 기본 달력을 바꾼다 |
+| `DateField.Content`  | 팝업. `mobileVariant`: `popover`(기본) / `drawer`                          |
 
 ## 알아둘 것
 
@@ -229,7 +253,7 @@ const schema = z.object({
 - 값은 시간대 없는 날짜이고 `format` 은 표시에만 씁니다. 표시는 그 날의 UTC 자정을 `timeZone: 'UTC'` 로 그려서 로컬 시간대가 하루를 밀지 못합니다(`format` 옵션의 `timeZone` 보다 먼저입니다).
 - 바깥에서 준 값을 min/max 로 자르지 않습니다.
 - 글자로 친 날짜도 `CalendarDate` 로 읽습니다.
-- BCP 47 태그가 아닌 `locale`(date-fns `Locale` 객체, `'de_DE'`)은 오류입니다.
+- locale 은 `IdsProvider` 의 것이고 달력, 표시 형식, 입력 해석에 함께 씁니다. BCP 47 태그가 아니면(`'de_DE'`) 오류입니다.
 - 표시 글자는 런타임의 `Intl` 데이터입니다. 서버(Node)와 브라우저의 ICU 가 다르면 글자가 조금 다를 수 있습니다.
 - 팝업은 필드 전체 너비 이상으로 열리고, 화면 밖으로 나가지 않게 위아래를 고릅니다.
 - `drawer` 는 modal 입니다. 뒤 화면을 어둡게 가리고 스크롤을 잠그며, 포커스를 sheet 안에 둡니다. 배경을 누르거나 Escape 로 닫으면 포커스가 필드로 돌아갑니다.

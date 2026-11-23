@@ -4,7 +4,7 @@ import { createContext, use, type ComponentProps, type Ref } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { CalendarOptions } from '.';
+import type { CalendarDayProps } from './day';
 import type { calendarStyle } from './style';
 import type { CalendarState } from './use-calendar';
 import type { IdsSize } from '../../../tokens/types';
@@ -21,8 +21,7 @@ type ContextValue = {
   native: Omit<NativeProps, 'ref'>;
   rootRef: Ref<HTMLDivElement>;
   onGridMouseLeave: () => void;
-  modifierNames: string[];
-  renderDay?: CalendarOptions['renderDay'];
+  day: CalendarDayProps | undefined;
 };
 
 export const CalendarContext = createContext<ContextValue | null>(null);

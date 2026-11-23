@@ -153,22 +153,28 @@ test('the nearest provider translates, and one without translate inherits it', a
     .toBeInTheDocument();
 });
 
-test('the provider locale formats dates, and a component locale overrides it', async () => {
+test('the provider locale formats dates, and a nested provider locale overrides it', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme} locale="en-US">
-      <Calendar aria-label="Provider" />
-      <Calendar aria-label="Component" locale="de-DE" />
+      <Calendar aria-label="Outer" />
+      <IdsProvider.Scope locale="de-DE">
+        <Calendar aria-label="Nested" />
+        <TimePicker aria-label="Nested time" />
+      </IdsProvider.Scope>
     </IdsProvider>,
   );
 
   const month = new Date().toLocaleString('en-US', { month: 'long' });
   const monat = new Date().toLocaleString('de-DE', { month: 'long' });
   await expect
-    .element(screen.getByRole('group', { name: 'Provider' }))
+    .element(screen.getByRole('group', { name: 'Outer' }))
     .toMatchTextContent(new RegExp(month));
   await expect
-    .element(screen.getByRole('group', { name: 'Component' }))
+    .element(screen.getByRole('group', { name: 'Nested', exact: true }))
     .toMatchTextContent(new RegExp(monat));
+  await expect
+    .element(screen.getByRole('group', { name: 'Nested time' }))
+    .toHaveAttribute('data-hour-cycle', '24h');
 });
 
 test('server HTML under a translation hydrates without a mismatch', async () => {

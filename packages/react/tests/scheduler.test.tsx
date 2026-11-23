@@ -633,7 +633,9 @@ test('pointer: a dropped event takes focus, the same as a keyboard drop', async 
           defaultView="month"
           now={NOW}
           onEventChange={(event, change) =>
-            setEvents((all) => all.map((each) => (each.id === event.id ? { ...each, ...change } : each)))
+            setEvents((all) =>
+              all.map((each) => (each.id === event.id ? { ...each, ...change } : each)),
+            )
           }
         />
       </IdsProvider>
@@ -658,7 +660,9 @@ test('pointer: a dropped event takes focus, the same as a keyboard drop', async 
   await mouse('mouseReleased', to.x, to.y);
 
   await expect
-    .poll(() => document.activeElement?.closest('[data-scheduler-slot]')?.getAttribute('data-scheduler-slot'))
+    .poll(() =>
+      document.activeElement?.closest('[data-scheduler-slot]')?.getAttribute('data-scheduler-slot'),
+    )
     .toBe('algo');
 });
 
@@ -970,4 +974,16 @@ test('no event box covers another, so every end handle can be grabbed', async ()
     const { left, width, top, height } = edge.getBoundingClientRect();
     expect(document.elementFromPoint(left + width / 2, top + height / 2)).toBe(edge);
   }
+});
+
+test('the date popup opens under a locale whose only -u- keyword is the week start', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme} locale="ko-KR-u-fw-mon">
+      <Scheduler events={EVENTS} defaultDate={on(17)} now={NOW} />
+    </IdsProvider>,
+  );
+  await userEvent.click(screen.container.querySelector<HTMLElement>('[data-scheduler-range]')!);
+  const popup = screen.getByRole('dialog', { name: '날짜로 이동' });
+  await expect.element(popup.getByRole('grid')).toBeVisible();
+  expect(popup.element().querySelector('[role=grid] thead th')?.textContent).toBe('월');
 });

@@ -1,4 +1,4 @@
-import { Fragment, StrictMode, useState } from 'react';
+import { Fragment, StrictMode, useState, type ReactNode } from 'react';
 
 import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
@@ -7,8 +7,9 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { DateField, DateTimeField, Field, type Calendar } from '../src';
+import { Calendar, DateField, DateTimeField, Field, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -26,6 +27,15 @@ const keyOf = (date: CalendarDate | null | undefined) => date && date.toString()
 const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+const inLocale = (locale: string | undefined, children: ReactNode) => (
+  <IdsProvider theme={testTheme} locale={locale}>
+    {children}
+  </IdsProvider>
+);
+const shownMonths = () =>
+  [...document.querySelectorAll('[role=dialog] [role=grid]')].map((grid) =>
+    grid.getAttribute('aria-label'),
+  );
 
 async function copy(text: string) {
   const scratch = document.createElement('input');
@@ -61,12 +71,15 @@ test('SSR: Intl options, format functions, Field labelling and ISO local-date Fo
   for (const [format, locale, expected] of formats) {
     const doc = parse(
       renderToString(
-        <form>
-          <Field required>
-            <Field.Label>Date</Field.Label>
-            <DateField name="date" defaultValue={d(15)} format={format} locale={locale} />
-          </Field>
-        </form>,
+        inLocale(
+          locale,
+          <form>
+            <Field required>
+              <Field.Label>Date</Field.Label>
+              <DateField name="date" defaultValue={d(15)} format={format} />
+            </Field>
+          </form>,
+        ),
       ),
     );
     const combobox = doc.querySelector('[role=combobox]')!;
@@ -89,28 +102,29 @@ test('SSR: Intl options, format functions, Field labelling and ISO local-date Fo
 
 test('any BCP 47 tag works without an import, and anything else throws', () => {
   const shown = (locale: string) =>
-    parse(renderToString(<DateField defaultValue={d(15)} locale={locale} />)).querySelector(
+    parse(renderToString(inLocale(locale, <DateField defaultValue={d(15)} />))).querySelector(
       '[role=combobox]',
     )!.textContent;
   expect(shown('ko')).toContain('2026. 09. 15.');
   expect(shown('en-GB')).toContain('15/09/2026');
   expect(shown('zh-CN')).toContain('2026/09/15');
-  expect(() => renderToString(<DateField locale="not a locale" />)).toThrow(/BCP 47/);
-  expect(() => renderToString(<DateField locale="" />)).toThrow(/BCP 47/);
-  // @ts-expect-error A date-fns Locale object is no longer taken.
-  expect(() => renderToString(<DateField locale={{ code: 'de' }} />)).toThrow(/BCP 47/);
+  expect(() => renderToString(inLocale('not a locale', <DateField />))).toThrow(/BCP 47/);
+  expect(() => renderToString(inLocale('', <DateField />))).toThrow(/BCP 47/);
+  const localeObject = { code: 'de' } as unknown as string;
+  expect(() => renderToString(inLocale(localeObject, <DateField />))).toThrow(/BCP 47/);
 });
 
 test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear empties', async () => {
   const changes: (CalendarDate | null)[] = [];
   const screen = await render(
     <DateField
-      today={d(15)}
       min={d(10)}
       max={d(20)}
       disabled={(date) => date.day === 16}
       onValueChange={(next) => changes.push(next)}
-    />,
+    >
+      <DateField.Calendar today={d(15)} />
+    </DateField>,
   );
   const trigger = screen.getByRole('combobox');
   trigger.element().focus();
@@ -135,7 +149,9 @@ test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear 
 test('picking the day that is already chosen closes without reporting a change', async () => {
   const onValueChange = vi.fn();
   const screen = await render(
-    <DateField defaultValue={d(18)} today={d(15)} onValueChange={onValueChange} />,
+    <DateField defaultValue={d(18)} onValueChange={onValueChange}>
+      <DateField.Calendar today={d(15)} />
+    </DateField>,
   );
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(day('2026-09-18')).toHaveFocus();
@@ -147,7 +163,9 @@ test('picking the day that is already chosen closes without reporting a change',
 test('StrictMode opens on the active day; custom content keeps the close button to focus', async () => {
   const screen = await render(
     <StrictMode>
-      <DateField today={d(15)} />
+      <DateField>
+        <DateField.Calendar today={d(15)} />
+      </DateField>
     </StrictMode>,
   );
   const trigger = screen.getByRole('combobox');
@@ -158,8 +176,8 @@ test('StrictMode opens on the active day; custom content keeps the close button 
   await expect.element(trigger).toHaveFocus();
   await screen.rerender(
     <StrictMode>
-      <DateField mobileVariant="drawer">
-        <DateField.Content>Custom content</DateField.Content>
+      <DateField>
+        <DateField.Content mobileVariant="drawer">Custom content</DateField.Content>
       </DateField>
     </StrictMode>,
   );
@@ -175,12 +193,12 @@ test('range stays open, a half-picked range is missing from FormData and fails r
     <form>
       <DateField
         selectionMode="range"
-        today={d(15)}
         name="trip"
         required
-        monthsToShow={2}
         onValueChange={(next) => (value = next)}
-      />
+      >
+        <DateField.Calendar today={d(15)} monthsToShow={2} />
+      </DateField>
     </form>,
   );
   const trigger = screen.getByRole('combobox');
@@ -203,10 +221,58 @@ test('range stays open, a half-picked range is missing from FormData and fails r
   expect(validator().validity.valueMissing).toBe(false);
 });
 
+test('DateField.Calendar takes the calendar options: months shown, the first month and the caption', async () => {
+  const screen = await render(
+    <DateField>
+      <DateField.Calendar today={d(15)} monthsToShow={2} />
+    </DateField>,
+  );
+  await userEvent.click(screen.getByRole('combobox'));
+  await expect.poll(shownMonths).toEqual(['2026년 9월', '2026년 10월']);
+  await userEvent.keyboard('{Escape}');
+  await screen.rerender(
+    <DateField key="birthday" max={d(15)}>
+      <DateField.Calendar today={d(15)} defaultMonth={new CalendarDate(2000, 1, 1)}>
+        <Calendar.Caption layout="dropdown" />
+      </DateField.Calendar>
+    </DateField>,
+  );
+  await userEvent.click(screen.getByRole('combobox'));
+  await expect.poll(shownMonths).toEqual(['2000년 1월']);
+  await expect.element(screen.getByRole('combobox', { name: '연도' })).toHaveValue('2000');
+});
+
+test('DateField.Content mobileVariant="drawer" opens a drawer on a narrow screen and a popover on a wide one', async () => {
+  const screen = await render(
+    <DateField>
+      <DateField.Content mobileVariant="drawer" />
+      <DateField.Calendar today={d(15)} />
+    </DateField>,
+  );
+  const trigger = screen.getByRole('combobox');
+  await userEvent.click(trigger);
+  await expect.element(screen.getByRole('dialog')).toHaveAttribute('data-presentation', 'drawer');
+  await expect.element(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
+  await expect.element(day('2026-09-15')).toBeInTheDocument();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
+  await page.viewport(1024, 768);
+  try {
+    await userEvent.click(trigger);
+    await expect
+      .element(screen.getByRole('dialog'))
+      .toHaveAttribute('data-presentation', 'popover');
+  } finally {
+    await page.viewport(414, 896);
+  }
+});
+
 test('multiple toggles, repeats FormData entries, and readOnly/disabled block editing', async () => {
   const view = (props: { value?: CalendarDate[]; readOnly?: boolean; disabled?: boolean }) => (
     <form>
-      <DateField selectionMode="multiple" today={d(15)} name="dates" {...props} />
+      <DateField selectionMode="multiple" name="dates" {...props}>
+        <DateField.Calendar today={d(15)} />
+      </DateField>
     </form>
   );
   const screen = await render(view({}));
@@ -274,7 +340,9 @@ test('required blocks the submit until a date is picked and hands the browser fo
         submitted();
       }}
     >
-      <DateField name="day" required today={d(15)} />
+      <DateField name="day" required>
+        <DateField.Calendar today={d(15)} />
+      </DateField>
       <button>제출</button>
     </form>,
   );
@@ -291,7 +359,9 @@ test('required blocks the submit until a date is picked and hands the browser fo
   expect(form.checkValidity()).toBe(true);
   await screen.rerender(
     <form>
-      <DateField name="day" required disabled today={d(15)} />
+      <DateField name="day" required disabled>
+        <DateField.Calendar today={d(15)} />
+      </DateField>
     </form>,
   );
   expect(screen.container.querySelector('form')!.checkValidity()).toBe(true);
@@ -301,7 +371,9 @@ test('after a blocked submit the page under the browser message still takes clic
   const onNext = vi.fn();
   const screen = await render(
     <form onSubmit={(event) => event.preventDefault()}>
-      <DateField name="day" required today={d(15)} />
+      <DateField name="day" required>
+        <DateField.Calendar today={d(15)} />
+      </DateField>
       <button type="button" onClick={onNext}>
         다음
       </button>
@@ -323,14 +395,15 @@ test('open is controllable and onBlur waits until focus leaves the field and its
       <div>
         <button>outside</button>
         <DateField
-          today={d(15)}
           open={open}
           onOpenChange={(next) => {
             opens.push(next);
             setOpen(next);
           }}
           onBlur={onBlur}
-        />
+        >
+          <DateField.Calendar today={d(15)} />
+        </DateField>
       </div>
     );
   }
@@ -385,7 +458,9 @@ test('react-hook-form value mode: required error focus, Date value, reset and di
             registerOptions={{ required: 'Required' }}
           >
             <RHFField.Label>Date</RHFField.Label>
-            <DateField name="date" today={d(15)} />
+            <DateField name="date">
+              <DateField.Calendar today={d(15)} />
+            </DateField>
             <RHFField.Error />
           </RHFField>
           <button type="submit">제출</button>
@@ -422,17 +497,12 @@ test('popup width is anchored to the whole field and ignores descendant scrolls'
   const reads = vi.spyOn(Element.prototype, 'getBoundingClientRect');
   try {
     for (const component of [
-      <DateField
-        selectionMode="multiple"
-        today={d(15)}
-        defaultValue={[d(15)]}
-        style={{ width: 700 }}
-      />,
-      <DateTimeField
-        today={d(15)}
-        defaultValue={new CalendarDateTime(2026, 9, 15, 0, 0)}
-        style={{ width: 700 }}
-      />,
+      <DateField selectionMode="multiple" defaultValue={[d(15)]} style={{ width: 700 }}>
+        <DateField.Calendar today={d(15)} />
+      </DateField>,
+      <DateTimeField defaultValue={new CalendarDateTime(2026, 9, 15, 0, 0)} style={{ width: 700 }}>
+        <DateTimeField.Calendar today={d(15)} />
+      </DateTimeField>,
     ]) {
       const screen = await render(component);
       const trigger = screen.getByRole('combobox');
@@ -511,7 +581,11 @@ test('Clear is a ghost IconButton in the field size that keeps its tab stop and 
 });
 
 test('the chevron gives way to Clear once there is a value', async () => {
-  const screen = await render(<DateField today={d(15)} />);
+  const screen = await render(
+    <DateField>
+      <DateField.Calendar today={d(15)} />
+    </DateField>,
+  );
   const trigger = screen.getByRole('combobox');
   expect(trigger.element().querySelectorAll('svg')).toHaveLength(2);
   await userEvent.click(trigger);
@@ -527,7 +601,11 @@ test('the chevron gives way to Clear once there is a value', async () => {
 });
 
 test('every opening starts on the month of the chosen date', async () => {
-  const screen = await render(<DateField defaultValue={d(15)} today={d(15)} />);
+  const screen = await render(
+    <DateField defaultValue={d(15)}>
+      <DateField.Calendar today={d(15)} />
+    </DateField>,
+  );
   await userEvent.click(screen.getByRole('combobox'));
   await userEvent.click(screen.getByRole('button', { name: '다음 달' }));
   await expect.element(day('2026-10-15')).toBeInTheDocument();
@@ -580,9 +658,12 @@ test('typed entry: the text box takes the label and role, the calendar button le
   const hint = (locale: string, format?: DateField.Props['format']) =>
     parse(
       renderToString(
-        <DateField locale={locale} format={format}>
-          <DateField.Input />
-        </DateField>,
+        inLocale(
+          locale,
+          <DateField format={format}>
+            <DateField.Input />
+          </DateField>,
+        ),
       ),
     )
       .querySelector('input')!
@@ -595,13 +676,15 @@ test('typed entry: the text box takes the label and role, the calendar button le
 
 test('typed entry reads the shown format, written forms, bare digits and the locale order', async () => {
   const changes: (string | null | undefined)[] = [];
-  const view = (props: Pick<DateField.Props, 'locale' | 'format'>) => (
-    <form onSubmit={(event) => event.preventDefault()}>
-      <DateField name="day" onValueChange={(next) => changes.push(keyOf(next))} {...props}>
-        <DateField.Input />
-      </DateField>
-    </form>
-  );
+  const view = ({ locale, format }: { locale?: string; format?: DateField.Props['format'] }) =>
+    inLocale(
+      locale,
+      <form onSubmit={(event) => event.preventDefault()}>
+        <DateField name="day" format={format} onValueChange={(next) => changes.push(keyOf(next))}>
+          <DateField.Input />
+        </DateField>
+      </form>,
+    );
   const screen = await render(view({}));
   await userEvent.fill(textBox(), '2026-09-20');
   textBox().blur();
@@ -722,9 +805,10 @@ test('a pasted or autofilled date is read at once; typing waits, and an IME Ente
 test('typed entry and the calendar share one value; ArrowDown opens on the typed date', async () => {
   const changes: (string | null | undefined)[] = [];
   const screen = await render(
-    <DateField today={d(15)} onValueChange={(next) => changes.push(keyOf(next))}>
+    <DateField onValueChange={(next) => changes.push(keyOf(next))}>
       <DateField.Input />
       <DateField.Clear />
+      <DateField.Calendar today={d(15)} />
     </DateField>,
   );
   await userEvent.fill(textBox(), '2026-09-18');
@@ -809,10 +893,11 @@ test('the local time zone shifts neither the shown day nor the day the calendar 
         <DateField
           name="day"
           defaultValue={d(15)}
-          today={d(15)}
           format={{ dateStyle: 'full' }}
           onValueChange={(next) => changes.push(keyOf(next))}
-        />
+        >
+          <DateField.Calendar today={d(15)} />
+        </DateField>
       </form>,
     );
     const trigger = screen.getByRole('combobox');

@@ -115,3 +115,22 @@ export const nativeDigits = memoize((locale: string): Map<string, number> => {
 
 export const weekStartOf = (locale: string) =>
   ((DAYS_IN_WEEK - getDayOfWeek(A_SUNDAY, locale)) % DAYS_IN_WEEK) as WeekDay;
+
+const WEEKDAY_KEYWORDS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+const WEEK_START_KEYWORD = /-fw-[a-z]{3}/i;
+const UNICODE_EXTENSION = /-u-/i;
+const PRIVATE_USE = /-x-/i;
+const EMPTY_UNICODE_EXTENSION = /-u(?=$|-[a-z0-9](?:-|$))/i;
+
+export function withWeekStart(locale: string, day: WeekDay): string {
+  const weekStart = `fw-${WEEKDAY_KEYWORDS[day]}`;
+  const tag = resolveLocale(locale)
+    .replace(WEEK_START_KEYWORD, '')
+    .replace(EMPTY_UNICODE_EXTENSION, '');
+  const tagged = UNICODE_EXTENSION.test(tag)
+    ? tag.replace(UNICODE_EXTENSION, `-u-${weekStart}-`)
+    : PRIVATE_USE.test(tag)
+      ? tag.replace(PRIVATE_USE, `-u-${weekStart}-x-`)
+      : `${tag}-u-${weekStart}`;
+  return resolveLocale(tagged);
+}

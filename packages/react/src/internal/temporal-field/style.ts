@@ -5,7 +5,7 @@ import type { IdsSize } from '../../tokens/types';
 
 export const temporalFieldStyle = tv({
   slots: {
-    root: ['relative inline-flex w-full min-w-0 items-center', fieldSurface.base],
+    root: ['relative flex w-full min-w-0 items-center', fieldSurface.base],
     trigger: [
       'flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center self-stretch',
       'bg-transparent text-start outline-none disabled:cursor-not-allowed',

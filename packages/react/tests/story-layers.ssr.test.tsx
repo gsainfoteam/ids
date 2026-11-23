@@ -5,16 +5,11 @@ type StoryFile = Record<string, StoryObj> & { default: Meta };
 
 const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/data/bubble/index.stories.tsx',
-  'components/data/calendar/index.stories.tsx',
   'components/data/chip/index.stories.tsx',
   'components/data/image/index.stories.tsx',
   'components/data/item/index.stories.tsx',
   'components/data/table/index.stories.tsx',
-  'components/data/time-picker/index.stories.tsx',
-  'components/form/date-field/index.stories.tsx',
-  'components/form/date-time-field/index.stories.tsx',
   'components/form/editor/index.stories.tsx',
-  'components/form/time-field/index.stories.tsx',
   'components/layout/scroll-area/index.stories.tsx',
   'components/utility/ids-provider/index.stories.tsx',
 ]);

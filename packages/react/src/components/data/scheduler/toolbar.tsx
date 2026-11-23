@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
 import { getLocalTimeZone, today as todayIn } from '@internationalized/date';
 
 import { SchedulerDayCountField } from './day-count-field';
 import { stepOf, type SchedulerView } from './layout';
-import { useTranslate } from '../../../internal/translate';
+import { withWeekStart } from '../../../internal/date-locale';
+import { LanguageContext, useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 import { ButtonGroup } from '../../action/button-group';
 import { IconButton } from '../../action/icon-button';
@@ -50,6 +51,7 @@ export function SchedulerToolbar({
   weekStartsOn,
 }: SchedulerToolbarProps) {
   const t = useTranslate();
+  const language = use(LanguageContext);
   const [picking, setPicking] = useState(false);
   const step = stepOf(view, dayCount);
   const range = format.range(view, days, date);
@@ -97,17 +99,17 @@ export function SchedulerToolbar({
           align="start"
           className={styles.datePopup()}
         >
-          <Calendar
-            value={date}
-            defaultMonth={date}
-            today={today}
-            locale={locale}
-            weekStartsOn={weekStartsOn}
-            onValueChange={(picked) => {
-              if (picked) onDateChange(picked);
-              setPicking(false);
-            }}
-          />
+          <LanguageContext value={{ ...language, locale: withWeekStart(locale, weekStartsOn) }}>
+            <Calendar
+              value={date}
+              defaultMonth={date}
+              today={today}
+              onValueChange={(picked) => {
+                if (picked) onDateChange(picked);
+                setPicking(false);
+              }}
+            />
+          </LanguageContext>
         </Popover.Content>
       </Popover>
 

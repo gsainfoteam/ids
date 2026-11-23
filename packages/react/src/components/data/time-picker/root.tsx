@@ -25,12 +25,10 @@ export type TimePickerOptions = {
   step?: number;
   min?: Time;
   max?: Time;
-  locale?: string;
   size?: IdsSize;
   disabled?: boolean;
   readOnly?: boolean;
   variant?: TimePickerVariant;
-  selectionMode?: 'single' | 'none';
 };
 
 export type TimePickerProps = Omit<
@@ -54,11 +52,9 @@ export function TimePickerRoot({
   step = 1,
   min,
   max,
-  locale,
   size,
   disabled = false,
   readOnly = false,
-  selectionMode = 'single',
   variant = 'grid',
   className,
   style,
@@ -68,7 +64,7 @@ export function TimePickerRoot({
   const t = useTranslate();
   const providerLocale = useProviderLocale();
 
-  const resolvedLocale = resolveLocale(locale ?? providerLocale);
+  const resolvedLocale = resolveLocale(providerLocale);
   const api = useTimePicker({
     value,
     defaultValue,
@@ -80,7 +76,7 @@ export function TimePickerRoot({
     max,
     locale: resolvedLocale,
     disabled,
-    readOnly: readOnly || selectionMode === 'none',
+    readOnly,
   });
   const { state } = api;
   const periodLeads = periodFirst(resolvedLocale);

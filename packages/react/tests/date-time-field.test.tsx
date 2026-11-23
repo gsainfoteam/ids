@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
 
 import {
   BuddhistCalendar,
@@ -10,11 +10,12 @@ import {
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, onTestFinished, test, vi } from 'vitest';
-import { cdp, userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { DateTimeField, Field, TimeField } from '../src';
+import { DateTimeField, Field, IdsProvider, TimeField } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
 type ClockValue = CalendarDateTime | Time;
@@ -35,6 +36,11 @@ const d = (day = 15, hour = 9, minute = 30, second = 0) =>
 const t = (day = 15) => new CalendarDate(2026, 9, day);
 const hiddenValue = () => document.querySelector<HTMLInputElement>('input[type=hidden]')?.value;
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
+const inLocale = (locale: string | undefined, children: ReactNode) => (
+  <IdsProvider theme={testTheme} locale={locale}>
+    {children}
+  </IdsProvider>
+);
 const clockFields = [
   {
     nineThirty: new Time(9, 30),
@@ -48,7 +54,11 @@ const clockFields = [
     valueType: CalendarDateTime,
     pickedTen: '2026-09-15T10:00',
     hourOf: (value: ClockValue) => (value as CalendarDateTime).hour,
-    field: (props: ClockProps) => <DateTimeField today={t()} {...(props as DateTimeField.Props)} />,
+    field: (props: ClockProps) => (
+      <DateTimeField {...(props as DateTimeField.Props)}>
+        <DateTimeField.Calendar today={t()} />
+      </DateTimeField>
+    ),
   },
 ];
 
@@ -83,10 +93,10 @@ test('SSR formatting, local serialization, Field ARIA and diagnostics for both c
     expect(combobox.getAttribute('aria-required')).toBe('true');
     expect(doc.querySelector('button button')).toBeNull();
   }
-  const shown = (props: DateTimeField.Props) =>
-    parse(renderToString(<DateTimeField defaultValue={d(15, 14, 5)} {...props} />)).querySelector(
-      '[role=combobox]',
-    )!.textContent;
+  const shown = ({ locale, ...props }: DateTimeField.Props & { locale?: string }) =>
+    parse(
+      renderToString(inLocale(locale, <DateTimeField defaultValue={d(15, 14, 5)} {...props} />)),
+    ).querySelector('[role=combobox]')!.textContent;
   expect(shown({})).toBe('2026. 09. 15. 오후 2:05');
   expect(shown({ locale: 'en-US' })).toBe('09/15/2026, 2:05 PM');
   expect(shown({ hourCycle: '24h' })).toBe('2026. 09. 15. 14:05');
@@ -159,11 +169,12 @@ test('the calendar keeps the clock time and the clock keeps the day', async () =
     <StrictMode>
       <DateTimeField
         defaultValue={d()}
-        today={t()}
         hourCycle="24h"
         step={15}
         onValueChange={(next) => (value = next)}
-      />
+      >
+        <DateTimeField.Calendar today={t()} />
+      </DateTimeField>
     </StrictMode>,
   );
   await userEvent.click(screen.getByRole('combobox'));
@@ -182,14 +193,15 @@ test('limits cover the whole moment: first and last day clamp the clock, blocked
   const screen = await render(
     <DateTimeField
       defaultValue={d(16, 12)}
-      today={t()}
       hourCycle="24h"
       step={15}
       min={d(15, 9, 35)}
       max={d(18, 10, 20)}
       disabled={(date) => date.day === 17}
       onValueChange={(next) => (value = next)}
-    />,
+    >
+      <DateTimeField.Calendar today={t()} />
+    </DateTimeField>,
   );
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(day(14)).toHaveAttribute('data-disabled');
@@ -207,7 +219,9 @@ test('limits cover the whole moment: first and last day clamp the clock, blocked
 test('an empty field shows no time until one is picked, then builds it on today', async () => {
   let value = undefined as CalendarDateTime | null | undefined;
   const screen = await render(
-    <DateTimeField today={t(20)} hourCycle="24h" onValueChange={(next) => (value = next)} />,
+    <DateTimeField hourCycle="24h" onValueChange={(next) => (value = next)}>
+      <DateTimeField.Calendar today={t(20)} />
+    </DateTimeField>,
   );
   await userEvent.click(screen.getByRole('combobox'));
   expect(document.querySelector('[data-time-picker] [aria-selected=true]')).toBeNull();
@@ -260,7 +274,9 @@ test('a sub-second range with no representable time disables the day and the clo
   const min = new CalendarDateTime(2026, 9, 15, 9, 30, 0, 1);
   const max = new CalendarDateTime(2026, 9, 15, 9, 30, 0, 999);
   const screen = await render(
-    <DateTimeField today={t()} min={min} max={max} precision="second" hourCycle="24h" />,
+    <DateTimeField min={min} max={max} precision="second" hourCycle="24h">
+      <DateTimeField.Calendar today={t()} />
+    </DateTimeField>,
   );
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(day(15)).toHaveAttribute('data-disabled');
@@ -275,14 +291,15 @@ test('a min with milliseconds starts the clock at the next whole second, only on
   await render(
     <DateTimeField
       defaultValue={d(15, 9, 30, 0)}
-      today={t()}
       min={new CalendarDateTime(2026, 9, 15, 9, 30, 0, 500)}
       max={d(16, 8, 0)}
       precision="second"
       step={20}
       hourCycle="24h"
       onValueChange={(next) => (value = next)}
-    />,
+    >
+      <DateTimeField.Calendar today={t()} />
+    </DateTimeField>,
   );
   await userEvent.click(document.querySelector<HTMLElement>('[role=combobox]')!);
   await expect.element(option('hour', 8)).toHaveAttribute('aria-disabled', 'true');
@@ -309,10 +326,11 @@ test('every wall-clock time can be picked, and the local time zone shifts nothin
         <DateTimeField
           name="when"
           defaultValue={new CalendarDateTime(2026, 3, 7, 2, 30)}
-          today={new CalendarDate(2026, 3, 7)}
           hourCycle="24h"
           onValueChange={(next) => (value = next)}
-        />
+        >
+          <DateTimeField.Calendar today={new CalendarDate(2026, 3, 7)} />
+        </DateTimeField>
       </form>,
     );
     const trigger = screen.getByRole('combobox');
@@ -328,4 +346,58 @@ test('every wall-clock time can be picked, and the local time zone shifts nothin
     );
     await screen.unmount();
   }
+});
+
+test('the Calendar and TimePicker parts take their own options, and Content opens a drawer on a narrow screen', async () => {
+  const screen = await render(
+    <DateTimeField defaultValue={d()}>
+      <DateTimeField.Content mobileVariant="drawer" />
+      <DateTimeField.Calendar today={t()} monthsToShow={2} />
+      <DateTimeField.TimePicker variant="wheel" />
+    </DateTimeField>,
+  );
+  const trigger = screen.getByRole('combobox');
+  await userEvent.click(trigger);
+  const dialog = screen.getByRole('dialog');
+  await expect.element(dialog).toHaveAttribute('data-presentation', 'drawer');
+  await expect.element(dialog).toHaveAttribute('aria-modal', 'true');
+  await expect
+    .poll(() =>
+      [...document.querySelectorAll('[role=dialog] [role=grid]')].map((grid) =>
+        grid.getAttribute('aria-label'),
+      ),
+    )
+    .toEqual(['2026년 9월', '2026년 10월']);
+  await expect
+    .element(document.querySelector<HTMLElement>('[role=dialog] [data-time-picker]'))
+    .toHaveAttribute('data-variant', 'wheel');
+  await userEvent.keyboard('{Escape}');
+  await expect.element(dialog).not.toBeInTheDocument();
+  await page.viewport(1024, 768);
+  try {
+    await userEvent.click(trigger);
+    await expect
+      .element(screen.getByRole('dialog'))
+      .toHaveAttribute('data-presentation', 'popover');
+  } finally {
+    await page.viewport(414, 896);
+  }
+});
+
+test('a Calendar placed inside Content still gives the field its today', async () => {
+  let value = undefined as CalendarDateTime | null | undefined;
+  const screen = await render(
+    <DateTimeField hourCycle="24h" onValueChange={(next) => (value = next)}>
+      <DateTimeField.Content>
+        <DateTimeField.Calendar today={t(20)} />
+        <DateTimeField.TimePicker />
+      </DateTimeField.Content>
+    </DateTimeField>,
+  );
+  await userEvent.click(screen.getByRole('combobox'));
+  await expect
+    .element(document.querySelector<HTMLElement>('[role=dialog] [data-calendar-day="2026-09-20"]'))
+    .toHaveAttribute('data-today');
+  await userEvent.click(option('hour', 14));
+  expect([value?.month, value?.day, value?.hour]).toEqual([9, 20, 14]);
 });

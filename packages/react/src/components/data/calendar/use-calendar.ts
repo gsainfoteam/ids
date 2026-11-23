@@ -59,7 +59,6 @@ export type UseCalendarOptions = DateLimits & {
   onValueChange?: (value: CalendarValue) => void;
   readOnly: boolean;
   monthsToShow: number;
-  weekStartsOn?: number;
   month?: CalendarDate;
   defaultMonth?: CalendarDate;
   onMonthChange?: (month: CalendarDate) => void;
@@ -75,7 +74,6 @@ function validateOptions({
   month,
   defaultMonth,
   today,
-  weekStartsOn,
 }: UseCalendarOptions) {
   [min, max, month, defaultMonth, today].forEach((date) => validateDate(date));
   invariant(
@@ -85,11 +83,6 @@ function validateOptions({
   invariant(
     Number.isInteger(monthsToShow) && monthsToShow >= 1 && monthsToShow <= 12,
     'Calendar: monthsToShow must be 1..12.',
-  );
-  invariant(
-    weekStartsOn === undefined ||
-      (Number.isInteger(weekStartsOn) && weekStartsOn >= 0 && weekStartsOn <= 6),
-    'Calendar: weekStartsOn must be 0..6.',
   );
 }
 
@@ -116,7 +109,7 @@ export function useCalendar(options: UseCalendarOptions) {
 
   const pick = use(CalendarPickContext);
   const allDisabled = disabled === true;
-  const readOnly = options.readOnly || selectionMode === 'none';
+  const { readOnly } = options;
 
   const [mountedToday] = useState(() => todayIn(getLocalTimeZone()));
   const today = options.today ?? mountedToday;
