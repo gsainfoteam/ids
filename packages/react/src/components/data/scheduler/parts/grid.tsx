@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useId, type CSSProperties, type ReactNode } from 'react';
 
 import {
   parseDate,
@@ -24,8 +24,7 @@ import { Divider } from '../../../layout/divider';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { sameDay } from '../../calendar/lib/date';
 import { ItemGroup } from '../../item-group';
-import { useInternalFirstHourScroll } from '../hooks/use-first-hour-scroll';
-import { useInternalHourHeight } from '../hooks/use-hour-height';
+import { useInternalSchedulerGridBody } from '../hooks/use-scheduler-grid-body';
 import { measureInTheGrid } from '../lib/drag-geometry';
 import {
   allDayBarsIn,
@@ -101,15 +100,11 @@ export function SchedulerGrid<E extends SchedulerEventData>({
   const baseId = useId();
   const headId = (day: CalendarDate) => `${baseId}-${day.toString()}`;
   const allDayLabelId = `${baseId}-all-day`;
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
   const allDayBars = allDayBarsIn(events, days);
   const firstHour = Math.min(firstHourOf(events, days) ?? WORKDAY_START_HOUR, WORKDAY_START_HOUR);
 
   const canMove = onEventChange !== undefined;
-  const hourHeight = useInternalHourHeight(bodyRef, canMove);
-
-  useInternalFirstHourScroll(viewportRef, bodyRef, firstHour);
+  const { viewportRef, bodyRef, hourHeight } = useInternalSchedulerGridBody(canMove, firstHour);
 
   const selectionOn = (selection: SchedulerSelection<PressedTime> | null, day: CalendarDate) => {
     if (!selection || !sameDay(selection.from.day, day)) return null;
