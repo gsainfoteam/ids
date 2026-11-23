@@ -2,6 +2,7 @@
 
 대화 메시지 한 건입니다. 보낸 사람(아바타, 이름), 본문, 말풍선 옆 줄(안 읽은 수, 시간), 동작을 한 줄로 놓습니다. 면은 Bubble 이 맡고, Message 는 배치를 맡습니다.
 
+- **칸을 채웁니다(fill).** 메시지는 놓인 칸의 폭을 채웁니다. 폭은 감싼 요소(대화 목록의 칸)가 정합니다.
 - **말풍선.** 본문에 `<Bubble>` 을 두면 말풍선 메시지가 됩니다. 두지 않으면 본문(Marker, Accordion, 문단)을 메시지 폭 그대로 그립니다. 누가 말하는지와 상관없이 고릅니다.
 - **방향.** `align` 이 붙는 쪽을 고르고, 안의 Bubble 에도 같은 쪽을 줍니다. 기본은 `start` 입니다.
 - **연속 메시지.** [MessageGroup](../message-group/README.md) 이 같은 사람의 메시지를 묶습니다. 첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보이고, 이어지는 말풍선은 맞닿는 모서리를 줄입니다.
@@ -149,7 +150,7 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 </Message.Actions>
 ```
 
-- `Message.Actions` 는 붙이지 않은(`attached={false}`) ButtonGroup 이고, `size="tiny"`, `variant="outline"` 을 안의 버튼에 줍니다. 이름은 `t('message.actions')`("메시지 동작") 입니다.
+- `Message.Actions` 는 ButtonGroup 이고, 안의 버튼을 레이아웃 div 로 8px 띄웁니다. `size="tiny"`, `variant="outline"` 을 안의 버튼에 줍니다. 이름은 `t('message.actions')`("메시지 동작") 입니다.
 - `Message.Copy` 는 `text` 가 없으면 본문(`Message.Content`)의 `innerText` 를 복사합니다. 본문에 둔 Marker 와 Accordion 의 글자도 들어가므로, 원문을 따로 가진 앱은 `text` 를 줍니다.
 - 복사하면 잠깐 체크로 바뀌고 `role="status"` 로 "복사했습니다" 를 알립니다. Clipboard API 가 없는 곳에서는 그리지 않습니다.
 - 동작 버튼은 평범한 버튼이라 Tab 으로 차례로 갑니다. 메시지 줄 자체는 포커스를 받지 않습니다.

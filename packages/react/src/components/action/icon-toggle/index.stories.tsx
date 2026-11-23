@@ -70,6 +70,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <IconToggle variant="outline" icon={<BoldIcon />} aria-label="굵게" />,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -166,7 +170,38 @@ export const Gallery: Story = {
   ),
 };
 
-export const AutomaticLabel: Story = {
+export const SwitchBetweenListAndGrid: Story = {
+  render: function Render() {
+    const [grid, setGrid] = useState(false);
+
+    return (
+      <div className="flex items-center gap-3">
+        <IconToggle
+          variant="outline"
+          pressed={grid}
+          onPressedChange={setGrid}
+          icon={grid ? <Squares2X2Icon /> : <ListBulletIcon />}
+          aria-label="격자로 보기"
+        />
+        <span className="text-body-b3-regular">{grid ? '격자' : '목록'}</span>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'pressed와 onPressedChange로 켜짐을 앱 상태에 묶습니다. 켜짐에 따라 아이콘과 옆 글자를 바꿉니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '격자로 보기' }));
+    await expect(canvas.getByText('격자')).toBeVisible();
+  },
+};
+
+export const NameTheToggleFromItsIcon: Story = {
   render: () => (
     <div className="flex gap-2">
       <IconToggle icon={<PinIcon />} />
@@ -193,7 +228,7 @@ export const AutomaticLabel: Story = {
   },
 };
 
-export const StateIcon: Story = {
+export const FillTheIconWhenPressed: Story = {
   render: () => (
     <IconToggle
       aria-label="좋아요"
@@ -226,7 +261,7 @@ export const StateIcon: Story = {
   },
 };
 
-export const Transparent: Story = {
+export const DrawOnlyTheIcon: Story = {
   render: () => (
     <IconToggle
       aria-label="좋아요"
@@ -260,33 +295,8 @@ export const Transparent: Story = {
   },
 };
 
-export const Controlled: Story = {
-  render: function Render() {
-    const [grid, setGrid] = useState(false);
-
-    return (
-      <div className="flex items-center gap-3">
-        <IconToggle
-          variant="outline"
-          pressed={grid}
-          onPressedChange={setGrid}
-          icon={grid ? <Squares2X2Icon /> : <ListBulletIcon />}
-          aria-label="격자로 보기"
-        />
-        <span className="text-body-b3-regular">{grid ? '격자' : '목록'}</span>
-      </div>
-    );
-  },
-  parameters: {
-    docs: { description: { story: 'pressed와 onPressedChange로 제어합니다.' } },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '격자로 보기' }));
-    await expect(canvas.getByText('격자')).toBeVisible();
-  },
-};
-
 export const Square: Story = {
+  tags: ['verification'],
   render: () => (
     <div className="flex items-center gap-2">
       <IconToggle data-testid="off" variant="outline" icon={<StarIcon />} aria-label="별" />

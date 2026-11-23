@@ -22,11 +22,12 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 ```tsx
 <FloatingButton aria-label="새 글 작성"><PlusIcon /></FloatingButton>  // 아이콘만: 원형
 <FloatingButton><PlusIcon />새 글 작성</FloatingButton>                // 글자 있음: 확장형
-<FloatingButton iconOnly><Trans id="compose" /></FloatingButton>      // 글자를 읽을 수 없는 내용은 직접 지정
 <FloatingButton size="tiny" aria-label="추가"><PlusIcon /></FloatingButton>  // 56px -> 44px
 ```
 
 - 확장형은 아이콘 쪽 안쪽 여백이 조금 줄어듭니다.
+- 모양은 children 에 보이는 글자가 있는지로만 정합니다. 문자열과 숫자, 그리고 `aria-hidden` 이 아닌 요소 안의 문자열을 글자로 셉니다.
+- 글자를 그리는 컴포넌트(`<Trans id="compose" />`)는 안을 읽을 수 없어 아이콘으로 셉니다. 확장형으로 그리려면 `{t('compose')}` 처럼 문자열을 넘깁니다.
 - 크기를 주지 않은 아이콘은 `standard` 24px, `tiny` 20px 입니다.
 
 ## 위치
@@ -67,7 +68,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 
 ```tsx
 <FloatingButton disabled={uploading} focusableWhenDisabled aria-busy={uploading}>
-  {uploading ? <Spinner decorative /> : <ArrowUpTrayIcon />}  {/* 스피너가 아이콘 크기로 들어간다 */}
+  {uploading ? <Spinner aria-hidden /> : <ArrowUpTrayIcon />}  {/* 스피너가 아이콘 크기로 들어간다 */}
   {uploading ? '업로드 중' : '업로드'}
 </FloatingButton>
 ```
@@ -98,12 +99,11 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 | `variant`               | `solid`(기본) / `soft` / `outline` / `glossy`                           |
 | `colorScheme`           | `primary`(기본) / `neutral` / `danger` / `success` / `warning` / `info` |
 | `size`                  | `standard`(56px, 기본) / `tiny`(44px)                                   |
-| `iconOnly`              | 보이는 글자가 있는지로 자동으로 정한다                                  |
 | `type`                  | `button`. 폼을 제출하지 않는다                                          |
 | `asChild`               | 자식 요소 하나(링크)를 버튼으로 그린다                                  |
 | `focusableWhenDisabled` | 비활성이어도 포커스와 탭 순서를 지킨다                                  |
 | `ref`                   | 실제 `button`, `asChild` 면 자식 요소                                   |
-| 그 외                   | Button 과 같다 (상태 함수 prop, `data-*`, `onInteractionChange`)        |
+| 그 외                   | Button 과 같다 (상태 함수 prop, `onInteractionChange`)        |
 
 ## 알아둘 것
 

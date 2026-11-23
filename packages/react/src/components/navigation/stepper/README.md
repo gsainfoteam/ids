@@ -103,7 +103,7 @@ const [step, setStep] = useState(0);
 - 연결선은 completed 뒤에도 중립색이고, 표시 칸의 아래 끝에서 다음 표시 칸의 위 끝까지 틈 없이 이어집니다.
 - 늘 표시 전용이라 버튼이 없습니다. `value`, `defaultValue`, `onValueChange`, `linear` 는 쓰지 않고, 주면 개발 모드에서 경고합니다.
 - 목록 이름의 기본값이 없습니다. "진행 단계" 는 기록의 이름이 아니므로 `aria-label` 이나 `aria-labelledby` 를 줍니다. 없으면 개발 모드에서 경고합니다.
-- 진행 중인 일(도는 빌드)은 `<Stepper.Indicator><Spinner decorative /></Stepper.Indicator>` 와 제목의 글로 알립니다. 한 단계씩 나아가는 파이프라인이면 기록 대신 `value` 만 준 표시 전용 진행을 씁니다. 도는 단계에 `aria-current="step"` 이 붙습니다.
+- 진행 중인 일(도는 빌드)은 `<Stepper.Indicator><Spinner aria-hidden /></Stepper.Indicator>` 와 제목의 글로 알립니다. 한 단계씩 나아가는 파이프라인이면 기록 대신 `value` 만 준 표시 전용 진행을 씁니다. 도는 단계에 `aria-current="step"` 이 붙습니다.
 
 ## Body
 
@@ -172,7 +172,7 @@ const [step, setStep] = useState(0);
 </Stepper.Indicator>
 
 <Stepper.Indicator>
-  <Spinner decorative />                        {/* 도는 단계 */}
+  <Spinner aria-hidden />                        {/* 도는 단계 */}
 </Stepper.Indicator>
 
 <Stepper.Description>

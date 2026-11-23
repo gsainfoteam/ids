@@ -147,8 +147,9 @@ test('an icon-only button is named from the icon component; text makes it extend
           <PlusIcon />
           작성
         </FloatingButton>
-        <FloatingButton id="forced" iconOnly>
-          <span>+</span>
+        <FloatingButton id="hidden-text" aria-label="작성">
+          <PlusIcon />
+          <span aria-hidden="true">+</span>
         </FloatingButton>
       </div>,
     ),
@@ -159,7 +160,7 @@ test('an icon-only button is named from the icon component; text makes it extend
   const extended = doc.getElementById('extended')!;
   expect(extended.hasAttribute('aria-label')).toBe(false);
   expect(extended.hasAttribute('data-icon-only')).toBe(false);
-  expect(doc.getElementById('forced')!.hasAttribute('data-icon-only')).toBe(true);
+  expect(doc.getElementById('hidden-text')!.hasAttribute('data-icon-only')).toBe(true);
 });
 
 test('variant, colorScheme, size and placement land on the element', () => {

@@ -36,22 +36,38 @@ test('the separator is a Divider across the group that overlaps the joined borde
   );
   expect(vertical.getAttribute('aria-orientation')).toBe('horizontal');
   for (const name of ['h-px', '-my-px']) expect(vertical.classList, name).toContain(name);
+});
 
-  const spaced = separator(
-    <ButtonGroup aria-label="저장" attached={false}>
+test('className styles the group and never decides whether it joins its items', () => {
+  const line = separator(
+    <ButtonGroup aria-label="저장" className="gap-2">
       <ButtonGroup.Separator />
     </ButtonGroup>,
   );
-  expect(spaced.classList, 'spaced controls leave no seam').not.toContain('-mx-px');
-  for (const name of ['h-5', 'min-h-0', 'self-center'])
-    expect(spaced.classList, `a spaced separator is short: ${name}`).toContain(name);
+  expect(line.classList).toContain('-mx-px');
+});
 
-  const tiny = separator(
-    <ButtonGroup aria-label="저장" attached={false} size="tiny" orientation="vertical">
-      <ButtonGroup.Separator />
-    </ButtonGroup>,
+test('items in the app own layout div keep their corners, and the arrows still move', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <ToggleGroup aria-label="시간" variant="outline" defaultValue="09:00">
+        <div className="flex flex-wrap gap-2">
+          <Toggle value="09:00">09:00</Toggle>
+          <Toggle value="10:00">10:00</Toggle>
+        </div>
+      </ToggleGroup>
+    </IdsProvider>,
   );
-  for (const name of ['w-4', 'self-center']) expect(tiny.classList, name).toContain(name);
+  const first = screen.getByRole('radio', { name: '09:00' });
+  const second = screen.getByRole('radio', { name: '10:00' });
+  for (const toggle of [first.element(), second.element()]) {
+    const style = getComputedStyle(toggle);
+    expect([style.borderStartEndRadius, style.borderEndStartRadius]).toEqual(['10px', '10px']);
+  }
+  await userEvent.click(first);
+  await userEvent.keyboard('{ArrowRight}');
+  await expect.element(second).toHaveFocus();
+  await expect.element(second).toBeChecked();
 });
 
 test('inside a single-select ToggleGroup the separator only draws a line', () => {
@@ -180,9 +196,11 @@ test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its
 test('spaced glossy buttons keep their own shadows', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <ButtonGroup aria-label="저장" variant="glossy" attached={false}>
-        <Button>저장</Button>
-        <Button>더보기</Button>
+      <ButtonGroup aria-label="저장" variant="glossy">
+        <div className="flex gap-2">
+          <Button>저장</Button>
+          <Button>더보기</Button>
+        </div>
       </ButtonGroup>
     </IdsProvider>,
   );

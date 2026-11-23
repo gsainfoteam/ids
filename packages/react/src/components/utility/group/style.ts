@@ -1,41 +1,25 @@
 import { tv } from '../../../utils';
 
 import type { GroupOrientation } from '.';
-import type { IdsSize } from '../../../tokens/types';
 
 export const groupStyle = tv({
   slots: {
     root: [
-      'relative flex w-fit items-stretch',
+      'relative inline-flex max-w-full items-stretch',
       '[&>:not(input,[popover],[data-floating-ui-focus-guard])]:relative',
       '[&>*]:data-hovered:z-10 [&>*]:data-active:z-20 [&>*]:focus-ring-visible:z-30',
       'has-[>[data-group]]:gap-2',
+      'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:rounded-standard',
+      'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-sm',
+      '[&>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-none',
     ],
     separator: 'relative z-25',
   },
   variants: {
     orientation: {
-      horizontal: { root: 'flex-row' },
-      vertical: { root: 'flex-col' },
-    } satisfies Record<GroupOrientation, object>,
-    attached: {
-      true: {
+      horizontal: {
         root: [
-          'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:rounded-standard',
-          'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-sm',
-          '[&>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-none',
-        ],
-      },
-      false: { root: 'gap-2' },
-    },
-    size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
-  },
-  compoundVariants: [
-    {
-      orientation: 'horizontal',
-      attached: true,
-      class: {
-        root: [
+          'flex-row',
           '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-s-none',
           '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-e-none',
           '[&>[data-variant=outline]+[data-variant=outline]]:-ms-px',
@@ -45,12 +29,9 @@ export const groupStyle = tv({
         ],
         separator: '-mx-px',
       },
-    },
-    {
-      orientation: 'vertical',
-      attached: true,
-      class: {
+      vertical: {
         root: [
+          'flex-col',
           '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-t-none',
           '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-b-none',
           '[&>[data-variant=outline]+[data-variant=outline]]:-mt-px',
@@ -60,23 +41,7 @@ export const groupStyle = tv({
         ],
         separator: '-my-px',
       },
-    },
-    {
-      orientation: 'horizontal',
-      attached: false,
-      class: { separator: 'h-5 min-h-0 self-center' },
-    },
-    {
-      orientation: 'vertical',
-      attached: false,
-      class: { separator: 'w-5 self-center' },
-    },
-    { orientation: 'horizontal', attached: false, size: 'tiny', class: { separator: 'h-4' } },
-    { orientation: 'vertical', attached: false, size: 'tiny', class: { separator: 'w-4' } },
-  ],
-  defaultVariants: {
-    orientation: 'horizontal',
-    attached: true,
-    size: 'standard',
+    } satisfies Record<GroupOrientation, object>,
   },
+  defaultVariants: { orientation: 'horizontal' },
 });

@@ -572,7 +572,7 @@ export const TrackAPipeline: Story = {
         </Stepper.Item>
         <Stepper.Item>
           <Stepper.Indicator>
-            <Spinner decorative />
+            <Spinner aria-hidden />
           </Stepper.Indicator>
           <Stepper.Title>재시도 중</Stepper.Title>
         </Stepper.Item>
@@ -586,7 +586,7 @@ export const TrackAPipeline: Story = {
     docs: {
       description: {
         story:
-          '`value` 만 준 표시 전용 Stepper 로 파이프라인을 그립니다. 실패한 단계는 `error`, 도는 단계는 `Stepper.Indicator` 에 `Spinner decorative` 를 둡니다. 현재 단계의 `li` 가 `aria-current="step"` 이라 따로 알리지 않아도 됩니다. `Stepper.Body` 는 진행에서도 쓰고, 안의 링크는 단계와 따로 Tab 이 멈춥니다.',
+          '`value` 만 준 표시 전용 Stepper 로 파이프라인을 그립니다. 실패한 단계는 `error`, 도는 단계는 `Stepper.Indicator` 에 `Spinner aria-hidden` 을 둡니다. 현재 단계의 `li` 가 `aria-current="step"` 이라 따로 알리지 않아도 됩니다. `Stepper.Body` 는 진행에서도 쓰고, 안의 링크는 단계와 따로 Tab 이 멈춥니다.',
       },
     },
   },

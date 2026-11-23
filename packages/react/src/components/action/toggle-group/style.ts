@@ -2,11 +2,7 @@ import { tv } from '../../../utils';
 
 export const toggleGroupStyle = tv({
   variants: {
-    orientation: { horizontal: '', vertical: '' },
-    attached: { true: '', false: '' },
+    orientation: { horizontal: '[&>[data-toggle-group-item]]:flex-1', vertical: '' },
   },
-  compoundVariants: [
-    { orientation: 'horizontal', attached: true, class: '[&>[data-toggle-group-item]]:flex-1' },
-  ],
-  defaultVariants: { orientation: 'horizontal', attached: true },
+  defaultVariants: { orientation: 'horizontal' },
 });

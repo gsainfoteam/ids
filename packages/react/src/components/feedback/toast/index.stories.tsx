@@ -32,17 +32,13 @@ const meta = {
         'bottom-right',
       ],
     },
+    variant: { control: 'radio', options: ['stacked', 'expanded'] },
     max: { control: { type: 'number', min: 1, max: 10 } },
-    gap: { control: { type: 'number', min: 0, max: 32 } },
-    offset: { control: { type: 'number', min: 0, max: 64 } },
-    expand: { control: 'boolean' },
   },
   args: {
     placement: 'bottom-right',
+    variant: 'stacked',
     max: 3,
-    gap: 14,
-    offset: 24,
-    expand: false,
   },
 } satisfies Meta<typeof Toaster>;
 
@@ -89,6 +85,17 @@ function optionsFor(content: (typeof contents)[number], id?: string): ToastOptio
   return { id };
 }
 
+export const Usage: Story = {
+  render: () => (
+    <>
+      <Button variant="outline" onClick={() => toast.success('저장했습니다')}>
+        저장
+      </Button>
+      <Toaster />
+    </>
+  ),
+};
+
 export const Gallery: Story = {
   render: function Render() {
     useEffect(() => {
@@ -127,10 +134,10 @@ export const Gallery: Story = {
         </Showcase.Section>
         <Showcase.Section
           title="Stack"
-          description="새 알림이 앞에 오고, 뒤의 알림은 5% 씩 작아진 채 가장자리만 보입니다. 올려 두거나 포커스하면 펼쳐지고 시간이 멈춥니다. expand 는 늘 펼쳐 둡니다."
+          description="새 알림이 앞에 오고, 뒤의 알림은 5% 씩 작아진 채 가장자리만 보입니다. 올려 두거나 포커스하면 펼쳐지고 시간이 멈춥니다. expanded 는 늘 펼쳐 둡니다."
         >
-          <Showcase.Row label="expand">
-            <Toaster expand max={kinds.length} />
+          <Showcase.Row label="expanded">
+            <Toaster variant="expanded" max={kinds.length} />
           </Showcase.Row>
         </Showcase.Section>
       </Showcase>
@@ -144,8 +151,7 @@ export const Gallery: Story = {
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const ToastPromise: Story = {
-  name: 'Promise',
+export const FollowAPromise: Story = {
   render: () => (
     <>
       <Button
@@ -166,6 +172,14 @@ export const ToastPromise: Story = {
       <Toaster />
     </>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'toast.promise 는 약속이 도는 동안 loading 알림을 띄우고, 끝나면 같은 알림을 success 나 error 로 바꿉니다. success 는 결과를 받는 함수로 문구를 만듭니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '파일 올리기' }));
     await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('올리는 중'));
@@ -175,7 +189,7 @@ export const ToastPromise: Story = {
   },
 };
 
-export const UpdateById: Story = {
+export const UpdateAToastInPlace: Story = {
   render: () => (
     <>
       <div className="flex gap-2">
@@ -189,6 +203,14 @@ export const UpdateById: Story = {
       <Toaster />
     </>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '같은 id 로 다시 띄우면 새 알림을 쌓지 않고 그 알림을 바꿉니다. 진행 중이던 알림을 완료로 바꿀 때 씁니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '내보내기 시작' }));
     const loading = await canvas.findByRole('status');
@@ -199,7 +221,7 @@ export const UpdateById: Story = {
   },
 };
 
-export const Action: Story = {
+export const OfferUndo: Story = {
   render: function Render() {
     const [restored, setRestored] = useState(0);
 
@@ -222,6 +244,14 @@ export const Action: Story = {
       </>
     );
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'action 은 알림 안에 버튼 하나를 둡니다. 누르면 onClick 이 돌고 알림이 닫힙니다. 되돌릴 시간을 주려면 duration 을 늘립니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '메일 지우기' }));
     await userEvent.click(await canvas.findByRole('button', { name: '되돌리기' }));
@@ -239,12 +269,12 @@ const placements = [
   'bottom-right',
 ] as const satisfies readonly Toaster.Placement[];
 
-export const Placement: Story = {
+export const ChooseWhereToastsAppear: Story = {
   render: function Render() {
     const [placement, setPlacement] = useState<Toaster.Placement>('bottom-right');
 
     return (
-      <>
+      <div className="flex flex-col items-start gap-4">
         <ToggleGroup<Toaster.Placement>
           aria-label="위치"
           required
@@ -257,16 +287,20 @@ export const Placement: Story = {
             </Toggle>
           ))}
         </ToggleGroup>
-        <Button
-          variant="outline"
-          className="mt-4"
-          onClick={() => toast.info(`${placement} 에 떴습니다`)}
-        >
+        <Button variant="outline" onClick={() => toast.info(`${placement} 에 떴습니다`)}>
           알림 띄우기
         </Button>
         <Toaster placement={placement} />
-      </>
+      </div>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'placement 로 화면의 여섯 자리 중 하나에 알림을 쌓습니다. 위쪽에 두면 새 알림이 위에서 내려옵니다.',
+      },
+    },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(canvas.getByRole('radio', { name: 'top-center' }));
@@ -279,5 +313,49 @@ export const Placement: Story = {
     const view = canvasElement.ownerDocument.defaultView!;
     const box = region.getBoundingClientRect();
     expect(box.top).toBeLessThan(view.innerHeight / 2);
+  },
+};
+
+export const KeepTheStackOpen: Story = {
+  render: () => (
+    <>
+      <Button
+        variant="outline"
+        onClick={() => {
+          toast('첫 번째 알림', { duration: Infinity });
+          toast('두 번째 알림', { duration: Infinity });
+        }}
+      >
+        알림 두 개 띄우기
+      </Button>
+      <div className="[--toaster-gap:8px] [--toaster-offset:32px]">
+        <Toaster variant="expanded" />
+      </div>
+    </>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'variant="expanded" 는 올려 두지 않아도 알림을 펼쳐 둡니다. 알림 사이와 화면 가장자리까지의 거리는 Toaster 를 감싼 요소의 --toaster-gap, --toaster-offset 으로 바꿉니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '알림 두 개 띄우기' }));
+    await waitFor(() => expect(canvas.getAllByRole('status')).toHaveLength(2));
+    const region = canvasElement.querySelector<HTMLElement>('[data-toaster-region]')!;
+    expect(region).toHaveAttribute('data-expanded');
+    const [front, behind] = [...canvasElement.querySelectorAll<HTMLElement>('[data-toast]')] as [
+      HTMLElement,
+      HTMLElement,
+    ];
+    await waitFor(() => expect(getComputedStyle(behind).scale).toBe('1'));
+    await waitFor(() =>
+      expect(front.getBoundingClientRect().top - behind.getBoundingClientRect().bottom).toBeCloseTo(
+        8,
+        0,
+      ),
+    );
   },
 };

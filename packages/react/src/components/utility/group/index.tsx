@@ -1,11 +1,6 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
-import {
-  GroupRoot,
-  GroupSeparator,
-  type GroupOrientation,
-  type GroupContextValue,
-} from './root';
+import { GroupRoot, GroupSeparator, type GroupOrientation, type GroupContextValue } from './root';
 import { groupStyle } from './style';
 
 import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
@@ -18,7 +13,6 @@ export function Group(props: Group.Props) {
 export namespace Group {
   export type Props = ComponentProps<'div'> & {
     orientation?: GroupOrientation;
-    attached?: boolean;
     size?: IdsSize;
     variant?: SurfaceVariant;
     separator?: GroupContextValue['separator'];

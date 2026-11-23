@@ -64,18 +64,21 @@ test('inside a button, a label or a live region the spinner goes quiet', async (
   await expect.element(screen.getByRole('status')).not.toBeInTheDocument();
 });
 
-test('decorative forces either way', async () => {
-  const screen = await render(<Spinner decorative />);
+test('aria-hidden forces either way, and the svg stays hidden', async () => {
+  const screen = await render(<Spinner aria-hidden />);
   settle();
   await expect.element(screen.getByRole('status')).not.toBeInTheDocument();
   await screen.rerender(
     <Button key="b">
-      <Spinner decorative={false} />
+      <Spinner aria-hidden={false} />
       Saving
     </Button>,
   );
   settle();
   await expect.element(screen.getByRole('status')).toHaveTextContent('불러오는 중');
+  expect(screen.container.querySelector('[data-spinner]')!.getAttribute('aria-hidden')).toBe(
+    'true',
+  );
 });
 
 test('an explicit size, or the Field size, puts the icon token on the svg', async () => {

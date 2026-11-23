@@ -3,7 +3,7 @@
 눌린 상태를 유지하는 버튼입니다. 서식 툴바의 굵게, 보기 전환, 사이드바 열기처럼 켜고 끄는 명령에 씁니다.
 
 - **꺼지면 조용하게.** 꺼진 토글은 배경이 없고, 켜지면 글자색 층을 press 세기(`state-press`, 10%)로 얹어 hover(`state-hover`, 6%)와 구별됩니다. 테마 색으로 강조하려면 `soft` 나 `solid` 를 고릅니다.
-- **상태가 DOM 에.** `aria-pressed` 로 스크린 리더에 알리고, 같은 상태가 `data-pressed` 로 붙어 CSS 만으로 꾸밀 수 있습니다.
+- **켜짐을 알립니다.** `aria-pressed` 로 스크린 리더에 켜짐을 알립니다.
 - **제어와 비제어.** `defaultPressed` 로 두거나 `pressed` 와 `onPressedChange` 로 제어합니다.
 - **취소할 수 있는 클릭.** `onClick` 이 먼저 돌고, 거기서 `preventDefault` 하면 상태가 바뀌지 않습니다.
 - **Button 과 같은 기반.** `asChild`, `focusableWhenDisabled`, 상태 함수 prop, `colorScheme`, 그룹 크기를 Button 과 같게 받습니다.
@@ -63,23 +63,21 @@ import { Toggle } from '@gsainfoteam/ids-react';
 
 - 아이콘 하나만 쓸 때는 `IconToggle` 이 이름을 아이콘에서 찾아 줍니다.
 
-## 상태 함수
+## 상태
 
 ```tsx
 <Toggle>{(state) => (state.pressed ? '켜짐' : '꺼짐')}</Toggle>
 ```
 
-| 상태           | data 속성            | 뜻                   |
-| -------------- | -------------------- | -------------------- |
-| `pressed`      | `data-pressed`       | 켜져 있다            |
-| `hovered`      | `data-hovered`       | 마우스가 올라가 있다 |
-| `active`       | `data-active`        | 누르고 있다          |
-| `focusVisible` | `data-focus-visible` | 키보드로 포커스했다  |
-| `disabled`     | `data-disabled`      | 비활성               |
+| 상태           | 뜻                   |
+| -------------- | -------------------- |
+| `pressed`      | 켜져 있다            |
+| `hovered`      | 마우스가 올라가 있다 |
+| `active`       | 누르고 있다          |
+| `focusVisible` | 키보드로 포커스했다  |
+| `disabled`     | 비활성               |
 
-- 켜진 토글에는 `data-hovered` 와 `data-active` 가 붙지 않습니다. 켜진 배경이 hover 배경과 다투지 않게 하기 위해서입니다.
-- 켜진 동안 올리거나 누르면 `data-pressed-hovered`, `data-pressed-active` 가 붙습니다. `data-hovered`, `data-active` 는 켜진 동안 붙지 않습니다.
-- 루트에는 `data-variant`, `data-size` 가 붙고, `ToggleGroup` 안에서는 `data-value` 도 붙습니다.
+- 켜짐은 `pressed` / `onPressedChange` 로, 나머지는 `children` 에 넘긴 상태 함수나 `onInteractionChange` 로 읽습니다.
 
 ## 키보드
 

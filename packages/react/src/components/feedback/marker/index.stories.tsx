@@ -42,6 +42,17 @@ export const Playground: Story = {
   ),
 };
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-80">
+      <Marker>
+        <DocumentTextIcon />
+        파일 4개를 읽었어요
+      </Marker>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -132,7 +143,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Pending: Story = {
+export const ShowWorkInProgress: Story = {
   render: () => (
     <div className="w-72">
       <Marker pending>생각하는 중</Marker>
@@ -157,7 +168,7 @@ export const Pending: Story = {
   },
 };
 
-export const Separator: Story = {
+export const MarkADateInAThread: Story = {
   render: () => (
     <div className="w-80">
       <Marker variant="separator">
@@ -185,7 +196,7 @@ export const Separator: Story = {
   },
 };
 
-export const AsLink: Story = {
+export const LinkToWhatItDid: Story = {
   render: () => (
     <div className="w-72">
       <Marker asChild>
@@ -211,7 +222,7 @@ export const AsLink: Story = {
   },
 };
 
-export const InAccordion: Story = {
+export const FoldTheDetailsAway: Story = {
   render: () => (
     <div className="w-96">
       <Accordion type="multiple">

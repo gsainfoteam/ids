@@ -17,7 +17,6 @@ export namespace Spinner {
 
   export type Props = Omit<ComponentProps<'svg'>, 'children' | 'className' | 'width' | 'height'> & {
     size?: IdsSize;
-    decorative?: boolean;
     className?: string | ((state: State) => string | undefined);
   };
 
