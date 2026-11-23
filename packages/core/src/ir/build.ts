@@ -310,6 +310,7 @@ function buildColor(sources: Sources, naming: Naming, modes: readonly string[]) 
   return {
     familyGroups: Object.entries(roles.families).map(([group, members]) => ({
       name: name([group]),
+      list: name([group, ...config.targets.collections.familyGroup]),
       families: members,
     })),
     families: families.map((family) => name([family])),

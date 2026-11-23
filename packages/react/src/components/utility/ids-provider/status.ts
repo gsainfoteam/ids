@@ -1,6 +1,6 @@
 import { COMPARED_STEP, RED_GREEN_PAIRS, alikeUnderRedGreenCvd, tooClose } from './color-distance';
 import { chromaOf, hueOf, rampFromSteps, rotatedRamp, signedHueDelta } from './palette-seed';
-import { STATUS_PALETTES } from '../../../tokens/palette-model';
+import { IDS_STATUS_PALETTES } from '../../../tokens/palette-model';
 
 import type { IdsRamp, IdsStatusFamily } from './theme';
 
@@ -9,7 +9,7 @@ export const STATUS_PALETTE_NAMES = {
   warning: 'yellow',
   danger: 'red',
   info: 'sky',
-} as const satisfies { [family in IdsStatusFamily]: keyof typeof STATUS_PALETTES };
+} as const satisfies { [family in IdsStatusFamily]: keyof typeof IDS_STATUS_PALETTES };
 
 export const STATUS_HUES: { [family in IdsStatusFamily]: { from: number; to: number } } = {
   danger: { from: 5, to: 31 },
@@ -41,7 +41,7 @@ export function harmonizedRotation(family: IdsStatusFamily, hue: number, primary
 }
 
 export const fixedStatusPalette = (family: IdsStatusFamily) =>
-  rampFromSteps(STATUS_PALETTES[STATUS_PALETTE_NAMES[family]]);
+  rampFromSteps(IDS_STATUS_PALETTES[STATUS_PALETTE_NAMES[family]]);
 
 const HALVINGS_BEFORE_GIVING_UP = 6;
 

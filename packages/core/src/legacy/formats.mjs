@@ -99,17 +99,6 @@ const COMPONENT_SHADOWS = COMPONENT_TOKENS.filter(({ property }) => property ===
 
 const shadowStepOf = (reference) => reference.match(/^\{shadow\.([^}]+)\}$/)[1];
 
-const px = (n) => (n === 0 ? "0" : `${n}px`);
-
-const NO_SHADOW_THAT_STILL_COMPOSES = "0 0 #0000";
-
-const cssShadow = (layers) =>
-  layers.length === 0
-    ? NO_SHADOW_THAT_STILL_COMPOSES
-    : layers
-        .map(({ x, y, blur, spread, color }) => `${px(x)} ${px(y)} ${px(blur)} ${px(spread)} ${color}`)
-        .join(", ");
-
 const T_DART_CLASS = `${GENERATED}
 
 class {{NAME}} {
@@ -132,38 +121,7 @@ const T_DART_ENUM = `enum {{NAME}} {
 {{VALUES}},
 }`;
 
-const T_TS_FILE = `${GENERATED}
-
-{{BODY}}
-`;
-
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
-
-const ENUMS_THE_APP_DEFINES_IN_REACT = ["color"];
-
-const tsTypesFormatter = ({ dictionary }) => {
-  const enums = Object.fromEntries(
-    Object.entries(parseEnums(dictionary)).filter(
-      ([key]) => !ENUMS_THE_APP_DEFINES_IN_REACT.includes(key),
-    ),
-  );
-  return render(T_TS_FILE, {
-    BODY: Object.entries(enums)
-      .map(
-        ([key, values]) =>
-          `export type ${enumName(key)} = ${values.map((v) => `'${v}'`).join(" | ")};`,
-      )
-      .join("\n"),
-  });
-};
-
-
-const tsList = (values) => `[${values.map((v) => `'${v}'`).join(", ")}]`;
-
-const tsRecord = (entries, indent) =>
-  `{\n${Object.entries(entries)
-    .map(([key, value]) => `${indent}  '${key}': ${value},`)
-    .join("\n")}\n${indent}}`;
 
 const neutralScale = (dictionary, mode) =>
   byPath(dictionary, "neutral")
@@ -178,25 +136,6 @@ const stateOpacity = (dictionary) =>
   Object.fromEntries(stateTokens(dictionary, "number").map((t) => [toCamel(slug(t)), parseFloat(val(t)) / 100]));
 
 const stateFillColor = (dictionary) => val(stateTokens(dictionary, "color").find((t) => slug(t) === "fill-color"));
-
-const tsColorRolesFormatter = ({ dictionary }) =>
-  render(T_TS_FILE, {
-    BODY: [
-      ...Object.entries(COLOR_ROLES.families).map(
-        ([group, families]) =>
-          `export const IDS_${group.toUpperCase()}_FAMILIES = ${tsList(families)} as const;`,
-      ),
-      `export const IDS_COLOR_FAMILIES = ${tsList(COLOR_FAMILIES)} as const;`,
-      `export const IDS_FAMILY_SLOTS = ${tsList(TEMPLATE_SLOTS.map(({ slot }) => slot))} as const;`,
-      `export const IDS_NEUTRAL_ONLY_SLOTS = ${tsList(NEUTRAL_ONLY_SLOTS)} as const;`,
-      `export const IDS_STATE_OPACITY = ${tsRecord(stateOpacity(dictionary), "")} as const;`,
-      `export const IDS_STATE_FILL_COLOR = '${stateFillColor(dictionary)}';`,
-      `export const IDS_NEUTRAL_SCALES = {\n${MODES.map(
-        (mode) => `  ${mode}: ${tsList(neutralScale(dictionary, mode))},`,
-      ).join("\n")}\n} as const;`,
-      `export const IDS_NEUTRAL_STEPS = ${tsRecord(NEUTRAL_ROLE_STEPS, "")} as const;`,
-    ].join("\n\n"),
-  });
 
 const dartEnumsFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
@@ -327,34 +266,6 @@ const dartColorRolesFormatter = ({ dictionary }) => {
       .join(" &&\n"),
   });
 };
-
-const tsComponentTokensFormatter = () =>
-  render(T_TS_FILE, {
-    BODY: [
-      `export const IDS_SHADOWS = ${tsRecord(
-        Object.fromEntries(SHADOW_STEPS.map(({ step, layers }) => [step, `'${cssShadow(layers)}'`])),
-        "",
-      )} as const;`,
-      `export const IDS_COMPONENT_COLORS = ${tsRecord(
-        Object.fromEntries(
-          COMPONENT_COLORS.map(({ name, modes }) => [
-            name,
-            `{ ${MODES.map((mode) => `${mode}: '${modes[mode]}'`).join(", ")} }`,
-          ]),
-        ),
-        "",
-      )} as const;`,
-      `export const IDS_COMPONENT_SHADOWS = ${tsRecord(
-        Object.fromEntries(
-          COMPONENT_SHADOWS.map(({ name, modes }) => [
-            name,
-            `{ ${MODES.map((mode) => `${mode}: '${shadowStepOf(modes[mode])}'`).join(", ")} }`,
-          ]),
-        ),
-        "",
-      )} as const;`,
-    ].join("\n\n"),
-  });
 
 const dartColor = (hex) => {
   const [r, g, b, a = "ff"] = hex.slice(1).match(/../g);
@@ -541,9 +452,6 @@ const dartTypographyFormatter = ({ dictionary }) => {
 };
 
 return {
-    "../react/src/tokens/types.ts": tsTypesFormatter({ dictionary: legacy.jsDictionary }),
-    "../react/src/tokens/color-roles.ts": tsColorRolesFormatter({ dictionary: legacy.jsDictionary }),
-    "../react/src/tokens/component-tokens.ts": tsComponentTokensFormatter({ dictionary: legacy.jsDictionary }),
     "../flutter/lib/tokens/ids_enums.dart": dartEnumsFormatter({ dictionary: legacy.jsDictionary }),
     "../flutter/lib/tokens/ids_color_roles.dart": dartColorRolesFormatter({ dictionary: legacy.jsDictionary }),
     "../flutter/lib/tokens/ids_motion.dart": dartMotionFormatter({ dictionary: legacy.jsDictionary }),
