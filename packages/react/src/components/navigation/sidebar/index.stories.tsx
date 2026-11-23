@@ -697,7 +697,7 @@ export const BuildAWorkspaceTree: Story = {
     docs: {
       description: {
         story:
-          '`Sidebar.Item` 안에 `Sidebar.Item` 을 넣으면 하위 메뉴가 됩니다. `Sidebar.Group` 의 `collapsible` 은 묶음을 접고, 항목 끝의 Badge 와 Kbd 는 끝 칸에 놓입니다.',
+          '`Sidebar.Item` 안에 `Sidebar.Item` 을 넣으면 하위 메뉴가 됩니다. `Sidebar.Group` 의 `collapsible` 은 묶음을 접고, 항목 끝의 Chip 과 Kbd 는 끝 칸에 놓입니다.',
       },
     },
   },
