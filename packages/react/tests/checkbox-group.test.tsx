@@ -166,14 +166,6 @@ test('required means at least one, with its own message, and reset restores the 
   await expect.poll(() => [...new FormData(form)]).toEqual([['skills', 'ts']]);
   expect(changes, 'a reset is not reported').toEqual([[]]);
   await screen.rerender(
-    <div key="custom">
-      <CheckboxGroup aria-label="Skills" required requiredMessage="Pick one">
-        {items}
-      </CheckboxGroup>
-    </div>,
-  );
-  expect(validator()!.validationMessage).toBe('Pick one');
-  await screen.rerender(
     <div key="readonly">
       <CheckboxGroup aria-label="Skills" required readOnly>
         {items}

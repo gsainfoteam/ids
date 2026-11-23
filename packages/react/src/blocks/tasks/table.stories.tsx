@@ -10,7 +10,7 @@ import {
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Chip } from '../../components/data/chip';
-import { DataTable } from '../../components/data/data-table';
+import { DataTable, useDataTable } from '../../components/data/data-table';
 import { Empty } from '../../components/data/empty';
 import { toast } from '../../components/feedback/toast';
 import { Select } from '../../components/form/select';
@@ -217,7 +217,7 @@ export const PC: Story = {
     const [query, setQuery] = useState('');
     const [status, setStatus] = useState<Status | 'all'>('all');
     const [priority, setPriority] = useState<Priority | 'all'>('all');
-    const [selection, setSelection] = useState<DataTable.RowSelection>({});
+    const [selection, setSelection] = useState<DataTable.RowSelectionState>({});
 
     const shown = useMemo(
       () =>
@@ -229,6 +229,15 @@ export const PC: Story = {
         ),
       [tasks, status, priority, query],
     );
+    const table = useDataTable({
+      columns: COLUMNS,
+      data: shown,
+      getRowId: (task) => task.id,
+      getRowLabel: (task) => task.title,
+      sorting: { defaultValue: [{ id: 'due', desc: true }] },
+      selection: {},
+      pagination: { defaultValue: { pageIndex: 0, pageSize: 8 } },
+    });
     const selectedIds = Object.keys(selection).filter((id) => selection[id]);
     const filtering = query !== '' || status !== 'all' || priority !== 'all';
 
@@ -314,20 +323,8 @@ export const PC: Story = {
           )}
         </div>
 
-        <DataTable
-          aria-label="할 일"
-          columns={COLUMNS}
-          data={shown}
-          getRowId={(task) => task.id}
-          enableRowSelection
-          getRowLabel={(task) => task.title}
-          rowSelection={selection}
-          onRowSelectionChange={setSelection}
-          enablePagination
-          defaultPagination={{ pageIndex: 0, pageSize: 8 }}
-          defaultSorting={[{ id: 'due', desc: true }]}
-          highlightOnHover
-          empty={
+        <DataTable table={table} value={selection} onValueChange={setSelection} aria-label="할 일">
+          <DataTable.Empty>
             <Empty variant="soft" size="tiny">
               <Empty.Media>
                 <MagnifyingGlassIcon />
@@ -335,8 +332,8 @@ export const PC: Story = {
               <Empty.Title>맞는 할 일이 없어요</Empty.Title>
               <Empty.Description>필터를 지우거나 다른 낱말로 찾아 보세요.</Empty.Description>
             </Empty>
-          }
-        />
+          </DataTable.Empty>
+        </DataTable>
       </main>
     );
   },

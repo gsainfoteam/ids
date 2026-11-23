@@ -44,6 +44,15 @@ const thumbOf = (control: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Label>
+      <Switch defaultChecked />
+      자동 저장
+    </Label>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -80,7 +89,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Composition">
         <Showcase.Row label="Label">
-          <Label className="text-body-b3-medium inline-flex items-center gap-2">
+          <Label>
             <Switch defaultChecked />
             자동 저장
           </Label>
@@ -97,7 +106,7 @@ export const Gallery: Story = {
               {(state) => (state.checked ? <CheckIcon /> : <XMarkIcon />)}
             </Switch.Thumb>
           </Switch>
-          <Switch aria-label="테마" className="data-[state=checked]:bg-neutral-solid">
+          <Switch aria-label="테마">
             <Switch.Thumb>{(state) => (state.checked ? <MoonIcon /> : <SunIcon />)}</Switch.Thumb>
           </Switch>
         </Showcase.Row>
@@ -106,29 +115,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '실제 체크박스에 `role="switch"` 를 얹었습니다. Space로 바뀌고, Enter는 폼 제출에 남겨 두어 바꾸지 않습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    const control = canvas.getByRole('switch', { name: '알림 받기' });
-    await userEvent.tab();
-    await expect(control).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    await expect(control).not.toBeChecked();
-    await userEvent.keyboard(' ');
-    await expect(control).toBeChecked();
-    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
-    await expect(thumbOf(control)).toHaveAttribute('data-state', 'checked');
-  },
-};
-
-export const Settings: Story = {
+export const ToggleSettingsRightAway: Story = {
   render: function Render() {
     const [settings, setSettings] = useState({ email: true, push: false, sms: false });
 
@@ -141,13 +128,14 @@ export const Settings: Story = {
     return (
       <div className="flex w-80 flex-col gap-4">
         {rows.map(([key, label]) => (
-          <Field key={key} orientation="horizontal" className="grid-cols-[minmax(0,1fr)_auto]">
-            <Field.Label>{label}</Field.Label>
+          <div key={key} className="flex items-center justify-between gap-4">
+            <Label htmlFor={`setting-${key}`}>{label}</Label>
             <Switch
+              id={`setting-${key}`}
               checked={settings[key]}
               onCheckedChange={(next) => setSettings((prev) => ({ ...prev, [key]: next }))}
             />
-          </Field>
+          </div>
         ))}
         <output aria-label="설정" className="text-body-b3-regular font-mono">
           {JSON.stringify(settings)}
@@ -159,7 +147,7 @@ export const Settings: Story = {
     docs: {
       description: {
         story:
-          '즉시 반영되는 설정에 씁니다. `Field` 로 감싸면 라벨을 눌러도 바뀌고, 라벨이 스위치의 이름이 됩니다.',
+          '즉시 반영되는 설정에 씁니다. `Label htmlFor` 로 이으면 라벨을 눌러도 바뀌고, 라벨이 스위치의 이름이 됩니다. 줄 배치는 감싸는 `div` 가 정합니다.',
       },
     },
   },
@@ -170,53 +158,7 @@ export const Settings: Story = {
   },
 };
 
-export const ReadOnly: Story = {
-  args: { readOnly: true, defaultChecked: true, 'aria-label': '관리자가 켠 설정' },
-  parameters: {
-    docs: {
-      description: {
-        story: '읽기 전용은 포커스를 받고 폼으로 제출되지만 바뀌지 않습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    const control = canvas.getByRole('switch');
-    await userEvent.click(control);
-    await userEvent.keyboard(' ');
-    await expect(control).toBeChecked();
-    await expect(control).toHaveAttribute('aria-readonly', 'true');
-    await expect(args.onCheckedChange).not.toHaveBeenCalled();
-  },
-};
-
-export const RightToLeft: Story = {
-  render: () => (
-    <div dir="rtl" className="flex gap-3">
-      <Switch aria-label="오른쪽에서 왼쪽" />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '`dir="rtl"` 안에서는 thumb이 오른쪽에서 출발해 왼쪽으로 갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const control = canvas.getByRole('switch');
-    const track = control.closest<HTMLElement>('[data-switch]')!;
-    const thumb = thumbOf(control);
-    const gap = () => ({
-      start: track.getBoundingClientRect().right - thumb.getBoundingClientRect().right,
-      end: thumb.getBoundingClientRect().left - track.getBoundingClientRect().left,
-    });
-    await expect(gap().start).toBeLessThan(4);
-    await userEvent.click(control);
-    await waitFor(() => expect(gap().end).toBeLessThan(4));
-  },
-};
-
-export const NativeForm: Story = {
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -228,7 +170,7 @@ export const NativeForm: Story = {
           setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
         }}
       >
-        <Label className="text-body-b3-medium inline-flex items-center gap-2">
+        <Label>
           <Switch name="autosave" value="yes" defaultChecked />
           자동 저장
         </Label>
@@ -264,7 +206,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const BindWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ defaultValues: { autoSave: true } });
     const [result, setResult] = useState('');
@@ -313,5 +255,75 @@ export const ReactHookForm: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '끄고 초기화' }));
     await waitFor(() => expect(thumbOf(control)).toHaveAttribute('data-state', 'unchecked'));
     await expect(control).not.toBeChecked();
+  },
+};
+
+export const ShowASettingThatCannotChange: Story = {
+  args: { readOnly: true, defaultChecked: true, 'aria-label': '관리자가 켠 설정' },
+  parameters: {
+    docs: {
+      description: {
+        story: '읽기 전용은 포커스를 받고 폼으로 제출되지만 바뀌지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    const control = canvas.getByRole('switch');
+    await userEvent.click(control);
+    await userEvent.keyboard(' ');
+    await expect(control).toBeChecked();
+    await expect(control).toHaveAttribute('aria-readonly', 'true');
+    await expect(args.onCheckedChange).not.toHaveBeenCalled();
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '실제 체크박스에 `role="switch"` 를 얹었습니다. Space로 바뀌고, Enter는 폼 제출에 남겨 두어 바꾸지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    const control = canvas.getByRole('switch', { name: '알림 받기' });
+    await userEvent.tab();
+    await expect(control).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(control).not.toBeChecked();
+    await userEvent.keyboard(' ');
+    await expect(control).toBeChecked();
+    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
+    await expect(thumbOf(control)).toHaveAttribute('data-state', 'checked');
+  },
+};
+
+export const RightToLeft: Story = {
+  tags: ['verification'],
+  render: () => (
+    <div dir="rtl" className="flex gap-3">
+      <Switch aria-label="오른쪽에서 왼쪽" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '`dir="rtl"` 안에서는 thumb이 오른쪽에서 출발해 왼쪽으로 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const control = canvas.getByRole('switch');
+    const track = control.closest<HTMLElement>('[data-switch]')!;
+    const thumb = thumbOf(control);
+    const gap = () => ({
+      start: track.getBoundingClientRect().right - thumb.getBoundingClientRect().right,
+      end: thumb.getBoundingClientRect().left - track.getBoundingClientRect().left,
+    });
+    await expect(gap().start).toBeLessThan(4);
+    await userEvent.click(control);
+    await waitFor(() => expect(gap().end).toBeLessThan(4));
   },
 };

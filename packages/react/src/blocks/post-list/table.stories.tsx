@@ -4,7 +4,7 @@ import { MagnifyingGlassIcon, PencilSquareIcon } from '@heroicons/react/24/outli
 
 import { Button } from '../../components/action/button';
 import { Chip } from '../../components/data/chip';
-import { DataTable } from '../../components/data/data-table';
+import { DataTable, useDataTable } from '../../components/data/data-table';
 import { TextField } from '../../components/form/text-field';
 import { Link } from '../../components/typography/link';
 
@@ -230,6 +230,13 @@ export const PC: Story = {
         ),
       [query],
     );
+    const table = useDataTable({
+      columns: COLUMNS,
+      data: rows,
+      getRowId: (post) => post.id,
+      sorting: { defaultValue: [{ id: 'postedOn', desc: true }] },
+      pagination: { defaultValue: { pageIndex: 0, pageSize: 8 } },
+    });
 
     return (
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
@@ -260,17 +267,9 @@ export const PC: Story = {
           <TextField.Clear />
         </TextField>
 
-        <DataTable
-          columns={COLUMNS}
-          data={rows}
-          getRowId={(post) => post.id}
-          defaultSorting={[{ id: 'postedOn', desc: true }]}
-          enablePagination
-          defaultPagination={{ pageIndex: 0, pageSize: 8 }}
-          highlightOnHover
-          aria-label="공지사항"
-          empty={`‘${query}’에 맞는 글이 없어요.`}
-        />
+        <DataTable table={table} aria-label="공지사항">
+          <DataTable.Empty>{`‘${query}’에 맞는 글이 없어요.`}</DataTable.Empty>
+        </DataTable>
       </main>
     );
   },

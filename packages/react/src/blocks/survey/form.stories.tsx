@@ -165,10 +165,15 @@ export const PC: Story = {
                 max={5}
                 value={difficulty}
                 onValueChange={setDifficulty}
-                marks={[1, 3, 5]}
                 formatLabel={(value) => DIFFICULTY[value] ?? String(value)}
                 aria-labelledby="difficulty-question"
-              />
+              >
+                <Slider.Marks>
+                  <Slider.Mark value={1} />
+                  <Slider.Mark value={3} />
+                  <Slider.Mark value={5} />
+                </Slider.Marks>
+              </Slider>
             </Card.Content>
           </Card>
 

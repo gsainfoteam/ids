@@ -71,40 +71,26 @@ type Plan = 'free' | 'pro' | 'team';
 - `readOnly` 면 포커스만 옮겨지고 선택은 그대로입니다.
 - 루트에 준 `onKeyDown` 이 먼저 불리고, 거기서 `preventDefault()` 하면 `Home` `End` 를 그룹이 처리하지 않습니다.
 
-## 배치와 카드형 선택지
+## 배치
 
 ```tsx
 <RadioGroup orientation="horizontal" />      // vertical(기본) / horizontal. aria-orientation도 붙는다
 
-<RadioGroup<Plan> className="grid gap-3" aria-label="플랜">
-  {({ Item }) =>
-    plans.map((plan) => (
-      <Label
-        key={plan.value}
-        className="flex items-start gap-3 rounded-standard p-4 inset-ring-1 inset-ring-neutral
-                   has-data-[state=checked]:inset-ring-primary-strong"   // 선택된 카드
-      >
-        <Item value={plan.value} />
-        <span>{plan.label}</span>
-      </Label>
-    ))
-  }
-</RadioGroup>
+<div className="max-w-md">                   {/* 너비는 감싸는 요소가 */}
+  <RadioGroup aria-label="플랜">…</RadioGroup>
+</div>
 ```
 
-- 카드 전체가 `Label` 이라 어디를 눌러도 선택됩니다. 선택된 항목의 원에 `data-state="checked"` 가 붙어 `has-data-[state=checked]:` 로 카드를 꾸밉니다.
+- **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`).
+- 카드형 선택지는 IDS 위에 새로 그린 디자인이라 README 에 두지 않습니다. `ChooseAPlanFromCards` 스토리(`custom-design`)를 봅니다. 선택된 카드는 `value` 로 알아냅니다.
 
-## 상태와 스타일
+## 상태
 
-그룹 루트에 붙는 속성입니다. 항목의 상태는 [Radio](../radio/README.md) 를 봅니다. `className` 과 `style` 은 `RadioGroup.State`(`value`, `orientation`, `disabled`, `readOnly`, `required`, `invalid`)를 받는 함수도 됩니다.
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-| 속성                              | 뜻                          |
-| --------------------------------- | --------------------------- |
-| `data-orientation`                | `vertical` / `horizontal`   |
-| `data-disabled` / `disabled`      | 모든 항목이 비활성          |
-| `data-readonly` / `aria-readonly` | 선택을 바꿀 수 없다         |
-| `data-required` / `aria-required` | 필수                        |
-| `data-invalid` / `aria-invalid`   | 오류. 모든 항목이 danger 색 |
+- 고른 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 정합니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style` 에 `RadioGroup.State`(`value`, `orientation`, `disabled`, `readOnly`, `required`, `invalid`)를 받는 함수를 줍니다.
+- 항목의 상태는 [Radio](../radio/README.md) 를 봅니다.
 
 ## 폼
 
@@ -164,7 +150,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `size` / `variant`       | 항목으로 전해진다                                     |
 | `children`               | `({ Item }) => ReactNode` 또는 `Radio` 들             |
 | `ref`                    | `<fieldset>` 루트. `focus()` 는 항목으로 넘어간다     |
-| 그 외 속성               | 그룹 루트로 간다 (`id`, `aria-label`, `className` 등) |
+| 그 외 속성               | 그룹 루트로 간다 (`id`, `aria-label`) |
 
 ## 알아둘 것
 

@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import { cdp, page, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
@@ -106,7 +106,6 @@ test('SSR: a range is a labelled group whose thumbs bound each other', () => {
   const doc = parse(
     renderToString(
       <Slider
-        selectionMode="range"
         aria-label="Price"
         name="price"
         defaultValue={[20, 70]}
@@ -198,7 +197,6 @@ test('range thumbs never cross and keep minStepsBetweenThumbs apart', async () =
   const changes: Array<[number, number]> = [];
   const screen = await render(
     <Slider
-      selectionMode="range"
       aria-label="Price"
       defaultValue={[40, 50]}
       step={5}
@@ -251,9 +249,7 @@ test('pointer: a press moves the nearest thumb, a drag follows, the release comm
 
 test('pointer: stacked range thumbs split by the direction of the first move', async (context) => {
   skipWithoutCdp(context);
-  const screen = await render(
-    <Slider selectionMode="range" aria-label="Stack" defaultValue={[50, 50]} />,
-  );
+  const screen = await render(<Slider aria-label="Stack" defaultValue={[50, 50]} />);
   const thumb = screen.getByRole('slider', { name: '시작' });
   await press(drawnAt(thumb, 0.5));
   await drag(drawnAt(thumb, 0.3));
@@ -349,14 +345,7 @@ test('controlled value, silent form reset and focus handed from the root to a th
   function Parent() {
     const [value, set] = useState<[number, number]>([10, 20]);
     setValue = set;
-    return (
-      <Slider
-        selectionMode="range"
-        aria-label="Range"
-        value={value}
-        onValueChange={(next) => changes.push(next)}
-      />
-    );
+    return <Slider aria-label="Range" value={value} onValueChange={(next) => changes.push(next)} />;
   }
   const screen = await render(<Parent />);
   screen.getByRole('slider', { name: '끝' }).element().focus();
@@ -397,7 +386,7 @@ test('controlled value, silent form reset and focus handed from the root to a th
 
 test('parts: custom track, no range, thumb children and the value label switch', async () => {
   const screen = await render(
-    <Slider aria-label="Hue" defaultValue={120} max={360} valueLabel="never">
+    <Slider aria-label="Hue" defaultValue={120} max={360}>
       <Slider.Track className="hue">
         <Slider.Thumb>{(state) => <b data-deg="">{`${state.thumbValue}deg`}</b>}</Slider.Thumb>
       </Slider.Track>
@@ -436,14 +425,16 @@ test('parts: custom track, no range, thumb children and the value label switch',
 test('invalid configuration throws', () => {
   expect(() => renderToString(<Slider min={10} max={10} />)).toThrow(/min/);
   expect(() => renderToString(<Slider step={0} />)).toThrow(/step/);
-  expect(() =>
-    // @ts-expect-error -- a range takes a [start, end] tuple, not a number
-    renderToString(<Slider selectionMode="range" defaultValue={5} />),
-  ).toThrow(/\[start, end\]/);
-  expect(() =>
-    // @ts-expect-error -- a single slider takes a number, not a tuple
-    renderToString(<Slider defaultValue={[1, 2]} />),
-  ).toThrow(/number/);
+});
+
+test('the first value fixes the shape; a later change of shape warns and keeps it', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  const screen = await render(<Slider aria-label="Price" value={[20, 60]} />);
+  await expect.element(screen.getByRole('group', { name: 'Price' })).toBeInTheDocument();
+  await screen.rerender(<Slider aria-label="Price" value={40 as unknown as [number, number]} />);
+  await expect.poll(() => warn.mock.calls.flat().join(' ')).toMatch(/keeps the shape/);
+  expect(now(), 'a number on a range slider moves both thumbs to it').toEqual([40, 40]);
+  warn.mockRestore();
 });
 
 test('react-hook-form controlMode="value": numbers in, error focus on the thumb', async () => {
@@ -480,7 +471,9 @@ test('react-hook-form controlMode="value": numbers in, error focus on the thumb'
 
 test('a decimal step lands on exact values and draws one mark per step', async () => {
   const screen = await render(
-    <Slider aria-label="투명도" min={0} max={1} step={0.1} defaultValue={0} marks />,
+    <Slider aria-label="투명도" min={0} max={1} step={0.1} defaultValue={0}>
+      <Slider.Marks />
+    </Slider>,
   );
   const thumb = screen.getByRole('slider', { name: '투명도' });
 
@@ -493,4 +486,38 @@ test('a decimal step lands on exact values and draws one mark per step', async (
 
   const root = rootOf(thumb);
   expect(root.querySelectorAll('[aria-hidden="true"] > span')).toHaveLength(11);
+});
+
+test('Slider.Mark draws a labelled tick, and Slider.Thumb takes its own aria-label', async () => {
+  const screen = await render(
+    <Slider aria-label="Price" defaultValue={[20, 80]} formatLabel={(value) => `${value}%`}>
+      <Slider.Track>
+        <Slider.Range />
+        <Slider.Thumb index={0} aria-label="최저가" />
+        <Slider.Thumb index={1} aria-label="최고가">
+          <Slider.ValueLabel className="opacity-100" />
+        </Slider.Thumb>
+      </Slider.Track>
+      <Slider.Marks>
+        <Slider.Mark value={0} />
+        <Slider.Mark value={50}>절반</Slider.Mark>
+      </Slider.Marks>
+    </Slider>,
+  );
+  await expect.element(screen.getByRole('slider', { name: '최저가' })).toBeInTheDocument();
+  const upper = screen.getByRole('slider', { name: '최고가' });
+  await expect.element(upper).toHaveTextContent('80%');
+  const marks = [...screen.container.querySelectorAll<HTMLElement>('[data-value]')];
+  expect(marks.map((mark) => mark.textContent)).toEqual(['0%', '절반']);
+});
+
+test('a Slider without a Track draws the default one before its other parts', async () => {
+  const screen = await render(
+    <Slider aria-label="Volume" defaultValue={30}>
+      <Slider.Marks />
+    </Slider>,
+  );
+  await expect
+    .element(screen.getByRole('slider', { name: 'Volume' }))
+    .toHaveAttribute('aria-valuenow', '30');
 });

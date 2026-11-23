@@ -37,7 +37,6 @@ export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.Slid
       value={Math.round(color.a * 100)}
       onValueChange={(percent) => c.picker.actions.setChannel('alpha', percent)}
       formatLabel={(value: number) => t('colorPicker.percent', { value })}
-      valueLabel="never"
       aria-label={props['aria-label'] ?? t('colorPicker.alpha')}
       size={c.size}
       disabled={c.state.disabled}
@@ -50,7 +49,7 @@ export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.Slid
           backgroundSize: '100% 100%, 8px 8px',
         }}
       >
-        <Slider.Thumb style={overChecker(cssColor(rgba))} />
+        <Slider.Thumb style={overChecker(cssColor(rgba))}>{null}</Slider.Thumb>
       </Slider.Track>
     </Slider>
   );

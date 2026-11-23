@@ -25,7 +25,7 @@ export const sliderStyle = tv({
       'pointer-events-none absolute rounded-indicator px-1.5 py-0.5 whitespace-nowrap',
       'bg-neutral-solid text-caption-c1-medium text-on-neutral-solid tabular-nums',
       'opacity-0 transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'group-focus-visible/thumb:opacity-100 group-data-dragging/thumb:opacity-100 data-visible:opacity-100',
+      'group-focus-visible/thumb:opacity-100 group-data-dragging/thumb:opacity-100',
     ],
     marks: 'relative text-caption-c2-regular text-neutral',
     mark: 'absolute flex items-center gap-1 whitespace-nowrap',
