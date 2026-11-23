@@ -20,19 +20,12 @@ const meta = {
   argTypes: {
     direction: { control: 'radio', options: ['both', 'horizontal', 'vertical'] },
     disabled: { control: 'boolean' },
-    minWidth: { control: 'number' },
-    maxWidth: { control: 'number' },
-    minHeight: { control: 'number' },
-    maxHeight: { control: 'number' },
   },
   args: {
     direction: 'both',
     defaultWidth: 320,
     defaultHeight: 180,
-    minWidth: 160,
-    maxWidth: 480,
-    minHeight: 96,
-    maxHeight: 320,
+    style: { minWidth: 160, maxWidth: 480, minHeight: 96, maxHeight: 320 },
     className: panel,
     children: '모서리나 가장자리의 손잡이를 끌거나, 손잡이에 포커스한 뒤 방향키로 크기를 바꿉니다.',
     onWidthChange: fn(),
@@ -55,6 +48,18 @@ function middleOf(path: SVGGeometryElement) {
 }
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Resizable
+      defaultWidth={320}
+      defaultHeight={180}
+      className="concentric-p-4 border-neutral bg-base text-body-b3-regular border"
+    >
+      모서리를 끌어 너비와 높이를 바꿉니다.
+    </Resizable>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -130,10 +135,7 @@ export const Gallery: Story = {
           <Resizable
             defaultWidth={240}
             defaultHeight={120}
-            minWidth={200}
-            maxWidth={320}
-            minHeight={96}
-            maxHeight={160}
+            style={{ minWidth: 200, maxWidth: 320, minHeight: 96, maxHeight: 160 }}
             className={panel}
           >
             너비 200 ~ 320px, 높이 96 ~ 160px 안에서만 바뀝니다.
@@ -203,51 +205,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const KeyboardResizing: Story = {
-  render: () => (
-    <div className="flex flex-col gap-6">
-      <Resizable
-        direction="horizontal"
-        defaultWidth={240}
-        maxWidth={360}
-        className={cn(panel, 'h-24')}
-      >
-        가장자리: ← → 16px, Shift 64px, Home End 최솟값과 최댓값, Enter 처음 크기
-      </Resizable>
-      <Resizable defaultWidth={240} defaultHeight={120} className={panel}>
-        모서리: ← → 너비, ↑ ↓ 높이
-      </Resizable>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '가장자리 손잡이는 separator 하나입니다. 모서리 손잡이는 "크기 조절" group 안의 separator 둘(너비, 높이)이 Tab 한 칸을 나눠 씁니다. ↑ ↓ 를 누르면 포커스가 높이 separator 로 옮겨 가서, 스크린 리더는 늘 값이 바뀐 separator 를 읽습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const [edge, width] = canvas.getAllByRole('separator', { name: '너비' });
-    edge!.focus();
-    await userEvent.keyboard('{ArrowRight}');
-    await waitFor(() => expect(valueOf(edge!)).toBe(256));
-    await userEvent.keyboard('{End}');
-    await waitFor(() => expect(valueOf(edge!)).toBe(360));
-    await userEvent.keyboard('{Enter}');
-    await waitFor(() => expect(valueOf(edge!)).toBe(240));
-
-    await userEvent.tab();
-    await expect(width).toHaveFocus();
-    await userEvent.keyboard('{ArrowDown}');
-    const height = canvas.getByRole('separator', { name: '높이' });
-    await waitFor(() => expect(height).toHaveFocus());
-    await expect(valueOf(height)).toBe(136);
-    await expect(width).toHaveAttribute('tabindex', '-1');
-  },
-};
-
-export const PointerDrag: Story = {
+export const ResizeByDragging: Story = {
   render: () => (
     <Resizable defaultWidth={240} defaultHeight={120} className={panel}>
       모서리를 끌면 두 축이 함께 바뀝니다. 끄는 동안 Escape 를 누르면 처음 크기로 돌아갑니다.
@@ -257,7 +215,7 @@ export const PointerDrag: Story = {
     docs: {
       description: {
         story:
-          '끄는 동안에는 한 프레임에 한 번 DOM 에 크기를 쓰고, 놓을 때 한 번 `onWidthChange` `onHeightChange` 를 부릅니다. 손잡이를 두 번 누르면 처음 크기로 돌아갑니다.',
+          '`defaultWidth` `defaultHeight` 로 처음 크기를 주면 모서리를 끌어 두 축을 함께 바꿉니다. 끄는 동안에는 한 프레임에 한 번 DOM 에 크기를 쓰고, 놓을 때 한 번 `onWidthChange` `onHeightChange` 를 부릅니다. 손잡이를 두 번 누르면 처음 크기로 돌아갑니다.',
       },
     },
   },
@@ -285,14 +243,13 @@ export const PointerDrag: Story = {
   },
 };
 
-export const Step: Story = {
+export const SnapTheSizeToAStep: Story = {
   render: () => (
     <Resizable
       direction="vertical"
       step={12}
       defaultHeight={96}
-      minHeight={48}
-      maxHeight={240}
+      style={{ minHeight: 48, maxHeight: 240 }}
       getValueLabel={(size) => `${size / 48}시간`}
       className={cn(panel, 'w-64')}
     >
@@ -330,7 +287,35 @@ export const Step: Story = {
   },
 };
 
-export const ControlledSize: Story = {
+export const LimitTheSizeWithCss: Story = {
+  render: () => (
+    <Resizable
+      direction="horizontal"
+      defaultWidth={240}
+      className={cn(panel, 'h-28 max-w-80 min-w-50')}
+    >
+      너비가 200 ~ 320px 안에서만 바뀝니다.
+    </Resizable>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '최소와 최대 크기는 CSS 의 `min-width` `max-width` `min-height` `max-height` 가 정합니다. `className="min-w-50 max-w-80"` 이나 `style={{ minWidth: 200, maxWidth: 320 }}` 으로 주면 끌기와 방향키가 그 안에서 멈추고, Home 과 End 가 그 끝으로 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const edge = canvas.getByRole('separator', { name: '너비' });
+    edge.focus();
+    await userEvent.keyboard('{End}');
+    await waitFor(() => expect(valueOf(edge)).toBe(320));
+    await userEvent.keyboard('{Home}');
+    await waitFor(() => expect(valueOf(edge)).toBe(200));
+  },
+};
+
+export const ControlTheSize: Story = {
   render: function Render() {
     const [width, setWidth] = useState(280);
     const [height, setHeight] = useState(140);
@@ -341,8 +326,7 @@ export const ControlledSize: Story = {
         height={height}
         onWidthChange={setWidth}
         onHeightChange={setHeight}
-        minWidth={200}
-        minHeight={96}
+        style={{ minWidth: 200, minHeight: 96 }}
         className={panel}
       >
         <output aria-live="polite">
@@ -365,5 +349,50 @@ export const ControlledSize: Story = {
     await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('216 x 140'));
     await userEvent.keyboard('{ArrowUp}');
     await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('216 x 124'));
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <Resizable
+        direction="horizontal"
+        defaultWidth={240}
+        style={{ maxWidth: 360 }}
+        className={cn(panel, 'h-24')}
+      >
+        가장자리: ← → 16px, Shift 64px, Home End 최솟값과 최댓값, Enter 처음 크기
+      </Resizable>
+      <Resizable defaultWidth={240} defaultHeight={120} className={panel}>
+        모서리: ← → 너비, ↑ ↓ 높이
+      </Resizable>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '가장자리 손잡이는 separator 하나입니다. 모서리 손잡이는 "크기 조절" group 안의 separator 둘(너비, 높이)이 Tab 한 칸을 나눠 씁니다. ↑ ↓ 를 누르면 포커스가 높이 separator 로 옮겨 가서, 스크린 리더는 늘 값이 바뀐 separator 를 읽습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const [edge, width] = canvas.getAllByRole('separator', { name: '너비' });
+    edge!.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(valueOf(edge!)).toBe(256));
+    await userEvent.keyboard('{End}');
+    await waitFor(() => expect(valueOf(edge!)).toBe(360));
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(valueOf(edge!)).toBe(240));
+
+    await userEvent.tab();
+    await expect(width).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+    const height = canvas.getByRole('separator', { name: '높이' });
+    await waitFor(() => expect(height).toHaveFocus());
+    await expect(valueOf(height)).toBe(136);
+    await expect(width).toHaveAttribute('tabindex', '-1');
   },
 };

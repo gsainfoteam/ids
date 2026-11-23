@@ -26,6 +26,23 @@ const HANDLE = new Set<unknown>([ResizableHandle]);
 
 const pixels = (size: number | undefined) => (size === undefined ? undefined : `${size}px`);
 
+const PIXEL_LENGTH = /^\d+(\.\d+)?px$/;
+
+const pixelsIn = (length: unknown) =>
+  typeof length === 'number'
+    ? length
+    : typeof length === 'string' && PIXEL_LENGTH.test(length)
+      ? Number.parseFloat(length)
+      : undefined;
+
+const boundsBeforeMeasuring = (style: Resizable.Props['style']) => {
+  const declared = typeof style === 'object' ? style : undefined;
+  return {
+    width: { min: pixelsIn(declared?.minWidth), max: pixelsIn(declared?.maxWidth) },
+    height: { min: pixelsIn(declared?.minHeight), max: pixelsIn(declared?.maxHeight) },
+  };
+};
+
 export function ResizableRoot({
   direction = 'both',
   width,
@@ -34,10 +51,6 @@ export function ResizableRoot({
   height,
   defaultHeight,
   onHeightChange,
-  minWidth = 0,
-  maxWidth = Infinity,
-  minHeight = 0,
-  maxHeight = Infinity,
   step,
   getValueLabel,
   disabled = false,
@@ -59,21 +72,20 @@ export function ResizableRoot({
   const rootId = child?.props.id ?? id ?? `ids-resizable-${generatedId}`;
   const content = child ? child.props.children : children;
   const [dragging, setDragging] = useState(false);
+  const declared = boundsBeforeMeasuring(style);
 
   const resizable = useResizable({
     width: {
       value: width,
       defaultValue: defaultWidth,
       onChange: onWidthChange,
-      min: minWidth,
-      max: maxWidth,
+      declared: declared.width,
     },
     height: {
       value: height,
       defaultValue: defaultHeight,
       onChange: onHeightChange,
-      min: minHeight,
-      max: maxHeight,
+      declared: declared.height,
     },
     step,
     getValueLabel,

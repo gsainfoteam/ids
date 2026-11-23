@@ -42,8 +42,7 @@ export function EditorImageView({ node, editor, selected, updateAttributes }: Re
         <Resizable
           direction="horizontal"
           width={widthOf(node.attrs.width)}
-          minWidth={MIN_IMAGE_WIDTH}
-          maxWidth={room}
+          style={{ minWidth: MIN_IMAGE_WIDTH, maxWidth: room }}
           contentEditable={false}
           className={styles.imageResizable()}
           onWidthChange={(width) => updateAttributes({ width: Math.round(width) })}

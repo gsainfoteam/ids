@@ -130,8 +130,10 @@ export function SchedulerMovable({
       direction="vertical"
       step={(hourHeight * SNAP_MINUTES) / MINUTES_IN_HOUR}
       height={segment.hours * hourHeight}
-      minHeight={SHORTEST_SHOWN_HOURS * hourHeight}
-      maxHeight={(HOURS_IN_DAY - segment.startHour) * hourHeight}
+      style={{
+        minHeight: SHORTEST_SHOWN_HOURS * hourHeight,
+        maxHeight: (HOURS_IN_DAY - segment.startHour) * hourHeight,
+      }}
       getValueLabel={(height) => drag.endLabel(segment, day, height)}
       onHeightChange={(height) => drag.resize(segment, height)}
     >

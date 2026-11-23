@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { flushSync } from 'react-dom';
 
@@ -11,14 +11,12 @@ import {
   type ResizeAxis,
   type ResizeDimension,
 } from '../../../internal/resize-handle';
-import { isDevelopment } from '../../../utils/dev';
 
 type SizeOptions = {
   value: number | undefined;
   defaultValue: number | undefined;
   onChange: ((size: number) => void) | undefined;
-  min: number;
-  max: number;
+  declared: { min: number | undefined; max: number | undefined };
 };
 
 export type UseResizableOptions = {
@@ -40,15 +38,6 @@ function useSize({ value, defaultValue, onChange }: SizeOptions) {
   return { size, setSize, resetTo };
 }
 
-function useWarnWhenBoundsCross(dimension: ResizeDimension, min: number, max: number) {
-  useEffect(() => {
-    if (isDevelopment && min > max)
-      console.warn(
-        `[IDS] Resizable: the minimum ${dimension} (${min}px) is greater than the maximum (${max}px); the maximum wins.`,
-      );
-  }, [dimension, min, max]);
-}
-
 export function useResizable({
   width,
   height,
@@ -60,9 +49,6 @@ export function useResizable({
   const sizes = { width: useSize(width), height: useSize(height) };
   const measured = useMeasuredAxes({ width: element, height: element });
 
-  useWarnWhenBoundsCross('width', width.min, width.max);
-  useWarnWhenBoundsCross('height', height.min, height.max);
-
   const axisOf = (dimension: ResizeDimension, options: SizeOptions): ResizeAxis => {
     const { size, setSize, resetTo } = sizes[dimension];
     const drawn = measured[dimension];
@@ -71,8 +57,8 @@ export function useResizable({
       dimension,
       target: element,
       size: size ?? drawn?.size,
-      min: Math.max(options.min, drawn?.min ?? 0),
-      max: Math.min(options.max, drawn?.max ?? Infinity),
+      min: drawn?.min ?? options.declared.min ?? 0,
+      max: drawn?.max ?? options.declared.max ?? Infinity,
       controls,
       step,
       valueLabel: getValueLabel && ((value) => getValueLabel(value, dimension)),

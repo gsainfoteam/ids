@@ -13,7 +13,7 @@
 ```tsx
 import { Resizable } from '@gsainfoteam/ids-react';
 
-<Resizable defaultWidth={400} defaultHeight={240} minWidth={240} className="concentric-p-4 border">
+<Resizable defaultWidth={400} defaultHeight={240} className="concentric-p-4 min-w-60 border">
   내용
 </Resizable>;
 ```
@@ -65,13 +65,15 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ## 한계
 
 ```tsx
-<Resizable minWidth={240} maxWidth={640} minHeight={120} maxHeight={480} />
-<Resizable direction="vertical" className="min-h-20 max-h-96" />   // px 인 CSS 한계도 지킨다
+<Resizable className="min-w-60 max-w-160 min-h-30 max-h-120" />
+<Resizable style={{ minWidth: 240, maxWidth: 640 }} />
 ```
 
-- 기본은 `min*` 0, `max*` 없음입니다.
-- 요소의 CSS `min-width` `max-width` `min-height` `max-height` 가 px 이면 props 한계와 함께 지킵니다. `%` 나 `min-content` 는 읽지 못하므로 props 로 줍니다.
-- `max*` 가 없으면 `End` 키는 동작하지 않고 `aria-valuemax` 도 붙지 않습니다.
+- 한계는 prop 이 아니라 요소의 CSS `min-width` `max-width` `min-height` `max-height` 입니다. 클래스로 주든 `style` 로 주든 그려진 값을 읽습니다. 기본은 최소 0, 최대 없음입니다.
+- px 로 계산되는 값만 읽습니다. `%` 나 `min-content` 는 읽지 못하므로 px 로 줍니다.
+- 한계가 바뀌면 크기가 그대로여도 다시 읽습니다.
+- 서버 렌더와 첫 측정 전의 `aria-valuemin` `aria-valuemax` 는 `style` 객체의 px 값으로 정합니다. 클래스로만 준 한계는 측정한 뒤에 붙습니다.
+- 최대가 없으면 `End` 키는 동작하지 않고 `aria-valuemax` 도 붙지 않습니다.
 
 ## 칸 단위와 값 글자
 
@@ -191,18 +193,16 @@ import { Resizable } from '@gsainfoteam/ids-react';
 | `width` / `defaultWidth`              | px. 없으면 CSS 너비                                   |
 | `height` / `defaultHeight`            | px. 없으면 CSS 높이                                   |
 | `onWidthChange` / `onHeightChange`    | `(size: number) => void`                              |
-| `minWidth` `maxWidth` `minHeight` `maxHeight` | px. 기본 0 과 없음                            |
 | `step`                                | px. 끌기와 방향키가 이 배수에 맞는다                  |
 | `getValueLabel`                       | `(size, dimension) => string`. `aria-valuetext`       |
 | `disabled`                            | 손잡이가 흐려지고 Tab 과 포인터에서 빠진다            |
 | `asChild`                             | 자식 요소 하나의 크기를 바꾼다                        |
-| `className` / `style`                 | 상태를 받는 함수도 된다                               |
+| `className` / `style`                 | 상태를 받는 함수도 된다. CSS 최소·최대 크기가 한계다 |
 | 그 외 속성, `ref`                      | 요소로 간다. `id` 가 없으면 만들어 `aria-controls` 에 쓴다 |
 | `Resizable.Handle`                    | `asChild`, `className`, `children`, 그 외 div 속성     |
 
 ## 알아둘 것
 
-- `min*` 이 `max*` 보다 크면 개발 빌드에서 경고하고 최댓값을 씁니다.
 - `Resizable.Handle` 을 Resizable 밖에 두면 오류입니다.
 - 요소에 `overflow-hidden` 을 주면 끝 밖으로 나온 손잡이의 절반이 잘립니다. 누를 영역이 줄고 가장자리 막대와 모서리의 호가 반만 보입니다.
 - 가장자리 손잡이의 누를 영역은 끝 선 안팎으로 12px 씩입니다. 끝에 붙은 안쪽 컨트롤(스크롤 막대 등)이 있으면 `Resizable.Handle` 의 `className` 으로 영역을 바꿉니다.

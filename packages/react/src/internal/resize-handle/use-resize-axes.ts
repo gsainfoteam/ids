@@ -93,11 +93,19 @@ export function useMeasuredAxes(targets: Partial<Record<ResizeDimension, HTMLEle
       setMeasured((previous) => (isEqual(previous, next) ? previous : next));
     };
 
-    const observer = new first[1].ownerDocument.defaultView!.ResizeObserver(read);
-    for (const [, element] of observed) observer.observe(element);
+    const view = first[1].ownerDocument.defaultView!;
+    const resized = new view.ResizeObserver(read);
+    const restyled = new view.MutationObserver(read);
+    for (const [, element] of observed) {
+      resized.observe(element);
+      restyled.observe(element, { attributeFilter: ['style', 'class'] });
+    }
     read();
 
-    return () => observer.disconnect();
+    return () => {
+      resized.disconnect();
+      restyled.disconnect();
+    };
   }, [width, height]);
 
   return measured;

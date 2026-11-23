@@ -30,10 +30,6 @@ export namespace Resizable {
     height?: number;
     defaultHeight?: number;
     onHeightChange?: (height: number) => void;
-    minWidth?: number;
-    maxWidth?: number;
-    minHeight?: number;
-    maxHeight?: number;
     step?: number;
     getValueLabel?: (size: number, dimension: Dimension) => string;
     disabled?: boolean;

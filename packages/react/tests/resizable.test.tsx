@@ -63,7 +63,7 @@ test('SSR: the default handle follows the direction and carries its ARIA from th
           direction={direction}
           defaultWidth={400}
           defaultHeight={300}
-          minWidth={200}
+          style={{ minWidth: 200 }}
         >
           내용
         </Resizable>,
@@ -108,8 +108,7 @@ test('an edge handle resizes by keys: 16px steps, 64px with Shift, Home and End 
     <Resizable
       direction="horizontal"
       defaultWidth={200}
-      minWidth={120}
-      maxWidth={300}
+      style={{ minWidth: 120, maxWidth: 300 }}
       onWidthChange={onWidthChange}
       className="h-24"
     >
@@ -128,11 +127,11 @@ test('an edge handle resizes by keys: 16px steps, 64px with Shift, Home and End 
   await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
   await expect.poll(width).toBe(152);
   await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
-  await expect.poll(width, { message: 'clamped to minWidth' }).toBe(120);
+  await expect.poll(width, { message: 'clamped to min-width' }).toBe(120);
   await userEvent.keyboard('{End}');
   await expect.poll(width).toBe(300);
   await userEvent.keyboard('{ArrowRight}');
-  await expect.poll(width, { message: 'clamped to maxWidth' }).toBe(300);
+  await expect.poll(width, { message: 'clamped to max-width' }).toBe(300);
   await userEvent.keyboard('{Home}');
   await expect.poll(width).toBe(120);
   await userEvent.keyboard('{Enter}');
@@ -142,7 +141,7 @@ test('an edge handle resizes by keys: 16px steps, 64px with Shift, Home and End 
 
 test('the corner grip is one tab stop whose arrows resize each axis and move focus to the separator that changed', async () => {
   const screen = await render(
-    <Resizable defaultWidth={240} defaultHeight={160} maxHeight={200}>
+    <Resizable defaultWidth={240} defaultHeight={160} className="max-h-[200px]">
       내용
     </Resizable>,
   );
@@ -331,7 +330,7 @@ test('dragging an edge follows the pointer, writes the DOM each frame and report
     <Resizable
       direction="horizontal"
       defaultWidth={200}
-      maxWidth={260}
+      style={{ maxWidth: 260 }}
       onWidthChange={onWidthChange}
       className="h-24"
     >
@@ -351,7 +350,7 @@ test('dragging an edge follows the pointer, writes the DOM each frame and report
   expect(document.documentElement.style.userSelect).toBe('none');
 
   await mouse('mouseMoved', { x: start.x + 90, y: start.y });
-  await expect.poll(() => box(screen).offsetWidth, { message: 'clamped to maxWidth' }).toBe(260);
+  await expect.poll(() => box(screen).offsetWidth, { message: 'clamped to max-width' }).toBe(260);
   await mouse('mouseMoved', { x: start.x + 40, y: start.y });
   await mouse('mouseReleased', { x: start.x + 40, y: start.y });
 
@@ -563,19 +562,24 @@ test('dragging the grip inside a pressable card does not press the card', async 
   expect(onClick).not.toHaveBeenCalled();
 });
 
-test('dev warnings: a minimum above the maximum; a Handle outside Resizable throws', async () => {
-  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-  await render(
-    <Resizable minWidth={300} maxWidth={200} minHeight={10} maxHeight={5}>
+test('bounds written in style are read again when only the style changes', async () => {
+  const screen = await render(
+    <Resizable direction="horizontal" defaultWidth={200} style={{ maxWidth: 300 }} className="h-24">
       내용
     </Resizable>,
   );
-  await nextFrame();
-  expect(warn.mock.calls.map(([message]) => String(message))).toEqual([
-    expect.stringMatching(/Resizable: the minimum width \(300px\) is greater than the maximum/),
-    expect.stringMatching(/Resizable: the minimum height \(10px\) is greater than the maximum/),
-  ]);
+  const handle = screen.getByRole('separator', { name: '너비' });
+  await expect.element(handle).toHaveAttribute('aria-valuemax', '300');
 
+  await screen.rerender(
+    <Resizable direction="horizontal" defaultWidth={200} style={{ maxWidth: 240 }} className="h-24">
+      내용
+    </Resizable>,
+  );
+  await expect.element(handle).toHaveAttribute('aria-valuemax', '240');
+});
+
+test('a Handle outside Resizable throws', async () => {
   expect(() => renderToString(<Resizable.Handle />)).toThrow(
     /\[IDS\] Resizable\.Handle must be rendered inside Resizable/,
   );
