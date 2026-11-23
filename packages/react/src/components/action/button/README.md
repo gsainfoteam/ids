@@ -128,6 +128,7 @@ const [state, setState] = useState<Button.State>();
 | `disabled`     | 비활성                             |
 
 - `onInteractionChange(state)` 는 상태를 부모에 알려 줄 뿐 제어 prop 이 아닙니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style` 에 `Button.State` 를 받는 함수를 줍니다.
 - `variant`, `colorScheme`, `size` 는 앱이 넘긴 값입니다.
 
 ## 폼
