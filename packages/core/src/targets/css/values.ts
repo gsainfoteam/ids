@@ -6,12 +6,7 @@ const AT_START = { sourceIndex: 0, sourceEndIndex: 0 };
 
 export const word = (value: string): Node => ({ type: 'word', value, ...AT_START });
 
-export const string = (value: string): Node => ({
-  type: 'string',
-  value,
-  quote: '"',
-  ...AT_START,
-});
+export const string = (value: string): Node => ({ type: 'string', value, quote: '"', ...AT_START });
 
 const space = (): Node => ({ type: 'space', value: ' ', ...AT_START });
 
@@ -29,14 +24,7 @@ const operator = (symbol: string) => () => [space(), word(symbol), space()];
 export const product = (...factors: Value[]) => joined(operator('*'), factors);
 
 export const call = (name: string, ...args: Value[]): Value => [
-  {
-    type: 'function',
-    value: name,
-    before: '',
-    after: '',
-    nodes: commas(...args),
-    ...AT_START,
-  },
+  { type: 'function', value: name, before: '', after: '', nodes: commas(...args), ...AT_START },
 ];
 
 export const variable = (property: string, fallback?: Value): Value =>
