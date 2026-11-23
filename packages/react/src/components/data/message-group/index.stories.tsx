@@ -53,6 +53,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-96 break-keep">
+      <MessageGroup aria-label="김지수의 메시지">
+        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+          <Bubble>학식 메뉴 알려 줘</Bubble>
+        </Message>
+        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+          <Bubble>오늘 거</Bubble>
+        </Message>
+      </MessageGroup>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -113,7 +128,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const FirstAndLast: Story = {
+export const GroupMessagesFromOnePerson: Story = {
   render: () => (
     <div className="w-96 break-keep">
       <MessageGroup align="start" aria-label="김지수의 메시지">

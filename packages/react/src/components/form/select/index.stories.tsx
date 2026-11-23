@@ -67,6 +67,19 @@ const trigger = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-64">
+      <Field.Label>과일</Field.Label>
+      <Select placeholder="과일 선택">
+        <Select.Item value="apple">사과</Select.Item>
+        <Select.Item value="banana">바나나</Select.Item>
+        <Select.Item value="cherry">체리</Select.Item>
+      </Select>
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -198,55 +211,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  args: {
-    children: (
-      <>
-        <Select.Item value="apple">사과</Select.Item>
-        <Select.Item value="banana" disabled>
-          바나나
-        </Select.Item>
-        <Select.Item value="cherry">체리</Select.Item>
-        <Select.Item value="grape">포도</Select.Item>
-        <Select.Item value="mango">망고</Select.Item>
-      </>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '포커스는 트리거에 남고 aria-activedescendant 가 옵션을 가리킵니다. ↑↓ Home End PageUp PageDown 으로 움직이고, 글자를 치면 그 글자로 시작하는 옵션으로 갑니다. 같은 글자를 반복하면 그 글자의 옵션을 차례로 돕니다. 비활성 옵션은 건너뜁니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, canvas, userEvent, args }) => {
-    const button = trigger(canvasElement);
-    button.focus();
-    await userEvent.keyboard('{ArrowDown}');
-    await waitFor(() => expect(canvas.getByRole('listbox')).toBeVisible());
-    await expect(button).toHaveFocus();
-    const active = () => document.getElementById(button.getAttribute('aria-activedescendant')!);
-    await expect(active()).toHaveTextContent('사과');
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(active()).toHaveTextContent('체리');
-    await userEvent.keyboard('{End}');
-    await expect(active()).toHaveTextContent('망고');
-    await userEvent.keyboard('{ArrowUp}');
-    await expect(active()).toHaveTextContent('포도');
-    await userEvent.keyboard('{Home}');
-    await expect(active()).toHaveTextContent('사과');
-    await userEvent.keyboard('망');
-    await expect(active()).toHaveTextContent('망고');
-    await userEvent.keyboard('{Enter}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('mango');
-    await expect(canvas.queryByRole('listbox')).toBeNull();
-    await expect(button).toHaveFocus();
-    await expect(button).toHaveTextContent('망고');
-  },
-};
-
-export const SearchAndMultiple: Story = {
+export const PickSeveralWithSearch: Story = {
   render: function Render() {
     const [value, setValue] = useState<string[]>([]);
 
@@ -306,7 +271,7 @@ export const SearchAndMultiple: Story = {
   },
 };
 
-export const Clearable: Story = {
+export const LetTheUserClearTheChoice: Story = {
   args: {
     defaultValue: 'cherry',
     children: [
@@ -335,44 +300,7 @@ export const Clearable: Story = {
   },
 };
 
-const countries = Array.from({ length: 40 }, (_, index) => `도시 ${index + 1}`);
-
-export const LongList: Story = {
-  args: {
-    defaultValue: '도시 32',
-    children: countries.map((city) => (
-      <Select.Item key={city} value={city}>
-        {city}
-      </Select.Item>
-    )),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '열면 선택한 옵션이 목록 가운데로 스크롤됩니다. 이후 키보드 이동은 필요한 만큼만 스크롤하고, 문서는 스크롤하지 않습니다. 아래 공간이 모자라면 위로 뒤집혀 열리고, 화면 안에서 높이가 줄어듭니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, canvas, userEvent }) => {
-    await userEvent.click(trigger(canvasElement));
-    const option = canvas.getByRole('option', { name: '도시 32' });
-    const popup = option.closest<HTMLElement>('[data-field-popup]')!;
-    await waitFor(() => {
-      const box = popup.getBoundingClientRect(),
-        rect = option.getBoundingClientRect();
-      expect(rect.top).toBeGreaterThanOrEqual(box.top);
-      expect(rect.bottom).toBeLessThanOrEqual(box.bottom);
-    });
-    await expect(option).toHaveAttribute('data-highlighted');
-    await userEvent.keyboard('{PageDown}');
-    await expect(canvas.getByRole('option', { name: '도시 40' })).toHaveAttribute(
-      'data-highlighted',
-    );
-  },
-};
-
-export const NativeForm: Story = {
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -443,7 +371,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ fruit: string | null }>({ defaultValues: { fruit: null } });
     const [result, setResult] = useState('');
@@ -497,7 +425,7 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const ControlledOpen: Story = {
+export const OpenFromOutside: Story = {
   render: function Render() {
     const [open, setOpen] = useState(false);
 
@@ -543,7 +471,7 @@ const statuses = [
   ['done', '완료', cn('bg-success-solid')],
 ] as const;
 
-export const CustomItems: Story = {
+export const DrawCustomOptions: Story = {
   args: {
     defaultValue: 'doing',
     children: statuses.map(([value, label, dot]) => (
@@ -578,7 +506,7 @@ export const CustomItems: Story = {
   },
 };
 
-export const Drawer: Story = {
+export const OpenAsABottomSheetOnPhones: Story = {
   args: {
     mobileVariant: 'drawer',
     children: (
@@ -600,5 +528,92 @@ export const Drawer: Story = {
           '640px 보다 좁은 화면에서 mobileVariant="drawer" 는 모달 하단 시트로 엽니다. 배경이 어두워지고 클릭을 받지 않으며, 포커스는 시트 안에 머물고, 페이지 스크롤이 잠깁니다. 넓은 화면에서는 팝오버와 같습니다.',
       },
     },
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: {
+    children: (
+      <>
+        <Select.Item value="apple">사과</Select.Item>
+        <Select.Item value="banana" disabled>
+          바나나
+        </Select.Item>
+        <Select.Item value="cherry">체리</Select.Item>
+        <Select.Item value="grape">포도</Select.Item>
+        <Select.Item value="mango">망고</Select.Item>
+      </>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '포커스는 트리거에 남고 aria-activedescendant 가 옵션을 가리킵니다. ↑↓ Home End PageUp PageDown 으로 움직이고, 글자를 치면 그 글자로 시작하는 옵션으로 갑니다. 같은 글자를 반복하면 그 글자의 옵션을 차례로 돕니다. 비활성 옵션은 건너뜁니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, canvas, userEvent, args }) => {
+    const button = trigger(canvasElement);
+    button.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(canvas.getByRole('listbox')).toBeVisible());
+    await expect(button).toHaveFocus();
+    const active = () => document.getElementById(button.getAttribute('aria-activedescendant')!);
+    await expect(active()).toHaveTextContent('사과');
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(active()).toHaveTextContent('체리');
+    await userEvent.keyboard('{End}');
+    await expect(active()).toHaveTextContent('망고');
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(active()).toHaveTextContent('포도');
+    await userEvent.keyboard('{Home}');
+    await expect(active()).toHaveTextContent('사과');
+    await userEvent.keyboard('망');
+    await expect(active()).toHaveTextContent('망고');
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('mango');
+    await expect(canvas.queryByRole('listbox')).toBeNull();
+    await expect(button).toHaveFocus();
+    await expect(button).toHaveTextContent('망고');
+  },
+};
+
+const countries = Array.from({ length: 40 }, (_, index) => `도시 ${index + 1}`);
+
+export const LongList: Story = {
+  tags: ['verification'],
+  args: {
+    defaultValue: '도시 32',
+    children: countries.map((city) => (
+      <Select.Item key={city} value={city}>
+        {city}
+      </Select.Item>
+    )),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '열면 선택한 옵션이 목록 가운데로 스크롤됩니다. 이후 키보드 이동은 필요한 만큼만 스크롤하고, 문서는 스크롤하지 않습니다. 아래 공간이 모자라면 위로 뒤집혀 열리고, 화면 안에서 높이가 줄어듭니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, canvas, userEvent }) => {
+    await userEvent.click(trigger(canvasElement));
+    const option = canvas.getByRole('option', { name: '도시 32' });
+    const popup = option.closest<HTMLElement>('[data-field-popup]')!;
+    await waitFor(() => {
+      const box = popup.getBoundingClientRect(),
+        rect = option.getBoundingClientRect();
+      expect(rect.top).toBeGreaterThanOrEqual(box.top);
+      expect(rect.bottom).toBeLessThanOrEqual(box.bottom);
+    });
+    await expect(option).toHaveAttribute('data-highlighted');
+    await userEvent.keyboard('{PageDown}');
+    await expect(canvas.getByRole('option', { name: '도시 40' })).toHaveAttribute(
+      'data-highlighted',
+    );
   },
 };

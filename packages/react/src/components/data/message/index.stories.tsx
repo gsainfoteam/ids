@@ -61,6 +61,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-96 break-keep">
+      <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        오늘 셔틀 몇 시에 와?
+      </Message>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase className="break-keep">
@@ -178,7 +188,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const AssistantAnswer: Story = {
+export const FoldReasoningAndToolSteps: Story = {
   render: () => (
     <div className="flex w-96 flex-col gap-6 break-keep">
       <Message align="end">다음 학기 전공 필수 과목 정리해 줘</Message>
@@ -231,7 +241,7 @@ export const AssistantAnswer: Story = {
   },
 };
 
-export const Copy: Story = {
+export const CopyAnAnswer: Story = {
   render: () => (
     <div className="w-96 break-keep">
       <Message shape="plain" name="GIST 도우미">
@@ -260,7 +270,7 @@ export const Copy: Story = {
   },
 };
 
-export const Retry: Story = {
+export const ResendAFailedMessage: Story = {
   args: { onRetry: fn() },
   render: function Render(args) {
     const [status, setStatus] = useState<Message.Status>('error');
@@ -301,7 +311,7 @@ export const Retry: Story = {
   },
 };
 
-export const Unread: Story = {
+export const CountWhoHasNotReadIt: Story = {
   render: function Render() {
     const [unread, setUnread] = useState(2);
     const [seen, setSeen] = useState(false);
@@ -357,6 +367,7 @@ export const Unread: Story = {
 };
 
 export const Keyboard: Story = {
+  tags: ['verification'],
   render: () => (
     <div className="w-96 break-keep">
       <Message shape="plain" name="GIST 도우미">

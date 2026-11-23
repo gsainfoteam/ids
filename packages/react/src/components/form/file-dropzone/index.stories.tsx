@@ -54,6 +54,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-80">
+      <Field.Label>첨부 파일</Field.Label>
+      <FileDropzone />
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -115,7 +124,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Limits: Story = {
+export const LimitTypeSizeAndCount: Story = {
   args: {
     'aria-label': undefined,
     multiple: true,
@@ -149,7 +158,7 @@ export const Limits: Story = {
   },
 };
 
-export const PasteAndDrop: Story = {
+export const PasteOrDropFiles: Story = {
   args: { multiple: true, accept: 'image/*' },
   parameters: {
     docs: {
@@ -181,7 +190,7 @@ export const PasteAndDrop: Story = {
   },
 };
 
-export const CustomItems: Story = {
+export const DrawYourOwnFileList: Story = {
   args: { multiple: true, defaultValue: [photo('a.svg'), pdf('b.pdf')] },
   render: (args) => (
     <div className="w-80">

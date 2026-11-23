@@ -43,6 +43,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <KbdGroup>
+      <Kbd keys="Mod" />
+      <span>then</span>
+      <Kbd>G</Kbd>
+    </KbdGroup>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -89,7 +99,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const InheritedSizeAndPlatform: Story = {
+export const SetSizeAndPlatformForEveryKey: Story = {
   render: () => (
     <KbdGroup size="tiny" platform="mac" data-testid="group">
       <Kbd keys="Mod" />

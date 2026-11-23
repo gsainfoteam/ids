@@ -66,6 +66,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <RichText value={'수강 신청은 **8월 12일 오전 10시**에 열립니다.'} />,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -143,7 +147,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const BlogPost: Story = {
+export const ShowASavedMarkdownPost: Story = {
   render: () => (
     <article className="max-w-2xl">
       <RichText value={POST} mentionHref={(id) => `#people/${id}`} />
@@ -173,7 +177,7 @@ export const BlogPost: Story = {
   },
 };
 
-export const Json: Story = {
+export const ShowAValueSavedAsJson: Story = {
   render: () => (
     <RichText
       format="json"
@@ -201,4 +205,12 @@ export const Json: Story = {
       }}
     />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor 가 `format="json"` 으로 저장한 Tiptap 문서를 `format="json"` 으로 그대로 그립니다. 마크다운으로 바꾸지 않아 콜아웃 같은 블록도 그대로 남습니다.',
+      },
+    },
+  },
 };

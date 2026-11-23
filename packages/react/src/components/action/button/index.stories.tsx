@@ -58,6 +58,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <Button>저장</Button>,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -155,7 +159,7 @@ export const Gallery: Story = {
 
 const A_SAVE_TAKES = 2000;
 
-export const Transparent: Story = {
+export const AddAnActionWithoutABackground: Story = {
   render: () => (
     <div className="flex items-center gap-2">
       <Button variant="transparent">취소</Button>
@@ -183,7 +187,7 @@ export const Transparent: Story = {
   },
 };
 
-export const Loading: Story = {
+export const ShowProgressWhileSaving: Story = {
   args: { onClick: fn(() => new Promise((resolve) => setTimeout(resolve, A_SAVE_TAKES))) },
   render: function Render(args) {
     const [saving, setSaving] = useState(false);
@@ -233,7 +237,7 @@ export const Loading: Story = {
   },
 };
 
-export const AsLink: Story = {
+export const StyleALinkAsAButton: Story = {
   render: () => (
     <div className="flex gap-3">
       <Button asChild>
@@ -264,7 +268,7 @@ export const AsLink: Story = {
   },
 };
 
-export const ColorScheme: Story = {
+export const MarkADestructiveAction: Story = {
   render: () => (
     <div className="flex gap-2">
       <Button variant="outline">취소</Button>
@@ -293,7 +297,7 @@ export const ColorScheme: Story = {
   },
 };
 
-export const FormSubmit: Story = {
+export const SubmitAForm: Story = {
   render: function Render() {
     const [result, setResult] = useState('');
 
@@ -332,7 +336,7 @@ export const FormSubmit: Story = {
   },
 };
 
-export const StateProps: Story = {
+export const ChangeTheLookOnHoverAndFocus: Story = {
   render: () => (
     <Button
       variant={(state) => (state.hovered ? 'solid' : 'outline')}
@@ -363,6 +367,7 @@ export const StateProps: Story = {
 };
 
 export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
   render: function Render() {
     const [shown, setShown] = useState(false);
 

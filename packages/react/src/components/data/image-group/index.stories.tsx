@@ -54,6 +54,18 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="max-w-md">
+      <ImageGroup aria-label="풍경 사진">
+        {PHOTOS.slice(0, 3).map((photo) => (
+          <Image key={photo.id} src={photo.src} alt={photo.alt} ratio={1} />
+        ))}
+      </ImageGroup>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -99,7 +111,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const ControlledViewer: Story = {
+export const OpenTheViewerFromOutside: Story = {
   render: function Render() {
     const [index, setIndex] = useState(0);
     const [open, setOpen] = useState(false);
