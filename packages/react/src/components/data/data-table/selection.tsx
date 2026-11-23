@@ -28,9 +28,10 @@ function SelectAllRows({ table }: HeaderContext<DataTableFeatures, RowData, unkn
   );
 }
 
-function SelectRow({ row }: CellContext<DataTableFeatures, RowData, unknown>) {
+function SelectRow({ row, table }: CellContext<DataTableFeatures, RowData, unknown>) {
   const t = useTranslate();
-  const { size, getRowLabel } = useDataTableContext();
+  const { size } = useDataTableContext();
+  const getRowLabel = table.options.meta?.getRowLabel;
 
   const label = getRowLabel
     ? t('dataTable.selectRow', {

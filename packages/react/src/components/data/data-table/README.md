@@ -2,14 +2,14 @@
 
 정렬, 행 선택, 페이지, 열 너비 조절, 빈 상태와 로딩을 갖춘 데이터 표입니다. 로직은 [TanStack Table v9](https://tanstack.com/table)(`@tanstack/react-table`)이 맡고, 모양은 IDS `Table` 파트가 그립니다.
 
-- **TanStack 그대로.** `columns` 와 `data` 를 받고, 열 정의, 상태 모양(`SortingState`, `RowSelectionState`, `PaginationState`), 옵션 이름(`enableSorting`, `manualPagination`, `getRowId`)이 TanStack 과 같습니다.
-- **기능은 켜는 것만.** 정렬은 기본으로 켜져 있고, 선택(`enableRowSelection`), 페이지(`enablePagination`), 열 너비(`enableColumnResizing`)는 켤 때만 붙습니다.
+- **hook 하나, 표 하나.** `useDataTable()` 이 열, 데이터와 기능을 받아 TanStack 표를 만들고, `<DataTable table={table}>` 이 그 표를 그립니다.
+- **기능은 객체를 줄 때만.** `sorting`, `selection`, `pagination`, `columnSizing` 은 객체를 주면 켜집니다. 상태는 객체 안의 `value` / `defaultValue` / `onValueChange` 입니다.
+- **TanStack 그대로.** 열 정의와 상태 모양(`SortingState`, `RowSelectionState`, `PaginationState`)이 TanStack 과 같고, hook 이 돌려준 표에서 `getSelectedRowModel()`, `resetRowSelection()` 같은 TanStack 메서드를 바로 씁니다.
+- **화면은 part.** `DataTable.Toolbar`, `.Content`, `.Pagination`, `.Caption`, `.Empty` 로 표 위아래 줄과 빈 상태를 고릅니다. 하나도 적지 않으면 기본 배치로 그립니다.
 - **접근성.** 정렬 머리글은 ghost `Button` 이고 `th` 에 `aria-sort`, 선택은 이름 있는 체크박스, 너비 핸들은 키보드로 움직이는 `separator`, 로딩은 `aria-busy` 입니다.
-- **Table 의 모양.** `variant`, `size`, `striped`, `highlightOnHover`, `stickyHeader` 는 `Table` 과 같습니다. 가로로 넘치면 열이 더 남은 가장자리가 흐려지는 것도 Table 과 같습니다.
-- **트레이 위의 표.** `outline` 은 표 카드를 `bg-neutral-soft` 트레이에 올리고, 선택 수와 페이지 이동을 트레이 아래 줄에 둡니다. 아래 [모양](#모양)에 있습니다.
 
 ```tsx
-import { DataTable } from '@gsainfoteam/ids-react';
+import { DataTable, useDataTable } from '@gsainfoteam/ids-react';
 
 type Member = { id: string; name: string; email: string; score: number };
 
@@ -21,16 +21,78 @@ const columns = column.columns([
   column.accessor('score', { header: '점수', meta: { align: 'end' } }),
 ]);
 
-<DataTable
-  columns={columns}
-  data={members}
-  getRowId={(member) => member.id}
-  aria-label="멤버"
-/>;
+function Members({ members }: { members: Member[] }) {
+  const table = useDataTable({
+    columns,
+    data: members,
+    getRowId: (member) => member.id,
+    sorting: {},
+  });
+
+  return <DataTable table={table} aria-label="멤버" />;
+}
 ```
 
 - `columns` 와 `data` 는 렌더마다 새로 만들지 않습니다. 모듈 위나 `useMemo`, 상태에 둡니다. 새 배열이 오면 TanStack 이 모든 행을 다시 계산합니다.
 - `getRowId` 를 주면 선택 상태의 키가 행 번호 대신 그 id 가 됩니다. 정렬이나 페이지가 바뀌어도 선택이 행을 따라갑니다.
+- hook 은 클라이언트 컴포넌트에서 부릅니다. 열 정의에 함수가 있으면 Server Component 에서 넘길 수 없습니다.
+
+## useDataTable
+
+```tsx
+const table = useDataTable({
+  columns,
+  data,
+  getRowId: (row) => row.id,
+  getRowLabel: (row) => row.name,
+  sorting: { multiple: true, defaultValue: [{ id: 'name', desc: false }] },
+  selection: { value: selected, onValueChange: setSelected },
+  pagination: { manual: true, rowCount, defaultValue: { pageIndex: 0, pageSize: 20 } },
+  columnSizing: {},
+});
+```
+
+| 옵션           | 켜면                                   | 객체 안                                                        |
+| -------------- | -------------------------------------- | -------------------------------------------------------------- |
+| `columns`, `data` | 필수. TanStack 과 같다              |                                                                |
+| `getRowId`     | 행 id. 선택과 React key 에 쓴다        |                                                                |
+| `getRowLabel`  | 행 체크박스 이름                       |                                                                |
+| `sorting`      | 머리글을 눌러 정렬                     | `multiple`, `removable`, `manual`, 값 trio(`SortingState`)      |
+| `selection`    | 맨 앞 체크박스 열, 고른 수             | `multiple`, `enabled(row)`, 값 trio(`RowSelectionState`)        |
+| `pagination`   | 아래 줄 페이지 이동(10행씩)            | `manual`, `rowCount`, 값 trio(`PaginationState`)                |
+| `columnSizing` | 머리글 끝 너비 핸들                    | 값 trio(`ColumnSizingState`)                                    |
+
+- 콜백은 TanStack 의 updater 가 아니라 새 값을 받습니다. `useState` 의 setter 를 그대로 넘겨도 됩니다.
+- `value` 를 주면 제어, `defaultValue` 만 주면 비제어입니다. 제어일 때는 콜백에서 값을 다시 써야 화면이 바뀝니다.
+- 돌려받은 `table` 은 TanStack 표(`DataTable.Instance<Member>`)입니다. 표 바깥의 버튼에서 `table.getSelectedRowModel().rows` 를 읽거나 `table.resetRowSelection()` 을 부릅니다.
+
+## Part
+
+```tsx
+<DataTable table={table} aria-label="멤버" />            // Content 와, 선택이나 페이지가 켜져 있으면 아래 Toolbar
+
+<DataTable table={table} aria-label="멤버" className="h-96">
+  <DataTable.Toolbar>                                     // 고른 수 뒤에 앱의 버튼
+    <Button variant="soft" className="ms-auto">내보내기</Button>
+  </DataTable.Toolbar>
+  <DataTable.Content />
+  <DataTable.Pagination />
+  <DataTable.Caption>3월 활동 점수</DataTable.Caption>
+  <DataTable.Empty>아직 멤버가 없습니다.</DataTable.Empty>
+</DataTable>
+```
+
+| Part                  | 그리는 것                                                                      |
+| --------------------- | ------------------------------------------------------------------------------ |
+| `DataTable.Toolbar`   | 표 위나 아래의 줄. 선택이 켜져 있으면 "{n}개 선택됨" 을 앞에 적고 children 을 뒤에 둔다 |
+| `DataTable.Content`   | 표 카드(머리글, 행, 로딩 막)                                                   |
+| `DataTable.Pagination`| 페이지 이동. Toolbar 안이면 줄 끝에, 바깥이면 자기 줄에                        |
+| `DataTable.Caption`   | `Table.Caption`. 표 아래 `<caption>` 이고 표의 이름이 된다                      |
+| `DataTable.Empty`     | 행이 없을 때의 칸 내용. 기본 "데이터가 없습니다."                              |
+
+- `Toolbar`, `Content`, `Pagination` 은 적은 순서대로 그립니다. 하나라도 적으면 기본 배치는 그리지 않으니 `Content` 도 적습니다.
+- `Caption` 과 `Empty` 는 어디에 적어도 표 안에 들어갑니다.
+- 머리글은 늘 `sticky` 입니다. DataTable 에 높이(`className="h-96"`)를 주면 행만 스크롤되고 머리글은 위에 남습니다.
 
 ## 열 정의
 
@@ -56,16 +118,14 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 
 - `cell`, `header` 에 함수를 주면 컴포넌트로 그립니다. 안에서 훅을 써도 됩니다.
 - 타입은 `DataTable.ColumnDef<Member>`, `DataTable.Features` 로 가져옵니다.
-- 열 정의에 함수가 있으면 Server Component 에서 넘길 수 없습니다. 열 정의와 DataTable 은 클라이언트 컴포넌트에 둡니다.
 
 ## 정렬
 
 ```tsx
-<DataTable columns={columns} data={data} />                             // 기본. 모든 열 정렬 가능
-<DataTable defaultSorting={[{ id: 'score', desc: true }]} />            // 처음 정렬
-<DataTable sorting={sorting} onSortingChange={setSorting} />            // 제어
-<DataTable enableSorting={false} />                                     // 끄기
-<DataTable enableMultiSort={false} enableSortingRemoval={false} />      // TanStack 옵션 그대로
+useDataTable({ columns, data, sorting: {} });                                       // 켜기
+useDataTable({ columns, data, sorting: { defaultValue: [{ id: 'score', desc: true }] } });
+useDataTable({ columns, data, sorting: { value: sorting, onValueChange: setSorting } });
+useDataTable({ columns, data, sorting: { multiple: false, removable: false } });   // 한 열만, 풀지 않음
 ```
 
 | 입력                 | 동작                                                    |
@@ -74,19 +134,20 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 | `Enter` `Space`      | 머리글 버튼에서 누르기와 같다                           |
 | `Shift` + 누르기     | 지금 정렬에 이 열을 덧붙인다(여러 열 정렬)              |
 
+- `sorting` 을 주지 않으면 머리글은 글자이고 버튼이 없습니다.
 - 글자 열은 오름차순, 숫자 열은 내림차순부터 시작합니다(TanStack 기본값). 열의 `sortDescFirst` 로 바꿉니다.
 - 정렬된 열의 `th` 에만 `aria-sort="ascending"` / `"descending"` 이 붙습니다. APG 정렬 표 예제와 같습니다.
 - 아이콘은 머리글 칸 끝에 붙습니다. 정렬 없음 `ChevronUpDown` 은 버튼에 올리거나 포커스할 때만 보이고, 오름차순 `ChevronUp` 과 내림차순 `ChevronDown` 은 `text-primary` 로 늘 보입니다. 모두 `aria-hidden` 입니다.
 - `align: 'end'` 열은 글자가 끝에, 아이콘이 칸 앞에 옵니다.
-- 서버가 정렬하면 `manualSorting` 을 줍니다. DataTable 은 받은 순서를 그대로 그립니다.
+- 서버가 정렬하면 `manual: true` 를 줍니다. DataTable 은 받은 순서를 그대로 그립니다.
 
 ## 행 선택
 
 ```tsx
-<DataTable enableRowSelection getRowLabel={(member) => member.name} />
-<DataTable enableRowSelection={(row) => row.original.active} />         // 고를 수 없는 행은 체크박스가 꺼진다
-<DataTable rowSelection={selection} onRowSelectionChange={setSelection} />
-<DataTable enableRowSelection enableMultiRowSelection={false} />        // 하나만
+useDataTable({ columns, data, getRowLabel: (member) => member.name, selection: {} });
+useDataTable({ columns, data, selection: { enabled: (row) => row.original.active } }); // 고를 수 없는 행은 체크박스가 꺼진다
+useDataTable({ columns, data, selection: { value: selection, onValueChange: setSelection } });
+useDataTable({ columns, data, selection: { multiple: false } });                        // 하나만
 ```
 
 - 켜면 맨 앞에 체크박스 열이 붙습니다. 이 열은 정렬하지 않고 너비를 조절하지 않습니다.
@@ -94,36 +155,33 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 - `Shift` 를 누른 채 체크박스를 누르면 마지막으로 누른 행부터 그 행까지 같은 값으로 바꿉니다.
 - 체크박스 이름은 `getRowLabel` 이 있으면 "{label} 선택", 없으면 "{n}번째 행 선택" 입니다.
 - 선택된 행은 `Table.Row selected` 로 `bg-primary-soft` 가 깔리고 `data-selected` 가 붙습니다.
-- 표 아래 "{n}개 선택됨" 이 `aria-live="polite"` 로 바뀐 수를 알립니다.
+- `DataTable.Toolbar` 의 "{n}개 선택됨" 이 `aria-live="polite"` 로 바뀐 수를 알립니다.
 - 값은 `{ [rowId]: true }` 입니다. 지운 행의 id 는 스스로 빠지지 않으니 데이터에서 행을 지울 때 선택에서도 뺍니다.
 
 ## 페이지
 
 ```tsx
-<DataTable enablePagination />                                            // 10행씩
-<DataTable enablePagination defaultPagination={{ pageIndex: 0, pageSize: 20 }} />
-<DataTable enablePagination pagination={page} onPaginationChange={setPage} />
+useDataTable({ columns, data, pagination: {} });                                              // 10행씩
+useDataTable({ columns, data, pagination: { defaultValue: { pageIndex: 0, pageSize: 20 } } });
 
-<DataTable                                                                // 서버가 자른다
-  data={pageRows}
-  enablePagination
-  manualPagination
-  rowCount={total}
-  pagination={page}
-  onPaginationChange={setPage}
-/>
+useDataTable({                                                                                // 서버가 자른다
+  columns,
+  data: pageRows,
+  pagination: { manual: true, rowCount: total, value: page, onValueChange: setPage },
+});
 ```
 
-- 켜면 표 아래에 IDS `Pagination` 이 붙습니다. 첫 페이지(`Pagination.First`), 이전, "1 / 5 페이지", 다음, 마지막 페이지(`Pagination.Last`) 순서이고, 버튼은 ghost `IconButton` 입니다.
+- 켜면 아래 Toolbar 에 IDS `Pagination` 이 붙습니다. 첫 페이지(`Pagination.First`), 이전, "1 / 5 페이지", 다음, 마지막 페이지(`Pagination.Last`) 순서이고, 버튼은 ghost `IconButton` 입니다.
 - 끝에 닿은 버튼은 `aria-disabled` 로 꺼지고 포커스를 잃지 않습니다(`focusableWhenDisabled`).
 - 페이지 글자는 `aria-live="polite"` 라 바뀐 페이지를 읽습니다. 버튼 묶음은 이름 "페이지 탐색" 인 `<nav>` 입니다.
 - 키보드는 Pagination 과 같습니다. 버튼에서 `←` `→` 는 이전, 다음 페이지, `Home` `End` 는 첫, 마지막 페이지입니다.
-- 데이터나 정렬이 바뀌면 TanStack 이 첫 페이지로 돌아갑니다(`autoResetPageIndex`). `manualPagination` 이면 돌아가지 않습니다.
+- 데이터나 정렬이 바뀌면 TanStack 이 첫 페이지로 돌아갑니다(`autoResetPageIndex`). `manual` 이면 돌아가지 않습니다.
 
 ## 열 너비
 
 ```tsx
-<DataTable enableColumnResizing />
+useDataTable({ columns, data, columnSizing: {} });
+useDataTable({ columns, data, columnSizing: { value: widths, onValueChange: setWidths } }); // 너비를 저장한다
 ```
 
 | 입력                     | 동작                                  |
@@ -142,28 +200,36 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 ## 빈 상태와 로딩
 
 ```tsx
-<DataTable data={[]} />                                   // "데이터가 없습니다."
-<DataTable data={[]} empty="아직 멤버가 없습니다." />      // 문구 바꾸기
-<DataTable data={[]} empty={<Empty>...</Empty>} />        // Empty 컴포넌트를 그대로 넣는다
-<DataTable loading />                                     // aria-busy, Spinner
+<DataTable table={table} />                                         // 행이 없으면 "데이터가 없습니다."
+<DataTable table={table}>
+  <DataTable.Empty>아직 멤버가 없습니다.</DataTable.Empty>          // 문구 바꾸기
+</DataTable>
+<DataTable table={table}>
+  <DataTable.Empty><Empty>...</Empty></DataTable.Empty>             // Empty 컴포넌트를 그대로 넣는다
+</DataTable>
+<DataTable table={table} aria-busy={loading} />                     // Spinner
 ```
 
-- 행이 없으면 모든 열을 가로지르는 한 칸짜리 행에 `empty` 를 그립니다.
-- `loading` 이면 `<table>` 에 `aria-busy="true"` 가 붙습니다. 행이 없으면 그 칸에, 있으면 표 위에 반투명 막과 Spinner 를 겹치고 표를 누를 수 없게 합니다.
+- 행이 없으면 모든 열을 가로지르는 한 칸짜리 행에 `DataTable.Empty` 를 그립니다.
+- `aria-busy` 는 `<table>` 에 그대로 붙습니다. 행이 없으면 그 칸에, 있으면 표 위에 반투명 막과 Spinner 를 겹치고 표를 누를 수 없게 합니다.
 - Spinner 는 나타나고 잠시 뒤 "불러오는 중" 을 한 번 알립니다.
+
 
 ## 모양
 
 ```tsx
-<DataTable variant="outline" />   // 기본. 트레이 위의 카드, 열 사이 세로선
-<DataTable variant="ghost" />     // 트레이와 세로선 없이 Table ghost 그대로
+<DataTable table={table} variant="outline" />   // 기본. 트레이 위의 카드, 열 사이 세로선
+<DataTable table={table} variant="striped" />   // outline 에 짝수 행 bg-block 줄무늬
+<DataTable table={table} variant="ghost" />     // 트레이와 세로선 없이 Table ghost 그대로
 ```
 
-- `outline` 의 바깥 `div` 는 `concentric-p-1 bg-neutral-soft` 트레이입니다. 표 카드는 `rounded-standard`(10px) 라 트레이 모서리는 14px 이 됩니다.
+- `outline` 과 `striped` 의 바깥 `div` 는 `concentric-p-1 bg-neutral-soft` 트레이입니다. 표 카드는 `rounded-standard`(10px) 라 트레이 모서리는 14px 이 됩니다.
 - 표 카드는 `bg-surface`, `border-neutral` 테두리와 `shadow-xs` 이고, 열 사이에 `border-neutral` 세로선이 들어갑니다.
 - 머리글 행은 트레이(`bg-neutral-soft`, 4단계)와 카드(`bg-surface`, 2단계) 사이인 `bg-block`(3단계) 입니다. 트레이와 같은 색이면 다크 모드에서 머리글이 트레이에 묻힙니다.
-- 바닥글은 트레이 안쪽 아래 줄입니다. 페이지 버튼과 정렬 버튼의 hover 와 press 는 글자색 state layer 라 트레이와 머리글 위에서도 따로 맞추지 않아도 보입니다.
-- 바닥글이 없으면(선택과 페이지가 모두 꺼짐) 트레이는 표 둘레 4px 테두리로만 보입니다.
+- `striped` 의 줄무늬는 DataTable 이 직접 그립니다(`even:not-data-selected:bg-block`). 고른 행은 줄무늬 대신 `bg-primary-soft` 입니다.
+- 행에 올리면 늘 글자색 state layer(`hover:state-hover`)가 깔립니다.
+- Toolbar 는 트레이 안쪽의 줄입니다. 페이지 버튼과 정렬 버튼의 hover 와 press 는 글자색 state layer 라 트레이와 머리글 위에서도 따로 맞추지 않아도 보입니다.
+- Toolbar 가 없으면(선택과 페이지가 모두 꺼짐) 트레이는 표 둘레 4px 테두리로만 보입니다.
 
 머리글에 아이콘을 넣으려면 `header` 에 아이콘과 글자를 함께 줍니다. 머리글 내용은 `gap-1.5` 의 가로 줄로 감싸지고, 그 줄의 직계 자식 svg 는 16px 입니다. 선택 열의 Checkbox 안 svg 는 Checkbox 가 크기를 정합니다.
 
@@ -181,38 +247,28 @@ column.accessor('name', {
 
 ## 속성
 
-| 속성                                               | 기본 / 동작                                         |
-| -------------------------------------------------- | --------------------------------------------------- |
-| `columns`, `data`                                  | 필수. TanStack 과 같다                              |
-| `getRowId`                                         | 행 id. 선택과 React key 에 쓴다                     |
-| `getRowLabel`                                      | 행 체크박스 이름                                    |
-| `variant`, `size`, `striped`, `highlightOnHover`, `stickyHeader` | `Table` 과 같다                       |
-| `caption`                                          | `Table.Caption`                                     |
-| `id`, `aria-label`, `aria-labelledby`, `aria-describedby` | `<table>`                                    |
-| `enableSorting`, `enableMultiSort`, `enableSortingRemoval`, `manualSorting` | 정렬(기본 켜짐)            |
-| `sorting`, `defaultSorting`, `onSortingChange`     | 정렬 상태                                           |
-| `enableRowSelection`, `enableMultiRowSelection`    | 선택(기본 꺼짐)                                     |
-| `rowSelection`, `defaultRowSelection`, `onRowSelectionChange` | 선택 상태                                |
-| `enablePagination`, `manualPagination`, `rowCount` | 페이지(기본 꺼짐)                                   |
-| `pagination`, `defaultPagination`, `onPaginationChange` | 페이지 상태(기본 `{ pageIndex: 0, pageSize: 10 }`) |
-| `enableColumnResizing`                             | 열 너비(기본 꺼짐)                                  |
-| `loading`, `empty`                                 | 로딩과 빈 상태                                      |
-| `className`, `style`                               | 표와 바닥글을 감싼 바깥 `div`                       |
-
-- 콜백은 TanStack 의 updater 가 아니라 새 값을 받습니다. `useState` 의 setter 를 그대로 넘겨도 됩니다.
-- 값(`sorting` 등)을 주면 제어, `default*` 만 주면 비제어입니다. 제어일 때는 콜백에서 값을 다시 써야 화면이 바뀝니다.
+| 속성                                                     | 기본 / 동작                                    |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| `table`                                                  | 필수. `useDataTable()` 이 돌려준 표            |
+| `variant`                                                | `outline`(기본) / `striped` / `ghost`          |
+| `size`                                                   | `standard`(기본) / `tiny`                      |
+| `id`, `aria-label`, `aria-labelledby`, `aria-describedby`, `aria-busy` | `<table>`                        |
+| `className`, `style`                                     | 표와 Toolbar 를 감싼 바깥 `div`                |
+| `children`                                               | Part                                           |
 
 ## data 속성
 
-| 속성                                   | 붙는 곳           |
-| -------------------------------------- | ----------------- |
-| `data-data-table`, `data-loading`      | 바깥 `div`        |
-| `data-sorted`                          | 정렬된 열의 `th`  |
-| `data-data-table-sort`                 | 정렬 버튼         |
-| `data-data-table-resizer`, `data-resizing` | 너비 핸들     |
-| `data-data-table-message`              | 빈 상태, 로딩 칸  |
-| `data-data-table-loading`              | 로딩 막           |
-| `data-data-table-footer`, `-summary`, `-page` | 바닥글     |
+| 속성                                          | 붙는 곳                    |
+| --------------------------------------------- | -------------------------- |
+| `data-data-table`, `data-variant`, `data-loading` | 바깥 `div`             |
+| `data-data-table-content`                     | 표 카드를 감싼 `div`       |
+| `data-sorted`                                 | 정렬된 열의 `th`           |
+| `data-data-table-sort`                        | 정렬 버튼                  |
+| `data-data-table-resizer`, `data-resizing`    | 너비 핸들                  |
+| `data-data-table-message`                     | 빈 상태, 로딩 칸           |
+| `data-data-table-loading`                     | 로딩 막                    |
+| `data-data-table-toolbar`, `-summary`         | Toolbar 와 고른 수         |
+| `data-data-table-pagination`, `-page`         | 페이지 이동과 페이지 글자  |
 
 - 표 자체의 속성(`data-table`, `data-selected` 등)은 `Table` README 에 있습니다.
 

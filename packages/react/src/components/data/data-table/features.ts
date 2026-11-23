@@ -26,6 +26,14 @@ export type DataTableColumnMeta = {
   label?: string;
 };
 
+export type DataTableMeta = {
+  selectable: boolean;
+  paginated: boolean;
+  resizable: boolean;
+  getRowLabel: ((row: never) => string) | undefined;
+  setRtl: (rtl: boolean) => void;
+};
+
 export const dataTableFeatures = tableFeatures({
   rowSortingFeature,
   sortedRowModel: createSortedRowModel(),
@@ -41,6 +49,7 @@ export const dataTableFeatures = tableFeatures({
   columnSizingFeature,
   columnResizingFeature,
   columnMeta: metaHelper<DataTableColumnMeta>(),
+  tableMeta: metaHelper<DataTableMeta>(),
 });
 
 export type DataTableFeatures = typeof dataTableFeatures;

@@ -2,14 +2,17 @@ import { resizeHandle } from '../../../internal/resize-handle';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { TableAlign, TableVariant } from '../table/context';
+import type { TableAlign } from '../table/context';
+
+export type DataTableVariant = 'outline' | 'striped' | 'ghost';
 
 export const dataTableStyle = tv({
   slots: {
     root: 'flex w-full min-w-0 flex-col',
     frame: 'relative',
     table: '',
-    header: '',
+    header: 'sticky top-0 z-10',
+    row: 'hover:state-hover',
     head: 'group/head relative',
     cell: '',
     sortButton: [
@@ -39,27 +42,22 @@ export const dataTableStyle = tv({
     message: 'h-24 text-center text-neutral',
     overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-base/60',
     spinner: 'size-6 text-neutral',
-    footer: 'flex flex-wrap items-center justify-between gap-3',
+    bar: 'flex flex-wrap items-center gap-3',
     summary: 'text-neutral',
     pagination: 'ms-auto',
     page: 'min-w-16 px-1 text-center whitespace-nowrap tabular-nums',
   },
   variants: {
     variant: {
-      outline: {
-        root: 'concentric-p-1 bg-neutral-soft',
-        table: '[--table-radius:var(--radius-standard)] bg-surface shadow-xs',
-        header: 'bg-block',
-        head: 'not-last:border-e not-last:border-neutral',
-        cell: 'not-last:border-e not-last:border-neutral',
-        overlay: 'rounded-standard',
-        footer: 'gap-2 ps-3 pe-1 pt-1',
+      outline: {},
+      striped: {
+        row: 'even:not-data-selected:bg-block',
       },
       ghost: {
         root: 'gap-3',
         overlay: 'rounded-container',
       },
-    } satisfies Record<TableVariant, object>,
+    } satisfies Record<DataTableVariant, object>,
     size: {
       standard: {
         sortButton: 'h-8',
@@ -77,10 +75,24 @@ export const dataTableStyle = tv({
       center: { sortButton: 'justify-center', label: 'justify-center' },
       end: { sortButton: 'flex-row-reverse', label: 'justify-end' },
     } satisfies Record<TableAlign, object>,
-    loading: {
+    busy: {
       true: { frame: 'pointer-events-none' },
       false: {},
     },
   },
-  defaultVariants: { variant: 'outline', size: 'standard', align: 'start', loading: false },
+  compoundVariants: [
+    {
+      variant: ['outline', 'striped'],
+      class: {
+        root: 'concentric-p-1 bg-neutral-soft',
+        table: '[--table-radius:var(--radius-standard)] bg-surface shadow-xs',
+        header: 'bg-block',
+        head: 'not-last:border-e not-last:border-neutral',
+        cell: 'not-last:border-e not-last:border-neutral',
+        overlay: 'rounded-standard',
+        bar: 'gap-2 ps-3 pe-1 not-first:pt-1 not-last:pb-1',
+      },
+    },
+  ],
+  defaultVariants: { variant: 'outline', size: 'standard', align: 'start', busy: false },
 });

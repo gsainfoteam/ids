@@ -7,7 +7,7 @@ import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import englishCatalog from '../messages/en.json';
-import { DataTable, IdsProvider, type IdsTranslate } from '../src';
+import { DataTable, IdsProvider, useDataTable, type IdsTranslate } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 
@@ -37,17 +37,25 @@ const manyPeople = (count: number): Person[] =>
 const idOf = (row: Person) => row.id;
 const nameOf = (row: Person) => row.name;
 
-function table(props: Partial<DataTable.Props<Person>> = {}) {
+type Options = Partial<DataTable.Options<Person>>;
+type RootProps = Partial<Omit<DataTable.Props<Person>, 'table'>>;
+
+function People({ options, ...props }: RootProps & { options: Options }) {
+  const people = useDataTable({
+    columns,
+    data: PEOPLE,
+    getRowId: idOf,
+    getRowLabel: nameOf,
+    sorting: {},
+    ...options,
+  });
+  return <DataTable table={people} aria-label="People" {...props} />;
+}
+
+function table(options: Options = {}, props: RootProps = {}) {
   return (
     <IdsProvider theme={testTheme}>
-      <DataTable
-        columns={columns}
-        data={PEOPLE}
-        getRowId={idOf}
-        getRowLabel={nameOf}
-        aria-label="People"
-        {...props}
-      />
+      <People options={options} {...props} />
     </IdsProvider>
   );
 }
@@ -95,7 +103,7 @@ test('SSR: header, rows and the Korean empty text render on the server', () => {
 
 test('a sortable header is a button; clicking cycles aria-sort and the row order', async () => {
   const onSortingChange = vi.fn();
-  const screen = await render(table({ onSortingChange }));
+  const screen = await render(table({ sorting: { onValueChange: onSortingChange } }));
   const name = () => screen.getByRole('columnheader', { name: 'Name' });
 
   await expect.element(name()).not.toHaveAttribute('aria-sort');
@@ -115,7 +123,7 @@ test('a sortable header is a button; clicking cycles aria-sort and the row order
 
 test('the sort button works from the keyboard and Shift adds a second sort', async () => {
   const onSortingChange = vi.fn();
-  const screen = await render(table({ onSortingChange }));
+  const screen = await render(table({ sorting: { onValueChange: onSortingChange } }));
 
   screen.getByRole('button', { name: 'Age' }).element().focus();
   await userEvent.keyboard('{Enter}');
@@ -132,7 +140,7 @@ test('the sort button works from the keyboard and Shift adds a second sort', asy
 
 test('controlled sorting only moves when the app writes it back', async () => {
   const onSortingChange = vi.fn();
-  const screen = await render(table({ sorting: [], onSortingChange }));
+  const screen = await render(table({ sorting: { value: [], onValueChange: onSortingChange } }));
 
   await userEvent.click(screen.getByRole('button', { name: 'Name' }));
   expect(onSortingChange).toHaveBeenCalledWith([{ id: 'name', desc: false }]);
@@ -142,7 +150,7 @@ test('controlled sorting only moves when the app writes it back', async () => {
 });
 
 test('the sort icon hides until hover or focus, and a sorted column shows it in primary', async () => {
-  const screen = await render(table({ defaultSorting: [{ id: 'age', desc: true }] }));
+  const screen = await render(table({ sorting: { defaultValue: [{ id: 'age', desc: true }] } }));
   const icon = (name: string) =>
     screen.getByRole('button', { name }).element().querySelector('svg:last-child')!;
 
@@ -156,9 +164,9 @@ test('the sort icon hides until hover or focus, and a sorted column shows it in 
 });
 
 test('outline sets the table on a neutral tray and divides the columns', async () => {
-  const screen = await render(table({ enablePagination: true }));
+  const screen = await render(table({ pagination: {} }));
   const root = screen.container.querySelector<HTMLElement>('[data-data-table]')!;
-  const footer = root.querySelector('[data-data-table-footer]')!;
+  const toolbar = root.querySelector('[data-data-table-toolbar]')!;
   const firstCell = root.querySelector('tbody td')!;
 
   await expect.element(screen.getByRole('table')).toBeVisible();
@@ -166,7 +174,7 @@ test('outline sets the table on a neutral tray and divides the columns', async (
   expect(getComputedStyle(root.querySelector('thead')!).backgroundColor).toBe(
     colorOf('--ids-color-bg-block'),
   );
-  expect(root.contains(footer)).toBe(true);
+  expect(root.contains(toolbar)).toBe(true);
   expect(getComputedStyle(firstCell).borderInlineEndWidth).toBe('1px');
   expect(getComputedStyle(root.querySelector('tbody td:last-child')!).borderInlineEndWidth).toBe(
     '0px',
@@ -174,7 +182,7 @@ test('outline sets the table on a neutral tray and divides the columns', async (
 });
 
 test('ghost keeps the plain table with no tray', async () => {
-  const screen = await render(table({ variant: 'ghost' }));
+  const screen = await render(table({}, { variant: 'ghost' }));
   const root = screen.container.querySelector<HTMLElement>('[data-data-table]')!;
 
   await expect.element(screen.getByRole('table')).toBeVisible();
@@ -182,15 +190,61 @@ test('ghost keeps the plain table with no tray', async () => {
   expect(getComputedStyle(root.querySelector('tbody td')!).borderInlineEndWidth).toBe('0px');
 });
 
-test('enableSorting={false} and a column without sorting render plain headers', async () => {
-  const screen = await render(table({ enableSorting: false }));
+test('striped tints every other body row with bg-block and keeps the tray', async () => {
+  const screen = await render(table({}, { variant: 'striped' }));
+  const root = screen.container.querySelector<HTMLElement>('[data-data-table]')!;
+  const [first, second] = root.querySelectorAll('tbody tr');
+
+  await expect.element(screen.getByRole('table')).toBeVisible();
+  expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  expect(getComputedStyle(first).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+  expect(getComputedStyle(second).backgroundColor).toBe(colorOf('--ids-color-bg-block'));
+});
+
+test('the header sticks to the top of the scrolling table', async () => {
+  const screen = await render(table());
+  await expect.element(screen.getByRole('table')).toBeVisible();
+  expect(getComputedStyle(screen.container.querySelector('thead')!).position).toBe('sticky');
+});
+
+test('parts render in the order written, and the toolbar leads with the selected count', async () => {
+  const screen = await render(
+    table(
+      { selection: { defaultValue: { ada: true } }, pagination: {} },
+      {
+        children: [
+          <DataTable.Toolbar key="toolbar">
+            <button type="button">Export</button>
+          </DataTable.Toolbar>,
+          <DataTable.Content key="content" />,
+          <DataTable.Pagination key="pagination" />,
+          <DataTable.Caption key="caption">Team</DataTable.Caption>,
+        ],
+      },
+    ),
+  );
+  const root = screen.container.querySelector('[data-data-table]')!;
+
+  await expect.element(screen.getByRole('table', { name: 'People' })).toBeVisible();
+  expect([...root.children].map((child) => child.firstElementChild?.tagName ?? '')).toEqual([
+    'P',
+    'DIV',
+    'NAV',
+  ]);
+  const toolbar = root.querySelector('[data-data-table-toolbar]')!;
+  expect(toolbar.textContent).toBe('1개 선택됨Export');
+  expect(root.querySelector('caption')!.textContent).toBe('Team');
+});
+
+test('without sorting the headers are plain text', async () => {
+  const screen = await render(table({ sorting: undefined }));
   await expect.element(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
   expect(screen.getByRole('button').elements()).toHaveLength(0);
 });
 
 test('row selection: named checkboxes, a mixed select-all, Shift ranges and the count', async () => {
   const onRowSelectionChange = vi.fn();
-  const screen = await render(table({ enableRowSelection: true, onRowSelectionChange }));
+  const screen = await render(table({ selection: { onValueChange: onRowSelectionChange } }));
   const all = screen.getByRole('checkbox', { name: '모든 행 선택' });
 
   await userEvent.click(screen.getByRole('checkbox', { name: 'Grace 선택' }));
@@ -214,7 +268,7 @@ test('row selection: named checkboxes, a mixed select-all, Shift ranges and the 
 });
 
 test('a selection checkbox sits on the same center line as the text beside it', async () => {
-  const screen = await render(table({ enableRowSelection: true, enableSorting: false }));
+  const screen = await render(table({ selection: {}, sorting: undefined }));
   const centerOf = (rect: DOMRect) => rect.top + rect.height / 2;
   const textCenter = (cell: Element) => {
     const range = document.createRange();
@@ -235,7 +289,7 @@ test('a selection checkbox sits on the same center line as the text beside it', 
 
 test('a row that cannot be selected keeps a disabled checkbox; without a label rows are numbered', async () => {
   const screen = await render(
-    table({ getRowLabel: undefined, enableRowSelection: (row) => row.original.age < 80 }),
+    table({ getRowLabel: undefined, selection: { enabled: (row) => row.original.age < 80 } }),
   );
 
   await expect.element(screen.getByRole('checkbox', { name: '2번째 행 선택' })).toBeDisabled();
@@ -247,7 +301,7 @@ test('a row that cannot be selected keeps a disabled checkbox; without a label r
 test('pagination: ten rows a page, the buttons move and keep focus at the ends', async () => {
   const onPaginationChange = vi.fn();
   const screen = await render(
-    table({ data: manyPeople(23), enablePagination: true, onPaginationChange }),
+    table({ data: manyPeople(23), pagination: { onValueChange: onPaginationChange } }),
   );
   const status = screen.getByText(/\/ 3 페이지$/);
 
@@ -274,19 +328,20 @@ test('server pagination draws the rows it is given and counts pages from rowCoun
   function Server() {
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 2 });
     const start = pagination.pageIndex * pagination.pageSize;
+    const people = useDataTable({
+      columns,
+      data: PEOPLE.slice(start, start + pagination.pageSize),
+      getRowId: idOf,
+      pagination: {
+        manual: true,
+        rowCount: PEOPLE.length,
+        value: pagination,
+        onValueChange: setPagination,
+      },
+    });
     return (
       <IdsProvider theme={testTheme}>
-        <DataTable
-          columns={columns}
-          data={PEOPLE.slice(start, start + pagination.pageSize)}
-          getRowId={idOf}
-          enablePagination
-          manualPagination
-          rowCount={PEOPLE.length}
-          pagination={pagination}
-          onPaginationChange={setPagination}
-          aria-label="People"
-        />
+        <DataTable table={people} aria-label="People" />
       </IdsProvider>
     );
   }
@@ -300,7 +355,7 @@ test('server pagination draws the rows it is given and counts pages from rowCoun
 
 test('column resizing: a focusable separator per column, sized by keys and by dragging', async (context) => {
   skipWithoutCdp(context);
-  const screen = await render(table({ enableColumnResizing: true }));
+  const screen = await render(table({ columnSizing: {} }));
   const handle = () => screen.getByRole('separator', { name: 'Name 열 너비' });
   const width = () => Number(handle().element().getAttribute('aria-valuenow'));
   const col = () => screen.container.querySelector<HTMLElement>('col')!;
@@ -336,7 +391,7 @@ test('column resizing: a focusable separator per column, sized by keys and by dr
 });
 
 test('right to left: the arrow that points away from the column widens it', async () => {
-  const screen = await render(<div dir="rtl">{table({ enableColumnResizing: true })}</div>);
+  const screen = await render(<div dir="rtl">{table({ columnSizing: {} })}</div>);
   const handle = screen.getByRole('separator', { name: 'Name 열 너비' });
 
   await expect.element(handle).toBeInTheDocument();
@@ -346,16 +401,18 @@ test('right to left: the arrow that points away from the column widens it', asyn
 });
 
 test('empty and loading states', async () => {
-  const screen = await render(table({ data: [], empty: 'Nobody yet' }));
+  const screen = await render(
+    table({ data: [] }, { children: <DataTable.Empty>Nobody yet</DataTable.Empty> }),
+  );
   await expect.element(screen.getByText('Nobody yet')).toBeVisible();
 
-  await screen.rerender(table({ data: [], loading: true }));
+  await screen.rerender(table({ data: [] }, { 'aria-busy': true }));
   await expect
     .element(screen.getByRole('table', { name: 'People' }))
     .toHaveAttribute('aria-busy', 'true');
   expect(screen.container.querySelector('[data-data-table-message] [data-spinner]')).not.toBeNull();
 
-  await screen.rerender(table({ loading: true }));
+  await screen.rerender(table({}, { 'aria-busy': true }));
   expect(screen.container.querySelector('[data-data-table-loading] [data-spinner]')).not.toBeNull();
   expect(screen.container.querySelectorAll('tbody tr')).toHaveLength(PEOPLE.length);
 
@@ -373,18 +430,26 @@ test('every string speaks the translation', async () => {
       .reduce<unknown>((node, name) => (node as Record<string, unknown>)[name], englishCatalog);
     return new IntlMessageFormat(pattern as string, 'en-US').format(values) as string;
   };
+  function Everything() {
+    const people = useDataTable({
+      columns,
+      data: manyPeople(12),
+      getRowId: idOf,
+      selection: {},
+      pagination: {},
+      columnSizing: {},
+    });
+    const nobody = useDataTable({ columns, data: [] });
+    return (
+      <>
+        <DataTable table={people} aria-label="People" />
+        <DataTable table={nobody} aria-label="Nobody" />
+      </>
+    );
+  }
   const screen = await render(
     <IdsProvider theme={testTheme} translate={english} locale="en-US">
-      <DataTable
-        columns={columns}
-        data={manyPeople(12)}
-        getRowId={idOf}
-        enableRowSelection
-        enablePagination
-        enableColumnResizing
-        aria-label="People"
-      />
-      <DataTable columns={columns} data={[]} aria-label="Nobody" />
+      <Everything />
     </IdsProvider>,
   );
 
