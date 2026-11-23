@@ -44,14 +44,15 @@ export const isCalendarDateTime = (value: unknown): value is CalendarDateTime =>
   value !== null &&
   DATE_TIME_FIELDS.every((field) => Number.isInteger((value as Shaped)[field])) &&
   typeof (value as Shaped).calendar?.identifier === 'string' &&
-  isFunction((value as Shaped).compare);
+  isFunction((value as Shaped).compare) &&
+  !('timeZone' in value);
 
 export function validateDateTime(value: unknown) {
   if (value == null) return;
 
   invariant(
     isCalendarDateTime(value),
-    'DateTimeField: expected a CalendarDateTime from @internationalized/date (new CalendarDateTime(2026, 9, 15, 14, 30)) or null.',
+    'DateTimeField: expected a CalendarDateTime from @internationalized/date (new CalendarDateTime(2026, 9, 15, 14, 30)) or null. Convert a ZonedDateTime with toCalendarDateTime(value).',
   );
   invariant(
     value.calendar.identifier === GREGORIAN,

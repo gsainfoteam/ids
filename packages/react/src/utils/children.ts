@@ -54,3 +54,12 @@ export function findElementOfType<P = unknown>(
 export function containsElementOfType(children: unknown, types: ReadonlySet<unknown>): boolean {
   return findElementOfType(children, types) !== undefined;
 }
+
+export function buttonTypeFor(asChild: boolean | undefined, children: ReactNode) {
+  if (!asChild) return 'button';
+  const childIsAnUntypedButton =
+    isValidElement<{ type?: string }>(children) &&
+    elementTypeOf(children) === 'button' &&
+    children.props.type === undefined;
+  return childIsAnUntypedButton ? 'button' : undefined;
+}
