@@ -102,15 +102,6 @@ import { TooltipDelayGroup } from '@gsainfoteam/ids-react';
 ```tsx
 <Tooltip>
   <Tooltip.Trigger asChild>
-    <span tabIndex={0} className="inline-flex">
-      <Button disabled className="pointer-events-none">삭제</Button>
-    </span>
-  </Tooltip.Trigger>
-  <Tooltip.Content>권한이 없어 삭제할 수 없습니다</Tooltip.Content>
-</Tooltip>
-
-<Tooltip>
-  <Tooltip.Trigger asChild>
     <Button disabled focusableWhenDisabled>삭제</Button>
   </Tooltip.Trigger>
   <Tooltip.Content>권한이 없어 삭제할 수 없습니다</Tooltip.Content>

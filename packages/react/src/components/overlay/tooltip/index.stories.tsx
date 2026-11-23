@@ -191,9 +191,11 @@ export const ExplainAnActionInTwoLines: Story = {
       <Tooltip.Trigger asChild>
         <Button variant="outline">공유</Button>
       </Tooltip.Trigger>
-      <Tooltip.Content className="flex flex-col gap-0.5">
-        <span>링크 복사</span>
-        <span className="opacity-70">누구나 볼 수 있습니다</span>
+      <Tooltip.Content>
+        <span className="flex flex-col gap-0.5">
+          <span>링크 복사</span>
+          <span className="opacity-70">누구나 볼 수 있습니다</span>
+        </span>
         <Tooltip.Arrow />
       </Tooltip.Content>
     </Tooltip>
@@ -202,7 +204,7 @@ export const ExplainAnActionInTwoLines: Story = {
     docs: {
       description: {
         story:
-          '`Tooltip.Content` 에는 글자 말고도 요소를 넣을 수 있고, 그 글이 trigger 의 설명(`aria-describedby`)이 됩니다. `className` 으로 줄을 나누고, `Tooltip.Arrow` 로 화살표를 답니다.',
+          '`Tooltip.Content` 에는 글자 말고도 요소를 넣을 수 있고, 그 글이 trigger 의 설명(`aria-describedby`)이 됩니다. 줄은 안에 둔 앱의 요소로 나누고, `Tooltip.Arrow` 로 화살표를 답니다.',
       },
     },
   },
@@ -265,11 +267,9 @@ export const ExplainWhyAButtonIsDisabled: Story = {
   render: () => (
     <Tooltip openDelay={0}>
       <Tooltip.Trigger asChild>
-        <span tabIndex={0} className="rounded-standard focus-ring inline-flex">
-          <Button colorScheme="danger" disabled className="pointer-events-none">
-            삭제
-          </Button>
-        </span>
+        <Button colorScheme="danger" disabled focusableWhenDisabled>
+          삭제
+        </Button>
       </Tooltip.Trigger>
       <Tooltip.Content>권한이 없어 삭제할 수 없습니다</Tooltip.Content>
     </Tooltip>
@@ -278,12 +278,12 @@ export const ExplainWhyAButtonIsDisabled: Story = {
     docs: {
       description: {
         story:
-          '꺼진 버튼은 hover 와 focus 를 받지 않아 툴팁이 열리지 않습니다. `tabIndex={0}` 인 `span` 으로 감싸 그 `span` 을 `Tooltip.Trigger` 로 삼으면, 왜 누를 수 없는지 알려 줄 수 있습니다.',
+          '`disabled` 인 버튼은 hover 와 focus 를 받지 않아 툴팁이 열리지 않습니다. IDS 버튼에 `focusableWhenDisabled` 를 주면 누를 수는 없어도 포커스와 hover 를 받아, 왜 누를 수 없는지 알려 줄 수 있습니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.hover(canvas.getByRole('button', { name: '삭제' }).parentElement!);
+    await userEvent.hover(canvas.getByRole('button', { name: '삭제' }));
     await waitFor(() =>
       expect(canvas.getByRole('tooltip')).toHaveTextContent('권한이 없어 삭제할 수 없습니다'),
     );

@@ -207,25 +207,6 @@ export const Gallery: Story = {
             </Drawer>
           </Showcase.Row>
         </Showcase.Section>
-
-        <Showcase.Section
-          title="Size"
-          description="크기 prop 은 없습니다. 좌우는 w-[min(24rem,100%-2rem)], 위아래는 내용 높이이고 className 으로 바꿉니다."
-        >
-          <Showcase.Row label="className">
-            <Drawer>
-              <Drawer.Trigger asChild>
-                <Button variant="outline">넓게</Button>
-              </Drawer.Trigger>
-              <Drawer.Content className="w-[min(40rem,calc(100%-2rem))]">
-                <Drawer.Header>
-                  <Drawer.Title>넓은 서랍</Drawer.Title>
-                </Drawer.Header>
-                <Drawer.Close />
-              </Drawer.Content>
-            </Drawer>
-          </Showcase.Row>
-        </Showcase.Section>
       </Showcase>
     );
   },
@@ -343,7 +324,7 @@ export const KeepThePageUsableBehind: Story = {
           <Drawer.Trigger asChild>
             <Button variant="outline">목차 열기</Button>
           </Drawer.Trigger>
-          <Drawer.Content className="w-60">
+          <Drawer.Content>
             <Drawer.Header>
               <Drawer.Title>목차</Drawer.Title>
             </Drawer.Header>
@@ -400,16 +381,14 @@ export const Keyboard: Story = {
 export const FixedElementsBehind: Story = {
   tags: ['verification'],
   render: () => (
-    <div className="flex h-[200vh] flex-col gap-3">
+    <div className="flex h-[200vh] flex-col items-start gap-3">
       <p className="text-body-b3-regular text-neutral">
         페이지를 내린 뒤 열어 보세요. 오른쪽 아래 버튼은 화면에 있던 자리에서 페이지와 함께
         줄어듭니다.
       </p>
       <Drawer side="bottom">
         <Drawer.Trigger asChild>
-          <Button variant="outline" className="self-start">
-            열기
-          </Button>
+          <Button variant="outline">열기</Button>
         </Drawer.Trigger>
         <Drawer.Content>
           <Drawer.Handle />

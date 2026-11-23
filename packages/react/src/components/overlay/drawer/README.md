@@ -57,13 +57,12 @@ import { Drawer } from '@gsainfoteam/ids-react';
 ```tsx
 <Drawer side="right" />                                      // 기본. 폭 min(24rem, 100% - 2rem), 높이 전체
 <Drawer side="bottom" />                                     // 폭 전체, 높이는 내용만큼(화면 - 2rem 까지)
-<Drawer.Content className="w-[min(40rem,calc(100%-2rem))]" /> // 크기는 className 으로
 ```
 
-- 크기 prop 은 없습니다. 내용이 길면 패널 안에서 스크롤합니다. 막대는 OS 막대가 아니라 [ScrollArea](../../layout/scroll-area/README.md) 의 `hover` 막대라 둥근 모서리 안쪽에 섭니다.
-- `Drawer.Content` 가 ScrollArea root 이고 padding 과 `gap` 은 안쪽 viewport 가 가집니다. `className` 의 `p-*`, `gap-*` 는 root 에 붙으므로, 여백을 바꾸려면 안쪽에 요소를 두고 거기에 줍니다.
+- 크기 prop 은 없고 `Drawer.Content` 에 `className` 도 주지 않습니다. 내용이 길면 패널 안에서 스크롤합니다. 막대는 OS 막대가 아니라 [ScrollArea](../../layout/scroll-area/README.md) 의 `hover` 막대라 둥근 모서리 안쪽에 섭니다.
+- `Drawer.Content` 가 ScrollArea root 이고 padding 과 `gap` 은 안쪽 viewport 가 가집니다. 내용의 배치를 바꾸려면 안쪽에 앱의 요소를 두고 거기에 줍니다.
 - `bottom` 패널은 화면 키보드가 덮는 만큼 올라갑니다. 필드의 시트와 같은 `sheet-viewport.ts` 를 씁니다.
-- 여백은 `concentric-p-6` 입니다. `bottom`, `top` 은 그 여백에 safe area(`env(safe-area-inset-*)`)를 더합니다. `className` 으로 `concentric-p-4` 를 줘도 화면 쪽 모서리는 각진 채로 남습니다.
+- 여백은 `concentric-p-6` 입니다. `bottom`, `top` 은 그 여백에 safe area(`env(safe-area-inset-*)`)를 더합니다. 화면 쪽 모서리는 각지고 안쪽 모서리만 둥급니다.
 
 ## 끌기
 

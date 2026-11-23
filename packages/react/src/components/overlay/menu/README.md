@@ -143,7 +143,9 @@ const [zoom, setZoom] = useState('100');
 
 ```tsx
 <Menu triggerType="contextmenu">
-  <Menu.Trigger className="h-40 border border-dashed">여기를 우클릭하세요</Menu.Trigger>
+  <Menu.Trigger asChild>
+    <div className="h-40 border border-dashed">여기를 우클릭하세요</div>
+  </Menu.Trigger>
   <Menu.Content aria-label="편집">...</Menu.Content>
 </Menu>
 ```

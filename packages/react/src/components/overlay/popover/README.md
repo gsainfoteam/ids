@@ -47,7 +47,18 @@ import { Popover } from '@gsainfoteam/ids-react';
 <Popover.Content side="right" align="start" />       // top | right | bottom | left, start | center | end
 <Popover.Content sideOffset={4} alignOffset={-8} />  // px
 <Popover.Content anchor={cellRef} />                 // trigger 대신 다른 요소 옆에 붙는다(요소 또는 ref)
-<Popover.Content className="w-96" />                 // 기본 폭 w-72, 크기 prop 은 없다
+```
+
+- 폭은 내용을 따릅니다. 크기 prop 도 `className` 도 쓰지 않고, 폭이 필요한 내용은 앱의 요소로 감쌉니다. 화면 폭에서 1rem 씩 남기고 줄바꿈합니다.
+- `Popover.Title` 과 `Popover.Description` 은 18rem(`max-w-72`)에서 줄바꿈합니다. 글만 둔 Popover 가 한 줄로 길게 늘어나지 않습니다.
+
+```tsx
+<Popover.Content>
+  <div className="grid w-80 gap-3">
+    <Popover.Title>알림</Popover.Title>
+    <NotificationList />
+  </div>
+</Popover.Content>
 ```
 
 - 놓인 쪽은 `data-side`, `data-align` 으로 읽습니다. 들어오는 애니메이션도 그쪽에서 자랍니다.

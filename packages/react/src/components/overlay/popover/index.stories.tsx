@@ -80,7 +80,7 @@ export const Gallery: Story = {
                   {side} {align}
                 </Button>
               </Popover.Trigger>
-              <Popover.Content side={side} align={align} className="w-48">
+              <Popover.Content side={side} align={align}>
                 <Popover.Arrow />
                 {side} / {align}
               </Popover.Content>
@@ -260,7 +260,7 @@ export const OpenAPopoverInsideAPopover: Story = {
               기간
             </Button>
           </Popover.Trigger>
-          <Popover.Content aria-label="기간" side="right" className="w-40">
+          <Popover.Content aria-label="기간" side="right">
             최근 7일
           </Popover.Content>
         </Popover>
@@ -299,7 +299,7 @@ export const AwaitAChoiceFromOverlayOpen: Story = {
           onClick={async () => {
             const picked = await overlay.open<string>(({ close }) => (
               <Popover>
-                <Popover.Content aria-label="색 고르기" anchor={anchor} className="w-auto">
+                <Popover.Content aria-label="색 고르기" anchor={anchor}>
                   <div className="flex gap-2">
                     <Button size="tiny" onClick={() => close('빨강')}>
                       빨강

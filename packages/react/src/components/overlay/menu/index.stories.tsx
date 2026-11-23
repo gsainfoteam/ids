@@ -95,11 +95,13 @@ const meta = {
           </Menu.Content>
         </>
       ) : args.triggerType === 'contextmenu' ? (
-        <Menu.Trigger
-          data-testid={contextArea}
-          className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
-        >
-          여기를 우클릭하세요
+        <Menu.Trigger asChild>
+          <div
+            data-testid={contextArea}
+            className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
+          >
+            여기를 우클릭하세요
+          </div>
         </Menu.Trigger>
       ) : (
         <Menu.Trigger asChild>
@@ -532,8 +534,10 @@ export const Gallery: Story = {
         >
           <Showcase.Row label="우클릭">
             <Menu triggerType="contextmenu">
-              <Menu.Trigger className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-32 w-72 items-center justify-center border border-dashed">
-                여기를 우클릭하세요
+              <Menu.Trigger asChild>
+                <div className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-32 w-72 items-center justify-center border border-dashed">
+                  여기를 우클릭하세요
+                </div>
               </Menu.Trigger>
               <Menu.Content aria-label="편집">
                 <Menu.Item>
@@ -677,11 +681,13 @@ export const ToggleOptionsFromAMenu: Story = {
 export const OpenOnRightClick: Story = {
   render: () => (
     <Menu triggerType="contextmenu">
-      <Menu.Trigger
-        data-testid={contextArea}
-        className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
-      >
-        여기를 우클릭하세요
+      <Menu.Trigger asChild>
+        <div
+          data-testid={contextArea}
+          className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
+        >
+          여기를 우클릭하세요
+        </div>
       </Menu.Trigger>
       <Menu.Content aria-label="편집">
         <Menu.Item>
