@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 
 import { CalendarDate, CalendarDateTime, Time } from '@internationalized/date';
 import { describe, expect, onTestFinished, test, vi } from 'vitest';
-import { page, userEvent, type Locator } from 'vitest/browser';
+import { page, server, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import {
@@ -623,6 +623,17 @@ function drawForm(spec: Spec, setup: Setup) {
 
 const formElement = () => document.getElementById(FORM_ID) as HTMLFormElement;
 
+const PLAYWRIGHTS_FIREFOX_CLICK_LEAVES_SOME_FIELDS_UNRESET = server.browser === 'firefox';
+
+async function pressReset() {
+  const reset = page.getByRole('button', { name: 'Reset' });
+  if (PLAYWRIGHTS_FIREFOX_CLICK_LEAVES_SOME_FIELDS_UNRESET) {
+    (reset.element() as HTMLButtonElement).click();
+    return;
+  }
+  await userEvent.click(reset);
+}
+
 function watchSubmitsTheBrowserWouldSend() {
   const submitted = vi.fn();
   const afterEveryReactHandler = (event: Event) => {
@@ -644,7 +655,7 @@ describe.each(specs)('$control in a plain form', (spec) => {
 
     await expect.poll(entries).toEqual(expected(spec.edited));
 
-    (page.getByRole('button', { name: 'Reset' }).element() as HTMLButtonElement).click();
+    await pressReset();
 
     await expect.poll(entries).toEqual(expected(spec.defaults));
     await spec.showsDefault();

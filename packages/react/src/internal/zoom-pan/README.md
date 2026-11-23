@@ -4,9 +4,9 @@
 
 | 파일                                 | 내용                                                                             |
 | ------------------------------------ | -------------------------------------------------------------------------------- |
-| [`engine.ts`](#enginets)             | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션 |
-| [`use-zoom-pan.ts`](#use-zoom-pants) | React hook `useInternalZoomPan`. 두 요소에 엔진을 붙이고 배율을 state 로 제어한다        |
-| [`math.ts`](#mathts)                 | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성              |
+| [`lib/engine.ts`](#libenginets)             | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션 |
+| [`hooks/use-zoom-pan.ts`](#hooksuse-zoom-pants) | React hook `useInternalZoomPan`. 두 요소에 엔진을 붙이고 배율을 state 로 제어한다        |
+| [`lib/math.ts`](#libmathts)                 | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성              |
 
 ## 쓰는 곳
 
@@ -59,7 +59,7 @@ useInternalSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르
 | `+` `=`, `-`, `0`    | 가운데를 기준으로 2배, 절반, 1배                                                                   |
 | 방향키 (확대 중)     | 50px 씩 옮긴다. 배율 1 이면 처리하지 않고(`false`) 뷰어의 이전, 다음에 넘긴다                      |
 
-## engine.ts
+## lib/engine.ts
 
 | 이름                                          | 하는 일                                                                          |
 | --------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -84,7 +84,7 @@ useInternalSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르
 - 영역이나 그림의 크기가 바뀌면(`ResizeObserver`) 이동을 새 한계 안으로 옮깁니다.
 - React 를 모르는 엔진입니다. React 에서는 아래 `useInternalZoomPan` 이 붙입니다.
 
-## use-zoom-pan.ts
+## hooks/use-zoom-pan.ts
 
 | 이름                                            | 하는 일                                                                              |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -99,7 +99,7 @@ useInternalSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르
 - 엔진을 만들 때의 배율은 그 렌더의 배율입니다. 뷰어는 장을 넘길 때 `value` 와 `zoom`(1)을 한 번에 바꾸므로 새 장은 1 에서 시작합니다.
 - `disabled` 나 요소가 바뀌면 엔진을 떼면서 transform 을 지웁니다. 뷰어는 닫히는 동안 떼지 않습니다. 떼면 확대한 사진이 닫히는 애니메이션의 첫 장면보다 먼저 1 로 돌아갑니다.
 
-## math.ts
+## lib/math.ts
 
 - 한 점을 기준으로 한 확대는 그 점 아래의 그림이 제자리에 남는 식입니다: `x' = p - (p - x) * s' / s`. PhotoSwipe 의 `Slide.zoomTo` 와 YARL Zoom 의 `changeZoom` 이 같은 식을 씁니다.
 - 이동 한계는 확대한 그림이 영역을 덮는 만큼입니다: `|x| <= (s * w - W) / 2`. 영역보다 좁은 축은 가운데에 둡니다(PhotoSwipe 의 `PanBounds`, YARL 의 `changeOffsets`).
