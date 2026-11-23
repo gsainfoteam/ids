@@ -1,14 +1,30 @@
 'use client';
 
-import { type ComponentProps, type MouseEvent } from 'react';
+import { useLayoutEffect, type ComponentProps, type MouseEvent } from 'react';
 
 import { usePopoverContext } from './context';
+import { DEFAULT_HOVER_DELAYS } from './use-popover';
 import { mergeProps, part } from '../../../utils';
 
-export type PopoverTriggerProps = ComponentProps<'button'> & { asChild?: boolean };
+export type PopoverTriggerProps = ComponentProps<'button'> & {
+  asChild?: boolean;
+  openDelay?: number;
+  closeDelay?: number;
+};
 
-export function PopoverTrigger({ asChild, children, ...props }: PopoverTriggerProps) {
+export function PopoverTrigger({
+  asChild,
+  openDelay = DEFAULT_HOVER_DELAYS.open,
+  closeDelay = DEFAULT_HOVER_DELAYS.close,
+  children,
+  ...props
+}: PopoverTriggerProps) {
   const { popover } = usePopoverContext('Popover.Trigger');
+
+  const { setDelays } = popover;
+  useLayoutEffect(() => {
+    setDelays({ open: openDelay, close: closeDelay });
+  }, [setDelays, openDelay, closeDelay]);
 
   return part(
     'button',

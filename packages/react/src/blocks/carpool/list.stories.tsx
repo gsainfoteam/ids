@@ -147,6 +147,7 @@ export const PC: Story = {
                   <Button type="submit">열기</Button>
                 </Drawer.Footer>
               </form>
+              <Drawer.Close />
             </Drawer.Content>
           </Drawer>
         </div>

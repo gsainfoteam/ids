@@ -12,10 +12,10 @@ import { IconButton } from '../../action/icon-button';
 
 export type DrawerCloseProps = Omit<ComponentProps<'button'>, 'type'> & { asChild?: boolean };
 
-export function DrawerClose({ asChild, children, onClick, ...props }: DrawerCloseProps) {
+export function DrawerClose({ asChild, children, className, onClick, ...props }: DrawerCloseProps) {
   const t = useTranslate();
 
-  const { drawer } = useDrawerContext('Drawer.Close');
+  const { drawer, styles } = useDrawerContext('Drawer.Close');
 
   const close = (event: MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
@@ -23,12 +23,18 @@ export function DrawerClose({ asChild, children, onClick, ...props }: DrawerClos
   };
 
   if (asChild)
-    return part('button', true, children, { ...props, onClick: close, 'data-drawer-close': '' });
+    return part('button', true, children, {
+      ...props,
+      className,
+      onClick: close,
+      'data-drawer-close': '',
+    });
   if (children == null)
     return (
       <IconButton
         aria-label={t('drawer.close')}
         {...props}
+        className={styles.close({ className })}
         variant="ghost"
         size="tiny"
         icon={<XMarkIcon />}
@@ -37,7 +43,7 @@ export function DrawerClose({ asChild, children, onClick, ...props }: DrawerClos
       />
     );
   return (
-    <Button variant="outline" {...props} onClick={close} data-drawer-close="">
+    <Button variant="outline" {...props} className={className} onClick={close} data-drawer-close="">
       {children}
     </Button>
   );

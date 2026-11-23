@@ -20,6 +20,7 @@ import {
   translateAlong,
   velocityOf,
 } from '../src/components/overlay/drawer/drawer-gesture';
+import { useDrawer } from '../src/components/overlay/drawer/use-drawer';
 
 type Point = { x: number; y: number };
 
@@ -217,9 +218,19 @@ function Sheet({ children, ...props }: Partial<Drawer.Props> & { children?: Reac
         <Drawer.Footer>
           <Drawer.Close>Cancel</Drawer.Close>
         </Drawer.Footer>
+        <Drawer.Close />
       </Drawer.Content>
     </Drawer>
   );
+}
+
+function SnapSheet({
+  points,
+  onValueChange,
+  ...props
+}: Partial<Drawer.Props> & Pick<Drawer.SnapOptions, 'points' | 'onValueChange'>) {
+  const drawer = useDrawer({ snap: { points, onValueChange } });
+  return <Sheet {...props} drawer={drawer} />;
 }
 
 const TallBody = () => <div className="h-[400px] shrink-0" data-testid="body" />;
@@ -306,6 +317,33 @@ test('a backdrop click closes and the drawer does not', async () => {
   await userEvent.click(page.elementLocator(backdrop), { position: { x: 5, y: 5 } });
   await expect.element(drawer).not.toBeInTheDocument();
   expect(onOpenChange.mock.calls).toEqual([[false]]);
+});
+
+test('the corner close button is drawn only where Drawer.Close is written', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Drawer defaultOpen>
+        <Drawer.Content>
+          <Drawer.Title>Filters</Drawer.Title>
+        </Drawer.Content>
+      </Drawer>
+    </IdsProvider>,
+  );
+  await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeVisible();
+  expect(screen.getByRole('button', { name: '닫기' }).elements()).toHaveLength(0);
+  await screen.unmount();
+
+  const withClose = await render(
+    <IdsProvider theme={testTheme}>
+      <Drawer defaultOpen>
+        <Drawer.Content>
+          <Drawer.Title>Filters</Drawer.Title>
+          <Drawer.Close />
+        </Drawer.Content>
+      </Drawer>
+    </IdsProvider>,
+  );
+  await expect.element(withClose.getByRole('button', { name: '닫기' })).toBeVisible();
 });
 
 test('a drawer that cannot be dismissed ignores Escape, the backdrop and a flick', async (context) => {
@@ -622,11 +660,11 @@ describe('snap points', () => {
     const onActiveSnapPointChange = vi.fn();
     await render(
       <IdsProvider theme={testTheme}>
-        <Sheet
+        <SnapSheet
           side="bottom"
           defaultOpen
-          snapPoints={snapPoints}
-          onActiveSnapPointChange={onActiveSnapPointChange}
+          points={snapPoints}
+          onValueChange={onActiveSnapPointChange}
         />
       </IdsProvider>,
     );
@@ -657,11 +695,11 @@ describe('snap points', () => {
     const onActiveSnapPointChange = vi.fn();
     const screen = await render(
       <IdsProvider theme={testTheme}>
-        <Sheet
+        <SnapSheet
           side="bottom"
           defaultOpen
-          snapPoints={snapPoints}
-          onActiveSnapPointChange={onActiveSnapPointChange}
+          points={snapPoints}
+          onValueChange={onActiveSnapPointChange}
         />
       </IdsProvider>,
     );
@@ -676,6 +714,42 @@ describe('snap points', () => {
     await userEvent.keyboard('{Enter}');
     expect(onActiveSnapPointChange.mock.calls).toEqual([[0.5], [1], [0.25]]);
     await expect.poll(() => backdrop.style.getPropertyValue('--drawer-fade')).toBe('0');
+  });
+
+  test('snap.setValue moves the drawer from a button outside it', async () => {
+    const onValueChange = vi.fn();
+
+    function OutsideControl() {
+      const drawer = useDrawer({ snap: { points: snapPoints, onValueChange } });
+
+      return (
+        <>
+          <Button onClick={() => drawer.snap?.setValue(1)}>Expand</Button>
+          <output data-testid="snap-value">{String(drawer.snap?.value)}</output>
+          <Drawer side="bottom" modal={false} defaultOpen drawer={drawer}>
+            <Drawer.Content>
+              <Drawer.Title>Route</Drawer.Title>
+            </Drawer.Content>
+          </Drawer>
+        </>
+      );
+    }
+
+    const screen = await render(
+      <IdsProvider theme={testTheme}>
+        <OutsideControl />
+      </IdsProvider>,
+    );
+    await expect.element(screen.getByRole('dialog', { name: 'Route' })).toBeVisible();
+    const size = sheetOf().offsetHeight;
+    const offsets = snapOffsets(snapPoints, size, window.innerHeight);
+    await expect.poll(() => translateY(sheetOf())).toBeCloseTo(offsets[0]!, 0);
+    await expect.element(screen.getByTestId('snap-value')).toHaveTextContent('0.25');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Expand' }));
+    await expect.poll(() => translateY(sheetOf())).toBe(0);
+    await expect.element(screen.getByTestId('snap-value')).toHaveTextContent('1');
+    expect(onValueChange.mock.calls).toEqual([[1]]);
   });
 
   test('without snap points the handle is a picture, not a button', async () => {
@@ -727,18 +801,15 @@ describe('background scale', () => {
     expect(document.body.style.background).toBe('');
   });
 
-  test('scaleBackground={false} and a non-modal drawer leave the page alone', async () => {
-    for (const props of [{ scaleBackground: false }, { modal: false }]) {
-      const screen = await render(
-        <IdsProvider theme={testTheme}>
-          <Sheet defaultOpen {...props} />
-        </IdsProvider>,
-      );
-      await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeVisible();
-      expect(rootOf(screen).style.transform).toBe('');
-      expect(document.body.style.background).toBe('');
-      await screen.unmount();
-    }
+  test('a non-modal drawer leaves the page alone', async () => {
+    const screen = await render(
+      <IdsProvider theme={testTheme}>
+        <Sheet defaultOpen modal={false} />
+      </IdsProvider>,
+    );
+    await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeVisible();
+    expect(rootOf(screen).style.transform).toBe('');
+    expect(document.body.style.background).toBe('');
   });
 
   test('fixed elements of the page stay where they were on screen and scale with it', async () => {

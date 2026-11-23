@@ -81,16 +81,12 @@ export function EditorToolTip({
   children,
 }: EditorToolTipProps & { children: ReactElement }) {
   return (
-    <Tooltip
-      disabled={disabled}
-      content={
-        <>
-          {label}
-          {shortcut && <Kbd keys={shortcut} />}
-        </>
-      }
-    >
-      {children}
+    <Tooltip disabled={disabled}>
+      <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
+      <Tooltip.Content>
+        {label}
+        {shortcut && <Kbd keys={shortcut} />}
+      </Tooltip.Content>
     </Tooltip>
   );
 }

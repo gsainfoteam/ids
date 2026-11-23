@@ -152,8 +152,10 @@ function HoverCard(props: Partial<Popover.Props>) {
   return (
     <>
       <p>Away</p>
-      <Popover triggerType="hover" openDelay={0} closeDelay={0} {...props}>
-        <Popover.Trigger>Profile</Popover.Trigger>
+      <Popover triggerType="hover" {...props}>
+        <Popover.Trigger openDelay={0} closeDelay={0}>
+          Profile
+        </Popover.Trigger>
         <Popover.Content aria-label="Profile card" side="bottom">
           <p>Card body</p>
         </Popover.Content>
