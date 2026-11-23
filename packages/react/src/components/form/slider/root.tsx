@@ -3,7 +3,8 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { SliderContext } from './context';
-import { useInternalSlider, useInternalValueShape, type SliderValue } from './hooks/use-slider';
+import { useInternalSlider, type SliderValue } from './hooks/use-slider';
+import { useInternalSliderValueShape } from './hooks/use-slider-value-shape';
 import { resolve, type StateProp } from './lib/state-prop';
 import { SliderTrack } from './parts/track';
 import { sliderStyle } from './style';
@@ -99,7 +100,7 @@ export function SliderRoot<V extends SliderValue>(props: SliderProps<V>) {
 
   invariant(min < max, 'Slider: `min` must be less than `max`.');
   invariant(step > 0, 'Slider: `step` must be positive.');
-  const range = useInternalValueShape(value ?? defaultValue);
+  const range = useInternalSliderValueShape(value ?? defaultValue);
 
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const slider = useInternalSlider({
