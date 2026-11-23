@@ -13,9 +13,7 @@
 ```tsx
 import { Resizable } from '@gsainfoteam/ids-react';
 
-<Resizable defaultWidth={400} defaultHeight={240} className="concentric-p-4 min-w-60 border">
-  내용
-</Resizable>;
+<Resizable className="concentric-p-4 h-60 w-100 border">내용</Resizable>;
 ```
 
 ## 방향
@@ -51,43 +49,50 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ## 크기
 
 ```tsx
-<Resizable defaultWidth={400} defaultHeight={240} />             // 비제어
-<Resizable width={width} onWidthChange={setWidth} />             // 제어. px 숫자
-<Resizable height={height} onHeightChange={setHeight} />
-<Resizable direction="horizontal" className="w-full" />          // 크기를 주지 않으면 CSS 크기에서 시작
+<Resizable className="h-60 w-100" />                     // 처음 크기는 요소의 CSS 크기
+
+const resizable = useResizable({
+  width: { defaultValue: 400 },                          // 비제어. px 숫자
+  height: { value: height, onValueChange: setHeight },   // 제어
+});
+<Resizable resizable={resizable} />
 ```
 
+- 크기 말고 다른 것이 필요 없으면 훅 없이 씁니다. 처음에는 CSS 크기(`w-100`, `w-full` 등)를 따르고, 처음 바꿀 때부터 px 크기를 가집니다.
+- 처음 크기를 숫자로 정하거나, 크기를 앱 상태로 들거나, 한계와 칸 단위를 줄 때는 `useResizable()` 의 결과를 `resizable` 로 넘깁니다. 축마다 `{ value, defaultValue, onValueChange, min, max }` 입니다.
 - 크기는 px 숫자이고 요소의 `style.width` `style.height` 로 들어갑니다. `className` 의 너비보다 우선합니다.
-- 크기를 주지 않으면 처음에는 CSS 크기(`w-full` 등)를 따르고, 처음 바꿀 때부터 px 크기를 가집니다.
-- `onWidthChange` `onHeightChange` 는 끌기가 끝날 때 한 번, 키를 누를 때마다 부릅니다. 끄는 도중에는 부르지 않습니다.
-- `Enter` 와 손잡이 두 번 누르기는 처음 크기로 돌아갑니다: `defaultWidth`, 없으면 처음 받은 `width`, 둘 다 없으면 CSS 크기. CSS 크기로 돌아갈 때는 그 크기를 잰 값을 알립니다.
+- `onValueChange` 는 끌기가 끝날 때 한 번, 키를 누를 때마다 부릅니다. 끄는 도중에는 부르지 않습니다.
+- `Enter` 와 손잡이 두 번 누르기는 처음 크기로 돌아갑니다: `defaultValue`, 없으면 처음 받은 `value`, 둘 다 없으면 CSS 크기. CSS 크기로 돌아갈 때는 그 크기를 잰 값을 알립니다.
 
 ## 한계
 
 ```tsx
-<Resizable className="min-w-60 max-w-160 min-h-30 max-h-120" />
-<Resizable style={{ minWidth: 240, maxWidth: 640 }} />
+const resizable = useResizable({
+  width: { min: 240, max: 640 },
+  height: { min: 120, max: 480 },
+});
+<Resizable resizable={resizable} />
 ```
 
-- 한계는 prop 이 아니라 요소의 CSS `min-width` `max-width` `min-height` `max-height` 입니다. 클래스로 주든 `style` 로 주든 그려진 값을 읽습니다. 기본은 최소 0, 최대 없음입니다.
-- px 로 계산되는 값만 읽습니다. `%` 나 `min-content` 는 읽지 못하므로 px 로 줍니다.
-- 한계가 바뀌면 크기가 그대로여도 다시 읽습니다.
-- 서버 렌더와 첫 측정 전의 `aria-valuemin` `aria-valuemax` 는 `style` 객체의 px 값으로 정합니다. 클래스로만 준 한계는 측정한 뒤에 붙습니다.
+- 한계는 축마다 `min` `max`(px)입니다. 기본은 최소 0, 최대 없음입니다.
+- Resizable 은 `className` 과 `style` 을 읽어 한계를 정하지 않습니다. 둘은 앱의 모양에만 씁니다. CSS `min-width` 등을 함께 주면 화면의 크기는 CSS 가 막지만 손잡이의 값과 `aria-valuemin` `aria-valuemax` 는 모릅니다.
+- 한계는 서버 HTML 의 `aria-valuemin` `aria-valuemax` 에도 그대로 들어갑니다.
 - 최대가 없으면 `End` 키는 동작하지 않고 `aria-valuemax` 도 붙지 않습니다.
+- 개발 중에 최소가 최대보다 크면 경고하고, 최대가 이깁니다.
 
 ## 칸 단위와 값 글자
 
 ```tsx
-<Resizable direction="vertical" step={12} />              // 높이가 12px 의 배수에 맞는다
-<Resizable
-  direction="vertical"
-  step={12}
-  getValueLabel={(size) => `${size / 48}시간`}            // aria-valuetext 를 "1.5시간"으로
-/>
+const resizable = useResizable({
+  height: { defaultValue: 96 },
+  step: 12,                                     // 높이가 12px 의 배수에 맞는다
+  getValueLabel: (size) => `${size / 48}시간`,  // aria-valuetext 를 "1.5시간"으로
+});
+<Resizable resizable={resizable} direction="vertical" />
 ```
 
 - `step` 을 주면 끄는 크기가 가장 가까운 `step` 의 배수에 맞춰집니다. 방향키는 다음 배수로, `Shift` 와 함께면 네 칸을 옮깁니다. 없으면 1px 단위로 끌고 방향키는 16px, 64px 입니다.
-- `min*` `max*` 가 배수가 아니면 한계가 이깁니다. 한계 바로 앞의 배수에서 한계로 갑니다.
+- `min` `max` 가 배수가 아니면 한계가 이깁니다. 한계 바로 앞의 배수에서 한계로 갑니다.
 - `getValueLabel(size, dimension)` 이 separator 의 `aria-valuetext` 가 됩니다. 없으면 "416px" 입니다. `aria-valuenow` 는 늘 px 입니다.
 
 ## 손잡이 바꾸기
@@ -128,8 +133,8 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ## 다른 요소를 그대로
 
 ```tsx
-<Resizable asChild defaultWidth={320}>
-  <Card>
+<Resizable asChild>
+  <Card className="w-80">
     <Card.Title>제목</Card.Title>
   </Card>
 </Resizable>
@@ -190,16 +195,18 @@ import { Resizable } from '@gsainfoteam/ids-react';
 | 속성                                  | 기본 / 동작                                           |
 | ------------------------------------- | ----------------------------------------------------- |
 | `direction`                           | `both`(기본) / `horizontal` / `vertical`              |
-| `width` / `defaultWidth`              | px. 없으면 CSS 너비                                   |
-| `height` / `defaultHeight`            | px. 없으면 CSS 높이                                   |
-| `onWidthChange` / `onHeightChange`    | `(size: number) => void`                              |
-| `step`                                | px. 끌기와 방향키가 이 배수에 맞는다                  |
-| `getValueLabel`                       | `(size, dimension) => string`. `aria-valuetext`       |
+| `resizable`                           | `useResizable()` 의 결과. 없으면 CSS 크기, 한계 없음  |
 | `disabled`                            | 손잡이가 흐려지고 Tab 과 포인터에서 빠진다            |
 | `asChild`                             | 자식 요소 하나의 크기를 바꾼다                        |
-| `className` / `style`                 | 상태를 받는 함수도 된다. CSS 최소·최대 크기가 한계다 |
+| `className` / `style`                 | 모양에만 쓴다. 상태를 받는 함수도 된다                |
 | 그 외 속성, `ref`                      | 요소로 간다. `id` 가 없으면 만들어 `aria-controls` 에 쓴다 |
 | `Resizable.Handle`                    | `asChild`, `className`, `children`, 그 외 div 속성     |
+
+| `useResizable` 옵션        | 뜻                                                        |
+| -------------------------- | --------------------------------------------------------- |
+| `width` / `height`         | `{ value, defaultValue, onValueChange, min, max }`, px    |
+| `step`                     | px. 끌기와 방향키가 이 배수에 맞는다                      |
+| `getValueLabel`            | `(size, dimension) => string`. `aria-valuetext`           |
 
 ## 알아둘 것
 

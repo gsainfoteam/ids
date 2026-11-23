@@ -3,6 +3,11 @@ import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 import { ResizableHandle, type ResizableHandleProps } from './handle';
 import { ResizableRoot } from './root';
 import { resizableStyle } from './style';
+import {
+  type ResizableAxisOptions,
+  type ResizableInstance,
+  type UseResizableOptions,
+} from './use-resizable';
 import { type StateValue } from '../../../internal/state-props';
 
 export function Resizable(props: Resizable.Props) {
@@ -22,16 +27,13 @@ export namespace Resizable {
     disabled: boolean;
   };
 
+  export type Instance = ResizableInstance;
+  export type Options = UseResizableOptions;
+  export type AxisOptions = ResizableAxisOptions;
+
   export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
+    resizable?: Instance;
     direction?: Direction;
-    width?: number;
-    defaultWidth?: number;
-    onWidthChange?: (width: number) => void;
-    height?: number;
-    defaultHeight?: number;
-    onHeightChange?: (height: number) => void;
-    step?: number;
-    getValueLabel?: (size: number, dimension: Dimension) => string;
     disabled?: boolean;
     asChild?: boolean;
     className?: StateValue<string | undefined, State>;
@@ -50,3 +52,6 @@ export namespace Resizable {
 }
 
 export type ResizableProps = Resizable.Props;
+
+export { useResizable } from './use-resizable';
+export type { ResizableAxisOptions, ResizableInstance, UseResizableOptions } from './use-resizable';

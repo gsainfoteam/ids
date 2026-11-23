@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react';
 
-import { Resizable } from '../../../layout/resizable';
+import { Resizable, useResizable } from '../../../layout/resizable';
 import { editorStyle } from '../style';
 
 const MIN_IMAGE_WIDTH = 48;
@@ -29,6 +29,14 @@ export function EditorImageView({ node, editor, selected, updateAttributes }: Re
   const [wrapper, setWrapper] = useState<HTMLElement | null>(null);
   const room = useWidthOf(wrapper);
   const { src, alt, title } = node.attrs as { src: string; alt?: string; title?: string };
+  const resizable = useResizable({
+    width: {
+      value: widthOf(node.attrs.width),
+      onValueChange: (width) => updateAttributes({ width: Math.round(width) }),
+      min: MIN_IMAGE_WIDTH,
+      max: room,
+    },
+  });
   const image = <img src={src} alt={alt ?? ''} title={title} className={styles.resizedImage()} />;
 
   return (
@@ -40,12 +48,10 @@ export function EditorImageView({ node, editor, selected, updateAttributes }: Re
     >
       {editor.isEditable ? (
         <Resizable
+          resizable={resizable}
           direction="horizontal"
-          width={widthOf(node.attrs.width)}
-          style={{ minWidth: MIN_IMAGE_WIDTH, maxWidth: room }}
           contentEditable={false}
           className={styles.imageResizable()}
-          onWidthChange={(width) => updateAttributes({ width: Math.round(width) })}
         >
           {image}
         </Resizable>

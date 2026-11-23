@@ -145,7 +145,7 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 <div {...separator} aria-label={props['aria-label'] ?? separator['aria-label']} />
 ```
 
-- `useMeasuredAxes({ width, height })` 는 `ResizeObserver` 로 그려진 크기와 CSS px 한계를 state 로 둡니다. 크기는 그대로인 채 `style` 이나 `class` 만 바뀌어 `min-width` `max-height` 같은 한계가 달라질 때도 `MutationObserver` 로 다시 읽습니다. Resizable 은 한계를 prop 으로 받지 않고 이 값만 쓰므로, 이것을 빼면 바뀐 한계가 다음 크기 변화 전까지 낡은 채 남습니다. 서버 렌더와 첫 측정 전에는 Resizable 이 `style` 객체의 px 값(`minWidth: 240`, `'240px'`)을 대신 씁니다. 크기를 주지 않은 축의 `aria-valuenow` 와, CSS 한계가 들어간 `aria-valuemin` `aria-valuemax` 가 여기서 옵니다. 끄는 동안은 읽지 않습니다.
+- `useMeasuredAxes({ width, height })` 는 `ResizeObserver` 로 그려진 크기와 CSS px 한계를 state 로 둡니다. 크기를 주지 않은 축의 `aria-valuenow` 와, CSS 한계가 들어간 `aria-valuemin` `aria-valuemax` 가 여기서 옵니다. 끄는 동안은 읽지 않습니다.
 - `useAxesDrag(axes, { disabled, onDraggingChange })` 는 `useResizeDrag` 를 축에 잇습니다. 시작할 때 그려진 크기와 한계를 재고, 프레임마다 요소의 `style.width` / `style.height` 에 바로 쓰고, 끝에는 인라인 값을 시작 전으로 되돌린 뒤 `flushSync` 로 `resize` 를 부릅니다. 제어 컴포넌트의 부모가 값을 받지 않으면 요소는 원래 크기로 남습니다.
 - `axisKeyMap(axis, resizeTo?)` 는 누른 순간의 그려진 크기로 `resizeKeyMap` 을 만듭니다.
 - `useAxisSeparator(axis, options)` 는 한 축의 separator 에 필요한 것(ARIA, 끌기, 키, `Enter` 되돌리기)을 한 번에 돌려줍니다.

@@ -15,6 +15,7 @@ import { ResizableContext } from './context';
 import { ResizableHandle } from './handle';
 import { resizableStyle } from './style';
 import { useResizable } from './use-resizable';
+import { useResizableElement } from './use-resizable-element';
 import { resolveState } from '../../../internal/state-props';
 import { containsElementOfType, invariant, mergeProps, mergeRefs } from '../../../utils';
 
@@ -26,33 +27,9 @@ const HANDLE = new Set<unknown>([ResizableHandle]);
 
 const pixels = (size: number | undefined) => (size === undefined ? undefined : `${size}px`);
 
-const PIXEL_LENGTH = /^\d+(\.\d+)?px$/;
-
-const pixelsIn = (length: unknown) =>
-  typeof length === 'number'
-    ? length
-    : typeof length === 'string' && PIXEL_LENGTH.test(length)
-      ? Number.parseFloat(length)
-      : undefined;
-
-const boundsBeforeMeasuring = (style: Resizable.Props['style']) => {
-  const declared = typeof style === 'object' ? style : undefined;
-  return {
-    width: { min: pixelsIn(declared?.minWidth), max: pixelsIn(declared?.maxWidth) },
-    height: { min: pixelsIn(declared?.minHeight), max: pixelsIn(declared?.maxHeight) },
-  };
-};
-
 export function ResizableRoot({
+  resizable: given,
   direction = 'both',
-  width,
-  defaultWidth,
-  onWidthChange,
-  height,
-  defaultHeight,
-  onHeightChange,
-  step,
-  getValueLabel,
   disabled = false,
   asChild = false,
   id,
@@ -72,25 +49,8 @@ export function ResizableRoot({
   const rootId = child?.props.id ?? id ?? `ids-resizable-${generatedId}`;
   const content = child ? child.props.children : children;
   const [dragging, setDragging] = useState(false);
-  const declared = boundsBeforeMeasuring(style);
-
-  const resizable = useResizable({
-    width: {
-      value: width,
-      defaultValue: defaultWidth,
-      onChange: onWidthChange,
-      declared: declared.width,
-    },
-    height: {
-      value: height,
-      defaultValue: defaultHeight,
-      onChange: onHeightChange,
-      declared: declared.height,
-    },
-    step,
-    getValueLabel,
-    controls: rootId,
-  });
+  const own = useResizable();
+  const resizable = useResizableElement(given ?? own, rootId);
 
   const state: Resizable.State = {
     direction,

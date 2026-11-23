@@ -5,7 +5,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Card, IdsProvider, Resizable } from '../src';
+import { Card, IdsProvider, Resizable, useResizable } from '../src';
 import { skipWithoutCdp } from './engines';
 import { arcOf, expectTheArcToHug, middleOfTheArc, pointsAlong, type Point } from './resize-grip';
 import { testTheme } from './theme';
@@ -48,6 +48,17 @@ const sizeOf = (element: HTMLElement) => ({
   height: element.offsetHeight,
 });
 
+function Sized({
+  width,
+  height,
+  step,
+  getValueLabel,
+  ...props
+}: Omit<Resizable.Props, 'resizable'> & Resizable.Options) {
+  const resizable = useResizable({ width, height, step, getValueLabel });
+  return <Resizable resizable={resizable} {...props} />;
+}
+
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
 afterEach(() => {
@@ -58,15 +69,14 @@ test('SSR: the default handle follows the direction and carries its ARIA from th
   const html = (direction: Resizable.Direction) =>
     parse(
       renderToString(
-        <Resizable
+        <Sized
           id="panel"
           direction={direction}
-          defaultWidth={400}
-          defaultHeight={300}
-          style={{ minWidth: 200 }}
+          width={{ defaultValue: 400, min: 200 }}
+          height={{ defaultValue: 300 }}
         >
           내용
-        </Resizable>,
+        </Sized>,
       ),
     );
 
@@ -105,15 +115,13 @@ test('SSR: the default handle follows the direction and carries its ARIA from th
 test('an edge handle resizes by keys: 16px steps, 64px with Shift, Home and End to the bounds, Enter back', async () => {
   const onWidthChange = vi.fn();
   const screen = await render(
-    <Resizable
+    <Sized
       direction="horizontal"
-      defaultWidth={200}
-      style={{ minWidth: 120, maxWidth: 300 }}
-      onWidthChange={onWidthChange}
+      width={{ defaultValue: 200, min: 120, max: 300, onValueChange: onWidthChange }}
       className="h-24"
     >
       내용
-    </Resizable>,
+    </Sized>,
   );
   const handle = screen.getByRole('separator', { name: '너비' });
   const width = () => box(screen).offsetWidth;
@@ -141,9 +149,9 @@ test('an edge handle resizes by keys: 16px steps, 64px with Shift, Home and End 
 
 test('the corner grip is one tab stop whose arrows resize each axis and move focus to the separator that changed', async () => {
   const screen = await render(
-    <Resizable defaultWidth={240} defaultHeight={160} className="max-h-[200px]">
+    <Sized width={{ defaultValue: 240 }} height={{ defaultValue: 160, max: 200 }}>
       내용
-    </Resizable>,
+    </Sized>,
   );
   const grip = screen.getByRole('group', { name: '크기 조절' });
   const width = screen.getByRole('separator', { name: '너비' });
@@ -188,9 +196,13 @@ test('the corner grip is one tab stop whose arrows resize each axis and move foc
 
 test('the corner grip is an arc concentric with the corner, on the edge line the edge pills use, and follows a changed radius', async () => {
   const panel = (rounded: string) => (
-    <Resizable defaultWidth={240} defaultHeight={160} className={`border ${rounded}`}>
+    <Sized
+      width={{ defaultValue: 240 }}
+      height={{ defaultValue: 160 }}
+      className={`border ${rounded}`}
+    >
       내용
-    </Resizable>
+    </Sized>
   );
   const screen = await render(panel('rounded-[20px]'));
   const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
@@ -210,9 +222,9 @@ test('the corner grip is an arc concentric with the corner, on the edge line the
 
   const runStroke = Number(arcOf(grip())!.getAttribute('stroke-width'));
   const edge = await render(
-    <Resizable direction="vertical" defaultHeight={80} className="w-40">
+    <Sized direction="vertical" height={{ defaultValue: 80 }} className="w-40">
       내용
-    </Resizable>,
+    </Sized>,
   );
   const pill = getComputedStyle(
     edge.container.querySelector('[role="separator"][data-resizable-handle]')!,
@@ -230,9 +242,13 @@ test('the corner grip is an arc concentric with the corner, on the edge line the
 test('right to left: the arc mirrors into the bottom-left corner', async () => {
   const screen = await render(
     <div dir="rtl" className="flex">
-      <Resizable defaultWidth={240} defaultHeight={160} className="rounded-[20px] border">
+      <Sized
+        width={{ defaultValue: 240 }}
+        height={{ defaultValue: 160 }}
+        className="rounded-[20px] border"
+      >
         내용
-      </Resizable>
+      </Sized>
     </div>,
   );
   const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
@@ -252,9 +268,13 @@ test('right to left: the arc mirrors into the bottom-left corner', async () => {
 
 test('the arc takes the pointer within 12px of it everywhere along it, and nowhere else', async () => {
   const screen = await render(
-    <Resizable defaultWidth={240} defaultHeight={160} className="rounded-[20px] border">
+    <Sized
+      width={{ defaultValue: 240 }}
+      height={{ defaultValue: 160 }}
+      className="rounded-[20px] border"
+    >
       내용
-    </Resizable>,
+    </Sized>,
   );
   const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
   await expect.poll(() => arcOf(grip())).not.toBeNull();
@@ -294,17 +314,19 @@ test('controlled: the size moves only when the app writes it back', async () => 
   function Controlled({ accept }: { accept: boolean }) {
     const [width, setWidth] = useState(200);
     return (
-      <Resizable
+      <Sized
         direction="horizontal"
-        width={width}
-        onWidthChange={(next) => {
-          onWidthChange(next);
-          if (accept) setWidth(next);
+        width={{
+          value: width,
+          onValueChange: (next) => {
+            onWidthChange(next);
+            if (accept) setWidth(next);
+          },
         }}
         className="h-24"
       >
         {width}
-      </Resizable>
+      </Sized>
     );
   }
 
@@ -327,15 +349,13 @@ test('dragging an edge follows the pointer, writes the DOM each frame and report
   skipWithoutCdp(context);
   const onWidthChange = vi.fn();
   const screen = await render(
-    <Resizable
+    <Sized
       direction="horizontal"
-      defaultWidth={200}
-      style={{ maxWidth: 260 }}
-      onWidthChange={onWidthChange}
+      width={{ defaultValue: 200, max: 260, onValueChange: onWidthChange }}
       className="h-24"
     >
       내용
-    </Resizable>,
+    </Sized>,
   );
   const handle = () => screen.getByRole('separator', { name: '너비' }).element();
   const start = centerOf(handle());
@@ -366,14 +386,13 @@ test('Escape during a drag restores the starting size; a double click resets', a
   skipWithoutCdp(context);
   const onWidthChange = vi.fn();
   const screen = await render(
-    <Resizable
+    <Sized
       direction="horizontal"
-      defaultWidth={200}
-      onWidthChange={onWidthChange}
+      width={{ defaultValue: 200, onValueChange: onWidthChange }}
       className="h-24"
     >
       내용
-    </Resizable>,
+    </Sized>,
   );
   const handle = () => screen.getByRole('separator', { name: '너비' }).element();
   const start = centerOf(handle());
@@ -399,9 +418,9 @@ test('Escape during a drag restores the starting size; a double click resets', a
 test('the grip drags both axes at once with the mouse, and by touch', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
-    <Resizable defaultWidth={200} defaultHeight={120}>
+    <Sized width={{ defaultValue: 200 }} height={{ defaultValue: 120 }}>
       내용
-    </Resizable>,
+    </Sized>,
   );
   const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
   await expect.poll(() => arcOf(grip())).not.toBeNull();
@@ -425,9 +444,9 @@ test('right to left: the handle sits on the left, the arrow away from the box wi
   skipWithoutCdp(context);
   const screen = await render(
     <div dir="rtl" className="flex">
-      <Resizable direction="horizontal" defaultWidth={200} className="h-24">
+      <Sized direction="horizontal" width={{ defaultValue: 200 }} className="h-24">
         내용
-      </Resizable>
+      </Sized>
     </div>,
   );
   const handle = () => screen.getByRole('separator', { name: '너비' }).element();
@@ -449,9 +468,13 @@ test('without a size the element keeps its natural size until resized, and Enter
   const onWidthChange = vi.fn();
   const screen = await render(
     <div className="w-72">
-      <Resizable direction="horizontal" onWidthChange={onWidthChange} className="h-24 w-full">
+      <Sized
+        direction="horizontal"
+        width={{ onValueChange: onWidthChange }}
+        className="h-24 w-full"
+      >
         내용
-      </Resizable>
+      </Sized>
     </div>,
   );
   const handle = screen.getByRole('separator', { name: '너비' });
@@ -467,11 +490,11 @@ test('without a size the element keeps its natural size until resized, and Enter
   expect(onWidthChange.mock.calls).toEqual([[272], [288]]);
 });
 
-test('CSS min and max in px bound the keys like the props do', async () => {
+test('min and max bound the keys and Home and End go to them', async () => {
   const screen = await render(
-    <Resizable direction="vertical" defaultHeight={100} className="max-h-32 min-h-20 w-40">
+    <Sized direction="vertical" height={{ defaultValue: 100, min: 80, max: 128 }} className="w-40">
       내용
-    </Resizable>,
+    </Sized>,
   );
   const handle = screen.getByRole('separator', { name: '높이' });
   await expect.element(handle).toHaveAttribute('aria-valuemin', '80');
@@ -486,14 +509,14 @@ test('CSS min and max in px bound the keys like the props do', async () => {
 
 test('asChild resizes the child itself and puts the handle inside it; a declared Handle replaces the default', async () => {
   const screen = await render(
-    <Resizable asChild direction="vertical" defaultHeight={120}>
+    <Sized asChild direction="vertical" height={{ defaultValue: 120 }}>
       <section aria-label="패널" className="w-48">
         내용
         <Resizable.Handle asChild className="bg-red-500">
           <div data-testid="custom" />
         </Resizable.Handle>
       </section>
-    </Resizable>,
+    </Sized>,
   );
   const section = screen.getByRole('region', { name: '패널' }).element() as HTMLElement;
   expect(section.hasAttribute('data-resizable')).toBe(true);
@@ -517,9 +540,9 @@ test('disabled handles leave the tab order and ignore the pointer', async (conte
   const screen = await render(
     <>
       <button type="button">앞</button>
-      <Resizable direction="horizontal" disabled defaultWidth={200} className="h-24">
+      <Sized direction="horizontal" disabled width={{ defaultValue: 200 }} className="h-24">
         내용
-      </Resizable>
+      </Sized>
       <button type="button">뒤</button>
     </>,
   );
@@ -546,9 +569,9 @@ test('dragging the grip inside a pressable card does not press the card', async 
     <IdsProvider theme={testTheme}>
       <Card onClick={onClick}>
         <Card.Title>카드</Card.Title>
-        <Resizable defaultWidth={160} defaultHeight={80}>
+        <Sized width={{ defaultValue: 160 }} height={{ defaultValue: 80 }}>
           내용
-        </Resizable>
+        </Sized>
       </Card>
     </IdsProvider>,
   );
@@ -562,24 +585,19 @@ test('dragging the grip inside a pressable card does not press the card', async 
   expect(onClick).not.toHaveBeenCalled();
 });
 
-test('bounds written in style are read again when only the style changes', async () => {
-  const screen = await render(
-    <Resizable direction="horizontal" defaultWidth={200} style={{ maxWidth: 300 }} className="h-24">
+test('dev warnings: a minimum above the maximum; a Handle outside Resizable throws', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  await render(
+    <Sized width={{ min: 300, max: 200 }} height={{ min: 10, max: 5 }}>
       내용
-    </Resizable>,
+    </Sized>,
   );
-  const handle = screen.getByRole('separator', { name: '너비' });
-  await expect.element(handle).toHaveAttribute('aria-valuemax', '300');
+  await nextFrame();
+  expect(warn.mock.calls.map(([message]) => String(message))).toEqual([
+    expect.stringMatching(/Resizable: the minimum width \(300px\) is greater than the maximum/),
+    expect.stringMatching(/Resizable: the minimum height \(10px\) is greater than the maximum/),
+  ]);
 
-  await screen.rerender(
-    <Resizable direction="horizontal" defaultWidth={200} style={{ maxWidth: 240 }} className="h-24">
-      내용
-    </Resizable>,
-  );
-  await expect.element(handle).toHaveAttribute('aria-valuemax', '240');
-});
-
-test('a Handle outside Resizable throws', async () => {
   expect(() => renderToString(<Resizable.Handle />)).toThrow(
     /\[IDS\] Resizable\.Handle must be rendered inside Resizable/,
   );
