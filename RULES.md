@@ -450,7 +450,7 @@ changes it.
   on the block's own elements (a wrapping `<div>`, a plain heading or paragraph), never on an IDS
   component or part, and they never set a color, border, background, radius, shadow or `style`.
   A line is a `Divider`, a surface a `Card` or an `Item`, muted text a component's `Description`
-  part.
+  part. A block never styles an IDS component through its `data-*` attributes.
 - A block picks `solid`, `outline` or `soft` and never `ghost`, except for the buttons inside a
   bar that already draws the surface (a toolbar `Card`), which stay `ghost`. A text link (in running text, or
   a "forgot password" or "sign up" line) is `Link`; a link in a table cell or a footer list is
@@ -815,6 +815,16 @@ it is built: no `gap-*` test on `className` to stop joining a Group, no `min-wid
 `style` to bound a Resizable. A behaviour the app needs is a prop, a part or composition (a
 layout `<div>` inside a ButtonGroup spaces its buttons).
 
+**`data-*` attributes are IDS's own styling hook, not public API.** Component code keeps using
+them, and they stay in the DOM, but nothing documents or promises them. An app reads a
+component's state at runtime: the value trio and `on*Change` callbacks, or a state function on
+`className` or `style` (`className={(state) => …}`) where the component has one, which, like
+`className` itself, is for custom design only. A README has no data attribute table: its
+"상태" section lists those runtime ways. Stories and blocks never style an IDS component with
+`data-[…]:`, `data-x:`, `group-data-` or `peer-data-` variants; a `custom-design` story uses the
+state function. State an app plausibly needs and cannot read at runtime is a decision for a new
+API (a state function or a callback), not a data attribute to document.
+
 **The parent sizes and places a component.** Stories, READMEs and blocks give no `className` or
 `style` to an IDS component or part. The one exception is a story that shows a new design built
 on IDS, tagged `tags: ['custom-design']`.
@@ -877,19 +887,24 @@ const table = useDataTable({
   data,
   columns,
   sorting: { multiple: true, defaultValue: [{ id: 'name', desc: false }] },
-  selection: { value: selected, onValueChange: setSelected },
+  selection: { multiple: true },
   pagination: { manual: true, rowCount, defaultValue: { pageIndex: 0, pageSize: 20 } },
 });
 
-<DataTable table={table} variant="outline" size="tiny" className="h-96">
-  <DataTable.Toolbar />
-  <DataTable.Content />
-  <DataTable.Pagination />
-</DataTable>
+<div className="flex h-96 flex-col">
+  <DataTable table={table} value={selected} onValueChange={setSelected} variant="outline" size="tiny">
+    <DataTable.Toolbar />
+    <DataTable.Content />
+    <DataTable.Pagination />
+  </DataTable>
+</div>
 ```
 
+The value a form submits (the selected rows) sits on the root as its trio, so a `Field` binds it
+like any input; view state (sorting, pagination, column sizes) stays in the hook.
+
 Ark UI's `useX` with `X.RootProvider`, TanStack Table's `useReactTable` and Mantine React Table's
-`<MantineReactTable table={table} />` work the same way. Sorting, selection, pagination, editor
+`<MantineReactTable table={table} />` work the same way. Sorting, pagination, editor
 extensions and scheduler views belong in a hook; a value trio and two options do not.
 
 **Props in Flutter.** ids_flutter widgets follow the same rule in Flutter's own idiom. The design

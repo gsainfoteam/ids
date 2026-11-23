@@ -76,7 +76,6 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 <Spinner className={(state) => (state.announced ? 'text-primary' : undefined)} />
 ```
 
-- svg에는 `data-spinner` 와, 크기가 정해졌으면 `data-size` 가 붙습니다.
 
 ## 속성
 

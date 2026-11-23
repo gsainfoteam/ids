@@ -150,23 +150,6 @@ import { Toaster } from '@gsainfoteam/ids-react';
 <Toaster hotkey="Mod+Shift+Y" />
 ```
 
-## 상태
-
-| 속성                 | 붙는 곳                                  |
-| -------------------- | ---------------------------------------- |
-| `data-toaster`       | 알림 영역을 품은 live region             |
-| `data-placement`     | 알림 영역                                |
-| `data-expanded`      | 펼쳐진 알림 영역과 알림                  |
-| `data-front`         | 맨 앞 알림                               |
-| `data-visible`       | `max` 안에 드는 알림                     |
-| `data-loading`       | loading 알림                             |
-| `data-swiping`       | 밀고 있는 알림                           |
-| `data-swipe-out`     | 밀려 나가는 알림(`x` / `y`)              |
-| `data-ending-style`  | 닫히는 애니메이션 중인 알림              |
-| `data-color-scheme`  | 알림의 의미                              |
-
-- 알림마다 `--toasts-before`(앞에 있는 알림 수), `--offset`(펼쳤을 때의 거리), `--initial-height`(제 높이)가, 영역에 `--front-toast-height`, `--gap` 이 붙습니다.
-
 ## 알아둘 것
 
 - 서버 렌더 결과에는 아무것도 없습니다. 알림 영역은 브라우저에서 그려지고, 알림이 있는 동안만 top layer 에 올라옵니다.

@@ -111,7 +111,7 @@ import { Alert } from '@gsainfoteam/ids-react';
 <Alert className={(state) => (state.dismissible ? 'pe-2' : undefined)} />
 ```
 
-- 루트에 `data-alert`, `data-color-scheme`, `data-variant`, `data-dismissible`, 닫히는 동안 `data-ending-style` 이 붙습니다.
+- 열림은 `open` / `onOpenChange` 로 읽습니다.
 
 ## 속성
 

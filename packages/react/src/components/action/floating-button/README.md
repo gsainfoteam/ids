@@ -103,7 +103,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 | `asChild`               | 자식 요소 하나(링크)를 버튼으로 그린다                                  |
 | `focusableWhenDisabled` | 비활성이어도 포커스와 탭 순서를 지킨다                                  |
 | `ref`                   | 실제 `button`, `asChild` 면 자식 요소                                   |
-| 그 외                   | Button 과 같다 (상태 함수 prop, `data-*`, `onInteractionChange`)        |
+| 그 외                   | Button 과 같다 (상태 함수 prop, `onInteractionChange`)        |
 
 ## 알아둘 것
 

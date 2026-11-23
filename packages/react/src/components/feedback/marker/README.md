@@ -90,7 +90,7 @@ Marker 는 접지 않습니다. 추론이나 도구 호출처럼 펼쳐 보는 �
 | `size`    | 넘긴 크기      |
 | `pending` | 진행 중이다    |
 
-- 요소에는 `data-marker`, `data-variant`, `data-size`, 진행 중이면 `data-pending` 이 붙습니다.
+- 상태는 `className`, `style` 에 넘긴 상태 함수로 읽습니다. IDS 위에 새 디자인을 얹을 때만 씁니다.
 
 ## 속성
 
