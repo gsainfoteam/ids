@@ -71,12 +71,12 @@ type Period = 'day' | 'week' | 'month';
 
 ```tsx
 <SegmentedControl size="tiny" />              // standard(기본) / tiny. 생략하면 Field 를 따른다
-<SegmentedControl stretch />                  // 부모 폭을 채우고 칸이 폭을 나눠 갖는다
+<SegmentedControl className="w-full *:flex-1" />  // 부모 폭을 채우고 칸이 폭을 나눠 갖는다
 <SegmentedControl orientation="vertical" />   // horizontal(기본) / vertical. aria-orientation 도 붙는다
 ```
 
 - 트랙은 다른 컨트롤과 같은 높이입니다. 칸이 8px 낮고 트랙이 `concentric-p-1` 로 둘러쌉니다.
-- `stretch` 가 아니면 트랙은 내용 폭만큼만 차지합니다.
+- 가로 트랙은 내용 폭만큼만 차지합니다. `w-full` 은 트랙을 넓히고, `*:flex-1` 은 칸이 그 폭을 똑같이 나누게 합니다.
 
 ## 모양
 
@@ -139,7 +139,6 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `onValueChange`          | 사용자가 고를 때                                      |
 | `name` / `form`          | 칸의 라디오가 함께 쓰는 이름과 `form` 속성            |
 | `size`                   | `standard`(기본) / `tiny`                             |
-| `stretch`                | 부모 폭을 채운다. 기본 `false`                        |
 | `orientation`            | `horizontal`(기본) / `vertical`                       |
 | `disabled`               | 모든 칸 비활성                                        |
 | `readOnly`               | 선택을 바꿀 수 없다                                   |

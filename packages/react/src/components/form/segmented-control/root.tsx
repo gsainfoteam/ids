@@ -34,7 +34,6 @@ export type SegmentedControlProps<T extends string> = Omit<
   form?: string;
   orientation?: SegmentedControlOrientation;
   size?: IdsSize;
-  stretch?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
   required?: boolean;
@@ -69,7 +68,6 @@ export function SegmentedControlRoot<T extends string>({
   form,
   orientation = 'horizontal',
   size,
-  stretch = false,
   disabled = false,
   readOnly = false,
   required = false,
@@ -93,7 +91,7 @@ export function SegmentedControlRoot<T extends string>({
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const ariaInvalid = rest['aria-invalid'] ?? invalid;
   const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
-  const styles = segmentedControlStyle({ orientation, stretch, size: resolvedSize });
+  const styles = segmentedControlStyle({ orientation, size: resolvedSize });
 
   const items =
     typeof children === 'function'

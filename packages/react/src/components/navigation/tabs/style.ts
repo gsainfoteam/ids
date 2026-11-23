@@ -28,7 +28,6 @@ export const tabsStyle = tv({
       secondary: { list: 'scheme-secondary' },
       tertiary: { list: 'scheme-tertiary' },
     } satisfies Record<TabsColorScheme, object>,
-    stretch: { true: {}, false: {} },
     orientation: {
       horizontal: {
         root: 'flex-col',
@@ -88,7 +87,6 @@ export const tabsStyle = tv({
     } satisfies Record<IdsSize, object>,
   },
   compoundVariants: [
-    { orientation: 'horizontal', stretch: true, class: { list: '[&>[role=tab]]:flex-1' } },
     {
       variant: 'underline',
       orientation: 'horizontal',
@@ -124,7 +122,6 @@ export const tabsStyle = tv({
     {
       variant: 'segmented',
       orientation: 'horizontal',
-      stretch: false,
       class: { list: 'w-fit' },
     },
     { variant: 'segmented', orientation: 'vertical', class: { list: 'self-start' } },

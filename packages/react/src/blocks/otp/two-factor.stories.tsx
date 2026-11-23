@@ -43,7 +43,7 @@ export const PC: Story = {
 
         <Card.Content>
           <Tabs defaultValue="app" variant="segmented" className="gap-5">
-            <Tabs.List aria-label="인증 방법" stretch>
+            <Tabs.List aria-label="인증 방법" className="w-full *:flex-1">
               <Tabs.Trigger value="app">
                 <DevicePhoneMobileIcon />
                 인증 앱

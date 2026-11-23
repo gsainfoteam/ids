@@ -57,6 +57,21 @@ const tabs = () => document.querySelectorAll<HTMLElement>('[role="tab"]');
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Tabs defaultValue="overview">
+      <Tabs.List aria-label="상품 정보">
+        <Tabs.Trigger value="overview">개요</Tabs.Trigger>
+        <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
+        <Tabs.Trigger value="qna">Q&A</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="overview">가볍고 오래 가는 무선 키보드입니다.</Tabs.Content>
+      <Tabs.Content value="reviews">리뷰 128개, 평균 4.6점.</Tabs.Content>
+      <Tabs.Content value="qna">질문 12개에 모두 답했습니다.</Tabs.Content>
+    </Tabs>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -169,9 +184,9 @@ export const Gallery: Story = {
             <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
           </Tabs>
         </Showcase.Row>
-        <Showcase.Row label="pill stretch" className="w-full max-w-md">
+        <Showcase.Row label="pill *:flex-1" className="w-full max-w-md">
           <Tabs defaultValue="new" variant="pill" className="w-full">
-            <Tabs.List aria-label="정렬" stretch>
+            <Tabs.List aria-label="정렬" className="*:flex-1">
               <Tabs.Trigger value="new">최신</Tabs.Trigger>
               <Tabs.Trigger value="popular">인기</Tabs.Trigger>
               <Tabs.Trigger value="comments">댓글 많은</Tabs.Trigger>
@@ -181,9 +196,9 @@ export const Gallery: Story = {
             <Tabs.Content value="comments">댓글 많은 글</Tabs.Content>
           </Tabs>
         </Showcase.Row>
-        <Showcase.Row label="segmented stretch" className="w-full max-w-md">
+        <Showcase.Row label="segmented w-full *:flex-1" className="w-full max-w-md">
           <Tabs defaultValue="qr" variant="segmented" className="w-full">
-            <Tabs.List aria-label="로그인 방법" stretch>
+            <Tabs.List aria-label="로그인 방법" className="w-full *:flex-1">
               <Tabs.Trigger value="qr">QR 코드</Tabs.Trigger>
               <Tabs.Trigger value="password">비밀번호</Tabs.Trigger>
             </Tabs.List>
@@ -196,7 +211,236 @@ export const Gallery: Story = {
   ),
 };
 
+export const SelectOnlyOnEnter: Story = {
+  render: (args) => (
+    <Tabs defaultValue="inbox" activationMode="manual" onValueChange={args.onValueChange}>
+      <Tabs.List aria-label="메일함">
+        <Tabs.Trigger value="inbox">받은 편지</Tabs.Trigger>
+        <Tabs.Trigger value="sent">보낸 편지</Tabs.Trigger>
+        <Tabs.Trigger value="spam">스팸</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="inbox">새 메일 3통</Tabs.Content>
+      <Tabs.Content value="sent">보낸 메일 12통</Tabs.Content>
+      <Tabs.Content value="spam">스팸 없음</Tabs.Content>
+    </Tabs>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`activationMode="manual"` 이면 화살표는 포커스만 옮기고 Enter 나 Space 가 탭을 고릅니다. 내용을 그리는 데 오래 걸릴 때 씁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('tab', { name: '보낸 편지' })).toHaveFocus();
+    await expect(canvas.getByRole('tab', { name: '보낸 편지' })).toHaveAttribute(
+      'aria-selected',
+      'false',
+    );
+    await expect(args.onValueChange).not.toHaveBeenCalled();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.getByRole('tab', { name: '보낸 편지' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('보낸 메일 12통');
+    await userEvent.keyboard('{ArrowRight} ');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('spam');
+  },
+};
+
+export const PlaceTabsBesideTheContent: Story = {
+  render: () => (
+    <Tabs defaultValue="profile" orientation="vertical">
+      <Tabs.List aria-label="설정">
+        <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
+        <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
+        <Tabs.Trigger value="account">계정</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="profile">이름과 사진을 바꿉니다.</Tabs.Content>
+      <Tabs.Content value="alerts">알림을 받을 곳을 고릅니다.</Tabs.Content>
+      <Tabs.Content value="account">비밀번호를 바꾸거나 탈퇴합니다.</Tabs.Content>
+    </Tabs>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '세로 탭은 목록이 앞에, 내용이 옆에 놓이고 위아래 화살표로 옮깁니다. 좌우 화살표는 가로채지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical');
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('tab', { name: '프로필' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(canvas.getByRole('tab', { name: '알림' })).toHaveFocus();
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('알림을 받을 곳을 고릅니다.');
+    await userEvent.keyboard('{ArrowUp}{ArrowUp}');
+    await expect(canvas.getByRole('tab', { name: '계정' })).toHaveFocus();
+  },
+};
+
+export const SwitchTabsFromOutside: Story = {
+  render: function Render() {
+    const [tab, setTab] = useState<'profile' | 'alerts'>('profile');
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Tabs value={tab} onValueChange={setTab}>
+          <Tabs.List aria-label="설정">
+            <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
+            <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content value="profile">이름과 사진</Tabs.Content>
+          <Tabs.Content value="alerts">알림 받을 곳</Tabs.Content>
+        </Tabs>
+        <Button variant="outline" onClick={() => setTab('alerts')}>
+          알림 설정으로
+        </Button>
+        <output aria-label="탭 값">{tab}</output>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`value` 와 `onValueChange` 로 바깥에서 탭을 바꿉니다. `useState` 의 타입이 탭 값의 타입이 되어, 없는 값을 주면 컴파일 오류입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '알림 설정으로' }));
+    await expect(canvas.getByRole('tab', { name: '알림' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await userEvent.click(canvas.getByRole('tab', { name: '프로필' }));
+    await expect(canvas.getByLabelText('탭 값')).toHaveTextContent('profile');
+  },
+};
+
+export const SpreadTabsAcrossTheWidth: Story = {
+  render: () => (
+    <div className="flex w-full max-w-md flex-col gap-6">
+      <Tabs defaultValue="new" variant="pill">
+        <Tabs.List aria-label="정렬" className="*:flex-1">
+          <Tabs.Trigger value="new">최신</Tabs.Trigger>
+          <Tabs.Trigger value="popular">인기</Tabs.Trigger>
+          <Tabs.Trigger value="comments">댓글 많은</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="new">최신 글</Tabs.Content>
+        <Tabs.Content value="popular">인기 글</Tabs.Content>
+        <Tabs.Content value="comments">댓글 많은 글</Tabs.Content>
+      </Tabs>
+      <Tabs defaultValue="qr" variant="segmented">
+        <Tabs.List aria-label="로그인 방법" className="w-full *:flex-1">
+          <Tabs.Trigger value="qr">QR 코드</Tabs.Trigger>
+          <Tabs.Trigger value="password">비밀번호</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="qr">휴대폰으로 QR 코드를 비춰요</Tabs.Content>
+        <Tabs.Content value="password">이메일과 비밀번호로 로그인해요</Tabs.Content>
+      </Tabs>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '카드 폭에 맞춘 두세 칸짜리 탭은 `Tabs.List` 에 `className="*:flex-1"` 을 주어 탭이 목록 폭을 똑같이 나누게 합니다. 내용 폭만 차지하는 segmented 는 `className="w-full *:flex-1"` 로 트랙부터 폭을 채웁니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    for (const name of ['정렬', '로그인 방법']) {
+      const list = canvas.getByRole('tablist', { name });
+      const widths = [...list.querySelectorAll('[role="tab"]')].map(
+        (tab) => tab.getBoundingClientRect().width,
+      );
+      for (const width of widths) await expect(Math.abs(width - widths[0]!)).toBeLessThan(1);
+    }
+  },
+};
+
+export const KeepHiddenPanelsMounted: Story = {
+  render: () => (
+    <Tabs defaultValue="write" variant="enclosed">
+      <Tabs.List aria-label="댓글">
+        <Tabs.Trigger value="write">쓰기</Tabs.Trigger>
+        <Tabs.Trigger value="preview">미리보기</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="write" forceMount className="p-1">
+        <TextField
+          aria-label="댓글"
+          placeholder="댓글을 남겨 주세요"
+          data-1p-ignore
+          data-lpignore="true"
+        />
+      </Tabs.Content>
+      <Tabs.Content value="preview" forceMount>
+        미리보기에 들어갈 글은 페이지 안 찾기로도 찾을 수 있습니다.
+      </Tabs.Content>
+    </Tabs>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '고르지 않은 내용은 기본으로 그리지 않습니다. `forceMount` 를 주면 숨긴 채 남겨서 입력한 값과 스크롤이 그대로 있고, 브라우저의 페이지 안 찾기가 숨은 글을 찾으면 그 탭을 엽니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByRole('textbox', { name: '댓글' }), '좋아요');
+    await userEvent.click(canvas.getByRole('tab', { name: '미리보기' }));
+    await expect(canvas.getByRole('textbox', { name: '댓글', hidden: true })).not.toBeVisible();
+    await userEvent.click(canvas.getByRole('tab', { name: '쓰기' }));
+    await expect(canvas.getByRole('textbox', { name: '댓글' })).toHaveValue('좋아요');
+  },
+};
+
+export const NarrowTheTabValueType: Story = {
+  render: function Render() {
+    const [section, setSection] = useState<'docs' | 'api'>('docs');
+
+    return (
+      <Tabs value={section} onValueChange={setSection}>
+        {({ List, Trigger, Content }) => (
+          <>
+            <List aria-label="문서">
+              <Trigger value="docs">문서</Trigger>
+              <Trigger value="api">API</Trigger>
+            </List>
+            <Content value="docs">시작하기와 가이드</Content>
+            <Content value="api">모든 컴포넌트의 속성</Content>
+          </>
+        )}
+      </Tabs>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'children 을 함수로 쓰면 탭 값의 타입으로 좁힌 `List`, `Trigger`, `Content` 를 받습니다. 없는 `value` 는 컴파일 오류입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('tab', { name: 'API' }));
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('모든 컴포넌트의 속성');
+    await expect(tabs()).toHaveLength(2);
+  },
+};
+
 export const Keyboard: Story = {
+  tags: ['verification'],
   render: (args) => (
     <Tabs defaultValue="overview" onValueChange={args.onValueChange}>
       <Tabs.List aria-label="상품 정보">
@@ -249,82 +493,8 @@ export const Keyboard: Story = {
   },
 };
 
-export const ManualActivation: Story = {
-  render: (args) => (
-    <Tabs defaultValue="inbox" activationMode="manual" onValueChange={args.onValueChange}>
-      <Tabs.List aria-label="메일함">
-        <Tabs.Trigger value="inbox">받은 편지</Tabs.Trigger>
-        <Tabs.Trigger value="sent">보낸 편지</Tabs.Trigger>
-        <Tabs.Trigger value="spam">스팸</Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content value="inbox">새 메일 3통</Tabs.Content>
-      <Tabs.Content value="sent">보낸 메일 12통</Tabs.Content>
-      <Tabs.Content value="spam">스팸 없음</Tabs.Content>
-    </Tabs>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '`activationMode="manual"` 이면 화살표는 포커스만 옮기고 Enter 나 Space 가 탭을 고릅니다. 내용을 그리는 데 오래 걸릴 때 씁니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.tab();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(canvas.getByRole('tab', { name: '보낸 편지' })).toHaveFocus();
-    await expect(canvas.getByRole('tab', { name: '보낸 편지' })).toHaveAttribute(
-      'aria-selected',
-      'false',
-    );
-    await expect(args.onValueChange).not.toHaveBeenCalled();
-    await userEvent.keyboard('{Enter}');
-    await expect(canvas.getByRole('tab', { name: '보낸 편지' })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('보낸 메일 12통');
-    await userEvent.keyboard('{ArrowRight} ');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('spam');
-  },
-};
-
-export const Vertical: Story = {
-  render: () => (
-    <Tabs defaultValue="profile" orientation="vertical">
-      <Tabs.List aria-label="설정">
-        <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
-        <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
-        <Tabs.Trigger value="account">계정</Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content value="profile">이름과 사진을 바꿉니다.</Tabs.Content>
-      <Tabs.Content value="alerts">알림을 받을 곳을 고릅니다.</Tabs.Content>
-      <Tabs.Content value="account">비밀번호를 바꾸거나 탈퇴합니다.</Tabs.Content>
-    </Tabs>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '세로 탭은 목록이 앞에, 내용이 옆에 놓이고 위아래 화살표로 옮깁니다. 좌우 화살표는 가로채지 않습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await expect(canvas.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical');
-    await userEvent.tab();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(canvas.getByRole('tab', { name: '프로필' })).toHaveFocus();
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(canvas.getByRole('tab', { name: '알림' })).toHaveFocus();
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('알림을 받을 곳을 고릅니다.');
-    await userEvent.keyboard('{ArrowUp}{ArrowUp}');
-    await expect(canvas.getByRole('tab', { name: '계정' })).toHaveFocus();
-  },
-};
-
 export const RightToLeft: Story = {
+  tags: ['verification'],
   render: () => (
     <div dir="rtl">
       <Tabs defaultValue="one">
@@ -355,118 +525,8 @@ export const RightToLeft: Story = {
   },
 };
 
-export const Controlled: Story = {
-  render: function Render() {
-    const [tab, setTab] = useState<'profile' | 'alerts'>('profile');
-
-    return (
-      <div className="flex flex-col items-start gap-3">
-        <Tabs value={tab} onValueChange={setTab}>
-          <Tabs.List aria-label="설정">
-            <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
-            <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
-          </Tabs.List>
-          <Tabs.Content value="profile">이름과 사진</Tabs.Content>
-          <Tabs.Content value="alerts">알림 받을 곳</Tabs.Content>
-        </Tabs>
-        <Button variant="outline" onClick={() => setTab('alerts')}>
-          알림 설정으로
-        </Button>
-        <output aria-label="탭 값">{tab}</output>
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '`value` 와 `onValueChange` 로 바깥에서 탭을 바꿉니다. `useState` 의 타입이 탭 값의 타입이 되어, 없는 값을 주면 컴파일 오류입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '알림 설정으로' }));
-    await expect(canvas.getByRole('tab', { name: '알림' })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
-    await userEvent.click(canvas.getByRole('tab', { name: '프로필' }));
-    await expect(canvas.getByLabelText('탭 값')).toHaveTextContent('profile');
-  },
-};
-
-export const ForceMount: Story = {
-  render: () => (
-    <Tabs defaultValue="write" variant="enclosed">
-      <Tabs.List aria-label="댓글">
-        <Tabs.Trigger value="write">쓰기</Tabs.Trigger>
-        <Tabs.Trigger value="preview">미리보기</Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content value="write" forceMount className="p-1">
-        <TextField
-          aria-label="댓글"
-          placeholder="댓글을 남겨 주세요"
-          data-1p-ignore
-          data-lpignore="true"
-        />
-      </Tabs.Content>
-      <Tabs.Content value="preview" forceMount>
-        미리보기에 들어갈 글은 페이지 안 찾기로도 찾을 수 있습니다.
-      </Tabs.Content>
-    </Tabs>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '고르지 않은 내용은 기본으로 그리지 않습니다. `forceMount` 를 주면 숨긴 채 남겨서 입력한 값과 스크롤이 그대로 있고, 브라우저의 페이지 안 찾기가 숨은 글을 찾으면 그 탭을 엽니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByRole('textbox', { name: '댓글' }), '좋아요');
-    await userEvent.click(canvas.getByRole('tab', { name: '미리보기' }));
-    await expect(canvas.getByRole('textbox', { name: '댓글', hidden: true })).not.toBeVisible();
-    await userEvent.click(canvas.getByRole('tab', { name: '쓰기' }));
-    await expect(canvas.getByRole('textbox', { name: '댓글' })).toHaveValue('좋아요');
-  },
-};
-
-export const TypedParts: Story = {
-  render: function Render() {
-    const [section, setSection] = useState<'docs' | 'api'>('docs');
-
-    return (
-      <Tabs value={section} onValueChange={setSection}>
-        {({ List, Trigger, Content }) => (
-          <>
-            <List aria-label="문서">
-              <Trigger value="docs">문서</Trigger>
-              <Trigger value="api">API</Trigger>
-            </List>
-            <Content value="docs">시작하기와 가이드</Content>
-            <Content value="api">모든 컴포넌트의 속성</Content>
-          </>
-        )}
-      </Tabs>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'children 을 함수로 쓰면 탭 값의 타입으로 좁힌 `List`, `Trigger`, `Content` 를 받습니다. 없는 `value` 는 컴파일 오류입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('tab', { name: 'API' }));
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('모든 컴포넌트의 속성');
-    await expect(tabs()).toHaveLength(2);
-  },
-};
-
 export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
   render: function Render() {
     const [shown, setShown] = useState(false);
 

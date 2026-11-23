@@ -27,13 +27,9 @@ export const segmentedControlStyle = tv({
   },
   variants: {
     orientation: {
-      horizontal: { root: 'flex-row', item: 'justify-center' },
+      horizontal: { root: 'w-fit flex-row', item: 'justify-center' },
       vertical: { root: 'flex-col', item: 'justify-start text-start' },
     } satisfies Record<SegmentedControlOrientation, object>,
-    stretch: {
-      true: { root: 'w-full' },
-      false: { root: 'w-fit' },
-    },
     size: {
       standard: {
         item: [
@@ -51,6 +47,5 @@ export const segmentedControlStyle = tv({
       },
     } satisfies Record<IdsSize, object>,
   },
-  compoundVariants: [{ orientation: 'horizontal', stretch: true, class: { item: 'flex-1' } }],
-  defaultVariants: { orientation: 'horizontal', stretch: false, size: 'standard' },
+  defaultVariants: { orientation: 'horizontal', size: 'standard' },
 });

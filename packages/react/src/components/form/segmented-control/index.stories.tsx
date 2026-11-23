@@ -31,7 +31,7 @@ const meta = {
   argTypes: {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
-    stretch: { control: 'boolean' },
+    className: { control: 'text' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     required: { control: 'boolean' },
@@ -92,7 +92,10 @@ export const Gallery: Story = {
         />
       </Showcase.Section>
 
-      <Showcase.Section title="Content">
+      <Showcase.Section
+        title="Content"
+        description='트랙은 내용 폭만큼만 차지합니다. className="w-full *:flex-1" 이면 부모 폭을 채우고 칸이 폭을 똑같이 나눠 갖습니다.'
+      >
         <Showcase.Row label="icon + text">
           <SegmentedControl defaultValue="list" aria-label="보기">
             <SegmentedControl.Item value="list">
@@ -122,9 +125,13 @@ export const Gallery: Story = {
             </SegmentedControl.Item>
           </SegmentedControl>
         </Showcase.Row>
-        <Showcase.Row label="stretch">
+        <Showcase.Row label="w-full *:flex-1">
           <div className="w-80">
-            <SegmentedControl<Period> stretch defaultValue="day" aria-label="늘인 기간">
+            <SegmentedControl<Period>
+              className="w-full *:flex-1"
+              defaultValue="day"
+              aria-label="폭을 채운 기간"
+            >
               {({ Item }) =>
                 periods.map((period) => (
                   <Item key={period.value} value={period.value}>
