@@ -101,7 +101,7 @@
 ### 문자열
 
 - 컴포넌트 코드의 한국어 리터럴, module 최상단에서 `messages`를 읽은 경우
-- 새 `t()` 키를 `internal/messages.ts`에만 넣고 `messages/en.json`의 같은 자리에 넣지 않은 경우, 키를 정렬 순서에서 벗어난 자리에 넣은 경우
+- 새 `t()` 키를 `packages/core/messages/ko.json`에만 넣고 `packages/core/messages/en.json`의 같은 자리에 넣지 않은 경우, 키를 정렬 순서에서 벗어난 자리에 넣은 경우, `pnpm codegen`으로 생성한 카탈로그를 커밋하지 않은 경우
 - 날짜, 시간, 숫자가 `locale ?? useProviderLocale() ?? default` 순서를 따르지 않는 경우
 - 개발 경고를 영어가 아닌 말로 쓰거나 catalog에 넣은 경우
 - 개발 경고에 `import.meta.env.DEV`를 쓴 경우. `isDevelopment`를 씁니다
