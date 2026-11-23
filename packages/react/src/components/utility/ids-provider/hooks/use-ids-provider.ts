@@ -7,11 +7,11 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 
 import { noop } from 'es-toolkit';
 
+import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { useInternalMediaQuery } from '../../../../hooks/use-media-query';
 import { resolveThemeVariables, type ThemeVariables } from '../lib/theme-variables';
 
@@ -66,23 +66,8 @@ function useInternalAxis<T>({
   inherited,
   setInherited,
 }: AxisOptions<T>) {
-  const [inner, setInner] = useState(defaultValue);
-  const controlled = value !== undefined;
-  const current = !owned ? inherited : controlled ? value : inner;
-
-  const latest = useRef({ current, controlled, onChange });
-  useLayoutEffect(() => {
-    latest.current = { current, controlled, onChange };
-  });
-
-  const setOwn = useCallback((next: T) => {
-    const { current, controlled, onChange } = latest.current;
-    if (Object.is(next, current)) return;
-    if (!controlled) setInner(next);
-    onChange?.(next);
-  }, []);
-
-  return [current, owned ? setOwn : setInherited] as const;
+  const [own, setOwn] = useControllableState({ value, defaultValue, onValueChange: onChange });
+  return [owned ? own : inherited, owned ? setOwn : setInherited] as const;
 }
 
 export type UseIdsProviderOptions = {

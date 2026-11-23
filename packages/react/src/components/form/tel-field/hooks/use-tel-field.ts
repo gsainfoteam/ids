@@ -18,6 +18,7 @@ import {
 
 import { isSupportedCountry } from 'libphonenumber-js/min';
 
+import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { useInternalFormReset } from '../../../../hooks/use-form-reset';
 import {
   isInvalid,
@@ -110,9 +111,13 @@ export function useInternalTelField({
   const locked = disabled || readOnly;
 
   const [chosen, setChosen] = useState<CountryCode>(defaultCountry);
-  const [stored, setStored] = useState(() => toE164(defaultValue, defaultCountry));
+  const [phone, setPhone] = useControllableState({
+    value,
+    defaultValue: toE164(defaultValue, defaultCountry),
+    onValueChange,
+  });
   const controlled = value !== undefined;
-  const current = controlled ? toE164(value, chosen) : stored;
+  const current = controlled ? toE164(phone, chosen) : phone;
   const country = separateCountry ? countryOf(current, chosen) : chosen;
   const initialDraft = (): Draft | null =>
     inNationalForm(defaultValue)
@@ -134,8 +139,7 @@ export function useInternalTelField({
         : presentPhone(current, country, format, separateCountry));
 
   const commit = (next: string) => {
-    if (!controlled) setStored(next);
-    if (next !== current) onValueChange?.(next);
+    if (next !== current) setPhone(next);
   };
 
   const emit = (next: ReadPhone) => {
@@ -151,7 +155,7 @@ export function useInternalTelField({
   }, [display]);
 
   useInternalFormReset(inputRef, () => {
-    if (!controlled) setStored(toE164(defaultValue, defaultCountry));
+    if (!controlled) setPhone(toE164(defaultValue, defaultCountry), { silent: true });
     setChosen(defaultCountry);
     setDraft(initialDraft());
     setComposition(null);
