@@ -254,11 +254,33 @@ tests and maintainers. ids_flutter's Widgetbook carries the same layers over to 
 (`packages/flutter/RULES.md`), so a change to a layer here changes it there in the same commit.
 
 1. **Basic**, first in the file and in exactly this order:
-   - `Playground`: args wired to controls, nothing else.
+   - `Playground`: every prop and part a reader would try, as a control (draft, prototyped on
+     Button, Select and Dialog):
+     - `render` takes the args and writes the tree out, so Show code and the Code tab print the
+       exact composition the controls picked. It adds no `key` and no Fragment of its own:
+       Show code prints a top-level `key` and every Fragment as `<React.Fragment>`. A value a
+       mapping gives as several elements is an array.
+     - A value a control cannot type (an icon, children, a set of parts, a `className`) is a
+       string option `mapping`ed to the JSX or class (`leadingIcon: PlusIcon`, `items: groups`,
+       `contentWidth: lg`). The JSX keeps the names a reader writes (`<PlusIcon />`, not
+       `React.forwardRef`), which `.storybook/preview.tsx` resolves for Show code.
+     - An arg that goes to a part, not the root, is named for the part (`titleText`,
+       `contentPlacement`, `fieldLabel`) and every arg sits under `table.category`: the root's
+       props by kind (`Look`, `State`, `Value`), a part's by the part (`Dialog.Content`).
+     - `controls.include` (or `exclude`) leaves out what a reader cannot set from a control, and
+       a control that only matters with another one shows with `if` (`href` with `asChild`,
+       `defaultValue` with `selectionMode`). Callbacks stay `fn()` so they reach Actions.
+     - A `default*` prop takes effect on the next mount: the reader presses Remount. Storybook's
+       `jsx.skip`, which would hide a remounting wrapper, prints the wrapper anyway (10.3.1).
    - `Usage`: the smallest real use, written inline in `render` with no `args` (a Select inside a
      `Field` with its label, a ButtonGroup of three buttons). It may carry a `play`.
    - `Gallery`: **required.** Every variant, size and state on one screen, built from the
      `Showcase` kit so all galleries read alike. Import it as `~story-kit`.
+   - `LiveCode` (draft, optional, right after `Gallery`): `liveCodeStory({ id, code,
+     description })` from `~live-code`. `code` is a Usage-sized module with real imports from
+     `@gsainfoteam/ids-react` and `@heroicons/react/*`; the reader edits it in the
+     Live code editor panel, and `LiveCodeDocsPage` puts the same editor at the top of the Docs
+     page (see Live code).
 2. **Examples**: one story per task a reader wants to do, named for that task
    (`ShowProgressWhileSaving`, `BuildASplitButton`, `GroupTogglesInAToolbar`; not `Loading`,
    `Separator` or `Mixed`). Each sets `parameters.docs.description.story`, which says what the
@@ -272,7 +294,27 @@ tests and maintainers. ids_flutter's Widgetbook carries the same layers over to 
 ```tsx
 import { Showcase } from '~story-kit';
 
-export const Playground: Story = {};
+const leadingIcons = { none: undefined, PlusIcon: <PlusIcon />, TrashIcon: <TrashIcon /> };
+
+export const Playground: StoryObj<Button.Props & { leadingIcon?: ReactNode }> = {
+  args: { leadingIcon: 'none' },
+  argTypes: {
+    leadingIcon: {
+      control: 'select',
+      options: Object.keys(leadingIcons),
+      mapping: leadingIcons,
+      table: { category: 'Content' },
+    },
+    focusableWhenDisabled: { if: { arg: 'disabled' }, table: { category: 'State' } },
+  },
+  parameters: { controls: { include: ['children', 'leadingIcon', 'variant', 'disabled'] } },
+  render: ({ leadingIcon, children, ...args }) => (
+    <Button {...args}>
+      {leadingIcon}
+      {children}
+    </Button>
+  ),
+};
 
 export const Usage: Story = {
   render: () => <Button>저장</Button>,
@@ -355,6 +397,36 @@ alone when no icon fits it. The icon comes from the set the file already imports
 `@heroicons/react/16/solid` in component stories and READMEs, `24/outline` in blocks. A
 `Menu.CheckboxItem` in a group of such items takes an icon too; a menu of only checkbox and radio
 items stays bare, since their check or dot sits at the end and marks them already.
+
+## Live code (draft)
+
+`LiveCode` stories let a reader edit a Usage-sized module and see it render, prototyped on Button,
+Select and Dialog.
+
+- **Editor.** `storybook-addon-code-editor` (Monaco, with Babel standalone evaluating the module),
+  a devDependency used only by `.storybook`, so `dist` and `.size-limit.json` do not change.
+  Monaco's files are served from `staticDirs` and load only when an editor opens.
+- **Two places.** The story's Live code editor panel, beside Controls, and the top of the Docs
+  page (`LiveCodeDocsPage` as `parameters.docs.page`): the story's canvas, then the editor. Both
+  share the code by `id`, and both preview under the theme decorator, so the toolbar's theme and
+  mode apply. A `LiveCode` story carries `tags: ['!autodocs']`, so the Docs page's Stories list
+  leaves it out.
+- **Imports.** The module imports from `@gsainfoteam/ids-react` (every export of `src/index.ts`)
+  and the four `@heroicons/react` sets, and default-exports the component to render.
+- **Types.** Monaco reads `dist/**/*.d.ts` when `pnpm build` ran before Storybook started:
+  completion lists prop values and a wrong one is an error. Without `dist`, it checks syntax only.
+- **Server-safe.** The addon reads `window` and the docs blocks read `document` when imported, so
+  `live-code.tsx` loads the addon with `import()` and the blocks through `lazy`. A `LiveCode`
+  story renders nothing on the server and then its preview on the client, so the SSR, hydration and
+  translation checks run it like any story; no tag excludes it.
+- **Tailwind.** The preview starts `@tailwindcss/browser` (pinned to the `tailwindcss` version)
+  on `tailwindcss/theme.css`, `tailwindcss/utilities.css` and `@gsainfoteam/ids-css/no-fonts.css`,
+  with no preflight, so a class the reader types (`w-[333px]`, `-rotate-2`) and an IDS utility the
+  build never saw both get CSS. It stays on until the preview reloads and builds every class in the
+  page again, in the same layers: on the Button, Select, Dialog and Card galleries, light and dark,
+  no computed style changed.
+- **Known gaps.** Opening the panel before the addon has loaded leaves it blank until another tab
+  is opened and closed. Edits live until the page reloads.
 
 ## Blocks
 
