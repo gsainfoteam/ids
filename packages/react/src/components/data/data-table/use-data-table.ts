@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import {
   useTable,
@@ -11,7 +11,12 @@ import {
   type SortingState,
 } from '@tanstack/react-table';
 
-import { dataTableFeatures, type DataTableColumnDef, type DataTableFeatures } from './features';
+import {
+  dataTableFeatures,
+  type DataTableColumnDef,
+  type DataTableFeatures,
+  type DataTableSelectionChange,
+} from './features';
 import { selectionColumn } from './selection';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 
@@ -29,7 +34,7 @@ export type DataTableSortingOptions = ValueOptions<SortingState> & {
   manual?: boolean;
 };
 
-export type DataTableSelectionOptions<TData extends RowData> = ValueOptions<RowSelectionState> & {
+export type DataTableSelectionOptions<TData extends RowData> = {
   multiple?: boolean;
   enabled?: (row: Row<DataTableFeatures, TData>) => boolean;
 };
@@ -75,11 +80,8 @@ export function useDataTable<TData extends RowData>({
     defaultValue: sortingOptions?.defaultValue ?? NO_SORTING,
     onValueChange: sortingOptions?.onValueChange,
   });
-  const [rowSelection, setRowSelection] = useControllableState({
-    value: selectionOptions?.value,
-    defaultValue: selectionOptions?.defaultValue ?? NO_SELECTION,
-    onValueChange: selectionOptions?.onValueChange,
-  });
+  const [rowSelection, showSelection] = useState(NO_SELECTION);
+  const selectionOwner = useRef<DataTableSelectionChange | null>(null);
   const [pagination, setPagination] = useControllableState({
     value: paginationOptions?.value,
     defaultValue: paginationOptions?.defaultValue ?? FIRST_PAGE_OF_TEN,
@@ -111,7 +113,7 @@ export function useDataTable<TData extends RowData>({
     defaultColumn: COLUMN_WIDTH_LIMITS,
     state: { sorting, rowSelection, pagination, columnSizing },
     onSortingChange: setSorting,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: (updater) => (selectionOwner.current ?? showSelection)(updater),
     onPaginationChange: setPagination,
     onColumnSizingChange: setColumnSizing,
     enableSorting: sortable,
@@ -125,6 +127,19 @@ export function useDataTable<TData extends RowData>({
     enableColumnResizing: resizable,
     columnResizeMode: 'onChange',
     columnResizeDirection: rtl ? 'rtl' : 'ltr',
-    meta: { selectable, paginated, resizable, getRowLabel, setRtl },
+    meta: {
+      selectable,
+      paginated,
+      resizable,
+      getRowLabel,
+      setRtl,
+      showSelection,
+      ownSelection: (owner) => {
+        selectionOwner.current = owner;
+        return () => {
+          selectionOwner.current = null;
+        };
+      },
+    },
   });
 }

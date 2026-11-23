@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useForm as useTanStackForm } from '@tanstack/react-form';
 import { IntlMessageFormat } from 'intl-messageformat';
 import { renderToString } from 'react-dom/server';
+import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
@@ -10,6 +12,8 @@ import englishCatalog from '../messages/en.json';
 import { DataTable, IdsProvider, useDataTable, type IdsTranslate } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
+import { Field as RhfField } from '../src/react-hook-form';
+import { Field as TanStackField } from '../src/tanstack-form';
 
 type Person = { id: string; name: string; age: number };
 
@@ -210,8 +214,9 @@ test('the header sticks to the top of the scrolling table', async () => {
 test('parts render in the order written, and the toolbar leads with the selected count', async () => {
   const screen = await render(
     table(
-      { selection: { defaultValue: { ada: true } }, pagination: {} },
+      { selection: {}, pagination: {} },
       {
+        defaultValue: { ada: true },
         children: [
           <DataTable.Toolbar key="toolbar">
             <button type="button">Export</button>
@@ -244,7 +249,7 @@ test('without sorting the headers are plain text', async () => {
 
 test('row selection: named checkboxes, a mixed select-all, Shift ranges and the count', async () => {
   const onRowSelectionChange = vi.fn();
-  const screen = await render(table({ selection: { onValueChange: onRowSelectionChange } }));
+  const screen = await render(table({ selection: {} }, { onValueChange: onRowSelectionChange }));
   const all = screen.getByRole('checkbox', { name: '모든 행 선택' });
 
   await userEvent.click(screen.getByRole('checkbox', { name: 'Grace 선택' }));
@@ -265,6 +270,94 @@ test('row selection: named checkboxes, a mixed select-all, Shift ranges and the 
   await userEvent.click(all);
   await expect.element(all).not.toBeChecked();
   expect(onRowSelectionChange).toHaveBeenLastCalledWith({});
+});
+
+test('controlled selection only moves when the app writes it back, and an outside value shows', async () => {
+  const onValueChange = vi.fn();
+  const screen = await render(table({ selection: {} }, { value: { ken: true }, onValueChange }));
+
+  await expect.element(screen.getByRole('checkbox', { name: 'Ken 선택' })).toBeChecked();
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Ada 선택' }));
+  expect(onValueChange).toHaveBeenLastCalledWith({ ken: true, ada: true });
+  await expect.element(screen.getByRole('checkbox', { name: 'Ada 선택' })).not.toBeChecked();
+
+  await screen.rerender(table({ selection: {} }, { value: { ada: true }, onValueChange }));
+  await expect.element(screen.getByRole('checkbox', { name: 'Ada 선택' })).toBeChecked();
+  await expect.element(screen.getByRole('checkbox', { name: 'Ken 선택' })).not.toBeChecked();
+});
+
+test('a react-hook-form Field binds the selection with no wiring', async () => {
+  let methods!: UseFormReturn<{ invitees: DataTable.RowSelectionState }>;
+  function Invite() {
+    const form = useForm<{ invitees: DataTable.RowSelectionState }>({
+      defaultValues: { invitees: { grace: true } },
+    });
+    const people = useDataTable({
+      columns,
+      data: PEOPLE,
+      getRowId: idOf,
+      getRowLabel: nameOf,
+      selection: {},
+    });
+    useEffect(() => {
+      methods = form;
+    });
+    return (
+      <IdsProvider theme={testTheme}>
+        <FormProvider {...form}>
+          <RhfField name="invitees" controlMode="value">
+            <RhfField.Label>Invitees</RhfField.Label>
+            <DataTable table={people} />
+          </RhfField>
+        </FormProvider>
+      </IdsProvider>
+    );
+  }
+  const screen = await render(<Invite />);
+
+  await expect.element(screen.getByRole('checkbox', { name: 'Grace 선택' })).toBeChecked();
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Ada 선택' }));
+  expect(methods.getValues('invitees')).toEqual({ grace: true, ada: true });
+
+  methods.reset({ invitees: { ken: true } });
+  await expect.element(screen.getByRole('checkbox', { name: 'Ken 선택' })).toBeChecked();
+  await expect.element(screen.getByRole('checkbox', { name: 'Grace 선택' })).not.toBeChecked();
+});
+
+test('a TanStack Form Field binds the selection with no wiring', async () => {
+  const useInviteForm = () =>
+    useTanStackForm({ defaultValues: { invitees: { ken: true } as DataTable.RowSelectionState } });
+  let form!: ReturnType<typeof useInviteForm>;
+  function Invite() {
+    const api = useInviteForm();
+    const people = useDataTable({
+      columns,
+      data: PEOPLE,
+      getRowId: idOf,
+      getRowLabel: nameOf,
+      selection: {},
+    });
+    useEffect(() => {
+      form = api;
+    });
+    return (
+      <IdsProvider theme={testTheme}>
+        <api.Field name="invitees">
+          {(field) => (
+            <TanStackField field={field} controlMode="value">
+              <TanStackField.Label>Invitees</TanStackField.Label>
+              <DataTable table={people} />
+            </TanStackField>
+          )}
+        </api.Field>
+      </IdsProvider>
+    );
+  }
+  const screen = await render(<Invite />);
+
+  await expect.element(screen.getByRole('checkbox', { name: 'Ken 선택' })).toBeChecked();
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Barbara 선택' }));
+  await expect.poll(() => form.getFieldValue('invitees')).toEqual({ ken: true, barbara: true });
 });
 
 test('a selection checkbox sits on the same center line as the text beside it', async () => {

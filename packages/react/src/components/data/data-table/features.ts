@@ -17,6 +17,8 @@ import {
   type ColumnDef,
   type ColumnHelper,
   type RowData,
+  type RowSelectionState,
+  type Updater,
 } from '@tanstack/table-core';
 
 import type { TableAlign } from '../table/context';
@@ -26,12 +28,16 @@ export type DataTableColumnMeta = {
   label?: string;
 };
 
+export type DataTableSelectionChange = (updater: Updater<RowSelectionState>) => void;
+
 export type DataTableMeta = {
   selectable: boolean;
   paginated: boolean;
   resizable: boolean;
   getRowLabel: ((row: never) => string) | undefined;
   setRtl: (rtl: boolean) => void;
+  showSelection: (selection: RowSelectionState) => void;
+  ownSelection: (owner: DataTableSelectionChange) => () => void;
 };
 
 export const dataTableFeatures = tableFeatures({

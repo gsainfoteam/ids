@@ -237,7 +237,7 @@ export const PC: Story = {
       getRowId: (task) => task.id,
       getRowLabel: (task) => task.title,
       sorting: { defaultValue: [{ id: 'due', desc: true }] },
-      selection: { value: selection, onValueChange: setSelection },
+      selection: {},
       pagination: { defaultValue: { pageIndex: 0, pageSize: 8 } },
     });
     const selectedIds = Object.keys(selection).filter((id) => selection[id]);
@@ -325,7 +325,7 @@ export const PC: Story = {
           )}
         </div>
 
-        <DataTable table={table} aria-label="할 일">
+        <DataTable table={table} value={selection} onValueChange={setSelection} aria-label="할 일">
           <DataTable.Empty>
             <Empty variant="soft" size="tiny">
               <Empty.Media>

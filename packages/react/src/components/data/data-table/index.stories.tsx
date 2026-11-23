@@ -7,10 +7,12 @@ import {
   TrashIcon,
   UserIcon,
 } from '@heroicons/react/16/solid';
+import { FormProvider, useForm } from 'react-hook-form';
 import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { Field as FormField } from '../../../react-hook-form';
 import { Button } from '../../action/button';
 import { Empty } from '../empty';
 
@@ -111,6 +113,8 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     'aria-busy': { control: 'boolean' },
+    value: { control: false },
+    defaultValue: { control: false },
   },
   args: {
     'aria-label': '멤버',
@@ -165,7 +169,7 @@ export const Gallery: Story = {
       getRowId: rowId,
       getRowLabel: rowLabel,
       sorting: {},
-      selection: { defaultValue: { m2: true, m3: true } },
+      selection: {},
       pagination: { defaultValue: { pageIndex: 0, pageSize: 4 } },
     });
     const striped = useDataTable({
@@ -174,7 +178,7 @@ export const Gallery: Story = {
       getRowId: rowId,
       getRowLabel: rowLabel,
       sorting: {},
-      selection: { defaultValue: { m2: true } },
+      selection: {},
       pagination: { defaultValue: { pageIndex: 0, pageSize: 4 } },
     });
     const withIcons = useDataTable({
@@ -216,11 +220,17 @@ export const Gallery: Story = {
 
         <Showcase.Section title="Selection · Pagination">
           <Showcase.Row label="selection">
-            <DataTable table={selected} aria-label="선택과 페이지" className="w-[34rem]" />
+            <DataTable
+              table={selected}
+              defaultValue={{ m2: true, m3: true }}
+              aria-label="선택과 페이지"
+              className="w-[34rem]"
+            />
           </Showcase.Row>
           <Showcase.Row label="striped tiny">
             <DataTable
               table={striped}
+              defaultValue={{ m2: true }}
               variant="striped"
               size="tiny"
               aria-label="줄무늬"
@@ -321,7 +331,7 @@ export const SelectRows: Story = {
     docs: {
       description: {
         story:
-          '`selection` 은 맨 앞에 체크박스 열을 붙이고, 표 아래 줄에 고른 수를 적습니다. 머리글 체크박스는 모든 행을 고르고, 일부만 골랐으면 `indeterminate` 입니다. Shift 를 누른 채 누르면 마지막으로 누른 행부터 범위를 고릅니다. 체크박스 이름은 `getRowLabel` 로 정합니다.',
+          '`useDataTable` 에 `selection` 을 주면 맨 앞에 체크박스 열을 붙이고, 표 아래 줄에 고른 수를 적습니다. 고른 행은 root 의 `value` / `defaultValue` / `onValueChange` 입니다. 머리글 체크박스는 모든 행을 고르고, 일부만 골랐으면 `indeterminate` 입니다. Shift 를 누른 채 누르면 마지막으로 누른 행부터 범위를 고릅니다. 체크박스 이름은 `getRowLabel` 로 정합니다.',
       },
     },
   },
@@ -353,12 +363,18 @@ export const ActOnTheSelectedRows: Story = {
       getRowId: (member) => member.id,
       getRowLabel: (member) => member.name,
       sorting: {},
-      selection: { value: selection, onValueChange: setSelection },
+      selection: {},
     });
     const chosen = table.getSelectedRowModel().rows.length;
 
     return (
-      <DataTable table={table} aria-label="멤버" className="max-w-2xl">
+      <DataTable
+        table={table}
+        value={selection}
+        onValueChange={setSelection}
+        aria-label="멤버"
+        className="max-w-2xl"
+      >
         <DataTable.Toolbar>
           <Button
             variant="soft"
@@ -383,7 +399,7 @@ export const ActOnTheSelectedRows: Story = {
     docs: {
       description: {
         story:
-          '`DataTable.Toolbar` 는 표 위나 아래의 줄입니다. 선택이 켜져 있으면 고른 수를 앞에 적고, 그 뒤에 children 을 둡니다. `useDataTable` 이 돌려준 표는 TanStack Table 그대로라 `getSelectedRowModel()` 로 고른 행을 읽습니다. part 를 쓰면 그 순서대로 그리므로 `DataTable.Content` 도 적습니다.',
+          '`DataTable.Toolbar` 는 표 위나 아래의 줄입니다. 선택이 켜져 있으면 고른 수를 앞에 적고, 그 뒤에 children 을 둡니다. 고른 행은 root 의 `value` 와 `onValueChange` 로 앱이 가지고, `useDataTable` 이 돌려준 TanStack 표의 `getSelectedRowModel()` 로도 읽습니다. part 를 쓰면 그 순서대로 그리므로 `DataTable.Content` 도 적습니다.',
       },
     },
   },
@@ -397,6 +413,57 @@ export const ActOnTheSelectedRows: Story = {
     await expect(canvas.getAllByRole('row')).toHaveLength(MEMBERS.length - 1);
     await expect(canvas.queryByRole('row', { name: /이영희/ })).toBeNull();
     await expect(canvas.getByText('0개 선택됨')).toBeVisible();
+  },
+};
+
+export const ChooseRowsInAForm: Story = {
+  render: function Render() {
+    const [result, setResult] = useState('');
+    const methods = useForm<{ invitees: DataTable.RowSelectionState }>({
+      defaultValues: { invitees: { m2: true } },
+    });
+    const table = useDataTable({
+      data: MEMBERS,
+      columns,
+      getRowId: (member) => member.id,
+      getRowLabel: (member) => member.name,
+      selection: {},
+    });
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="flex max-w-2xl flex-col gap-3"
+          onSubmit={methods.handleSubmit((data) =>
+            setResult(`초대: ${Object.keys(data.invitees).join(', ')}`),
+          )}
+        >
+          <FormField name="invitees" controlMode="value">
+            <FormField.Label>초대할 멤버</FormField.Label>
+            <DataTable table={table} />
+          </FormField>
+          <div className="flex items-center gap-3">
+            <Button type="submit">초대하기</Button>
+            <output className="text-body-b3-regular">{result}</output>
+          </div>
+        </form>
+      </FormProvider>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '고른 행은 root 의 `value` / `onValueChange` 라 react-hook-form 의 `Field controlMode="value"` 가 다른 입력처럼 묶습니다. `useController` 를 따로 쓰지 않아도 되고, `reset()` 과 `defaultValues` 도 표에 그대로 보입니다. TanStack Form 의 `Field` 도 같습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByRole('checkbox', { name: '이영희 선택' })).toBeChecked();
+
+    await userEvent.click(canvas.getByRole('checkbox', { name: '박민수 선택' }));
+    await userEvent.click(canvas.getByRole('button', { name: '초대하기' }));
+    await expect(canvas.getByText('초대: m2, m3')).toBeVisible();
   },
 };
 

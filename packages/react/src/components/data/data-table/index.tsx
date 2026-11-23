@@ -68,6 +68,9 @@ export namespace DataTable {
     'aria-labelledby'?: string;
     'aria-describedby'?: string;
     'aria-busy'?: boolean | 'true' | 'false';
+    value?: TanStackRowSelectionState;
+    defaultValue?: TanStackRowSelectionState;
+    onValueChange?: (value: TanStackRowSelectionState) => void;
     className?: string;
     style?: CSSProperties;
     children?: ReactNode;

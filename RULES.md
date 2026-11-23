@@ -765,6 +765,11 @@ Every other prop is an option. The rules for options:
   from a `useX()` hook exported beside it. The hook takes one object per feature, on when the
   object is given, with the feature's state inside as a trio, and the root takes the result as one
   prop. The same result reaches parts the app renders outside the root.
+- **The value a form submits stays on the root.** Even when the rest moves into a hook, the state a
+  form would hold (DataTable's selected rows) stays the root's `value` / `defaultValue` /
+  `onValueChange`, because the react-hook-form and TanStack Form `Field` bind a control by handing
+  those props to the element and cannot reach a value inside a hook. Screen state (sorting, page,
+  column widths) stays in the hook.
 - **Existing props that break this rule are debt, not precedent.** Some components still carry
   them (Drawer's `scaleBackground`, Table's `striped`, Dialog's `hideClose`), and other sections
   of this file may still describe them. A new prop follows this rule, never their example.
@@ -774,11 +779,18 @@ const table = useDataTable({
   data,
   columns,
   sorting: { multiple: true, defaultValue: [{ id: 'name', desc: false }] },
-  selection: { value: selected, onValueChange: setSelected },
+  selection: { multiple: true },
   pagination: { manual: true, rowCount, defaultValue: { pageIndex: 0, pageSize: 20 } },
 });
 
-<DataTable table={table} variant="outline" size="tiny" className="h-96">
+<DataTable
+  table={table}
+  value={selected}
+  onValueChange={setSelected}
+  variant="outline"
+  size="tiny"
+  className="h-96"
+>
   <DataTable.Toolbar />
   <DataTable.Content />
   <DataTable.Pagination />
@@ -787,7 +799,7 @@ const table = useDataTable({
 
 Ark UI's `useX` with `X.RootProvider`, TanStack Table's `useReactTable` and Mantine React Table's
 `<MantineReactTable table={table} />` work the same way. Sorting, selection, pagination, editor
-extensions and scheduler views belong in a hook; a value trio and two options do not.
+extensions and scheduler views belong in a hook; the submitted value trio and two options do not.
 
 **Props in Flutter.** ids_flutter widgets follow the same rule in Flutter's own idiom. The design
 is decided in React; where the ecosystems differ, Flutter does what a Flutter developer expects

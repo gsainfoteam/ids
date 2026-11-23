@@ -6,12 +6,15 @@ DataTable takes its behaviour from a `useDataTable()` hook and draws its screen 
 
 - `const table = useDataTable({ columns, data, getRowId, getRowLabel, sorting, selection, pagination, columnSizing })`
   returns the TanStack table, and `<DataTable table={table}>` draws it. Each feature is on when its
-  object is given, with its state as a `value` / `defaultValue` / `onValueChange` trio:
+  object is given; sorting, pagination and column sizing hold their state as a `value` /
+  `defaultValue` / `onValueChange` trio:
   - `sorting: { multiple, removable, manual, … }` replaces `enableSorting`, `enableMultiSort`,
     `enableSortingRemoval`, `manualSorting`, `sorting`, `defaultSorting` and `onSortingChange`.
     Sorting is now off until `sorting` is given.
-  - `selection: { multiple, enabled(row), … }` replaces `enableRowSelection`,
-    `enableMultiRowSelection`, `rowSelection`, `defaultRowSelection` and `onRowSelectionChange`.
+  - `selection: { multiple, enabled(row) }` replaces `enableRowSelection` and
+    `enableMultiRowSelection`. The selected rows are the root's `value`, `defaultValue` and
+    `onValueChange` (in place of `rowSelection`, `defaultRowSelection` and `onRowSelectionChange`),
+    so a react-hook-form or TanStack Form `Field` binds them like any other control.
   - `pagination: { manual, rowCount, … }` replaces `enablePagination`, `manualPagination`,
     `rowCount`, `pagination`, `defaultPagination` and `onPaginationChange`.
   - `columnSizing: {}` replaces `enableColumnResizing`, and can hold the widths as a trio.

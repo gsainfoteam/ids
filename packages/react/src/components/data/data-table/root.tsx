@@ -2,6 +2,8 @@
 
 import { isValidElement, useLayoutEffect, useRef, type ReactNode } from 'react';
 
+import { isEqual, isPlainObject } from 'es-toolkit';
+
 import { DataTableCaption } from './caption';
 import { DataTableContent } from './content';
 import { DataTableContext } from './context';
@@ -9,12 +11,45 @@ import { DataTableEmpty } from './empty';
 import { DataTablePagination } from './pagination';
 import { dataTableStyle } from './style';
 import { DataTableToolbar } from './toolbar';
+import { useControllableState } from '../../../hooks/use-controllable-state';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { DataTable } from '.';
 import type { DataTableFeatures } from './features';
 import type { ReactTable } from '@tanstack/react-table';
-import type { RowData } from '@tanstack/table-core';
+import type { RowData, RowSelectionState, Updater } from '@tanstack/table-core';
+
+const NO_SELECTION: RowSelectionState = {};
+
+function selectionOf(value: unknown) {
+  if (value === undefined) return undefined;
+  return isPlainObject(value) ? (value as RowSelectionState) : NO_SELECTION;
+}
+
+function applied(updater: Updater<RowSelectionState>, previous: RowSelectionState) {
+  return typeof updater === 'function' ? updater(previous) : updater;
+}
+
+function useSelectionTrio(
+  table: ReactTable<DataTableFeatures, RowData>,
+  trio: Pick<DataTable.Props<RowData>, 'value' | 'defaultValue' | 'onValueChange'>,
+) {
+  const meta = table.options.meta;
+  const [selection, setSelection] = useControllableState({
+    value: selectionOf(trio.value),
+    defaultValue: trio.defaultValue ?? NO_SELECTION,
+    onValueChange: trio.onValueChange,
+  });
+  const shown = table.state.rowSelection;
+
+  useLayoutEffect(() =>
+    meta?.ownSelection((updater) => setSelection((previous) => applied(updater, previous))),
+  );
+
+  useLayoutEffect(() => {
+    if (meta && !isEqual(selection, shown)) meta.showSelection(selection);
+  }, [meta, selection, shown]);
+}
 
 function isRtl(element: HTMLElement) {
   const direction = element.ownerDocument.defaultView?.getComputedStyle(element).direction;
@@ -46,6 +81,9 @@ export function DataTableRoot<TData extends RowData>({
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
   'aria-busy': ariaBusy,
+  value,
+  defaultValue,
+  onValueChange,
   className,
   style,
   children,
@@ -53,6 +91,7 @@ export function DataTableRoot<TData extends RowData>({
   const table = instance as unknown as ReactTable<DataTableFeatures, RowData>;
   const rootRef = useRef<HTMLDivElement>(null);
   const setRtl = table.options.meta?.setRtl;
+  useSelectionTrio(table, { value, defaultValue, onValueChange });
 
   useLayoutEffect(() => {
     if (rootRef.current) setRtl?.(isRtl(rootRef.current));

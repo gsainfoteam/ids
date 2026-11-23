@@ -3,7 +3,8 @@
 정렬, 행 선택, 페이지, 열 너비 조절, 빈 상태와 로딩을 갖춘 데이터 표입니다. 로직은 [TanStack Table v9](https://tanstack.com/table)(`@tanstack/react-table`)이 맡고, 모양은 IDS `Table` 파트가 그립니다.
 
 - **hook 하나, 표 하나.** `useDataTable()` 이 열, 데이터와 기능을 받아 TanStack 표를 만들고, `<DataTable table={table}>` 이 그 표를 그립니다.
-- **기능은 객체를 줄 때만.** `sorting`, `selection`, `pagination`, `columnSizing` 은 객체를 주면 켜집니다. 상태는 객체 안의 `value` / `defaultValue` / `onValueChange` 입니다.
+- **기능은 객체를 줄 때만.** `sorting`, `selection`, `pagination`, `columnSizing` 은 객체를 주면 켜집니다. 정렬, 페이지, 열 너비의 상태는 객체 안의 `value` / `defaultValue` / `onValueChange` 입니다.
+- **고른 행은 root 의 값.** 고른 행은 다른 입력처럼 `<DataTable value defaultValue onValueChange>` 입니다. 그래서 react-hook-form 과 TanStack Form 의 `Field` 가 따로 연결하지 않아도 묶습니다.
 - **TanStack 그대로.** 열 정의와 상태 모양(`SortingState`, `RowSelectionState`, `PaginationState`)이 TanStack 과 같고, hook 이 돌려준 표에서 `getSelectedRowModel()`, `resetRowSelection()` 같은 TanStack 메서드를 바로 씁니다.
 - **화면은 part.** `DataTable.Toolbar`, `.Content`, `.Pagination`, `.Caption`, `.Empty` 로 표 위아래 줄과 빈 상태를 고릅니다. 하나도 적지 않으면 기본 배치로 그립니다.
 - **접근성.** 정렬 머리글은 ghost `Button` 이고 `th` 에 `aria-sort`, 선택은 이름 있는 체크박스, 너비 핸들은 키보드로 움직이는 `separator`, 로딩은 `aria-busy` 입니다.
@@ -46,10 +47,12 @@ const table = useDataTable({
   getRowId: (row) => row.id,
   getRowLabel: (row) => row.name,
   sorting: { multiple: true, defaultValue: [{ id: 'name', desc: false }] },
-  selection: { value: selected, onValueChange: setSelected },
+  selection: { multiple: true },
   pagination: { manual: true, rowCount, defaultValue: { pageIndex: 0, pageSize: 20 } },
   columnSizing: {},
 });
+
+<DataTable table={table} value={selected} onValueChange={setSelected} />;
 ```
 
 | 옵션           | 켜면                                   | 객체 안                                                        |
@@ -58,12 +61,13 @@ const table = useDataTable({
 | `getRowId`     | 행 id. 선택과 React key 에 쓴다        |                                                                |
 | `getRowLabel`  | 행 체크박스 이름                       |                                                                |
 | `sorting`      | 머리글을 눌러 정렬                     | `multiple`, `removable`, `manual`, 값 trio(`SortingState`)      |
-| `selection`    | 맨 앞 체크박스 열, 고른 수             | `multiple`, `enabled(row)`, 값 trio(`RowSelectionState`)        |
+| `selection`    | 맨 앞 체크박스 열, 고른 수             | `multiple`, `enabled(row)`. 값은 root 의 `value` trio          |
 | `pagination`   | 아래 줄 페이지 이동(10행씩)            | `manual`, `rowCount`, 값 trio(`PaginationState`)                |
 | `columnSizing` | 머리글 끝 너비 핸들                    | 값 trio(`ColumnSizingState`)                                    |
 
 - 콜백은 TanStack 의 updater 가 아니라 새 값을 받습니다. `useState` 의 setter 를 그대로 넘겨도 됩니다.
 - `value` 를 주면 제어, `defaultValue` 만 주면 비제어입니다. 제어일 때는 콜백에서 값을 다시 써야 화면이 바뀝니다.
+- 고른 행만 root 에 두는 까닭: 폼에 들어가는 값은 고른 행뿐입니다. 폼 라이브러리의 `Field` 는 자식 요소에 `value` 와 `onValueChange` 를 넣어 묶는데, hook 안의 값에는 넣을 곳이 없습니다. 정렬, 페이지, 너비는 화면 상태라 hook 에 둡니다.
 - 돌려받은 `table` 은 TanStack 표(`DataTable.Instance<Member>`)입니다. 표 바깥의 버튼에서 `table.getSelectedRowModel().rows` 를 읽거나 `table.resetRowSelection()` 을 부릅니다.
 
 ## Part
@@ -146,8 +150,15 @@ useDataTable({ columns, data, sorting: { multiple: false, removable: false } });
 ```tsx
 useDataTable({ columns, data, getRowLabel: (member) => member.name, selection: {} });
 useDataTable({ columns, data, selection: { enabled: (row) => row.original.active } }); // 고를 수 없는 행은 체크박스가 꺼진다
-useDataTable({ columns, data, selection: { value: selection, onValueChange: setSelection } });
 useDataTable({ columns, data, selection: { multiple: false } });                        // 하나만
+
+<DataTable table={table} defaultValue={{ m2: true }} />                                   // 처음 고른 행
+<DataTable table={table} value={selection} onValueChange={setSelection} />              // 제어
+
+<Field name="invitees" controlMode="value">                                             // react-hook-form
+  <Field.Label>초대할 멤버</Field.Label>
+  <DataTable table={table} />
+</Field>
 ```
 
 - 켜면 맨 앞에 체크박스 열이 붙습니다. 이 열은 정렬하지 않고 너비를 조절하지 않습니다.
@@ -156,7 +167,8 @@ useDataTable({ columns, data, selection: { multiple: false } });                
 - 체크박스 이름은 `getRowLabel` 이 있으면 "{label} 선택", 없으면 "{n}번째 행 선택" 입니다.
 - 선택된 행은 `Table.Row selected` 로 `bg-primary-soft` 가 깔리고 `data-selected` 가 붙습니다.
 - `DataTable.Toolbar` 의 "{n}개 선택됨" 이 `aria-live="polite"` 로 바뀐 수를 알립니다.
-- 값은 `{ [rowId]: true }` 입니다. 지운 행의 id 는 스스로 빠지지 않으니 데이터에서 행을 지울 때 선택에서도 뺍니다.
+- 값은 `{ [rowId]: true }` 이고 root 의 `value` / `defaultValue` / `onValueChange` 가 가집니다. `table.getSelectedRowModel()` 과 `table.resetRowSelection()` 도 같은 값을 읽고 씁니다.
+- 지운 행의 id 는 스스로 빠지지 않으니 데이터에서 행을 지울 때 선택에서도 뺍니다.
 
 ## 페이지
 
@@ -252,6 +264,7 @@ column.accessor('name', {
 | `table`                                                  | 필수. `useDataTable()` 이 돌려준 표            |
 | `variant`                                                | `outline`(기본) / `striped` / `ghost`          |
 | `size`                                                   | `standard`(기본) / `tiny`                      |
+| `value`, `defaultValue`, `onValueChange`                 | 고른 행(`RowSelectionState`). `selection` 을 켤 때 |
 | `id`, `aria-label`, `aria-labelledby`, `aria-describedby`, `aria-busy` | `<table>`                        |
 | `className`, `style`                                     | 표와 Toolbar 를 감싼 바깥 `div`                |
 | `children`                                               | Part                                           |
@@ -276,3 +289,5 @@ column.accessor('name', {
 
 - 필터, 열 숨기기, 열 고정, 행 펼치기, 가상화는 아직 없습니다. 필요하면 `Table` 파트로 TanStack 표를 직접 그립니다.
 - 열 정의의 `footer` 는 그리지 않습니다.
+- 고른 행은 root 가 hook 의 표에 layout effect 로 넘깁니다. 서버 HTML 에는 `value` 와 `defaultValue` 의 체크가 빠지고, hydration 직후 그려지기 전에 채워집니다.
+- 선택을 켠 `table` 은 DataTable 하나에만 줍니다. 두 root 가 같은 표의 선택을 나눠 가지지 못합니다.
