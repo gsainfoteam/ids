@@ -26,7 +26,6 @@ const plans: Array<{ value: Plan; label: string; description: string }> = [
 
 const orientations = ['vertical', 'horizontal'] as const;
 const sizes = ['standard', 'tiny'] as const;
-const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
 const meta = {
   title: 'Form/RadioGroup',
@@ -48,7 +47,7 @@ const meta = {
     onValueChange: fn(),
     children: ({ Item }) =>
       plans.map((plan) => (
-        <Label key={plan.value} className={row}>
+        <Label key={plan.value}>
           <Item value={plan.value} />
           {plan.label}
         </Label>
@@ -60,6 +59,21 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <RadioGroup aria-label="구독 플랜" defaultValue="free">
+      <Label>
+        <Radio value="free" />
+        무료
+      </Label>
+      <Label>
+        <Radio value="pro" />
+        Pro
+      </Label>
+    </RadioGroup>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -77,7 +91,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -106,7 +120,7 @@ export const Gallery: Story = {
             >
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -119,7 +133,7 @@ export const Gallery: Story = {
           <RadioGroup<Plan> orientation="horizontal" defaultValue="free" aria-label="일부 비활성">
             {({ Item }) =>
               plans.map((plan) => (
-                <Label key={plan.value} className={row}>
+                <Label key={plan.value}>
                   <Item value={plan.value} disabled={plan.value === 'team'} />
                   {plan.label}
                 </Label>
@@ -137,7 +151,7 @@ export const Gallery: Story = {
             <RadioGroup<Plan> defaultValue="free">
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -146,71 +160,55 @@ export const Gallery: Story = {
             </RadioGroup>
           </Field>
         </Showcase.Row>
-        <Showcase.Row label="cards">
-          <RadioGroup<Plan>
-            defaultValue="pro"
-            aria-label="플랜 카드"
-            className="grid w-full max-w-md gap-3"
-          >
-            {({ Item }) =>
-              plans.map((plan) => (
-                <Label
-                  key={plan.value}
-                  className={cn(
-                    'rounded-standard flex cursor-pointer items-start gap-3 p-4',
-                    'inset-ring-neutral inset-ring-1',
-                    'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
-                  )}
-                >
-                  <Item value={plan.value} className="mt-0.5" />
-                  <span className="flex flex-col gap-1">
-                    <span className="text-body-b3-medium">{plan.label}</span>
-                    <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
-                  </span>
-                </Label>
-              ))
-            }
-          </RadioGroup>
-        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Cards: Story = {
+export const ChooseAPlanFromCards: Story = {
   args: { onValueChange: fn() },
-  render: (args) => (
-    <RadioGroup<Plan>
-      defaultValue="pro"
-      onValueChange={args.onValueChange}
-      aria-label="플랜 카드"
-      className="grid w-full max-w-md gap-3"
-    >
-      {({ Item }) =>
-        plans.map((plan) => (
-          <Label
-            key={plan.value}
-            className={cn(
-              'rounded-standard flex cursor-pointer items-start gap-3 p-4',
-              'inset-ring-neutral inset-ring-1',
-              'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary-strong',
-            )}
-          >
-            <Item value={plan.value} className="mt-0.5" />
-            <span className="flex flex-col gap-1">
-              <span className="text-body-b3-medium">{plan.label}</span>
-              <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
-            </span>
-          </Label>
-        ))
-      }
-    </RadioGroup>
-  ),
+  tags: ['custom-design'],
+  render: function Render(args) {
+    const [plan, setPlan] = useState<Plan>('pro');
+
+    return (
+      <div className="w-full max-w-md">
+        <RadioGroup<Plan>
+          value={plan}
+          onValueChange={(next) => {
+            setPlan(next);
+            args.onValueChange?.(next);
+          }}
+          aria-label="플랜 카드"
+        >
+          {({ Item }) =>
+            plans.map((option) => (
+              <Label
+                key={option.value}
+                className={cn(
+                  'rounded-standard flex cursor-pointer items-start gap-3 p-4',
+                  option.value === plan
+                    ? 'bg-primary-soft inset-ring-primary-strong inset-ring-1'
+                    : 'inset-ring-neutral inset-ring-1',
+                )}
+              >
+                <Item value={option.value} className="mt-0.5" />
+                <span className="flex flex-col gap-1">
+                  <span className="text-body-b3-medium">{option.label}</span>
+                  <span className="text-caption-c1-regular text-neutral">{option.description}</span>
+                </span>
+              </Label>
+            ))
+          }
+        </RadioGroup>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          '카드형 선택지는 합성으로 만듭니다. `Label` 로 감싸면 카드 어디를 눌러도 선택되고, `has-data-[state=checked]:` 로 선택된 카드를 꾸밉니다.',
+          '카드형 선택지는 IDS 위에 새로 그린 디자인입니다(`custom-design`). `Label` 로 감싸면 카드 어디를 눌러도 선택되고, 제어하는 `value` 로 선택된 카드를 알아내 꾸밉니다.',
       },
     },
   },
@@ -221,65 +219,7 @@ export const Cards: Story = {
   },
 };
 
-export const Keyboard: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '같은 `name` 을 쓰는 native 라디오라서 Tab은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. Home 과 End 는 처음과 끝 항목을 고릅니다. 비활성 항목은 건너뜁니다.',
-      },
-    },
-  },
-  render: (args) => (
-    <RadioGroup {...args}>
-      {({ Item }) =>
-        plans.map((plan) => (
-          <Label key={plan.value} className={row}>
-            <Item value={plan.value} disabled={plan.value === 'pro'} />
-            {plan.label}
-          </Label>
-        ))
-      }
-    </RadioGroup>
-  ),
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.tab();
-    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toBeChecked();
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
-    await userEvent.keyboard('{Home}');
-    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
-    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
-    await userEvent.keyboard('{End}');
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
-  },
-};
-
-export const ReadOnly: Story = {
-  args: { readOnly: true },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '읽기 전용이면 선택이 바뀌지 않습니다. 화살표 키로 포커스는 옮겨 다닐 수 있고 값은 제출됩니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.click(canvas.getByRole('radio', { name: 'Pro' }));
-    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
-    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
-    await expect(canvas.getByRole('radiogroup')).toHaveAttribute('aria-readonly', 'true');
-    await expect(args.onValueChange).not.toHaveBeenCalled();
-  },
-};
-
-export const NativeForm: Story = {
+export const RequireAChoiceInANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -296,7 +236,7 @@ export const NativeForm: Story = {
           <RadioGroup<Plan> name="plan">
             {({ Item }) =>
               plans.map((plan) => (
-                <Label key={plan.value} className={row}>
+                <Label key={plan.value}>
                   <Item value={plan.value} />
                   {plan.label}
                 </Label>
@@ -335,7 +275,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ plan: Plan | '' }>({ defaultValues: { plan: '' } });
     const [result, setResult] = useState('');
@@ -356,7 +296,7 @@ export const ReactHookForm: Story = {
             <RadioGroup<Plan>>
               {({ Item }) =>
                 plans.map((plan) => (
-                  <Label key={plan.value} className={row}>
+                  <Label key={plan.value}>
                     <Item value={plan.value} />
                     {plan.label}
                   </Label>
@@ -389,11 +329,32 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const PlainChildren: Story = {
+export const ShowAChoiceThatCannotChange: Story = {
+  args: { readOnly: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '읽기 전용이면 선택이 바뀌지 않습니다. 화살표 키로 포커스는 옮겨 다닐 수 있고 값은 제출됩니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole('radio', { name: 'Pro' }));
+    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
+    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
+    await expect(canvas.getByRole('radiogroup')).toHaveAttribute('aria-readonly', 'true');
+    await expect(args.onValueChange).not.toHaveBeenCalled();
+  },
+};
+
+export const PlaceRadiosDirectly: Story = {
   render: () => (
     <RadioGroup aria-label="사이즈" orientation="horizontal" defaultValue="m">
       {['s', 'm', 'l', 'xl'].map((size) => (
-        <Label key={size} className={row}>
+        <Label key={size}>
           <Radio value={size} />
           {size.toUpperCase()}
         </Label>
@@ -412,5 +373,43 @@ export const PlainChildren: Story = {
     await userEvent.click(canvas.getByRole('radio', { name: 'XL' }));
     await expect(canvas.getByRole('radio', { name: 'XL' })).toBeChecked();
     await expect(canvas.getByRole('radio', { name: 'M' })).not.toBeChecked();
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '같은 `name` 을 쓰는 native 라디오라서 Tab은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. Home 과 End 는 처음과 끝 항목을 고릅니다. 비활성 항목은 건너뜁니다.',
+      },
+    },
+  },
+  render: (args) => (
+    <RadioGroup {...args}>
+      {({ Item }) =>
+        plans.map((plan) => (
+          <Label key={plan.value}>
+            <Item value={plan.value} disabled={plan.value === 'pro'} />
+            {plan.label}
+          </Label>
+        ))
+      }
+    </RadioGroup>
+  ),
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
+    await userEvent.keyboard('{Home}');
+    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
+    await userEvent.keyboard('{End}');
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
   },
 };

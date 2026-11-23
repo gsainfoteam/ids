@@ -548,7 +548,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 - 값(`name`)과 `required`: Select, ChipField, ColorField, ToggleGroup, [temporal-field](./temporal-field/README.md)
 - 값만: Slider
 - `required` 만: CheckboxGroup, FileField. 값은 각 Checkbox 와 `<input type="file">` 이 이미 FormData 에 넣습니다.
-- `message`: CheckboxGroup (`requiredMessage` prop)
+- `message`: CheckboxGroup (`t('checkboxGroup.required')`)
 
 ### 쓰는 법
 
@@ -574,7 +574,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
   required={required && !readOnly}
   disabled={disabled}
   anchor={anchorRef}
-  message={requiredMessage}         // 기본값 t('checkboxGroup.required')
+  message={t('checkboxGroup.required')}
 />
 ```
 

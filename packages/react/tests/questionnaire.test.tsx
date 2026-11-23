@@ -192,3 +192,29 @@ test('a single question shows no progress bar', async () => {
   await expect.element(page.getByRole('progressbar')).not.toBeInTheDocument();
   await expect.element(button('보내기')).toBeInTheDocument();
 });
+
+test('Questionnaire.Submit names the last button and stays the next button before it', async () => {
+  const onComplete = vi.fn();
+  await render(
+    <Questionnaire onComplete={onComplete}>
+      <Questionnaire.Submit className="submit">계획 세우기</Questionnaire.Submit>
+      <Questionnaire.Question name="tone">
+        어떤 말투로 쓸까요?
+        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+      </Questionnaire.Question>
+      <Questionnaire.Question name="length">
+        얼마나 길게 쓸까요?
+        <Questionnaire.Option value="short">짧게</Questionnaire.Option>
+      </Questionnaire.Question>
+    </Questionnaire>,
+  );
+
+  const navigation = page.getByRole('group', { name: '질문 이동' });
+  await expect.element(navigation.getByRole('button', { name: '다음' })).toHaveClass('submit');
+  await userEvent.click(radio('격식'));
+  await userEvent.click(button('다음'));
+  await userEvent.click(radio('짧게'));
+  await expect.element(navigation.getByRole('button', { name: '계획 세우기' })).toBeVisible();
+  await userEvent.click(button('계획 세우기'));
+  expect(onComplete).toHaveBeenCalledWith({ tone: 'formal', length: 'short' });
+});

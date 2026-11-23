@@ -100,6 +100,7 @@ export function useRating({
     hover,
     displayed,
     rootRef: mergedRef,
+    anchorRef: rootRef,
     preview,
     choose,
     forwardRootFocusToChecked,

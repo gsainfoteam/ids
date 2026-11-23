@@ -102,21 +102,32 @@ type Skill = 'js' | 'ts' | 'py';
 
 ```tsx
 <CheckboxGroup orientation="horizontal" />                 // vertical(기본) / horizontal
-<CheckboxGroup className="grid grid-cols-2" />             // 격자는 className으로
+
+<div className="w-80">                                      {/* 너비는 감싸는 요소가 */}
+  <CheckboxGroup aria-label="관심 기술">
+    {({ Item }) => (
+      <div className="grid grid-cols-2 gap-3">               {/* 격자는 안쪽 div 로 */}
+        {skills.map((skill) => (
+          <Label key={skill.value}>
+            <Item value={skill.value} />
+            {skill.label}
+          </Label>
+        ))}
+      </div>
+    )}
+  </CheckboxGroup>
+</div>
 ```
 
-## 상태와 스타일
+- **크기 계약: fill.** 블록으로 부모 너비를 채우고 바깥 여백이 없습니다. 너비와 자리는 감싸는 요소가 정합니다(`<div className="w-80">…</div>`).
 
-`className` 과 `style` 은 그룹 상태를 받는 함수도 됩니다. 같은 상태가 루트에 `data-*` 로 붙습니다. 항목의 상태는 [Checkbox](../checkbox/README.md) 를 봅니다.
+## 상태
 
-| 상태          | `data-*`                         | 뜻                          |
-| ------------- | -------------------------------- | --------------------------- |
-| `value`       |                                  | 고른 값                     |
-| `orientation` | `data-orientation`               | `vertical` / `horizontal`   |
-| `disabled`    | `data-disabled`, `aria-disabled` | 모든 항목이 비활성          |
-| `readOnly`    | `data-readonly`                  | 값을 바꿀 수 없다           |
-| `required`    | `data-required`                  | 하나 이상 골라야 한다       |
-| `invalid`     | `data-invalid`, `aria-invalid`   | 오류. 모든 항목이 danger 색 |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 고른 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 정합니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style` 에 `CheckboxGroup.State`(`value`, `orientation`, `disabled`, `readOnly`, `required`, `invalid`)를 받는 함수를 줍니다.
+- 항목의 상태는 [Checkbox](../checkbox/README.md) 를 봅니다.
 
 ## 폼
 
@@ -130,7 +141,7 @@ type Skill = 'js' | 'ts' | 'py';
 </form>
 ```
 
-- `required` 는 체크박스 하나하나가 아니라 그룹에 걸립니다. 메시지는 `requiredMessage` 로 바꿉니다.
+- `required` 는 체크박스 하나하나가 아니라 그룹에 걸립니다. 메시지 "하나 이상 선택하세요." 는 `IdsProvider` 의 `translate` 에서 `checkboxGroup.required` 키로 바꿉니다.
 - 읽기 전용이나 비활성인 그룹은 검사하지 않습니다.
 
 ## react-hook-form
@@ -169,11 +180,10 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `name` / `form`          | 항목의 `name` 과 `form`                        |
 | `orientation`            | `vertical`(기본) / `horizontal`                |
 | `required`               | 하나 이상 골라야 제출된다                      |
-| `requiredMessage`        | 비었을 때 메시지. 기본 `하나 이상 선택하세요.` |
 | `disabled` / `readOnly`  | 모든 항목에 전해진다                           |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선       |
 | `size` / `variant`       | 항목으로 전해진다                              |
-| `className` / `style`    | 루트로 간다. 그룹 상태를 받는 함수도 된다      |
+| `className` / `style`    | 루트로 간다. 새 디자인(`custom-design`)에서만 쓴다      |
 | `children`               | `({ All, Item }) => ReactNode` 또는 Checkbox들 |
 | `ref`                    | 그룹 루트. `focus()` 는 항목으로 넘어간다      |
 

@@ -7,7 +7,7 @@
 - **키보드.** 점수마다 native `<input type="radio">` 라 방향키는 브라우저의 라디오 그대로 한 칸씩 움직이며 고릅니다. 첫 점수에서 한 번 더 내리면 0점입니다. Tab은 고른 점수 하나에 멈춥니다.
 - **모양은 합성.** `Rating.Item` 에 하트, 점, 얼굴처럼 원하는 아이콘을 넣습니다. 전부 같은 모양이어도, 자리마다 달라도 됩니다.
 - **폼.** `name` 을 주면 고른 라디오가 점수를 제출하고, `required` 면 0점일 때 브라우저가 "점수를 선택하세요." 로 막습니다. 초기화도 브라우저가 합니다. react-hook-form은 `controlMode="value"` 로 연결됩니다.
-- **표시 전용.** `selectionMode="none"` 은 "5점 만점에 4.5점" 으로 읽히는 그림입니다.
+- **표시 전용.** `readOnly` 는 "5점 만점에 4.5점" 으로 읽히는 그림입니다. 라디오가 없어 Tab 이 멈추지 않습니다.
 
 ```tsx
 import { Field, Rating } from '@gsainfoteam/ids-react';
@@ -24,6 +24,7 @@ import { Field, Rating } from '@gsainfoteam/ids-react';
 <Rating defaultValue={3} />                                  // 비제어
 <Rating value={score} onValueChange={setScore} />           // 제어
 <Rating step={0.5} max={10} />                              // 반 점, 10점 만점. max는 양의 정수
+<Rating readOnly value={4.5} step={0.5} aria-label="평균 평점" /> // 표시 전용 그림
 ```
 
 - 값은 `0` 부터 `max` 까지이고 가장 가까운 `step` 으로 맞춥니다. 0점은 "고르지 않음" 입니다.
@@ -62,26 +63,19 @@ import { Field, Rating } from '@gsainfoteam/ids-react';
     <span className="block size-full rounded-full bg-current" />   {/* 점 */}
   </Rating.Item>
 </Rating>
-
-<Rating className="scheme-warning" />   {/* 채운 색은 text-scheme. 기본 scheme-primary */}
 ```
 
 - 아이콘은 빈 층과 채운 층에 두 번 그려지고, 채운 층을 잘라서 반 점을 표시합니다. `currentColor` 로 그리는 아이콘이면 됩니다.
-- `Rating.Item` 의 `className`, `style`, `children` 은 자리 상태(`index`, `itemValue`, `fill`)를 받는 함수도 됩니다.
+- `Rating.Item` 의 `children` 은 자리 상태(`index`, `itemValue`, `fill`)를 받는 함수도 됩니다.
+- 채운 색은 `text-scheme` 이고 `scheme-primary` 입니다. 오류면 `scheme-danger` 입니다.
 - 아이콘은 `aria-hidden` 이고 `inert` 입니다. 이벤트 핸들러, `id`, 폼 컨트롤을 넣지 않습니다.
 
-## 상태와 스타일
+## 상태
 
-| 속성              | 붙는 곳 | 뜻                                           |
-| ----------------- | ------- | -------------------------------------------- |
-| `data-state`      | 자리    | `full` / `half` / `empty`. 미리보기를 따른다 |
-| `data-previewing` | 루트    | 마우스로 미리보는 중                         |
-| `data-disabled`   | 루트    | 비활성                                       |
-| `data-readonly`   | 루트    | 읽기 전용                                    |
-| `data-required`   | 루트    | 필수                                         |
-| `data-invalid`    | 루트    | 오류. 채운 색이 danger                       |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-- `Rating.State` 는 `value`, `previewValue`, `interactive`, `disabled`, `readOnly`, `required`, `invalid` 입니다. 루트의 `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+- 점수는 `value` / `defaultValue` / `onValueChange`, 마우스 미리보기 점수는 `onHover` 로 읽습니다.
+- 새 디자인(`custom-design`)에서만 루트의 `className`, `style` 에 `Rating.State`(`value`, `previewValue`, `interactive`, `disabled`, `readOnly`, `required`, `invalid`)를, `Rating.Item` 에 `Rating.ItemState`(더해서 `index`, `itemValue`, `fill`)를 받는 함수를 줍니다.
 
 ## 폼
 
@@ -97,7 +91,8 @@ import { Field, Rating } from '@gsainfoteam/ids-react';
 
 - 점수마다 라디오가 있고 고른 점수의 라디오가 `name=점수` 로 제출됩니다. 0점은 아무 라디오도 고르지 않은 상태입니다.
 - `name` 이 없으면 라디오가 폼에 속하지 않아(`form=""`) 제출되지 않습니다. 라디오를 한 묶음으로 잇는 이름은 Rating 이 만듭니다.
-- `required` 는 0점을 막습니다. 메시지는 `requiredMessage` 로 바꿉니다. 읽기 전용이면 검사하지 않고, 비활성이면 제출도 하지 않습니다.
+- `required` 는 0점을 막습니다. 메시지 "점수를 선택하세요." 는 `IdsProvider` 의 `translate` 로 바꿉니다(`rating.required`). 읽기 전용이면 검사하지 않고, 비활성이면 제출도 하지 않습니다.
+- 읽기 전용이면 라디오 대신 hidden input 이 `name=점수` 를 제출합니다. 0점이면 항목이 없습니다.
 
 ## react-hook-form
 
@@ -130,6 +125,8 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 <Rating size="tiny" /> // standard(28px 아이콘) / tiny(22px). 줄 높이는 컨트롤 높이(36px / 32px). 생략하면 Field를 따른다
 ```
 
+- **크기 계약: hug.** 아이콘 줄 크기만큼 차지하고 바깥 여백이 없습니다. 자리와 간격은 감싸는 요소와 그 `gap` 이 정합니다. 부모보다 넓으면 줄을 바꿉니다.
+
 ## 속성
 
 | 속성                     | 기본 / 동작                                             |
@@ -138,18 +135,16 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `onValueChange`          | 값이 실제로 바뀔 때                                     |
 | `onHover`                | 마우스 미리보기 점수, 벗어나면 `null`                   |
 | `max` / `step`           | `5` / `1`. `step` 은 `1` 또는 `0.5`                     |
-| `selectionMode`          | `single`(기본) / `none`: 표시 전용                      |
-| `readOnly`               | 바꿀 수 없다. 탭 정지점은 남아 점수를 읽을 수 있다      |
+| `readOnly`               | 표시 전용 그림. Tab 에 멈추지 않는다. `name` 이 있으면 점수를 제출 |
 | `disabled`               | 조작, 탭 이동, 폼 제출에서 모두 빠진다                  |
 | `required`               | 0점이면 제출을 막는다                                   |
-| `requiredMessage`        | 기본 `점수를 선택하세요.`                               |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선                |
 | `name` / `form`          | 라디오의 `name`, `form`. 고른 점수를 제출한다           |
 | `getValueLabel`          | `(value, max) => string`                                |
 | `size`                   | `standard` / `tiny`                                     |
 | `children`               | `Rating.Item` 들. 생략하면 별                           |
 | `ref`                    | 그룹. `focus()` 는 고른 점수로 넘어간다                 |
-| 그 외 속성               | 그룹으로 간다 (`id`, `aria-*`, `className`, `style` 등) |
+| 그 외 속성               | 그룹으로 간다 (`id`, `aria-*`) |
 
 ## 알아둘 것
 

@@ -3,20 +3,18 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { SliderContext } from './context';
-import { percentOf, position, stepMarks, thumbOffset } from './slider-math';
 import { resolve, type StateProp } from './state-prop';
 import { sliderStyle } from './style';
 import { SliderTrack } from './track';
-import { useSlider, type SliderValue } from './use-slider';
+import { useSlider, useValueShape, type SliderValue } from './use-slider';
 import { FormValue } from '../../../internal/form-value';
 import { useTranslate } from '../../../internal/translate';
-import { invariant, mergeProps } from '../../../utils';
+import { containsElementOfType, invariant, mergeProps } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
 export type SliderOrientation = 'horizontal' | 'vertical';
-export type SliderValueLabel = 'auto' | 'always' | 'never';
 
 export type SliderState = {
   value: SliderValue;
@@ -34,26 +32,14 @@ export type SliderThumbState = SliderState & {
   thumbDragging: boolean;
 };
 
-type SingleProps = {
-  selectionMode?: 'single';
-  value?: number;
-  defaultValue?: number;
-  onValueChange?: (value: number) => void;
-  onValueCommit?: (value: number) => void;
-};
-
-type RangeProps = {
-  selectionMode: 'range';
-  value?: [number, number];
-  defaultValue?: [number, number];
-  onValueChange?: (value: [number, number]) => void;
-  onValueCommit?: (value: [number, number]) => void;
-};
-
-type SharedProps = Omit<
+export type SliderProps<V extends SliderValue = SliderValue> = Omit<
   ComponentProps<'div'>,
   'children' | 'className' | 'style' | 'defaultValue' | 'onChange' | 'role'
 > & {
+  value?: V;
+  defaultValue?: V;
+  onValueChange?: (value: V) => void;
+  onValueCommit?: (value: V) => void;
   min?: number;
   max?: number;
   step?: number;
@@ -66,22 +52,18 @@ type SharedProps = Omit<
   invalid?: boolean;
   name?: string;
   form?: string;
-  marks?: boolean | readonly number[];
   formatLabel?: (value: number) => string;
-  valueLabel?: SliderValueLabel;
-  thumbLabels?: readonly [string, string];
   className?: StateProp<string | undefined>;
   style?: StateProp<CSSProperties | undefined>;
   children?: ReactNode;
 };
 
-export type SliderProps = SharedProps & (SingleProps | RangeProps);
+const TRACK = new Set<unknown>([SliderTrack]);
 
-export function SliderRoot(props: SliderProps) {
+export function SliderRoot<V extends SliderValue>(props: SliderProps<V>) {
   const t = useTranslate();
 
   const {
-    selectionMode = 'single',
     value,
     defaultValue,
     onValueChange,
@@ -98,10 +80,7 @@ export function SliderRoot(props: SliderProps) {
     invalid,
     name,
     form,
-    marks = false,
     formatLabel,
-    valueLabel = 'auto',
-    thumbLabels = [t('slider.start'), t('slider.end')],
     className,
     style,
     children,
@@ -120,17 +99,7 @@ export function SliderRoot(props: SliderProps) {
 
   invariant(min < max, 'Slider: `min` must be less than `max`.');
   invariant(step > 0, 'Slider: `step` must be positive.');
-  const range = selectionMode === 'range';
-  invariant(
-    [value, defaultValue].every(
-      (entry) =>
-        entry === undefined ||
-        (range ? Array.isArray(entry) && entry.length === 2 : typeof entry === 'number'),
-    ),
-    range
-      ? 'Slider: `selectionMode="range"` takes a `[start, end]` value.'
-      : 'Slider: a single slider takes a number value.',
-  );
+  const range = useValueShape(value ?? defaultValue);
 
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const slider = useSlider({
@@ -169,7 +138,7 @@ export function SliderRoot(props: SliderProps) {
     ref: setThumb(index),
     role: 'slider',
     tabIndex: disabled ? -1 : 0,
-    'aria-label': range ? thumbLabels[index] : ariaLabel,
+    'aria-label': range ? t(index === 0 ? 'slider.start' : 'slider.end') : ariaLabel,
     'aria-labelledby': range ? undefined : ariaLabelledby,
     'aria-describedby': range ? undefined : ariaDescribedby,
     'aria-orientation': orientation,
@@ -186,12 +155,6 @@ export function SliderRoot(props: SliderProps) {
     ...thumbHandlers(index),
   });
 
-  const markValues = Array.isArray(marks)
-    ? (marks as readonly number[])
-    : marks
-      ? stepMarks(min, max, step)
-      : [];
-
   return (
     <SliderContext.Provider
       value={{
@@ -199,10 +162,10 @@ export function SliderRoot(props: SliderProps) {
         styles,
         min,
         max,
+        step,
         range,
         dragging,
         formatLabel,
-        valueLabel,
         setTrack,
         thumbProps,
       }}
@@ -229,21 +192,8 @@ export function SliderRoot(props: SliderProps) {
         className={styles.root({ className: resolve(className, state) })}
         style={resolve(style, state)}
       >
-        {children ?? <SliderTrack />}
-        {markValues.length > 0 && (
-          <div aria-hidden="true" className={styles.marks()}>
-            {markValues.map((mark) => (
-              <span
-                key={mark}
-                className={styles.mark()}
-                style={position(orientation, thumbOffset(percentOf(mark, min, max)))}
-              >
-                <span className={styles.tick()} />
-                {Array.isArray(marks) && (formatLabel?.(mark) ?? String(mark))}
-              </span>
-            ))}
-          </div>
-        )}
+        {!containsElementOfType(children, TRACK) && <SliderTrack />}
+        {children}
         <FormValue
           name={name}
           form={form}

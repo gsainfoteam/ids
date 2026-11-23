@@ -106,21 +106,25 @@ test('controlled changes respect the owner; outside updates do not echo', async 
   expect(values).toEqual([4]);
 });
 
-test('readOnly, disabled and display-only block changes; display-only reads as one image', async () => {
+test('disabled blocks changes; readOnly draws one image and still submits its score', async () => {
   const onValueChange = vi.fn();
-  for (const blocked of [{ readOnly: true }, { disabled: true }]) {
-    const screen = await render(<Rating {...blocked} value={2} onValueChange={onValueChange} />);
-    await userEvent.click(option(4), { force: true });
-    option(2).element().focus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '2');
-    await screen.unmount();
-  }
+  const disabled = await render(<Rating disabled value={2} onValueChange={onValueChange} />);
+  await userEvent.click(option(4), { force: true });
+  option(2).element().focus();
+  await userEvent.keyboard('{ArrowRight}');
+  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '2');
+  await disabled.unmount();
   expect(onValueChange).not.toHaveBeenCalled();
-  const screen = await render(<Rating selectionMode="none" value={3} aria-label="상품" />);
-  expect(screen.container.querySelectorAll('input')).toHaveLength(0);
+
+  const screen = await render(
+    <form>
+      <Rating readOnly value={3} name="score" aria-label="상품" />
+    </form>,
+  );
+  expect(screen.container.querySelectorAll('input[type=radio]')).toHaveLength(0);
   await expect.element(screen.getByRole('img')).toHaveAccessibleName(/상품.*3점/);
-  expect(screen.container.querySelector('input'), 'nothing to submit').toBeNull();
+  const form = screen.container.querySelector('form')!;
+  expect(new FormData(form).get('score')).toBe('3');
 });
 
 test('Rating.Item: one template for every star, indexed items for their own, all inert', async () => {
