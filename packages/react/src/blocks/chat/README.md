@@ -6,7 +6,7 @@ Storybook `Blocks/Chat/*`. 사람끼리 이야기하는 화면입니다. 챗봇�
 | --------- | ---------------------------------------------------------------------------------------------- |
 | `Channel` | 동아리 채널. 날짜 구분선, 아바타와 이름이 붙은 메시지, 첨부 카드, 답글 버튼, 입력 중 표시, 입력창. |
 
-- **쓰인 컴포넌트.** Item, Avatar, AvatarGroup, Badge, Card, Button, IconButton, TextArea, ScrollArea, Divider, Spacer
+- **쓰인 컴포넌트.** Item, Avatar, AvatarGroup, Chip, Card, Button, IconButton, TextArea, ScrollArea, Divider, Spacer
 - **알아둘 것.**
   - 말풍선 컴포넌트가 아직 없어서 메시지를 말풍선 없이 줄로 쌓습니다.
   - 날짜 구분은 글자를 가운데 둔 `Divider` 입니다.

@@ -8,7 +8,7 @@ Storybook `Blocks/Settings/*`. 설정 화면 세 가지입니다.
 | `Tabs`     | 일반, 알림, 화면, 보안 탭. 화면 탭에서 고른 모드와 테마 색이 페이지에 바로 들어간다.               |
 | `Sidebar`  | 왼쪽 분류 목록과 오른쪽 내용. `md` 보다 좁으면 분류가 Select 로 바뀐다.                           |
 
-- **쓰인 컴포넌트.** Card, Item, Field, TextField, TextArea, PasswordField, Select, Switch, RadioGroup, Checkbox, TimeField, Table, Tabs, ToggleGroup, Toggle, Dialog, Avatar, Badge, Progress, Button, Divider, Label, IdsProvider, toast
+- **쓰인 컴포넌트.** Card, Item, Field, TextField, TextArea, PasswordField, Select, Switch, RadioGroup, Checkbox, TimeField, Table, Tabs, ToggleGroup, Toggle, Dialog, Avatar, Chip, Progress, Button, Divider, Label, IdsProvider, toast
 - **알아둘 것.**
   - 스위치 행은 `Item` 입니다. `Switch` 에 `Item.Title` 과 `Item.Description` 의 id 를 `aria-labelledby`, `aria-describedby` 로 이어 이름과 설명을 줍니다.
   - 계정 삭제는 `role="alertdialog"` 인 `Dialog` 입니다. 확인 문구를 똑같이 적어야 지우기 버튼이 켜집니다.
