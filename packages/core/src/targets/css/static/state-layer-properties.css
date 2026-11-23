@@ -1,0 +1,20 @@
+@property --ids-state-opacity {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --ids-state-color {
+  syntax: '*';
+  inherits: false;
+}
+
+@property --ids-state-layer-hover {
+  syntax: '*';
+  inherits: false;
+}
+
+@property --ids-state-layer-press {
+  syntax: '*';
+  inherits: false;
+}

@@ -1,0 +1,7 @@
+--ids-concentric-pad: --spacing(--value(number));
+padding: var(--ids-concentric-pad);
+border-radius: min(
+  var(--ids-radius-standard) + (var(--ids-concentric-pad) + var(--ids-concentric-nested)) *
+    var(--ids-corner-radius-scale, 1),
+  var(--ids-radius-container)
+);

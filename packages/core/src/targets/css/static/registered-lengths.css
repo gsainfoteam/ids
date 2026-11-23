@@ -1,0 +1,11 @@
+@property --scroll-area-thickness {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --scroll-area-gap {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}

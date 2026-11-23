@@ -1,0 +1,14 @@
+@layer base {
+  [data-mode]:not([data-mode] [data-mode]),
+  [data-mode].bg-base {
+    --ids-bg-current: var(--ids-color-bg-base);
+  }
+
+  .bg-surface {
+    --ids-bg-current: var(--ids-color-bg-surface);
+  }
+
+  .bg-block {
+    --ids-bg-current: var(--ids-color-bg-block);
+  }
+}

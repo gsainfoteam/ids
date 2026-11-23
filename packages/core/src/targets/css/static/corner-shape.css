@@ -1,0 +1,23 @@
+@layer base {
+  [data-mode],
+  [data-mode] * {
+    corner-shape: var(--ids-corner-shape, round);
+  }
+
+  [data-mode]::before,
+  [data-mode]::after,
+  [data-mode] *::before,
+  [data-mode] *::after {
+    corner-shape: inherit;
+  }
+}
+
+@utility rounded-full {
+  corner-shape: round;
+}
+
+@supports (corner-shape: squircle) {
+  [data-mode] {
+    --ids-corner-radius-scale: var(--ids-theme-corner-radius-scale, 1);
+  }
+}

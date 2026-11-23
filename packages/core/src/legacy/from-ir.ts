@@ -8,17 +8,10 @@ interface LegacyToken {
   filePath: string;
 }
 
-type Platform = 'css' | 'js';
-
 const dimension = ({ value, unit }: Dimension) => `${value}${unit}`;
 
 const lineHeight = (value: LineHeight) =>
   value.kind === 'length' ? dimension(value.length) : value.multiplier;
-
-const CSS_FAMILY_NEEDS_QUOTES = /\s/;
-
-const cssFontStack = (stack: readonly string[]) =>
-  stack.map((family) => (CSS_FAMILY_NEEDS_QUOTES.test(family) ? `'${family}'` : family)).join(', ');
 
 const token = (
   category: string,
@@ -33,7 +26,7 @@ const token = (
   filePath: `tokens/${category}.json`,
 });
 
-function dictionary(ir: Ir, platform: Platform) {
+function dictionary(ir: Ir) {
   const { typography } = ir;
   const allTokens = [
     ...ir.enums.map((entry) =>
@@ -82,12 +75,7 @@ function dictionary(ir: Ir, platform: Platform) {
       token('letter-spacing', entry.name.segments, 'dimension', dimension(entry.value)),
     ),
     ...typography.fontFamilies.map((entry) =>
-      token(
-        'font-family',
-        entry.name.segments,
-        'fontFamily',
-        platform === 'css' ? cssFontStack(entry.stack) : entry.stack,
-      ),
+      token('font-family', entry.name.segments, 'fontFamily', entry.stack),
     ),
     ...typography.fontSizeAdjusts.map((entry) =>
       token('font-size-adjust', entry.name.segments, 'number', entry.value),
@@ -193,8 +181,7 @@ const typographyEntries = (ir: Ir) =>
 
 export function legacyInputs(ir: Ir) {
   return {
-    cssDictionary: dictionary(ir, 'css'),
-    jsDictionary: dictionary(ir, 'js'),
+    jsDictionary: dictionary(ir),
     neutralRoleSteps: Object.fromEntries(
       ir.color.neutralSteps.map(({ role, step }) => [role, step]),
     ),

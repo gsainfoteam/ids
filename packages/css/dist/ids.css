@@ -185,7 +185,9 @@
   --outline-color-field-bar: var(--ids-color-border-field-bar);
   --stroke-field-bar: var(--ids-color-border-field-bar);
   --background-color-field-code-outline: var(--ids-color-bg-field-code-outline);
-  --background-color-field-block-outline: var(--ids-color-bg-field-block-outline);
+  --background-color-field-block-outline: var(
+    --ids-color-bg-field-block-outline
+  );
   --background-color-switch-thumb: var(--ids-color-bg-switch-thumb);
   --background-color-segment: var(--ids-color-bg-segment);
   --background-color-qr-code: var(--ids-color-bg-qr-code);
@@ -283,12 +285,14 @@
 @theme {
   --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
   --animate-caret-blink: ids-caret-blink 1.25s ease-out infinite;
-  --animate-skeleton-pulse: ids-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-skeleton-pulse: ids-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1)
+    infinite;
   --animate-skeleton-wave: ids-skeleton-wave 2s ease-in-out infinite;
 }
 
 @theme inline {
-  --animate-marquee: ids-marquee var(--marquee-duration, 20s) linear infinite var(--marquee-direction, normal) var(--marquee-play-state, running);
+  --animate-marquee: ids-marquee var(--marquee-duration, 20s) linear infinite
+    var(--marquee-direction, normal) var(--marquee-play-state, running);
 }
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
@@ -296,9 +300,15 @@
 @custom-variant focus-ring-visible {
   &:focus-visible,
   &[data-focus-visible],
-  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-  &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
-  &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+  &:has([data-field-input]:focus-visible):not(
+      :has([popover] [data-field-input]:focus-visible)
+    ),
+  &:has([data-text-field-input]:focus-visible):not(
+      :has([popover] [data-text-field-input]:focus-visible)
+    ),
+  &:has([data-text-area-input]:focus-visible):not(
+      :has([popover] [data-text-area-input]:focus-visible)
+    ) {
     @slot;
   }
 }
@@ -306,11 +316,7 @@
 @utility focus-ring {
   outline: none;
 
-  &:focus-visible,
-  &[data-focus-visible],
-  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-  &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
-  &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+  @variant focus-ring-visible {
     @apply ring-[3px] ring-primary-strong/40 inset-ring-primary-strong;
   }
 
@@ -318,11 +324,7 @@
   &[data-invalid] {
     @apply inset-ring-danger-strong;
 
-    &:focus-visible,
-    &[data-focus-visible],
-    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-    &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
-    &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+    @variant focus-ring-visible {
       @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
@@ -331,11 +333,7 @@
 @utility focus-ring-scheme {
   outline: none;
 
-  &:focus-visible,
-  &[data-focus-visible],
-  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-  &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
-  &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+  @variant focus-ring-visible {
     @apply ring-[3px] ring-scheme-strong/40 inset-ring-scheme-strong;
   }
 
@@ -343,11 +341,7 @@
   &[data-invalid] {
     @apply inset-ring-danger-strong;
 
-    &:focus-visible,
-    &[data-focus-visible],
-    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-    &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
-    &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+    @variant focus-ring-visible {
       @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
@@ -356,11 +350,7 @@
 @utility focus-ring-current {
   outline: none;
 
-  &:focus-visible,
-  &[data-focus-visible],
-  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-  &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
-  &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+  @variant focus-ring-visible {
     @apply ring-[3px] ring-current/40 inset-ring-current;
   }
 
@@ -368,21 +358,24 @@
   &[data-invalid] {
     @apply inset-ring-danger-strong;
 
-    &:focus-visible,
-    &[data-focus-visible],
-    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-    &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
-    &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+    @variant focus-ring-visible {
       @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
 }
 
-
 @utility state-layer {
   background-image: linear-gradient(
-    color-mix(in srgb, var(--ids-state-color, currentColor) var(--ids-state-opacity), transparent),
-    color-mix(in srgb, var(--ids-state-color, currentColor) var(--ids-state-opacity), transparent)
+    color-mix(
+      in srgb,
+      var(--ids-state-color, currentColor) var(--ids-state-opacity),
+      transparent
+    ),
+    color-mix(
+      in srgb,
+      var(--ids-state-color, currentColor) var(--ids-state-opacity),
+      transparent
+    )
   );
 }
 
@@ -625,15 +618,14 @@
   padding: var(--ids-concentric-pad);
   border-radius: min(
     var(--ids-radius-standard) +
-      (var(--ids-concentric-pad) + var(--ids-concentric-nested)) * var(--ids-corner-radius-scale, 1),
+      (var(--ids-concentric-pad) + var(--ids-concentric-nested)) *
+      var(--ids-corner-radius-scale, 1),
     var(--ids-radius-container)
   );
 }
 
 @layer utilities {
-  [class*="concentric-p-"]:has(
-    .concentric-p-0\.5:not([popover], [popover] *)
-  ) {
+  [class*="concentric-p-"]:has(.concentric-p-0\.5:not([popover], [popover] *)) {
     --ids-concentric-nested: calc(var(--spacing) * 0.5);
   }
   [class*="concentric-p-"]:has(
@@ -846,431 +838,961 @@
     --ids-concentric-nested: calc(var(--spacing) * 16);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 0.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-1:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-0\.5)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 1);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-0\.5)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 1.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-0\.5)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 2);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-0\.5)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 2.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-0\.5)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 3);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 3.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 4);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 4.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 5.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 6);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-1\.5)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 6.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-1) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 7);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-1\.5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1\.5)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 7.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-2:not([popover] [popover], [popover] [popover] *)
-  ) {
+      .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 8);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-2\.5)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 8.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-1) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-3)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 9);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-1\.5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1\.5)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 9.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-2) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-2:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-2)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-4)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-2:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 10);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-2\.5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-2\.5)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 10.5);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-3) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-3:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-3)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-5)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-3:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 11);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-4) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-4:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-4)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-6)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-4:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 12);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-5:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-5)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-5:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 13);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-6) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-6:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-6)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+      :where(.concentric-p-8)
+        .concentric-p-6:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 14);
   }
   [class*="concentric-p-"]:is([popover], [popover] *):has(
-    :where(.concentric-p-8) .concentric-p-8:not([popover] [popover], [popover] [popover] *)
-  ) {
+      :where(.concentric-p-8)
+        .concentric-p-8:not([popover] [popover], [popover] [popover] *)
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 16);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 0.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-1:not(
+        [popover] [popover] [popover],
+        [popover] [popover] [popover] *
+      ),
+      :where(.concentric-p-0\.5)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 1);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-0\.5)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 1.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-2:not(
+        [popover] [popover] [popover],
+        [popover] [popover] [popover] *
+      ),
+      :where(.concentric-p-0\.5)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 2);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-0\.5)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 2.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-0\.5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-3:not(
+        [popover] [popover] [popover],
+        [popover] [popover] [popover] *
+      ),
+      :where(.concentric-p-0\.5)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 3);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 3.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-4:not(
+        [popover] [popover] [popover],
+        [popover] [popover] [popover] *
+      ),
+      :where(.concentric-p-1)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 4);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 4.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-5:not(
+        [popover] [popover] [popover],
+        [popover] [popover] [popover] *
+      ),
+      :where(.concentric-p-1)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 5.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-6:not(
+        [popover] [popover] [popover],
+        [popover] [popover] [popover] *
+      ),
+      :where(.concentric-p-1)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 6);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-1\.5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-1\.5)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 6.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-1) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 7);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-1\.5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1\.5)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 7.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      .concentric-p-8:not(
+        [popover] [popover] [popover],
+        [popover] [popover] [popover] *
+      ),
+      :where(.concentric-p-2)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 8);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-0\.5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-2\.5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-0\.5)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-2\.5)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-0\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 8.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-1) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-3) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-3)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-1:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 9);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-1\.5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-1\.5)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-1\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 9.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-2) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-4) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-2)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-4)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-2:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 10);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-2\.5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-2\.5)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-2\.5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 10.5);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-3) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-3)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-5)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-3:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 11);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-4) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-6) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-4)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-6)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-4:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 12);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-5)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-5:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 13);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-6) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
-    :where(.concentric-p-8) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-6)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        ),
+      :where(.concentric-p-8)
+        .concentric-p-6:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 14);
   }
   [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
-    :where(.concentric-p-8) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *)
-  ) {
+      :where(.concentric-p-8)
+        .concentric-p-8:not(
+          [popover] [popover] [popover],
+          [popover] [popover] [popover] *
+        )
+    ) {
     --ids-concentric-nested: calc(var(--spacing) * 16);
   }
 }
@@ -1431,8 +1953,13 @@
   --ids-font-size-h3: 32px;
   --ids-font-size-h2: 40px;
   --ids-font-size-h1: 48px;
-  --ids-font-family-sans: 'Pretendard GOV Variable', 'Pretendard GOV', 'Pretendard Variable', Pretendard, sans-serif;
-  --ids-font-family-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Pretendard GOV Variable', 'Pretendard GOV', 'Pretendard Variable', Pretendard, monospace;
+  --ids-font-family-sans:
+    "Pretendard GOV Variable", "Pretendard GOV", "Pretendard Variable",
+    Pretendard, sans-serif;
+  --ids-font-family-mono:
+    "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, "Pretendard GOV Variable", "Pretendard GOV",
+    "Pretendard Variable", Pretendard, monospace;
   --ids-font-weight-regular: 400;
   --ids-font-weight-medium: 500;
   --ids-font-weight-semibold: 600;
@@ -1459,149 +1986,353 @@
 
 @theme inline {
   --text-headline-h1-bold: var(--ids-text-headline-h1-bold);
-  --text-headline-h1-bold--font-weight: var(--ids-text-headline-h1-bold--font-weight);
-  --text-headline-h1-bold--line-height: var(--ids-text-headline-h1-bold--line-height);
-  --text-headline-h1-bold--letter-spacing: var(--ids-text-headline-h1-bold--letter-spacing);
+  --text-headline-h1-bold--font-weight: var(
+    --ids-text-headline-h1-bold--font-weight
+  );
+  --text-headline-h1-bold--line-height: var(
+    --ids-text-headline-h1-bold--line-height
+  );
+  --text-headline-h1-bold--letter-spacing: var(
+    --ids-text-headline-h1-bold--letter-spacing
+  );
   --text-headline-h1-semibold: var(--ids-text-headline-h1-semibold);
-  --text-headline-h1-semibold--font-weight: var(--ids-text-headline-h1-semibold--font-weight);
-  --text-headline-h1-semibold--line-height: var(--ids-text-headline-h1-semibold--line-height);
-  --text-headline-h1-semibold--letter-spacing: var(--ids-text-headline-h1-semibold--letter-spacing);
+  --text-headline-h1-semibold--font-weight: var(
+    --ids-text-headline-h1-semibold--font-weight
+  );
+  --text-headline-h1-semibold--line-height: var(
+    --ids-text-headline-h1-semibold--line-height
+  );
+  --text-headline-h1-semibold--letter-spacing: var(
+    --ids-text-headline-h1-semibold--letter-spacing
+  );
   --text-headline-h1-medium: var(--ids-text-headline-h1-medium);
-  --text-headline-h1-medium--font-weight: var(--ids-text-headline-h1-medium--font-weight);
-  --text-headline-h1-medium--line-height: var(--ids-text-headline-h1-medium--line-height);
-  --text-headline-h1-medium--letter-spacing: var(--ids-text-headline-h1-medium--letter-spacing);
+  --text-headline-h1-medium--font-weight: var(
+    --ids-text-headline-h1-medium--font-weight
+  );
+  --text-headline-h1-medium--line-height: var(
+    --ids-text-headline-h1-medium--line-height
+  );
+  --text-headline-h1-medium--letter-spacing: var(
+    --ids-text-headline-h1-medium--letter-spacing
+  );
   --text-headline-h2-bold: var(--ids-text-headline-h2-bold);
-  --text-headline-h2-bold--font-weight: var(--ids-text-headline-h2-bold--font-weight);
-  --text-headline-h2-bold--line-height: var(--ids-text-headline-h2-bold--line-height);
-  --text-headline-h2-bold--letter-spacing: var(--ids-text-headline-h2-bold--letter-spacing);
+  --text-headline-h2-bold--font-weight: var(
+    --ids-text-headline-h2-bold--font-weight
+  );
+  --text-headline-h2-bold--line-height: var(
+    --ids-text-headline-h2-bold--line-height
+  );
+  --text-headline-h2-bold--letter-spacing: var(
+    --ids-text-headline-h2-bold--letter-spacing
+  );
   --text-headline-h2-semibold: var(--ids-text-headline-h2-semibold);
-  --text-headline-h2-semibold--font-weight: var(--ids-text-headline-h2-semibold--font-weight);
-  --text-headline-h2-semibold--line-height: var(--ids-text-headline-h2-semibold--line-height);
-  --text-headline-h2-semibold--letter-spacing: var(--ids-text-headline-h2-semibold--letter-spacing);
+  --text-headline-h2-semibold--font-weight: var(
+    --ids-text-headline-h2-semibold--font-weight
+  );
+  --text-headline-h2-semibold--line-height: var(
+    --ids-text-headline-h2-semibold--line-height
+  );
+  --text-headline-h2-semibold--letter-spacing: var(
+    --ids-text-headline-h2-semibold--letter-spacing
+  );
   --text-headline-h2-medium: var(--ids-text-headline-h2-medium);
-  --text-headline-h2-medium--font-weight: var(--ids-text-headline-h2-medium--font-weight);
-  --text-headline-h2-medium--line-height: var(--ids-text-headline-h2-medium--line-height);
-  --text-headline-h2-medium--letter-spacing: var(--ids-text-headline-h2-medium--letter-spacing);
+  --text-headline-h2-medium--font-weight: var(
+    --ids-text-headline-h2-medium--font-weight
+  );
+  --text-headline-h2-medium--line-height: var(
+    --ids-text-headline-h2-medium--line-height
+  );
+  --text-headline-h2-medium--letter-spacing: var(
+    --ids-text-headline-h2-medium--letter-spacing
+  );
   --text-headline-h3-bold: var(--ids-text-headline-h3-bold);
-  --text-headline-h3-bold--font-weight: var(--ids-text-headline-h3-bold--font-weight);
-  --text-headline-h3-bold--line-height: var(--ids-text-headline-h3-bold--line-height);
-  --text-headline-h3-bold--letter-spacing: var(--ids-text-headline-h3-bold--letter-spacing);
+  --text-headline-h3-bold--font-weight: var(
+    --ids-text-headline-h3-bold--font-weight
+  );
+  --text-headline-h3-bold--line-height: var(
+    --ids-text-headline-h3-bold--line-height
+  );
+  --text-headline-h3-bold--letter-spacing: var(
+    --ids-text-headline-h3-bold--letter-spacing
+  );
   --text-headline-h3-semibold: var(--ids-text-headline-h3-semibold);
-  --text-headline-h3-semibold--font-weight: var(--ids-text-headline-h3-semibold--font-weight);
-  --text-headline-h3-semibold--line-height: var(--ids-text-headline-h3-semibold--line-height);
-  --text-headline-h3-semibold--letter-spacing: var(--ids-text-headline-h3-semibold--letter-spacing);
+  --text-headline-h3-semibold--font-weight: var(
+    --ids-text-headline-h3-semibold--font-weight
+  );
+  --text-headline-h3-semibold--line-height: var(
+    --ids-text-headline-h3-semibold--line-height
+  );
+  --text-headline-h3-semibold--letter-spacing: var(
+    --ids-text-headline-h3-semibold--letter-spacing
+  );
   --text-headline-h3-medium: var(--ids-text-headline-h3-medium);
-  --text-headline-h3-medium--font-weight: var(--ids-text-headline-h3-medium--font-weight);
-  --text-headline-h3-medium--line-height: var(--ids-text-headline-h3-medium--line-height);
-  --text-headline-h3-medium--letter-spacing: var(--ids-text-headline-h3-medium--letter-spacing);
+  --text-headline-h3-medium--font-weight: var(
+    --ids-text-headline-h3-medium--font-weight
+  );
+  --text-headline-h3-medium--line-height: var(
+    --ids-text-headline-h3-medium--line-height
+  );
+  --text-headline-h3-medium--letter-spacing: var(
+    --ids-text-headline-h3-medium--letter-spacing
+  );
   --text-headline-h4-bold: var(--ids-text-headline-h4-bold);
-  --text-headline-h4-bold--font-weight: var(--ids-text-headline-h4-bold--font-weight);
-  --text-headline-h4-bold--line-height: var(--ids-text-headline-h4-bold--line-height);
-  --text-headline-h4-bold--letter-spacing: var(--ids-text-headline-h4-bold--letter-spacing);
+  --text-headline-h4-bold--font-weight: var(
+    --ids-text-headline-h4-bold--font-weight
+  );
+  --text-headline-h4-bold--line-height: var(
+    --ids-text-headline-h4-bold--line-height
+  );
+  --text-headline-h4-bold--letter-spacing: var(
+    --ids-text-headline-h4-bold--letter-spacing
+  );
   --text-headline-h4-semibold: var(--ids-text-headline-h4-semibold);
-  --text-headline-h4-semibold--font-weight: var(--ids-text-headline-h4-semibold--font-weight);
-  --text-headline-h4-semibold--line-height: var(--ids-text-headline-h4-semibold--line-height);
-  --text-headline-h4-semibold--letter-spacing: var(--ids-text-headline-h4-semibold--letter-spacing);
+  --text-headline-h4-semibold--font-weight: var(
+    --ids-text-headline-h4-semibold--font-weight
+  );
+  --text-headline-h4-semibold--line-height: var(
+    --ids-text-headline-h4-semibold--line-height
+  );
+  --text-headline-h4-semibold--letter-spacing: var(
+    --ids-text-headline-h4-semibold--letter-spacing
+  );
   --text-headline-h4-medium: var(--ids-text-headline-h4-medium);
-  --text-headline-h4-medium--font-weight: var(--ids-text-headline-h4-medium--font-weight);
-  --text-headline-h4-medium--line-height: var(--ids-text-headline-h4-medium--line-height);
-  --text-headline-h4-medium--letter-spacing: var(--ids-text-headline-h4-medium--letter-spacing);
+  --text-headline-h4-medium--font-weight: var(
+    --ids-text-headline-h4-medium--font-weight
+  );
+  --text-headline-h4-medium--line-height: var(
+    --ids-text-headline-h4-medium--line-height
+  );
+  --text-headline-h4-medium--letter-spacing: var(
+    --ids-text-headline-h4-medium--letter-spacing
+  );
   --text-headline-h5-bold: var(--ids-text-headline-h5-bold);
-  --text-headline-h5-bold--font-weight: var(--ids-text-headline-h5-bold--font-weight);
-  --text-headline-h5-bold--line-height: var(--ids-text-headline-h5-bold--line-height);
-  --text-headline-h5-bold--letter-spacing: var(--ids-text-headline-h5-bold--letter-spacing);
+  --text-headline-h5-bold--font-weight: var(
+    --ids-text-headline-h5-bold--font-weight
+  );
+  --text-headline-h5-bold--line-height: var(
+    --ids-text-headline-h5-bold--line-height
+  );
+  --text-headline-h5-bold--letter-spacing: var(
+    --ids-text-headline-h5-bold--letter-spacing
+  );
   --text-headline-h5-semibold: var(--ids-text-headline-h5-semibold);
-  --text-headline-h5-semibold--font-weight: var(--ids-text-headline-h5-semibold--font-weight);
-  --text-headline-h5-semibold--line-height: var(--ids-text-headline-h5-semibold--line-height);
-  --text-headline-h5-semibold--letter-spacing: var(--ids-text-headline-h5-semibold--letter-spacing);
+  --text-headline-h5-semibold--font-weight: var(
+    --ids-text-headline-h5-semibold--font-weight
+  );
+  --text-headline-h5-semibold--line-height: var(
+    --ids-text-headline-h5-semibold--line-height
+  );
+  --text-headline-h5-semibold--letter-spacing: var(
+    --ids-text-headline-h5-semibold--letter-spacing
+  );
   --text-headline-h5-medium: var(--ids-text-headline-h5-medium);
-  --text-headline-h5-medium--font-weight: var(--ids-text-headline-h5-medium--font-weight);
-  --text-headline-h5-medium--line-height: var(--ids-text-headline-h5-medium--line-height);
-  --text-headline-h5-medium--letter-spacing: var(--ids-text-headline-h5-medium--letter-spacing);
+  --text-headline-h5-medium--font-weight: var(
+    --ids-text-headline-h5-medium--font-weight
+  );
+  --text-headline-h5-medium--line-height: var(
+    --ids-text-headline-h5-medium--line-height
+  );
+  --text-headline-h5-medium--letter-spacing: var(
+    --ids-text-headline-h5-medium--letter-spacing
+  );
   --text-headline-h6-bold: var(--ids-text-headline-h6-bold);
-  --text-headline-h6-bold--font-weight: var(--ids-text-headline-h6-bold--font-weight);
-  --text-headline-h6-bold--line-height: var(--ids-text-headline-h6-bold--line-height);
-  --text-headline-h6-bold--letter-spacing: var(--ids-text-headline-h6-bold--letter-spacing);
+  --text-headline-h6-bold--font-weight: var(
+    --ids-text-headline-h6-bold--font-weight
+  );
+  --text-headline-h6-bold--line-height: var(
+    --ids-text-headline-h6-bold--line-height
+  );
+  --text-headline-h6-bold--letter-spacing: var(
+    --ids-text-headline-h6-bold--letter-spacing
+  );
   --text-headline-h6-semibold: var(--ids-text-headline-h6-semibold);
-  --text-headline-h6-semibold--font-weight: var(--ids-text-headline-h6-semibold--font-weight);
-  --text-headline-h6-semibold--line-height: var(--ids-text-headline-h6-semibold--line-height);
-  --text-headline-h6-semibold--letter-spacing: var(--ids-text-headline-h6-semibold--letter-spacing);
+  --text-headline-h6-semibold--font-weight: var(
+    --ids-text-headline-h6-semibold--font-weight
+  );
+  --text-headline-h6-semibold--line-height: var(
+    --ids-text-headline-h6-semibold--line-height
+  );
+  --text-headline-h6-semibold--letter-spacing: var(
+    --ids-text-headline-h6-semibold--letter-spacing
+  );
   --text-headline-h6-medium: var(--ids-text-headline-h6-medium);
-  --text-headline-h6-medium--font-weight: var(--ids-text-headline-h6-medium--font-weight);
-  --text-headline-h6-medium--line-height: var(--ids-text-headline-h6-medium--line-height);
-  --text-headline-h6-medium--letter-spacing: var(--ids-text-headline-h6-medium--letter-spacing);
+  --text-headline-h6-medium--font-weight: var(
+    --ids-text-headline-h6-medium--font-weight
+  );
+  --text-headline-h6-medium--line-height: var(
+    --ids-text-headline-h6-medium--line-height
+  );
+  --text-headline-h6-medium--letter-spacing: var(
+    --ids-text-headline-h6-medium--letter-spacing
+  );
   --text-body-b1-bold: var(--ids-text-body-b1-bold);
   --text-body-b1-bold--font-weight: var(--ids-text-body-b1-bold--font-weight);
   --text-body-b1-bold--line-height: var(--ids-text-body-b1-bold--line-height);
-  --text-body-b1-bold--letter-spacing: var(--ids-text-body-b1-bold--letter-spacing);
+  --text-body-b1-bold--letter-spacing: var(
+    --ids-text-body-b1-bold--letter-spacing
+  );
   --text-body-b1-semibold: var(--ids-text-body-b1-semibold);
-  --text-body-b1-semibold--font-weight: var(--ids-text-body-b1-semibold--font-weight);
-  --text-body-b1-semibold--line-height: var(--ids-text-body-b1-semibold--line-height);
-  --text-body-b1-semibold--letter-spacing: var(--ids-text-body-b1-semibold--letter-spacing);
+  --text-body-b1-semibold--font-weight: var(
+    --ids-text-body-b1-semibold--font-weight
+  );
+  --text-body-b1-semibold--line-height: var(
+    --ids-text-body-b1-semibold--line-height
+  );
+  --text-body-b1-semibold--letter-spacing: var(
+    --ids-text-body-b1-semibold--letter-spacing
+  );
   --text-body-b1-medium: var(--ids-text-body-b1-medium);
-  --text-body-b1-medium--font-weight: var(--ids-text-body-b1-medium--font-weight);
-  --text-body-b1-medium--line-height: var(--ids-text-body-b1-medium--line-height);
-  --text-body-b1-medium--letter-spacing: var(--ids-text-body-b1-medium--letter-spacing);
+  --text-body-b1-medium--font-weight: var(
+    --ids-text-body-b1-medium--font-weight
+  );
+  --text-body-b1-medium--line-height: var(
+    --ids-text-body-b1-medium--line-height
+  );
+  --text-body-b1-medium--letter-spacing: var(
+    --ids-text-body-b1-medium--letter-spacing
+  );
   --text-body-b1-regular: var(--ids-text-body-b1-regular);
-  --text-body-b1-regular--font-weight: var(--ids-text-body-b1-regular--font-weight);
-  --text-body-b1-regular--line-height: var(--ids-text-body-b1-regular--line-height);
-  --text-body-b1-regular--letter-spacing: var(--ids-text-body-b1-regular--letter-spacing);
+  --text-body-b1-regular--font-weight: var(
+    --ids-text-body-b1-regular--font-weight
+  );
+  --text-body-b1-regular--line-height: var(
+    --ids-text-body-b1-regular--line-height
+  );
+  --text-body-b1-regular--letter-spacing: var(
+    --ids-text-body-b1-regular--letter-spacing
+  );
   --text-body-b2-bold: var(--ids-text-body-b2-bold);
   --text-body-b2-bold--font-weight: var(--ids-text-body-b2-bold--font-weight);
   --text-body-b2-bold--line-height: var(--ids-text-body-b2-bold--line-height);
-  --text-body-b2-bold--letter-spacing: var(--ids-text-body-b2-bold--letter-spacing);
+  --text-body-b2-bold--letter-spacing: var(
+    --ids-text-body-b2-bold--letter-spacing
+  );
   --text-body-b2-semibold: var(--ids-text-body-b2-semibold);
-  --text-body-b2-semibold--font-weight: var(--ids-text-body-b2-semibold--font-weight);
-  --text-body-b2-semibold--line-height: var(--ids-text-body-b2-semibold--line-height);
-  --text-body-b2-semibold--letter-spacing: var(--ids-text-body-b2-semibold--letter-spacing);
+  --text-body-b2-semibold--font-weight: var(
+    --ids-text-body-b2-semibold--font-weight
+  );
+  --text-body-b2-semibold--line-height: var(
+    --ids-text-body-b2-semibold--line-height
+  );
+  --text-body-b2-semibold--letter-spacing: var(
+    --ids-text-body-b2-semibold--letter-spacing
+  );
   --text-body-b2-medium: var(--ids-text-body-b2-medium);
-  --text-body-b2-medium--font-weight: var(--ids-text-body-b2-medium--font-weight);
-  --text-body-b2-medium--line-height: var(--ids-text-body-b2-medium--line-height);
-  --text-body-b2-medium--letter-spacing: var(--ids-text-body-b2-medium--letter-spacing);
+  --text-body-b2-medium--font-weight: var(
+    --ids-text-body-b2-medium--font-weight
+  );
+  --text-body-b2-medium--line-height: var(
+    --ids-text-body-b2-medium--line-height
+  );
+  --text-body-b2-medium--letter-spacing: var(
+    --ids-text-body-b2-medium--letter-spacing
+  );
   --text-body-b2-regular: var(--ids-text-body-b2-regular);
-  --text-body-b2-regular--font-weight: var(--ids-text-body-b2-regular--font-weight);
-  --text-body-b2-regular--line-height: var(--ids-text-body-b2-regular--line-height);
-  --text-body-b2-regular--letter-spacing: var(--ids-text-body-b2-regular--letter-spacing);
+  --text-body-b2-regular--font-weight: var(
+    --ids-text-body-b2-regular--font-weight
+  );
+  --text-body-b2-regular--line-height: var(
+    --ids-text-body-b2-regular--line-height
+  );
+  --text-body-b2-regular--letter-spacing: var(
+    --ids-text-body-b2-regular--letter-spacing
+  );
   --text-body-b3-bold: var(--ids-text-body-b3-bold);
   --text-body-b3-bold--font-weight: var(--ids-text-body-b3-bold--font-weight);
   --text-body-b3-bold--line-height: var(--ids-text-body-b3-bold--line-height);
-  --text-body-b3-bold--letter-spacing: var(--ids-text-body-b3-bold--letter-spacing);
+  --text-body-b3-bold--letter-spacing: var(
+    --ids-text-body-b3-bold--letter-spacing
+  );
   --text-body-b3-semibold: var(--ids-text-body-b3-semibold);
-  --text-body-b3-semibold--font-weight: var(--ids-text-body-b3-semibold--font-weight);
-  --text-body-b3-semibold--line-height: var(--ids-text-body-b3-semibold--line-height);
-  --text-body-b3-semibold--letter-spacing: var(--ids-text-body-b3-semibold--letter-spacing);
+  --text-body-b3-semibold--font-weight: var(
+    --ids-text-body-b3-semibold--font-weight
+  );
+  --text-body-b3-semibold--line-height: var(
+    --ids-text-body-b3-semibold--line-height
+  );
+  --text-body-b3-semibold--letter-spacing: var(
+    --ids-text-body-b3-semibold--letter-spacing
+  );
   --text-body-b3-medium: var(--ids-text-body-b3-medium);
-  --text-body-b3-medium--font-weight: var(--ids-text-body-b3-medium--font-weight);
-  --text-body-b3-medium--line-height: var(--ids-text-body-b3-medium--line-height);
-  --text-body-b3-medium--letter-spacing: var(--ids-text-body-b3-medium--letter-spacing);
+  --text-body-b3-medium--font-weight: var(
+    --ids-text-body-b3-medium--font-weight
+  );
+  --text-body-b3-medium--line-height: var(
+    --ids-text-body-b3-medium--line-height
+  );
+  --text-body-b3-medium--letter-spacing: var(
+    --ids-text-body-b3-medium--letter-spacing
+  );
   --text-body-b3-regular: var(--ids-text-body-b3-regular);
-  --text-body-b3-regular--font-weight: var(--ids-text-body-b3-regular--font-weight);
-  --text-body-b3-regular--line-height: var(--ids-text-body-b3-regular--line-height);
-  --text-body-b3-regular--letter-spacing: var(--ids-text-body-b3-regular--letter-spacing);
+  --text-body-b3-regular--font-weight: var(
+    --ids-text-body-b3-regular--font-weight
+  );
+  --text-body-b3-regular--line-height: var(
+    --ids-text-body-b3-regular--line-height
+  );
+  --text-body-b3-regular--letter-spacing: var(
+    --ids-text-body-b3-regular--letter-spacing
+  );
   --text-caption-c1-semibold: var(--ids-text-caption-c1-semibold);
-  --text-caption-c1-semibold--font-weight: var(--ids-text-caption-c1-semibold--font-weight);
-  --text-caption-c1-semibold--line-height: var(--ids-text-caption-c1-semibold--line-height);
-  --text-caption-c1-semibold--letter-spacing: var(--ids-text-caption-c1-semibold--letter-spacing);
+  --text-caption-c1-semibold--font-weight: var(
+    --ids-text-caption-c1-semibold--font-weight
+  );
+  --text-caption-c1-semibold--line-height: var(
+    --ids-text-caption-c1-semibold--line-height
+  );
+  --text-caption-c1-semibold--letter-spacing: var(
+    --ids-text-caption-c1-semibold--letter-spacing
+  );
   --text-caption-c1-medium: var(--ids-text-caption-c1-medium);
-  --text-caption-c1-medium--font-weight: var(--ids-text-caption-c1-medium--font-weight);
-  --text-caption-c1-medium--line-height: var(--ids-text-caption-c1-medium--line-height);
-  --text-caption-c1-medium--letter-spacing: var(--ids-text-caption-c1-medium--letter-spacing);
+  --text-caption-c1-medium--font-weight: var(
+    --ids-text-caption-c1-medium--font-weight
+  );
+  --text-caption-c1-medium--line-height: var(
+    --ids-text-caption-c1-medium--line-height
+  );
+  --text-caption-c1-medium--letter-spacing: var(
+    --ids-text-caption-c1-medium--letter-spacing
+  );
   --text-caption-c1-regular: var(--ids-text-caption-c1-regular);
-  --text-caption-c1-regular--font-weight: var(--ids-text-caption-c1-regular--font-weight);
-  --text-caption-c1-regular--line-height: var(--ids-text-caption-c1-regular--line-height);
-  --text-caption-c1-regular--letter-spacing: var(--ids-text-caption-c1-regular--letter-spacing);
+  --text-caption-c1-regular--font-weight: var(
+    --ids-text-caption-c1-regular--font-weight
+  );
+  --text-caption-c1-regular--line-height: var(
+    --ids-text-caption-c1-regular--line-height
+  );
+  --text-caption-c1-regular--letter-spacing: var(
+    --ids-text-caption-c1-regular--letter-spacing
+  );
   --text-caption-c2-semibold: var(--ids-text-caption-c2-semibold);
-  --text-caption-c2-semibold--font-weight: var(--ids-text-caption-c2-semibold--font-weight);
-  --text-caption-c2-semibold--line-height: var(--ids-text-caption-c2-semibold--line-height);
-  --text-caption-c2-semibold--letter-spacing: var(--ids-text-caption-c2-semibold--letter-spacing);
+  --text-caption-c2-semibold--font-weight: var(
+    --ids-text-caption-c2-semibold--font-weight
+  );
+  --text-caption-c2-semibold--line-height: var(
+    --ids-text-caption-c2-semibold--line-height
+  );
+  --text-caption-c2-semibold--letter-spacing: var(
+    --ids-text-caption-c2-semibold--letter-spacing
+  );
   --text-caption-c2-medium: var(--ids-text-caption-c2-medium);
-  --text-caption-c2-medium--font-weight: var(--ids-text-caption-c2-medium--font-weight);
-  --text-caption-c2-medium--line-height: var(--ids-text-caption-c2-medium--line-height);
-  --text-caption-c2-medium--letter-spacing: var(--ids-text-caption-c2-medium--letter-spacing);
+  --text-caption-c2-medium--font-weight: var(
+    --ids-text-caption-c2-medium--font-weight
+  );
+  --text-caption-c2-medium--line-height: var(
+    --ids-text-caption-c2-medium--line-height
+  );
+  --text-caption-c2-medium--letter-spacing: var(
+    --ids-text-caption-c2-medium--letter-spacing
+  );
   --text-caption-c2-regular: var(--ids-text-caption-c2-regular);
-  --text-caption-c2-regular--font-weight: var(--ids-text-caption-c2-regular--font-weight);
-  --text-caption-c2-regular--line-height: var(--ids-text-caption-c2-regular--line-height);
-  --text-caption-c2-regular--letter-spacing: var(--ids-text-caption-c2-regular--letter-spacing);
+  --text-caption-c2-regular--font-weight: var(
+    --ids-text-caption-c2-regular--font-weight
+  );
+  --text-caption-c2-regular--line-height: var(
+    --ids-text-caption-c2-regular--line-height
+  );
+  --text-caption-c2-regular--letter-spacing: var(
+    --ids-text-caption-c2-regular--letter-spacing
+  );
   --text-c2: var(--ids-font-size-c2);
   --text-c1: var(--ids-font-size-c1);
   --text-b3: var(--ids-font-size-b3);
@@ -1678,85 +2409,211 @@
 }
 
 [data-mode] {
-  --ids-radius-standard: round(calc(var(--ids-theme-radius-standard, 10px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
-  --ids-radius-indicator: round(calc(var(--ids-theme-radius-indicator, 4px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
-  --ids-radius-container: round(calc(var(--ids-theme-radius-container, 16px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
+  --ids-radius-standard: round(
+    calc(
+      var(--ids-theme-radius-standard, 10px) *
+        var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)
+    ),
+    1px
+  );
+  --ids-radius-indicator: round(
+    calc(
+      var(--ids-theme-radius-indicator, 4px) *
+        var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)
+    ),
+    1px
+  );
+  --ids-radius-container: round(
+    calc(
+      var(--ids-theme-radius-container, 16px) *
+        var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)
+    ),
+    1px
+  );
 }
 
 [data-scale] {
   --spacing: calc(0.25rem * var(--ids-scale, 1));
   --ids-text-headline-h1-bold: round(calc(48px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h1-bold--line-height: round(calc(56px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h1-bold--line-height: round(
+    calc(56px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h1-semibold: round(calc(48px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h1-semibold--line-height: round(calc(56px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h1-semibold--line-height: round(
+    calc(56px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h1-medium: round(calc(48px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h1-medium--line-height: round(calc(56px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h1-medium--line-height: round(
+    calc(56px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h2-bold: round(calc(40px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h2-bold--line-height: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h2-bold--line-height: round(
+    calc(48px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h2-semibold: round(calc(40px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h2-semibold--line-height: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h2-semibold--line-height: round(
+    calc(48px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h2-medium: round(calc(40px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h2-medium--line-height: round(calc(48px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h2-medium--line-height: round(
+    calc(48px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h3-bold: round(calc(32px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h3-bold--line-height: round(calc(40px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h3-bold--line-height: round(
+    calc(40px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h3-semibold: round(calc(32px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h3-semibold--line-height: round(calc(40px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h3-semibold--line-height: round(
+    calc(40px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h3-medium: round(calc(32px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h3-medium--line-height: round(calc(40px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h3-medium--line-height: round(
+    calc(40px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h4-bold: round(calc(28px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h4-bold--line-height: round(calc(36px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h4-bold--line-height: round(
+    calc(36px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h4-semibold: round(calc(28px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h4-semibold--line-height: round(calc(36px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h4-semibold--line-height: round(
+    calc(36px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h4-medium: round(calc(28px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h4-medium--line-height: round(calc(36px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h4-medium--line-height: round(
+    calc(36px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h5-bold: round(calc(24px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h5-bold--line-height: round(calc(32px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h5-bold--line-height: round(
+    calc(32px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h5-semibold: round(calc(24px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h5-semibold--line-height: round(calc(32px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h5-semibold--line-height: round(
+    calc(32px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h5-medium: round(calc(24px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h5-medium--line-height: round(calc(32px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h5-medium--line-height: round(
+    calc(32px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h6-bold: round(calc(20px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h6-bold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h6-bold--line-height: round(
+    calc(28px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h6-semibold: round(calc(20px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h6-semibold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h6-semibold--line-height: round(
+    calc(28px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-headline-h6-medium: round(calc(20px * var(--ids-scale, 1)), 1px);
-  --ids-text-headline-h6-medium--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-headline-h6-medium--line-height: round(
+    calc(28px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b1-bold: round(calc(18px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b1-bold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-bold--line-height: round(
+    calc(28px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b1-semibold: round(calc(18px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b1-semibold--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-semibold--line-height: round(
+    calc(28px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b1-medium: round(calc(18px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b1-medium--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-medium--line-height: round(
+    calc(28px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b1-regular: round(calc(18px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b1-regular--line-height: round(calc(28px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b1-regular--line-height: round(
+    calc(28px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b2-bold: round(calc(16px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b2-bold--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-bold--line-height: round(
+    calc(24px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b2-semibold: round(calc(16px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b2-semibold--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-semibold--line-height: round(
+    calc(24px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b2-medium: round(calc(16px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b2-medium--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-medium--line-height: round(
+    calc(24px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b2-regular: round(calc(16px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b2-regular--line-height: round(calc(24px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b2-regular--line-height: round(
+    calc(24px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b3-bold: round(calc(14px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b3-bold--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-bold--line-height: round(
+    calc(20px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b3-semibold: round(calc(14px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b3-semibold--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-semibold--line-height: round(
+    calc(20px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b3-medium: round(calc(14px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b3-medium--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-medium--line-height: round(
+    calc(20px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-body-b3-regular: round(calc(14px * var(--ids-scale, 1)), 1px);
-  --ids-text-body-b3-regular--line-height: round(calc(20px * var(--ids-scale, 1)), 1px);
+  --ids-text-body-b3-regular--line-height: round(
+    calc(20px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-caption-c1-semibold: round(calc(12px * var(--ids-scale, 1)), 1px);
-  --ids-text-caption-c1-semibold--line-height: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c1-semibold--line-height: round(
+    calc(16px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-caption-c1-medium: round(calc(12px * var(--ids-scale, 1)), 1px);
-  --ids-text-caption-c1-medium--line-height: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c1-medium--line-height: round(
+    calc(16px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-caption-c1-regular: round(calc(12px * var(--ids-scale, 1)), 1px);
-  --ids-text-caption-c1-regular--line-height: round(calc(16px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c1-regular--line-height: round(
+    calc(16px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-caption-c2-semibold: round(calc(10px * var(--ids-scale, 1)), 1px);
-  --ids-text-caption-c2-semibold--line-height: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c2-semibold--line-height: round(
+    calc(14px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-caption-c2-medium: round(calc(10px * var(--ids-scale, 1)), 1px);
-  --ids-text-caption-c2-medium--line-height: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c2-medium--line-height: round(
+    calc(14px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-text-caption-c2-regular: round(calc(10px * var(--ids-scale, 1)), 1px);
-  --ids-text-caption-c2-regular--line-height: round(calc(14px * var(--ids-scale, 1)), 1px);
+  --ids-text-caption-c2-regular--line-height: round(
+    calc(14px * var(--ids-scale, 1)),
+    1px
+  );
   --ids-font-size-c2: round(calc(10px * var(--ids-scale, 1)), 1px);
   --ids-font-size-c1: round(calc(12px * var(--ids-scale, 1)), 1px);
   --ids-font-size-b3: round(calc(14px * var(--ids-scale, 1)), 1px);
@@ -1824,56 +2681,93 @@
   --ids-color-bg-surface: var(--ids-theme-light-bg-surface, #ffffff);
   --ids-color-bg-block: var(--ids-theme-light-bg-block, #fafafa);
   --ids-color-bg-neutral-soft: var(--ids-theme-light-bg-neutral-soft, #f5f5f5);
-  --ids-color-bg-neutral-solid: var(--ids-theme-light-bg-neutral-solid, #0a0a0a);
+  --ids-color-bg-neutral-solid: var(
+    --ids-theme-light-bg-neutral-solid,
+    #0a0a0a
+  );
   --ids-color-text-on-base: var(--ids-theme-light-text-on-base);
   --ids-color-text-on-surface: var(--ids-theme-light-text-on-surface);
   --ids-color-text-on-block: var(--ids-theme-light-text-on-block);
   --ids-color-text-on-neutral-soft: var(--ids-theme-light-text-on-neutral-soft);
-  --ids-color-text-on-neutral-solid: var(--ids-theme-light-text-on-neutral-solid);
+  --ids-color-text-on-neutral-solid: var(
+    --ids-theme-light-text-on-neutral-solid
+  );
   --ids-color-text-neutral: var(--ids-theme-light-text-neutral, #525252);
-  --ids-color-text-neutral-strong: var(--ids-theme-light-text-neutral-strong, #0a0a0a);
+  --ids-color-text-neutral-strong: var(
+    --ids-theme-light-text-neutral-strong,
+    #0a0a0a
+  );
   --ids-color-border-neutral: var(--ids-theme-light-border-neutral, #e5e5e5);
-  --ids-color-border-neutral-strong: var(--ids-theme-light-border-neutral-strong, #d4d4d4);
+  --ids-color-border-neutral-strong: var(
+    --ids-theme-light-border-neutral-strong,
+    #d4d4d4
+  );
   --ids-color-bg-primary-soft: var(--ids-theme-light-bg-primary-soft);
   --ids-color-bg-primary-solid: var(--ids-theme-light-bg-primary-solid);
   --ids-color-text-on-primary-soft: var(--ids-theme-light-text-on-primary-soft);
-  --ids-color-text-on-primary-solid: var(--ids-theme-light-text-on-primary-solid);
+  --ids-color-text-on-primary-solid: var(
+    --ids-theme-light-text-on-primary-solid
+  );
   --ids-color-text-primary: var(--ids-theme-light-text-primary);
   --ids-color-text-primary-strong: var(--ids-theme-light-text-primary-strong);
   --ids-color-border-primary: var(--ids-theme-light-border-primary);
-  --ids-color-border-primary-strong: var(--ids-theme-light-border-primary-strong);
+  --ids-color-border-primary-strong: var(
+    --ids-theme-light-border-primary-strong
+  );
   --ids-color-bg-secondary-soft: var(--ids-theme-light-bg-secondary-soft);
   --ids-color-bg-secondary-solid: var(--ids-theme-light-bg-secondary-solid);
-  --ids-color-text-on-secondary-soft: var(--ids-theme-light-text-on-secondary-soft);
-  --ids-color-text-on-secondary-solid: var(--ids-theme-light-text-on-secondary-solid);
+  --ids-color-text-on-secondary-soft: var(
+    --ids-theme-light-text-on-secondary-soft
+  );
+  --ids-color-text-on-secondary-solid: var(
+    --ids-theme-light-text-on-secondary-solid
+  );
   --ids-color-text-secondary: var(--ids-theme-light-text-secondary);
-  --ids-color-text-secondary-strong: var(--ids-theme-light-text-secondary-strong);
+  --ids-color-text-secondary-strong: var(
+    --ids-theme-light-text-secondary-strong
+  );
   --ids-color-border-secondary: var(--ids-theme-light-border-secondary);
-  --ids-color-border-secondary-strong: var(--ids-theme-light-border-secondary-strong);
+  --ids-color-border-secondary-strong: var(
+    --ids-theme-light-border-secondary-strong
+  );
   --ids-color-bg-tertiary-soft: var(--ids-theme-light-bg-tertiary-soft);
   --ids-color-bg-tertiary-solid: var(--ids-theme-light-bg-tertiary-solid);
-  --ids-color-text-on-tertiary-soft: var(--ids-theme-light-text-on-tertiary-soft);
-  --ids-color-text-on-tertiary-solid: var(--ids-theme-light-text-on-tertiary-solid);
+  --ids-color-text-on-tertiary-soft: var(
+    --ids-theme-light-text-on-tertiary-soft
+  );
+  --ids-color-text-on-tertiary-solid: var(
+    --ids-theme-light-text-on-tertiary-solid
+  );
   --ids-color-text-tertiary: var(--ids-theme-light-text-tertiary);
   --ids-color-text-tertiary-strong: var(--ids-theme-light-text-tertiary-strong);
   --ids-color-border-tertiary: var(--ids-theme-light-border-tertiary);
-  --ids-color-border-tertiary-strong: var(--ids-theme-light-border-tertiary-strong);
+  --ids-color-border-tertiary-strong: var(
+    --ids-theme-light-border-tertiary-strong
+  );
   --ids-color-bg-success-soft: var(--ids-theme-light-bg-success-soft);
   --ids-color-bg-success-solid: var(--ids-theme-light-bg-success-solid);
   --ids-color-text-on-success-soft: var(--ids-theme-light-text-on-success-soft);
-  --ids-color-text-on-success-solid: var(--ids-theme-light-text-on-success-solid);
+  --ids-color-text-on-success-solid: var(
+    --ids-theme-light-text-on-success-solid
+  );
   --ids-color-text-success: var(--ids-theme-light-text-success);
   --ids-color-text-success-strong: var(--ids-theme-light-text-success-strong);
   --ids-color-border-success: var(--ids-theme-light-border-success);
-  --ids-color-border-success-strong: var(--ids-theme-light-border-success-strong);
+  --ids-color-border-success-strong: var(
+    --ids-theme-light-border-success-strong
+  );
   --ids-color-bg-warning-soft: var(--ids-theme-light-bg-warning-soft);
   --ids-color-bg-warning-solid: var(--ids-theme-light-bg-warning-solid);
   --ids-color-text-on-warning-soft: var(--ids-theme-light-text-on-warning-soft);
-  --ids-color-text-on-warning-solid: var(--ids-theme-light-text-on-warning-solid);
+  --ids-color-text-on-warning-solid: var(
+    --ids-theme-light-text-on-warning-solid
+  );
   --ids-color-text-warning: var(--ids-theme-light-text-warning);
   --ids-color-text-warning-strong: var(--ids-theme-light-text-warning-strong);
   --ids-color-border-warning: var(--ids-theme-light-border-warning);
-  --ids-color-border-warning-strong: var(--ids-theme-light-border-warning-strong);
+  --ids-color-border-warning-strong: var(
+    --ids-theme-light-border-warning-strong
+  );
   --ids-color-bg-danger-soft: var(--ids-theme-light-bg-danger-soft);
   --ids-color-bg-danger-solid: var(--ids-theme-light-bg-danger-solid);
   --ids-color-text-on-danger-soft: var(--ids-theme-light-text-on-danger-soft);
@@ -1916,51 +2810,85 @@
   --ids-color-text-on-surface: var(--ids-theme-dark-text-on-surface);
   --ids-color-text-on-block: var(--ids-theme-dark-text-on-block);
   --ids-color-text-on-neutral-soft: var(--ids-theme-dark-text-on-neutral-soft);
-  --ids-color-text-on-neutral-solid: var(--ids-theme-dark-text-on-neutral-solid);
+  --ids-color-text-on-neutral-solid: var(
+    --ids-theme-dark-text-on-neutral-solid
+  );
   --ids-color-text-neutral: var(--ids-theme-dark-text-neutral, #d4d4d4);
-  --ids-color-text-neutral-strong: var(--ids-theme-dark-text-neutral-strong, #fafafa);
+  --ids-color-text-neutral-strong: var(
+    --ids-theme-dark-text-neutral-strong,
+    #fafafa
+  );
   --ids-color-border-neutral: var(--ids-theme-dark-border-neutral, #2e2e2e);
-  --ids-color-border-neutral-strong: var(--ids-theme-dark-border-neutral-strong, #3a3a3a);
+  --ids-color-border-neutral-strong: var(
+    --ids-theme-dark-border-neutral-strong,
+    #3a3a3a
+  );
   --ids-color-bg-primary-soft: var(--ids-theme-dark-bg-primary-soft);
   --ids-color-bg-primary-solid: var(--ids-theme-dark-bg-primary-solid);
   --ids-color-text-on-primary-soft: var(--ids-theme-dark-text-on-primary-soft);
-  --ids-color-text-on-primary-solid: var(--ids-theme-dark-text-on-primary-solid);
+  --ids-color-text-on-primary-solid: var(
+    --ids-theme-dark-text-on-primary-solid
+  );
   --ids-color-text-primary: var(--ids-theme-dark-text-primary);
   --ids-color-text-primary-strong: var(--ids-theme-dark-text-primary-strong);
   --ids-color-border-primary: var(--ids-theme-dark-border-primary);
-  --ids-color-border-primary-strong: var(--ids-theme-dark-border-primary-strong);
+  --ids-color-border-primary-strong: var(
+    --ids-theme-dark-border-primary-strong
+  );
   --ids-color-bg-secondary-soft: var(--ids-theme-dark-bg-secondary-soft);
   --ids-color-bg-secondary-solid: var(--ids-theme-dark-bg-secondary-solid);
-  --ids-color-text-on-secondary-soft: var(--ids-theme-dark-text-on-secondary-soft);
-  --ids-color-text-on-secondary-solid: var(--ids-theme-dark-text-on-secondary-solid);
+  --ids-color-text-on-secondary-soft: var(
+    --ids-theme-dark-text-on-secondary-soft
+  );
+  --ids-color-text-on-secondary-solid: var(
+    --ids-theme-dark-text-on-secondary-solid
+  );
   --ids-color-text-secondary: var(--ids-theme-dark-text-secondary);
-  --ids-color-text-secondary-strong: var(--ids-theme-dark-text-secondary-strong);
+  --ids-color-text-secondary-strong: var(
+    --ids-theme-dark-text-secondary-strong
+  );
   --ids-color-border-secondary: var(--ids-theme-dark-border-secondary);
-  --ids-color-border-secondary-strong: var(--ids-theme-dark-border-secondary-strong);
+  --ids-color-border-secondary-strong: var(
+    --ids-theme-dark-border-secondary-strong
+  );
   --ids-color-bg-tertiary-soft: var(--ids-theme-dark-bg-tertiary-soft);
   --ids-color-bg-tertiary-solid: var(--ids-theme-dark-bg-tertiary-solid);
-  --ids-color-text-on-tertiary-soft: var(--ids-theme-dark-text-on-tertiary-soft);
-  --ids-color-text-on-tertiary-solid: var(--ids-theme-dark-text-on-tertiary-solid);
+  --ids-color-text-on-tertiary-soft: var(
+    --ids-theme-dark-text-on-tertiary-soft
+  );
+  --ids-color-text-on-tertiary-solid: var(
+    --ids-theme-dark-text-on-tertiary-solid
+  );
   --ids-color-text-tertiary: var(--ids-theme-dark-text-tertiary);
   --ids-color-text-tertiary-strong: var(--ids-theme-dark-text-tertiary-strong);
   --ids-color-border-tertiary: var(--ids-theme-dark-border-tertiary);
-  --ids-color-border-tertiary-strong: var(--ids-theme-dark-border-tertiary-strong);
+  --ids-color-border-tertiary-strong: var(
+    --ids-theme-dark-border-tertiary-strong
+  );
   --ids-color-bg-success-soft: var(--ids-theme-dark-bg-success-soft);
   --ids-color-bg-success-solid: var(--ids-theme-dark-bg-success-solid);
   --ids-color-text-on-success-soft: var(--ids-theme-dark-text-on-success-soft);
-  --ids-color-text-on-success-solid: var(--ids-theme-dark-text-on-success-solid);
+  --ids-color-text-on-success-solid: var(
+    --ids-theme-dark-text-on-success-solid
+  );
   --ids-color-text-success: var(--ids-theme-dark-text-success);
   --ids-color-text-success-strong: var(--ids-theme-dark-text-success-strong);
   --ids-color-border-success: var(--ids-theme-dark-border-success);
-  --ids-color-border-success-strong: var(--ids-theme-dark-border-success-strong);
+  --ids-color-border-success-strong: var(
+    --ids-theme-dark-border-success-strong
+  );
   --ids-color-bg-warning-soft: var(--ids-theme-dark-bg-warning-soft);
   --ids-color-bg-warning-solid: var(--ids-theme-dark-bg-warning-solid);
   --ids-color-text-on-warning-soft: var(--ids-theme-dark-text-on-warning-soft);
-  --ids-color-text-on-warning-solid: var(--ids-theme-dark-text-on-warning-solid);
+  --ids-color-text-on-warning-solid: var(
+    --ids-theme-dark-text-on-warning-solid
+  );
   --ids-color-text-warning: var(--ids-theme-dark-text-warning);
   --ids-color-text-warning-strong: var(--ids-theme-dark-text-warning-strong);
   --ids-color-border-warning: var(--ids-theme-dark-border-warning);
-  --ids-color-border-warning-strong: var(--ids-theme-dark-border-warning-strong);
+  --ids-color-border-warning-strong: var(
+    --ids-theme-dark-border-warning-strong
+  );
   --ids-color-bg-danger-soft: var(--ids-theme-dark-bg-danger-soft);
   --ids-color-bg-danger-solid: var(--ids-theme-dark-bg-danger-solid);
   --ids-color-text-on-danger-soft: var(--ids-theme-dark-text-on-danger-soft);

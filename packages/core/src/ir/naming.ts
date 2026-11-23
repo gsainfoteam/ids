@@ -1,3 +1,4 @@
+import { mapValues } from 'es-toolkit/object';
 import { upperFirst } from 'es-toolkit/string';
 
 import type { NameCase, Spelling, TargetsConfig } from '../sources/config.ts';
@@ -22,12 +23,22 @@ export function createNaming(targets: TargetsConfig) {
       ]),
     ) as Record<Roles, string>;
 
-  const name = (segments: Segments): Name => ({
-    segments: [...segments],
-    css: spellAll(targets.targets.css.names, segments),
-    ts: spellAll(targets.targets.ts.names, segments),
-    dart: spellAll(targets.targets.dart.names, segments),
-  });
+  const name = (segments: Segments, sub: Segments = []): Name => {
+    const merged = [...segments, ...sub];
+    const css = spellAll(targets.targets.css.names, segments);
+    return {
+      segments: [...segments],
+      ...(sub.length === 0 ? {} : { sub: [...sub] }),
+      css:
+        sub.length === 0
+          ? css
+          : mapValues(css, (base) =>
+              [base, CASES.kebab(sub)].join(targets.targets.css.subSeparator),
+            ),
+      ts: spellAll(targets.targets.ts.names, merged),
+      dart: spellAll(targets.targets.dart.names, merged),
+    };
+  };
 
   const symbols = (declared: Record<string, Segments>) =>
     Object.fromEntries(Object.entries(declared).map(([key, segments]) => [key, name(segments)]));
