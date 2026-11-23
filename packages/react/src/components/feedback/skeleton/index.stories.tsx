@@ -4,6 +4,7 @@ import { expect, within } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
 import { Badge } from '../../data/badge';
@@ -36,7 +37,7 @@ const meta = {
   args: {
     loading: true,
     animation: 'pulse',
-    className: 'max-w-sm',
+    className: cn('max-w-sm'),
     children: (
       <Card>
         <Card.Header>
