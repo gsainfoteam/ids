@@ -21,10 +21,11 @@ package.json, pubspec.yaml   ─┘   (valibot 검사)   (IR + ir.schema.json)
   - 실행마다 `out/ir.json`(git 에서 제외)과 `ir.schema.json`(커밋)을 쓴다. Dart 쪽 IR 모델은 `ir.schema.json` 에서 만든다.
 - 타깃 emitter: IR 만 읽는다. 이름을 다시 만들지 않고 IR 의 철자를 그대로 쓴다.
   - `src/targets/css/`: `css/dist/ids.css`(아래 "CSS 타깃").
+  - `src/targets/ts/emit.ts`: `react/src/tokens` 의 `types.ts`, `color-roles.ts`, `component-tokens.ts`, `palette-model.ts`(아래 "TS 타깃").
   - `src/targets/ts/foundations.ts`: 스토리가 읽는 `react/src/tokens/foundations.json`. JSON 을 Prettier 로 정리해 쓴다.
   - `src/targets/output.ts`: `targets.json` 의 `outputs` 에서 출력 경로를 찾고, 그 파일 자리의 Prettier 설정으로 정리해 쓴다.
   - `src/fonts/copy.ts`: IR 의 `fonts.bundled` 대로 Flutter 글꼴을 복사한다.
-  - `src/legacy/`: 이전 Style Dictionary 포매터를 IR 에서 먹인다. `from-ir.ts` 가 IR 을 이전 입력 모양으로 바꾸고, 출력은 이전 파이프라인과 바이트가 같다. TS, Dart emitter 가 차례로 이 폴더를 대신한다.
+  - `src/legacy/`: 이전 Style Dictionary 포매터를 IR 에서 먹인다. `from-ir.ts` 가 IR 을 이전 입력 모양으로 바꾸고, 출력은 이전 파이프라인과 바이트가 같다. Dart emitter 가 이 폴더를 대신한다.
 - 문구는 아직 `messages.build.mjs` 가 따로 만든다(아래 "문구 카탈로그").
 
 ## 원본
@@ -199,6 +200,16 @@ src/targets/css/
   - 글자 토큰과 텍스트 스타일의 `:root` 값과 Tailwind 이름, `[data-mode]` 반지름과 `[data-scale]` 배율 길이(`scale`)
 - `static/*.css` 는 손으로 쓴 CSS 다. 토큰 이름을 바꾸면 이 파일들도 고친다. focus-ring utility 셋은 `@variant focus-ring-visible` 로 trigger 를 읽는다.
 - `src/targets/**` 는 문자열을 잇지 않는다. ESLint(`eslint.config.js`)가 식이 든 템플릿 문자열, 문자열 `+`, `replace`, `replaceAll`, `concat`, `padStart`, `padEnd` 를 막는다. 철자는 `literals.ts` 에만 둔다. 오류 메시지는 예외다.
+
+## TS 타깃
+
+`src/targets/ts/emit.ts` 가 TypeScript compiler API 의 `factory` 로 문장 노드를 만들고, printer 로 찍은 뒤 Prettier(`react/prettier.config.js`)로 정리한다.
+
+- `nodes.ts` 가 노드를 만든다. 문자열, 음수, 배열, 객체(`record` 는 여러 줄, `inlineRecord` 는 한 줄), `export const … as const`, 문자열 union 타입.
+- `literals.ts` 는 머리 주석, 문장 사이 빈 줄, 식별자인지 보는 규칙만 둔다. 식별자가 아닌 키(`'bg-base'`)는 문자열 키가 된다.
+- 상수 이름은 `targets.json` 의 `targets.ts.symbols` 에서 IR 이 만든 `ts.constant` 다(`IDS_COLOR_FAMILIES`). 계열 묶음은 `collections.familyGroup` 을 붙여 `IDS_NEUTRAL_FAMILIES` 가 된다.
+- 그림자 문자열(`0 1px 2px 0 #0000000d`)은 CSS 타깃의 값 노드(`shadowValue`)를 그대로 직렬화한다.
+- 출력 경로는 `targets.ts.outputs` 의 `types`, `colorRoles`, `componentTokens`, `paletteModel` 이다.
 
 ## 토큰 종류 더하기
 
