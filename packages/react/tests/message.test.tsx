@@ -136,16 +136,34 @@ test('the end column pushes the content to the end', async () => {
   ).toBeLessThan(1);
 });
 
+test('SSR: the avatar is drawn only where Message.Avatar is written, named by the sender', () => {
+  const doc = parse(
+    <>
+      <Message name="김지수">
+        <Message.Avatar />
+        안녕
+      </Message>
+      <Message name="김지수">안녕</Message>
+    </>,
+  );
+  const [written, bare] = articles(doc);
+  expect(written!.querySelector('[data-message-avatar]')).not.toBeNull();
+  expect(bare!.querySelector('[data-message-avatar]')).toBeNull();
+});
+
 test('MessageGroup hands out align and shows the name first and the time last', () => {
   const doc = parse(
     <MessageGroup align="end" aria-label="내 메시지">
-      <Message name="나" avatar="data:image/png;base64,AAAA" time={SENT_AT}>
+      <Message name="나" time={SENT_AT}>
+        <Message.Avatar src="data:image/png;base64,AAAA" />
         <Bubble align="end">하나</Bubble>
       </Message>
-      <Message name="나" avatar="data:image/png;base64,AAAA" time={SENT_AT}>
+      <Message name="나" time={SENT_AT}>
+        <Message.Avatar src="data:image/png;base64,AAAA" />
         <Bubble>둘</Bubble>
       </Message>
-      <Message name="나" avatar="data:image/png;base64,AAAA" time={SENT_AT} align="start">
+      <Message name="나" time={SENT_AT} align="start">
+        <Message.Avatar src="data:image/png;base64,AAAA" />
         <Bubble>셋</Bubble>
       </Message>
     </MessageGroup>,
@@ -468,10 +486,12 @@ test('axe finds nothing in a chat of groups, answers and failures', async () => 
           <Message.Actions />
         </Message>
         <MessageGroup align="start" aria-label="김지수의 메시지">
-          <Message name="김지수" avatar="data:image/png;base64,AAAA" time={SENT_AT}>
+          <Message name="김지수" time={SENT_AT}>
+            <Message.Avatar src="data:image/png;base64,AAAA" />
             <Bubble>학식 메뉴 알려 줘</Bubble>
           </Message>
-          <Message name="김지수" avatar="data:image/png;base64,AAAA" time={SENT_AT} unread={2}>
+          <Message name="김지수" time={SENT_AT} unread={2}>
+            <Message.Avatar src="data:image/png;base64,AAAA" />
             <Bubble>오늘 거</Bubble>
           </Message>
         </MessageGroup>

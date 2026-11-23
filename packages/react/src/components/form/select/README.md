@@ -100,7 +100,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
     <Select.Icon /> {/* 기본은 아래 화살표 */}
   </Select.Trigger>
   {/* Content 를 생략하면 나머지 자식을 감싼다 */}
-  <Select.Content className="max-h-60">
+  <Select.Content>
     <Select.Group heading="한식">
       <Select.Item value="kimchi">김치찌개</Select.Item>
     </Select.Group>
@@ -117,6 +117,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 
 - `Item`, `Group` 은 `Content` 나 루트의 자식, 또는 Fragment 안에 둡니다. 다른 컴포넌트 안은 찾지 않습니다.
 - `Select.Separator` 는 `decorative` 인 `Divider` 입니다. listbox 에는 옵션과 그룹만 둘 수 있어 스크린 리더에는 숨깁니다.
+- 팝업 높이는 IDS 가 정합니다. 120px 에서 360px 사이에서 화면에 남은 공간만큼 열리고, 넘치는 옵션은 목록 안에서 스크롤됩니다.
 - `Trigger`, `Clear`, `Content` 는 각각 하나까지입니다. 옵션은 `Content` 안이나 루트 중 한 곳에만 둡니다.
 - 모든 part 가 `asChild` 를 받습니다. 자식은 props 와 ref 를 해당 element 에 전달해야 합니다.
 
@@ -126,7 +127,6 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 <Select.Item
   value="doing"
   label="진행 중"                                 // 트리거와 typeahead 가 쓰는 글자
-  className={(item) => (item.selected ? 'font-medium' : undefined)}
 >
   <StatusDot />
   진행 중
@@ -140,23 +140,22 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 </Select.Trigger>
 ```
 
-| Item 상태     | 뜻                            |
-| ------------- | ----------------------------- |
-| `selected`    | 고른 옵션                     |
-| `highlighted` | 키보드나 마우스가 가리킨 옵션 |
-| `disabled`    | 고를 수 없는 옵션             |
+- Item 의 `children` 은 `Select.ItemState`(`selected`, `highlighted`, `disabled`)를 받는 함수도 됩니다. Value 의 `children` 은 `{ value, labels, placeholder }` 를 받습니다.
 
-- Item 의 `className` 과 `children` 은 위 상태를 받는 함수도 됩니다. Value 의 `children` 은 `{ value, labels, placeholder }` 를 받습니다.
-- 루트와 Trigger 의 `className` 은 `Select.State` 를 받는 함수도 됩니다.
+## 상태
 
-## 상태와 data 속성
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-| 요소   | 속성                                                                                                                            |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| 루트   | `data-open`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-placeholder`, `data-size`, `data-variant` |
-| 트리거 | `data-popup-open`, `data-placeholder`, `data-readonly`                                                                          |
-| Item   | `data-selected`, `data-highlighted`, `data-disabled`                                                                            |
-| 팝업   | `data-presentation` (`popover` / `drawer`), `data-side` (`top` / `bottom`)                                                      |
+- 고른 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 정합니다.
+- 열림은 `open` / `defaultOpen` / `onOpenChange` 로 읽고 정합니다.
+- `Select.Item` 과 `Select.Value` 의 `children` 함수가 옵션과 트리거에 그릴 내용을 상태에 따라 고릅니다.
+- 새 디자인(`custom-design`)에서만 루트와 `Select.Trigger` 의 `className` 에 `Select.State`(`open`, `disabled`, `readOnly`, `invalid`, `required`, `placeholder`, `multiple`)를, `Select.Item` 의 `className` 에 `Select.ItemState` 를 받는 함수를 줍니다.
+
+```tsx custom-design
+<Select.Item value="doing" className={(item) => (item.selected ? 'font-medium' : undefined)}>
+  진행 중
+</Select.Item>
+```
 
 ## 열림 상태
 
@@ -171,8 +170,12 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 ## 팝업
 
 ```tsx
-<Select mobileVariant="drawer">{items}</Select> // 640px 미만에서 하단 시트
+<Select>
+  <Select.Content mobileVariant="drawer">{items}</Select.Content> {/* 640px 미만에서 하단 시트 */}
+</Select>
 ```
+
+- `mobileVariant` 는 팝업 part 인 `Select.Content` 가 받습니다. 기본은 `popover` 이고, 좁은 화면에서도 팝오버로 엽니다. 하단 시트로 열려면 옵션을 모두 `Select.Content` 안에 둡니다.
 
 - 팝업은 브라우저 top layer 에 떠서 `overflow: hidden` 부모에 잘리지 않고, 테마는 그대로 이어받습니다.
 - 폭은 트리거 이상, 최소 240px 입니다. 아래 공간이 모자라면 위로 열리고, 목록을 걸러 높이가 바뀌어도 열린 쪽을 지킵니다. 페이지를 스크롤하면 트리거를 따라가고, 트리거가 화면을 벗어나면 함께 벗어납니다.
@@ -239,13 +242,17 @@ const methods = useForm({ defaultValues: { fruit: null, tags: [] } }); // 하나
 | `placeholder`            | `선택하세요`                                                        |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                  |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                          |
-| `mobileVariant`          | `popover`(기본) / `drawer`: 640px 미만에서 모달 하단 시트           |
 | `invalid`                | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선          |
 | `disabled` / `readOnly`  | 열기와 선택을 막는다                                                |
 | `name` / `form`          | 값마다 hidden input                                                 |
 | `required`               | 브라우저 검증                                                       |
-| `className` / `style`    | 루트. `className` 은 상태를 받는 함수도 된다                        |
+| `className` / `style`    | 루트. 새 디자인(`custom-design`)에서만 쓴다                         |
 | `ref`, 그 외 native 속성 | 트리거 button (`id`, `aria-*`, `autoFocus`, `onFocus`, `onBlur` 등) |
+
+| `Select.Content`  | 기본 / 동작                                                         |
+| ----------------- | ------------------------------------------------------------------- |
+| `mobileVariant`   | `popover`(기본) / `drawer`: 640px 미만에서 모달 하단 시트           |
+| `asChild`         | 자식 element 가 listbox 가 된다                                     |
 
 ## 알아둘 것
 

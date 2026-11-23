@@ -113,7 +113,7 @@ export const PC: Story = {
     return (
       <div className="break-keep">
         <Sidebar.Provider>
-          <Sidebar value={current} collapsible aria-label="주 메뉴">
+          <Sidebar value={current} collapsible="icon" aria-label="주 메뉴">
             <Sidebar.Header>
               <Avatar name="인포팀" size="tiny" aria-hidden>
                 <Avatar.Fallback>
