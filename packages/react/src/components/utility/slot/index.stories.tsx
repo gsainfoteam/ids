@@ -16,6 +16,10 @@ const meta = {
   component: Slot,
   tags: ['autodocs'],
   parameters: { controls: { disable: true } },
+  args: {
+    className: cn('rounded-standard bg-primary-solid text-on-primary-solid px-4 py-2'),
+    children: <a href="#slot">Slot이 감싼 링크</a>,
+  },
 } satisfies Meta<typeof Slot>;
 
 export default meta;
@@ -39,7 +43,9 @@ function Tag({
   );
 }
 
-export const Playground: Story = {
+export const Playground: Story = {};
+
+export const Usage: Story = {
   render: () => (
     <Slot className="rounded-standard bg-primary-solid text-on-primary-solid px-4 py-2">
       <a href="#slot">Slot이 감싼 링크</a>
@@ -89,7 +95,32 @@ export const Gallery: Story = {
   ),
 };
 
-export const MergesClassName: Story = {
+export const BuildAnAsChildComponent: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Tag>새 글</Tag>
+      <Tag asChild>
+        <a href="#notices">공지로 가기</a>
+      </Tag>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "컴포넌트가 `asChild` 일 때 자기 태그 대신 `Slot` 을 그리면, 자기 className 과 속성을 자식 요소에 입힙니다. 위 `Tag` 는 `const Root = asChild ? Slot : 'span'` 한 줄로 링크가 됩니다.",
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole('link', { name: '공지로 가기' });
+    await expect(link).toHaveAttribute('data-tag');
+    await expect(link).toHaveClass('bg-primary-soft');
+    await expect(canvas.getByText('새 글').tagName).toBe('SPAN');
+  },
+};
+
+export const MergeClassNames: Story = {
   render: () => (
     <Slot className="text-primary px-2">
       <span className="px-4 underline">양쪽 className이 합쳐진다</span>
@@ -98,7 +129,7 @@ export const MergesClassName: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'className은 둘을 합치고, 같은 속성을 다투면 Slot 쪽이 이깁니다(px-2).',
+        story: '`className` 은 둘을 합치고, 같은 속성을 다투면 Slot 쪽이 이깁니다(`px-2`).',
       },
     },
   },
@@ -111,14 +142,14 @@ export const MergesClassName: Story = {
   },
 };
 
-export const MergesStyle: Story = {
+export const MergeStyles: Story = {
   render: () => (
     <Slot style={{ color: 'var(--ids-color-text-primary)' }}>
       <span style={{ color: 'red', fontWeight: 600 }}>style 합치기</span>
     </Slot>
   ),
   parameters: {
-    docs: { description: { story: 'style은 얕게 합쳐지고 겹치는 속성은 Slot 쪽이 이깁니다.' } },
+    docs: { description: { story: '`style` 은 얕게 합쳐지고 겹치는 속성은 Slot 쪽이 이깁니다.' } },
   },
   play: async ({ canvas }) => {
     const span = canvas.getByText('style 합치기');
@@ -127,7 +158,7 @@ export const MergesStyle: Story = {
   },
 };
 
-export const Handlers: Story = {
+export const ChainEventHandlers: Story = {
   render: function Render() {
     const [log, setLog] = useState<string[]>([]);
 
@@ -151,7 +182,7 @@ export const Handlers: Story = {
     docs: {
       description: {
         story:
-          '이벤트 핸들러는 자식 것이 먼저, 그다음 Slot 것이 실행됩니다. 자식이 preventDefault를 부르면 Slot 핸들러는 건너뜁니다.',
+          '이벤트 핸들러는 자식 것이 먼저, 그다음 Slot 것이 실행됩니다. 자식이 `preventDefault` 를 부르면 Slot 핸들러는 건너뜁니다.',
       },
     },
   },
@@ -163,11 +194,12 @@ export const Handlers: Story = {
   },
 };
 
-export const PropsAndRefs: Story = {
-  render: function PropsAndRefs() {
+export const ForwardPropsAndRefs: Story = {
+  render: function Render() {
     const slotRef = useRef<HTMLElement>(null);
     const childRef = useRef<HTMLButtonElement>(null);
     const [same, setSame] = useState('');
+
     return (
       <div className="flex flex-col gap-2">
         <Slot ref={slotRef} aria-label="Slot이 지정한 이름">
@@ -189,7 +221,7 @@ export const PropsAndRefs: Story = {
   parameters: {
     docs: {
       description: {
-        story: '그 밖의 prop은 Slot 쪽이 이깁니다. ref는 양쪽 모두 같은 요소를 가리킵니다.',
+        story: '그 밖의 prop 은 Slot 쪽이 이깁니다. `ref` 는 양쪽 모두 같은 요소를 가리킵니다.',
       },
     },
   },

@@ -29,6 +29,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <Link href="#notices">공지 모아 보기</Link>,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -126,7 +130,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const InRunningText: Story = {
+export const LinkInsideASentence: Story = {
   render: () => (
     <p className="text-body-b2-regular max-w-md">
       비밀번호를 잊었다면 <Link href="#forgot-password">비밀번호 찾기</Link>로 새로 정할 수 있어요.
@@ -147,7 +151,7 @@ export const InRunningText: Story = {
   },
 };
 
-export const NewTab: Story = {
+export const OpenInANewTab: Story = {
   render: () => (
     <div className="flex flex-col gap-3">
       <Link href="https://www.gist.ac.kr" target="_blank">
@@ -177,7 +181,7 @@ export const NewTab: Story = {
   },
 };
 
-export const AsChild: Story = {
+export const StyleARouterLink: Story = {
   render: () => (
     <div className="flex flex-col gap-3">
       <Link asChild>
@@ -212,7 +216,7 @@ export const AsChild: Story = {
   },
 };
 
-export const LinkList: Story = {
+export const ListLinksInAFooter: Story = {
   render: () => (
     <nav aria-label="바닥글">
       <ul className="text-body-b3-regular flex flex-col gap-2">
@@ -250,7 +254,7 @@ export const LinkList: Story = {
   },
 };
 
-export const CurrentPage: Story = {
+export const MarkTheCurrentPage: Story = {
   render: () => (
     <nav aria-label="주 메뉴">
       <ul className="text-body-b3-medium flex gap-6">

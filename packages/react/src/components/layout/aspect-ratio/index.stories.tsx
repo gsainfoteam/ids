@@ -30,6 +30,14 @@ const tile = cn(
   'flex items-center justify-center rounded-standard bg-primary-soft text-body-b3-medium text-on-primary-soft',
 );
 
+const ratios = [
+  ['1:1', 1],
+  ['4:3', 4 / 3],
+  ['16:9', 16 / 9],
+  ['21:9', 21 / 9],
+  ['3:4', 3 / 4],
+] as const;
+
 export const Playground: Story = {
   render: (args) => (
     <div className="w-80">
@@ -40,13 +48,17 @@ export const Playground: Story = {
   ),
 };
 
-const ratios = [
-  ['1:1', 1],
-  ['4:3', 4 / 3],
-  ['16:9', 16 / 9],
-  ['21:9', 21 / 9],
-  ['3:4', 3 / 4],
-] as const;
+export const Usage: Story = {
+  render: () => (
+    <div className="w-80">
+      <AspectRatio ratio={16 / 9} className="rounded-standard bg-neutral-soft overflow-hidden">
+        <div className="text-body-b3-medium text-neutral flex items-center justify-center">
+          16:9
+        </div>
+      </AspectRatio>
+    </div>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -85,7 +97,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Responsive: Story = {
+export const KeepTheRatioWhileTheWidthChanges: Story = {
   render: function Render() {
     const [compact, setCompact] = useState(false);
 
@@ -105,7 +117,8 @@ export const Responsive: Story = {
   parameters: {
     docs: {
       description: {
-        story: '부모 폭이 바뀌면 높이를 CSS가 다시 계산합니다. 크기를 재는 스크립트가 없습니다.',
+        story:
+          '`ratio` 하나로 폭이 바뀌어도 비율을 지키는 칸을 얻습니다. 부모 폭이 바뀌면 높이를 CSS가 다시 계산하고, 크기를 재는 스크립트는 없습니다.',
       },
     },
   },
@@ -120,7 +133,7 @@ export const Responsive: Story = {
   },
 };
 
-export const MediaFills: Story = {
+export const FillTheFrameWithAnImage: Story = {
   render: () => (
     <div className="w-60">
       <AspectRatio data-testid="frame" className="rounded-standard overflow-hidden">
@@ -131,7 +144,8 @@ export const MediaFills: Story = {
   parameters: {
     docs: {
       description: {
-        story: '3:1 그림을 1:1 칸에 넣어도 칸을 채우고, 넘치는 좌우는 잘립니다.',
+        story:
+          '`img` 나 `video` 를 자식으로 두면 칸을 채웁니다. 3:1 그림을 1:1 칸에 넣어도 칸을 채우고, 넘치는 좌우는 잘립니다(`object-cover`). 모서리는 `rounded-standard overflow-hidden` 으로 깎습니다.',
       },
     },
   },
@@ -144,7 +158,7 @@ export const MediaFills: Story = {
   },
 };
 
-export const IntrinsicContent: Story = {
+export const ClipContentTallerThanTheFrame: Story = {
   render: () => (
     <div className="w-60">
       <AspectRatio
@@ -160,7 +174,8 @@ export const IntrinsicContent: Story = {
   parameters: {
     docs: {
       description: {
-        story: '자식 크기가 칸을 늘리지 않습니다. 넘치는 부분은 overflow-hidden으로 자릅니다.',
+        story:
+          '자식이 칸보다 커도 칸은 늘어나지 않고 비율을 지킵니다. 넘치는 부분은 `overflow-hidden` 으로 자릅니다.',
       },
     },
   },

@@ -42,6 +42,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <Pagination defaultPage={3} pageCount={10} />,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -109,7 +113,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Controlled: Story = {
+export const FollowThePageInYourState: Story = {
   render: function Render() {
     const [page, setPage] = useState(1);
     return (
@@ -136,32 +140,7 @@ export const Controlled: Story = {
   },
 };
 
-export const Keyboard: Story = {
-  args: { defaultPage: 5, pageCount: 10 },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '버튼마다 Tab 이 멈춥니다. 안에 포커스가 있을 때 `←` `→` 는 이전과 다음 페이지로, `Home` `End` 는 첫 페이지와 마지막 페이지로 옮깁니다. 페이지 번호에서 누르면 포커스가 새 현재 페이지를 따라가고, 이전과 다음에서 누르면 그 버튼에 남습니다. 오른쪽에서 왼쪽으로 쓰는 화면에서는 `←` 와 `→` 가 바뀝니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '5페이지' }));
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(args.onPageChange).toHaveBeenLastCalledWith(6);
-    await expect(canvas.getByRole('button', { name: '6페이지' })).toHaveFocus();
-    await userEvent.keyboard('{End}');
-    await expect(canvas.getByRole('button', { name: '10페이지' })).toHaveFocus();
-    await userEvent.keyboard('{Home}');
-    await expect(canvas.getByRole('button', { name: '1페이지' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-  },
-};
-
-export const Links: Story = {
+export const GiveEveryPageAnAddress: Story = {
   render: () => <Pagination defaultPage={3} pageCount={10} getHref={(page) => `#page-${page}`} />,
   parameters: {
     docs: {
@@ -184,7 +163,7 @@ export const Links: Story = {
   },
 };
 
-export const RouterLink: Story = {
+export const LinkWithYourRouter: Story = {
   render: function Render() {
     const [page, setPage] = useState(4);
     return (
@@ -226,7 +205,7 @@ export const RouterLink: Story = {
   },
 };
 
-export const Composition: Story = {
+export const PlaceThePartsYourself: Story = {
   render: () => (
     <Pagination defaultPage={2} pageCount={3} variant="outline">
       <Pagination.List>
@@ -266,7 +245,7 @@ export const Composition: Story = {
   },
 };
 
-export const FirstAndLast: Story = {
+export const ShowPageOfTotal: Story = {
   render: function Render() {
     const [page, setPage] = useState(7);
 
@@ -316,5 +295,31 @@ export const FirstAndLast: Story = {
 
     await userEvent.click(canvas.getByRole('button', { name: '첫 페이지' }));
     await expect(canvas.getByText('1 / 20')).toBeVisible();
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { defaultPage: 5, pageCount: 10 },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '버튼마다 Tab 이 멈춥니다. 안에 포커스가 있을 때 `←` `→` 는 이전과 다음 페이지로, `Home` `End` 는 첫 페이지와 마지막 페이지로 옮깁니다. 페이지 번호에서 누르면 포커스가 새 현재 페이지를 따라가고, 이전과 다음에서 누르면 그 버튼에 남습니다. 오른쪽에서 왼쪽으로 쓰는 화면에서는 `←` 와 `→` 가 바뀝니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '5페이지' }));
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(args.onPageChange).toHaveBeenLastCalledWith(6);
+    await expect(canvas.getByRole('button', { name: '6페이지' })).toHaveFocus();
+    await userEvent.keyboard('{End}');
+    await expect(canvas.getByRole('button', { name: '10페이지' })).toHaveFocus();
+    await userEvent.keyboard('{Home}');
+    await expect(canvas.getByRole('button', { name: '1페이지' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   },
 };
