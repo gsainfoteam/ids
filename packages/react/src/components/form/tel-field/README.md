@@ -68,7 +68,7 @@ import { Field, TelField } from '@gsainfoteam/ids-react';
 ## 국가 선택
 
 ```tsx
-<TelField defaultCountry="KR" locale="ko-KR">
+<TelField defaultCountry="KR">
   <TelField.CountrySelect />                          {/* 트리거에 "KR +82" */}
   <TelField.Input />
 </TelField>
@@ -76,7 +76,7 @@ import { Field, TelField } from '@gsainfoteam/ids-react';
 <TelField.CountrySelect aria-label="Country" searchPlaceholder="Search" /> {/* 문구 바꾸기 */}
 ```
 
-- 목록은 libphonenumber-js가 아는 모든 나라이고, `locale` 의 나라 이름 순서로 정렬합니다. 기본 `locale` 은 `ko-KR` 입니다.
+- 목록은 libphonenumber-js가 아는 모든 나라이고, 가장 가까운 `IdsProvider` 의 `locale` 로 나라 이름을 쓰고 그 순서로 정렬합니다. provider 에 `locale` 이 없으면 `ko-KR` 입니다.
 - 나라를 바꾸면 국가 번호만 바꾸고 나머지 숫자는 둡니다. 그 번호가 새 나라에서 올바른지는 검증이 알립니다.
 - 국가 선택이 있으면 국가 번호는 선택에 두고 입력에는 국내 형식만 보입니다. `+1 …` 을 입력하거나 붙여 넣으면 선택이 미국으로 바뀝니다.
 - 코드가 넣은 값의 국가 번호가 고른 나라와 같으면 고른 나라를 그대로 둡니다. 미국과 캐나다는 같은 `+1` 을 씁니다.
@@ -133,7 +133,6 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `onChange`               | native change 이벤트                                          |
 | `format`                 | `auto`(기본) / `international` / `none`                       |
 | `defaultCountry`         | `KR`. 지원하는 ISO alpha-2 코드                               |
-| `locale`                 | `ko-KR`. 국가 이름의 언어                                     |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                            |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |

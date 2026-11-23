@@ -45,6 +45,18 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>전화번호</Field.Label>
+      <TelField name="tel" defaultCountry="KR">
+        <TelField.CountrySelect />
+        <TelField.Input />
+      </TelField>
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -131,7 +143,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const CountryAndValue: Story = {
+export const ShowTheValueAsE164: Story = {
   render: function Render() {
     const [value, setValue] = useState('');
 
@@ -170,7 +182,7 @@ export const CountryAndValue: Story = {
   },
 };
 
-export const InternationalInput: Story = {
+export const TypeAnInternationalNumber: Story = {
   render: (args) => (
     <TelField {...args}>
       <TelField.CountrySelect />
@@ -194,7 +206,7 @@ export const InternationalInput: Story = {
   },
 };
 
-export const Paste: Story = {
+export const PasteANumberInAnyForm: Story = {
   render: (args) => <TelField {...args} />,
   parameters: {
     docs: {
@@ -214,7 +226,7 @@ export const Paste: Story = {
   },
 };
 
-export const Validation: Story = {
+export const RejectAnIncompleteNumber: Story = {
   render: function Render() {
     const [sent, setSent] = useState('');
 
