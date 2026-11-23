@@ -25,7 +25,7 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 
 | Property  | Type                              | Default   |
 | --------- | --------------------------------- | --------- |
-| `align`   | `'start' \| 'end'`                | `'start'` |
+| `align`   | `'start' \| 'end'`                | Message 의 `align`, 없으면 `'start'` |
 | `variant` | `'soft' \| 'solid' \| 'outline'`  | `'soft'`  |
 | `asChild` | `boolean`                         | `false`   |
 
@@ -61,7 +61,7 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 </ol>
 ```
 
-- Bubble 은 Message 안에 있는지 살피지 않습니다. Message 는 `align` 을 넘기고, 직접 둔 Bubble 은 앱이 `align` 을 줍니다.
+- Message 안의 Bubble 은 Message 가 context(`BubbleAlignContext`)로 주는 `align` 을 받습니다. Bubble 이 주변을 살피는 것이 아니라 Message 가 주는 값입니다. Bubble 에 준 `align` 이 이기고, Message 밖에서는 `start` 입니다.
 - 한국어는 줄 바깥 요소에 `break-keep` 을 줍니다. 글자 단위로 접히면 줄이 거의 꽉 차서 줄일 폭이 남지 않습니다.
 
 ## 폭 맞춤

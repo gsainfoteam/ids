@@ -35,13 +35,13 @@ const meta = {
     <div className="w-96 break-keep">
       <MessageGroup {...args}>
         <Message name="김지수" avatar={JISU} time={SENT_AT}>
-          학식 메뉴 알려 줘
+          <Bubble>학식 메뉴 알려 줘</Bubble>
         </Message>
         <Message name="김지수" avatar={JISU} time={SENT_AT}>
-          오늘 거
+          <Bubble>오늘 거</Bubble>
         </Message>
         <Message name="김지수" avatar={JISU} time={SENT_AT}>
-          2학생회관 기준으로
+          <Bubble>2학생회관 기준으로</Bubble>
         </Message>
       </MessageGroup>
     </div>
@@ -94,30 +94,26 @@ export const Gallery: Story = {
           <div className="w-96 break-keep">
             <MessageGroup align="end" aria-label="내 메시지">
               <Message name="나" time={ANSWERED_AT} unread={2}>
-                <Bubble align="end" variant="solid">
-                  돈가스랑 우동이야
-                </Bubble>
+                <Bubble variant="solid">돈가스랑 우동이야</Bubble>
               </Message>
               <Message name="나" time={ANSWERED_AT} unread={2}>
-                <Bubble align="end" variant="solid">
-                  같이 갈래?
-                </Bubble>
+                <Bubble variant="solid">같이 갈래?</Bubble>
               </Message>
             </MessageGroup>
           </div>
         </Showcase.Row>
       </Showcase.Section>
       <Showcase.Section
-        title="Plain"
-        description="말풍선이 없는 메시지는 마지막 메시지의 아래 줄에 시간을 그립니다."
+        title="Without a Bubble"
+        description="본문에 Bubble 이 없는 메시지는 마지막 메시지의 아래 줄에 시간을 그립니다."
       >
-        <Showcase.Row label="plain">
+        <Showcase.Row label="본문">
           <div className="w-96 break-keep">
             <MessageGroup aria-label="GIST 도우미의 메시지">
-              <Message shape="plain" name="GIST 도우미" time={ANSWERED_AT}>
+              <Message name="GIST 도우미" time={ANSWERED_AT}>
                 12시 20분에 광주송정역행 셔틀이 학생회관 앞에서 출발해요.
               </Message>
-              <Message shape="plain" name="GIST 도우미" time={ANSWERED_AT}>
+              <Message name="GIST 도우미" time={ANSWERED_AT}>
                 다음 셔틀은 1시 20분이에요.
               </Message>
             </MessageGroup>

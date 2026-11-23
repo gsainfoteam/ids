@@ -6,7 +6,7 @@ import { MessageContent, type MessageContentProps } from './content';
 import { MessageCopy, type MessageCopyProps } from './copy';
 import { MessageFooter, type MessageFooterProps } from './footer';
 import { MessageHeader, type MessageHeaderProps } from './header';
-import { MessageRoot, type MessageAlign, type MessageShape, type MessageStatus } from './root';
+import { MessageRoot, type MessageAlign, type MessageStatus } from './root';
 import { messageStyle } from './style';
 
 export function Message(props: Message.Props) {
@@ -14,24 +14,20 @@ export function Message(props: Message.Props) {
 }
 
 export namespace Message {
-  export type Shape = MessageShape;
   export type Align = MessageAlign;
   export type Status = MessageStatus;
 
-  export type Props = Omit<ComponentProps<'article'>, 'children'> &
-    (
-      | { shape?: Extract<MessageShape, 'bubble'>; align?: MessageAlign }
-      | { shape: Extract<MessageShape, 'plain'>; align?: never }
-    ) & {
-      name?: string;
-      avatar?: string | ReactNode;
-      time?: Date;
-      locale?: string;
-      status?: MessageStatus;
-      unread?: number | boolean;
-      onRetry?: () => void;
-      children?: ReactNode;
-    };
+  export type Props = Omit<ComponentProps<'article'>, 'children'> & {
+    align?: MessageAlign;
+    name?: string;
+    avatar?: string | ReactNode;
+    time?: Date;
+    locale?: string;
+    status?: MessageStatus;
+    unread?: number | boolean;
+    onRetry?: () => void;
+    children?: ReactNode;
+  };
 
   export type AvatarProps = MessageAvatarProps;
   export type HeaderProps = MessageHeaderProps;
@@ -73,4 +69,4 @@ export namespace Message {
   export const Style = messageStyle;
 }
 
-export type { MessageAlign, MessageShape, MessageStatus } from './root';
+export type { MessageAlign, MessageStatus } from './root';
