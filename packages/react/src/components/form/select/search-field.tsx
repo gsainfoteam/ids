@@ -18,10 +18,10 @@ export function SelectSearchField({ placeholder, ...props }: SelectSearchFieldPr
   const { state: s, ids } = c.select;
 
   const own = mergeProps(props as Record<string, unknown>, {
-    'aria-label': props['aria-label'] ?? t('select.search'),
+    'aria-label': props['aria-label'] ?? t('common.search'),
     'data-select-search': '',
     value: s.query,
-    placeholder: placeholder ?? t('select.searchPlaceholder'),
+    placeholder,
     onChange: (event: ChangeEvent<HTMLInputElement>) =>
       c.select.actions.search(event.currentTarget.value),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'search'),

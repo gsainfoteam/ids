@@ -164,9 +164,9 @@ export function Workspace({ layout }: { layout?: number[] }) {
 
 - 핸들은 `role="separator"` 이고 Tab 에 멈춥니다. `aria-orientation` 은 선의 방향이라 옆으로 놓인 패널 사이는 `vertical` 입니다.
 - `aria-valuenow` 는 앞 패널의 퍼센트, `aria-valuemin` `aria-valuemax` 는 다른 패널의 한계까지 셈한 범위입니다. 접을 수 있는 패널의 최솟값은 접힌 크기입니다.
-- `aria-valuetext` 는 "30%", 접혔으면 "접힘" 입니다.
+- `aria-valuetext` 는 앞 패널의 퍼센트("30%", 접혔으면 "0%")입니다. 접혔는지는 핸들 위 버튼의 `aria-expanded` 가 알립니다.
 - `aria-controls` 는 앞 패널 하나를 가리킵니다(APG Window Splitter).
-- 이름은 기본 "패널 크기 조절" 입니다. 무엇을 나누는지 `aria-label` 로 알려 줍니다.
+- 이름은 기본 "크기 조절" 입니다. 무엇을 나누는지 `aria-label` 로 알려 줍니다.
 
 ## 상태
 
@@ -201,7 +201,7 @@ export function Workspace({ layout }: { layout?: number[] }) {
 
 | `Splitter.Handle` | 기본 / 동작                  |
 | ----------------- | ---------------------------- |
-| `aria-label`      | "패널 크기 조절"             |
+| `aria-label`      | "크기 조절"             |
 | `asChild`         | 자식 요소 하나를 핸들로 쓴다 |
 
 ## 알아둘 것

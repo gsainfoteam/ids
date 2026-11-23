@@ -50,7 +50,7 @@ export function TelFieldCountrySelect({
         )}
       </Select.Trigger>
       <Select.Content>
-        <Select.SearchField placeholder={searchPlaceholder ?? t('telField.countrySearch')} />
+        <Select.SearchField placeholder={searchPlaceholder ?? t('common.search')} />
         {countryOptions(locale).map((option) => (
           <Select.Item
             key={option.code}

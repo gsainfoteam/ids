@@ -77,7 +77,6 @@ export function DateFieldRoot(props: DateFieldProps) {
   const cell = (useFieldSize(rest.size) ?? 'standard') === 'tiny' ? 32 : 36;
   const calendar = pickerPart<DateFieldCalendarProps>(rest.children, DateFieldCalendar);
   const shown = Math.min(calendar?.props.monthsToShow ?? 1, MONTHS_SIDE_BY_SIDE);
-  const range = selectionMode === 'range';
   return (
     <DateFieldContext value={{ selectionMode, min, max, disabled }}>
       <TemporalField<CalendarValue>
@@ -94,10 +93,8 @@ export function DateFieldRoot(props: DateFieldProps) {
           display: (next) => describeDates(next, selectionMode, formatDate),
           serialize: (next) => serializeDates(next, selectionMode),
           messages: {
-            placeholder: t(range ? 'dateField.rangePlaceholder' : 'dateField.placeholder'),
-            title: t(range ? 'dateField.rangeTitle' : 'dateField.title'),
-            clear: t('dateField.clear'),
-            close: t('dateField.close'),
+            clear: t('common.clear'),
+            close: t('common.close'),
             open: t('dateField.open'),
           },
           icon: CalendarDaysIcon,

@@ -73,15 +73,18 @@ test('every string is an ICU message, and a translation takes the same arguments
   }
 });
 
-test('a Korean default uses only plain arguments, which formatDefaultMessage fills', () => {
-  for (const key of keys)
+test('both catalogs use only plain arguments, which formatDefaultMessage fills', () => {
+  for (const key of keys) {
     for (const element of parse(korean[key], 'ko-KR'))
       expect([LITERAL, SIMPLE_ARGUMENT], key).toContain(element.type);
+    for (const element of parse(english[key], 'en-US'))
+      expect([LITERAL, SIMPLE_ARGUMENT], key).toContain(element.type);
+  }
 
-  expect(formatDefaultMessage('textArea.countOfMax', { count: 1200, maxLength: 2000 })).toBe(
-    '1,200 / 2,000',
+  expect(formatDefaultMessage('rating.valueLabel', { value: 1200, max: 2000 })).toBe(
+    '2,000점 만점에 1,200점',
   );
-  expect(formatDefaultMessage('chipField.remove', { label: '사과' })).toBe('사과 삭제');
+  expect(formatDefaultMessage('common.removeItem', { label: '사과' })).toBe('사과 삭제');
 });
 
 test('every key is used by the code', () => {

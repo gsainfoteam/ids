@@ -5,19 +5,23 @@ import { type ComponentProps } from 'react';
 import { cssColor } from './color';
 import { usePicker } from './context';
 import { GRADIENT_DIRECTION } from './gradient';
-import { useTranslate } from '../../../internal/translate';
+import { useIntlWords, useTranslate } from '../../../internal/translate';
 import { mergeProps } from '../../../utils';
 
 export type ColorPickerAreaProps = Omit<ComponentProps<'div'>, 'children'>;
 
 export function ColorPickerArea({ className, style, ...props }: ColorPickerAreaProps) {
   const t = useTranslate();
+  const words = useIntlWords();
 
   const c = usePicker('ColorPicker.Area');
   const { color, rgba } = c.picker.state;
   const saturation = Math.round(color.s * 100);
   const brightness = Math.round(color.v * 100);
-  const valueText = t('colorPicker.areaValue', { saturation, brightness });
+  const valueText = t('colorPicker.areaValue', {
+    saturation: words.percent(saturation),
+    brightness: words.percent(brightness),
+  });
   const channel = {
     type: 'range',
     min: 0,

@@ -4,7 +4,7 @@
 
 - **세 가지 입력.** 버튼으로 고르고, 필드에 끌어다 놓고, 포커스를 둔 채 붙여넣습니다. 스크린샷도 붙여넣기로 바로 들어갑니다.
 - **미리보기.** 이미지는 썸네일로 보입니다. 파일을 지우거나 필드가 사라지면 썸네일 주소를 바로 해제합니다.
-- **제한과 거부 사유.** `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받은 뒤, 파일마다 이유를 알립니다.
+- **제한과 거부 사유.** `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받습니다. 규칙과 거부 사유의 문구는 앱이 `FileField.Limits`, `FileField.Rejection` 으로 씁니다.
 - **폼.** 지금 고른 `File` 이 그대로 FormData 에 들어갑니다. `required` 는 브라우저 검증이 막고, `<button type="reset">` 은 처음 값으로 되돌립니다.
 - **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-80"><FileField /></div>`.
 - **끌어 놓는 영역이 필요하면 [FileDropzone](../file-dropzone/README.md).** 같은 값, 제한, part 를 받고, 필드 대신 넓은 영역을 그립니다.
@@ -49,12 +49,30 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
   maxSize={5 * 1024 * 1024} // 파일당 bytes
   maxCount={5} // 여러 개일 때 전체 개수
   onReject={(rejections) => {}} // [{ file, reason: 'type' | 'size' | 'count' }]
-/>
+>
+  <FileField.Limits>
+    {({ accept, maxSize, maxCount }) => `이미지, PDF · 파일당 최대 5 MB · 최대 ${maxCount}개`}
+  </FileField.Limits>
+  <FileField.Rejection>
+    {({ file, reason }) =>
+      `${file.name}: ${
+        reason === 'type'
+          ? '허용되지 않는 형식입니다.'
+          : reason === 'size'
+            ? '5 MB보다 큽니다.'
+            : '5개까지 고를 수 있습니다.'
+      }`
+    }
+  </FileField.Rejection>
+</FileField>
 ```
 
 - 걸린 파일만 빼고 나머지는 받습니다. 모두 걸리면 이전 값을 그대로 둡니다.
-- 사유는 필드 아래 `role="alert"` 로 `big.pdf: 5 MB보다 큽니다.` 처럼 보이고, 트리거가 `aria-invalid` 가 됩니다. 다음에 제대로 고르거나 지우거나 초기화하면 사라집니다.
-- 크기는 `512 B`, `1.5 KB`, `23 MB` 처럼 읽기 쉬운 단위로 적습니다.
+- 거부가 있으면 트리거가 `aria-invalid` 가 됩니다. 다음에 제대로 고르거나 지우거나 초기화하면 풀립니다.
+- `FileField.Limits` 의 자식 함수는 `{ accept, maxSize, maxCount }` 를 받습니다. `accept` 는 소문자로 다듬은 토큰 배열, `maxCount` 는 여러 개일 때만 옵니다. 컨트롤 아래에 그리고 트리거의 `aria-describedby` 로 잇습니다.
+- `FileField.Rejection` 은 거부된 파일마다 한 줄(`<li>`)입니다. 자식 함수는 `{ file, reason }` 을 받고, 줄들은 필드 아래 `role="alert"` 목록에 들어가 트리거의 `aria-describedby` 로 이어집니다.
+- 두 part 를 쓰지 않으면 문구를 그리지 않습니다. `aria-invalid` 와 `onReject` 는 그대로 동작합니다.
+- 두 part 는 루트의 바로 아래 자식으로 둡니다. 나머지 자식이 없으면 기본 구성이 그대로 나옵니다.
 
 ## 구성
 
@@ -74,7 +92,9 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
             <>
               <FileField.Preview file={file} /> {/* 이미지면 썸네일, 아니면 문서 아이콘 */}
               <Item.Content>
-                <Item.Title truncate>{index + 1}. {file.name}</Item.Title>
+                <Item.Title truncate>
+                  {index + 1}. {file.name}
+                </Item.Title>
               </Item.Content>
               <Item.Actions>
                 <FileField.Remove file={file} />
@@ -95,7 +115,7 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 - `Preview` 는 행 안에서는 `Item.Media` 타일이고, 하나만 받는 필드의 트리거 안에서는 글자 크기의 썸네일입니다.
 - `Clear` 와 `Remove` 는 ghost `IconButton` 입니다. children 은 아이콘이고, `asChild` 면 넘긴 버튼이 같은 모양과 동작을 받습니다.
 - 목록에서 파일을 지우면 포커스가 그 자리에 온 파일로, 마지막 파일이면 트리거로 갑니다.
-- 모든 part 는 `asChild` 를 받습니다.
+- `Rejection` 을 뺀 모든 part 는 `asChild` 를 받습니다.
 
 ## 상태
 
@@ -155,7 +175,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `onReject`               | 거부 목록                                                                               |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                                      |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                                              |
-| `placeholder`            | `파일 선택 또는 드래그`                                                                 |
+| `placeholder`            | 기본값 없음. 비어 있을 때 트리거에 보인다                                               |
 | `invalid`                | danger 색. 명시한 `aria-invalid` 가 우선하고, 거부가 있으면 늘 오류                     |
 | `disabled` / `readOnly`  | 고르기, 놓기, 붙여넣기, 지우기를 막는다                                                 |
 | `name` / `form`          | 지금 파일을 같은 이름으로 제출                                                          |

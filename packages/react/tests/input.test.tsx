@@ -53,7 +53,7 @@ test('uncontrolled search clear emits one native change, retains focus and suppo
   );
   const search = screen.getByRole('searchbox');
   expect(ref).toBe(search.element());
-  await userEvent.click(screen.getByRole('button', { name: '검색어 지우기' }));
+  await userEvent.click(screen.getByRole('button', { name: '지우기' }));
   await expect.element(search).toHaveValue('');
   expect(values).toEqual([['', 'q', 'change']]);
   await expect.element(search).toHaveFocus();
@@ -84,7 +84,7 @@ test('controlled search clear respects owner state, then accepts external update
   }
   const screen = await render(<Demo />);
   const search = screen.getByRole('searchbox');
-  await userEvent.click(screen.getByRole('button', { name: '검색어 지우기' }));
+  await userEvent.click(screen.getByRole('button', { name: '지우기' }));
   expect(values).toEqual(['']);
   await expect.element(search).toHaveValue('');
   update('external');
@@ -120,7 +120,7 @@ test('search shows a search icon and a Clear only while filled; address types st
     expect(screen.container.querySelector('[data-text-field-adornment] svg')).not.toBeNull();
     await expect.element(screen.getByRole('button')).not.toBeInTheDocument();
     await userEvent.fill(search, 'ids');
-    await expect.element(screen.getByRole('button')).toHaveAttribute('aria-label', '검색어 지우기');
+    await expect.element(screen.getByRole('button')).toHaveAttribute('aria-label', '지우기');
     await userEvent.keyboard('{Escape}');
     expect(escapes).toEqual([true]);
     await expect.element(search).toHaveValue('');
@@ -189,7 +189,7 @@ test('RHF native search and controlled number/tel retain value types, clear, res
   const search = screen.getByRole('searchbox', { name: 'Search' });
   const count = screen.getByRole('spinbutton', { name: 'Count' });
   const phone = screen.getByRole('textbox', { name: 'Phone' });
-  await userEvent.click(screen.getByRole('button', { name: '검색어 지우기' }));
+  await userEvent.click(screen.getByRole('button', { name: '지우기' }));
   expect(methods.getValues('query')).toBe('');
   await userEvent.fill(count, '3');
   await userEvent.fill(phone, '01012345678');

@@ -63,7 +63,7 @@ const [seats, setSeats] = useState<number | null>(2);
 
 - `step` 을 줄 때만 격자에 맞춥니다. 주지 않으면 ↑↓의 기본 단위 1로만 씁니다.
 - 격자 밖의 값에서 ↑↓를 누르면 그 방향의 가장 가까운 격자로 먼저 갑니다. native `stepUp()` 과 같습니다.
-- 범위 밖의 값은 `aria-invalid` 와 native 검증(`customError`)으로 알립니다. 문구는 "값은 10 이하여야 합니다." 이고 `Field.Error` 가 보여 줍니다.
+- 범위 밖의 값은 `aria-invalid` 와 native 검증(`customError`)으로 알립니다. 기본 문구는 "올바른 값이 아닙니다." 이고 `Field.Error` 가 보여 줍니다. 범위를 적은 문구는 앱이 `<Field.Error match="customError">1에서 8까지 넣을 수 있습니다.</Field.Error>` 로 씁니다.
 - 증감은 십진 연산이라 `0.1 + 0.2` 같은 오차가 생기지 않습니다.
 
 ## 버튼

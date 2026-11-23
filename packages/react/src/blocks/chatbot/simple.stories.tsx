@@ -169,7 +169,7 @@ export const PC: Story = {
         </ScrollArea>
 
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-4">
-          <PromptInput onSend={() => {}}>
+          <PromptInput aria-label="메시지" onSend={() => {}}>
             <PromptInput.Input
               aria-label="GIST 도우미에게 묻기"
               placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요"

@@ -70,7 +70,7 @@ const [time, setTime] = useState<Time | null>(null);
 
 - 시간제는 브라우저의 `Intl` 이 그 locale 에 쓰는 시간제(CLDR)를 따릅니다.
 - 오전/오후 컬럼은 locale 이 쓰는 자리에 놓입니다. 12시간제 시각을 `formatToParts` 로 나눠 `dayPeriod` 가 `hour` 앞인지 봅니다. 한국어, 일본어는 앞, 영어는 뒤입니다.
-- 오전/오후 이름도 같은 `dayPeriod` 부분입니다(`오전`/`오후`, `AM`/`PM`, `午前`/`午後`). 컬럼 이름(`시`, `분`, `초`, `오전/오후`)은 IDS 메시지이고 `aria-label` 로 바꿉니다.
+- 오전/오후 이름도 같은 `dayPeriod` 부분입니다(`오전`/`오후`, `AM`/`PM`, `午前`/`午後`). 컬럼 이름은 `Intl.DisplayNames` 의 `hour`, `minute`, `second`, `dayPeriod` 입니다(`시`, `분`, `초`, `오전/오후`, `Hour`, `AM/PM`). 첫 글자는 대문자로 씁니다. `aria-label` 로 바꿉니다.
 - 잘못된 태그(`'de_DE'`, date-fns `Locale` 객체)는 오류입니다.
 
 ## 키보드

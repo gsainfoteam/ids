@@ -12,7 +12,7 @@
 ```tsx
 import { Chip, Sidebar } from '@gsainfoteam/ids-react';
 
-<Sidebar value={pathname} collapsible>
+<Sidebar aria-label="사이드바" value={pathname} collapsible>
   <Sidebar.Header>
     <Logo />
   </Sidebar.Header>
@@ -52,7 +52,7 @@ import { Chip, Sidebar } from '@gsainfoteam/ids-react';
 
 - Header, Footer 밖의 자식은 가운데 스크롤 영역(ScrollArea)의 `<nav>` 에 들어갑니다. 위아래에 더 내용이 있으면 그 끝이 흐려집니다(`fade`). Group 밖의 Item 은 이어진 것끼리 `<ul>` 하나로 묶입니다.
 - Header 를 생략해도 `collapsible` 이면 접기 버튼만 있는 줄이 생깁니다. `Sidebar.Trigger` 를 직접 두면 저절로 붙지 않습니다.
-- 사이드바의 이름은 `aria-label` 로 줍니다. 기본은 "사이드바" 이고 `<aside>`, `<nav>`, Drawer 가 같은 이름을 씁니다.
+- 사이드바의 이름은 필수입니다. `aria-label`(또는 보이는 제목의 `id` 를 가리키는 `aria-labelledby`)로 주고, `<aside>`, `<nav>`, Drawer 가 같은 이름을 씁니다. 이름이 없으면 개발 모드에서 경고합니다.
 
 ## 항목
 
@@ -236,12 +236,12 @@ onItemsChange={async (next, { item, to }) => {
 ## 접기
 
 ```tsx
-<Sidebar collapsible />                                         // 'icon' 과 같다. 아이콘 띠로 접힌다
-<Sidebar collapsible="offcanvas" />                             // 통째로 밀려 나간다. Provider 가 필요하다
-<Sidebar collapsible defaultCollapsed />                        // 비제어
-<Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed} /> // 제어
-<Sidebar collapsible shortcut="Mod+\" />                        // 단축키를 바꾼다
-<Sidebar collapsible shortcut={false} />                        // 단축키를 끈다
+<Sidebar aria-label="사이드바" collapsible />                                                         // 'icon' 과 같다. 아이콘 띠로 접힌다
+<Sidebar aria-label="사이드바" collapsible="offcanvas" />                                             // 통째로 밀려 나간다. Provider 가 필요하다
+<Sidebar aria-label="사이드바" collapsible defaultCollapsed />                                        // 비제어
+<Sidebar aria-label="사이드바" collapsible collapsed={collapsed} onCollapsedChange={setCollapsed} />  // 제어
+<Sidebar aria-label="사이드바" collapsible shortcut="Mod+\" />                                        // 단축키를 바꾼다
+<Sidebar aria-label="사이드바" collapsible shortcut={false} />                                        // 단축키를 끈다
 ```
 
 - 아이콘 띠는 48px 입니다. 라벨과 묶음 라벨은 화면에서만 숨고, 끝 칸은 사라집니다. 항목에 마우스를 올리거나 키보드로 오면 라벨이 오른쪽 Tooltip 으로 뜹니다.
@@ -262,7 +262,7 @@ export default async function Layout({ children }) {
 
   return (
     <Sidebar.Provider>
-      <Sidebar collapsible persist="sidebar" defaultCollapsed={collapsed}>…</Sidebar>
+      <Sidebar aria-label="사이드바" collapsible persist="sidebar" defaultCollapsed={collapsed}>…</Sidebar>
       <Sidebar.Inset>{children}</Sidebar.Inset>
     </Sidebar.Provider>
   );
@@ -275,9 +275,9 @@ export default async function Layout({ children }) {
 ## 모양
 
 ```tsx
-<Sidebar variant="sidebar" />    // 기본. 가장자리에 붙고 오른쪽에 Divider 선 하나
-<Sidebar variant="floating" />   // 사이드바가 Card 표면(테두리, 그림자, 둥근 모서리)으로 뜬다
-<Sidebar variant="inset" />      // 사이드바는 바탕에 깔리고 Sidebar.Inset 본문이 카드로 뜬다
+<Sidebar aria-label="사이드바" variant="sidebar" />   // 기본. 가장자리에 붙고 오른쪽에 Divider 선 하나
+<Sidebar aria-label="사이드바" variant="floating" />  // 사이드바가 Card 표면(테두리, 그림자, 둥근 모서리)으로 뜬다
+<Sidebar aria-label="사이드바" variant="inset" />     // 사이드바는 바탕에 깔리고 Sidebar.Inset 본문이 카드로 뜬다
 ```
 
 - `inset` 은 본문을 `Sidebar.Inset` 이 그리므로 `Sidebar.Provider` 가 필요합니다. 없으면 개발 모드에서 경고합니다.
@@ -289,7 +289,7 @@ export default async function Layout({ children }) {
 
 ```tsx
 <Sidebar.Provider>
-  <Sidebar value={pathname} variant="inset" collapsible="offcanvas" persist="sidebar">
+  <Sidebar aria-label="사이드바" value={pathname} variant="inset" collapsible="offcanvas" persist="sidebar">
     …
   </Sidebar>
   <Sidebar.Inset>
@@ -325,7 +325,7 @@ export default async function Layout({ children }) {
 | `onCollapsedChange`                          | 접거나 펼칠 때 새 상태로                                            |
 | `shortcut`                                   | `'Mod+B'`. `false` 면 끈다                                          |
 | `persist`                                    | 접힘 상태를 쓸 쿠키 이름                                            |
-| `aria-label`                                 | 사이드바의 이름. 기본 "사이드바"                                    |
+| `aria-label` / `aria-labelledby`             | 필수. 사이드바의 이름                                               |
 | `Sidebar.Group`                              | `label`, `collapsible`, `defaultOpen`(`true`)                       |
 | `Sidebar.Group` 데이터 방식                  | `items`, `children(item, { depth })`, `onItemsChange`, `canMove`    |
 | `Sidebar.Item`                               | `value`, `href`, `asChild`, `disabled`, `onClick`, `colorScheme`    |

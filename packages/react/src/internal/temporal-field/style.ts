@@ -21,7 +21,6 @@ export const temporalFieldStyle = tv({
     content: 'flex justify-center',
     panel: 'flex flex-col gap-4 sm:flex-row',
     panelTime: 'flex min-w-0 flex-col gap-2 sm:w-52',
-    panelHint: 'text-caption-c1-regular text-neutral',
   },
   variants: {
     variant: {

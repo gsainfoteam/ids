@@ -1,8 +1,10 @@
 'use client';
 
-import { createContext, use, useCallback } from 'react';
+import { createContext, use, useCallback, useMemo } from 'react';
 
+import { intlWords, type IntlWords } from './intl-words';
 import {
+  DEFAULT_LOCALE,
   formatDefaultMessage,
   type IdsMessageKey,
   type IdsMessageValues,
@@ -33,4 +35,11 @@ export function useTranslate(ownCatalog?: MessageTree): Translate {
 
 export function useProviderLocale(): string | undefined {
   return use(LanguageContext).locale;
+}
+
+export function useIntlWords(locale?: string): IntlWords {
+  const providerLocale = useProviderLocale();
+  const tag = locale ?? providerLocale ?? DEFAULT_LOCALE;
+
+  return useMemo(() => intlWords(tag), [tag]);
 }

@@ -19,8 +19,9 @@ import { ChartTable } from './table';
 import { ChartTitle } from './title';
 import { useChartSize } from './use-chart-size';
 import { useKeysOverARestingPointer } from './use-keys-over-a-resting-pointer';
+import { hasAccessibleName, useUnnamedWarning } from '../../../internal/accessible-name';
 import { DEFAULT_LOCALE } from '../../../internal/messages';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+import { useProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -94,7 +95,6 @@ function paintedChildren(
 }
 
 export function ChartRoot({ config, className, style, children, ...props }: Chart.Props) {
-  const t = useTranslate();
   const providerLocale = useProviderLocale();
   const id = useId();
   const frameRef = useRef<HTMLDivElement>(null);
@@ -119,9 +119,14 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
   const titleId = title ? (title.props.id ?? `${id}title`) : undefined;
   const descriptionId = description ? (description.props.id ?? `${id}description`) : undefined;
   const table = recognised ? tableOf(graph.props, config) : undefined;
+  const graphName = {
+    'aria-label': graph?.props['aria-label'],
+    'aria-labelledby': graph?.props['aria-labelledby'] ?? titleId,
+  };
 
   const wrapsAnUnknownChart = graph !== undefined && !recognised && !hasOwnTable;
   const uncoloredSeries = uncoloredKeys(config).length;
+  useUnnamedWarning('Chart', graph !== undefined && !hasAccessibleName(graphName));
 
   useEffect(() => {
     if (isDevelopment && wrapsAnUnknownChart) console.warn(WRAPPED_CHART_WARNING);
@@ -140,10 +145,7 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
             width: size.width,
             height: size.height,
             role: graph.props.role ?? 'img',
-            'aria-labelledby': graph.props['aria-labelledby'] ?? titleId,
-            'aria-label': titleId
-              ? graph.props['aria-label']
-              : (graph.props['aria-label'] ?? t('chart.label')),
+            ...graphName,
             'aria-describedby': graph.props['aria-describedby'] ?? descriptionId,
           } as Partial<GraphElement['props']>,
           ...(recognised ? [paintedChildren(graph, config, fadeIdOf)] : []),

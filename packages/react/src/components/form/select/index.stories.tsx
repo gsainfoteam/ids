@@ -490,7 +490,7 @@ export const PickSeveralWithSearch: Story = {
   play: async ({ canvas, userEvent }) => {
     const button = canvas.getByRole('combobox', { name: '관심 분야' });
     await userEvent.click(button);
-    const search = canvas.getByRole('combobox', { name: '옵션 검색' });
+    const search = canvas.getByRole('combobox', { name: '검색' });
     await expect(search).toHaveFocus();
     await userEvent.type(search, 'dart');
     await userEvent.keyboard('{Enter}');
@@ -530,11 +530,11 @@ export const LetTheUserClearTheChoice: Story = {
     },
   },
   play: async ({ canvas, canvasElement, userEvent, args }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '선택 지우기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(null);
     await expect(trigger(canvasElement)).toHaveFocus();
     await expect(trigger(canvasElement)).toHaveTextContent('과일 선택');
-    await expect(canvas.queryByRole('button', { name: '선택 지우기' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: '지우기' })).toBeNull();
   },
 };
 
@@ -553,7 +553,7 @@ export const SubmitWithANativeForm: Story = {
       >
         <Field className="w-full">
           <Field.Label>과일</Field.Label>
-          <Select name="fruit" required>
+          <Select name="fruit" placeholder="과일 선택" required>
             {fruits.map(([value, label]) => (
               <Select.Item key={value} value={value}>
                 {label}
@@ -604,7 +604,7 @@ export const SubmitWithANativeForm: Story = {
       '{"fruit":"banana","tags":["apple"]}',
     );
     await userEvent.click(canvas.getByRole('button', { name: '초기화' }));
-    await waitFor(() => expect(fruit).toHaveTextContent('선택하세요'));
+    await waitFor(() => expect(fruit).toHaveTextContent('과일 선택'));
     await expect(form.checkValidity()).toBe(false);
   },
 };

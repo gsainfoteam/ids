@@ -35,7 +35,7 @@ const scrollSettles = () => new Promise((resolve) => setTimeout(resolve, 200));
 const nextEvent = (target: EventTarget, type: string) =>
   new Promise((resolve) => target.addEventListener(type, resolve, { once: true }));
 
-test('SSR: Korean names by default, the clock and periods from the locale tag, diagnostics', () => {
+test('SSR: column names and periods from the locale tag, the clock and periods from the locale tag, diagnostics', () => {
   const doc = ssr({ precision: 'second', step: 15 });
   expect(doc.querySelector('[role=group]')!.getAttribute('aria-label')).toBe('시간');
   expect(labels(doc)).toEqual(['오전/오후', '시', '분', '초']);
@@ -49,8 +49,8 @@ test('SSR: Korean names by default, the clock and periods from the locale tag, d
   expect(ssr({}, 'de-DE').querySelector('[data-time-column=period]')).toBeNull();
   const japanese = ssr({ hourCycle: '12h' }, 'ja-JP');
   expect(periods(japanese)).toEqual(['午前', '午後']);
-  expect(labels(japanese)[0]).toBe('오전/오후');
-  expect(labels(ssr({}, 'en-US'))).toEqual(['시', '분', '오전/오후']);
+  expect(labels(japanese)[0]).toBe('午前/午後');
+  expect(labels(ssr({}, 'en-US'))).toEqual(['Hour', 'Minute', 'AM/PM']);
   expect(periods(ssr({}, 'ar-EG'))).toEqual(['ص', 'م']);
   expect(ssr({}, 'en-US-u-hc-h23').querySelector('[data-time-column=period]')).toBeNull();
   expect(() => ssr({}, 'en US')).toThrow(/BCP 47/);

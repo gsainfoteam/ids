@@ -73,6 +73,7 @@ const meta = {
     value: { control: 'text' },
   },
   args: {
+    'aria-label': '사이드바',
     variant: 'sidebar',
     collapsible: 'icon',
     value: '/board',
@@ -152,7 +153,7 @@ export const Playground: Story = {};
 export const Usage: Story = {
   render: () => (
     <Sidebar.Provider>
-      <Sidebar value="/inbox">
+      <Sidebar aria-label="사이드바" value="/inbox">
         <Sidebar.Group label="워크스페이스">
           <Sidebar.Item value="/inbox" href="#inbox">
             <InboxIcon />
@@ -388,7 +389,7 @@ export const UseRouterLinks: Story = {
 
     return (
       <Sidebar.Provider>
-        <Sidebar value={pathname}>
+        <Sidebar aria-label="사이드바" value={pathname}>
           <Sidebar.Group label="워크스페이스">
             <Sidebar.Item value="/inbox" asChild>
               <a
@@ -571,10 +572,10 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
 </Sidebar>`;
 
 export const BuildAWorkspaceTree: Story = {
-  args: { value: 'frontend-active' },
+  args: { 'aria-label': '워크스페이스', value: 'frontend-active' },
   render: (args) => (
     <Sidebar.Provider>
-      <Sidebar {...args} aria-label="워크스페이스">
+      <Sidebar {...args}>
         <Sidebar.Header>
           <Avatar name="GIST 인포팀" size="tiny" aria-hidden>
             <Avatar.Fallback>
@@ -773,13 +774,13 @@ const FAVORITES_CODE = `<Sidebar aria-label="워크스페이스">
 </Sidebar>`;
 
 export const ReorderFavorites: Story = {
-  args: { value: 'tokens' },
+  args: { 'aria-label': '워크스페이스', value: 'tokens' },
   render: function Render(args) {
     const [favorites, setFavorites] = useState(FAVORITES);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args} aria-label="워크스페이스">
+        <Sidebar {...args}>
           <Sidebar.Item value="inbox" href="#inbox">
             <InboxIcon />
             받은 소식
@@ -880,13 +881,13 @@ const CHANNELS_CODE = `<Sidebar aria-label="워크스페이스">
 </Sidebar>`;
 
 export const MoveChannelsBetweenCategories: Story = {
-  args: { value: 'frontend' },
+  args: { 'aria-label': '워크스페이스', value: 'frontend' },
   render: function Render(args) {
     const [channels, setChannels] = useState(CHANNELS);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args} aria-label="워크스페이스">
+        <Sidebar {...args}>
           <Sidebar.Group
             label="채널"
             items={channels}
@@ -1029,13 +1030,13 @@ const PAGES_CODE = `<Sidebar aria-label="워크스페이스">
 </Sidebar>`;
 
 export const ConfirmBeforeMovingAPage: Story = {
-  args: { value: 'color' },
+  args: { 'aria-label': '워크스페이스', value: 'color' },
   render: function Render(args) {
     const [pages, setPages] = useState(PAGES);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args} aria-label="워크스페이스">
+        <Sidebar {...args}>
           <Sidebar.Group
             label="페이지"
             items={pages}
@@ -1141,13 +1142,13 @@ const FILES_CODE = `<Sidebar aria-label="파일">
 </Sidebar>`;
 
 export const BuildAFileTree: Story = {
-  args: { value: 'button.tsx' },
+  args: { 'aria-label': '파일', value: 'button.tsx' },
   render: function Render(args) {
     const [files, setFiles] = useState(FILES);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args} aria-label="파일">
+        <Sidebar {...args}>
           <Sidebar.Group
             label="ids-react"
             items={files}
@@ -1195,7 +1196,7 @@ export const OpenAsADrawerOnPhones: Story = {
   globals: { viewport: { value: 'mobile2', isRotated: false } },
   render: () => (
     <Sidebar.Provider>
-      <Sidebar value="/">
+      <Sidebar aria-label="사이드바" value="/">
         <Sidebar.Item value="/" href="#home">
           <HomeIcon />홈
         </Sidebar.Item>

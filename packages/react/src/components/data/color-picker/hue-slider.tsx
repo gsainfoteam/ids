@@ -2,7 +2,7 @@
 
 import { usePicker } from './context';
 import { GRADIENT_DIRECTION } from './gradient';
-import { useTranslate } from '../../../internal/translate';
+import { useIntlWords, useTranslate } from '../../../internal/translate';
 import { Slider } from '../../form/slider';
 
 import type { ColorPicker } from '.';
@@ -11,6 +11,7 @@ const HUES = 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00
 
 export function ColorPickerHueSlider({ className, ...props }: ColorPicker.SliderProps) {
   const t = useTranslate();
+  const words = useIntlWords();
 
   const c = usePicker('ColorPicker.HueSlider');
   const { color } = c.picker.state;
@@ -24,7 +25,7 @@ export function ColorPickerHueSlider({ className, ...props }: ColorPicker.Slider
       largeStep={10}
       value={Math.round(color.h)}
       onValueChange={(hue) => c.picker.actions.setChannel('hue', hue)}
-      formatLabel={(degrees: number) => t('colorPicker.hueValue', { degrees })}
+      formatLabel={words.degrees}
       aria-label={props['aria-label'] ?? t('colorPicker.hue')}
       size={c.size}
       disabled={c.state.disabled}
