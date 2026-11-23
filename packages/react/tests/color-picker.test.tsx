@@ -55,10 +55,26 @@ async function acceptClipboardWritePrompt() {
   return () => session.send('Browser.resetPermissions', { browserContextId });
 }
 
+const asServerComponentHandsItOver = <T,>(component: T): T =>
+  ({
+    $$typeof: Symbol.for('react.lazy'),
+    _payload: component,
+    _init: (payload: T) => payload,
+  }) as unknown as T;
+
 test('SSR: one group with an area of two sliders, a hue slider, a text input and a palette', () => {
   const doc = parse(
     renderToString(
-      <ColorPicker defaultValue="#3B82F6" swatches={['#3B82F6', 'nonsense', '#22C55E']} />,
+      <ColorPicker defaultValue="#3B82F6">
+        <ColorPicker.Area />
+        <ColorPicker.HueSlider />
+        <ColorPicker.Input />
+        <ColorPicker.Swatches>
+          <ColorPicker.Swatch value="#3B82F6" />
+          <ColorPicker.Swatch value="nonsense" />
+          <ColorPicker.Swatch value="#22C55E" />
+        </ColorPicker.Swatches>
+      </ColorPicker>,
     ),
   );
   const group = doc.querySelector('[data-color-picker]')!;
@@ -103,6 +119,58 @@ test('SSR: one group with an area of two sliders, a hue slider, a text input and
   expect(doc.querySelector('[data-color-picker-copy]')).toBeNull();
 });
 
+test('SSR: with no children the picker draws the area, the hue slider and the input, and no alpha or palette', () => {
+  const doc = parse(renderToString(<ColorPicker defaultValue="#3B82F680" />));
+  expect(doc.querySelector('[data-color-picker-area]')).not.toBeNull();
+  expect(doc.querySelector('[data-color-picker-hue]')).not.toBeNull();
+  expect(doc.querySelector('[data-color-picker-alpha]')).toBeNull();
+  expect(doc.querySelector('[role=radiogroup]')).toBeNull();
+  expect(
+    doc.querySelector<HTMLInputElement>('[data-color-picker-input]')!.value,
+    'without an AlphaSlider the value is opaque',
+  ).toBe('#3B82F6');
+});
+
+test('an AlphaSlider among the children turns the alpha channel on, also when a Server Component hands it over', () => {
+  const AlphaSlider = asServerComponentHandsItOver(ColorPicker.AlphaSlider);
+  for (const slider of [<ColorPicker.AlphaSlider key="direct" />, <AlphaSlider key="lazy" />]) {
+    const doc = parse(
+      renderToString(
+        <ColorPicker defaultValue="#3B82F680" format="rgb">
+          <div>{slider}</div>
+          <ColorPicker.Input />
+        </ColorPicker>,
+      ),
+    );
+    expect(
+      doc.querySelector('[data-color-picker-alpha] [role=slider]')!.getAttribute('aria-valuetext'),
+    ).toBe('50%');
+    expect(doc.querySelector<HTMLInputElement>('[data-color-picker-input]')!.value).toBe(
+      'rgba(59, 130, 246, 0.5)',
+    );
+  }
+});
+
+test('an AlphaSlider the root cannot see draws nothing and warns in development', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  try {
+    function Sliders() {
+      return <ColorPicker.AlphaSlider />;
+    }
+    const screen = await render(
+      <ColorPicker defaultValue="#3B82F680">
+        <Sliders />
+      </ColorPicker>,
+    );
+    expect(screen.container.querySelector('[data-color-picker-alpha]')).toBeNull();
+    await expect
+      .poll(() => warn.mock.calls.flat().join(' '))
+      .toMatch(/ColorPicker\.AlphaSlider: .*cannot see one/);
+  } finally {
+    warn.mockRestore();
+  }
+});
+
 test('the area takes arrows for both axes, Shift for bigger steps, Home and End', async () => {
   const state = tracked({ defaultValue: '#FF0000' });
   const screen = await render(state.node);
@@ -134,7 +202,16 @@ test('black and grays keep the hue and saturation the user dragged through', asy
 });
 
 test('hue and alpha are Sliders: keys, Shift and page steps, and a press on the track', async () => {
-  const state = tracked({ defaultValue: '#FF000080', alpha: true, format: 'rgb' });
+  const state = tracked({
+    defaultValue: '#FF000080',
+    format: 'rgb',
+    children: (
+      <>
+        <ColorPicker.HueSlider />
+        <ColorPicker.AlphaSlider />
+      </>
+    ),
+  });
   const screen = await render(state.node);
   const hue = slider('색조');
   hue.element().focus();
@@ -237,7 +314,13 @@ test('typed text is a draft until Enter or blur; unreadable text is reverted', a
 test('swatches are one RadioGroup: a click or Home and End choose, and no form sees them', async () => {
   const state = tracked({
     defaultValue: '#22C55E',
-    swatches: ['#EF4444', { value: '#22C55E', label: 'Green' }, '#3B82F6'],
+    children: (
+      <ColorPicker.Swatches>
+        <ColorPicker.Swatch value="#EF4444" />
+        <ColorPicker.Swatch value="#22C55E" label="Green" />
+        <ColorPicker.Swatch value="#3B82F6" />
+      </ColorPicker.Swatches>
+    ),
   });
   const screen = await render(<form>{state.node}</form>);
   const form = screen.container.querySelector('form')!;
@@ -262,7 +345,12 @@ test('swatches are one RadioGroup: a click or Home and End choose, and no form s
   const readOnly = tracked({
     defaultValue: '#EF4444',
     readOnly: true,
-    swatches: ['#EF4444', '#3B82F6'],
+    children: (
+      <ColorPicker.Swatches>
+        <ColorPicker.Swatch value="#EF4444" />
+        <ColorPicker.Swatch value="#3B82F6" />
+      </ColorPicker.Swatches>
+    ),
   });
   await screen.rerender(<div key="read-only">{readOnly.node}</div>);
   await userEvent.click(page.getByRole('radio', { name: '#3B82F6' }));
@@ -295,7 +383,12 @@ test('a Swatch on its own is a radio checked by the color it shows', async () =>
 test('eyedropper: shown only where the API exists; a cancelled pick changes nothing', async () => {
   try {
     vi.stubGlobal('EyeDropper', undefined);
-    const without = await render(<ColorPicker defaultValue="#FFFFFF80" alpha />);
+    const without = await render(
+      <ColorPicker defaultValue="#FFFFFF80">
+        <ColorPicker.EyeDropper />
+        <ColorPicker.AlphaSlider />
+      </ColorPicker>,
+    );
     expect(without.container.querySelector('[data-color-picker-eyedropper]')).toBeNull();
     await without.unmount();
 
@@ -309,7 +402,15 @@ test('eyedropper: shown only where the API exists; a cancelled pick changes noth
         open = open;
       },
     );
-    const state = tracked({ defaultValue: '#FFFFFF80', alpha: true });
+    const state = tracked({
+      defaultValue: '#FFFFFF80',
+      children: (
+        <>
+          <ColorPicker.EyeDropper />
+          <ColorPicker.AlphaSlider />
+        </>
+      ),
+    });
     await render(state.node);
     const button = page.getByRole('button', { name: '화면에서 색 고르기' });
     await expect.element(button).toHaveAttribute('data-variant', 'outline');
@@ -411,13 +512,14 @@ test('controlled, read-only and disabled', async () => {
 
 test('composition renders only the parts it is given', async () => {
   const screen = await render(
-    <ColorPicker defaultValue="#22C55E" swatches={['#22C55E']}>
+    <ColorPicker defaultValue="#22C55E">
       <ColorPicker.HueSlider />
       <ColorPicker.Input />
     </ColorPicker>,
   );
   expect(screen.container.querySelector('[data-color-picker-area]')).toBeNull();
   expect(screen.container.querySelector('[role=radiogroup]')).toBeNull();
+  expect(screen.container.querySelector('[data-color-picker-alpha]')).toBeNull();
   await expect.element(slider('색조')).toBeInTheDocument();
   await expect.element(textInput()).toBeInTheDocument();
 });

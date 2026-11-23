@@ -12,7 +12,7 @@
 ```tsx
 import { ColorPicker } from '@gsainfoteam/ids-react';
 
-<ColorPicker defaultValue="#3B82F6" swatches={['#EF4444', '#22C55E', '#3B82F6']} />;
+<ColorPicker defaultValue="#3B82F6" />;
 ```
 
 ## 값과 형식
@@ -20,11 +20,19 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 ```tsx
 <ColorPicker value={color} onValueChange={setColor} />   // 제어. 빈 문자열은 선택 없음
 <ColorPicker format="hex" />          // "#3B82F6"
-<ColorPicker format="hex" alpha />    // "#3B82F6CC", 투명도 슬라이더가 생긴다
-<ColorPicker format="rgb" alpha />    // "rgba(59, 130, 246, 0.8)"
 <ColorPicker format="hsl" />          // "hsl(217.22, 91.22%, 59.8%)"
 <ColorPicker format="oklch" />        // "oklch(0.6231 0.188 259.81)"
+
+<ColorPicker format="hex">            // "#3B82F6CC". AlphaSlider 가 있으면 투명도가 들어간다
+  <ColorPicker.Area />
+  <ColorPicker.HueSlider />
+  <ColorPicker.AlphaSlider />
+  <ColorPicker.Input />
+</ColorPicker>
 ```
+
+- 투명도는 `ColorPicker.AlphaSlider` 가 자식에 있을 때만 켜집니다. 없으면 값은 늘 불투명이고, `rgb` 는 `rgba(59, 130, 246, 0.8)` 대신 `rgb(59, 130, 246)` 로 적습니다.
+- 루트는 JSX 에 적힌 자식을 보고 `AlphaSlider` 를 찾습니다. 직접 만든 컴포넌트 안에 넣으면 찾지 못하고, 그 슬라이더는 그리지 않으며 개발 빌드에서 경고합니다.
 
 - 색을 읽고 쓰는 일은 [culori](https://culori.js.org) 가 합니다. HEX 3/4/6/8자리, `rgb()`, `hsl()`, `oklch()`, `color(srgb …)`, 이름 색(`red`) 을 읽고, `var()` 와 `currentColor` 는 읽지 않습니다.
 - 영역과 슬라이더는 sRGB 라서, sRGB 밖의 색은 가장 가까운 sRGB 색으로 잘립니다.
@@ -56,14 +64,18 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 ## 구성
 
 ```tsx
-<ColorPicker defaultValue="#22C55E" alpha swatches={palette}>
+<ColorPicker defaultValue="#22C55E">
   <ColorPicker.Area />         {/* 채도와 밝기 */}
   <ColorPicker.EyeDropper />   {/* EyeDropper API 가 없으면 그리지 않는다 */}
   <ColorPicker.HueSlider />
-  <ColorPicker.AlphaSlider />  {/* alpha 가 아니면 그리지 않는다 */}
+  <ColorPicker.AlphaSlider />  {/* 있으면 값에 투명도가 들어간다 */}
   <ColorPicker.Input />
   <ColorPicker.Copy />         {/* Clipboard API 가 없으면 그리지 않는다 */}
-  <ColorPicker.Swatches />     {/* swatches 로, 또는 Swatch 자식으로 */}
+  <ColorPicker.Swatches>       {/* 팔레트. 색마다 Swatch 하나 */}
+    {palette.map((color) => (
+      <ColorPicker.Swatch key={color} value={color} />
+    ))}
+  </ColorPicker.Swatches>
 </ColorPicker>
 
 <ColorPicker defaultValue="#22C55E">   {/* 색조와 입력만 */}
@@ -81,13 +93,13 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 </ColorPicker.Copy>
 ```
 
-- 자식이 없으면 영역, 스포이트와 슬라이더, 입력과 복사, 팔레트 순으로 그립니다.
+- 자식이 없으면 영역, 스포이트와 색조 슬라이더, 입력과 복사 순으로 그립니다. 투명도 슬라이더와 팔레트는 자식으로 둘 때만 그립니다.
 - `HueSlider` 와 `AlphaSlider` 는 채운 구간 없이 그라데이션 트랙을 쓰는 `Slider` 입니다. 받은 속성은 Slider 루트로 가고, `aria-label` 은 thumb의 이름이 됩니다.
 - `EyeDropper` 와 `Copy` 는 `IconButton variant="outline"` 입니다. 자식을 주면 기본 아이콘 대신 그 아이콘을 씁니다.
 - `Input` 은 고정폭 글꼴의 `TextField` 입니다. `className` 과 `style` 은 테두리 상자로, 그 밖의 속성은 input으로 갑니다.
 - `Swatches` 는 `RadioGroup`, `Swatch` 는 색 네모로 그린 `Radio` 입니다. 고른 색은 둘레의 고리로 보이고, `Swatch` 의 `ref` 와 속성은 라디오 input으로 갑니다.
 - 팔레트의 라디오는 어느 폼에도 속하지 않습니다. 피커를 폼 안에 두어도 제출되거나 검증되지 않습니다.
-- `swatches` 는 색 문자열이나 `{ value, label }` 입니다. 읽을 수 없는 색은 건너뜁니다. 이름이 없으면 값이 이름이 됩니다.
+- `Swatch` 의 `value` 는 색 문자열, `label` 은 스크린 리더와 툴팁의 이름입니다. 읽을 수 없는 색은 그리지 않고, 이름이 없으면 값이 이름이 됩니다. `Swatch` 가 하나도 없는 `Swatches` 는 그리지 않습니다.
 - 반투명 색은 체크무늬 위에 그려서 투명도가 보입니다. 체크무늬는 `bg-base` 와 `bg-neutral-soft` 색이라 다크 모드에서도 튀지 않습니다.
 
 ## 상태와 data 속성
@@ -110,10 +122,9 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 | `value` / `defaultValue` | `string` / `''`                                   |
 | `onValueChange`          | 값이 바뀔 때. 끄는 동안에도                       |
 | `format`                 | `hex`(기본) / `rgb` / `hsl` / `oklch`             |
-| `alpha`                  | 투명도를 포함하고 슬라이더를 그린다               |
-| `swatches`               | 팔레트                                            |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기        |
 | `disabled` / `readOnly`  | 모든 조작을 막는다. `readOnly` 는 포커스와 읽기만 |
+| 투명도와 팔레트          | `AlphaSlider`, `Swatches` part 가 있을 때         |
 | `aria-label`             | 기본 `색상 선택`                                  |
 | 그 외 div 속성           | 루트                                              |
 

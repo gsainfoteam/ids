@@ -375,11 +375,17 @@ export const Cover: Story = {
                   <Card.Header>
                     <Card.Title>강조 색</Card.Title>
                   </Card.Header>
-                  <ColorPicker
-                    defaultValue="#D946EF"
-                    swatches={['#EF4444', '#F59E0B', '#10B981', '#0EA5E9', '#8B5CF6', '#EC4899']}
-                    aria-label="강조 색"
-                  />
+                  <ColorPicker defaultValue="#D946EF" aria-label="강조 색">
+                    <ColorPicker.Area />
+                    <ColorPicker.HueSlider />
+                    <ColorPicker.Swatches>
+                      {['#EF4444', '#F59E0B', '#10B981', '#0EA5E9', '#8B5CF6', '#EC4899'].map(
+                        (color) => (
+                          <ColorPicker.Swatch key={color} value={color} />
+                        ),
+                      )}
+                    </ColorPicker.Swatches>
+                  </ColorPicker>
                 </Card>
               </IdsProvider.Scope>
 
