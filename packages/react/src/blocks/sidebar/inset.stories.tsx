@@ -13,6 +13,7 @@ import {
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
+import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
@@ -166,10 +167,27 @@ export const PC: Story = {
           </Item>
           <Divider />
           <div className="flex flex-col gap-4 p-4">
-            <Skeleton shape="text" lines={3} />
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
+            <Skeleton loading>
+              <p className="text-body-b3-regular">
+                수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
+                확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
+              </p>
+            </Skeleton>
+            <Skeleton loading asChild>
+              <Card className="h-24">
+                <Card.Title>수강 신청</Card.Title>
+              </Card>
+            </Skeleton>
+            <Skeleton loading asChild>
+              <Card className="h-24">
+                <Card.Title>장학금 안내</Card.Title>
+              </Card>
+            </Skeleton>
+            <Skeleton loading asChild>
+              <Card className="h-24">
+                <Card.Title>동아리 모집</Card.Title>
+              </Card>
+            </Skeleton>
           </div>
         </Sidebar.Inset>
       </Sidebar.Provider>

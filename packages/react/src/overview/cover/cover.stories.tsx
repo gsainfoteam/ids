@@ -728,8 +728,13 @@ export const Cover: Story = {
               </IdsProvider.Scope>
 
               <Card size="tiny" className={cn(tile, 'flex-row items-center gap-3')}>
-                <Skeleton shape="circle" />
-                <Skeleton lines={2} className="text-body-b3-regular flex-1" />
+                <Skeleton loading asChild>
+                  <Avatar name="김지스트" />
+                </Skeleton>
+                <Skeleton loading className="flex-1">
+                  <p className="text-body-b3-medium">김지스트</p>
+                  <p className="text-body-b3-regular">인포팀 프론트엔드</p>
+                </Skeleton>
               </Card>
 
               <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
@@ -1193,12 +1198,22 @@ export const Cover: Story = {
 
                   <Card size="tiny" className={tile}>
                     <div className="flex items-center gap-3">
-                      <Skeleton shape="circle" />
-                      <Skeleton lines={2} className="text-body-b3-regular flex-1" />
+                      <Skeleton loading asChild>
+                        <Avatar name="이인포" />
+                      </Skeleton>
+                      <Skeleton loading className="flex-1">
+                        <p className="text-body-b3-medium">이인포</p>
+                        <p className="text-body-b3-regular">인포팀 디자인</p>
+                      </Skeleton>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Skeleton shape="circle" />
-                      <Skeleton lines={2} className="text-body-b3-regular flex-1" />
+                      <Skeleton loading asChild>
+                        <Avatar name="박팀장" />
+                      </Skeleton>
+                      <Skeleton loading className="flex-1">
+                        <p className="text-body-b3-medium">박팀장</p>
+                        <p className="text-body-b3-regular">인포팀 팀장</p>
+                      </Skeleton>
                     </div>
                   </Card>
 
@@ -1567,7 +1582,12 @@ export const Cover: Story = {
                           <Breadcrumb.Page>공지</Breadcrumb.Page>
                         </Breadcrumb.Item>
                       </Breadcrumb>
-                      <Skeleton lines={3} className="text-body-b3-regular" />
+                      <Skeleton loading>
+                        <p className="text-body-b3-regular">
+                          2026 가을 학기 수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업
+                          요건을 확인하세요.
+                        </p>
+                      </Skeleton>
                       <Button size="tiny" variant="soft">
                         더 보기
                       </Button>

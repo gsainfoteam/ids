@@ -8,7 +8,6 @@ export function Skeleton(props: Skeleton.Props) {
 }
 
 export namespace Skeleton {
-  export type Shape = 'rect' | 'circle' | 'text';
   export type Animation = 'pulse' | 'wave' | 'none';
 
   export type Props = Omit<
@@ -16,12 +15,10 @@ export namespace Skeleton {
     'children' | 'aria-busy' | 'aria-hidden' | 'inert'
   > & {
     ref?: Ref<HTMLElement>;
-    shape?: Shape;
-    lines?: number;
     animation?: Animation;
     loading?: boolean;
     asChild?: boolean;
-    children?: ReactNode;
+    children: ReactNode;
   };
 
   export const Style = skeletonStyle;

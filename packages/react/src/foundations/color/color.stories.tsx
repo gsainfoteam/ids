@@ -594,7 +594,9 @@ export const Lab: Story = {
                   </Item>
                   <div className="flex items-center gap-3">
                     <Spinner aria-label={`불러오는 중 ${mode}`} />
-                    <Skeleton className="h-4 w-24" />
+                    <Skeleton loading>
+                      <p className="text-body-b3-regular">학기 공지</p>
+                    </Skeleton>
                     <Kbd keys="Mod+K" platform="mac" />
                   </div>
                   <Calendar

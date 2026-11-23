@@ -23,6 +23,7 @@ final directories = <WidgetbookNode>[
   ),
   WidgetbookCategory(
     name: 'Checks',
+    isInitiallyExpanded: false,
     children: [
       WidgetbookFolder(name: 'Form', children: [fieldChecks]),
       WidgetbookFolder(name: 'Feedback', children: [spinnerChecks]),

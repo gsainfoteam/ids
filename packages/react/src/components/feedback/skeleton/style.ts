@@ -6,16 +6,9 @@ export const skeletonStyle = tv({
   slots: {
     root: '',
     paint: 'bg-neutral-soft',
-    line: 'flex h-[1lh] items-center',
-    bar: 'h-[1em] w-full rounded-indicator',
     content: 'contents',
   },
   variants: {
-    shape: {
-      rect: { root: 'block w-full overflow-hidden rounded-standard before:block before:h-4' },
-      circle: { root: 'block size-10 shrink-0 rounded-full' },
-      text: { root: 'block w-full' },
-    } satisfies Record<Skeleton.Shape, object>,
     animation: {
       pulse: { paint: 'animate-skeleton-pulse motion-reduce:animate-none' },
       wave: {
@@ -33,10 +26,6 @@ export const skeletonStyle = tv({
       true: { content: 'invisible' },
       false: {},
     },
-    short: {
-      true: { bar: 'w-3/5' },
-      false: {},
-    },
   },
   compoundVariants: [
     { wrapping: 'div', loading: true, class: { root: 'rounded-standard' } },
@@ -51,5 +40,5 @@ export const skeletonStyle = tv({
       },
     },
   ],
-  defaultVariants: { animation: 'pulse', loading: false, short: false },
+  defaultVariants: { animation: 'pulse', loading: true },
 });

@@ -10,7 +10,7 @@
 
 | 모듈                                             | 내용                                                                                  | 쓰는 곳                                                                                                                                                                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, Progress                                                                                                                                                                                                     |
+| [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, CircularProgress                                                                                                                                                                                             |
 | [`surfaces/control-surface.ts`](#surfacescontrol-surfacets)       | 버튼류 컨트롤의 클래스 조각, scheme 클래스, compound variant                          | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
 | [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer, Badge                                                                                                                                                                                     |
 | [`corner-geometry.ts`](#corner-geometryts)     | 계산된 모서리 반지름 읽기, 곡선의 45도 지점이 모서리에서 들어온 거리                  | ScrollArea, Badge |
@@ -52,12 +52,12 @@
 
 ## arc.tsx
 
-Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
+Spinner 와 CircularProgress 가 그리는 원호의 SVG 와 치수입니다.
 
 ### 쓰는 곳
 
 - Spinner: `Arc` 를 그대로 그립니다.
-- Progress 원형: `Track`, `Indicator` 파트가 `<circle>` 을 직접 그리고 `ARC_RADIUS`, `ARC_CIRCUMFERENCE` 만 가져갑니다.
+- CircularProgress: `Track`, `Indicator` 파트가 `<circle>` 을 직접 그리고 `ARC_RADIUS`, `ARC_CIRCUMFERENCE` 만 가져갑니다.
 
 ### 쓰는 법
 
@@ -73,15 +73,12 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
   trackClassName={track()}
 />
 
-// components/feedback/progress/indicator.tsx (Progress.Indicator, circular)
+// components/feedback/circular-progress/indicator.tsx (CircularProgress.Indicator)
 <circle
-  cx="12"
-  cy="12"
-  r={ARC_RADIUS}
-  strokeWidth="3"
+  {...circleGeometry}           // cx, cy 12, r ARC_RADIUS, strokeWidth 3 (circle.ts)
   strokeDasharray={ARC_CIRCUMFERENCE}
-  strokeDashoffset={ARC_CIRCUMFERENCE * (1 - (ratio ?? 0.25))}
-  className={styles.indicatorCircle({ className: resolvedClassName })}
+  strokeDashoffset={ARC_CIRCUMFERENCE * (1 - ratio)}
+  className={styles.indicator({ className: resolve(className, state) })}
 />
 ```
 
@@ -90,11 +87,11 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
 - `Arc` 는 크기와 애니메이션을 정하지 않고 호출하는 쪽에 맡깁니다. Spinner 가 `size-*` 클래스를 가지면 버튼의 아이콘 크기 규칙(`[&_svg:not([class*='size-'])]`, [surfaces/control-surface.ts](#surfacescontrol-surfacets))이 그 Spinner 를 건너뜁니다.
 - 그래서 Spinner 는 기본 크기를 `width`, `height` 속성(`1em`)으로 줍니다. 버튼 안에서는 위 규칙의 CSS 가 이 속성을 이깁니다.
 - 표시 원은 `origin-center -rotate-90` 으로 12시에서 시작합니다. `strokeDashoffset` 을 `둘레 * (1 - ratio)` 로 두면 `ratio` 만큼만 그려집니다.
-- Progress 의 원형은 Track 과 Indicator 가 따로 쓰는 파트라서, 두 원을 한 번에 그리는 `Arc` 대신 치수만 가져갑니다. 같은 상수를 써서 Spinner 와 같은 원이 됩니다.
+- CircularProgress 는 Track 과 Indicator 가 따로 쓰는 파트라서, 두 원을 한 번에 그리는 `Arc` 대신 치수만 가져갑니다. 같은 상수를 써서 Spinner 와 같은 원이 됩니다.
 
 ### 알아둘 것
 
-- `ARC_RADIUS`, `strokeWidth`(3), `viewBox`(`0 0 24 24`)를 바꾸면 Progress 도 같이 고칩니다. Progress 는 `strokeWidth` 와 `viewBox` 를 따로 적습니다.
+- `ARC_RADIUS`, `strokeWidth`(3), `viewBox`(`0 0 24 24`)를 바꾸면 CircularProgress 도 같이 고칩니다. CircularProgress 는 `strokeWidth` 를 `circle.ts` 에, `viewBox` 를 `root.tsx` 에 따로 적습니다.
 - `Arc` 에 `size-*` 나 `animate-*` 클래스를 넣지 않습니다. 둘 다 `Spinner.Style` 이 정합니다.
 
 ## surfaces/control-surface.ts

@@ -173,7 +173,7 @@ packages/react/src/
     form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
     data/        Accordion, Avatar, Badge, Calendar, Card, Carousel, Chip, DataTable, Empty, Image,
                  Item, Marquee, QRCode, Table, TimePicker, ...
-    feedback/    Alert, Progress, Skeleton, Spinner, Toast
+    feedback/    Alert, Progress, CircularProgress, Skeleton, Spinner, Toast
     layout/      AspectRatio, Divider, Spacer, ScrollArea, MessageScroller, Resizable, Splitter
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
@@ -307,9 +307,13 @@ export const DevelopmentWarnings: Story = {
 ```
 
 **`'verification'` is the one marker.** `.storybook/main.ts` declares it with
-`excludeFromDocsStories`, so Storybook 10 leaves those stories off the Docs page while the sidebar
-still lists them. A story keeps the default `dev` and `test` tags, so `checkEveryStory`, the SSR,
-hydration and translation checks run it like any other. A future MDX page shows only the stories
+`excludeFromDocsStories` and `defaultFilterSelection: 'exclude'`, so Storybook 10 leaves those
+stories off the Docs page and hides them in the sidebar until a maintainer turns off the
+verification exclusion in the sidebar's tag filter; a story URL still opens one directly. Do not use
+`excludeFromSidebar`, which leaves no way to bring them back. Widgetbook has no tag filter, so
+ids_flutter keeps its verification use cases in the `Checks` category, collapsed at start. A story
+keeps the default `dev` and `test` tags, so `checkEveryStory`, the SSR, hydration and translation
+checks run it like any other. A future MDX page shows only the stories
 it names with `<Canvas of>` and never names a verification story. Do not use `'!autodocs'` or a
 name prefix for this.
 

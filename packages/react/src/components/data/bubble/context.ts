@@ -4,6 +4,7 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { BubbleAlign } from '.';
 import type { bubbleStyle } from './style';
 
 type Context = {
@@ -18,3 +19,5 @@ export function useBubbleContext(part: string) {
   invariant(context, `\`<${part}>\` must be used inside \`<Bubble>\`.`);
   return context;
 }
+
+export const BubbleAlignContext = createContext<BubbleAlign | undefined>(undefined);

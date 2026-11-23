@@ -3,17 +3,12 @@
 import { type ComponentProps } from 'react';
 
 import { useMessageContext } from './context';
-import { containsElementOfType, mergeRefs } from '../../../utils';
-import { Bubble } from '../bubble';
-import { BubbleRoot } from '../bubble/root';
+import { mergeRefs } from '../../../utils';
 
 export type MessageContentProps = ComponentProps<'div'>;
 
-const BUBBLE = new Set<unknown>([Bubble, BubbleRoot]);
-
 export function MessageContent({ className, children, ref, ...props }: MessageContentProps) {
-  const { styles, shape, align, contentRef } = useMessageContext('Message.Content');
-  const wrapInBubble = shape === 'bubble' && !containsElementOfType(children, BUBBLE);
+  const { styles, contentRef } = useMessageContext('Message.Content');
 
   return (
     <div
@@ -22,7 +17,7 @@ export function MessageContent({ className, children, ref, ...props }: MessageCo
       data-message-content=""
       className={styles.content({ className })}
     >
-      {wrapInBubble ? <Bubble align={align}>{children}</Bubble> : children}
+      {children}
     </div>
   );
 }

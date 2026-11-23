@@ -4,12 +4,11 @@ import { createContext, use, type ReactNode, type RefObject } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { MessageAlign, MessageShape, MessageStatus } from '.';
+import type { MessageAlign, MessageStatus } from '.';
 import type { messageStyle } from './style';
 
 type Context = {
   styles: ReturnType<typeof messageStyle>;
-  shape: MessageShape;
   align: MessageAlign;
   name: string | undefined;
   avatar: string | ReactNode;

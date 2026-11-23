@@ -79,7 +79,7 @@ export const editorStyle = tv({
       'block h-auto w-full rounded-standard',
       'in-data-selected:outline-2 in-data-selected:-outline-offset-2 in-data-selected:outline-primary-strong',
     ],
-    uploadPlaceholder: 'inline-block h-24 w-40 max-w-full align-middle before:hidden',
+    uploadPlaceholder: 'inline-block h-24 w-40 max-w-full align-middle',
     taskBox: 'mt-[calc((1lh_-_1rem)/2)]',
     textAlign: 'flex items-center gap-0.5',
     codeLanguage: '-ms-2.5 w-auto shrink-0 font-mono text-neutral',

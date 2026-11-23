@@ -11,14 +11,14 @@
 import { Bubble, Message, MessageGroup } from '@gsainfoteam/ids-react';
 
 <MessageGroup align="start" aria-label="김지수의 메시지">
-  <Message name="김지수" avatar={src} time={t1}>학식 메뉴 알려 줘</Message>  {/* 아바타, 이름 */}
-  <Message name="김지수" avatar={src} time={t2}>오늘 거</Message>           {/* 아바타 자리만, 이름은 스크린 리더에만 */}
-  <Message name="김지수" avatar={src} time={t3}>2학생회관 기준으로</Message>  {/* 말풍선 옆에 시간 */}
+  <Message name="김지수" avatar={src} time={t1}><Bubble>학식 메뉴 알려 줘</Bubble></Message>  {/* 아바타, 이름 */}
+  <Message name="김지수" avatar={src} time={t2}><Bubble>오늘 거</Bubble></Message>           {/* 아바타 자리만, 이름은 스크린 리더에만 */}
+  <Message name="김지수" avatar={src} time={t3}><Bubble>2학생회관 기준으로</Bubble></Message>  {/* 말풍선 옆에 시간 */}
 </MessageGroup>
 
 <MessageGroup align="end" aria-label="내 메시지">
-  <Message time={t4} unread={2}><Bubble align="end" variant="solid">돈가스랑 우동이야</Bubble></Message>
-  <Message time={t4} unread={2}><Bubble align="end" variant="solid">같이 갈래?</Bubble></Message>
+  <Message time={t4} unread={2}><Bubble variant="solid">돈가스랑 우동이야</Bubble></Message>  {/* Bubble 도 end */}
+  <Message time={t4} unread={2}><Bubble variant="solid">같이 갈래?</Bubble></Message>
 </MessageGroup>
 ```
 
@@ -38,7 +38,8 @@ import { Bubble, Message, MessageGroup } from '@gsainfoteam/ids-react';
 ## 방향
 
 - `align` 을 안의 Message 에 줍니다. Message 에 직접 준 `align` 이 이깁니다.
-- `shape="plain"` 인 Message 는 묶음의 `align` 을 따르지 않고 늘 `start` 입니다.
+- Message 는 받은 `align` 을 다시 안의 Bubble 에 줍니다. Bubble 에 직접 준 `align` 이 이깁니다.
+- 본문에 Bubble 이 없는 Message 도 묶음의 `align` 을 따릅니다.
 
 ## 알아둘 것
 

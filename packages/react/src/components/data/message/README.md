@@ -2,8 +2,8 @@
 
 대화 메시지 한 건입니다. 보낸 사람(아바타, 이름), 본문, 말풍선 옆 줄(안 읽은 수, 시간), 동작을 한 줄로 놓습니다. 면은 Bubble 이 맡고, Message 는 배치를 맡습니다.
 
-- **모양.** `shape="bubble"`(기본)은 본문을 Bubble 로 감싸고, `shape="plain"` 은 본문(Marker, Accordion, 문단)을 메시지 폭 그대로 그립니다. 누가 말하는지와 상관없이 고릅니다.
-- **방향.** `align` 이 붙는 쪽을 고릅니다. 기본은 `start` 입니다.
+- **말풍선.** 본문에 `<Bubble>` 을 두면 말풍선 메시지가 됩니다. 두지 않으면 본문(Marker, Accordion, 문단)을 메시지 폭 그대로 그립니다. 누가 말하는지와 상관없이 고릅니다.
+- **방향.** `align` 이 붙는 쪽을 고르고, 안의 Bubble 에도 같은 쪽을 줍니다. 기본은 `start` 입니다.
 - **연속 메시지.** [MessageGroup](../message-group/README.md) 이 같은 사람의 메시지를 묶습니다. 첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보이고, 이어지는 말풍선은 맞닿는 모서리를 줄입니다.
 - **읽음.** `unread` 에 안 읽은 사람 수(단체방)나 `true`(1대1)를 주면 말풍선 옆에 숫자나 점을 그립니다.
 - **보내는 중과 실패.** `pending` 은 말풍선을 옅게 하고 빛을 지나가게 합니다. `error` 는 말풍선 테두리를 빨갛게 하고, 시간 자리에 다시 보내기 버튼을, 아래에 실패 줄을 둡니다.
@@ -12,17 +12,23 @@
 ```tsx
 import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 
-<Message align="end">요약해 줘</Message>
+<Message align="end">
+  <Bubble variant="solid">요약해 줘</Bubble>
+</Message>
 
-<Message shape="plain" name="지글봇" avatar="/bot.png" time={sentAt}>
+<Message name="지글봇" avatar="/bot.png" time={sentAt}>
   <Marker>웹 검색 3건</Marker>
   요약입니다.
   <Message.Actions />
 </Message>
 
-<Message align="end" status="error" onRetry={resend}>보내기 실패한 글</Message>
+<Message align="end" status="error" onRetry={resend}>
+  <Bubble>보내기 실패한 글</Bubble>
+</Message>
 
-<Message align="end" time={sentAt} unread={2}>단체방에 보낸 글</Message>
+<Message align="end" time={sentAt} unread={2}>
+  <Bubble>단체방에 보낸 글</Bubble>
+</Message>
 
 <MessageGroup align="start" aria-label="김지수의 메시지">
   <Message name="김지수" avatar={src} time={t1}><Bubble>학식 메뉴 알려 줘</Bubble></Message>
@@ -32,7 +38,6 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 
 | Property  | Type                                         | Default                          |
 | --------- | -------------------------------------------- | -------------------------------- |
-| `shape`   | `'bubble' \| 'plain'`                        | `'bubble'`                       |
 | `align`   | `'start' \| 'end'`                           | `'start'`                        |
 | `name`    | `string`                                     | -                                |
 | `avatar`  | `string \| ReactNode`                        | -                                |
@@ -59,22 +64,24 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 - 파트가 아닌 자식(글, Marker, Accordion, Bubble)은 본문(`Message.Content`)으로 갑니다. 본문은 세로로 쌓이고 블록 사이에 8px 를 둡니다.
 - 머리와 아래 줄에 자식을 주면 기본 내용 대신 그 자식을 그립니다. 머리에 자식을 주면 그 머리가 메시지의 이름이 됩니다.
 
-## 모양과 정렬
+## 말풍선과 정렬
 
 ```tsx
-<Message align="end">요약해 줘</Message>                 {/* 끝에 붙고 <Bubble align="end"> 로 감싼다 */}
-<Message shape="plain">…</Message>                      {/* AI 답이든 내 말이든 폭 그대로 */}
+<Message align="end">
+  <Bubble variant="solid">같이 갈래?</Bubble>   {/* 끝에 붙고, Bubble 은 Message 의 align 을 받는다 */}
+</Message>
 
 <Message align="end">
-  <Bubble align="end" variant="solid">같이 갈래?</Bubble>  {/* 직접 둔 Bubble 은 앱이 align 을 준다 */}
+  <Bubble align="start">인용한 말</Bubble>      {/* Bubble 에 준 align 이 이긴다 */}
 </Message>
+
+<Message name="도우미">…</Message>              {/* Bubble 이 없으면 폭 그대로. AI 답이든 내 말이든 */}
 ```
 
-- `align="end"` 면 아바타가 끝 쪽에 서고, 내용 열이 끝으로 붙습니다.
-- `align` 은 `shape="bubble"` 일 때만 받습니다. `plain` 은 폭 그대로 그려 붙을 쪽이 없으므로 타입에서 `align` 을 막고(`never`), 늘 `start` 입니다. 묶음이 주는 `align` 도 따르지 않습니다.
-- `shape="bubble"` 이면 본문을 저절로 감쌉니다. 본문에 Bubble 이 이미 있으면 감싸지 않습니다. `plain` 이어도 본문에 직접 둔 Bubble 은 말풍선으로 다룹니다(옆 줄, 상태 모양).
-- 저절로 감쌀 때는 Bubble 에 Message 의 `align` 을 넘기고, variant 는 Bubble 의 기본 `soft` 입니다.
-- Bubble 은 Message 안에 있는지 살피지 않습니다. 직접 둔 Bubble 의 꼬리는 앱이 `align` 으로 정합니다.
+- 본문에 Bubble 이 있으면 말풍선 메시지입니다. Message 는 본문을 Bubble 로 감싸지 않으므로, 말풍선이 필요하면 앱이 `<Bubble>` 을 둡니다. 본문은 파트가 아닌 자식이나 `Message.Content` 의 자식입니다.
+- 말풍선 메시지는 시간, 안 읽은 수, 다시 보내기 버튼을 말풍선 옆 줄에 둡니다. Bubble 이 없으면 시간은 머리나 아래 줄에, 다시 보내기 버튼은 실패 줄에 섭니다.
+- `align="end"` 면 아바타가 끝 쪽에 서고, 머리와 본문과 동작이 끝으로 붙습니다. Bubble 이 없어도 같아서, 폭보다 짧은 본문은 끝에 붙고 긴 본문은 폭을 채웁니다.
+- Message 는 자기 `align` 을 안의 Bubble 에 context 로 줍니다. Bubble 이 Message 를 찾는 것이 아니라 Message 가 주는 값이고, Bubble 에 직접 준 `align` 이 이깁니다. MessageGroup 의 `align` 도 Message 를 거쳐 Bubble 까지 갑니다.
 - 본문 바로 아래의 Bubble(`Message.Content > [data-bubble]`)은 Message 가 스타일을 덧씁니다. 묶음의 모서리, `pending` 의 옅은 면과 빛, `error` 의 테두리입니다. Bubble 의 `data-align` 과 `data-variant` 를 읽으므로 직접 둔 Bubble 에도 그대로 적용됩니다.
 - 말풍선이 있으면 본문은 메시지 폭의 80% 까지 자라고, 그 안에서 Bubble 은 `--bubble-max-width: 100%` 입니다. 나머지 폭에 옆 줄이 섭니다.
 
@@ -128,7 +135,7 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 - 보내지 못한 메시지에는 보낸 시간이 없으므로 `time` 을 줘도 시간을 그리지 않습니다. 말풍선이 있으면 그 자리에 다시 보내기 버튼(`t('message.retry')`)이 서고, `onRetry` 가 없으면 비워 둡니다.
 - 말풍선이 없는 메시지는 머리와 아래 줄에도 시간을 그리지 않고, 다시 보내기 버튼을 실패 줄 옆에 둡니다.
 - 실패 줄은 `Marker` 이고 `role="status"` 입니다.
-- 요소에는 `data-message`, `data-shape`, `data-align`, `data-status` 가 붙고, 묶음 안이면 `data-first`, `data-last` 가 붙습니다.
+- 요소에는 `data-message`, `data-align`, `data-status` 가 붙고, 묶음 안이면 `data-first`, `data-last` 가 붙습니다.
 
 ## 동작
 
@@ -150,7 +157,7 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 ## 추론과 도구 줄
 
 ```tsx
-<Message shape="plain" name="도우미">
+<Message name="도우미">
   <Accordion type="multiple">
     <Accordion.Item value="reasoning">
       <Accordion.Header asChild>

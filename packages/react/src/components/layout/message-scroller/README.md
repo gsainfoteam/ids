@@ -114,7 +114,7 @@ AI SDK `useChat` 의 메시지를 `Message` 로 그립니다. `scrollOnAppend="s
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { Message, MessageScroller } from '@gsainfoteam/ids-react';
+import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 import type { UIMessage } from 'ai';
 
 const textOf = (message: UIMessage) =>
@@ -135,8 +135,8 @@ export function Chat() {
       {turnsOf(messages).map((turn) => (
         <div key={turn[0].id} className="flex flex-col gap-4">
           {turn.map((message) => (
-            <Message key={message.id} from={message.role}>
-              {textOf(message)}
+            <Message key={message.id} align={message.role === 'user' ? 'end' : 'start'}>
+              {message.role === 'user' ? <Bubble>{textOf(message)}</Bubble> : textOf(message)}
             </Message>
           ))}
         </div>

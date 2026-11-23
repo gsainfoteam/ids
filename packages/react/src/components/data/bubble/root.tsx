@@ -1,8 +1,8 @@
 'use client';
 
-import { cloneElement, isValidElement, type ReactNode } from 'react';
+import { cloneElement, isValidElement, use, type ReactNode } from 'react';
 
-import { BubbleContext } from './context';
+import { BubbleAlignContext, BubbleContext } from './context';
 import { fitToLongestLine } from './fit-to-longest-line';
 import { BubbleReactions } from './reactions';
 import { bubbleStyle } from './style';
@@ -22,7 +22,7 @@ function splitTrailingReactions(children: ReactNode) {
 }
 
 export function BubbleRoot({
-  align = 'start',
+  align: alignProp,
   variant = 'soft',
   asChild = false,
   className,
@@ -30,6 +30,9 @@ export function BubbleRoot({
   ref,
   ...rest
 }: Bubble.Props) {
+  const inheritedAlign = use(BubbleAlignContext);
+
+  const align = alignProp ?? inheritedAlign ?? 'start';
   const target = asChild && isValidElement<{ children?: ReactNode }>(children) ? children : null;
   const { body, reactions } = splitTrailingReactions(target ? target.props.children : children);
   const overlap = reactions !== null;
