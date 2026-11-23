@@ -1,0 +1,26 @@
+'use client';
+
+import { useCallback, useRef, type Ref, type RefCallback } from 'react';
+
+import {
+  useInternalImageSettledBeforeMount,
+  useInternalImageStatus,
+  type ImageStatus,
+} from '../../../../internal/lib/image-status';
+import { mergeRefs } from '../../../../utils';
+
+export function useInternalImagePicture(
+  current: string | undefined,
+  onStatusChange: ((status: ImageStatus) => void) | undefined,
+  ref: Ref<HTMLImageElement> | undefined,
+) {
+  const { status, report } = useInternalImageStatus(current, onStatusChange);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const mergedRef: RefCallback<HTMLImageElement> = useCallback(
+    (node: HTMLImageElement | null) => mergeRefs(imageRef, ref)(node),
+    [ref],
+  );
+  useInternalImageSettledBeforeMount(imageRef, current, report);
+
+  return { status, report, imageRef, mergedRef };
+}
