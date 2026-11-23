@@ -1,6 +1,6 @@
 'use client';
 
-import { isValidElement, useLayoutEffect, useState, type ReactNode, type RefObject } from 'react';
+import { isValidElement, type ReactNode } from 'react';
 
 import {
   Tooltip,
@@ -11,8 +11,8 @@ import {
 
 import { useInternalChartContext } from '../context';
 import { Indicator } from './indicator';
-import { showInTopLayer, useInternalAnchored } from '../../../../internal/overlay';
 import { Card } from '../../card';
+import { useInternalChartTooltipPosition } from '../hooks/use-chart-tooltip-position';
 import { useInternalFormatValue } from '../hooks/use-format-value';
 import { configOrder, entryFor, type ChartIndicator } from '../lib/config';
 
@@ -25,15 +25,6 @@ export type ChartTooltipContentProps = Partial<TooltipContentProps> & {
 };
 
 type Row = { fill?: unknown };
-
-const GAP_FROM_THE_POINT = 12;
-
-const pointIn = (frameRef: RefObject<HTMLDivElement | null>, x: number, y: number) => ({
-  getBoundingClientRect: () => {
-    const frame = frameRef.current?.getBoundingClientRect();
-    return DOMRect.fromRect({ x: (frame?.left ?? 0) + x, y: (frame?.top ?? 0) + y });
-  },
-});
 
 const isDrawable = (node: ReactNode) => node !== undefined && node !== null && node !== '';
 
@@ -51,29 +42,13 @@ export function ChartTooltipContent({
 }: ChartTooltipContentProps) {
   const { config, styles, locale, frameRef } = useInternalChartContext('Chart.Tooltip');
   const format = useInternalFormatValue(locale);
-  const [box, setBox] = useState<HTMLDivElement | null>(null);
   const open = Boolean(active && payload?.length);
-
-  const anchored = useInternalAnchored({
+  const { setBox, anchored } = useInternalChartTooltipPosition({
     open,
-    reference: frameRef,
-    floating: box,
-    side: 'right',
-    align: 'start',
-    sideOffset: GAP_FROM_THE_POINT,
-    glide: true,
+    frameRef,
+    x: coordinate?.x,
+    y: coordinate?.y,
   });
-  const { setPositionReference } = anchored.refs;
-  const x = coordinate?.x;
-  const y = coordinate?.y;
-
-  useLayoutEffect(() => {
-    if (x !== undefined && y !== undefined) setPositionReference(pointIn(frameRef, x, y));
-  }, [frameRef, x, y, setPositionReference]);
-
-  useLayoutEffect(() => {
-    if (box?.isConnected) showInTopLayer(box);
-  }, [box]);
 
   if (!open || !payload) return null;
 
