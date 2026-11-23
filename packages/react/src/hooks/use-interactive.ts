@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffectEvent, useLayoutEffect, useState } from 'react';
 import type { FocusEvent, KeyboardEvent, PointerEvent } from 'react';
 
 import { isFunction, pickBy } from 'es-toolkit';
@@ -65,14 +65,10 @@ export function useInteractive<E extends Element = Element>({
     disabled: disabled ?? false,
   };
 
-  const onInteractionChangeRef = useRef(onInteractionChange);
+  const reportInteraction = useEffectEvent((next: InteractiveState) => onInteractionChange?.(next));
 
   useLayoutEffect(() => {
-    onInteractionChangeRef.current = onInteractionChange;
-  });
-
-  useLayoutEffect(() => {
-    onInteractionChangeRef.current?.({
+    reportInteraction({
       hovered: state.hovered,
       active: state.active,
       focused: state.focused,

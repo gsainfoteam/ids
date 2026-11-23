@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -132,10 +133,7 @@ export function useInternalOTPField({
         : next,
     );
   };
-  const syncRef = useRef(syncSelection);
-  useLayoutEffect(() => {
-    syncRef.current = syncSelection;
-  });
+  const syncSelectionLater = useEffectEvent(syncSelection);
 
   useLayoutEffect(() => {
     const input = inputRef.current;
@@ -149,7 +147,7 @@ export function useInternalOTPField({
 
   useEffect(() => {
     if (!focused) return;
-    const onSelectionChange = () => syncRef.current();
+    const onSelectionChange = () => syncSelectionLater();
     document.addEventListener('selectionchange', onSelectionChange);
     return () => document.removeEventListener('selectionchange', onSelectionChange);
   }, [focused]);
