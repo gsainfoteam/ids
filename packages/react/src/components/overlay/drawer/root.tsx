@@ -5,7 +5,7 @@ import { isValidElement, useState, type ReactElement, type ReactNode } from 'rea
 import { DrawerContext } from './context';
 import { DrawerOverlay, type DrawerOverlayProps } from './overlay';
 import { drawerStyle } from './style';
-import { useDrawer } from './use-drawer';
+import { useDrawerRoot } from './use-drawer-root';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Drawer } from '.';
@@ -20,18 +20,14 @@ export function DrawerRoot({
   onOpenChangeComplete,
   dismissible = true,
   role = 'dialog',
-  hideClose = false,
   side = 'right',
   modal = true,
-  scaleBackground = true,
-  snapPoints,
-  activeSnapPoint,
-  defaultActiveSnapPoint,
-  onActiveSnapPointChange,
-  fadeFromIndex,
+  drawer: controller,
   children,
 }: Drawer.Props) {
-  const drawer = useDrawer({
+  const snap = controller?.snap ?? null;
+
+  const drawer = useDrawerRoot({
     open,
     defaultOpen,
     onOpenChange,
@@ -39,12 +35,7 @@ export function DrawerRoot({
     dismissible,
     side,
     modal,
-    scaleBackground,
-    snapPoints,
-    activeSnapPoint,
-    defaultActiveSnapPoint,
-    onActiveSnapPointChange,
-    fadeFromIndex,
+    snap,
   });
 
   const [titled, setTitled] = useState(false);
@@ -61,13 +52,12 @@ export function DrawerRoot({
         side,
         modal,
         dismissible,
-        hideClose,
         overlay: overlay?.props,
         titled,
         setTitled,
         described,
         setDescribed,
-        styles: drawerStyle({ side, snapping: !!snapPoints && snapPoints.length > 0 }),
+        styles: drawerStyle({ side, snapping: snap !== null }),
       }}
     >
       {parts.filter((node) => node !== overlay)}

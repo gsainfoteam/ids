@@ -66,31 +66,35 @@ export function SidebarItem({
         dragKey={treeKey}
         preview={<SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />}
       >
-        <Tooltip content={parts.label} side="right" disabled={!sidebar.rail}>
-          <Item
-            asChild
-            interactive
-            size="tiny"
-            disabled={disabled}
-            selected={value !== undefined && value === sidebar.value}
-            aria-current={value !== undefined && value === sidebar.value ? 'page' : undefined}
-            className={sidebar.styles.item({ className })}
-          >
-            {linkElementOf(
-              { href, asChild, children },
-              {
-                'aria-describedby': sortable && treeKey !== undefined ? sortable.hintId : undefined,
-                ...rest,
-                'data-sidebar-item': '',
-                'data-sidebar-value': value,
-                onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
-                  onClick?.(event);
-                  sidebar.navigate();
+        <Tooltip disabled={!sidebar.rail}>
+          <Tooltip.Trigger asChild>
+            <Item
+              asChild
+              interactive
+              size="tiny"
+              disabled={disabled}
+              selected={value !== undefined && value === sidebar.value}
+              aria-current={value !== undefined && value === sidebar.value ? 'page' : undefined}
+              className={sidebar.styles.item({ className })}
+            >
+              {linkElementOf(
+                { href, asChild, children },
+                {
+                  'aria-describedby':
+                    sortable && treeKey !== undefined ? sortable.hintId : undefined,
+                  ...rest,
+                  'data-sidebar-item': '',
+                  'data-sidebar-value': value,
+                  onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
+                    onClick?.(event);
+                    sidebar.navigate();
+                  },
                 },
-              },
-              <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />,
-            )}
-          </Item>
+                <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />,
+              )}
+            </Item>
+          </Tooltip.Trigger>
+          <Tooltip.Content side="right">{parts.label}</Tooltip.Content>
         </Tooltip>
       </SidebarDragFrame>
     );

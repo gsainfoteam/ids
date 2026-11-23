@@ -4,6 +4,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { useDrawer } from './use-drawer';
 import { Button } from '../../action/button';
 import { FloatingButton } from '../../action/floating-button';
 import { Select } from '../../form/select';
@@ -15,6 +16,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const sides = ['top', 'right', 'bottom', 'left'] as const;
 
+const sideLabels = { top: '위', right: '오른쪽', bottom: '아래', left: '왼쪽' } as const;
+
 const meta = {
   title: 'Overlay/Drawer',
   component: Drawer,
@@ -23,26 +26,16 @@ const meta = {
     side: { control: 'radio', options: sides },
     role: { control: 'radio', options: ['dialog', 'alertdialog'] },
     modal: { control: 'boolean' },
-    scaleBackground: { control: 'boolean' },
     dismissible: { control: 'boolean' },
-    hideClose: { control: 'boolean' },
   },
   args: {
     side: 'right',
     role: 'dialog',
     modal: true,
-    scaleBackground: true,
     dismissible: true,
-    hideClose: false,
     onOpenChange: fn(),
     onOpenChangeComplete: fn(),
   },
-} satisfies Meta<typeof Drawer>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Playground: Story = {
   render: (args) => (
     <Drawer {...args}>
       <Drawer.Trigger asChild>
@@ -61,149 +54,173 @@ export const Playground: Story = {
             <Button>적용</Button>
           </Drawer.Close>
         </Drawer.Footer>
+        <Drawer.Close />
+      </Drawer.Content>
+    </Drawer>
+  ),
+} satisfies Meta<typeof Drawer>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Drawer>
+      <Drawer.Trigger asChild>
+        <Button variant="outline">알림 설정</Button>
+      </Drawer.Trigger>
+      <Drawer.Content>
+        <Drawer.Header>
+          <Drawer.Title>알림 설정</Drawer.Title>
+          <Drawer.Description>받을 알림을 고릅니다.</Drawer.Description>
+        </Drawer.Header>
+        <Drawer.Footer>
+          <Drawer.Close>닫기</Drawer.Close>
+        </Drawer.Footer>
+        <Drawer.Close />
       </Drawer.Content>
     </Drawer>
   ),
 };
 
-const sideLabels = { top: '위', right: '오른쪽', bottom: '아래', left: '왼쪽' } as const;
-
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="Side"
-        description="side 로 밀려 나오는 가장자리를 고릅니다. 기본은 right 이고, 화면에 닿는 쪽 모서리는 각지고 안쪽 모서리만 둥급니다."
-      >
-        <Showcase.Row label="side">
-          {sides.map((side) => (
-            <Drawer key={side} side={side}>
+  render: function Render() {
+    const map = useDrawer({ snap: { points: [0.3, 0.6, 1] } });
+
+    return (
+      <Showcase>
+        <Showcase.Section
+          title="Side"
+          description="side 로 밀려 나오는 가장자리를 고릅니다. 기본은 right 이고, 화면에 닿는 쪽 모서리는 각지고 안쪽 모서리만 둥급니다."
+        >
+          <Showcase.Row label="side">
+            {sides.map((side) => (
+              <Drawer key={side} side={side}>
+                <Drawer.Trigger asChild>
+                  <Button variant="outline">{sideLabels[side]}</Button>
+                </Drawer.Trigger>
+                <Drawer.Content>
+                  <Drawer.Handle />
+                  <Drawer.Header>
+                    <Drawer.Title>{sideLabels[side]}에서 열기</Drawer.Title>
+                    <Drawer.Description>끌어서 닫거나 Escape 를 누릅니다.</Drawer.Description>
+                  </Drawer.Header>
+                  <Drawer.Footer>
+                    <Drawer.Close>닫기</Drawer.Close>
+                  </Drawer.Footer>
+                </Drawer.Content>
+              </Drawer>
+            ))}
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Close"
+          description="닫기 버튼은 Drawer.Close 를 쓸 때만 그립니다. children 없는 Drawer.Close 는 모서리의 X 이고, children 을 주면 outline 버튼, asChild 면 그 요소가 닫습니다."
+        >
+          <Showcase.Row label="corner">
+            <Drawer>
               <Drawer.Trigger asChild>
-                <Button variant="outline">{sideLabels[side]}</Button>
+                <Button variant="outline">모서리 X</Button>
+              </Drawer.Trigger>
+              <Drawer.Content>
+                <Drawer.Header>
+                  <Drawer.Title>모서리 X</Drawer.Title>
+                </Drawer.Header>
+                <Drawer.Close />
+              </Drawer.Content>
+            </Drawer>
+          </Showcase.Row>
+          <Showcase.Row label="footer">
+            <Drawer>
+              <Drawer.Trigger asChild>
+                <Button variant="outline">Footer 버튼</Button>
+              </Drawer.Trigger>
+              <Drawer.Content>
+                <Drawer.Header>
+                  <Drawer.Title>Footer 버튼</Drawer.Title>
+                </Drawer.Header>
+                <Drawer.Footer>
+                  <Drawer.Close>취소</Drawer.Close>
+                  <Drawer.Close asChild>
+                    <Button>확인</Button>
+                  </Drawer.Close>
+                </Drawer.Footer>
+              </Drawer.Content>
+            </Drawer>
+          </Showcase.Row>
+          <Showcase.Row label="none">
+            <Drawer side="bottom">
+              <Drawer.Trigger asChild>
+                <Button variant="outline">버튼 없이</Button>
               </Drawer.Trigger>
               <Drawer.Content>
                 <Drawer.Handle />
                 <Drawer.Header>
-                  <Drawer.Title>{sideLabels[side]}에서 열기</Drawer.Title>
-                  <Drawer.Description>끌어서 닫거나 Escape 를 누릅니다.</Drawer.Description>
+                  <Drawer.Title>버튼 없이</Drawer.Title>
+                  <Drawer.Description>
+                    끌어 내리거나 바깥을 누르거나 Escape 로 닫습니다.
+                  </Drawer.Description>
                 </Drawer.Header>
-                <Drawer.Footer>
-                  <Drawer.Close>닫기</Drawer.Close>
-                </Drawer.Footer>
               </Drawer.Content>
             </Drawer>
-          ))}
-        </Showcase.Row>
-      </Showcase.Section>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section
-        title="Snap points"
-        description="snapPoints 로 멈출 높이를 정합니다. 화면 비율(0~1)이나 '320px' 를 씁니다. 손잡이를 누르거나 Enter 로 다음 높이로 갑니다. 배경은 fadeFromIndex 부터 어두워집니다."
-      >
-        <Showcase.Row label="snapPoints">
-          <Drawer side="bottom" snapPoints={[0.3, 0.6, 1]}>
-            <Drawer.Trigger asChild>
-              <Button variant="outline">지도 목록</Button>
-            </Drawer.Trigger>
-            <Drawer.Content>
-              <Drawer.Handle />
-              <Drawer.Header>
-                <Drawer.Title>주변 식당</Drawer.Title>
-                <Drawer.Description>위로 끌어 올리면 더 보입니다.</Drawer.Description>
-              </Drawer.Header>
-            </Drawer.Content>
-          </Drawer>
-        </Showcase.Row>
-      </Showcase.Section>
+        <Showcase.Section
+          title="Snap points"
+          description="useDrawer({ snap: { points } }) 의 결과를 drawer 로 넘기면 그 높이들에 멈춥니다. 화면 비율(0~1)이나 '320px' 를 씁니다. 손잡이를 누르거나 Enter 로 다음 높이로 갑니다."
+        >
+          <Showcase.Row label="snap">
+            <Drawer side="bottom" drawer={map}>
+              <Drawer.Trigger asChild>
+                <Button variant="outline">지도 목록</Button>
+              </Drawer.Trigger>
+              <Drawer.Content>
+                <Drawer.Handle />
+                <Drawer.Header>
+                  <Drawer.Title>주변 식당</Drawer.Title>
+                  <Drawer.Description>위로 끌어 올리면 더 보입니다.</Drawer.Description>
+                </Drawer.Header>
+              </Drawer.Content>
+            </Drawer>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section
-        title="Modal"
-        description="modal={false} 는 배경 없이 뜨고, 뒤 페이지를 계속 누르고 스크롤할 수 있습니다. 바깥을 눌러도 닫히지 않습니다. scaleBackground={false} 는 뒤 페이지를 줄이지 않습니다."
-      >
-        <Showcase.Row label="modal={false}">
-          <Drawer side="left" modal={false}>
-            <Drawer.Trigger asChild>
-              <Button variant="outline">목차</Button>
-            </Drawer.Trigger>
-            <Drawer.Content>
-              <Drawer.Header>
-                <Drawer.Title>목차</Drawer.Title>
-              </Drawer.Header>
-            </Drawer.Content>
-          </Drawer>
-        </Showcase.Row>
-        <Showcase.Row label="scaleBackground">
-          <Drawer side="bottom" scaleBackground={false}>
-            <Drawer.Trigger asChild>
-              <Button variant="outline">페이지를 줄이지 않고</Button>
-            </Drawer.Trigger>
-            <Drawer.Content>
-              <Drawer.Handle />
-              <Drawer.Header>
-                <Drawer.Title>공유</Drawer.Title>
-              </Drawer.Header>
-            </Drawer.Content>
-          </Drawer>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Size"
-        description="크기 prop 은 없습니다. 좌우는 w-[min(24rem,100%-2rem)], 위아래는 내용 높이이고 className 으로 바꿉니다."
-      >
-        <Showcase.Row label="className">
-          <Drawer>
-            <Drawer.Trigger asChild>
-              <Button variant="outline">넓게</Button>
-            </Drawer.Trigger>
-            <Drawer.Content className="w-[min(40rem,calc(100%-2rem))]">
-              <Drawer.Header>
-                <Drawer.Title>넓은 서랍</Drawer.Title>
-              </Drawer.Header>
-            </Drawer.Content>
-          </Drawer>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
-};
-
-export const KeyboardAndFocus: Story = {
-  render: () => (
-    <Drawer>
-      <Drawer.Trigger asChild>
-        <Button variant="outline">이름 바꾸기</Button>
-      </Drawer.Trigger>
-      <Drawer.Content>
-        <Drawer.Header>
-          <Drawer.Title>이름 바꾸기</Drawer.Title>
-        </Drawer.Header>
-        <TextField aria-label="새 이름" data-1p-ignore data-lpignore="true" />
-        <Drawer.Footer>
-          <Drawer.Close>취소</Drawer.Close>
-        </Drawer.Footer>
-      </Drawer.Content>
-    </Drawer>
-  ),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '이름 바꾸기' }));
-    await waitFor(() => expect(canvas.getByRole('textbox', { name: '새 이름' })).toHaveFocus());
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.getByRole('button', { name: '이름 바꾸기' })).toHaveFocus());
+        <Showcase.Section
+          title="Modal"
+          description="modal 이면 배경이 깔리고 뒤 페이지가 조금 작아집니다. modal={false} 는 배경 없이 뜨고, 뒤 페이지를 계속 누르고 스크롤할 수 있습니다. 바깥을 눌러도 닫히지 않습니다."
+        >
+          <Showcase.Row label="modal={false}">
+            <Drawer side="left" modal={false}>
+              <Drawer.Trigger asChild>
+                <Button variant="outline">목차</Button>
+              </Drawer.Trigger>
+              <Drawer.Content>
+                <Drawer.Header>
+                  <Drawer.Title>목차</Drawer.Title>
+                </Drawer.Header>
+                <Drawer.Close />
+              </Drawer.Content>
+            </Drawer>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
   },
 };
 
-export const SnapPoints: Story = {
+export const StopAtSnapPoints: Story = {
   render: function Render() {
     const [snap, setSnap] = useState<Drawer.SnapPoint>(0.3);
+    const drawer = useDrawer({
+      snap: { points: [0.3, '420px', 1], value: snap, onValueChange: setSnap },
+    });
 
     return (
-      <Drawer
-        side="bottom"
-        snapPoints={[0.3, '420px', 1]}
-        activeSnapPoint={snap}
-        onActiveSnapPointChange={setSnap}
-      >
+      <Drawer side="bottom" drawer={drawer}>
         <Drawer.Trigger asChild>
           <Button variant="outline">경로 보기</Button>
         </Drawer.Trigger>
@@ -217,6 +234,14 @@ export const SnapPoints: Story = {
       </Drawer>
     );
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`useDrawer({ snap })` 의 `points` 에 멈출 높이를 적고, 결과를 `drawer` 로 넘깁니다. `value` 와 `onValueChange` 로 지금 높이를 읽고 바꾸며, 손잡이를 누르거나 Enter 를 누르면 다음 높이로 갑니다. 배경은 `fadeFrom` 번째 높이부터 어두워지고, 주지 않으면 마지막 높이에서만 어둡습니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '경로 보기' }));
     const handle = await canvas.findByRole('button', { name: '끌어서 크기 조절' });
@@ -228,7 +253,7 @@ export const SnapPoints: Story = {
   },
 };
 
-export const Nested: Story = {
+export const StackADrawerOnADrawer: Story = {
   render: () => (
     <Drawer side="bottom">
       <Drawer.Trigger asChild>
@@ -263,6 +288,14 @@ export const Nested: Story = {
       </Drawer.Content>
     </Drawer>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '서랍 안에 Drawer 를 하나 더 쓰면 위에 쌓이고, 아래 서랍은 뒤로 물러납니다. Escape 는 맨 위 서랍만 닫습니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '설정' }));
     await userEvent.click(await canvas.findByRole('button', { name: '비밀번호 변경' }));
@@ -278,7 +311,7 @@ export const Nested: Story = {
   },
 };
 
-export const NonModal: Story = {
+export const KeepThePageUsableBehind: Story = {
   render: function Render() {
     const [count, setCount] = useState(0);
 
@@ -291,14 +324,23 @@ export const NonModal: Story = {
           <Drawer.Trigger asChild>
             <Button variant="outline">목차 열기</Button>
           </Drawer.Trigger>
-          <Drawer.Content className="w-60">
+          <Drawer.Content>
             <Drawer.Header>
               <Drawer.Title>목차</Drawer.Title>
             </Drawer.Header>
+            <Drawer.Close />
           </Drawer.Content>
         </Drawer>
       </div>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`modal={false}` 면 배경을 깔지 않고 뒤 페이지를 줄이지 않습니다. 서랍을 연 채로 페이지를 누르고 스크롤할 수 있고, 바깥을 눌러도 닫히지 않습니다.',
+      },
+    },
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '목차 열기' }));
@@ -309,19 +351,44 @@ export const NonModal: Story = {
   },
 };
 
-export const FixedElementsBehind: Story = {
-  name: 'Fixed elements behind',
+export const Keyboard: Story = {
+  tags: ['verification'],
   render: () => (
-    <div className="flex h-[200vh] flex-col gap-3">
+    <Drawer>
+      <Drawer.Trigger asChild>
+        <Button variant="outline">이름 바꾸기</Button>
+      </Drawer.Trigger>
+      <Drawer.Content>
+        <Drawer.Header>
+          <Drawer.Title>이름 바꾸기</Drawer.Title>
+        </Drawer.Header>
+        <TextField aria-label="새 이름" data-1p-ignore data-lpignore="true" />
+        <Drawer.Footer>
+          <Drawer.Close>취소</Drawer.Close>
+        </Drawer.Footer>
+        <Drawer.Close />
+      </Drawer.Content>
+    </Drawer>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '이름 바꾸기' }));
+    await waitFor(() => expect(canvas.getByRole('textbox', { name: '새 이름' })).toHaveFocus());
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.getByRole('button', { name: '이름 바꾸기' })).toHaveFocus());
+  },
+};
+
+export const FixedElementsBehind: Story = {
+  tags: ['verification'],
+  render: () => (
+    <div className="flex h-[200vh] flex-col items-start gap-3">
       <p className="text-body-b3-regular text-neutral">
         페이지를 내린 뒤 열어 보세요. 오른쪽 아래 버튼은 화면에 있던 자리에서 페이지와 함께
         줄어듭니다.
       </p>
       <Drawer side="bottom">
         <Drawer.Trigger asChild>
-          <Button variant="outline" className="self-start">
-            열기
-          </Button>
+          <Button variant="outline">열기</Button>
         </Drawer.Trigger>
         <Drawer.Content>
           <Drawer.Handle />

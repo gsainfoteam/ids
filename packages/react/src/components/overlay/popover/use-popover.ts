@@ -43,9 +43,14 @@ export type UsePopoverOptions = {
   onOpenChangeComplete?: (open: boolean) => void;
   modal: boolean;
   triggerType: PopoverTriggerType;
-  openDelay: number;
-  closeDelay: number;
 };
+
+export type PopoverHoverDelays = { open: number; close: number };
+
+export const DEFAULT_HOVER_DELAYS: PopoverHoverDelays = { open: 200, close: 100 };
+
+const sameDelays = (a: PopoverHoverDelays, b: PopoverHoverDelays) =>
+  a.open === b.open && a.close === b.close;
 
 const ARROW_CLEARS_THE_ROUNDED_CORNER = 16;
 
@@ -71,8 +76,6 @@ export function usePopover({
   onOpenChangeComplete,
   modal,
   triggerType,
-  openDelay,
-  closeDelay,
 }: UsePopoverOptions) {
   const item = useOverlayItem(openProp);
   const [ownOpen, setOwnOpen] = useControllableState({
@@ -112,6 +115,13 @@ export function usePopover({
   const setPlacement = useCallback(
     (next: PopoverPlacement) =>
       setPlacementState((previous) => (samePlacement(previous, next) ? previous : next)),
+    [],
+  );
+
+  const [delays, setDelaysState] = useState(DEFAULT_HOVER_DELAYS);
+  const setDelays = useCallback(
+    (next: PopoverHoverDelays) =>
+      setDelaysState((previous) => (sameDelays(previous, next) ? previous : next)),
     [],
   );
 
@@ -167,7 +177,7 @@ export function usePopover({
 
   const hover = useHover(anchored.context, {
     enabled: triggerType === 'hover',
-    delay: { open: openDelay, close: closeDelay },
+    delay: delays,
     handleClose: safePolygon(),
   });
   const { getReferenceProps } = useInteractions([hover]);
@@ -226,6 +236,7 @@ export function usePopover({
     setBackdrop,
     setArrow,
     setPlacement,
+    setDelays,
     ids: {
       content: `${baseId}-content`,
       title: `${baseId}-title`,

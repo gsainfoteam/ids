@@ -44,6 +44,8 @@ import { Menu } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+const contextArea = 'context-area';
+
 const meta = {
   title: 'Overlay/Menu',
   component: Menu,
@@ -55,14 +57,6 @@ const meta = {
     triggerType: 'click',
     onOpenChange: fn(),
   },
-} satisfies Meta<typeof Menu>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-const contextArea = 'context-area';
-
-export const Playground: Story = {
   render: (args) => (
     <Menu {...args}>
       {args.triggerType === 'command' ? (
@@ -101,11 +95,13 @@ export const Playground: Story = {
           </Menu.Content>
         </>
       ) : args.triggerType === 'contextmenu' ? (
-        <Menu.Trigger
-          data-testid={contextArea}
-          className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
-        >
-          여기를 우클릭하세요
+        <Menu.Trigger asChild>
+          <div
+            data-testid={contextArea}
+            className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
+          >
+            여기를 우클릭하세요
+          </div>
         </Menu.Trigger>
       ) : (
         <Menu.Trigger asChild>
@@ -159,6 +155,36 @@ export const Playground: Story = {
           </Menu>
         </Menu.Content>
       )}
+    </Menu>
+  ),
+} satisfies Meta<typeof Menu>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <Menu>
+      <Menu.Trigger asChild>
+        <Button variant="outline">파일</Button>
+      </Menu.Trigger>
+      <Menu.Content>
+        <Menu.Item>
+          <PencilIcon />
+          이름 바꾸기
+        </Menu.Item>
+        <Menu.Item>
+          <DocumentDuplicateIcon />
+          복제
+        </Menu.Item>
+        <Menu.Separator />
+        <Menu.Item>
+          <TrashIcon />
+          삭제
+        </Menu.Item>
+      </Menu.Content>
     </Menu>
   ),
 };
@@ -508,8 +534,10 @@ export const Gallery: Story = {
         >
           <Showcase.Row label="우클릭">
             <Menu triggerType="contextmenu">
-              <Menu.Trigger className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-32 w-72 items-center justify-center border border-dashed">
-                여기를 우클릭하세요
+              <Menu.Trigger asChild>
+                <div className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-32 w-72 items-center justify-center border border-dashed">
+                  여기를 우클릭하세요
+                </div>
               </Menu.Trigger>
               <Menu.Content aria-label="편집">
                 <Menu.Item>
@@ -547,7 +575,335 @@ export const Gallery: Story = {
   },
 };
 
+export const GroupItemsInASubmenu: Story = {
+  render: () => (
+    <Menu>
+      <Menu.Trigger asChild>
+        <Button variant="outline">파일</Button>
+      </Menu.Trigger>
+      <Menu.Content>
+        <Menu.Item>
+          <PencilIcon />
+          이름 바꾸기
+        </Menu.Item>
+        <Menu>
+          <Menu.Trigger>
+            <ShareIcon />
+            공유
+          </Menu.Trigger>
+          <Menu.Content>
+            <Menu.Item>
+              <EnvelopeIcon />
+              메일로 보내기
+            </Menu.Item>
+            <Menu.Item>
+              <LinkIcon />
+              링크 복사
+            </Menu.Item>
+          </Menu.Content>
+        </Menu>
+      </Menu.Content>
+    </Menu>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Menu.Content` 안에 `Menu` 를 하나 더 쓰고 그 `Menu.Trigger` 에 children 을 주면 하위 메뉴가 됩니다. 오른쪽 화살표나 포인터로 열고, Escape 나 왼쪽 화살표로 닫으면 포커스가 하위 메뉴의 trigger 로 돌아옵니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    canvas.getByRole('button', { name: '파일' }).focus();
+    await userEvent.keyboard('{ArrowUp}');
+    await waitFor(() => expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveFocus());
+    expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveAttribute('aria-haspopup', 'menu');
+    await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() =>
+      expect(canvas.getByRole('menuitem', { name: '메일로 보내기' })).toHaveFocus(),
+    );
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveFocus());
+    await waitFor(() =>
+      expect(canvas.queryByRole('menu', { name: '공유 하위 메뉴' })).not.toBeInTheDocument(),
+    );
+    expect(canvas.getByRole('menu', { name: '파일' })).toBeInTheDocument();
+  },
+};
+
+export const ToggleOptionsFromAMenu: Story = {
+  render: function Render() {
+    const [bold, setBold] = useState(false);
+    const [align, setAlign] = useState('left');
+
+    return (
+      <div className="flex items-center gap-3">
+        <Menu>
+          <Menu.Trigger asChild>
+            <Button variant="outline">서식</Button>
+          </Menu.Trigger>
+          <Menu.Content>
+            <Menu.CheckboxItem checked={bold} onCheckedChange={setBold}>
+              굵게
+            </Menu.CheckboxItem>
+            <Menu.Separator />
+            <Menu.RadioGroup value={align} onValueChange={setAlign}>
+              <Menu.Label>정렬</Menu.Label>
+              <Menu.RadioItem value="left">왼쪽</Menu.RadioItem>
+              <Menu.RadioItem value="center">가운데</Menu.RadioItem>
+            </Menu.RadioGroup>
+          </Menu.Content>
+        </Menu>
+        <span className="text-body-b3-regular">
+          굵게 {bold ? '켜짐' : '꺼짐'}, 정렬 {align}
+        </span>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Menu.CheckboxItem` 은 `checked` 와 `onCheckedChange` 로 켜고 끄고, `Menu.RadioGroup` 안의 `Menu.RadioItem` 은 `value` 와 `onValueChange` 로 하나를 고릅니다. 체크와 점이 줄 끝에 붙어 상태를 보여 줍니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '서식' }));
+    await userEvent.click(await canvas.findByRole('menuitemcheckbox', { name: '굵게' }));
+    await waitFor(() => expect(canvas.getByText('굵게 켜짐, 정렬 left')).toBeInTheDocument());
+    await userEvent.click(canvas.getByRole('button', { name: '서식' }));
+    await userEvent.click(await canvas.findByRole('menuitemradio', { name: '가운데' }));
+    await waitFor(() => expect(canvas.getByText('굵게 켜짐, 정렬 center')).toBeInTheDocument());
+  },
+};
+
+export const OpenOnRightClick: Story = {
+  render: () => (
+    <Menu triggerType="contextmenu">
+      <Menu.Trigger asChild>
+        <div
+          data-testid={contextArea}
+          className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
+        >
+          여기를 우클릭하세요
+        </div>
+      </Menu.Trigger>
+      <Menu.Content aria-label="편집">
+        <Menu.Item>
+          <ArrowUturnLeftIcon />
+          실행 취소
+          <Menu.Shortcut keys="Mod+Z" />
+        </Menu.Item>
+        <Menu.Item>
+          <ArrowUturnRightIcon />
+          다시 실행
+          <Menu.Shortcut keys="Mod+Shift+Z" />
+        </Menu.Item>
+        <Menu.Separator />
+        <Menu.Item>
+          <ScissorsIcon />
+          잘라내기
+          <Menu.Shortcut keys="Mod+X" />
+        </Menu.Item>
+        <Menu.Item>
+          <DocumentDuplicateIcon />
+          복사
+          <Menu.Shortcut keys="Mod+C" />
+        </Menu.Item>
+        <Menu.Item disabled>
+          <ClipboardIcon />
+          붙여넣기
+          <Menu.Shortcut keys="Mod+V" />
+        </Menu.Item>
+      </Menu.Content>
+    </Menu>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`triggerType="contextmenu"` 면 `Menu.Trigger` 영역을 우클릭하거나 길게 눌렀을 때 그 자리에서 열립니다. trigger 에 글이 없으면 `Menu.Content` 에 `aria-label` 로 메뉴 이름을 줍니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.pointer({ keys: '[MouseRight]', target: canvas.getByTestId(contextArea) });
+    const menu = await canvas.findByRole('menu', { name: '편집' });
+    await waitFor(() => expect(menu).toHaveFocus());
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.queryByRole('menu')).not.toBeInTheDocument());
+  },
+};
+
+export const OpenADialogFromAnItem: Story = {
+  render: function Render() {
+    const [name, setName] = useState('보고서.pdf');
+
+    return (
+      <div className="flex items-center gap-3">
+        <Menu>
+          <Menu.Trigger asChild>
+            <IconButton
+              variant="outline"
+              aria-label="파일 메뉴"
+              icon={<EllipsisHorizontalIcon />}
+            />
+          </Menu.Trigger>
+          <Menu.Content>
+            <Menu.Item
+              onSelect={async () => {
+                const renamed = await overlay.open<string>(({ close }) => (
+                  <Dialog>
+                    <Dialog.Content>
+                      <Dialog.Header>
+                        <Dialog.Title>이름 바꾸기</Dialog.Title>
+                      </Dialog.Header>
+                      <Dialog.Footer>
+                        <Dialog.Close>취소</Dialog.Close>
+                        <Button onClick={() => close('최종 보고서.pdf')}>바꾸기</Button>
+                      </Dialog.Footer>
+                    </Dialog.Content>
+                  </Dialog>
+                ));
+                if (renamed) setName(renamed);
+              }}
+            >
+              <PencilIcon />
+              이름 바꾸기…
+            </Menu.Item>
+          </Menu.Content>
+        </Menu>
+        <span className="text-body-b3-regular">{name}</span>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Menu.Item` 의 `onSelect` 에서 `overlay.open` 으로 Dialog 를 열고, 닫힐 때 넘긴 값을 기다립니다. Dialog 가 닫히면 포커스는 메뉴를 열었던 trigger 로 돌아옵니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '파일 메뉴' }));
+    await userEvent.click(await canvas.findByRole('menuitem', { name: '이름 바꾸기…' }));
+    await userEvent.click(await canvas.findByRole('button', { name: '바꾸기' }));
+    await waitFor(() => expect(canvas.getByText('최종 보고서.pdf')).toBeInTheDocument());
+    await waitFor(() => expect(canvas.getByRole('button', { name: '파일 메뉴' })).toHaveFocus());
+  },
+};
+
+export const SearchCommandsWithAHotkey: Story = {
+  render: function Render() {
+    const [last, setLast] = useState('없음');
+    const [dark, setDark] = useState(false);
+
+    const run = (name: string) => () => setLast(name);
+
+    return (
+      <div className="flex items-center gap-3">
+        <Menu triggerType="command" hotkey="Mod+K">
+          <Menu.Trigger asChild>
+            <Button variant="outline">
+              <MagnifyingGlassIcon />
+              명령 찾기
+              <Kbd keys="Mod+K" size="tiny" />
+            </Button>
+          </Menu.Trigger>
+          <Menu.Content>
+            <Menu.Search data-1p-ignore data-lpignore="true" />
+            <Menu.Group>
+              <Menu.Label>문서</Menu.Label>
+              <Menu.Item onSelect={run('새 문서')}>
+                <DocumentPlusIcon />새 문서
+                <Menu.Shortcut keys="Mod+N" />
+              </Menu.Item>
+              <Menu.Item onSelect={run('열기')}>
+                <FolderOpenIcon />
+                열기…
+                <Menu.Shortcut keys="Mod+O" />
+              </Menu.Item>
+              <Menu.Item onSelect={run('인쇄')}>
+                <PrinterIcon />
+                인쇄
+                <Menu.Shortcut keys="Mod+P" />
+              </Menu.Item>
+              <Menu.Item disabled>
+                <ClipboardIcon />
+                붙여넣기
+              </Menu.Item>
+            </Menu.Group>
+            <Menu.Separator />
+            <Menu.Group>
+              <Menu.Label>보기</Menu.Label>
+              <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
+                <MoonIcon />
+                어두운 화면
+              </Menu.CheckboxItem>
+            </Menu.Group>
+            <Menu.Separator />
+            <Menu.Group>
+              <Menu.Label>계정</Menu.Label>
+              <Menu.Item onSelect={run('설정')}>
+                <Cog6ToothIcon />
+                설정
+                <Menu.Shortcut keys="Mod+," />
+              </Menu.Item>
+              <Menu.Item onSelect={run('로그아웃')}>
+                <ArrowRightStartOnRectangleIcon />
+                로그아웃
+              </Menu.Item>
+            </Menu.Group>
+            <Menu.Empty>일치하는 명령이 없습니다.</Menu.Empty>
+          </Menu.Content>
+        </Menu>
+        <span className="text-body-b3-regular">
+          마지막 명령: {last}, 어두운 화면 {dark ? '켜짐' : '꺼짐'}
+        </span>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`triggerType="command"` 면 `Menu.Search` 가 있는 명령 팔레트로 열리고, `hotkey` 로 어디서나 엽니다. 검색어에 맞는 항목만 남고, 하나도 없으면 `Menu.Empty` 가 보입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /^명령 찾기/ }));
+    const search = await canvas.findByRole('combobox', { name: '명령 검색' });
+    await waitFor(() => expect(search).toHaveFocus());
+
+    await userEvent.type(search, 'zzz');
+    await waitFor(() =>
+      expect(canvas.getByRole('status')).toHaveTextContent('일치하는 명령이 없습니다.'),
+    );
+    expect(canvas.queryAllByRole('option')).toHaveLength(0);
+
+    await userEvent.clear(search);
+    await userEvent.type(search, '설정');
+    await waitFor(() =>
+      expect(canvas.getByRole('option', { name: /^설정/ })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      ),
+    );
+    expect(canvas.getAllByRole('option')).toHaveLength(1);
+    expect(canvas.queryByRole('group', { name: '문서' })).not.toBeInTheDocument();
+
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(canvas.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(canvas.getByText('마지막 명령: 설정, 어두운 화면 꺼짐')).toBeInTheDocument();
+    await waitFor(() => expect(canvas.getByRole('button', { name: /^명령 찾기/ })).toHaveFocus());
+  },
+};
+
 export const Keyboard: Story = {
+  tags: ['verification'],
   render: () => (
     <Menu>
       <Menu.Trigger asChild>
@@ -597,189 +953,8 @@ export const Keyboard: Story = {
   },
 };
 
-export const Submenu: Story = {
-  render: () => (
-    <Menu>
-      <Menu.Trigger asChild>
-        <Button variant="outline">파일</Button>
-      </Menu.Trigger>
-      <Menu.Content>
-        <Menu.Item>
-          <PencilIcon />
-          이름 바꾸기
-        </Menu.Item>
-        <Menu>
-          <Menu.Trigger>
-            <ShareIcon />
-            공유
-          </Menu.Trigger>
-          <Menu.Content>
-            <Menu.Item>
-              <EnvelopeIcon />
-              메일로 보내기
-            </Menu.Item>
-            <Menu.Item>
-              <LinkIcon />
-              링크 복사
-            </Menu.Item>
-          </Menu.Content>
-        </Menu>
-      </Menu.Content>
-    </Menu>
-  ),
-  play: async ({ canvas, userEvent }) => {
-    canvas.getByRole('button', { name: '파일' }).focus();
-    await userEvent.keyboard('{ArrowUp}');
-    await waitFor(() => expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveFocus());
-    expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveAttribute('aria-haspopup', 'menu');
-    await userEvent.keyboard('{ArrowRight}');
-    await waitFor(() =>
-      expect(canvas.getByRole('menuitem', { name: '메일로 보내기' })).toHaveFocus(),
-    );
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveFocus());
-    await waitFor(() =>
-      expect(canvas.queryByRole('menu', { name: '공유 하위 메뉴' })).not.toBeInTheDocument(),
-    );
-    expect(canvas.getByRole('menu', { name: '파일' })).toBeInTheDocument();
-  },
-};
-
-export const CheckboxAndRadio: Story = {
-  render: function Render() {
-    const [bold, setBold] = useState(false);
-    const [align, setAlign] = useState('left');
-
-    return (
-      <div className="flex items-center gap-3">
-        <Menu>
-          <Menu.Trigger asChild>
-            <Button variant="outline">서식</Button>
-          </Menu.Trigger>
-          <Menu.Content>
-            <Menu.CheckboxItem checked={bold} onCheckedChange={setBold}>
-              굵게
-            </Menu.CheckboxItem>
-            <Menu.Separator />
-            <Menu.RadioGroup value={align} onValueChange={setAlign}>
-              <Menu.Label>정렬</Menu.Label>
-              <Menu.RadioItem value="left">왼쪽</Menu.RadioItem>
-              <Menu.RadioItem value="center">가운데</Menu.RadioItem>
-            </Menu.RadioGroup>
-          </Menu.Content>
-        </Menu>
-        <span className="text-body-b3-regular">
-          굵게 {bold ? '켜짐' : '꺼짐'}, 정렬 {align}
-        </span>
-      </div>
-    );
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '서식' }));
-    await userEvent.click(await canvas.findByRole('menuitemcheckbox', { name: '굵게' }));
-    await waitFor(() => expect(canvas.getByText('굵게 켜짐, 정렬 left')).toBeInTheDocument());
-    await userEvent.click(canvas.getByRole('button', { name: '서식' }));
-    await userEvent.click(await canvas.findByRole('menuitemradio', { name: '가운데' }));
-    await waitFor(() => expect(canvas.getByText('굵게 켜짐, 정렬 center')).toBeInTheDocument());
-  },
-};
-
-export const ContextMenu: Story = {
-  render: () => (
-    <Menu triggerType="contextmenu">
-      <Menu.Trigger
-        data-testid={contextArea}
-        className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
-      >
-        여기를 우클릭하세요
-      </Menu.Trigger>
-      <Menu.Content aria-label="편집">
-        <Menu.Item>
-          <ArrowUturnLeftIcon />
-          실행 취소
-          <Menu.Shortcut keys="Mod+Z" />
-        </Menu.Item>
-        <Menu.Item>
-          <ArrowUturnRightIcon />
-          다시 실행
-          <Menu.Shortcut keys="Mod+Shift+Z" />
-        </Menu.Item>
-        <Menu.Separator />
-        <Menu.Item>
-          <ScissorsIcon />
-          잘라내기
-          <Menu.Shortcut keys="Mod+X" />
-        </Menu.Item>
-        <Menu.Item>
-          <DocumentDuplicateIcon />
-          복사
-          <Menu.Shortcut keys="Mod+C" />
-        </Menu.Item>
-        <Menu.Item disabled>
-          <ClipboardIcon />
-          붙여넣기
-          <Menu.Shortcut keys="Mod+V" />
-        </Menu.Item>
-      </Menu.Content>
-    </Menu>
-  ),
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.pointer({ keys: '[MouseRight]', target: canvas.getByTestId(contextArea) });
-    const menu = await canvas.findByRole('menu', { name: '편집' });
-    await waitFor(() => expect(menu).toHaveFocus());
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.queryByRole('menu')).not.toBeInTheDocument());
-  },
-};
-
-export const OpenDialogFromItem: Story = {
-  render: function Render() {
-    const [name, setName] = useState('보고서.pdf');
-
-    return (
-      <div className="flex items-center gap-3">
-        <Menu>
-          <Menu.Trigger asChild>
-            <IconButton variant="ghost" aria-label="파일 메뉴" icon={<EllipsisHorizontalIcon />} />
-          </Menu.Trigger>
-          <Menu.Content>
-            <Menu.Item
-              onSelect={async () => {
-                const renamed = await overlay.open<string>(({ close }) => (
-                  <Dialog>
-                    <Dialog.Content>
-                      <Dialog.Header>
-                        <Dialog.Title>이름 바꾸기</Dialog.Title>
-                      </Dialog.Header>
-                      <Dialog.Footer>
-                        <Dialog.Close>취소</Dialog.Close>
-                        <Button onClick={() => close('최종 보고서.pdf')}>바꾸기</Button>
-                      </Dialog.Footer>
-                    </Dialog.Content>
-                  </Dialog>
-                ));
-                if (renamed) setName(renamed);
-              }}
-            >
-              <PencilIcon />
-              이름 바꾸기…
-            </Menu.Item>
-          </Menu.Content>
-        </Menu>
-        <span className="text-body-b3-regular">{name}</span>
-      </div>
-    );
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '파일 메뉴' }));
-    await userEvent.click(await canvas.findByRole('menuitem', { name: '이름 바꾸기…' }));
-    await userEvent.click(await canvas.findByRole('button', { name: '바꾸기' }));
-    await waitFor(() => expect(canvas.getByText('최종 보고서.pdf')).toBeInTheDocument());
-    await waitFor(() => expect(canvas.getByRole('button', { name: '파일 메뉴' })).toHaveFocus());
-  },
-};
-
 export const NestedSubmenus: Story = {
+  tags: ['verification'],
   render: () => (
     <Menu>
       <Menu.Trigger asChild>
@@ -903,104 +1078,5 @@ export const NestedSubmenus: Story = {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.getByRole('button', { name: '문서' })).toHaveFocus());
     expect(canvas.queryByRole('menu')).not.toBeInTheDocument();
-  },
-};
-
-export const CommandPalette: Story = {
-  render: function Render() {
-    const [last, setLast] = useState('없음');
-    const [dark, setDark] = useState(false);
-
-    const run = (name: string) => () => setLast(name);
-
-    return (
-      <div className="flex items-center gap-3">
-        <Menu triggerType="command" hotkey="Mod+K">
-          <Menu.Trigger asChild>
-            <Button variant="outline">
-              <MagnifyingGlassIcon />
-              명령 찾기
-              <Kbd keys="Mod+K" size="tiny" />
-            </Button>
-          </Menu.Trigger>
-          <Menu.Content>
-            <Menu.Search data-1p-ignore data-lpignore="true" />
-            <Menu.Group>
-              <Menu.Label>문서</Menu.Label>
-              <Menu.Item onSelect={run('새 문서')}>
-                <DocumentPlusIcon />새 문서
-                <Menu.Shortcut keys="Mod+N" />
-              </Menu.Item>
-              <Menu.Item onSelect={run('열기')}>
-                <FolderOpenIcon />
-                열기…
-                <Menu.Shortcut keys="Mod+O" />
-              </Menu.Item>
-              <Menu.Item onSelect={run('인쇄')}>
-                <PrinterIcon />
-                인쇄
-                <Menu.Shortcut keys="Mod+P" />
-              </Menu.Item>
-              <Menu.Item disabled>
-                <ClipboardIcon />
-                붙여넣기
-              </Menu.Item>
-            </Menu.Group>
-            <Menu.Separator />
-            <Menu.Group>
-              <Menu.Label>보기</Menu.Label>
-              <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
-                <MoonIcon />
-                어두운 화면
-              </Menu.CheckboxItem>
-            </Menu.Group>
-            <Menu.Separator />
-            <Menu.Group>
-              <Menu.Label>계정</Menu.Label>
-              <Menu.Item onSelect={run('설정')}>
-                <Cog6ToothIcon />
-                설정
-                <Menu.Shortcut keys="Mod+," />
-              </Menu.Item>
-              <Menu.Item onSelect={run('로그아웃')}>
-                <ArrowRightStartOnRectangleIcon />
-                로그아웃
-              </Menu.Item>
-            </Menu.Group>
-            <Menu.Empty>일치하는 명령이 없습니다.</Menu.Empty>
-          </Menu.Content>
-        </Menu>
-        <span className="text-body-b3-regular">
-          마지막 명령: {last}, 어두운 화면 {dark ? '켜짐' : '꺼짐'}
-        </span>
-      </div>
-    );
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^명령 찾기/ }));
-    const search = await canvas.findByRole('combobox', { name: '명령 검색' });
-    await waitFor(() => expect(search).toHaveFocus());
-
-    await userEvent.type(search, 'zzz');
-    await waitFor(() =>
-      expect(canvas.getByRole('status')).toHaveTextContent('일치하는 명령이 없습니다.'),
-    );
-    expect(canvas.queryAllByRole('option')).toHaveLength(0);
-
-    await userEvent.clear(search);
-    await userEvent.type(search, '설정');
-    await waitFor(() =>
-      expect(canvas.getByRole('option', { name: /^설정/ })).toHaveAttribute(
-        'aria-selected',
-        'true',
-      ),
-    );
-    expect(canvas.getAllByRole('option')).toHaveLength(1);
-    expect(canvas.queryByRole('group', { name: '문서' })).not.toBeInTheDocument();
-
-    await userEvent.keyboard('{Enter}');
-    await waitFor(() => expect(canvas.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(canvas.getByText('마지막 명령: 설정, 어두운 화면 꺼짐')).toBeInTheDocument();
-    await waitFor(() => expect(canvas.getByRole('button', { name: /^명령 찾기/ })).toHaveFocus());
   },
 };

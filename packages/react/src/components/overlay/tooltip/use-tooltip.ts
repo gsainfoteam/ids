@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { use, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { omit } from 'es-toolkit';
 import { focusable } from 'tabbable';
@@ -29,13 +29,21 @@ export type UseTooltipOptions = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  side?: AnchoredSide;
-  align?: AnchoredAlign;
-  sideOffset?: number;
   openDelay?: number;
   closeDelay?: number;
   disabled?: boolean;
 };
+
+export type TooltipPlacement = {
+  side: AnchoredSide;
+  align: AnchoredAlign;
+  sideOffset: number;
+};
+
+export const DEFAULT_PLACEMENT: TooltipPlacement = { side: 'top', align: 'center', sideOffset: 6 };
+
+const samePlacement = (a: TooltipPlacement, b: TooltipPlacement) =>
+  a.side === b.side && a.align === b.align && a.sideOffset === b.sideOffset;
 
 const ARROW_KEEPS_CLEAR_OF_CORNER = 8;
 
@@ -46,9 +54,6 @@ export function useTooltip({
   open: openProp,
   defaultOpen = false,
   onOpenChange,
-  side = 'top',
-  align = 'center',
-  sideOffset = 6,
   openDelay,
   closeDelay,
   disabled = false,
@@ -64,6 +69,13 @@ export function useTooltip({
   const [content, setContent] = useState<HTMLElement | null>(null);
   const [arrow, setArrow] = useState<HTMLElement | null>(null);
   const [hoverHeldByEscape, setHoverHeldByEscape] = useState(false);
+
+  const [placement, setPlacementState] = useState(DEFAULT_PLACEMENT);
+  const setPlacement = useCallback(
+    (next: TooltipPlacement) =>
+      setPlacementState((previous) => (samePlacement(previous, next) ? previous : next)),
+    [],
+  );
 
   const requestOpen = (next: boolean, _event?: Event, reason?: OpenChangeReason) => {
     const openedByReturnedFocus =
@@ -90,9 +102,9 @@ export function useTooltip({
     onOpenChange: requestOpen,
     reference: trigger,
     floating: content,
-    side,
-    align,
-    sideOffset,
+    side: placement.side,
+    align: placement.align,
+    sideOffset: placement.sideOffset,
     arrow,
     arrowPadding: ARROW_KEEPS_CLEAR_OF_CORNER,
   });
@@ -158,6 +170,7 @@ export function useTooltip({
     content,
     setContent,
     setArrow,
+    setPlacement,
     closeByTriggerPress: (event: Event) => context.onOpenChange(false, event, 'reference-press'),
     getReferenceProps: interactions.getReferenceProps,
     floatingProps: omit(interactions.getFloatingProps(), [

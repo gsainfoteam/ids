@@ -166,12 +166,7 @@ export function SidebarRoot({
         </SidebarContext>
         {variant === 'sidebar' && <Divider orientation="vertical" className={styles.divider()} />}
       </aside>
-      <Drawer
-        side="left"
-        hideClose
-        open={controls.mobileOpen}
-        onOpenChange={controls.setMobileOpen}
-      >
+      <Drawer side="left" open={controls.mobileOpen} onOpenChange={controls.setMobileOpen}>
         <Drawer.Content aria-label={label} className={drawer.styles.drawer()}>
           <SidebarContext value={drawer}>
             {header ?? <SidebarHeader />}
