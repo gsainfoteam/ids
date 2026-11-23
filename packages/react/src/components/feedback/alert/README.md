@@ -7,6 +7,7 @@
 - **읽기 좋은 대비.** 제목과 아이콘은 계열의 글자 역할을 써서 노란 warning 도 APCA Lc 60 을 넘깁니다.
 - **알맞게 알립니다.** warning과 danger는 읽던 것을 끊고 알리고(`role="alert"`), 나머지는 기다렸다 알립니다(`role="status"`).
 - **닫기.** `Alert.Close` 를 넣으면 닫을 수 있고, 부모 상태 없이도 스스로 사라집니다. 안에 포커스가 있으면 Escape로도 닫히고, 포커스는 다음 요소로 옮겨 가 페이지 맨 위로 튕기지 않습니다.
+- **부모 너비를 채웁니다.** 너비는 감싼 요소가 정합니다(`<div className="max-w-md"><Alert>…</Alert></div>`).
 - **한글 입력.** 조합 중에 누른 Escape는 조합만 취소하고 알림은 그대로 둡니다.
 
 ```tsx
@@ -103,6 +104,8 @@ import { Alert } from '@gsainfoteam/ids-react';
 | `open`        | 열려 있다             |
 | `dismissible` | `Alert.Close` 가 있다 |
 | `ending`      | 닫히는 전환 중이다    |
+
+- IDS 위에 새 디자인을 얹을 때 `className` 과 `style` 은 이 상태를 받는 함수로도 줄 수 있습니다.
 
 ```tsx
 <Alert className={(state) => (state.dismissible ? 'pe-2' : undefined)} />

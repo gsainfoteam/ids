@@ -28,11 +28,13 @@ afterEach(() => {
   toast.dismissAll();
 });
 
-async function mount(props: Toaster.Props = {}) {
+async function mount(props: Toaster.Props = {}, around?: CSSProperties) {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <button type="button">page</button>
-      <Toaster {...props} />
+      <div style={around}>
+        <Toaster {...props} />
+      </div>
     </IdsProvider>,
   );
   await userEvent.hover(screen.getByRole('button', { name: 'page' }));
@@ -343,7 +345,7 @@ test('a hidden tab pauses the clock', async () => {
 });
 
 test('the stack: newest in front, the rest peek behind, smaller, until hovered', async () => {
-  await mount({ style: { '--toaster-gap': '10px' } as CSSProperties });
+  await mount({}, { '--toaster-gap': '10px' } as CSSProperties);
   toast('First', { duration: Infinity });
   toast('Second', { duration: Infinity, description: 'with a second line' });
   toast('Third', { duration: Infinity });

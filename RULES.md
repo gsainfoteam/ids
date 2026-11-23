@@ -375,12 +375,12 @@ changes it.
   file name sorts before the PC file, so Mobile comes first.
 - The PC story sets `tags: ['!autodocs']` and `parameters: { canvasPadding: false }`, so the
   block fills the canvas.
-- Every color, line, surface, corner and shadow comes from an IDS component. A block's own
-  className lays out (flex, grid, gaps, padding, widths, alignment, `hidden md:flex`) and sets the
-  IDS type scale on plain headings and paragraphs; it never sets a color, border, background,
-  radius, shadow or `style`. A line is a `Divider`, a surface a `Card` or an `Item`, muted text a
-  component's `Description` part. The classes a part documents (`border-b` on `Card.Header`) are
-  fine.
+- Every color, line, surface, corner and shadow comes from an IDS component. Layout classes
+  (flex, grid, gaps, padding, widths, alignment, `hidden md:flex`) and the IDS type scale go only
+  on the block's own elements (a wrapping `<div>`, a plain heading or paragraph), never on an IDS
+  component or part, and they never set a color, border, background, radius, shadow or `style`.
+  A line is a `Divider`, a surface a `Card` or an `Item`, muted text a component's `Description`
+  part.
 - A block picks `solid`, `outline` or `soft` and never `ghost`, except for the buttons inside a
   bar that already draws the surface (a toolbar `Card`), which stay `ghost`. A text link (in running text, or
   a "forgot password" or "sign up" line) is `Link`; a link in a table cell or a footer list is
@@ -725,24 +725,50 @@ has them all: drawn as text they fall back to a system font that sits them off c
 
 ## Component API
 
-**Props.** Looks go through `className` and `style`, behaviour through parts and hooks, so the
-props an app has to remember stay few. A root takes only:
+**Props.** Looks go through `variant`, `size` and parts, size and placement through the parent,
+behaviour through parts and hooks, so the props an app has to remember stay few. A root takes
+only:
 
 - the state it owns, as a trio: `value` / `defaultValue` / `onValueChange`, or `checked`, `open`,
   `pressed`, `page` with their `default*` and `on*Change` (see Callbacks);
 - `variant`, `size` and the color prop (`colorScheme`; renaming it `color` is still open);
-- `className`, `style`, `children` and `asChild`;
+- `className`, `style`, `children` and `asChild`; `className` and `style` exist only for a
+  custom design built on top of IDS;
 - native attributes of the element it renders (`disabled`, `name`, `required`, `min`, `step`,
   `id`, `aria-*`);
 - the accessible name it needs (`aria-label`, Image `alt`, Avatar `name`) and the input it draws
   when children cannot carry it (QRCode `value`, Highlight `query`, Chart `config`).
 
-**`className` and `style` are the app's design, never a signal.** A component merges them onto
-its element and never reads them to decide what it does or how its parts look: no `gap-*` test on
-`className` to stop joining a Group, no `min-width` read off `style` to bound a Resizable. A
-behaviour the app needs is a prop, a part or composition (a layout `<div>` inside a ButtonGroup
-spaces its buttons). An app may set a CSS variable the component's own CSS reads
-(`style={{ '--toaster-gap': '8px' }}`); the component's JS never reads it back.
+**`className` and `style` are a custom design's, never a signal.** A component merges them onto
+its element and never reads them, or a value computed from them, to decide what it does or how
+it is built: no `gap-*` test on `className` to stop joining a Group, no `min-width` read off
+`style` to bound a Resizable. A behaviour the app needs is a prop, a part or composition (a
+layout `<div>` inside a ButtonGroup spaces its buttons).
+
+**The parent sizes and places a component.** Stories, READMEs and blocks give no `className` or
+`style` to an IDS component or part. The one exception is a story that shows a new design built
+on IDS, tagged `tags: ['custom-design']`.
+
+- The app wraps the component in an element of its own: `<div className="w-64"><TextField /></div>`,
+  `<div className="col-span-2 grid"><Card /></div>`, `<div className="flex h-72 flex-col"><ScrollArea /></div>`.
+  Content inside a part is wrapped too: `<Card.Content><div className="grid gap-4">…</div></Card.Content>`.
+- No margin on a component. Spacing is the parent's `gap`. A ratio is `<AspectRatio>` around it.
+- A CSS variable a component's CSS reads is set on the wrapping element and inherited
+  (`<div className="[--toaster-gap:8px]"><Toaster /></div>`); the component's JS never reads it.
+- A part that frames content (`Card.Header`, `Card.Footer`) has a sensible default layout (flex,
+  gap, alignment), so the app needs no class on it.
+- Each component has one size contract, written in its README:
+  - **fill**: block-level, the parent's full width (`w-full min-w-0` where needed). Every
+    `*Field`, Select, TextArea, Slider, Progress, Card, Alert, Item, Table, DataTable, Tabs,
+    Accordion, Editor, Chart and Divider.
+  - **hug**: content width. Button, IconButton, ButtonGroup, ToggleGroup, Badge, Chip, Avatar,
+    Checkbox, Switch, Radio, Kbd, Link, Toggle and Spinner. A hug component stretches inside a
+    `grid` or `flex-col` parent by default CSS, so a full-width submit button is
+    `<form className="grid gap-4">…<Button /></form>`, never `w-full`.
+  - **scroll containers** (ScrollArea, MessageScroller, Splitter, Resizable): fill the height the
+    parent gives and can shrink (`min-h-0`).
+- What wrapping cannot do, because it changes the inside of a component (Tabs triggers sharing
+  the width equally), may become an enum prop after a decision, never a class.
 
 Every other prop is an option. The rules for options:
 

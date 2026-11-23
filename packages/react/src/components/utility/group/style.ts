@@ -5,7 +5,7 @@ import type { GroupOrientation } from '.';
 export const groupStyle = tv({
   slots: {
     root: [
-      'relative flex w-fit items-stretch',
+      'relative inline-flex max-w-full items-stretch',
       '[&>:not(input,[popover],[data-floating-ui-focus-guard])]:relative',
       '[&>*]:data-hovered:z-10 [&>*]:data-active:z-20 [&>*]:focus-ring-visible:z-30',
       'has-[>[data-group]]:gap-2',

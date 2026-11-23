@@ -5,7 +5,7 @@ import type { Alert } from '.';
 export const alertStyle = tv({
   slots: {
     root: [
-      'relative grid w-full items-start gap-x-3 concentric-p-3 px-4 text-body-b3-regular',
+      'relative grid w-full min-w-0 items-start gap-x-3 concentric-p-3 px-4 text-body-b3-regular',
       'transition-[opacity,translate] duration-(--ids-motion-fast) ease-out motion-reduce:transition-none',
       'data-ending-style:-translate-y-1 data-ending-style:opacity-0',
     ],

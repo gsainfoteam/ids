@@ -66,8 +66,10 @@ export const Gallery: Story = {
         <Showcase.Row label="tiny">
           <Spinner size="tiny" />
         </Showcase.Row>
-        <Showcase.Row label="className">
-          <Spinner className="size-8" />
+        <Showcase.Row label="in larger text">
+          <span className="text-[2rem]">
+            <Spinner />
+          </span>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -99,15 +101,22 @@ export const Gallery: Story = {
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section title="Color" description="색은 currentColor입니다.">
+      <Showcase.Section
+        title="Color"
+        description="색은 currentColor라 감싼 요소의 글자색을 따릅니다."
+      >
         <Showcase.Row label="text-neutral-strong">
           <Spinner size="standard" />
         </Showcase.Row>
         <Showcase.Row label="primary">
-          <Spinner size="standard" className="text-primary" />
+          <span className="text-primary">
+            <Spinner size="standard" />
+          </span>
         </Showcase.Row>
         <Showcase.Row label="on-muted">
-          <Spinner size="standard" className="text-neutral" />
+          <span className="text-neutral">
+            <Spinner size="standard" />
+          </span>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>

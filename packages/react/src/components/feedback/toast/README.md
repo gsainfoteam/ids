@@ -100,10 +100,12 @@ import { Toaster } from '@gsainfoteam/ids-react';
 | `max`        | `3`. 넘는 알림은 뒤에 숨어 기다리고, 기다리는 동안은 시간이 흐르지 않는다                 |
 | `hotkey`     | `'Alt+T'`. 영역으로 들어가는 단축키(`Hotkey` 문자열). F6 은 늘 된다                       |
 | `className`  | 알림 영역으로 간다                                                                        |
-| `style`      | 알림 영역으로 간다. 아래 CSS 변수로 간격을 바꾼다                                         |
+| `style`      | 알림 영역으로 간다                                                                        |
 | `aria-label` | 알림 영역의 이름. 기본 "알림"                                                             |
 
 - 640px 미만에서는 좌우 16px 을 남기고 화면 폭을 채웁니다. 그 이상에서는 356px 폭입니다.
+
+- 간격은 Toaster 를 감싼 요소에 CSS 변수로 정합니다. 변수는 상속되어 알림 영역에 닿습니다.
 
 | CSS 변수           | 기본 / 뜻                                                       |
 | ------------------ | --------------------------------------------------------------- |
@@ -111,8 +113,9 @@ import { Toaster } from '@gsainfoteam/ids-react';
 | `--toaster-offset` | `24px`. 화면 가장자리에서 떨어진 거리. 640px 미만에서는 16px    |
 
 ```tsx
-<Toaster style={{ '--toaster-gap': '8px', '--toaster-offset': '32px' } as CSSProperties} />
-<Toaster className="[--toaster-gap:8px]" />
+<div className="[--toaster-gap:8px] [--toaster-offset:32px]">
+  <Toaster />
+</div>
 ```
 
 ## 쌓기와 밀기

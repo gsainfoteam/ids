@@ -84,25 +84,23 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 ## 툴바
 
 ```tsx
-<Card className="w-fit flex-row gap-0 concentric-p-1">  {/* 막대는 Card 로 그린다 */}
-  <ButtonGroup variant="ghost" aria-label="사진 보기">
-    <div className="flex items-center gap-1">
-      <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-      <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-      <ButtonGroup.Separator className="mx-1 h-5 min-h-0 self-center" />  {/* 선 길이는 앱이 정한다 */}
-      <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-    </div>
-  </ButtonGroup>
-</Card>
+<ButtonGroup variant="outline" aria-label="사진 보기">
+  <div className="flex gap-1">                        {/* 버튼을 띄우는 앱의 레이아웃 div */}
+    <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+    <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+    <ButtonGroup.Separator />                         {/* 버튼 높이만큼 선을 긋는다 */}
+    <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+  </div>
+</ButtonGroup>
 ```
 
-- 테두리 막대 안에 버튼이 떠 있는 툴바는 `Card` 로 막대를 그리고, 그 안에 버튼을 레이아웃 div 로 띄운 그룹을 넣습니다.
-- 막대가 면을 그리므로 안의 버튼은 `ghost` 로 둡니다.
-- 버튼 묶음끼리 띄우려면 그룹 안에 그룹을 넣습니다. [합성](#합성)을 봅니다.
+- 버튼 사이를 띄운 툴바는 그룹 안에 레이아웃 div 를 둡니다. `variant`, `size` 는 div 를 건너 버튼에 닿습니다.
+- `Separator` 는 같은 줄의 버튼 높이만큼 늘어납니다.
 
 ## 붙이기와 띄우기
 
-- 그룹은 늘 직계 자식을 이어 붙입니다. 붙일지 말지를 정하는 prop 은 없고, `className` 과 `style` 은 그룹의 모양에만 쓰입니다.
+- 그룹은 늘 직계 자식을 이어 붙입니다. 붙일지 말지를 정하는 prop 은 없습니다.
+- 크기는 내용 너비(hug)입니다. `grid` 나 `flex-col` 부모 안에서는 부모 너비로 늘어나고, 그 안의 필드가 남은 폭을 채웁니다(`<div className="grid w-80"><ButtonGroup>…</ButtonGroup></div>`).
 - 버튼을 띄우려면 그룹 안에 앱의 레이아웃 div 를 두고 간격을 줍니다. div 안의 버튼은 그룹의 직계 자식이 아니라서 각자 모서리와 그림자를 지킵니다.
 - `size`, `variant`, 이름(`aria-label`)은 div 를 건너 그대로 안의 버튼에 닿습니다.
 

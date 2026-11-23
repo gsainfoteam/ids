@@ -141,17 +141,14 @@ export const Gallery: Story = {
             <Toggle value="board">보드</Toggle>
           </ToggleGroup>
         </Showcase.Row>
-        <Showcase.Row label="full width" className="max-w-md">
-          <ToggleGroup
-            aria-label="정렬 기준"
-            variant="outline"
-            defaultValue="new"
-            className="w-full"
-          >
-            <Toggle value="new">최신</Toggle>
-            <Toggle value="popular">인기</Toggle>
-            <Toggle value="comments">댓글 많은</Toggle>
-          </ToggleGroup>
+        <Showcase.Row label="in a grid">
+          <div className="grid w-full max-w-md">
+            <ToggleGroup aria-label="정렬 기준" variant="outline" defaultValue="new">
+              <Toggle value="new">최신</Toggle>
+              <Toggle value="popular">인기</Toggle>
+              <Toggle value="comments">댓글 많은</Toggle>
+            </ToggleGroup>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="spaced in a div">
           <ToggleGroup

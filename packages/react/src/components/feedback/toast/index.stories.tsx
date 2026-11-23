@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 
 import { expect, waitFor } from 'storybook/test';
 
@@ -274,7 +274,7 @@ export const ChooseWhereToastsAppear: Story = {
     const [placement, setPlacement] = useState<Toaster.Placement>('bottom-right');
 
     return (
-      <>
+      <div className="flex flex-col items-start gap-4">
         <ToggleGroup<Toaster.Placement>
           aria-label="위치"
           required
@@ -287,15 +287,11 @@ export const ChooseWhereToastsAppear: Story = {
             </Toggle>
           ))}
         </ToggleGroup>
-        <Button
-          variant="outline"
-          className="mt-4"
-          onClick={() => toast.info(`${placement} 에 떴습니다`)}
-        >
+        <Button variant="outline" onClick={() => toast.info(`${placement} 에 떴습니다`)}>
           알림 띄우기
         </Button>
         <Toaster placement={placement} />
-      </>
+      </div>
     );
   },
   parameters: {
@@ -332,17 +328,16 @@ export const KeepTheStackOpen: Story = {
       >
         알림 두 개 띄우기
       </Button>
-      <Toaster
-        variant="expanded"
-        style={{ '--toaster-gap': '8px', '--toaster-offset': '32px' } as CSSProperties}
-      />
+      <div className="[--toaster-gap:8px] [--toaster-offset:32px]">
+        <Toaster variant="expanded" />
+      </div>
     </>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'variant="expanded" 는 올려 두지 않아도 알림을 펼쳐 둡니다. 알림 사이와 화면 가장자리까지의 거리는 style 의 --toaster-gap, --toaster-offset 으로 바꿉니다.',
+          'variant="expanded" 는 올려 두지 않아도 알림을 펼쳐 둡니다. 알림 사이와 화면 가장자리까지의 거리는 Toaster 를 감싼 요소의 --toaster-gap, --toaster-offset 으로 바꿉니다.',
       },
     },
   },

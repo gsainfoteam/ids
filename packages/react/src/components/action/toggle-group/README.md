@@ -120,7 +120,9 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 ```tsx
 <ToggleGroup aria-label="정렬" variant="outline" size="tiny">  {/* 안의 토글이 따른다 */}
 <ToggleGroup aria-label="보기" orientation="vertical">         {/* 세로. 화살표도 위아래 */}
-<ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 붙인 토글이 폭을 나눠 가진다 */}
+<div className="grid">                                    {/* grid 부모 안에서 늘어나면 */}
+  <ToggleGroup aria-label="정렬">…</ToggleGroup>             {/* 붙인 토글이 폭을 나눠 가진다 */}
+</div>
 <ToggleGroup aria-label="시간">                                {/* 띄우려면 앱의 div 로 감싼다 */}
   <div className="flex flex-wrap gap-2">…</div>              {/* 띄운 토글은 제 너비로 줄을 넘긴다 */}
 </ToggleGroup>

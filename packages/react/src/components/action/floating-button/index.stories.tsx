@@ -33,6 +33,10 @@ const sizes = ['standard', 'tiny'] as const;
 const placements = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;
 const functionNamesSurviveBuild = isDevelopment;
 
+function Spot({ children }: { children: ReactNode }) {
+  return <div className="relative h-24 w-56 transform-[translateZ(0)]">{children}</div>;
+}
+
 function ContainingBlock({
   children,
   dir,
@@ -114,14 +118,11 @@ export const Gallery: Story = {
           rows={colorSchemes}
           columns={variants}
           render={(colorScheme, variant) => (
-            <FloatingButton
-              className="static"
-              colorScheme={colorScheme}
-              variant={variant}
-              aria-label={colorScheme}
-            >
-              <PlusIcon />
-            </FloatingButton>
+            <Spot>
+              <FloatingButton colorScheme={colorScheme} variant={variant} aria-label={colorScheme}>
+                <PlusIcon />
+              </FloatingButton>
+            </Spot>
           )}
         />
       </Showcase.Section>
@@ -132,37 +133,51 @@ export const Gallery: Story = {
       >
         {sizes.map((size) => (
           <Showcase.Row key={size} label={size}>
-            <FloatingButton className="static" size={size} aria-label="새 글 작성">
-              <PlusIcon />
-            </FloatingButton>
-            <FloatingButton className="static" size={size}>
-              <PlusIcon />새 글 작성
-            </FloatingButton>
-            <FloatingButton className="static" size={size} variant="outline">
-              <ChatBubbleLeftIcon />
-              문의
-            </FloatingButton>
+            <Spot>
+              <FloatingButton size={size} aria-label="새 글 작성">
+                <PlusIcon />
+              </FloatingButton>
+            </Spot>
+            <Spot>
+              <FloatingButton size={size}>
+                <PlusIcon />새 글 작성
+              </FloatingButton>
+            </Spot>
+            <Spot>
+              <FloatingButton size={size} variant="outline">
+                <ChatBubbleLeftIcon />
+                문의
+              </FloatingButton>
+            </Spot>
           </Showcase.Row>
         ))}
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="disabled">
-          <FloatingButton className="static" disabled aria-label="새 글 작성">
-            <PlusIcon />
-          </FloatingButton>
-          <FloatingButton className="static" variant="soft" disabled>
-            <PlusIcon />새 글 작성
-          </FloatingButton>
+          <Spot>
+            <FloatingButton disabled aria-label="새 글 작성">
+              <PlusIcon />
+            </FloatingButton>
+          </Spot>
+          <Spot>
+            <FloatingButton variant="soft" disabled>
+              <PlusIcon />새 글 작성
+            </FloatingButton>
+          </Spot>
         </Showcase.Row>
         <Showcase.Row label="loading">
-          <FloatingButton className="static" disabled aria-busy aria-label="업로드 중">
-            <Spinner aria-hidden />
-          </FloatingButton>
-          <FloatingButton className="static" disabled aria-busy>
-            <Spinner aria-hidden />
-            업로드 중
-          </FloatingButton>
+          <Spot>
+            <FloatingButton disabled aria-busy aria-label="업로드 중">
+              <Spinner aria-hidden />
+            </FloatingButton>
+          </Spot>
+          <Spot>
+            <FloatingButton disabled aria-busy>
+              <Spinner aria-hidden />
+              업로드 중
+            </FloatingButton>
+          </Spot>
         </Showcase.Row>
       </Showcase.Section>
 

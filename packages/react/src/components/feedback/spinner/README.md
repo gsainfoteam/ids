@@ -38,7 +38,8 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 
 <Spinner size="standard" />   {/* 아이콘 standard 토큰. 어디서든 고정 */}
 <Spinner size="tiny" />       {/* 아이콘 tiny 토큰 */}
-<Spinner className="size-8" /> {/* 큰 로딩 표시 */}
+<span className="text-[2rem]"><Spinner /></span>  {/* 큰 로딩 표시. 감싼 글자 크기를 따른다 */}
+<span className="text-primary"><Spinner /></span>   {/* 색도 감싼 요소의 글자색 */}
 ```
 
 - `size` 를 주면 컨트롤 안에서도 그 크기를 지킵니다. IconButton은 아이콘 칸을 늘 자기 크기로 맞추므로 예외입니다.
@@ -68,6 +69,8 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 | ----------- | ------------------------------------------------------ |
 | `size`      | 적용된 크기. 주변 컨트롤이나 글자를 따르면 `undefined` |
 | `announced` | 스크린 리더에 이름을 적었다                            |
+
+- IDS 위에 새 디자인을 얹을 때 `className` 과 `style` 은 이 상태를 받는 함수로도 줄 수 있습니다.
 
 ```tsx
 <Spinner className={(state) => (state.announced ? 'text-primary' : undefined)} />
