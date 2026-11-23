@@ -4,7 +4,6 @@ import { ArrowPathIcon, MapPinIcon, StarIcon } from '@heroicons/react/24/outline
 
 import { Button } from '../../components/action/button';
 import { IconToggle } from '../../components/action/icon-toggle';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
@@ -81,14 +80,18 @@ export const PC: Story = {
                 <Item.Content>
                   <Item.Title>
                     {arrival.route}
-                    {index === 0 && <Badge content="곧 도착" variant="soft" colorScheme="danger" />}
+                    {index === 0 && (
+                      <Chip variant="soft" colorScheme="danger">
+                        곧 도착
+                      </Chip>
+                    )}
                   </Item.Title>
                   <Item.Description>
                     {arrival.toward} · {arrival.time}
                   </Item.Description>
                 </Item.Content>
                 <Item.Actions>
-                  <Badge content={`${arrival.wait}분`} variant="soft" colorScheme="primary" />
+                  <Chip variant="soft" colorScheme="primary">{`${arrival.wait}분`}</Chip>
                 </Item.Actions>
               </Item>
             ))}

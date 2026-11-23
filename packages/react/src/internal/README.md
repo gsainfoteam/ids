@@ -12,7 +12,8 @@
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, CircularProgress                                                                                                                                                                                             |
 | [`surfaces/control-surface.ts`](#surfacescontrol-surfacets)       | 버튼류 컨트롤의 클래스 조각, scheme 클래스, compound variant                          | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
-| [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer                                                                                                                                                                                       |
+| [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer, Badge                                                                                                                                                                                     |
+| [`corner-geometry.ts`](#corner-geometryts)     | 계산된 모서리 반지름 읽기, 곡선의 45도 지점이 모서리에서 들어온 거리                  | ScrollArea, Badge |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`drag-surface.ts`](#drag-surfacets)             | 끌어 옮기는 항목의 놓을 자리 선, 따라오는 복사본, 들어 올린 모양, 끌기를 끝낸 click 과 Space 삼키기 | Sidebar, Editor, Scheduler |
 | [`drag-sensors.ts`](#drag-sensorsts)             | 끌기를 시작하는 규칙: 마우스 4px, 터치 250ms 누르기 | Sidebar, Editor, Scheduler |
@@ -192,6 +193,7 @@ export const iconToggleStyle = tv({
 - ScrollArea: `geometry.ts` 가 위 왼쪽 모서리의 지수로 막대 끝을 곡선에서 띄웁니다.
 - Image: `flip.ts` 가 뷰어를 열고 닫을 때 썸네일 모서리 모양으로 자릅니다(`insetClipPath`).
 - Drawer: `background-scale.ts` 가 뒤 페이지를 squircle 로 자르고, 반지름에 `cornerRadiusScale` 을 곱합니다.
+- Badge: `use-badge-inset.ts` 가 배지가 붙는 모서리의 지수로 곡선 위 지점을 구합니다.
 
 ### 쓰는 법
 
@@ -216,6 +218,40 @@ insetClipPath({ width, height }, { top, right, bottom, left }, radius, exponent)
 
 - `corner-shape` 를 모르는 브라우저는 값이 비어 있어 원(2)을 돌려줍니다. 그 브라우저는 모서리도 원으로 그립니다.
 - 지수 계산을 바꾸면 Resizable, TextArea 의 모서리 손잡이와 ScrollArea 막대 끝이 함께 바뀝니다.
+
+## corner-geometry.ts
+
+계산된 스타일에서 모서리 하나의 반지름을 px 로 읽고, 그 모서리 곡선의 45도 지점이 모서리에서 얼마나 들어와 있는지 구합니다. 곡선을 피하거나 곡선 위에 붙는 코드가 같은 식을 쓰게 합니다.
+
+### 쓰는 곳
+
+- ScrollArea: `geometry.ts` 의 `readShape` 가 네 모서리 반지름을 읽어 테두리 두께를 빼고, `cornerSquareFits` 가 두 막대가 만나는 모서리에 corner 칸이 들어가는지 봅니다.
+- Badge: `use-badge-inset.ts` 가 `cornerRadii` 로 감싼 요소의 모서리 반지름을 읽고, `--badge-inset-x` 와 `--badge-inset-y` 로 배지 중심을 곡선 위에 둡니다.
+
+### 쓰는 법
+
+```ts
+const style = getComputedStyle(element);
+const radius = cornerRadius(style, 'top-right', Math.min(width, height));
+// ScrollArea: '50%' 는 짧은 변 기준으로 풀고, 아주 큰 값은 짧은 변의 절반에서 멈춘다
+
+const { x, y } = cornerRadii(style, width, height)['top-right'];
+// Badge: 가로는 너비, 세로는 높이로 풀고, CSS 처럼 넘치는 반지름을 모두 같은 비율로 줄인다
+
+diagonalInset(radius, cornerExponent(style, 'top-right'));
+// radius × (1 − 2^(−1/n)). 원(n = 2) 은 0.293r, squircle(n = 4) 은 0.159r
+```
+
+### 왜 이렇게
+
+- `|x|ⁿ + |y|ⁿ = 1` 위에서 x = y 인 점은 `2^(−1/n)` 이라, 모서리에서 두 변 쪽으로 똑같이 `r(1 − 2^(−1/n))` 들어와 있습니다.
+- CSS 는 이웃 모서리 반지름의 합이 변보다 길면 모든 모서리 반지름에 같은 비율을 곱해 줄입니다. `cornerRadii` 는 그 계산을 그대로 따라서 `rounded-tl-full` 처럼 한 모서리만 큰 요소와 타원 모서리에서도 그려진 곡선과 맞습니다.
+- `cornerRadius` 는 짧은 변의 절반에서 자르는 간단한 근사입니다. 네 모서리가 같은 정사각형과 알약 모양에서는 `cornerRadii` 와 같고, ScrollArea 가 씁니다.
+
+### 알아둘 것
+
+- `cornerRadius` 는 테두리 바깥 곡선의 반지름입니다. 테두리 안쪽 곡선이 필요하면 ScrollArea 처럼 테두리 두께를 뺍니다.
+- `diagonalInset` 을 바꾸면 ScrollArea 막대 끝과 corner 칸, Badge 위치가 함께 바뀝니다.
 
 ## date-locale.ts
 

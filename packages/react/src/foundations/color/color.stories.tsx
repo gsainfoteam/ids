@@ -10,7 +10,6 @@ import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Toggle } from '../../components/action/toggle';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Calendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
 import { Chart } from '../../components/data/chart';
@@ -449,12 +448,9 @@ export const Lab: Story = {
                   {labSchemes.map((colorScheme) => (
                     <div key={colorScheme} className="flex flex-wrap items-center gap-2">
                       {labMarkVariants.map((variant) => (
-                        <Badge
-                          key={variant}
-                          content={colorScheme}
-                          variant={variant}
-                          colorScheme={colorScheme}
-                        />
+                        <Chip key={variant} variant={variant} colorScheme={colorScheme}>
+                          {colorScheme}
+                        </Chip>
                       ))}
                       {labMarkVariants.map((variant) => (
                         <Chip key={variant} variant={variant} colorScheme={colorScheme}>

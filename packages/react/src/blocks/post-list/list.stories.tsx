@@ -10,8 +10,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -312,7 +312,9 @@ export const PC: Story = {
                           <Item.Content>
                             <Item.Title>
                               {post.pinned && (
-                                <Badge content="고정" variant="soft" colorScheme="primary" />
+                                <Chip variant="soft" colorScheme="primary">
+                                  고정
+                                </Chip>
                               )}
                               {post.title}
                             </Item.Title>
@@ -322,7 +324,7 @@ export const PC: Story = {
                             </Item.Description>
                           </Item.Content>
                           <Item.Actions>
-                            <Badge content={`댓글 ${post.comments}`} variant="outline" />
+                            <Chip variant="outline">{`댓글 ${post.comments}`}</Chip>
                           </Item.Actions>
                         </a>
                       </Item>

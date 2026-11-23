@@ -4,7 +4,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../components/action/icon-button';
 import { Toggle } from '../../components/action/toggle';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
@@ -141,7 +140,7 @@ export const PC: Story = {
                   <Item.Content>
                     <Item.Title>
                       {event.title}
-                      {event.full && <Badge content="마감" variant="soft" />}
+                      {event.full && <Chip variant="soft">마감</Chip>}
                     </Item.Title>
                     <Item.Description>
                       10월 {event.day}일 ({event.weekday}) {event.time} · {event.place}

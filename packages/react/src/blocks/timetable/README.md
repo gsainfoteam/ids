@@ -7,9 +7,9 @@ Storybook `Blocks/Timetable/*`. 시간표 화면 두 가지입니다.
 | `Week`  | 요일과 교시의 표에 과목을 색으로 나눠 놓고, 옆에 듣는 과목과 학점을 둔다.                     |
 | `Today` | 다음 수업까지 남은 시간과 강의실, 오늘 수업 순서. 지난 수업은 끝남, 다음 수업은 지금 단계다.   |
 
-- **쓰인 컴포넌트.** Table, Badge, Card, Item, IdsProvider, Progress, Stepper, Button
+- **쓰인 컴포넌트.** Table, Chip, Card, Item, IdsProvider, Progress, Stepper, Button
 - **알아둘 것.**
-  - 과목 색은 과목마다 `IdsProvider.Scope theme={COURSE_THEMES[course.color]}` 로 감싼 `Badge colorScheme="primary"` 입니다. 색을 직접 칠하지 않고 팔레트에서 IDS 가 고른 역할 색을 빌립니다. 테마는 모듈 상수 `COURSE_THEMES` 에 팔레트 값과 함께 한 번 만들어 두고, 앱은 자기 팔레트로 바꿉니다.
+  - 과목 색은 과목마다 `IdsProvider.Scope theme={COURSE_THEMES[course.color]}` 로 감싼 `Chip colorScheme="primary"` 입니다. 색을 직접 칠하지 않고 팔레트에서 IDS 가 고른 역할 색을 빌립니다. 테마는 모듈 상수 `COURSE_THEMES` 에 팔레트 값과 함께 한 번 만들어 두고, 앱은 자기 팔레트로 바꿉니다.
   - 주간 표는 칸마다 한 교시라, 두 교시 연강은 두 칸에 같은 과목이 들어갑니다. 시간 축에 블록을 놓는 `Scheduler` 는 날짜가 있는 일정을 주 단위로 넘겨 보는 컴포넌트입니다. 학기 내내 같은 요일과 교시의 표에는 이동 도구 막대와 날짜가 맞지 않아 Table 로 둡니다.
   - 좁은 화면에서는 `Table` 이 가로로 스크롤되고, 더 남은 쪽 가장자리가 흐려집니다.
   - Today 의 순서는 `value` 만 준 표시 전용 `Stepper` 입니다.

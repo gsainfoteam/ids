@@ -7,8 +7,8 @@ import { Showcase } from '~story-kit';
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
-import { Badge } from '../../data/badge';
 import { Card } from '../../data/card';
+import { Chip } from '../../data/chip';
 import { Item } from '../../data/item';
 import { ItemGroup } from '../../data/item-group';
 
@@ -125,9 +125,9 @@ export const Gallery: Story = {
             <Avatar name="김지스트" size="tiny" />
           </Skeleton>
         </Showcase.Row>
-        <Showcase.Row label="Badge">
+        <Showcase.Row label="Chip">
           <Skeleton loading asChild>
-            <Badge>새 글</Badge>
+            <Chip>새 글</Chip>
           </Skeleton>
         </Showcase.Row>
         <Showcase.Row label="Button">

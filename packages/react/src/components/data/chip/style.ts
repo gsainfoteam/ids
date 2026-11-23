@@ -9,7 +9,7 @@ const replacesIconButtonFill = cn('data-hovered:state-hover data-active:state-pr
 export const chipStyle = tv({
   slots: {
     root: [
-      'inline-flex shrink-0 items-center rounded-full align-middle whitespace-nowrap',
+      'inline-flex max-w-full shrink-0 items-center rounded-full align-middle whitespace-nowrap',
       'state-layer',
       'data-disabled:opacity-50',
     ],
@@ -49,6 +49,7 @@ export const chipStyle = tv({
         close: 'size-3.5',
       },
     } satisfies Record<IdsSize, object>,
+    dot: { true: {}, false: {} },
     interactive: {
       true: {
         root: [
@@ -63,7 +64,12 @@ export const chipStyle = tv({
       false: {},
     },
   },
+  compoundVariants: [
+    { dot: true, size: 'standard', class: { root: 'size-2.5 px-0' } },
+    { dot: true, size: 'tiny', class: { root: 'size-2 px-0' } },
+  ],
   defaultVariants: {
+    dot: false,
     variant: 'soft',
     colorScheme: 'neutral',
     size: 'standard',

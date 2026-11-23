@@ -6,8 +6,8 @@ import { Time } from '@internationalized/date';
 import { Button } from '../../components/action/button';
 import { Toggle } from '../../components/action/toggle';
 import { ToggleGroup } from '../../components/action/toggle-group';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
@@ -334,7 +334,7 @@ export const PC: Story = {
                         {(Object.keys(COLOR_NAMES) as ThemeColor[]).map((value) => (
                           <Select.Item key={value} value={value}>
                             <IdsProvider.Scope theme={THEMES[value]} asChild>
-                              <Badge dot colorScheme="primary" aria-hidden />
+                              <Chip variant="solid" colorScheme="primary" aria-hidden />
                             </IdsProvider.Scope>
                             {COLOR_NAMES[value]}
                           </Select.Item>
@@ -349,7 +349,9 @@ export const PC: Story = {
                         <h3>미리 보기</h3>
                       </Card.Title>
                       <Card.Action>
-                        <Badge content="새 글 3" variant="soft" colorScheme="primary" />
+                        <Chip variant="soft" colorScheme="primary">
+                          새 글 3
+                        </Chip>
                       </Card.Action>
                     </Card.Header>
                     <Card.Content className="flex flex-col gap-4">

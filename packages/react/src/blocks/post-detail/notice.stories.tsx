@@ -2,8 +2,8 @@ import { ArrowDownTrayIcon, DocumentTextIcon, ListBulletIcon } from '@heroicons/
 
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -55,8 +55,10 @@ export const PC: Story = {
         <article>
           <Card.Header className="border-b">
             <div className="flex flex-wrap gap-1.5">
-              <Badge content="학사" variant="soft" />
-              <Badge content="중요" variant="soft" colorScheme="danger" />
+              <Chip variant="soft">학사</Chip>
+              <Chip variant="soft" colorScheme="danger">
+                중요
+              </Chip>
             </div>
             <Card.Title asChild>
               <h1 className="text-headline-h4-bold">2026학년도 2학기 수강 정정 안내</h1>

@@ -10,8 +10,8 @@ import {
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -200,7 +200,11 @@ export const PC: Story = {
                               </Item.Content>
                               {unread.includes(notification.id) && (
                                 <Item.Actions>
-                                  <Badge dot colorScheme="primary" aria-label="읽지 않음" />
+                                  <Chip
+                                    variant="solid"
+                                    colorScheme="primary"
+                                    aria-label="읽지 않음"
+                                  />
                                 </Item.Actions>
                               )}
                             </Item>

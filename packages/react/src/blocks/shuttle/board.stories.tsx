@@ -1,8 +1,8 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chart } from '../../components/data/chart';
+import { Chip } from '../../components/data/chip';
 import { Table } from '../../components/data/table';
 import { Alert } from '../../components/feedback/alert';
 import { Progress } from '../../components/feedback/progress';
@@ -155,7 +155,7 @@ export const PC: Story = {
                     </Card.Title>
                     {next && (
                       <Card.Action>
-                        <Badge content={`${next} 출발`} variant="soft" colorScheme="primary" />
+                        <Chip variant="soft" colorScheme="primary">{`${next} 출발`}</Chip>
                       </Card.Action>
                     )}
                   </Card.Header>
@@ -197,9 +197,11 @@ export const PC: Story = {
                           <Table.Cell>{clockOf(minutesOf(departure) + route.minutes)}</Table.Cell>
                           <Table.Cell align="end">
                             {departure === next ? (
-                              <Badge content="다음 차" variant="soft" colorScheme="primary" />
+                              <Chip variant="soft" colorScheme="primary">
+                                다음 차
+                              </Chip>
                             ) : gone ? (
-                              <Badge content="떠남" variant="outline" />
+                              <Chip variant="outline">떠남</Chip>
                             ) : null}
                           </Table.Cell>
                         </Table.Row>

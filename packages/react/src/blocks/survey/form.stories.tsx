@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { CheckboxGroup } from '../../components/form/checkbox-group';
@@ -56,7 +56,9 @@ export const PC: Story = {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
         <div className="flex flex-col gap-3">
-          <Badge content="익명" variant="soft" className="self-start" />
+          <Chip variant="soft" className="self-start">
+            익명
+          </Chip>
           <h1 className="text-headline-h3-bold">EC3101 알고리즘 강의 평가</h1>
           <p className="text-body-b2-regular">
             답은 이름 없이 모아서, 성적이 공개된 뒤에 교수님께 전달돼요. 3분이면 끝나요.
