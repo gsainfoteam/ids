@@ -147,7 +147,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
   },
   render: ({ leadingIcon, trailingIcon, children, asChild, href, ...args }) => {
     const busy = args['aria-busy'] === true;
-    const icon = busy ? <Spinner decorative /> : leadingIcon;
+    const icon = busy ? <Spinner aria-hidden /> : leadingIcon;
     const label = children as ReactNode;
     const props = { ...args, 'aria-busy': busy || undefined, disabled: args.disabled || busy };
 
