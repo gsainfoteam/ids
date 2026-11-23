@@ -7,7 +7,13 @@
 
 | 파일                       | 내용                                                                                              |
 | -------------------------- | ------------------------------------------------------------------------------------------------- |
-| [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `useInternalDrawerPresentation` 의 다시 내보내기 |
+| [`index.ts`](#indexts)     | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `useInternalDrawerPresentation` 의 다시 내보내기 |
+| [`root.tsx`](#roottsx)     | 팝업을 그리는 `FieldPopup`                                                                        |
+| [`hooks/use-field-popup.ts`](#hooksuse-field-popupts) | 팝업 요소, drawer 판정, 레이어, 위치, 제목 id 상태                                    |
+| [`hooks/use-field-popup-placement.ts`](#hooksuse-field-popup-placementts) | popover 를 top layer 에 올리기, drawer sheet 배치, 첫 배치 알림  |
+| [`hooks/use-field-popup-initial-focus.ts`](#hooksuse-field-popup-initial-focusts) | 열 때 한 번 주는 초기 포커스                             |
+| [`lib/reveal.ts`](#librevealts)   | 옵션을 팝업 안에서 보이게 스크롤하기(`revealPopupOption`), 첫 배치 뒤 다시 가운데 맞추기        |
+| [`lib/sheet.ts`](#libsheetts)     | drawer sheet 의 위치와 높이(`placeSheet`)                                                         |
 | [`lib/styles.ts`](#libstylests)   | `popupStyle`                                                                                      |
 | [`parts/header.tsx`](#partsheadertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                                                |
 | [`parts/search.tsx`](#partssearchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                                                           |
@@ -24,9 +30,15 @@
 | [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`                                               |
 | Menu                                          | `FieldPopupSearch`(명령 팔레트의 `Menu.Search`)                                |
 
-- `parts/search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/parts/search` 에서 직접 가져옵니다.
+- `parts/search.tsx` 는 `index.ts` 가 다시 내보내지 않습니다. `internal/field-popup/parts/search` 에서 직접 가져옵니다.
 
-## index.tsx
+## index.ts
+
+`FieldPopup`, `FieldPopupHeader`, `revealPopupOption`, 위치 타입(`PopupSide`, `PopupAlign`)과 overlay 의 `useInternalDrawerPresentation`, `PopupPresentation` 을 다시 내보냅니다. 필드는 `internal/field-popup` 에서 가져옵니다.
+
+## root.tsx
+
+필드의 팝업을 그리는 `FieldPopup` 입니다. 상태와 effect 는 [hooks/use-field-popup.ts](#hooksuse-field-popupts) 가 맡고, 이 파일은 `ModalLayer`, `ScrollArea`, 팝업 요소의 ARIA 를 그립니다.
 
 ### 쓰는 법
 
@@ -68,12 +80,11 @@ revealed.current = true;
 
 - [`useInternalAnchored`](../overlay/README.md#hooksuse-anchoredts) 가 anchor 를 따라갑니다. 방금 놓인 쪽을 지키고, 높이를 처음부터 상한으로 두고, 화면 안에 남깁니다.
 - 폭은 `preferredWidth`(기본 240px)와 anchor 폭 중 큰 쪽, `matchWidth` 면 anchor 폭입니다. 높이는 120px 와 `maxHeight` 사이입니다.
-- 첫 배치가 끝나면(`isPositioned`) 미뤄 둔 가운데 맞추기를 합니다([revealPopupOption](#revealpopupoption)).
+- 첫 배치가 끝나면(`isPositioned`) 미뤄 둔 가운데 맞추기를 합니다([lib/reveal.ts](#librevealts)).
 
 #### drawer
 
-- 아래쪽 sheet 입니다. 좌우 여백은 8px(`VIEWPORT_MARGIN`), 높이는 520px(`DRAWER_MAX_HEIGHT`)와 visual viewport 높이의 70% 중 작은 쪽입니다.
-- 화면 키보드가 덮는 만큼(`coveredByKeyboard`) sheet 를 올립니다([`sheet-viewport.ts`](../overlay/README.md#libsheet-viewportts)).
+- 아래쪽 sheet 입니다. 위치와 높이는 [lib/sheet.ts](#libsheetts) 가 정합니다.
 - modal 입니다([`ModalLayer`](../overlay/README.md#partsmodal-layertsx)): 어두운 배경, 포커스 가두기, 나머지 페이지 숨기기(`aria-hidden`), 스크롤 잠금(`RemoveScroll`, pinch zoom 은 허용), `role="dialog"`, `aria-modal`.
 - 필드는 sheet 를 닫으면서 포커스를 자기 trigger 로 돌려보냅니다. sheet 가 아직 붙어 있어도 스택은 anchor(필드 루트) 안으로 가는 포커스를 되돌리지 않습니다.
 - 열린 팝업이 drawer 로 바뀌면 배경을 먼저 top layer 에 올리고 팝업을 다시 올립니다. top layer 는 올린 순서로 쌓입니다.
@@ -91,12 +102,76 @@ revealed.current = true;
 - 바깥 누르기는 포커스도 옮기는데, 그 포커스 이동은 같은 닫기의 일부입니다. `open` 을 제어하는 쪽이 팝업을 열어 둔 채로 두어도 같은 닫기를 두 번 듣지 않습니다.
 - Escape 는 맨 위 레이어만 닫습니다. Dialog 안의 Select 는 Select 먼저 닫힙니다.
 
-#### 초기 포커스
+### 알아둘 것
+
+- `onClose` 는 `useInternalLayer` 가 부를 때마다 최신 값을 읽습니다. 렌더마다 새 함수를 넘겨도 다시 등록하지 않습니다.
+- 팝업의 `data-field-popup` 은 Field 가 읽습니다. Field 는 이 안의 input(검색 상자)을 필드의 값으로 세지 않습니다(`components/form/field/lib/control-state.ts` 의 `isInPopupOf`). `revealPopupOption` 도 이 속성으로 팝업을 찾습니다.
+- 팝업은 `[popover]` 라서, 다른 필드의 셸 안에 렌더돼도(TelField 안의 국가 Select) 그 셸의 `focus-ring` 이 팝업 안 input 의 포커스로 켜지지 않습니다. CSS 패키지의 `focus-ring` 이 셸 안 `[popover]` 에 든 `data-field-input`, `data-text-field-input`, `data-text-area-input` 을 뺍니다.
+- `data-presentation`, `data-side` 는 Select, ColorField README 에 적힌 공개 상태 속성입니다. 이름을 바꾸면 그 README 도 고칩니다.
+- `FieldPopup` 에 준 `ref` 는 요소에 닿지 않습니다. `ModalLayer` 의 `RemoveScroll` 이 자식의 ref 를 자기 것으로 바꿉니다. 요소가 필요하면 `data-*` 속성과 `closest` 로 찾습니다(Select 의 `data-select-popup`, ChipField 의 `data-chip-field-popup`).
+
+## hooks/use-field-popup.ts
+
+`FieldPopup` 의 상태를 담은 hook(`useInternalFieldPopup`)입니다. 팝업 요소(`popup`, `setPopup`), drawer 판정(`useInternalDrawerPresentation`), 스택의 레이어, anchor 위치(`useInternalAnchored`), 제목 id, 아래에 modal 이 있는지(`stacked`)를 돌려줍니다.
+
+### 쓰는 곳
+
+- [root.tsx](#roottsx) 의 `FieldPopup`
+
+### 왜 이렇게
+
+- 레이어는 popover 일 때 `popup`, drawer 일 때 `modal` 로 등록합니다. drawer 면 anchor 에 붙는 위치를 쓰지 않습니다(`positioned: !drawer`).
+- `stacked` 는 스택의 `onPositionChange` 가 알린 `modalsBelow` 입니다. 다른 modal 위에 열린 drawer 는 배경을 투명하게 둬서 페이지를 두 번 어둡게 하지 않습니다(`data-stacked`).
+- 배치와 초기 포커스는 [hooks/use-field-popup-placement.ts](#hooksuse-field-popup-placementts), [hooks/use-field-popup-initial-focus.ts](#hooksuse-field-popup-initial-focusts) 를 이 순서로 부릅니다. top layer 에 올린 뒤에 포커스를 줍니다.
+
+### 알아둘 것
+
+- 바꾸면 Select, ChipField, ColorField, 날짜와 시간 필드의 팝업이 함께 바뀝니다.
+
+## hooks/use-field-popup-placement.ts
+
+팝업을 놓는 layout effect 세 개를 담은 hook(`useInternalFieldPopupPlacement(popup, drawer, isPositioned)`)입니다.
+
+- popover: 팝업을 top layer 에 올리고 toaster 를 다시 위로 올립니다(`showInTopLayer`, `raiseWhatStaysAboveLayers`).
+- popover: 첫 배치가 끝나면(`isPositioned`) [lib/reveal.ts](#librevealts) 에 알립니다(`onPlacementLanded`).
+- drawer: [lib/sheet.ts](#libsheetts) 로 sheet 를 놓고, visual viewport 가 바뀔 때마다 다시 놓습니다(`onViewportChange`).
+
+### 쓰는 곳
+
+- [hooks/use-field-popup.ts](#hooksuse-field-popupts)
+
+### 알아둘 것
+
+- drawer 의 top layer 올리기는 `ModalLayer` 가 합니다. 이 hook 은 popover 만 올립니다.
+- 바꾸면 필드 팝업이 열리는 자리와 처음 가운데 맞추는 옵션이 함께 바뀝니다.
+
+## hooks/use-field-popup-initial-focus.ts
+
+팝업을 열 때 한 번 초기 포커스를 주는 hook(`useInternalFieldPopupInitialFocus(popup, drawer, initialFocusSelector)`)입니다.
+
+### 쓰는 곳
+
+- [hooks/use-field-popup.ts](#hooksuse-field-popupts)
+
+### 왜 이렇게
 
 - 순서: `initialFocusSelector` 에 맞는 요소, `[data-popup-autofocus]` 요소, drawer 면 첫 tabbable 또는 팝업 자신([`initialFocusTarget`](../overlay/README.md#libfocusts)). popover 는 앞의 둘이 없으면 포커스를 trigger 에 그대로 둡니다.
 - 한 번만 합니다(`initialFocusDone`). 다만 열린 채 drawer 로 바뀌었는데 포커스가 밖에 있으면 다시 합니다(`sheetMissingFocus`). modal sheet 는 포커스를 쥐어야 합니다.
 
-#### revealPopupOption
+### 알아둘 것
+
+- 바꾸면 Select 의 검색 상자, 날짜 필드의 달력처럼 열 때 포커스를 받는 요소가 함께 바뀝니다.
+
+## lib/reveal.ts
+
+옵션을 팝업 안에서 보이게 스크롤하는 `revealPopupOption(option, { center })` 와, 첫 배치가 끝났다는 알림(`onPlacementLanded`)입니다.
+
+### 쓰는 곳
+
+- Select(`use-select.ts`), ChipField(`use-chip-field.ts`): `revealPopupOption`
+- [hooks/use-field-popup-placement.ts](#hooksuse-field-popup-placementts): `onPlacementLanded`
+
+### 왜 이렇게
 
 - 팝업 안 스크롤 부모의 `scrollTop` 을 직접 바꿉니다(`scrollWithinPopup`). top layer 뒤의 문서는 스크롤하지 않습니다. 스크롤 부모는 옵션에서 가장 가까운 `overflow-y: auto | scroll` 조상이라, 목록이 있으면 listbox, 없으면 팝업의 viewport 입니다.
 - `center` 는 옵션을 가운데에 둡니다. 목록은 선택한 옵션을 가운데에 두고 열려야 합니다.
@@ -106,18 +181,31 @@ revealed.current = true;
 
 ### 알아둘 것
 
-- `onClose` 는 `useInternalLayer` 가 부를 때마다 최신 값을 읽습니다. 렌더마다 새 함수를 넘겨도 다시 등록하지 않습니다.
-- 팝업의 `data-field-popup` 은 Field 가 읽습니다. Field 는 이 안의 input(검색 상자)을 필드의 값으로 세지 않습니다(`components/form/field/lib/control-state.ts` 의 `isInPopupOf`). `revealPopupOption` 도 이 속성으로 팝업을 찾습니다.
-- 팝업은 `[popover]` 라서, 다른 필드의 셸 안에 렌더돼도(TelField 안의 국가 Select) 그 셸의 `focus-ring` 이 팝업 안 input 의 포커스로 켜지지 않습니다. CSS 패키지의 `focus-ring` 이 셸 안 `[popover]` 에 든 `data-field-input`, `data-text-field-input`, `data-text-area-input` 을 뺍니다.
-- `data-presentation`, `data-side` 는 Select, ColorField README 에 적힌 공개 상태 속성입니다. 이름을 바꾸면 그 README 도 고칩니다.
-- `FieldPopup` 에 준 `ref` 는 요소에 닿지 않습니다. `ModalLayer` 의 `RemoveScroll` 이 자식의 ref 를 자기 것으로 바꿉니다. 요소가 필요하면 `data-*` 속성과 `closest` 로 찾습니다(Select 의 `data-select-popup`, ChipField 의 `data-chip-field-popup`).
+- 첫 배치의 기록은 팝업 요소를 key 로 하는 `WeakSet`, `WeakMap` 입니다. 팝업이 닫혀 요소가 사라지면 함께 지워집니다.
+
+## lib/sheet.ts
+
+drawer 로 그리는 팝업의 위치와 높이를 정하는 함수(`placeSheet(popup, win)`)입니다.
+
+### 쓰는 곳
+
+- [hooks/use-field-popup-placement.ts](#hooksuse-field-popup-placementts)
+
+### 왜 이렇게
+
+- 좌우 여백은 8px(`VIEWPORT_MARGIN`), 높이는 520px(`DRAWER_MAX_HEIGHT`)와 visual viewport 높이의 70% 중 작은 쪽입니다.
+- 화면 키보드가 덮는 만큼(`coveredByKeyboard`) sheet 를 올립니다([`sheet-viewport.ts`](../overlay/README.md#libsheet-viewportts)). 아래 여백은 `safe-area-inset-bottom` 보다 작아지지 않습니다.
+
+### 알아둘 것
+
+- 바꾸면 Select, ChipField, ColorField, 날짜와 시간 필드의 drawer 크기가 함께 바뀝니다.
 
 ## lib/styles.ts
 
 ### 쓰는 법
 
 ```ts
-// internal/field-popup/index.tsx
+// internal/field-popup/root.tsx
 const styles = popupStyle({ presentation });   // 'popover' | 'drawer'
 <ScrollArea asChild fade="y">
   <div className={styles.popup({ className })}>
