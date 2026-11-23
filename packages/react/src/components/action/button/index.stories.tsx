@@ -259,11 +259,13 @@ export const Gallery: Story = {
             <a href="#gallery">비활성 링크</a>
           </Button>
         </Showcase.Row>
-        <Showcase.Row label="full width" className="max-w-sm">
-          <Button className="w-full">
-            <CheckIcon />
-            확인
-          </Button>
+        <Showcase.Row label="full width">
+          <div className="grid w-full max-w-sm">
+            <Button>
+              <CheckIcon />
+              확인
+            </Button>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -450,6 +452,7 @@ export const SubmitAForm: Story = {
 };
 
 export const ChangeTheLookOnHoverAndFocus: Story = {
+  tags: ['custom-design'],
   render: () => (
     <Button
       variant={(state) => (state.hovered ? 'solid' : 'outline')}

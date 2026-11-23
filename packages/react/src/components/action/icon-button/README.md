@@ -4,6 +4,7 @@
 
 - **이름 자동.** `aria-label` 을 생략하면 아이콘에서 이름을 찾습니다. `<PlusIcon />` 은 "Plus" 가 됩니다. 직접 준 이름이 항상 이깁니다.
 - **정확한 정사각형.** 아이콘이 무엇이든 높이와 너비가 컨트롤 크기와 같습니다. `standard` 36px, `tiny` 32px.
+- **내용 크기(hug).** Button 처럼 제 크기를 지키고, 놓이는 자리는 감싼 요소가 정합니다. 앱은 `className` 으로 크기를 바꾸지 않습니다.
 - **로딩은 합성.** `icon` 을 `<Spinner />` 로 바꾸고 `disabled` 를 켜면 스피너가 아이콘 크기로 들어가 버튼이 흔들리지 않습니다.
 - **Button 과 같은 동작.** `variant`, `colorScheme`, `asChild`, `focusableWhenDisabled`, 상태 함수 prop 이 모두 Button 과 같습니다. `variant` 기본값만 `ghost` 입니다.
 
