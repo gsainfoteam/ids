@@ -1,6 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { StyleDictionary } from "style-dictionary-utils";
-
+export function legacyTokenOutputs(legacy) {
 const GENERATED = "// GENERATED — do not edit manually";
 
 const slug = (t) => t.path.slice(1).join("-");
@@ -43,7 +41,7 @@ const resolveRef = (value, palette) => {
   return m ? (palette[m[1]] ?? value) : value;
 };
 
-const NEUTRAL_ROLE_STEPS = JSON.parse(readFileSync("./neutral-roles.json", "utf8"));
+const NEUTRAL_ROLE_STEPS = legacy.neutralRoleSteps;
 
 const isTypographyToken = (node) =>
   node &&
@@ -70,18 +68,7 @@ const flattenTypography = (node, path = []) => {
   );
 };
 
-const readTypographyEntries = (palette) => {
-  const json = JSON.parse(
-    readFileSync("./tokens/semantic/typography.json", "utf8"),
-  );
-  return flattenTypography(json.text ?? {}).map((entry) => ({
-    name: entry.name,
-    fontSize: resolveRef(entry.fontSize, palette),
-    fontWeight: resolveRef(entry.fontWeight, palette),
-    lineHeight: resolveRef(entry.lineHeight, palette),
-    letterSpacing: resolveRef(entry.letterSpacing, palette),
-  }));
-};
+const readTypographyEntries = () => legacy.typographyEntries;
 
 const lineHeightAsMultiplier = (lineHeight, fontSize) => {
   const raw = String(lineHeight);
@@ -106,7 +93,7 @@ const parseEnums = (dictionary) => {
   return result;
 };
 
-const COLOR_ROLES = JSON.parse(readFileSync("./color-roles.json", "utf8"));
+const COLOR_ROLES = legacy.colorRoles;
 
 const COLOR_FAMILIES = Object.values(COLOR_ROLES.families).flat();
 
@@ -147,8 +134,7 @@ const SCHEME_LAYER_IN_TEXT_COLOR = ["neutral"];
 
 const MODES = ["light", "dark"];
 
-const readTokenFile = (file, key) =>
-  Object.entries(JSON.parse(readFileSync(`./tokens/${file}`, "utf8"))[key]);
+const readTokenFile = (file, key) => Object.entries(legacy.tokenFiles[file][key]);
 
 const SHADOW_STEPS = readTokenFile("shadow.json", "shadow").map(([step, token]) => ({
   step,
@@ -1212,55 +1198,15 @@ const dartTypographyFormatter = ({ dictionary }) => {
   });
 };
 
-for (const [name, format] of [
-  ["ids/css", cssFormatter],
-  ["ids/ts-types", tsTypesFormatter],
-  ["ids/ts-color-roles", tsColorRolesFormatter],
-  ["ids/dart-enums", dartEnumsFormatter],
-  ["ids/dart-color-roles", dartColorRolesFormatter],
-  ["ids/dart-motion", dartMotionFormatter],
-  ["ids/ts-component-tokens", tsComponentTokensFormatter],
-  ["ids/dart-component-tokens", dartComponentTokensFormatter],
-  ["ids/dart-typography", dartTypographyFormatter],
-]) {
-  StyleDictionary.registerFormat({ name, format });
+return {
+    "../css/dist/ids.css": cssFormatter({ dictionary: legacy.cssDictionary }),
+    "../react/src/tokens/types.ts": tsTypesFormatter({ dictionary: legacy.jsDictionary }),
+    "../react/src/tokens/color-roles.ts": tsColorRolesFormatter({ dictionary: legacy.jsDictionary }),
+    "../react/src/tokens/component-tokens.ts": tsComponentTokensFormatter({ dictionary: legacy.jsDictionary }),
+    "../flutter/lib/tokens/ids_enums.dart": dartEnumsFormatter({ dictionary: legacy.jsDictionary }),
+    "../flutter/lib/tokens/ids_color_roles.dart": dartColorRolesFormatter({ dictionary: legacy.jsDictionary }),
+    "../flutter/lib/tokens/ids_motion.dart": dartMotionFormatter({ dictionary: legacy.jsDictionary }),
+    "../flutter/lib/tokens/ids_component_tokens.dart": dartComponentTokensFormatter({ dictionary: legacy.jsDictionary }),
+    "../flutter/lib/tokens/ids_typography.dart": dartTypographyFormatter({ dictionary: legacy.jsDictionary }),
+  };
 }
-
-export default {
-  log: { warnings: "disabled" },
-  source: ["tokens/**/*.json"],
-  platforms: {
-    css: {
-      transformGroup: "css",
-      prefix: "ids",
-      files: [{ destination: "../css/dist/ids.css", format: "ids/css" }],
-    },
-    ts: {
-      transformGroup: "js",
-      files: [
-        { destination: "../react/src/tokens/types.ts", format: "ids/ts-types" },
-        { destination: "../react/src/tokens/color-roles.ts", format: "ids/ts-color-roles" },
-        { destination: "../react/src/tokens/component-tokens.ts", format: "ids/ts-component-tokens" },
-      ],
-    },
-    dart: {
-      transformGroup: "js",
-      files: [
-        { destination: "../flutter/lib/tokens/ids_enums.dart", format: "ids/dart-enums" },
-        {
-          destination: "../flutter/lib/tokens/ids_color_roles.dart",
-          format: "ids/dart-color-roles",
-        },
-        { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
-        {
-          destination: "../flutter/lib/tokens/ids_component_tokens.dart",
-          format: "ids/dart-component-tokens",
-        },
-        {
-          destination: "../flutter/lib/tokens/ids_typography.dart",
-          format: "ids/dart-typography",
-        },
-      ],
-    },
-  },
-};

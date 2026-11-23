@@ -1,0 +1,37 @@
+{
+  "prefix": ["ids"],
+  "placeholders": { "family": "{family}" },
+  "targets": {
+    "css": {
+      "manifest": "../css/package.json",
+      "names": {
+        "identifier": { "case": "kebab", "prefixed": false },
+        "customProperty": { "case": "customProperty", "prefixed": true },
+        "themeProperty": { "case": "customProperty", "prefixed": false }
+      },
+      "symbols": {},
+      "outputs": {}
+    },
+    "ts": {
+      "manifest": "../react/package.json",
+      "names": {
+        "constant": { "case": "constant", "prefixed": true },
+        "member": { "case": "camel", "prefixed": false },
+        "type": { "case": "pascal", "prefixed": true },
+        "key": { "case": "kebab", "prefixed": false }
+      },
+      "symbols": {},
+      "outputs": { "foundations": "src/tokens/foundations.json" }
+    },
+    "dart": {
+      "manifest": "../flutter/pubspec.yaml",
+      "names": {
+        "member": { "case": "camel", "prefixed": false },
+        "type": { "case": "pascal", "prefixed": true },
+        "key": { "case": "kebab", "prefixed": false }
+      },
+      "symbols": {},
+      "outputs": {}
+    }
+  }
+}

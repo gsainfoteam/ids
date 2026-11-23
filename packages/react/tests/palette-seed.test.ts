@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { clampChroma, formatHex } from 'culori/fn';
 import { expect, test } from 'vitest';
 
-import palette from '../../core/tokens/palette.json';
+import palette from '../../core/tokens/palette.tokens.json';
 import {
   SCALE_RULES,
   createIdsPalette,
@@ -24,7 +24,7 @@ const seedAt = (l: number, c: number, h: number) =>
 test('the status palettes are the four in core', () => {
   for (const [name, steps] of Object.entries(STATUS_PALETTES))
     expect(steps).toEqual(
-      RAMP_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value),
+      RAMP_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value.hex),
     );
 });
 

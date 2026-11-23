@@ -4,8 +4,8 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import tokens from '../../../../core/tokens/motion.json';
 import { Button } from '../../components/action/button';
+import { motion } from '../../tokens/foundations.json';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -18,10 +18,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const durations = Object.entries(tokens.motion).map(([name, { $value }]) => ({
-  name,
-  value: $value,
-}));
+const durations = motion.map(({ name, milliseconds }) => ({ name, value: `${milliseconds}ms` }));
 
 const usage: { [name: string]: string } = {
   fast: 'hover, press, 색 전환 (Button, Chip, Badge, 필드)',
@@ -39,7 +36,7 @@ export const Durations: Story = {
       <Showcase>
         <Showcase.Section
           title="시간"
-          description="motion.json 의 세 단계입니다. 재생을 누르면 점이 각 시간 동안 ease-out 으로 움직입니다. 운영체제에서 동작 줄이기를 켜면 움직임 없이 바로 옮겨 갑니다."
+          description="motion.tokens.json 의 세 단계입니다. 재생을 누르면 점이 각 시간 동안 ease-out 으로 움직입니다. 운영체제에서 동작 줄이기를 켜면 움직임 없이 바로 옮겨 갑니다."
         >
           <Showcase.Row>
             <Button size="tiny" variant="outline" onClick={() => setMoved((value) => !value)}>
@@ -77,7 +74,7 @@ export const Durations: Story = {
   play: async ({ canvasElement }) => {
     const rows = [...canvasElement.querySelectorAll<HTMLElement>('[data-motion]')];
 
-    await expect(rows).toHaveLength(Object.keys(tokens.motion).length);
+    await expect(rows).toHaveLength(motion.length);
     for (const row of rows) {
       const dot = row.querySelector<HTMLElement>('[data-dot]')!;
       await expect(getComputedStyle(dot).transitionDuration).toBe(seconds(row.dataset.value!));

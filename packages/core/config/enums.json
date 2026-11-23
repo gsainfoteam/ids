@@ -1,0 +1,5 @@
+{
+  "mode": { "values": ["light", "dark"], "extend": { "dart": ["system"] } },
+  "size": { "values": ["standard", "tiny"] },
+  "variant": { "values": ["solid", "soft", "outline", "ghost", "glossy", "transparent"] }
+}

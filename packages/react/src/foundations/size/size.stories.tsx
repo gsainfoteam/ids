@@ -3,10 +3,10 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import tokens from '../../../../core/tokens/size.json';
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { TextField } from '../../components/form/text-field';
+import { size } from '../../tokens/foundations.json';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -19,7 +19,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const sizes = Object.entries(tokens.size).map(([name, { $value }]) => ({ name, value: $value }));
+const cssLength = ({ value, unit }: { value: number; unit: string }) => `${value}${unit}`;
+
+const sizes = size.map(({ name, value }) => ({ name, value: cssLength(value) }));
 const sizeScale = ['standard', 'tiny'] as const;
 
 function Measured({ name, value }: { name: string; value: string }) {
@@ -59,7 +61,7 @@ export const Scale: Story = {
     <Showcase>
       <Showcase.Section
         title="토큰"
-        description="size.json 의 값입니다. 컨트롤 높이와 그 안 아이콘 크기로, IdsSize 의 standard 와 tiny 두 단계뿐입니다."
+        description="size.tokens.json 의 값입니다. 컨트롤 높이와 그 안 아이콘 크기로, IdsSize 의 standard 와 tiny 두 단계뿐입니다."
       >
         <div ref={readResolved} className="flex flex-col gap-3">
           {sizes.map(({ name, value }) => (
@@ -87,7 +89,7 @@ export const Scale: Story = {
   play: async ({ canvasElement }) => {
     const rows = [...canvasElement.querySelectorAll<HTMLElement>('[data-size-token]')];
 
-    await expect(rows).toHaveLength(Object.keys(tokens.size).length);
+    await expect(rows).toHaveLength(size.length);
     for (const row of rows) {
       await expect(row.querySelector('[data-resolved]')?.textContent).toBe(row.dataset.value);
       await expect(getComputedStyle(row.querySelector('[data-box]')!).height).toBe(

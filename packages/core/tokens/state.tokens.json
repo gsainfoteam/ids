@@ -1,0 +1,18 @@
+{
+  "state": {
+    "hover": { "$type": "number", "$value": 0.06 },
+    "press": { "$type": "number", "$value": 0.1 },
+    "tint": {
+      "hover": { "$type": "number", "$value": 0.08 },
+      "press": { "$type": "number", "$value": 0.12 }
+    },
+    "fill": {
+      "color": {
+        "$type": "color",
+        "$value": { "colorSpace": "srgb", "components": [0, 0, 0], "hex": "#000000" }
+      },
+      "hover": { "$type": "number", "$value": 0.1 },
+      "press": { "$type": "number", "$value": 0.18 }
+    }
+  }
+}

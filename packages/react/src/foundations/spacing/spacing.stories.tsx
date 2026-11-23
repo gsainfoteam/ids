@@ -2,7 +2,7 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import tokens from '../../../../core/tokens/spacing.json';
+import { spacing as spacingTokens } from '../../tokens/foundations.json';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -17,10 +17,12 @@ type Story = StoryObj<typeof meta>;
 
 const TAILWIND_STEP_PX = 4;
 
-const spacing = Object.entries(tokens.spacing).map(([name, { $value }]) => ({
+const cssLength = ({ value, unit }: { value: number; unit: string }) => `${value}${unit}`;
+
+const spacing = spacingTokens.map(({ name, value }) => ({
   name,
-  value: $value,
-  step: parseFloat($value) / TAILWIND_STEP_PX,
+  value: cssLength(value),
+  step: value.value / TAILWIND_STEP_PX,
 }));
 
 export const Scale: Story = {
@@ -28,7 +30,7 @@ export const Scale: Story = {
     <Showcase>
       <Showcase.Section
         title="간격 눈금"
-        description="spacing.json 의 이름 붙은 간격입니다. Tailwind 의 4px 눈금 위에 있으므로 코드에서는 p-4, gap-2 같은 단계로 씁니다. 막대는 calc(var(--spacing) * 단계)로 그려 같은 값인지 보여 줍니다."
+        description="spacing.tokens.json 의 이름 붙은 간격입니다. Tailwind 의 4px 눈금 위에 있으므로 코드에서는 p-4, gap-2 같은 단계로 씁니다. 막대는 calc(var(--spacing) * 단계)로 그려 같은 값인지 보여 줍니다."
       >
         <div className="flex flex-col gap-3">
           {spacing.map(({ name, value, step }) => (
@@ -68,7 +70,7 @@ export const Scale: Story = {
   play: async ({ canvasElement }) => {
     const rows = [...canvasElement.querySelectorAll<HTMLElement>('[data-spacing]')];
 
-    await expect(rows).toHaveLength(Object.keys(tokens.spacing).length);
+    await expect(rows).toHaveLength(spacing.length);
     for (const row of rows) {
       const bar = row.querySelector<HTMLElement>('[data-bar]')!;
       await expect(getComputedStyle(bar).width).toBe(row.dataset.value);

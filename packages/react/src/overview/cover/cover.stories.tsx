@@ -21,9 +21,8 @@ import {
 import { CalendarDate, Time } from '@internationalized/date';
 import { noop } from 'es-toolkit';
 
-import { palettes, type PaletteHue } from '~story-kit';
+import { paletteHues, palettes } from '~story-kit';
 
-import enums from '../../../../core/tokens/enums.json';
 import { Button } from '../../components/action/button';
 import { ButtonGroup } from '../../components/action/button-group';
 import { IconButton } from '../../components/action/icon-button';
@@ -82,8 +81,6 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
-
-const themes = enums.ids.color.values.$value as PaletteHue[];
 
 const halves = {
   dark: cn(''),
@@ -1114,7 +1111,7 @@ export const Cover: Story = {
                       <Card.Description>색 하나로 전부 바뀝니다</Card.Description>
                     </Card.Header>
                     <div className="grid grid-cols-6 gap-2">
-                      {themes.map((color) => (
+                      {paletteHues.map((color) => (
                         <IdsProvider.Scope
                           key={color}
                           theme={{ primary: palettes[color] }}

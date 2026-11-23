@@ -1,0 +1,34 @@
+{
+  "shadow-surface": { "light": { "shadow": "1" }, "dark": { "shadow": "0" } },
+  "bg-control-outline": { "light": { "role": "bg-base" }, "dark": { "role": "bg-block" } },
+  "border-control-outline": {
+    "light": { "role": "border-neutral" },
+    "dark": { "role": "border-neutral-strong" }
+  },
+  "bg-field-outline": { "light": { "role": "bg-base" }, "dark": { "role": "bg-block" } },
+  "border-field-outline": {
+    "light": { "role": "border-neutral" },
+    "dark": { "role": "border-neutral-strong" }
+  },
+  "border-field-bar": {
+    "light": { "role": "border-neutral" },
+    "dark": { "role": "border-neutral-strong" }
+  },
+  "bg-field-code-outline": {
+    "light": { "role": "bg-neutral-soft" },
+    "dark": { "role": "bg-surface" }
+  },
+  "bg-field-block-outline": { "light": { "role": "bg-block" }, "dark": { "role": "bg-surface" } },
+  "bg-switch-thumb": { "light": { "role": "bg-base" }, "dark": { "role": "bg-neutral-solid" } },
+  "bg-segment": { "light": { "role": "bg-base" }, "dark": { "role": "border-neutral-strong" } },
+  "bg-qr-code": { "light": { "role": "bg-base" }, "dark": { "role": "bg-neutral-solid" } },
+  "text-qr-code": {
+    "light": { "role": "text-neutral-strong" },
+    "dark": { "role": "text-on-neutral-solid" }
+  },
+  "bg-qr-code-inverse": { "light": { "role": "bg-neutral-solid" }, "dark": { "role": "bg-base" } },
+  "text-qr-code-inverse": {
+    "light": { "role": "text-on-neutral-solid" },
+    "dark": { "role": "text-neutral-strong" }
+  }
+}
