@@ -15,8 +15,6 @@ const meta = {
   title: 'Layout/Spacer',
   component: Spacer,
   tags: ['autodocs'],
-  argTypes: { flex: { control: { type: 'number', min: 0.5, step: 0.5 } } },
-  args: { flex: 1 },
 } satisfies Meta<typeof Spacer>;
 
 export default meta;
@@ -30,6 +28,18 @@ export const Playground: Story = {
     <div className={cn('flex w-80 items-center gap-2 p-3', frame)}>
       <span>제목</span>
       <Spacer {...args} className={fill} />
+      <Button size="tiny" variant="outline">
+        더보기
+      </Button>
+    </div>
+  ),
+};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="flex w-80 items-center gap-2">
+      <span>제목</span>
+      <Spacer />
       <Button size="tiny" variant="outline">
         더보기
       </Button>
@@ -60,7 +70,10 @@ export const Gallery: Story = {
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section title="flex" description="여러 개를 두면 flex 비율로 남는 공간을 나눕니다.">
+      <Showcase.Section
+        title="Share"
+        description="여러 개를 두면 남는 공간을 나눕니다. grow-2 를 준 Spacer 는 두 몫을 가집니다."
+      >
         <Showcase.Row label="1 : 1">
           <div className={cn('flex h-12 w-80 items-center p-2', frame)}>
             <span>A</span>
@@ -75,7 +88,7 @@ export const Gallery: Story = {
             <span>A</span>
             <Spacer className={fill} />
             <span>B</span>
-            <Spacer flex={2} className={fill} />
+            <Spacer className={cn('grow-2', fill)} />
             <span>C</span>
           </div>
         </Showcase.Row>
@@ -88,7 +101,7 @@ export const Gallery: Story = {
             <Spacer />
             <Kbd>⌘K</Kbd>
           </Button>
-          <Button variant="ghost" className="w-72">
+          <Button variant="soft" className="w-72">
             설정
             <Spacer />
             <ChevronRightIcon />
@@ -99,13 +112,13 @@ export const Gallery: Story = {
   ),
 };
 
-export const Distribution: Story = {
+export const ShareTheSpaceUnevenly: Story = {
   render: () => (
     <div className="flex h-12 w-80" data-testid="row">
       <span className="shrink-0">시작</span>
       <Spacer data-testid="one" className={fill} />
       <span className="shrink-0">중간</span>
-      <Spacer flex={2} data-testid="two" className={fill} />
+      <Spacer data-testid="two" className={cn('grow-2', fill)} />
       <span className="shrink-0">끝</span>
     </div>
   ),
@@ -113,7 +126,7 @@ export const Distribution: Story = {
     docs: {
       description: {
         story:
-          '남는 공간을 flex 비율(1 : 2)로 나눕니다. Spacer는 보이지 않고 스크린 리더도 무시합니다.',
+          '남는 공간을 1 : 2 로 나눕니다. 두 몫을 가질 Spacer 에 `className="grow-2"` 를 줍니다. Spacer 는 보이지 않고 스크린 리더도 무시합니다.',
       },
     },
   },
@@ -129,7 +142,7 @@ export const Distribution: Story = {
   },
 };
 
-export const InsideButton: Story = {
+export const PushAShortcutToTheButtonEnd: Story = {
   render: () => (
     <Button variant="outline" className="w-72">
       검색
@@ -140,7 +153,8 @@ export const InsideButton: Story = {
   parameters: {
     docs: {
       description: {
-        story: '버튼 안에서 글자와 단축키를 양 끝으로 밉니다. 버튼 이름은 그대로입니다.',
+        story:
+          '버튼 글자와 `Kbd` 사이에 Spacer 를 두면 둘이 양 끝으로 갈라섭니다. Spacer 는 `span` 이라 버튼 안에 둘 수 있고, 버튼 이름은 그대로입니다.',
       },
     },
   },
