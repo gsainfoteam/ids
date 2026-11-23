@@ -256,7 +256,7 @@ export default {
 
 Typography는 색상/spacing과 달리 **여러 속성의 묶음**이다. 원시값과 semantic role을 분리해서 관리한다.
 
-**원시값** (`tokens/typography.json`) — palette 역할:
+**원시값** (`tokens/typography.tokens.json`) — palette 역할:
 
 ```json
 {
@@ -287,7 +287,7 @@ Typography는 색상/spacing과 달리 **여러 속성의 묶음**이다. 원시
 }
 ```
 
-**Semantic role** (`tokens/semantic/typography.json`) — W3C `$type: "typography"` 복합 타입:
+**Semantic role** (`tokens/text.tokens.json`) — W3C `$type: "typography"` 복합 타입:
 
 ```json
 {
