@@ -63,6 +63,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Badge content={3} aria-label="읽지 않은 알림 3개">
+      <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+    </Badge>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -181,7 +189,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Count: Story = {
+export const ShowAnUnreadCount: Story = {
   render: () => (
     <div className="flex items-center gap-8">
       <Badge content={99}>
@@ -224,7 +232,7 @@ export const Count: Story = {
   },
 };
 
-export const Accessibility: Story = {
+export const AnnounceTheCount: Story = {
   render: function Render() {
     const [unread, setUnread] = useState(3);
 
@@ -270,7 +278,7 @@ export const Accessibility: Story = {
   },
 };
 
-export const OnAvatar: Story = {
+export const AttachToAnAvatar: Story = {
   render: () => (
     <div className="flex items-center gap-6">
       <Badge content={3}>
@@ -296,7 +304,7 @@ export const OnAvatar: Story = {
   },
 };
 
-export const Invisible: Story = {
+export const ShowOnlineStatus: Story = {
   render: function Render() {
     const [online, setOnline] = useState(true);
 

@@ -140,6 +140,31 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Sidebar.Provider>
+      <Sidebar value="/inbox">
+        <Sidebar.Group label="워크스페이스">
+          <Sidebar.Item value="/inbox" href="#inbox">
+            <InboxIcon />
+            받은 소식
+          </Sidebar.Item>
+          <Sidebar.Item value="/bookmarks" href="#bookmarks">
+            <BookmarkIcon />
+            북마크
+          </Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar>
+      <Sidebar.Inset className="gap-4 p-6">
+        <div className="flex items-center gap-3">
+          <Sidebar.Trigger />
+          <h1 className="text-headline-h3-bold">받은 소식</h1>
+        </div>
+      </Sidebar.Inset>
+    </Sidebar.Provider>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase className="p-6">
@@ -328,7 +353,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const RouterLinks: Story = {
+export const UseRouterLinks: Story = {
   render: function Render() {
     const [pathname, setPathname] = useState('/inbox');
 
@@ -372,6 +397,14 @@ export const RouterLinks: Story = {
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '라우터의 링크 컴포넌트를 `Sidebar.Item asChild` 로 감쌉니다. `Sidebar` 의 `value` 를 지금 경로로 주면 같은 `value` 의 항목에 `aria-current="page"` 가 붙습니다.',
+      },
+    },
   },
 };
 
@@ -504,7 +537,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
   </Sidebar.Footer>
 </Sidebar>`;
 
-export const Tree: Story = {
+export const BuildAWorkspaceTree: Story = {
   args: { value: 'frontend-active' },
   render: (args) => (
     <Sidebar.Provider>
@@ -647,6 +680,14 @@ export const Tree: Story = {
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Sidebar.Item` 안에 `Sidebar.Item` 을 넣으면 하위 메뉴가 됩니다. `Sidebar.Group` 의 `collapsible` 은 묶음을 접고, 항목 끝의 Badge 와 Kbd 는 끝 칸에 놓입니다.',
+      },
+    },
+  },
 };
 
 type Page = {
@@ -685,7 +726,7 @@ const FAVORITES_CODE = `<Sidebar aria-label="워크스페이스">
   </Sidebar.Group>
 </Sidebar>`;
 
-export const Favorites: Story = {
+export const ReorderFavorites: Story = {
   args: { value: 'tokens' },
   render: function Render(args) {
     const [favorites, setFavorites] = useState(FAVORITES);
@@ -722,6 +763,14 @@ export const Favorites: Story = {
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Sidebar.Group` 에 `items` 와 `onItemsChange` 를 주면 항목을 끌어 순서를 바꿉니다. `canMove` 가 `to.parent === null` 만 허용해서 다른 항목 안으로는 넣지 않습니다.',
+      },
+    },
   },
 };
 
@@ -784,7 +833,7 @@ const CHANNELS_CODE = `<Sidebar aria-label="워크스페이스">
   </Sidebar.Group>
 </Sidebar>`;
 
-export const ChannelSections: Story = {
+export const MoveChannelsBetweenCategories: Story = {
   args: { value: 'frontend' },
   render: function Render(args) {
     const [channels, setChannels] = useState(CHANNELS);
@@ -829,6 +878,14 @@ export const ChannelSections: Story = {
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`canMove` 로 무엇을 어디에 놓을지 정합니다. 카테고리는 맨 위에만, 채널은 카테고리 안에만 놓입니다.',
+      },
+    },
   },
 };
 
@@ -915,7 +972,7 @@ const PAGES_CODE = `<Sidebar aria-label="워크스페이스">
   </Sidebar.Group>
 </Sidebar>`;
 
-export const NestedPages: Story = {
+export const ConfirmBeforeMovingAPage: Story = {
   args: { value: 'color' },
   render: function Render(args) {
     const [pages, setPages] = useState(PAGES);
@@ -969,6 +1026,14 @@ export const NestedPages: Story = {
       </Sidebar.Provider>
     );
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`onItemsChange` 는 옮긴 뒤의 배열과 옮긴 자리를 받습니다. Dialog 로 묻고 확인했을 때만 `items` 를 바꾸면 옮기기를 취소할 수 있습니다.',
+      },
+    },
+  },
 };
 
 type FileNode = { id: string; kind: 'folder' | 'file'; name: string; children?: FileNode[] };
@@ -1019,7 +1084,7 @@ const FILES_CODE = `<Sidebar aria-label="파일">
   </Sidebar.Group>
 </Sidebar>`;
 
-export const FileTree: Story = {
+export const BuildAFileTree: Story = {
   args: { value: 'button.tsx' },
   render: function Render(args) {
     const [files, setFiles] = useState(FILES);
@@ -1060,9 +1125,17 @@ export const FileTree: Story = {
       </Sidebar.Provider>
     );
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '폴더 안에는 무엇이든 넣고 파일 안에는 넣지 못하게 `canMove` 로 막습니다. 폴더는 `value` 없는 항목이라 눌러서 펼치고 접습니다.',
+      },
+    },
+  },
 };
 
-export const MobileDrawer: Story = {
+export const OpenAsADrawerOnPhones: Story = {
   globals: { viewport: { value: 'mobile2', isRotated: false } },
   render: () => (
     <Sidebar.Provider>
@@ -1084,6 +1157,14 @@ export const MobileDrawer: Story = {
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '640px 아래에서는 `Sidebar.Trigger` 가 왼쪽 Drawer 를 열고, 항목을 누르면 Drawer 가 닫힙니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '메뉴 열기' }));
     const drawer = await canvas.findByRole('dialog', { name: '사이드바' });
