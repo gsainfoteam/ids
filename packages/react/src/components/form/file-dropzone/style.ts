@@ -20,7 +20,6 @@ export const fileDropzoneStyle = tv({
     ],
     dropIcon: 'mb-1 size-6 text-neutral',
     title: 'font-medium break-keep text-balance',
-    hint: 'text-caption-c1-regular text-neutral break-keep text-balance',
   },
   variants: {
     variant: {

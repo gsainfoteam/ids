@@ -231,7 +231,7 @@ export const Viewer: Story = {
     await waitFor(() => expect(canvas.getByText('여름 들판')).toBeVisible());
     await userEvent.keyboard('{End}');
     await waitFor(() => expect(canvas.getByText('6 / 6')).toBeInTheDocument());
-    await expect(canvas.getByRole('button', { name: '다음 사진' })).toHaveAttribute(
+    await expect(canvas.getByRole('button', { name: '다음' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
@@ -380,7 +380,7 @@ export const OnePhoto: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '호수 위로 뜬 해 크게 보기' }));
     await canvas.findByRole('dialog', { name: VIEWER });
     await expect(canvas.getByText('아침의 호수')).toBeVisible();
-    await expect(canvas.queryByRole('button', { name: '다음 사진' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: '다음' })).toBeNull();
     await expect(canvas.queryByRole('group', { name: '사진 목록' })).toBeNull();
   },
 };

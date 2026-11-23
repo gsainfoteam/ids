@@ -43,8 +43,14 @@
       "types": "./dist/tanstack-form.d.ts",
       "default": "./dist/tanstack-form.js"
     },
-    "./messages/ko.json": "./dist/messages/ko.json",
-    "./messages/en.json": "./dist/messages/en.json"
+    "./locales/ko": {
+      "types": "./dist/locales/ko.d.ts",
+      "default": "./dist/locales/ko.js"
+    },
+    "./locales/en": {
+      "types": "./dist/locales/en.d.ts",
+      "default": "./dist/locales/en.js"
+    }
   },
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json",
@@ -151,7 +157,6 @@
     "eslint-plugin-storybook": "10.3.1",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.4.0",
-    "intl-messageformat": "^12.1.2",
     "jsdom": "^26.1.0",
     "jsqr": "^1.4.0",
     "playwright": "^1.63.0",

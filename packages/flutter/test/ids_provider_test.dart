@@ -2,18 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
-import 'fixtures/slang/generated/translations.g.dart';
 import 'test_theme.dart';
 
-class _MissingMessages with IdsMessages {
-  const _MissingMessages();
-}
-
-class _EmptyMessages with IdsMessages {
-  const _EmptyMessages();
+class _Japanese extends IdsMessagesEn {
+  const _Japanese();
 
   @override
-  String get spinnerLabel => '';
+  String get language => 'ja';
+
+  @override
+  String get commonLoading => '読み込み中';
+}
+
+class _Silent extends IdsMessagesKo {
+  const _Silent();
+
+  @override
+  String get commonLoading => '';
 }
 
 Widget host(Widget child) =>
@@ -196,7 +201,7 @@ void main() {
     );
     await tester.pumpWidget(build(IdsMode.light));
     expect(scope.mode, IdsMode.light);
-    expect(scope.locale, const Locale('ko', 'KR'));
+    expect(scope.locale, IdsLocale.ko);
     scope.toggleMode();
     scope.toggleMode();
     await tester.pump();
@@ -212,13 +217,11 @@ void main() {
       late IdsScope root;
       late IdsScope inherited;
       late IdsScope nested;
-      final translations = Translations().ids;
       await tester.pumpWidget(
         host(
           IdsProvider(
             theme: testTheme,
-            translation: translations,
-            locale: const Locale('en', 'US'),
+            locale: IdsLocale.en,
             child: Builder(
               builder: (context) {
                 root = IdsProvider.of(context);
@@ -235,7 +238,7 @@ void main() {
                     IdsProviderScope(
                       theme: const IdsThemeOverrides(radius: 12),
                       defaultMode: IdsMode.dark,
-                      locale: const Locale('ja'),
+                      locale: IdsLocale.ko,
                       child: Builder(
                         builder: (context) {
                           nested = IdsProvider.of(context);
@@ -253,8 +256,8 @@ void main() {
       expect(inherited.theme, root.theme);
       expect(nested.radius.standard, 12);
       expect(nested.theme.primary, testTheme.primary);
-      expect(nested.translation, translations);
-      expect(nested.locale, const Locale('ja'));
+      expect(inherited.locale, IdsLocale.en);
+      expect(nested.locale, IdsLocale.ko);
       inherited.setMode(IdsMode.dark);
       await tester.pump();
       expect(root.mode, IdsMode.dark);
@@ -337,40 +340,91 @@ void main() {
   );
 
   testWidgets(
-    'slang object changes rebuild IDS semantics and missing messages fall back',
+    'locale changes rebuild IDS semantics, and a subclass overrides one message',
     (tester) async {
       final semantics = tester.ensureSemantics();
       Widget build(
-        IdsMessages? translation, {
+        IdsLocale? locale, {
         String? label,
         bool decorative = false,
       }) => host(
         IdsProvider(
           theme: testTheme,
-          translation: translation,
-          locale: const Locale('en'),
+          locale: locale,
           child: IdsSpinner(semanticLabel: label, decorative: decorative),
         ),
       );
-      await tester.pumpWidget(build(Translations().ids));
+      await tester.pumpWidget(build(IdsLocale.en));
       await tester.pump(const Duration(milliseconds: 100));
       expect(find.semantics.byLabel('Loading'), findsOne);
-      final japanese = await tester.runAsync(() => AppLocale.ja.build());
-      await tester.pumpWidget(build(japanese!.ids));
+      await tester.pumpWidget(
+        build(
+          IdsLocale(
+            locale: const Locale('ja', 'JP'),
+            messages: const _Japanese(),
+          ),
+        ),
+      );
       expect(find.semantics.byLabel('読み込み中'), findsOne);
-      await tester.pumpWidget(build(const _MissingMessages()));
-      expect(find.semantics.byLabel('불러오는 중'), findsOne);
-      await tester.pumpWidget(build(const _EmptyMessages()));
+      await tester.pumpWidget(
+        build(
+          IdsLocale(
+            locale: const Locale('ko', 'KR'),
+            messages: const _Silent(),
+          ),
+        ),
+      );
       expect(find.semantics.byLabel('불러오는 중'), findsNothing);
-      await tester.pumpWidget(build(Translations().ids, label: 'Custom'));
+      await tester.pumpWidget(build(IdsLocale.en, label: 'Custom'));
       expect(find.semantics.byLabel('Custom'), findsOne);
-      await tester.pumpWidget(build(Translations().ids, decorative: true));
+      await tester.pumpWidget(build(IdsLocale.en, decorative: true));
       expect(find.semantics.byLabel('Loading'), findsNothing);
       await tester.pumpWidget(build(null));
       expect(find.semantics.byLabel('불러오는 중'), findsOne);
       semantics.dispose();
     },
   );
+
+  testWidgets('with no locale, the outermost provider follows the app locale', (
+    tester,
+  ) async {
+    late IdsScope english;
+    late IdsScope german;
+    Widget app(Locale locale, void Function(IdsScope) read) => Localizations(
+      locale: locale,
+      delegates: const [DefaultWidgetsLocalizations.delegate],
+      child: host(
+        IdsProvider(
+          theme: testTheme,
+          child: Builder(
+            builder: (context) {
+              read(IdsProvider.of(context));
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.pumpWidget(
+      app(const Locale('en', 'GB'), (scope) => english = scope),
+    );
+    expect(english.locale.locale, const Locale('en', 'GB'));
+    expect(english.messages.commonClose, 'Close');
+    await tester.pumpWidget(
+      app(const Locale('de', 'DE'), (scope) => german = scope),
+    );
+    expect(german.locale, IdsLocale.ko);
+  });
+
+  test('a locale in another language than its messages fails an assert', () {
+    expect(
+      () => IdsLocale(
+        locale: const Locale('de'),
+        messages: const IdsMessagesEn(),
+      ),
+      throwsAssertionError,
+    );
+  });
 
   testWidgets(
     'IDS settings leave application themes, text, icons and locale intact',
@@ -392,7 +446,7 @@ void main() {
                 child: IdsProvider(
                   theme: testTheme,
                   mode: IdsMode.dark,
-                  locale: const Locale('ko', 'KR'),
+                  locale: IdsLocale.ko,
                   child: Builder(
                     builder: (context) {
                       materialTheme = Theme.of(context);

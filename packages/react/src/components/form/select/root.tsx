@@ -135,7 +135,7 @@ export function SelectRoot(props: SelectProps) {
     open,
     defaultOpen,
     onOpenChange,
-    placeholder = t('select.placeholder'),
+    placeholder,
     variant = 'outline',
     size,
     invalid,
@@ -268,7 +268,7 @@ export function SelectRoot(props: SelectProps) {
 
   const listLabel = native['aria-labelledby']
     ? { 'aria-labelledby': native['aria-labelledby'] }
-    : { 'aria-label': native['aria-label'] ?? t('select.listbox') };
+    : { 'aria-label': native['aria-label'] ?? t('common.options') };
 
   return (
     <SelectContext
@@ -313,7 +313,7 @@ export function SelectRoot(props: SelectProps) {
           anchor={rootRef}
           onClose={select.actions.close}
           mobileVariant={mobileVariant}
-          label={native['aria-label'] ?? t('select.listbox')}
+          label={native['aria-label'] ?? t('common.options')}
           aria-labelledby={drawer ? native['aria-labelledby'] : undefined}
           data-select-popup={ids.base}
           onBlur={(event) => {

@@ -1,5 +1,8 @@
+import { memoize } from 'es-toolkit';
+
 import { messages } from './messages-catalog';
 
+import type { IdsLocale } from './locale';
 import type { editorMessages } from '../components/form/editor/messages-catalog';
 
 export { messages };
@@ -16,21 +19,30 @@ export type IdsMessageKey = LeafPaths<IdsMessageCatalog>;
 
 export type IdsMessageValues = Record<string, string | number>;
 
+type MessageFunction = (values: never) => string;
+
+export type MessageTree = { readonly [name: string]: string | MessageFunction | MessageTree };
+
 const PLACEHOLDER = /\{(\w+)\}/g;
 
-const koreanNumbers = new Intl.NumberFormat(DEFAULT_LOCALE);
-
-export type MessageTree = { readonly [name: string]: string | MessageTree };
+const numbersIn = memoize((tag: string) => new Intl.NumberFormat(tag));
 
 const lookUp = (catalog: MessageTree, key: string) => {
-  let node: string | MessageTree | undefined = catalog;
+  let node: MessageTree[string] | undefined = catalog;
   for (const name of key.split('.')) node = typeof node === 'object' ? node[name] : undefined;
-  return typeof node === 'string' ? node : undefined;
+  return typeof node === 'object' ? undefined : node;
 };
+
+const substitute = (message: string, values: IdsMessageValues, tag: string) =>
+  message.replace(PLACEHOLDER, (placeholder, name: string) => {
+    const value = values[name];
+    if (value === undefined) return placeholder;
+    return typeof value === 'number' ? numbersIn(tag).format(value) : value;
+  });
 
 export function defaultMessage(key: IdsMessageKey, ownCatalog?: MessageTree): string {
   const message = (ownCatalog && lookUp(ownCatalog, key)) ?? lookUp(messages, key);
-  if (message === undefined) throw new Error(`IDS has no default message for "${key}".`);
+  if (typeof message !== 'string') throw new Error(`IDS has no default message for "${key}".`);
   return message;
 }
 
@@ -39,9 +51,20 @@ export function formatDefaultMessage(
   values: IdsMessageValues = {},
   ownCatalog?: MessageTree,
 ): string {
-  return defaultMessage(key, ownCatalog).replace(PLACEHOLDER, (placeholder, name: string) => {
-    const value = values[name];
-    if (value === undefined) return placeholder;
-    return typeof value === 'number' ? koreanNumbers.format(value) : value;
-  });
+  return substitute(defaultMessage(key, ownCatalog), values, DEFAULT_LOCALE);
+}
+
+export function formatLocaleMessage(
+  locale: IdsLocale,
+  key: IdsMessageKey,
+  values: IdsMessageValues = {},
+  tag: string = locale.tag,
+): string | undefined {
+  for (let current: IdsLocale | undefined = locale; current; current = current.base) {
+    const message = lookUp(current.messages as MessageTree, key);
+    if (typeof message === 'function')
+      return (message as (values: IdsMessageValues) => string)(values);
+    if (typeof message === 'string') return substitute(message, values, tag);
+  }
+  return undefined;
 }

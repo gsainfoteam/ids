@@ -32,9 +32,9 @@ const resizable = useResizable({ width: { defaultValue: 320 }, height: { default
 
 | `direction`  | 손잡이                            | 스크린 리더                                                 |
 | ------------ | --------------------------------- | ----------------------------------------------------------- |
-| `both`       | 끝 아래 모서리를 따라 휜 호       | group "크기 조절" 안에 separator "너비", "높이"(Tab 한 칸) |
-| `horizontal` | 끝 가장자리 가운데의 세로 막대    | separator "너비"(`aria-orientation="vertical"`)             |
-| `vertical`   | 아래 가장자리 가운데의 가로 막대  | separator "높이"(`aria-orientation="horizontal"`)           |
+| `both`       | 끝 아래 모서리를 따라 휜 호       | group "크기 조절" 안에 separator 둘(너비 `vertical`, 높이 `horizontal`, Tab 한 칸) |
+| `horizontal` | 끝 가장자리 가운데의 세로 막대    | separator "크기 조절"(`aria-orientation="vertical"`)        |
+| `vertical`   | 아래 가장자리 가운데의 가로 막대  | separator "크기 조절"(`aria-orientation="horizontal"`)      |
 
 ## 모서리 손잡이
 
@@ -126,7 +126,7 @@ const resizable = useResizable({
 - `Resizable.Handle` 을 적으면 기본 손잡이를 그리지 않습니다. 손잡이의 종류는 `direction` 이 정합니다.
 - 모서리 손잡이에 `children` 이나 `asChild` 를 주면 호 대신 그 표시를 모서리 안쪽 16px 상자에 그리고, 누를 영역은 그 상자 둘레 24px 입니다.
 - 모서리 손잡이의 호는 글자색(`currentColor`)으로 그립니다. 올렸을 때와 끄는 동안은 손잡이 색(`text-neutral`)을 따릅니다.
-- `aria-label` 을 주면 기본 이름("너비", "높이", "크기 조절") 대신 씁니다.
+- `aria-label` 을 주면 기본 이름("크기 조절") 대신 씁니다. 너비인지 높이인지는 `aria-orientation` 이 알립니다.
 - 손잡이의 자리, 색, 막대 모양을 바꾸는 것은 IDS 밖의 디자인입니다. 스토리 `DesignYourOwnHandle`(`custom-design`)이 그 예입니다.
 
 ## 다른 요소를 그대로

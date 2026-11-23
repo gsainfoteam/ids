@@ -15,6 +15,7 @@ import { imageStyle } from './style';
 import { ImageViewerThumbnails, type ImageViewerThumbnailsProps } from './thumbnails';
 import { ImageViewerToolbar, type ImageViewerToolbarProps } from './toolbar';
 import { ImageViewer, type ImageViewerItem, type ImageViewerProps } from './viewer';
+import { ImageViewerFallback, type ImageViewerFallbackProps } from './viewer-fallback';
 import { ImageViewerZoomIn, type ImageViewerZoomInProps } from './zoom-in';
 import { ImageViewerZoomOut, type ImageViewerZoomOutProps } from './zoom-out';
 import { ImageViewerZoomReset, type ImageViewerZoomResetProps } from './zoom-reset';
@@ -81,6 +82,7 @@ export namespace Image {
     export type CaptionProps = ImageViewerCaptionProps;
     export type ThumbnailsProps = ImageViewerThumbnailsProps;
     export type SeparatorProps = ImageViewerSeparatorProps;
+    export type FallbackProps = ImageViewerFallbackProps;
 
     export const Toolbar = ImageViewerToolbar;
     export namespace Toolbar {
@@ -145,6 +147,11 @@ export namespace Image {
     export const Thumbnails = ImageViewerThumbnails;
     export namespace Thumbnails {
       export type Props = ImageViewerThumbnailsProps;
+    }
+
+    export const Fallback = ImageViewerFallback;
+    export namespace Fallback {
+      export type Props = ImageViewerFallbackProps;
     }
   }
 

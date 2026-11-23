@@ -45,7 +45,7 @@ export function TelFieldRoot({
   children,
   ...rootProps
 }: TelField.Props) {
-  const locale = useProviderLocale() ?? 'ko-KR';
+  const locale = useProviderLocale();
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const { items, leading, input, trailing } = splitAroundInput<TelField.InputProps>(
     children,

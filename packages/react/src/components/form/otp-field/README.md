@@ -8,7 +8,7 @@
 - **붙여넣기.** 전체 코드는 어느 칸에서든 통째로 들어가고, 일부만 붙여넣으면 선택한 칸부터 덮어씁니다. `123-456` 의 하이픈 같은 문자는 걸러집니다.
 - **폼.** `name` 하나에 FormData 항목 하나입니다. 다 채우지 않으면 브라우저 검증이 제출을 막고, `<label>` 을 누르면 다음 입력 칸으로 갑니다.
 - **react-hook-form, TanStack Form.** `register()` 도, 값 기반 연결도 그대로 됩니다.
-- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 칸은 제 크기를 지키고 줄의 시작에 붙습니다. 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-80"><OTPField length={6} /></div>`.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 칸은 제 크기를 지키고 줄의 시작에 붙습니다. 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-80"><OTPField aria-label="인증 코드" length={6} /></div>`.
 
 ```tsx
 import { Field, OTPField } from '@gsainfoteam/ids-react';
@@ -34,9 +34,9 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 | 칸 클릭                 | 그 칸으로 캐럿 이동                                         |
 
 ```tsx
-<OTPField length={6} pattern="numeric" />        // 숫자만 (기본)
-<OTPField length={8} pattern="alphanumeric" />   // 영문과 숫자
-<OTPField length={6} pattern={/[A-F0-9]/i} />    // 한 글자를 검사하는 정규식
+<OTPField aria-label="인증 코드" length={6} pattern="numeric" />       // 숫자만 (기본)
+<OTPField aria-label="인증 코드" length={8} pattern="alphanumeric" />  // 영문과 숫자
+<OTPField aria-label="인증 코드" length={6} pattern={/[A-F0-9]/i} />   // 한 글자를 검사하는 정규식
 ```
 
 - 허용되지 않는 글자는 DOM에 들어가기 전에 막혀서 캐럿이 움직이지 않습니다.
@@ -47,11 +47,12 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 ## 값
 
 ```tsx
-<OTPField length={6} defaultValue="123" />                      // 비제어
+<OTPField aria-label="인증 코드" length={6} defaultValue="123" />                      // 비제어
 
-<OTPField length={6} value={code} onValueChange={setCode} />     // 제어
+<OTPField aria-label="인증 코드" length={6} value={code} onValueChange={setCode} />     // 제어
 
 <OTPField
+  aria-label="인증 코드"
   length={6}
   onValueChange={(code) => console.log(code)}  // 바뀔 때마다
   onComplete={(code) => verify(code)}          // 비어 있던 칸이 모두 찼을 때 한 번
@@ -64,9 +65,9 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 ## 레이아웃
 
 ```tsx
-<OTPField length={6} />                 {/* 자식이 없으면 Group 하나에 6칸 */}
+<OTPField aria-label="인증 코드" length={6} />                 {/* 자식이 없으면 Group 하나에 6칸 */}
 
-<OTPField length={6}>
+<OTPField aria-label="인증 코드" length={6}>
   <OTPField.Group>                       {/* Group 안의 칸은 테두리를 공유한다 */}
     <OTPField.Slot index={0} />
     <OTPField.Slot index={1} />
@@ -80,7 +81,7 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
   </OTPField.Group>
 </OTPField>
 
-<OTPField length={4}>
+<OTPField aria-label="인증 코드" length={4}>
   <OTPField.Slot index={0} />            {/* Group 없이 두면 칸마다 떨어진다 */}
   <OTPField.Slot index={1} />
   <OTPField.Slot index={2} />
@@ -110,9 +111,9 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 ## 마스크와 자리 표시
 
 ```tsx
-<OTPField length={4} mask />                    // 채운 칸을 점으로
-<OTPField length={4} mask="*" />                // 원하는 글자로
-<OTPField length={6} placeholder="000000" />    // 빈 칸마다 한 글자씩
+<OTPField aria-label="인증 코드" length={4} mask />                  // 채운 칸을 점으로
+<OTPField aria-label="인증 코드" length={4} mask="*" />              // 원하는 글자로
+<OTPField aria-label="인증 코드" length={6} placeholder="000000" />  // 빈 칸마다 한 글자씩
 ```
 
 - 마스크는 칸에 그리는 모양만 바꿉니다. input은 `type="text"` 그대로라 비밀번호 관리자가 끼어들지 않습니다.
@@ -156,6 +157,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 <form.Field name="code">
   {(field) => (
     <OTPField
+      aria-label="인증 코드"
       length={6}
       value={field.state.value}
       onValueChange={field.handleChange}
@@ -168,9 +170,9 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 ## 크기와 variant
 
 ```tsx
-<OTPField variant="soft" />     // outline(기본) / soft
-<OTPField size="tiny" />        // standard(36px) / tiny(32px). 생략하면 Field를 따른다
-<OTPField invalid />            // 테두리와 포커스 링이 danger 색
+<OTPField aria-label="인증 코드" variant="soft" />  // outline(기본) / soft
+<OTPField aria-label="인증 코드" size="tiny" />     // standard(36px) / tiny(32px). 생략하면 Field를 따른다
+<OTPField aria-label="인증 코드" invalid />         // 테두리와 포커스 링이 danger 색
 ```
 
 ## 속성
@@ -192,7 +194,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
 ## 알아둘 것
 
-- `aria-label`, `aria-labelledby`, `id` 가 모두 없으면 `인증 코드` 라는 이름이 붙습니다. `Field.Label` 을 쓰면 라벨이 이름이 됩니다.
+- 이름은 앱이 줍니다. `Field.Label` 을 쓰면 라벨이 이름이 되고, Field 밖에서는 `aria-label` 을 줍니다. `aria-label`, `aria-labelledby`, `id` 가 모두 없으면 개발 모드에서 경고합니다.
 - 칸은 `aria-hidden` 이라 스크린 리더는 input 하나만 읽습니다.
 - 칸 위에 투명한 input이 덮여 있습니다. 칸에 `onClick` 을 달아도 이벤트는 input이 받습니다.
 - input 글자 크기는 16px로 고정입니다. iOS가 포커스할 때 화면을 확대하지 않게 하기 위해서입니다.

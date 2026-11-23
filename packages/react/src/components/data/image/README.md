@@ -113,6 +113,7 @@ const [index, setIndex] = useState(0);
       <Image.Viewer.Close />
     </Image.Viewer.Toolbar>
     <Image.Viewer.Thumbnails />                     {/* 기본 뷰어에는 없다 */}
+    <Image.Viewer.Fallback>사진을 불러오지 못했습니다</Image.Viewer.Fallback>  {/* 깨진 장의 글 */}
   </Image.Viewer>
 </ImageGroup>
 ```
@@ -127,6 +128,8 @@ const [index, setIndex] = useState(0);
 - 뷰어 부품은 `Image.Viewer` 아래에 있습니다(`Image.Viewer.Close`). 모두 뷰어의 상태를 읽으므로 `Image.Viewer` 안이면 어디에 두어도 됩니다. 버튼 부품은 도구 막대 안에 두는 것을 전제로 자리를 잡지 않습니다.
 - `Image.Viewer` 에 자식을 주면 그 부품만 그립니다. `Image.Viewer.Toolbar` 에 자식을 주지 않으면 기본 도구 막대입니다.
 - 썸네일 줄(`Image.Viewer.Thumbnails`)은 기본 뷰어에 없습니다. 넣으면 도구 막대 아래에 놓입니다.
+- 불러오지 못한 장은 그림 아이콘만 그리고, 스크린 리더는 `alt` 를 그림의 이름으로 읽습니다. IDS 가 쓴 글은 없습니다.
+- `Image.Viewer.Fallback` 의 children 은 깨진 장마다 아이콘 옆에 그려집니다. 적은 자리와 상관없이 사진 자리에 놓입니다.
 - 한 장뿐이면 번호, 이전과 다음, 썸네일은 그리지 않습니다.
 - 이전과 다음은 끝에서 `aria-disabled` 가 되고, `loop` 이면 넘어갑니다. 확대와 축소도 끝에서 `aria-disabled` 입니다.
 - 넘기면 배율이 1 로 돌아갑니다.
@@ -286,7 +289,7 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | `Image.Viewer.Share`                           | `IconButton` 속성. 이름 "공유하기". `navigator.share` 가 있을 때만        |
 | `Image.Viewer.Download`                        | `IconButton` 속성과 `<a>` 속성. 이름 "내려받기"                           |
 | `Image.Viewer.Close`                           | `IconButton` 속성. 이름 "닫기"                                            |
-| `Image.Viewer.Prev` / `Image.Viewer.Next`      | `IconButton` 속성. 이름 "이전 사진" / "다음 사진"                         |
+| `Image.Viewer.Prev` / `Image.Viewer.Next`      | `IconButton` 속성. 이름 "이전" / "다음"                                   |
 | `Image.Viewer.Caption`                         | 위 왼쪽의 지금 장 `caption`, 두 줄까지. 없으면 그리지 않는다              |
 | `Image.Viewer.Thumbnails`                      | 도구 막대 아래 썸네일 줄. 넘치면 가로로 스크롤한다                        |
 

@@ -28,33 +28,34 @@ import { schedulerStyle } from './style';
 import { SchedulerToolbar } from './toolbar';
 import { useNow } from './use-now';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { useRequiredName, type AccessibleName } from '../../../internal/accessible-name';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+import { useProviderLocale } from '../../../internal/translate';
 import { validateDate } from '../calendar/date';
 
 export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = Omit<
   ComponentProps<'div'>,
   'children' | 'defaultValue'
-> & {
-  events: readonly E[];
-  view?: SchedulerView;
-  defaultView?: SchedulerView;
-  onViewChange?: (view: SchedulerView) => void;
-  dayCount?: number;
-  defaultDayCount?: number;
-  onDayCountChange?: (count: number) => void;
-  date?: CalendarDate;
-  defaultDate?: CalendarDate;
-  onDateChange?: (date: CalendarDate) => void;
-  locale?: string;
-  weekStartsOn?: WeekDay;
-  now?: CalendarDateTime;
-  onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
-  eventMenu?: (event: E) => ReactNode;
-  slotMenu?: (slot: SchedulerSlot) => ReactNode;
-  onSlotSelect?: (slot: SchedulerSlot) => void;
-  children?: (event: E) => ReactNode;
-};
+> &
+  AccessibleName & {
+    events: readonly E[];
+    view?: SchedulerView;
+    defaultView?: SchedulerView;
+    onViewChange?: (view: SchedulerView) => void;
+    dayCount?: number;
+    defaultDayCount?: number;
+    onDayCountChange?: (count: number) => void;
+    date?: CalendarDate;
+    defaultDate?: CalendarDate;
+    onDateChange?: (date: CalendarDate) => void;
+    weekStartsOn?: WeekDay;
+    now?: CalendarDateTime;
+    onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
+    eventMenu?: (event: E) => ReactNode;
+    slotMenu?: (slot: SchedulerSlot) => ReactNode;
+    onSlotSelect?: (slot: SchedulerSlot) => void;
+    children?: (event: E) => ReactNode;
+  };
 
 const defaultEvent = () => <SchedulerEvent />;
 
@@ -69,7 +70,6 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   date: dateProp,
   defaultDate,
   onDateChange,
-  locale,
   weekStartsOn,
   now: nowProp,
   onEventChange,
@@ -83,10 +83,13 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   ...props
 }: SchedulerProps<E>) {
   [dateProp, defaultDate].forEach((date) => validateDate(date, 'Scheduler'));
+  useRequiredName('Scheduler', {
+    'aria-label': ariaLabel,
+    'aria-labelledby': props['aria-labelledby'],
+  });
 
-  const t = useTranslate();
   const providerLocale = useProviderLocale();
-  const resolvedLocale = resolveLocale(locale ?? providerLocale);
+  const resolvedLocale = resolveLocale(providerLocale);
   const weekStart = weekStartsOn ?? weekStartOf(resolvedLocale);
   const now = useNow(nowProp);
   const [firstShownDate] = useState(() => defaultDate ?? todayIn(getLocalTimeZone()));
@@ -120,7 +123,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
     <SchedulerContext value={{ styles, format }}>
       <div
         role="group"
-        aria-label={ariaLabel ?? t('scheduler.label')}
+        aria-label={ariaLabel}
         aria-describedby={describedBy}
         lang={resolvedLocale}
         {...props}

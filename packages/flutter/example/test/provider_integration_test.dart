@@ -15,7 +15,7 @@ void main() {
     );
   }
 
-  testWidgets('slang locale reaches IDS without replacing child state', (
+  testWidgets('the app locale reaches IDS without replacing child state', (
     tester,
   ) async {
     await pumpIntegration(tester);
@@ -23,7 +23,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Change language'));
     await tester.pumpAndSettle();
-    expect(find.text('Loading / 닫기'), findsNWidgets(2));
+    expect(find.text('Loading / Close'), findsNWidgets(2));
     expect(find.textContaining('Child: count 1'), findsOneWidget);
     expect(find.textContaining('locale en'), findsNWidgets(2));
 
@@ -31,7 +31,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       find.textContaining(
-        'Child: count 1, radius 4.0, locale fr, corner squircle',
+        'Child: count 1, radius 4.0, locale en-GB, corner squircle',
       ),
       findsOneWidget,
     );
@@ -40,7 +40,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       find.textContaining(
-        'Child: count 1, radius 10.0, locale en, corner round',
+        'Child: count 1, radius 10.0, locale en-US, corner round',
       ),
       findsOneWidget,
     );

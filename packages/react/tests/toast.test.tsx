@@ -131,7 +131,7 @@ test('a toast shows in a named region, and its close button dismisses it', async
   expect(regionOf().matches(':popover-open')).toBe(true);
   expect(status.element().querySelector('[data-toast-icon]'), 'neutral has no icon').toBeNull();
 
-  await userEvent.click(screen.getByRole('button', { name: '알림 닫기' }));
+  await userEvent.click(screen.getByRole('button', { name: '닫기' }));
   await expect.element(status).not.toBeInTheDocument();
   expect(onDismiss).toHaveBeenCalledOnce();
   await expect.poll(() => regionOf().matches(':popover-open')).toBe(false);
@@ -274,7 +274,7 @@ test('F6 and Alt+T move focus into the region and back, which pauses the clock',
   vi.advanceTimersByTime(500);
   await expect.element(screen.getByRole('status')).toBeInTheDocument();
   await userEvent.keyboard('{Tab}');
-  await expect.element(screen.getByRole('button', { name: '알림 닫기' })).toHaveFocus();
+  await expect.element(screen.getByRole('button', { name: '닫기' })).toHaveFocus();
   await userEvent.keyboard('{F6}');
   await expect.element(pageButton).toHaveFocus();
 

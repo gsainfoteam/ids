@@ -50,7 +50,7 @@ export function SelectContent({ asChild, children, className, ...props }: Select
           )}
         </ScrollArea.Viewport>
       </ScrollArea>
-      {empty.length ? empty : <SelectEmpty />}
+      {empty}
     </>
   );
 }

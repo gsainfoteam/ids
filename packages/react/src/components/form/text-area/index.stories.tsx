@@ -439,7 +439,7 @@ export const LetTheUserResizeIt: Story = {
   play: async ({ canvas, userEvent }) => {
     const textarea = canvas.getByRole('textbox', { name: '높이만' });
     const natural = textarea.offsetHeight;
-    const [height] = canvas.getAllByRole('separator', { name: '높이' });
+    const [height] = canvas.getAllByRole('separator', { name: '크기 조절' });
     height!.focus();
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(textarea.offsetHeight).toBe(natural + 16));
@@ -449,8 +449,10 @@ export const LetTheUserResizeIt: Story = {
     const shell = canvas
       .getByRole('textbox', { name: '너비만' })
       .closest<HTMLElement>('[data-text-area]')!;
-    const [width] = canvas.getAllByRole('separator', { name: '너비' });
-    width!.focus();
+    const width = shell.querySelector<HTMLElement>(
+      '[role="separator"][aria-orientation="vertical"]',
+    )!;
+    width.focus();
     await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
     await waitFor(() => expect(shell.style.width).toBe('256px'));
 

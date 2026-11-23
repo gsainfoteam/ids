@@ -1,7 +1,4 @@
 {
-  "ids(singleInterface=IdsMessages)": {
-    "spinnerLabel": "Loading"
-  },
   "demo": {
     "specimen": "Aa Wi 0123 한글",
     "divider": {
@@ -43,7 +40,7 @@
     },
     "provider": {
       "nestScopes": "IdsProviderScope inherits the parent theme and changes only what it sets. Only a scope that sets mode owns its mode.",
-      "connectSlang": "Pass slang's translations as translation and IDS strings follow the app language. State under a scope survives the change."
+      "followTheAppLanguage": "To match IDS to the app language, pick one IdsLocale for each app language and pass it as locale. State under a scope survives the change."
     }
   },
   "notes": {
@@ -55,8 +52,7 @@
       "color": "The color comes from IconTheme."
     },
     "provider": {
-      "familyByMode": "Each family as a solid fill, a soft surface and text, from the theme the IDS theme addon picks.",
-      "translation": "The slang catalog handed to IdsProvider."
+      "familyByMode": "Each family as a solid fill, a soft surface and text, from the theme the IDS theme addon picks."
     }
   }
 }

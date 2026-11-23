@@ -42,7 +42,7 @@ function controlled(props: NumberField.Props = {}, locale?: string) {
   }
   return {
     node: (
-      <LanguageContext value={{ locale }}>
+      <LanguageContext value={{ tag: locale }}>
         <Controlled />
       </LanguageContext>
     ),
@@ -101,19 +101,21 @@ function touchPointOn(target: Locator) {
 test('SSR Field wiring, formatted ARIA, and canonical native FormData', () => {
   const doc = parse(
     renderToString(
-      <form>
-        <Field required invalid size="tiny">
-          <Field.Label>Price</Field.Label>
-          <NumberField
-            name="price"
-            defaultValue={1234.5}
-            min={0}
-            max={2000}
-            formatOptions={{ style: 'currency', currency: 'USD' }}
-          />
-          <Field.Error>Check price</Field.Error>
-        </Field>
-      </form>,
+      <LanguageContext value={{ tag: 'en-US' }}>
+        <form>
+          <Field required invalid size="tiny">
+            <Field.Label>Price</Field.Label>
+            <NumberField
+              name="price"
+              defaultValue={1234.5}
+              min={0}
+              max={2000}
+              formatOptions={{ style: 'currency', currency: 'USD' }}
+            />
+            <Field.Error>Check price</Field.Error>
+          </Field>
+        </form>
+      </LanguageContext>,
     ),
   );
   const input = doc.querySelector<HTMLInputElement>('[role=spinbutton]')!;
@@ -232,9 +234,10 @@ test('localized digits and accounting parentheses parse; text that is no number 
   expect(arabic.value()).toBe(12);
   await screen.unmount();
 
-  const accounting = controlled({
-    formatOptions: { style: 'currency', currency: 'USD', currencySign: 'accounting' },
-  });
+  const accounting = controlled(
+    { formatOptions: { style: 'currency', currency: 'USD', currencySign: 'accounting' } },
+    'en-US',
+  );
   const next = await render(accounting.node);
   const field = next.getByRole('spinbutton');
   await userEvent.fill(field, '(');
@@ -820,7 +823,7 @@ test('a value set from outside is left alone when the field is focused and left'
   expect(form.changes).toEqual([]);
   await expect.element(input).toHaveAttribute('aria-invalid', 'true');
   expect(node(input).validity.customError).toBe(true);
-  expect(node(input).validationMessage).toBe('값은 10 이하여야 합니다.');
+  expect(node(input).validationMessage).toBe('올바른 값이 아닙니다.');
   await userEvent.fill(input, '3');
   expect(node(input).validity.valid).toBe(true);
 });
@@ -838,7 +841,7 @@ test('out-of-range values reach Field.Error through native validity', async () =
   );
   const error = () => screen.container.querySelector('[data-field-part=error]');
   await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-  await expect.poll(() => error()?.textContent).toBe('값은 1 이상이어야 합니다.');
+  await expect.poll(() => error()?.textContent).toBe('올바른 값이 아닙니다.');
   const input = screen.getByRole('spinbutton', { name: 'Seats' });
   node(input).focus();
   await userEvent.keyboard('{ArrowUp}');

@@ -263,7 +263,7 @@ export const CopyAnAnswer: Story = {
       configurable: true,
       value: { writeText: async (text: string) => void copied.push(text) },
     });
-    await userEvent.click(await canvas.findByRole('button', { name: '메시지 복사' }));
+    await userEvent.click(await canvas.findByRole('button', { name: '복사' }));
     await waitFor(() => expect(copied).toEqual(['12시 20분에 광주송정역행 셔틀이 와요.']));
     await expect(canvas.getByRole('status')).toHaveTextContent('복사했습니다');
   },
@@ -391,7 +391,7 @@ export const Keyboard: Story = {
       configurable: true,
       value: { writeText: async () => {} },
     });
-    const copy = await canvas.findByRole('button', { name: '메시지 복사' });
+    const copy = await canvas.findByRole('button', { name: '복사' });
     await userEvent.tab();
     await expect(copy).toHaveFocus();
     await userEvent.tab();

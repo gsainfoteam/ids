@@ -12,8 +12,8 @@ import {
   type QRCodeModuleShape,
 } from './qr-path';
 import { qrCodeStyle } from './style';
+import { useRequiredName } from '../../../internal/accessible-name';
 import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
 import { containsElementOfType } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -56,7 +56,8 @@ export function QRCodeRoot({
   'aria-labelledby': ariaLabelledBy,
   ...rest
 }: QRCode.Props) {
-  const t = useTranslate();
+  useRequiredName('QRCode', { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy });
+
   const hasLogo = containsElementOfType(children, LOGO_PARTS);
   const level = errorCorrection ?? (hasLogo ? 'H' : 'M');
   const finder = finderShape ?? FINDER_FOR_SHAPE[shape];
@@ -106,7 +107,7 @@ export function QRCodeRoot({
     <QRCodeContext value={{ logo: geometry?.logo, viewBox, styles }}>
       <div
         role="img"
-        aria-label={ariaLabelledBy === undefined ? (ariaLabel ?? t('qrCode.label')) : ariaLabel}
+        aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         {...rest}
         data-qr-code=""

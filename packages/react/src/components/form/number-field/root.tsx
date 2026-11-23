@@ -52,7 +52,7 @@ export function NumberFieldRoot({
   children,
   ...rootProps
 }: NumberField.Props) {
-  const locale = useProviderLocale() ?? 'en-US';
+  const locale = useProviderLocale();
 
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const { items, leading, input, trailing } = splitAroundInput<NumberField.InputProps>(

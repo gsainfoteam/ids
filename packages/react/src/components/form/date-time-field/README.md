@@ -50,7 +50,7 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 />
 ```
 
-- 막힌 날을 보고 있으면 시계가 막히고 `고를 수 있는 날짜를 먼저 고르세요.` 가 나옵니다.
+- 막힌 날을 보고 있으면 시계가 막힙니다(`aria-disabled`). IDS 가 쓴 안내 글은 없습니다.
 - 달력에는 `min` / `max` 의 날짜(`toCalendarDate`)가 가고, 시계에는 경계일에만 `Time` 한도(`toTime`)가 갑니다. 그 사이의 날은 하루 종일입니다.
 - 밀리초가 있는 `min`(09:30:00.500)은 다음 초(09:30:01)부터입니다. 그 날에 남는 시각이 없으면 그 날이 막힙니다.
 - `disabled` 는 [Calendar](../../data/calendar/README.md#제한) 의 `DateMatcher` 입니다. 날짜 칸은 `DateTimeField.Calendar` 안의 [`Calendar.Day`](../../data/calendar/README.md#날짜-칸-꾸미기) 로 꾸밉니다.
@@ -60,8 +60,8 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 ```tsx
 <DateTimeField />                                    // ko-KR: 2026. 09. 15. 오후 2:30
 <DateTimeField hourCycle="24h" />                    // 2026. 09. 15. 14:30
-<IdsProvider.Scope locale="en-US"><DateTimeField /></IdsProvider.Scope>  // 09/15/2026, 2:30 PM
-<IdsProvider.Scope locale="de-DE"><DateTimeField /></IdsProvider.Scope>  // 15.09.2026, 14:30
+<IdsProvider.Scope locale={en}><DateTimeField /></IdsProvider.Scope>  // 09/15/2026, 2:30 PM
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}><DateTimeField /></IdsProvider.Scope>  // 15.09.2026, 14:30
 <DateTimeField format={{ dateStyle: 'long', timeStyle: 'short' }} hourCycle="24h" />  // 2026년 9월 15일 14:30
 <DateTimeField format={(value, locale) => `${value.month}/${value.day} ${value.hour}시`} />  // 함수
 ```
@@ -146,7 +146,7 @@ const schema = z.object({
 | `format`                                         | locale 날짜와 시각. Intl 옵션이나 함수 |
 | `hourCycle`                                      | locale 시간제. `12h` / `24h`           |
 | `precision` / `step`                             | `minute` / `1`                         |
-| `placeholder`                                    | `날짜와 시간 선택`                     |
+| `placeholder`                                    | 기본 없음                              |
 | `name` / `form` / `required`                     | 숨은 값 입력과 브라우저 검증           |
 | `readOnly`                                       | 열기, 고르기, Clear 를 막는다          |
 | `invalid` / `variant` / `size`                   | DateField 와 같다                      |

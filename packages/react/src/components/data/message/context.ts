@@ -13,7 +13,6 @@ type Context = {
   name: string | undefined;
   avatar: string | ReactNode;
   time: Date | undefined;
-  locale: string | undefined;
   status: MessageStatus;
   unread: number | boolean | undefined;
   last: boolean;

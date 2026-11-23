@@ -205,7 +205,7 @@ export const ShowTheValueAsE164: Story = {
     await expect(input).toHaveValue('010-1234-5678');
     await expect(canvas.getByLabelText('전화번호 값')).toHaveTextContent('+821012345678');
     await userEvent.click(canvas.getByRole('combobox', { name: '국가' }));
-    await userEvent.type(canvas.getByRole('combobox', { name: '옵션 검색' }), '미국');
+    await userEvent.type(canvas.getByRole('combobox', { name: '검색' }), '미국');
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByLabelText('전화번호 값')).toHaveTextContent('+11012345678');
     await expect(canvas.getByRole('combobox', { name: '국가' })).toHaveTextContent('US +1');
@@ -277,7 +277,7 @@ export const RejectAnIncompleteNumber: Story = {
         <Field>
           <Field.Label>연락처</Field.Label>
           <TelField name="tel" required />
-          <Field.Error />
+          <Field.Error match="customError">올바른 전화번호를 입력하세요.</Field.Error>
         </Field>
         <Button type="submit">보내기</Button>
         <output aria-label="보낸 값">{sent}</output>
@@ -288,7 +288,7 @@ export const RejectAnIncompleteNumber: Story = {
     docs: {
       description: {
         story:
-          '덜 입력했거나 있을 수 없는 번호는 native 검증에 걸립니다. 폼이 제출을 막고 Field.Error가 이유를 보여 줍니다. 제출되는 값은 E.164입니다.',
+          '덜 입력했거나 있을 수 없는 번호는 native 검증에 걸립니다. 폼이 제출을 막고 Field.Error match="customError" 에 쓴 이유가 보입니다. 제출되는 값은 E.164입니다.',
       },
     },
   },

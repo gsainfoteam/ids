@@ -43,7 +43,6 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 | `name`    | `string`                                     | -                                |
 | `avatar`  | `string \| ReactNode`                        | -                                |
 | `time`    | `Date`                                       | -                                |
-| `locale`  | `string`                                     | IdsProvider 의 locale, `ko-KR`   |
 | `status`  | `'sent' \| 'pending' \| 'error'`             | `'sent'`                         |
 | `unread`  | `number \| boolean`                          | -                                |
 | `onRetry` | `() => void`                                 | -                                |

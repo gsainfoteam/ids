@@ -64,12 +64,13 @@ import { Field, Select } from '@gsainfoteam/ids-react';
   <Select.Item value="flutter" searchValue="Flutter Dart">
     Flutter
   </Select.Item>
-  <Select.Empty>결과 없음</Select.Empty> {/* 생략하면 "검색 결과가 없습니다." */}
+  <Select.Empty>결과 없음</Select.Empty> {/* 생략하면 결과가 없을 때 목록이 비어 있다 */}
 </Select>
 ```
 
 - 검색하면 첫 결과를 가리키고, 구분선은 숨깁니다.
-- `Select.Empty` 는 늘 마운트된 live region 이라 결과가 비는 순간 스크린 리더가 읽습니다.
+- `Select.Empty` 는 자식만 그립니다. 늘 마운트된 live region 이라 결과가 비는 순간 스크린 리더가 읽습니다.
+- `Select.SearchField` 의 `placeholder` 는 기본값이 없습니다.
 - `Select.SearchField` 는 테두리와 링 없이 아래 선만 그린 `TextField` 입니다. 돋보기나 여백을 눌러도 포커스가 입력에 남고, 받은 속성은 input 으로 갑니다.
 
 ## 여러 개 선택과 지우기
@@ -236,7 +237,7 @@ const methods = useForm({ defaultValues: { fruit: null, tags: [] } }); // 하나
 | `onValueChange`          | 고르거나 지울 때. 폼 초기화에는 부르지 않는다                       |
 | `open` / `defaultOpen`   | 열림 상태                                                           |
 | `onOpenChange`           | 열리고 닫힐 때                                                      |
-| `placeholder`            | `선택하세요`                                                        |
+| `placeholder`            | 기본값 없음. 고른 값이 없을 때 트리거에 보인다                      |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                  |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                          |
 | `mobileVariant`          | `popover`(기본) / `drawer`: 640px 미만에서 모달 하단 시트           |
