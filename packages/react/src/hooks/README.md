@@ -3,15 +3,17 @@
 여러 컴포넌트가 함께 쓰는 hook 입니다.
 
 - `use-interactive.ts` 의 hook, 함수, 상수, 타입과 `useControllableState` 는 `src/index.ts` 가 내보내는 공개 API 입니다. 이름이나 시그니처를 바꾸면 breaking change 입니다.
-- `useInternalFormReset` 은 내보내지 않습니다.
+- 이름이 `useInternal` 로 시작하는 hook 은 내보내지 않습니다.
 
 | 파일                                                     | 내용                                                 | 쓰는 곳                                                              |
 | -------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- |
 | [`use-clipboard-support.ts`](#use-clipboard-supportts)   | `navigator.clipboard.writeText` 가 있는지            | ColorPicker, CodeBlock 과 Message 의 복사 버튼                      |
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
+| [`use-media-query.ts`](#use-media-queryts)               | media query 가 맞는지                                | 동작 줄이기, IdsProvider 의 `system` 모드, 좁은 화면의 drawer        |
 | [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/lib/surface.ts` |
 | [`use-reduced-motion.ts`](#use-reduced-motionts)         | 동작 줄이기 설정(`prefers-reduced-motion`)           | Marquee, Carousel(`internal/slides`)                                 |
+| [`use-resize-observer.ts`](#use-resize-observerts)       | 요소 크기가 바뀔 때마다 부르는 callback              | Chart, Scheduler, Toaster, Editor 의 끌기 손잡이                     |
 
 ## use-clipboard-support.ts
 
@@ -74,6 +76,7 @@ useInternalFormReset(rootRef, () => {
 
 ### 알아둘 것
 
+- `setValue` 는 렌더가 바뀌어도 같은 함수입니다. React 의 `setState` 처럼 effect 의 의존성이나 context 값에 넣어도 다시 실행되지 않습니다. 렌더한 값과 callback 은 `useInsertionEffect` 에서 ref 에 옮겨 둡니다. 자식의 layout effect 가 부르더라도 이번 렌더의 값을 보게 하려는 것입니다.
 - updater 함수(`setValue((prev) => ...)`)는 React 의 state 큐가 아니라 이번 렌더 뒤에 알린 마지막 값(없으면 `current`)으로 계산됩니다. 한 이벤트에서 두 번 부르면 두 번째는 첫 번째 결과를 봅니다(`tests/use-controllable-state.test.tsx`).
 - 비제어일 때 `defaultValue` 는 첫 렌더에서만 읽습니다. 나중에 바뀐 `defaultValue` 는 reset 핸들러가 직접 넘길 때만 반영됩니다.
 - 폼 reset 으로 값을 되돌리는 컴포넌트는 모두 `silent` 로 부릅니다(Select 와 ChipField 포함). `tests/select.test.tsx` 와 `tests/chip-field.test.tsx` 가 reset 이 값을 알리지 않는지 확인합니다.
@@ -192,3 +195,54 @@ const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
 
 - 모양은 이 hook 이 아니라 CSS 의 `motion-reduce:` variant 가 먼저 정합니다. hook 은 hydration 뒤에야 `true` 가 되므로, 서버 HTML 의 첫 그림부터 맞으려면 CSS 가 같은 조건을 맡아야 합니다. hook 은 요소를 그릴지 말지(복제본), 상태가 무엇인지처럼 CSS 가 못 하는 일만 합니다.
 - Carousel 은 자동 넘김의 기본값을 `playing` 이 아니라 "고르지 않음(`undefined`)" 으로 두고, 고르지 않은 동안만 이 hook 의 값을 따릅니다. 첫 렌더의 `false` 가 재생 상태로 굳지 않게 하려는 것입니다(`components/data/carousel/hooks/use-carousel-motion.ts`).
+
+## use-media-query.ts
+
+`useInternalMediaQuery(query)` 는 media query 가 맞는지 돌려주고, 바뀌면 다시 렌더합니다.
+
+### 쓰는 곳
+
+- `useInternalReducedMotion`, IdsProvider 의 `system` 모드, [`internal/overlay`](../internal/overlay/README.md) 의 좁은 화면 drawer 판정
+
+### 쓰는 법
+
+```ts
+// internal/overlay/lib/sheet-viewport.ts
+return useInternalMediaQuery(mobileVariant === 'drawer' ? SMALL_SCREEN : null);
+```
+
+### 왜 이렇게
+
+- `useSyncExternalStore` 로 읽어서 tearing 이 없습니다. 서버와 hydration 의 첫 렌더는 `false` 입니다.
+- `null` 을 주면 구독하지 않고 `false` 입니다. 쓰지 않는 query 는 `matchMedia` 를 부르지 않습니다.
+- `matchMedia` 가 없는 환경에서도 `false` 입니다.
+
+## use-resize-observer.ts
+
+`useInternalResizeObserver(target, onResize)` 는 요소를 붙인 layout effect 에서 `onResize` 를 한 번 부르고, 크기가 바뀔 때마다 다시 부릅니다.
+
+### 쓰는 곳
+
+- Chart 의 크기, Scheduler 의 시간 높이, Toaster 의 toast 높이, Editor 끌기 손잡이의 자리
+
+### 쓰는 법
+
+```ts
+// components/data/chart/hooks/use-chart-size.ts
+useInternalResizeObserver(ref, (element) => {
+  const next = sizeOf(element);
+  setSize((current) => (sameSize(current, next) ? current : next));
+});
+```
+
+### 왜 이렇게
+
+- `target` 은 요소, ref, `null` 을 받습니다. `null` 이면 지켜보지 않습니다. 조건이 있으면 `enabled ? ref : null` 로 줍니다.
+- 처음 부르는 것이 layout effect 안이라 첫 paint 전에 크기를 압니다. ResizeObserver 의 첫 알림은 paint 뒤에 옵니다.
+- `onResize` 는 `useEffectEvent` 로 읽습니다. callback 이 바뀌어도 observer 를 다시 만들지 않고, 늘 마지막 렌더의 callback 을 부릅니다.
+
+### 알아둘 것
+
+- ref 는 effect 가 실행될 때 읽습니다. ref 가 가리키는 요소가 렌더 뒤에 바뀌면 따라가지 않습니다. 요소가 바뀌는 곳은 ref 대신 state 로 받은 요소를 줍니다.
+- 지켜보는 동안 바뀌는 다른 값으로 다시 재야 하면(Marquee 의 방향, TimePicker 의 선택) 이 hook 을 쓰지 않고 effect 를 직접 둡니다.
+
