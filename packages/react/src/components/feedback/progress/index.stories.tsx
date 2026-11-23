@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -28,12 +27,11 @@ const meta = {
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100 } },
     max: { control: 'number' },
-    shape: { control: 'radio', options: ['linear', 'circular'] },
     size: { control: 'radio', options: sizes },
     colorScheme: { control: 'select', options: schemes },
     indeterminate: { control: 'boolean' },
   },
-  args: { value: 65, max: 100, shape: 'linear', size: 'standard', colorScheme: 'primary' },
+  args: { value: 65, max: 100, size: 'standard', colorScheme: 'primary' },
 } satisfies Meta<typeof Progress>;
 
 export default meta;
@@ -49,6 +47,21 @@ export const Playground: Story = {
       <Progress.Value />
     </Progress>
   ),
+};
+
+export const Usage: Story = {
+  render: () => (
+    <Progress value={65} className="max-w-md">
+      <Progress.Label>사진 올리는 중</Progress.Label>
+      <Progress.Value />
+    </Progress>
+  ),
+  play: async ({ canvas }) => {
+    const progressbar = canvas.getByRole('progressbar', { name: '사진 올리는 중' });
+    await expect(progressbar).toHaveAttribute('aria-valuenow', '65');
+    await expect(progressbar).toHaveAttribute('aria-valuetext', '65%');
+    await expect(canvas.getByText('65%')).toHaveAttribute('aria-hidden', 'true');
+  },
 };
 
 export const Gallery: Story = {
@@ -69,31 +82,6 @@ export const Gallery: Story = {
         />
       </Showcase.Section>
 
-      <Showcase.Section title="Circular × Size">
-        {sizes.map((size) => (
-          <Showcase.Row key={size} label={size}>
-            {schemes.map((colorScheme, index) => (
-              <Progress
-                key={colorScheme}
-                shape="circular"
-                size={size}
-                colorScheme={colorScheme}
-                value={(index + 1) * 15}
-                aria-label={colorScheme}
-              >
-                {size === 'standard' && <Progress.Value />}
-              </Progress>
-            ))}
-          </Showcase.Row>
-        ))}
-        <Showcase.Row label="label, icon">
-          <Progress shape="circular" value={40}>
-            <ArrowDownTrayIcon />
-            <Progress.Label>다운로드 중</Progress.Label>
-          </Progress>
-        </Showcase.Row>
-      </Showcase.Section>
-
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
           <div className="w-64">
@@ -112,8 +100,6 @@ export const Gallery: Story = {
           <div className="w-64">
             <Progress aria-label="처리 중" />
           </div>
-          <Progress shape="circular" aria-label="처리 중" />
-          <Progress shape="circular" size="tiny" aria-label="처리 중" />
         </Showcase.Row>
       </Showcase.Section>
 
@@ -144,32 +130,9 @@ export const Gallery: Story = {
   ),
 };
 
-export const LabelNamesTheBar: Story = {
-  render: () => (
-    <Progress value={65} className="max-w-md">
-      <Progress.Label>사진 올리는 중</Progress.Label>
-      <Progress.Value />
-    </Progress>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Progress.Label이 progressbar의 이름이 됩니다. 눈에 보이는 값은 progressbar가 이미 알리므로 스크린 리더에서는 숨깁니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    const progressbar = canvas.getByRole('progressbar', { name: '사진 올리는 중' });
-    await expect(progressbar).toHaveAttribute('aria-valuenow', '65');
-    await expect(progressbar).toHaveAttribute('aria-valuetext', '65%');
-    await expect(canvas.getByText('65%')).toHaveAttribute('aria-hidden', 'true');
-  },
-};
-
 const megabytes = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 
-export const ValueLabel: Story = {
+export const ShowBytesInsteadOfAPercent: Story = {
   render: () => (
     <Progress
       value={2_411_724}
@@ -196,7 +159,56 @@ export const ValueLabel: Story = {
   },
 };
 
+export const WaitWithoutAKnownValue: Story = {
+  render: () => (
+    <div className="flex max-w-md flex-col gap-6">
+      <Progress aria-label="준비 중" />
+      <Progress size="tiny" aria-label="변환 중" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'value가 없거나 indeterminate면 진행률 없이 움직이고 aria-valuenow를 빼 둡니다. 모션 줄이기 설정에서는 흐린 막대로 멈춰 있습니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    for (const progressbar of canvas.getAllByRole('progressbar')) {
+      await expect(progressbar).not.toHaveAttribute('aria-valuenow');
+      await expect(progressbar).not.toHaveAttribute('aria-valuetext');
+    }
+  },
+};
+
+export const FollowALiveValue: Story = {
+  render: function Render() {
+    const [value, setValue] = useState(10);
+
+    useEffect(() => {
+      const id = setInterval(() => setValue((prev) => (prev >= 100 ? 10 : prev + 15)), 900);
+      return () => clearInterval(id);
+    }, []);
+
+    return (
+      <Progress value={value} colorScheme={value >= 100 ? 'success' : 'primary'} className="w-64">
+        <Progress.Label>동기화</Progress.Label>
+        <Progress.Value />
+      </Progress>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '값이 바뀌면 막대는 폭을 다시 계산하지 않고 미끄러져 움직입니다.',
+      },
+    },
+  },
+};
+
 export const OutOfRange: Story = {
+  tags: ['verification'],
   render: () => (
     <div className="flex max-w-md flex-col gap-4">
       <Progress value={8_400_000} max={8_388_608} aria-label="넘침" data-testid="over">
@@ -234,63 +246,8 @@ export const OutOfRange: Story = {
   },
 };
 
-export const Indeterminate: Story = {
-  render: () => (
-    <div className="flex max-w-md flex-col gap-6">
-      <Progress aria-label="준비 중" />
-      <div className="flex items-center gap-4">
-        <Progress shape="circular" aria-label="변환 중" />
-        <Progress shape="circular" size="tiny" aria-label="변환 중" />
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'value가 없거나 indeterminate면 진행률 없이 움직이고 aria-valuenow를 빼 둡니다. 모션 줄이기 설정에서는 흐린 막대로 멈춰 있습니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    for (const progressbar of canvas.getAllByRole('progressbar')) {
-      await expect(progressbar).not.toHaveAttribute('aria-valuenow');
-      await expect(progressbar).not.toHaveAttribute('aria-valuetext');
-    }
-  },
-};
-
-export const Live: Story = {
-  render: function Render() {
-    const [value, setValue] = useState(10);
-
-    useEffect(() => {
-      const id = setInterval(() => setValue((prev) => (prev >= 100 ? 10 : prev + 15)), 900);
-      return () => clearInterval(id);
-    }, []);
-
-    return (
-      <div className="flex items-center gap-6">
-        <Progress value={value} colorScheme={value >= 100 ? 'success' : 'primary'} className="w-64">
-          <Progress.Label>동기화</Progress.Label>
-          <Progress.Value />
-        </Progress>
-        <Progress shape="circular" value={value} aria-label="동기화">
-          <Progress.Value />
-        </Progress>
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: '값이 바뀌면 막대는 폭을 다시 계산하지 않고 미끄러져 움직입니다.',
-      },
-    },
-  },
-};
-
 export const RightToLeft: Story = {
+  tags: ['verification'],
   render: () => (
     <div dir="rtl" className="flex max-w-md flex-col gap-4">
       <Progress value={30}>

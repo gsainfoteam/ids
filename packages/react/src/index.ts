@@ -130,6 +130,7 @@ export type { TextAreaProps, TextAreaVariant } from './components/form/text-area
 
 export { Spinner } from './components/feedback/spinner';
 export { Progress } from './components/feedback/progress';
+export { CircularProgress } from './components/feedback/circular-progress';
 export { Skeleton } from './components/feedback/skeleton';
 export { Marker } from './components/feedback/marker';
 export { Label } from './components/typography/label';

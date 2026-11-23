@@ -1,6 +1,6 @@
 # Progress
 
-진행률을 아는 작업의 진행 상태를 막대나 원으로 보여 줍니다. 진행률을 모르는 짧은 대기는 `Spinner` 를 씁니다.
+진행률을 아는 작업의 진행 상태를 막대로 보여 줍니다. 원으로 그리려면 `CircularProgress` 를, 진행률을 모르는 짧은 대기는 `Spinner` 를 씁니다.
 
 - **이름과 값이 자동으로 연결됩니다.** `Progress.Label` 이 progressbar의 이름이 되고, `aria-valuenow` / `aria-valuemax` / `aria-valuetext` 가 붙습니다.
 - **화면과 스크린 리더가 같은 말을 합니다.** `getValueLabel` 로 만든 문장이 `aria-valuetext` 와 `Progress.Value` 의 기본 내용에 함께 쓰입니다.
@@ -67,27 +67,10 @@ import { Progress } from '@gsainfoteam/ids-react';
 - Track과 Indicator는 생략하면 기본 모양이 들어갑니다. Track이 없으면 다른 자식은 모두 막대 위에 놓입니다.
 - `Progress.Label`, `Progress.Value`, `Progress.Indicator` 는 `asChild` 로 다른 요소를 그릴 수 있습니다.
 
-## 원형
-
-```tsx
-<Progress shape="circular" value={65}>
-  <Progress.Value />                     {/* 가운데 */}
-</Progress>
-
-<Progress shape="circular" value={40}>
-  <ArrowDownTrayIcon />                  {/* 가운데 아이콘 */}
-  <Progress.Label>다운로드 중</Progress.Label>   {/* 원 옆 */}
-</Progress>
-```
-
-- `Progress.Label` 은 원 옆에, 나머지 자식은 원 가운데에 놓입니다.
-- Track과 Indicator를 넘기면 원의 트랙과 호에 `className` 이 적용됩니다.
-- `tiny`(24px)는 가운데에 글자가 들어가기 좁습니다. 아이콘이나 빈 원으로 씁니다.
-
 ## 크기와 색
 
 ```tsx
-<Progress size="tiny" />            // standard(8px 막대, 40px 원) / tiny(4px, 24px)
+<Progress size="tiny" />            // standard(8px 막대) / tiny(4px)
 <Progress colorScheme="success" />  // primary(기본) / neutral / info / success / warning / danger
 ```
 
@@ -101,13 +84,13 @@ import { Progress } from '@gsainfoteam/ids-react';
 | `valueLabel`                     | 값 문장. `aria-valuetext` 와 같다          |
 | `indeterminate`                  | 진행률 없이 그린다                         |
 | `complete`                       | 값이 `max` 에 닿았다                       |
-| `shape` / `size` / `colorScheme` | 넘긴 값                                    |
+| `size` / `colorScheme`           | 넘긴 값                                    |
 
 ```tsx
 <Progress value={value} className={(state) => (state.complete ? 'opacity-60' : undefined)} />
 ```
 
-- 루트에 `data-progress`, `data-shape`, `data-size`, `data-indeterminate`, `data-complete` 가 붙습니다.
+- 루트에 `data-progress`, `data-size`, `data-indeterminate`, `data-complete` 가 붙습니다.
 - 파트에는 `data-progress-label`, `data-progress-value`, `data-progress-track`, `data-progress-indicator` 가 붙습니다.
 
 ## 속성
@@ -117,7 +100,6 @@ import { Progress } from '@gsainfoteam/ids-react';
 | `value`                                      | 진행 값. 없으면 진행률 없이 그린다                                      |
 | `max`                                        | `100`                                                                   |
 | `indeterminate`                              | `false`                                                                 |
-| `shape`                                      | `linear`(기본) / `circular`                                             |
 | `size`                                       | `standard`(기본) / `tiny`                                               |
 | `colorScheme`                                | `primary`(기본) / `neutral` / `info` / `success` / `warning` / `danger` |
 | `getValueLabel`                              | `(value, max) => string`. 값 문장                                       |
@@ -127,5 +109,5 @@ import { Progress } from '@gsainfoteam/ids-react';
 
 ## 알아둘 것
 
-- 막대형에서 `role="progressbar"` 는 루트가 아니라 트랙에 붙습니다. `id` 와 `aria-*` 도 트랙으로 갑니다.
+- `role="progressbar"` 는 루트가 아니라 트랙에 붙습니다. `id` 와 `aria-*` 도 트랙으로 갑니다.
 - 이름이 없으면(`Progress.Label` 도 `aria-label` 도 없으면) 개발 모드에서 경고가 나옵니다.
