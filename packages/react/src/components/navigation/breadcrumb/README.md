@@ -27,12 +27,12 @@ import { Breadcrumb } from '@gsainfoteam/ids-react';
 
 | 파트                    | 그리는 요소                  | 역할                                                        |
 | ----------------------- | ---------------------------- | ----------------------------------------------------------- |
-| `Breadcrumb`            | `nav`                        | 랜드마크. `size`, `separator`, `maxItems` 를 받는다         |
+| `Breadcrumb`            | `nav`                        | 랜드마크. `size`, `maxItems` 를 받는다                      |
 | `Breadcrumb.List`       | `ol`                         | 생략하면 `Breadcrumb` 이 대신 그린다                        |
 | `Breadcrumb.Item`       | `li`                         | 항목 하나. 안에 `Link` 나 `Page` 를 둔다                    |
 | `Breadcrumb.Link`       | `a`                          | 상위 페이지 링크. `asChild` 로 라우터 Link 를 감싼다        |
 | `Breadcrumb.Page`       | `span`                       | 현재 페이지. `aria-current="page"`, 링크가 아니다           |
-| `Breadcrumb.Separator`  | `li aria-hidden`             | 구분자. 보통은 자동으로 들어간다                            |
+| `Breadcrumb.Separator`  | `li aria-hidden`             | 구분자. 쓰지 않으면 chevron 이 자동으로 들어간다            |
 | `Breadcrumb.Ellipsis`   | `li` 안의 `button` 과 `menu` | 접힌 항목. children 의 Item 이 메뉴 항목이 된다             |
 
 ## 라우터 Link
@@ -53,13 +53,9 @@ import { Link } from 'react-router';
 
 ## 구분자
 
-```tsx
-<Breadcrumb>                         {/* 기본 chevron */}
-<Breadcrumb separator="/">           {/* 글자 */}
-<Breadcrumb separator={<SlashIcon />}>  {/* 아이콘 */}
-```
-
-- 한 자리만 다르게 하려면 `Breadcrumb.List` 안에 `Breadcrumb.Separator` 를 직접 씁니다. 하나라도 직접 쓰면 자동 구분자는 모두 빠집니다.
+- 쓰지 않으면 항목 사이에 chevron 이 자동으로 들어갑니다.
+- 다른 구분자는 항목 사이에 `Breadcrumb.Separator` 를 직접 씁니다. 글자도 아이콘도 됩니다. 하나라도 직접 쓰면 자동 구분자는 모두 빠집니다.
+- 직접 쓴 구분자도 `maxItems` 로 접힙니다. 숨은 항목 앞의 구분자는 함께 빠지고, 말줄임 앞의 구분자 하나만 남습니다.
 
 ```tsx
 <Breadcrumb>
