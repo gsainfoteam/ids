@@ -25,5 +25,9 @@ DataTable takes its behaviour from a `useDataTable()` hook and draws its screen 
 - `striped` is `variant="striped"`. `stickyHeader` and `highlightOnHover` are gone: the header
   always sticks inside a DataTable given a height, and a row always shows the hover state layer.
 - `DataTable.Sorting`, `.RowSelection` and `.Pagination` are `DataTable.SortingState`,
-  `.RowSelectionState` and `.PaginationState`; `data-data-table-footer` is
-  `data-data-table-toolbar`.
+  `.RowSelectionState` and `.PaginationState`.
+- DataTable fills its parent's width and stays within the height the parent gives, scrolling its
+  rows inside; size it by wrapping it, not with `className`. `DataTable.Toolbar` places its
+  children together at the end of the row.
+- Its `data-*` attributes are no longer documented. Read the state from the hook's values, the
+  root's `value` and the TanStack table instead.
