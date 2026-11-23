@@ -403,7 +403,8 @@ story file adds nothing for it.
   last two give only PascalCase names, so a story constant named `today` is not taken for the
   function of that name. A name found in none of them (module-level data, a demo component,
   `useForm`) rules that candidate out. A Docs page with no candidate left has no editor: today
-  Field's zod page, Scheduler, Splitter and IdsProvider.
+  Calendar, DateField and DateTimeField (a module-level `today`), Field's zod page, Scheduler,
+  Splitter and IdsProvider.
 
 - **Usage is the starter.** Write `Usage` with literal values and imported names only, so the
   editor starts from the smallest real use. `tests/live-code.ssr.test.tsx` turns every `Usage`
