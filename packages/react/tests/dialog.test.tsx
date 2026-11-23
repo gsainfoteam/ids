@@ -113,9 +113,11 @@ test('a Select sheet opened over a dialog marks its backdrop stacked, so it does
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <Settings defaultOpen>
-        <Select aria-label="Theme" mobileVariant="drawer">
-          <Select.Item value="light">Light</Select.Item>
-          <Select.Item value="dark">Dark</Select.Item>
+        <Select aria-label="Theme">
+          <Select.Content mobileVariant="drawer">
+            <Select.Item value="light">Light</Select.Item>
+            <Select.Item value="dark">Dark</Select.Item>
+          </Select.Content>
         </Select>
       </Settings>
     </IdsProvider>,

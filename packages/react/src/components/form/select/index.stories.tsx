@@ -39,7 +39,6 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    mobileVariant: { control: 'radio', options: ['popover', 'drawer'] },
     invalid: { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
@@ -137,6 +136,7 @@ type SelectPlaygroundArgs = Omit<
   defaultValues?: string[];
   searchField?: boolean;
   clearButton?: boolean;
+  contentMobileVariant?: Select.ContentProps['mobileVariant'];
   wrapInField?: boolean;
   fieldLabel?: string;
   fieldDescription?: string;
@@ -198,7 +198,13 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
     placeholder: { control: 'text', table: { category: 'Value' } },
     variant: { table: { category: 'Look' } },
     size: { table: { category: 'Look' } },
-    mobileVariant: { table: { category: 'Look' } },
+    contentMobileVariant: {
+      name: 'mobileVariant',
+      control: 'inline-radio',
+      options: ['popover', 'drawer'],
+      description: '640px 보다 좁은 화면에서 drawer 는 모달 하단 시트로 엽니다.',
+      table: { category: 'Select.Content' },
+    },
     disabled: { table: { category: 'State' } },
     readOnly: { table: { category: 'State' } },
     required: { table: { category: 'State' } },
@@ -234,7 +240,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
         'placeholder',
         'variant',
         'size',
-        'mobileVariant',
+        'contentMobileVariant',
         'disabled',
         'readOnly',
         'required',
@@ -254,6 +260,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
     defaultValues,
     searchField,
     clearButton,
+    contentMobileVariant,
     wrapInField,
     fieldLabel,
     fieldDescription,
@@ -275,9 +282,11 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
           onValueChange={onValueChange}
         >
           {clear}
-          {search}
-          {items}
-          {empty}
+          <Select.Content mobileVariant={contentMobileVariant}>
+            {search}
+            {items}
+            {empty}
+          </Select.Content>
         </Select>
       ) : (
         <Select
@@ -288,9 +297,11 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
           onValueChange={onValueChange}
         >
           {clear}
-          {search}
-          {items}
-          {empty}
+          <Select.Content mobileVariant={contentMobileVariant}>
+            {search}
+            {items}
+            {empty}
+          </Select.Content>
         </Select>
       );
 
@@ -746,9 +757,8 @@ export const DrawCustomOptions: Story = {
 
 export const OpenAsABottomSheetOnPhones: Story = {
   args: {
-    mobileVariant: 'drawer',
     children: (
-      <>
+      <Select.Content mobileVariant="drawer">
         <Select.Item value="apple">사과</Select.Item>
         <Select.Item value="banana" disabled>
           바나나
@@ -756,14 +766,14 @@ export const OpenAsABottomSheetOnPhones: Story = {
         <Select.Item value="cherry">체리</Select.Item>
         <Select.Item value="grape">포도</Select.Item>
         <Select.Item value="mango">망고</Select.Item>
-      </>
+      </Select.Content>
     ),
   },
   parameters: {
     docs: {
       description: {
         story:
-          '640px 보다 좁은 화면에서 mobileVariant="drawer" 는 모달 하단 시트로 엽니다. 배경이 어두워지고 클릭을 받지 않으며, 포커스는 시트 안에 머물고, 페이지 스크롤이 잠깁니다. 넓은 화면에서는 팝오버와 같습니다.',
+          '640px 보다 좁은 화면에서 Select.Content 에 mobileVariant="drawer" 를 주면 모달 하단 시트로 엽니다. 옵션은 모두 Select.Content 안에 둡니다. 배경이 어두워지고 클릭을 받지 않으며, 포커스는 시트 안에 머물고, 페이지 스크롤이 잠깁니다. 넓은 화면에서는 팝오버와 같습니다.',
       },
     },
   },
