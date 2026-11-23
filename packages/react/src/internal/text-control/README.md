@@ -6,10 +6,10 @@
 | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | [`index.tsx`](#indextsx)                     | context, 상태 속성, 자식 나누기, `Adornments`, `TextControlClear`, 다른 파일의 다시 내보내기 |
 | [`style.ts`](#stylets)                       | `insetButtons`, `textControlStyle`                                                           |
-| [`use-text-control.ts`](#use-text-controlts) | 셸의 포커스, 셸 누르기, Escape 로 지우기                                                     |
-| [`use-input-value.ts`](#use-input-valuets)   | input 의 DOM 값을 따라가는 hook                                                              |
-| [`use-merged-ref.ts`](#use-merged-refts)     | ref 를 렌더마다 새로 만들지 않고 합치는 hook                                                 |
-| [`clear-input.ts`](#clear-inputts)           | 진짜 편집으로 값을 지우고 바꾸는 함수                                                        |
+| [`hooks/use-text-control.ts`](#hooksuse-text-controlts) | 셸의 포커스, 셸 누르기, Escape 로 지우기                                                     |
+| [`hooks/use-input-value.ts`](#hooksuse-input-valuets)   | input 의 DOM 값을 따라가는 hook                                                              |
+| [`hooks/use-merged-ref.ts`](#hooksuse-merged-refts)     | ref 를 렌더마다 새로 만들지 않고 합치는 hook                                                 |
+| [`lib/clear-input.ts`](#libclear-inputts)           | 진짜 편집으로 값을 지우고 바꾸는 함수                                                        |
 
 ## 쓰는 곳
 
@@ -23,7 +23,7 @@
 
 - TextField 는 `textControlStyle` 을 그대로 `TextField.Style` 로 쓰고, PasswordField, NumberField, TelField 는 `tv({ extend: textControlStyle })` 로 넓힙니다.
 - 네 필드의 `Clear` 는 모두 `TextControlClear` 입니다.
-- 상자의 클래스는 [`fieldSurface`](../README.md#field-surfacets), 상자 안 버튼은 `fieldAction.padded` 입니다.
+- 상자의 클래스는 [`fieldSurface`](../README.md#surfaceslibfield-surfacets), 상자 안 버튼은 `fieldAction.padded` 입니다.
 
 ## index.tsx
 
@@ -88,7 +88,7 @@ const styles = textControlStyle({ variant, size });
 
 - 여기에 hook 이나 컴포넌트를 두지 않습니다. 클라이언트 모듈로 옮기면 서버 컴포넌트에서 `TextField.Style` 과 `NumberField` 등의 `style.ts` 가 client reference 를 받아 `tv({ extend })` 에서 깨집니다(`tests/server-components.test.ts`).
 
-## use-text-control.ts
+## hooks/use-text-control.ts
 
 ### 쓰는 법
 
@@ -124,7 +124,7 @@ return {
 - `onEscape` 는 각 필드가 input 의 `onKeyDown` 에서 앱의 핸들러 뒤에 부릅니다. 앱의 핸들러가 `preventDefault()` 하면 지우지 않습니다.
 - TextArea 는 `clearable` 을 넘기지 않아 Escape 로 지우지 않습니다.
 
-## use-input-value.ts
+## hooks/use-input-value.ts
 
 ### 쓰는 법
 
@@ -157,7 +157,7 @@ onChange: (event: ChangeEvent<HTMLInputElement>) => {
 - 폼 reset 을 한 task 미루는 이유는 [`useInternalFormReset`](../../hooks/README.md#use-form-resetts) 과 같습니다. 사용자가 누른 reset 버튼에서는 microtask 가 값 복원 전에 돕니다.
 - NumberField 와 TelField 는 이 hook 을 쓰지 않고 값을 자기 state 로 가집니다.
 
-## use-merged-ref.ts
+## hooks/use-merged-ref.ts
 
 ### 쓰는 법
 
@@ -178,7 +178,7 @@ function assertInput(node: HTMLInputElement) {
 - React 19 이전 방식의 wrapper(react-textarea-autosize 의 composed ref)는 ref 가 돌려준 cleanup 을 버리고 `null` 을 넘겨 뗍니다. 그래서 `null` 이 오면 그때 cleanup 을 돌립니다(`wrapperIgnoredCleanup`).
 - cleanup 은 한 번만 돕니다. React 가 돌려받은 cleanup 을 부르든 wrapper 가 `null` 을 넘기든 먼저 온 쪽이 돌리고, 나중 쪽은 아무것도 하지 않습니다(`detach.current !== run`).
 
-## clear-input.ts
+## lib/clear-input.ts
 
 ### 쓰는 법
 
