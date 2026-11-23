@@ -319,6 +319,33 @@ test('a backdrop click closes and the drawer does not', async () => {
   expect(onOpenChange.mock.calls).toEqual([[false]]);
 });
 
+test('the corner close button is drawn only where Drawer.Close is written', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Drawer defaultOpen>
+        <Drawer.Content>
+          <Drawer.Title>Filters</Drawer.Title>
+        </Drawer.Content>
+      </Drawer>
+    </IdsProvider>,
+  );
+  await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeVisible();
+  expect(screen.getByRole('button', { name: '닫기' }).elements()).toHaveLength(0);
+  await screen.unmount();
+
+  const withClose = await render(
+    <IdsProvider theme={testTheme}>
+      <Drawer defaultOpen>
+        <Drawer.Content>
+          <Drawer.Title>Filters</Drawer.Title>
+          <Drawer.Close />
+        </Drawer.Content>
+      </Drawer>
+    </IdsProvider>,
+  );
+  await expect.element(withClose.getByRole('button', { name: '닫기' })).toBeVisible();
+});
+
 test('a drawer that cannot be dismissed ignores Escape, the backdrop and a flick', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
@@ -687,6 +714,42 @@ describe('snap points', () => {
     await userEvent.keyboard('{Enter}');
     expect(onActiveSnapPointChange.mock.calls).toEqual([[0.5], [1], [0.25]]);
     await expect.poll(() => backdrop.style.getPropertyValue('--drawer-fade')).toBe('0');
+  });
+
+  test('snap.setValue moves the drawer from a button outside it', async () => {
+    const onValueChange = vi.fn();
+
+    function OutsideControl() {
+      const drawer = useDrawer({ snap: { points: snapPoints, onValueChange } });
+
+      return (
+        <>
+          <Button onClick={() => drawer.snap?.setValue(1)}>Expand</Button>
+          <output data-testid="snap-value">{String(drawer.snap?.value)}</output>
+          <Drawer side="bottom" modal={false} defaultOpen drawer={drawer}>
+            <Drawer.Content>
+              <Drawer.Title>Route</Drawer.Title>
+            </Drawer.Content>
+          </Drawer>
+        </>
+      );
+    }
+
+    const screen = await render(
+      <IdsProvider theme={testTheme}>
+        <OutsideControl />
+      </IdsProvider>,
+    );
+    await expect.element(screen.getByRole('dialog', { name: 'Route' })).toBeVisible();
+    const size = sheetOf().offsetHeight;
+    const offsets = snapOffsets(snapPoints, size, window.innerHeight);
+    await expect.poll(() => translateY(sheetOf())).toBeCloseTo(offsets[0]!, 0);
+    await expect.element(screen.getByTestId('snap-value')).toHaveTextContent('0.25');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Expand' }));
+    await expect.poll(() => translateY(sheetOf())).toBe(0);
+    await expect.element(screen.getByTestId('snap-value')).toHaveTextContent('1');
+    expect(onValueChange.mock.calls).toEqual([[1]]);
   });
 
   test('without snap points the handle is a picture, not a button', async () => {
