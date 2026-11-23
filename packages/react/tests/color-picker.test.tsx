@@ -524,6 +524,23 @@ test('composition renders only the parts it is given', async () => {
   await expect.element(textInput()).toBeInTheDocument();
 });
 
+test('a Swatches with no Swatch draws nothing, also when its children are an empty list', () => {
+  const noSwatches: string[] = [];
+  const doc = parse(
+    renderToString(
+      <ColorPicker defaultValue="#22C55E">
+        <ColorPicker.Swatches>
+          {noSwatches.map((color) => (
+            <ColorPicker.Swatch key={color} value={color} />
+          ))}
+        </ColorPicker.Swatches>
+      </ColorPicker>,
+    ),
+  );
+  expect(doc.querySelector('[data-color-picker-swatches]')).toBeNull();
+  expect(doc.querySelector('[role=radiogroup]')).toBeNull();
+});
+
 test('with no value the controls start on a full red and the value stays empty', () => {
   const doc = parse(renderToString(<ColorPicker />));
   expect(doc.querySelector('[data-color-picker-area] input')!.getAttribute('aria-valuetext')).toBe(
