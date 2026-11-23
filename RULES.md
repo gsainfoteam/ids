@@ -173,7 +173,7 @@ packages/react/src/
     form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
     data/        Accordion, Avatar, Badge, Calendar, Card, Carousel, Chip, DataTable, Empty, Image,
                  Item, Marquee, QRCode, Table, TimePicker, ...
-    feedback/    Alert, Progress, Skeleton, Spinner, Toast
+    feedback/    Alert, Progress, CircularProgress, Skeleton, Spinner, Toast
     layout/      AspectRatio, Divider, Spacer, ScrollArea, MessageScroller, Resizable, Splitter
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
