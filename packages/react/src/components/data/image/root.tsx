@@ -19,10 +19,8 @@ import { ImageFallback } from './parts/fallback';
 import { ImagePlaceholder } from './parts/placeholder';
 import { ImageViewer, preloadImageViewer } from './parts/viewer';
 import { imageStyle } from './style';
-import {
-  useInternalImageSettledBeforeMount,
-  useInternalImageStatus,
-} from '../../../internal/lib/image-status';
+import { useInternalImageSettledBeforeMount } from '../../../internal/hooks/use-image-settled-before-mount';
+import { useInternalImageStatus } from '../../../internal/hooks/use-image-status';
 import { resolveState } from '../../../internal/lib/state-props';
 import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, mergeRefs } from '../../../utils';

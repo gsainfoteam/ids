@@ -63,7 +63,7 @@ import { Image } from '@gsainfoteam/ids-react';
 - 하이드레이션 전에 이미 불러온 그림, 캐시에서 바로 온 그림도 마운트 때 알아챕니다. 새 `src` 는 새 `<img>` 라서 앞 그림이 남지 않습니다.
 - `ratio` 없이 깨진 그림은 `width`, `height` 의 비율(없으면 4:3)로 자리를 지킵니다.
 - 이미지는 `loading="lazy"`, `decoding="async"` 가 기본입니다. 첫 화면의 큰 그림은 `loading="eager"` 와 `fetchPriority="high"` 를 줍니다.
-- 상태는 Avatar 와 같은 로직(`internal/lib/image-status`)입니다.
+- 상태는 Avatar 와 같은 로직(`internal/hooks/use-image-status`)입니다.
 
 ## 여러 장
 

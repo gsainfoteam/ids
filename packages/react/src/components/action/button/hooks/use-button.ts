@@ -19,8 +19,8 @@ import {
 } from 'react';
 
 import { useInteractiveProps } from '../../../../hooks/use-interactive';
+import { useInternalPressable } from '../../../../internal/hooks/use-pressable';
 import { keyHandler, withModifiers } from '../../../../internal/lib/keys';
-import { useInternalPressable } from '../../../../internal/lib/pressable';
 import { cn, invariant, mergeProps, mergeRefs } from '../../../../utils';
 import { isDevelopment } from '../../../../utils/dev';
 

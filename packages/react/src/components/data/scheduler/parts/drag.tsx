@@ -11,7 +11,7 @@ import {
 } from '@dnd-kit/core';
 import { toCalendarDateTime } from '@internationalized/date';
 
-import { useInternalDragSensors } from '../../../../internal/lib/drag-sensors';
+import { useInternalDragSensors } from '../../../../internal/hooks/use-drag-sensors';
 import { swallowTheClickThatEndsADrag } from '../../../../internal/lib/drag-surface';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { SchedulerDragContext, type SchedulerDragPiece, type SchedulerDragValue } from '../context';

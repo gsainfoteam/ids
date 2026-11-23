@@ -16,23 +16,28 @@
 | [`lib/corner-geometry.ts`](#libcorner-geometryts)     | 계산된 모서리 반지름 읽기, 곡선의 45도 지점이 모서리에서 들어온 거리                  | ScrollArea, Badge |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`lib/drag-surface.ts`](#libdrag-surfacets)             | 끌어 옮기는 항목의 놓을 자리 선, 따라오는 복사본, 들어 올린 모양, 끌기를 끝낸 click 과 Space 삼키기 | Sidebar, Editor, Scheduler |
-| [`lib/drag-sensors.ts`](#libdrag-sensorsts)             | 끌기를 시작하는 규칙: 마우스 4px, 터치 250ms 누르기 | Sidebar, Editor, Scheduler |
+| [`hooks/use-drag-sensors.ts`](#hooksuse-drag-sensorsts)             | 끌기를 시작하는 규칙: 마우스 4px, 터치 250ms 누르기 | Sidebar, Editor, Scheduler |
 | [`lib/decimal.ts`](#libdecimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`surfaces/lib/field-surface.ts`](#surfaceslibfield-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
 | [`surfaces/lib/footer-band.ts`](#surfaceslibfooter-bandts)             | 카드와 대화상자 바닥의 버튼 띠 클래스 조각                                          | Card, Dialog                                                                                                                                                                                                          |
 | [`lib/form-bridge.ts`](#libform-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수                         | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                                                                                                                            |
 | [`parts/form-value.tsx`](#partsform-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                                       |
-| [`lib/icon-label.ts`](#libicon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
+| [`lib/icon-label.ts`](#libicon-labelts)                 | 아이콘 요소에서 이름을 찾는 함수, 이미 이름이 있는지 보는 함수                         | `hooks/use-icon-label.ts`                                                                                                                                                                                |
+| [`hooks/use-icon-label.ts`](#hooksuse-icon-labelts)     | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
 | [`surfaces/lib/icon-square.ts`](#surfaceslibicon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
-| [`lib/image-status.ts`](#libimage-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar, Image                                                                                                                                                                                                         |
-| [`lib/keys.ts`](#libkeysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `lib/pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
+| [`lib/image-status.ts`](#libimage-statusts)             | `<img>` 를 불러오는 상태의 타입, 크기 없는 이미지를 `decode()` 로 가리는 함수            | `hooks/use-image-status.ts`, `hooks/use-image-settled-before-mount.ts`                                                                                                                                                                                                         |
+| [`hooks/use-image-status.ts`](#hooksuse-image-statusts) | `<img>` 를 불러오는 상태와 그 상태를 알리는 `report`                                  | Avatar, Image                                                                                                                                                                                                         |
+| [`hooks/use-image-settled-before-mount.ts`](#hooksuse-image-settled-before-mountts) | hydration 전에 끝난 이미지 읽기                                            | Avatar, Image                                                                                                                                                                                                         |
+| [`lib/keys.ts`](#libkeysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `hooks/use-pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
 | [`lib/list-styles.ts`](#liblist-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
 | [`lib/motion.ts`](#libmotionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | Image, `zoom-pan/` |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, Image, `field-popup/` |
-| [`lib/paragraph.ts`](#libparagraphts)                   | `<p>` 로 그리는 Description 파트의 ref, 안에 든 블록 요소 경고                       | Card, Item, Empty, Alert, Field |
-| [`lib/pressable.ts`](#libpressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `lib/surface.ts`                                                                                                                                                                                                  |
+| [`lib/paragraph.ts`](#libparagraphts)                   | `<p>` 안에 든 블록 요소 찾기                                                          | `hooks/use-paragraph-ref.ts` |
+| [`hooks/use-paragraph-ref.ts`](#hooksuse-paragraph-refts) | `<p>` 로 그리는 Description 파트의 ref, 안에 든 블록 요소 경고                       | Card, Item, Empty, Alert, Field |
+| [`lib/pressable.ts`](#libpressablets)                   | 클릭이 안쪽 컨트롤에서 시작했는지 보는 함수                                           | `hooks/use-pressable.ts`, `hooks/use-surface.ts`                                                                                                                                                                                                  |
+| [`hooks/use-pressable.ts`](#hooksuse-pressablets)       | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `hooks/use-surface.ts`                                                                                                                                                                                                  |
 | [`resize-handle/`](./resize-handle/README.md)    | 크기 조절 손잡이의 키 표, separator ARIA, 포인터 끌기, 클래스 조각, 가장자리와 모서리 손잡이 | DataTable, Resizable, Splitter, TextArea                                                                                                                                                                                                   |
 | [`lib/search-text.ts`](#libsearch-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
 | [`surfaces/lib/segment-surface.ts`](#surfaceslibsegment-surfacets)       | 트랙 위에 고른 칸을 띄우는 모양과 칸 높이                                             | SegmentedControl, Tabs(`segmented`) |
@@ -40,8 +45,11 @@
 | [`slides/`](#slides)                             | Embla Carousel 을 감싼 슬라이드 엔진, 장마다의 ARIA, 키, 넘김 알림                    | Carousel, Image |
 | [`lib/state-props.ts`](#libstate-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Image, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                 |
 | [`lib/status-palette.ts`](#libstatus-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                                    | Alert                                                                                                                                                                                                                 |
-| [`lib/surface.ts`](#libsurfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                                   | Card, Item, Chip                                                                                                                                                                                                      |
+| [`hooks/use-surface.ts`](#hooksuse-surfacets)           | 통째로 누르는 카드와 목록 행의 누르기와 인터랙션 상태                                 | Card, Item                                                                                                                                                                                                      |
+| [`hooks/use-labelling.ts`](#hooksuse-labellingts)       | 누르는 표면을 Title, Description 과 잇는 id 상태                                      | Card, Item                                                                                                                                                                                                      |
+| [`hooks/use-registered-id.ts`](#hooksuse-registered-idts) | 파트가 마운트된 동안 자기 id 를 루트에 등록하는 hook                                | Card, Item, Chip, `field-popup/`                                                                                                                                                                                                      |
 | [`parts/surface-trigger.tsx`](#partssurface-triggertsx)     | 누르는 표면의 Title 안에 그리는 버튼                                                  | Card.Title, Item.Title                                                                                                                                                                                                |
+| [`hooks/use-surface-trigger-space.ts`](#hooksuse-surface-trigger-spacets) | Title 버튼 위에서 눌린 Space 만 클릭으로 받는 키 핸들러                  | `parts/surface-trigger.tsx`                                                                                                                                                                                                |
 | [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                                                | DateField, TimeField, DateTimeField                                                                                                                                                                                   |
 | [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                                              | TextField, PasswordField, NumberField, TelField, TextArea                                                                                                                                                             |
 | [`surfaces/lib/toggle-surface.ts`](#surfaceslibtoggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
@@ -346,7 +354,7 @@ swallowTheSpaceKeyupThatWouldPress(); // 버튼 위에서 Space 로 집거나 �
 
 - 선, 복사본, 들어 올린 모양을 바꾸면 이 모듈을 쓰는 모든 컴포넌트의 끌기가 함께 바뀝니다.
 
-## lib/drag-sensors.ts
+## hooks/use-drag-sensors.ts
 
 dnd-kit 끌기를 시작하는 규칙을 한곳에 둔 hook 입니다. 끌어 옮기는 컴포넌트가 모두 같은 조건에서 끌기를 시작합니다.
 
@@ -604,7 +612,34 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 
 ## lib/icon-label.ts
 
-아이콘만 있는 컨트롤의 접근 가능한 이름(`aria-label`)을 아이콘에서 찾는 hook(`useInternalIconLabel`)과 그 헬퍼입니다.
+아이콘만 있는 컨트롤의 접근 가능한 이름(`aria-label`)을 아이콘 요소에서 찾는 함수들입니다. 이 함수들을 부르는 hook 은 [hooks/use-icon-label.ts](#hooksuse-icon-labelts) 입니다.
+
+- `iconLabel(node)`: 이름과 그 출처(`element`, `displayName`, `function`)를 돌려줍니다.
+- `humanizeIconName(name)`: 컴포넌트 이름을 읽을 수 있는 말로 바꿉니다.
+- `hasName(props)`: 컨트롤이 이미 `aria-label`, `aria-labelledby`, `title` 을 가졌는지 봅니다.
+- `warnFunctionNameLabel(component, label)`: 함수 이름에서 얻은 이름을 페이지에서 한 번 경고합니다.
+
+### 쓰는 곳
+
+- [hooks/use-icon-label.ts](#hooksuse-icon-labelts)
+
+### 왜 이렇게
+
+- 이름은 아이콘 요소의 `aria-label` 이나 `title`, 컴포넌트의 `displayName`, 함수 이름 순서로 찾습니다. 요소에서 못 찾으면 그 자식으로 내려가고, 글자는 건너뜁니다.
+- 컴포넌트 이름은 읽을 수 있는 말로 바꿉니다(`humanizeIconName`). `ChevronDownIcon` 은 "Chevron down", `XMarkIcon` 은 "X mark", tabler 의 `IconPlus` 는 "Plus" 입니다.
+- 함수 이름은 `UNMINIFIED_ICON_NAME`(`Icon` 으로 끝나는 PascalCase)에 맞을 때만 믿습니다. production minifier 는 함수 이름을 바꿉니다(Vite 기본 빌드에서 heroicons 의 `PlusIcon` 은 `jt` 같은 이름이 됩니다). 그래서 minify 된 빌드에서는 틀린 이름을 붙이는 대신 이름을 비워 둡니다.
+- `displayName` 은 문자열 리터럴이라 minify 뒤에도 남습니다(lucide 는 `'Plus'` 를 넣습니다).
+- 점이 든 `displayName` 은 아이콘 이름으로 쓰지 않습니다(`isIdsPartName`). IDS 파트는 Storybook 의 Show code 에 `<Avatar.Image>` 로 보이도록 `'Avatar.Image'` 같은 `displayName` 을 가집니다. 이 이름은 건너뛰고 함수 이름 규칙과 자식으로 넘어갑니다. 건너뛰지 않으면 `icon` 에 넣은 파트가 "Avatar.Image" 라는 이름을 붙입니다.
+- `forwardRef` 는 함수를 `render` 에, `memo` 는 감싼 컴포넌트를 `type` 에 둡니다. `componentName` 은 둘을 두 단계까지 따라갑니다(`forwardRefRender`, `memoWrapped`).
+
+### 알아둘 것
+
+- heroicons 는 `displayName` 이 없어서 production 빌드에서는 함수 이름 경로로 이름을 얻지 못합니다. 개발 경고가 앱에 `aria-label` 을 요구하는 이유입니다.
+- 규칙을 바꾸면 IconButton, IconToggle, FloatingButton 이 붙이는 이름이 함께 바뀝니다.
+
+## hooks/use-icon-label.ts
+
+아이콘만 있는 컨트롤의 접근 가능한 이름을 [lib/icon-label.ts](#libicon-labelts) 의 함수로 찾는 hook(`useInternalIconLabel`)입니다. 이름을 못 찾거나 함수 이름에서 찾으면 개발 빌드에서 경고합니다.
 
 ### 쓰는 곳
 
@@ -634,20 +669,15 @@ const label = useInternalIconLabel(
 
 ### 왜 이렇게
 
-- 이름은 아이콘 요소의 `aria-label` 이나 `title`, 컴포넌트의 `displayName`, 함수 이름 순서로 찾습니다. 요소에서 못 찾으면 그 자식으로 내려가고, 글자는 건너뜁니다.
-- 컴포넌트 이름은 읽을 수 있는 말로 바꿉니다(`humanizeIconName`). `ChevronDownIcon` 은 "Chevron down", `XMarkIcon` 은 "X mark", tabler 의 `IconPlus` 는 "Plus" 입니다.
-- 함수 이름은 `UNMINIFIED_ICON_NAME`(`Icon` 으로 끝나는 PascalCase)에 맞을 때만 믿습니다. production minifier 는 함수 이름을 바꿉니다(Vite 기본 빌드에서 heroicons 의 `PlusIcon` 은 `jt` 같은 이름이 됩니다). 그래서 minify 된 빌드에서는 틀린 이름을 붙이는 대신 이름을 비워 둡니다.
-- `displayName` 은 문자열 리터럴이라 minify 뒤에도 남습니다(lucide 는 `'Plus'` 를 넣습니다).
-- 점이 든 `displayName` 은 아이콘 이름으로 쓰지 않습니다(`isIdsPartName`). IDS 파트는 Storybook 의 Show code 에 `<Avatar.Image>` 로 보이도록 `'Avatar.Image'` 같은 `displayName` 을 가집니다. 이 이름은 건너뛰고 함수 이름 규칙과 자식으로 넘어갑니다. 건너뛰지 않으면 `icon` 에 넣은 파트가 "Avatar.Image" 라는 이름을 붙입니다.
-- `forwardRef` 는 함수를 `render` 에, `memo` 는 감싼 컴포넌트를 `type` 에 둡니다. `componentName` 은 둘을 두 단계까지 따라갑니다(`forwardRefRender`, `memoWrapped`).
+- `needsNoLabel`: 컨트롤이나 `asChild` 로 그리는 요소가 이미 이름(`aria-label`, `aria-labelledby`, `title`)을 가지면 찾지 않습니다(`hasName`). `icon` 이 `undefined` 면 지금은 아이콘만 있는 컨트롤이 아니라는 뜻(`notIconOnlyRightNow`)이라 찾지 않습니다.
 - 함수 이름에서 얻은 이름은 개발 빌드에서는 되지만 minify 된 production 빌드에서는 조용히 사라집니다. 그래서 페이지에서 처음 한 번 경고합니다(`warnFunctionNameLabel`). 이름을 전혀 못 찾아도 개발 빌드에서 경고합니다.
-- `needsNoLabel`: 컨트롤이나 `asChild` 로 그리는 요소가 이미 이름(`aria-label`, `aria-labelledby`, `title`)을 가지면 찾지 않습니다. `icon` 이 `undefined` 면 지금은 아이콘만 있는 컨트롤이 아니라는 뜻(`notIconOnlyRightNow`)이라 찾지 않습니다.
+- 경고는 effect 에서 냅니다. 렌더 중에 내면 Strict Mode 와 다시 그리기마다 경고가 거듭 찍힙니다.
 
 ### 알아둘 것
 
-- heroicons 는 `displayName` 이 없어서 production 빌드에서는 함수 이름 경로로 이름을 얻지 못합니다. 개발 경고가 앱에 `aria-label` 을 요구하는 이유입니다.
 - 반환값이 `undefined` 면 컴포넌트는 `rest['aria-label']` 을 그대로 씁니다.
 - 경고는 `isDevelopment` 로만 켭니다([utils/README](../utils/README.md#devts)).
+- 바꾸면 IconButton, IconToggle, FloatingButton 의 이름과 경고가 함께 바뀝니다.
 
 ## surfaces/lib/icon-square.ts
 
@@ -682,15 +712,28 @@ export const iconButtonStyle = tv({
 
 ## lib/image-status.ts
 
-`<img>` 를 불러오는 상태(`loading`, `loaded`, `error`)를 다루는 hook 두 개입니다.
+`<img>` 를 불러오는 상태의 타입(`ImageStatus`: `loading`, `loaded`, `error`)과 hook 이 쓰는 함수입니다.
 
-- `useInternalImageStatus(src, onStatusChange)`: 지금 `src` 의 상태와, 이미지가 상태를 알리는 `report(src, status)` 를 돌려줍니다. `src` 가 없으면 처음부터 `error` 입니다.
-- `useInternalImageSettledBeforeMount(imageRef, src, report)`: React 가 듣기 전에 이미 끝난 이미지를 마운트 때 읽어 `report` 로 넘깁니다.
+- `initialImageStatus(src)`: `src` 가 있으면 `loading`, 없으면 `error` 입니다.
+- `settleSizelessImage(image, settle)`: 다 불러왔는데 폭이 0 인 이미지를 `decode()` 의 성공과 실패로 가립니다.
 
 ### 쓰는 곳
 
-- Avatar: 루트가 `useInternalImageStatus`, `Avatar.Image` 가 `useInternalImageSettledBeforeMount`
-- Image: 사진 상자(`root.tsx` 의 `ImageFrame`)가 둘 다. 깨진 `<img>` 는 빼고 `Image.Fallback` 이 `alt` 를 이름으로 가진 그림이 됩니다.
+- [hooks/use-image-status.ts](#hooksuse-image-statusts), [hooks/use-image-settled-before-mount.ts](#hooksuse-image-settled-before-mountts)
+- Avatar, Image: `ImageStatus` 타입
+
+### 알아둘 것
+
+- 크기를 적지 않은 SVG 는 불러와도 `naturalWidth` 가 0 일 수 있습니다. `decode()` 가 없는 브라우저에서는 `error` 로 봅니다.
+
+## hooks/use-image-status.ts
+
+`<img>` 를 불러오는 상태(`loading`, `loaded`, `error`)를 다루는 hook(`useInternalImageStatus(src, onStatusChange)`)입니다. 지금 `src` 의 상태와, 이미지가 상태를 알리는 `report(src, status)` 를 돌려줍니다. `src` 가 없으면 처음부터 `error` 입니다.
+
+### 쓰는 곳
+
+- Avatar: 루트
+- Image: 사진 상자(`root.tsx` 의 `ImageFrame`). 깨진 `<img>` 는 빼고 `Image.Fallback` 이 `alt` 를 이름으로 가진 그림이 됩니다.
 
 ### 쓰는 법
 
@@ -714,15 +757,31 @@ useInternalImageSettledBeforeMount(imageRef, current, report);
 
 - 상태는 `{ src, status }` 로 기억합니다. `src` 가 바뀐 렌더에서는 기억한 상태 대신 `loading` 을 씁니다. effect 로 되돌리지 않으므로 앞 이미지의 `loaded` 가 새 `src` 와 함께 그려지는 순간이 없습니다.
 - `report` 는 지금 `src` 에서 온 알림만 받습니다(`currentSrc`). 늦게 끝난 앞 이미지의 `error` 가 새 이미지의 상태를 덮지 않습니다.
-- 서버 HTML 의 `<img>` 는 hydration 전에 이미 다 불러왔을 수 있습니다. 그 `load` 는 React 가 듣기 전에 지나갔으므로, `useInternalImageSettledBeforeMount` 가 layout effect 에서 `complete` 와 `naturalWidth` 를 읽습니다. 캐시에서 바로 온 이미지도 같습니다.
-- 크기를 적지 않은 SVG 는 불러와도 `naturalWidth` 가 0 일 수 있습니다. 그래서 `complete` 인데 폭이 0 이면 `decode()` 의 성공과 실패로 가립니다.
-- `onStatusChange` 는 상태가 바뀐 뒤의 effect 에서 부릅니다. 최신 함수는 ref 로 읽으므로 함수가 바뀌어도 다시 부르지 않습니다.
+- `onStatusChange` 는 상태가 바뀐 뒤의 effect 에서 부릅니다. 최신 함수는 `useEffectEvent` 로 읽으므로 함수가 바뀌어도 다시 부르지 않습니다.
 
 ### 알아둘 것
 
 - 쓰는 쪽은 `<img>` 에 `key={src}` 를 줍니다. 같은 요소의 `src` 만 바꾸면 새 이미지가 올 때까지 앞 이미지가 남습니다.
 - 실패한 `<img>` 를 DOM 에서 빼고 무엇을 대신 그릴지는 쓰는 컴포넌트가 정합니다. Avatar 는 이니셜, Image 는 `Image.Fallback` 입니다.
 - 상태의 규칙을 바꾸면 Avatar 와 Image 가 함께 바뀝니다. `tests/avatar.test.tsx` 와 `tests/image.test.tsx` 가 둘 다 확인합니다.
+
+## hooks/use-image-settled-before-mount.ts
+
+React 가 듣기 전에 이미 끝난 이미지를 마운트 때 읽어 `report` 로 넘기는 hook(`useInternalImageSettledBeforeMount(imageRef, src, report)`)입니다. `report` 는 [hooks/use-image-status.ts](#hooksuse-image-statusts) 가 돌려준 함수입니다.
+
+### 쓰는 곳
+
+- Avatar: `Avatar.Image`
+- Image: 사진 상자(`root.tsx` 의 `ImageFrame`)
+
+### 왜 이렇게
+
+- 서버 HTML 의 `<img>` 는 hydration 전에 이미 다 불러왔을 수 있습니다. 그 `load` 는 React 가 듣기 전에 지나갔으므로, layout effect 에서 `complete` 와 `naturalWidth` 를 읽습니다. 캐시에서 바로 온 이미지도 같습니다.
+- `complete` 인데 폭이 0 이면 [lib/image-status.ts](#libimage-statusts) 의 `settleSizelessImage` 로 가립니다.
+
+### 알아둘 것
+
+- 이 hook 이 없으면 hydration 전에 끝난 이미지는 `load` 가 다시 오지 않아 `loading` 에 머뭅니다.
 
 ## lib/keys.ts
 
@@ -898,11 +957,27 @@ content.animate(keyframes, { duration: motionDuration(content, 'normal'), easing
 
 ## lib/paragraph.ts
 
+`<p>` 안에 HTML 파서가 그 `<p>` 를 닫게 하는 블록 요소가 있는지 찾는 함수(`blockInsideParagraph`)입니다. 요소가 `<p>` 가 아니면 `null` 입니다.
+
+### 쓰는 곳
+
+- [hooks/use-paragraph-ref.ts](#hooksuse-paragraph-refts)
+
+### 왜 이렇게
+
+- 찾는 태그(`CLOSES_A_PARAGRAPH`)는 HTML 파서가 열린 `<p>` 를 닫는 태그 목록입니다. `<span>`, `<a>`, `<strong>` 처럼 문장 안에 들어가는 요소는 찾지 않습니다.
+
+### 알아둘 것
+
+- 목록을 바꾸면 Card, Item, Empty, Alert, Field 의 Description 이 경고하는 경우가 함께 바뀝니다.
+
+## hooks/use-paragraph-ref.ts
+
 `<p>` 로 그리는 Description 파트가 쓰는 hook(`useInternalParagraphRef`)입니다. 사용자의 `ref` 와 합친 ref 를 돌려주고, 개발 빌드에서 그 `<p>` 안에 블록 요소가 있으면 한 번 경고합니다.
 
 ### 쓰는 곳
 
-- Card.Description, Item.Description, Empty.Description, Alert.Description, Field.Description
+- Card.Description, Item.Description, Empty.Description, Alert.Description, Field.Description, Questionnaire 의 설명
 
 ### 쓰는 법
 
@@ -918,7 +993,7 @@ export function CardDescription({ asChild, className, ref, ...props }: CardDescr
 ### 왜 이렇게
 
 - `<p>` 는 블록 요소를 담지 못합니다. 서버 HTML 을 읽는 브라우저는 `<div>` 같은 태그에서 `<p>` 를 닫아 버려, 클라이언트가 만든 트리와 어긋나고 hydration 이 깨집니다. 클라이언트에서만 그리면 DOM 에는 그대로 들어가 조용히 넘어가므로, 개발 빌드에서 먼저 알립니다.
-- 찾는 태그(`CLOSES_A_PARAGRAPH`)는 HTML 파서가 열린 `<p>` 를 닫는 태그 목록입니다. `<span>`, `<a>`, `<strong>` 처럼 문장 안에 들어가는 요소는 경고하지 않습니다.
+- 블록 요소는 [lib/paragraph.ts](#libparagraphts) 의 `blockInsideParagraph` 로 찾습니다.
 - 검사는 렌더마다 effect 에서 DOM 을 봅니다. 컴포넌트가 그리는 `<div>` 도 찾으려면 React 요소가 아니라 그려진 결과를 봐야 합니다. 경고는 요소마다 한 번입니다.
 - `asChild` 로 다른 태그를 넣으면 그 요소가 `<p>` 가 아니라 검사하지 않습니다. `asChild` 로 넣은 `<p>` 는 검사합니다.
 
@@ -929,11 +1004,29 @@ export function CardDescription({ asChild, className, ref, ...props }: CardDescr
 
 ## lib/pressable.ts
 
-`div` 같은 요소가 `button` 처럼 Enter 와 Space 로 눌리게 하는 hook(`useInternalPressable`)과, 클릭이 안쪽 컨트롤에서 시작했는지 보는 함수(`isFromNestedControl`)입니다.
+클릭이 누르는 표면 안의 다른 컨트롤에서 시작했는지 보는 함수(`isFromNestedControl`)입니다.
 
 ### 쓰는 곳
 
-- [lib/surface.ts](#libsurfacets) 의 `useInternalSurface`: 누를 수 있는 Card, Item
+- [hooks/use-pressable.ts](#hooksuse-pressablets): 표면이 button 일 때의 클릭
+- [hooks/use-surface.ts](#hooksuse-surfacets): Title 이 버튼인 표면의 클릭
+
+### 왜 이렇게
+
+- `NESTED_CONTROL` 은 사용자가 따로 조작하는 요소입니다(링크, 버튼, 폼 요소, `role="checkbox"` 같은 위젯 역할, 크기 조절 핸들(`data-resize-handle`), `tabindex` 가 -1 이 아닌 요소). 여기서 시작한 클릭은 그 요소의 것입니다. 이 검사가 없으면 행 안의 버튼을 눌렀을 때 행의 동작도 같이 돕니다. 크기 조절 손잡이는 끌고 놓아도 `click` 이 나서, 이 검사가 없으면 카드 안의 손잡이를 끌 때마다 카드가 눌립니다.
+- 표면의 Title 버튼(`data-surface-trigger`, [parts/surface-trigger.tsx](#partssurface-triggertsx))은 안쪽 컨트롤로 치지 않습니다. 그 버튼의 클릭이 곧 표면을 누른 것입니다.
+
+### 알아둘 것
+
+- `NESTED_CONTROL` 에 없는 역할의 요소는 행의 클릭을 막지 못합니다. 새 역할의 컨트롤을 행 안에 두면 목록에 더합니다.
+
+## hooks/use-pressable.ts
+
+`div` 같은 요소가 `button` 처럼 Enter 와 Space 로 눌리게 하는 hook(`useInternalPressable`)입니다. 안쪽 컨트롤에서 시작한 클릭은 [lib/pressable.ts](#libpressablets) 의 `isFromNestedControl` 로 거릅니다.
+
+### 쓰는 곳
+
+- [hooks/use-surface.ts](#hooksuse-surfacets) 의 `useInternalSurface`: 누를 수 있는 Card, Item
 - Button: `asChild` 자식이 `button` 도 `a` 도 아닌 HTML 요소일 때(`kind === 'element'`)
 
 ### 쓰는 법
@@ -961,15 +1054,13 @@ const press = useInternalPressable<HTMLElement>({
 | Space keyup                 | 누른다. keydown 뒤에 포커스가 떠났으면 누르지 않는다 |
 | 안쪽 컨트롤에서 시작한 클릭 | `onClick` 을 부르지 않는다                           |
 
-- `NESTED_CONTROL` 은 사용자가 따로 조작하는 요소입니다(링크, 버튼, 폼 요소, `role="checkbox"` 같은 위젯 역할, 크기 조절 핸들(`data-resize-handle`), `tabindex` 가 -1 이 아닌 요소). 여기서 시작한 클릭은 그 요소의 것입니다. 이 검사가 없으면 행 안의 버튼을 눌렀을 때 행의 동작도 같이 돕니다. 크기 조절 손잡이는 끌고 놓아도 `click` 이 나서, 이 검사가 없으면 카드 안의 손잡이를 끌 때마다 카드가 눌립니다.
-- 표면의 Title 버튼(`data-surface-trigger`, [parts/surface-trigger.tsx](#partssurface-triggertsx))은 안쪽 컨트롤로 치지 않습니다. 그 버튼의 클릭이 곧 표면을 누른 것입니다.
 - 키는 `event.target === event.currentTarget` 일 때만 처리합니다. 안쪽 컨트롤에 포커스가 있을 때 누른 키는 그 컨트롤의 것입니다.
 - 호출한 쪽의 `onKeyDown` 을 먼저 부르고, 거기서 `preventDefault()` 하면 누르지 않습니다.
 
 ### 알아둘 것
 
 - `enabled` 가 `false` 면 받은 핸들러를 그대로 돌려주고 `role` 도 붙이지 않습니다. `asChild` 로 링크를 그리는 Card 는 링크의 동작을 그대로 씁니다.
-- `NESTED_CONTROL` 에 없는 역할의 요소는 행의 클릭을 막지 못합니다. 새 역할의 컨트롤을 행 안에 두면 목록에 더합니다.
+- 바꾸면 Button 의 `asChild` 요소와 누를 수 있는 Card, Item 의 키 동작이 함께 바뀝니다.
 
 ## lib/search-text.ts
 
@@ -1222,15 +1313,13 @@ const Glyph = statusIcons[state.colorScheme];
 - 색은 여기 없습니다. Alert 의 `--alert-*` 변수가 scheme 마다 색을 정하고, 테스트가 그 변수 이름을 봅니다.
 - scheme 을 더하면 `statusIcons` 가 `satisfies Record<StatusColorScheme, unknown>` 로 빠진 아이콘을 알려 줍니다. 쓰는 컴포넌트의 `colorScheme` variant 도 함께 더합니다.
 
-## lib/surface.ts
+## hooks/use-surface.ts
 
-카드나 목록 행처럼 통째로 누르는 표면의 hook 입니다. `useInternalSurface`(누르기와 인터랙션 상태), `useInternalLabelling`(이름과 설명 연결), `useInternalRegisteredId`(파트의 id 등록) 세 개입니다.
+카드나 목록 행처럼 통째로 누르는 표면의 누르기와 인터랙션 상태를 다루는 hook(`useInternalSurface`)입니다. 이름과 설명은 [hooks/use-labelling.ts](#hooksuse-labellingts), 파트의 id 는 [hooks/use-registered-id.ts](#hooksuse-registered-idts) 가 잇습니다.
 
 ### 쓰는 곳
 
-- Card(`use-card.ts`), Item(`use-item.ts`): `useInternalSurface`, `useInternalLabelling`
-- Card.Title, Card.Description, Item.Title, Item.Description, Chip.Label: `useInternalRegisteredId(setTitleId, id)` 처럼 등록 함수와 함께
-- Chip.Close: `useInternalRegisteredId(undefined, id)` 로 안정된 id 만 받습니다.
+- Card(`use-card.ts`), Item(`use-item.ts`)
 
 ### 쓰는 법
 
@@ -1261,18 +1350,52 @@ const { interaction, props, dataProps, labelling, descriptionId, register } = us
 
 - 누를 수 있는 표면은 세 가지입니다.
   - Title 이 있으면(`titleIsTheButton`) 루트는 평범한 `div` 로 남고 Title 이 버튼이 됩니다([parts/surface-trigger.tsx](#partssurface-triggertsx)). 루트의 `onClick` 은 안쪽 컨트롤이 아닌 곳을 누를 때와 Title 버튼이 눌릴 때 불립니다. 그래서 `Card.Action`, `Item.Actions` 의 버튼이 버튼 안에 들어가지 않습니다(axe `nested-interactive`).
-  - Title 이 없으면 루트가 [lib/pressable.ts](#libpressablets) 로 button 이 됩니다. 이때 안에 다른 버튼을 두지 않습니다.
+  - Title 이 없으면 루트가 [hooks/use-pressable.ts](#hooksuse-pressablets) 로 button 이 됩니다. 이때 안에 다른 버튼을 두지 않습니다.
   - `asChild` 면 자식(보통 링크)이 자기 의미를 그대로 갖고 인터랙션 상태만 얻습니다.
 - Title 을 찾는 일은 `containsElementOfType`(utils/children.ts)이 JSX 를 훑어 합니다. layout effect 로 등록된 id 를 기다리지 않으므로 서버 HTML 부터 역할이 맞습니다. 자식이 함수이거나 Title 이 직접 만든 컴포넌트 안에 있으면 찾지 못하고 루트가 버튼이 됩니다.
 - disabled 인 Title 모드 표면은 루트에 `aria-disabled` 를 붙입니다. 흐려진 카드 글자가 비활성 컴포넌트의 일부로 읽히고, axe 도 그 글자의 대비를 재지 않습니다.
 - 누를 수 없는 표면은 hover 나 press 가 없으므로 `data-hovered` 같은 속성을 붙이지 않습니다(`dataProps` 가 빈 객체).
-- 루트가 버튼일 때는 Title 을 이름으로, Description 을 설명으로 씁니다(`aria-labelledby`, `aria-describedby`). 연결하지 않으면 안의 글자가 모두 하나의 긴 이름으로 읽힙니다. Title 모드에서는 버튼의 글자가 곧 이름이고 설명만 `aria-describedby` 로 잇습니다(`useInternalLabelling` 이 돌려주는 `descriptionId`).
-- 파트는 마운트돼 있는 동안만 id 를 등록합니다(layout effect 에서 등록, cleanup 에서 `undefined`). 그래서 표면은 실제로 있는 파트만 가리킵니다.
+
+### 알아둘 것
+
+- Item 은 `selected` 를 `aria-pressed` 로 알립니다(`current` 가 아닐 때). Title 모드면 Title 버튼에, 아니면 루트에 붙습니다.
+
+## hooks/use-labelling.ts
+
+누르는 표면을 Title 과 Description 에 잇는 hook(`useInternalLabelling(surfaceIsTheButton)`)입니다. 파트가 등록하는 id 를 상태로 들고, 루트에 줄 `labelling` 과 Title 버튼에 줄 `descriptionId`, 파트에 줄 `register` 를 돌려줍니다.
+
+### 쓰는 곳
+
+- Card(`use-card.ts`), Item(`use-item.ts`)
+
+### 왜 이렇게
+
+- 루트가 버튼일 때는 Title 을 이름으로, Description 을 설명으로 씁니다(`aria-labelledby`, `aria-describedby`). 연결하지 않으면 안의 글자가 모두 하나의 긴 이름으로 읽힙니다.
+- Title 모드에서는 버튼의 글자가 곧 이름이고 설명만 `aria-describedby` 로 잇습니다(`descriptionId`).
 
 ### 알아둘 것
 
 - 누를 수 없는 표면과 Title 모드 표면은 `labelling` 이 빈 객체라 루트에 `aria-labelledby` 를 붙이지 않습니다.
-- Item 은 `selected` 를 `aria-pressed` 로 알립니다(`current` 가 아닐 때). Title 모드면 Title 버튼에, 아니면 루트에 붙습니다.
+- 바꾸면 Card 와 Item 의 접근 가능한 이름과 설명이 함께 바뀝니다.
+
+## hooks/use-registered-id.ts
+
+파트가 마운트돼 있는 동안 자기 id 를 루트에 등록하는 hook(`useInternalRegisteredId(register, own)`)입니다. `own` 이 없으면 `useId()` 로 만든 id 를 씁니다.
+
+### 쓰는 곳
+
+- Card.Title, Card.Description, Item.Title, Item.Description, Chip.Label: `useInternalRegisteredId(setTitleId, id)` 처럼 [hooks/use-labelling.ts](#hooksuse-labellingts) 의 등록 함수와 함께
+- Chip.Close: `useInternalRegisteredId(undefined, id)` 로 안정된 id 만 받습니다.
+- [`field-popup/`](./field-popup/README.md) 의 `FieldPopupHeader`: 제목 id 를 팝업의 `aria-labelledby` 로 등록합니다.
+
+### 왜 이렇게
+
+- layout effect 에서 등록하고 cleanup 에서 `undefined` 로 지웁니다. 그래서 표면은 실제로 있는 파트만 가리키고, 그리기 전에 id 가 이어집니다.
+- `register` 가 바뀔 때만 다시 등록합니다. 렌더마다 등록하면 루트의 상태가 바뀌어 다시 그리기가 이어집니다.
+
+### 알아둘 것
+
+- 바꾸면 Card, Item, Chip 과 필드 팝업의 `aria-labelledby`, `aria-describedby` 가 함께 바뀝니다.
 
 ## parts/surface-trigger.tsx
 
@@ -1286,10 +1409,27 @@ const { interaction, props, dataProps, labelling, descriptionId, register } = us
 
 - `asChild` 면 자식 요소(`<h3>`)는 그대로 두고 그 안의 내용을 버튼으로 감쌉니다. 제목 안에 버튼이 있는 모양이 Accordion 헤더와 같습니다.
 - 버튼은 native 라서 Enter 는 누를 때, Space 는 뗄 때 누르고, `disabled` 면 Tab 에서 빠집니다.
-- 다만 Firefox 와 WebKit 은 다른 곳에서 누른 Space 를 이 버튼 위에서 떼도 클릭합니다. 버튼은 Space 가 자기 위에서 눌렸는지 기억하고(`spaceWentDownHere`), 아니면 keyup 을 막아 Chromium 처럼 누르지 않습니다(`tests/card.test.tsx`).
+- 다만 Firefox 와 WebKit 은 다른 곳에서 누른 Space 를 이 버튼 위에서 떼도 클릭합니다. 버튼은 [hooks/use-surface-trigger-space.ts](#hooksuse-surface-trigger-spacets) 로 Space 가 자기 위에서 눌렸는지 기억하고, 아니면 keyup 을 막아 Chromium 처럼 누르지 않습니다(`tests/card.test.tsx`).
 - `data-field-input` 이 있어서 루트의 `focus-ring` 이 `:has([data-field-input]:focus-visible)` 로 카드 전체에 링을 그립니다. 버튼 자체에는 링을 그리지 않습니다.
 - 버튼은 제목의 배치를 이어받습니다(`inline-flex items-center gap-[inherit]`). Item.Title 처럼 아이콘과 글자를 나란히 두는 제목도 모양이 바뀌지 않습니다.
 - 설명(`describedBy`)과 눌림(`pressed`)은 루트가 정한 `trigger` 객체로 받습니다.
+
+## hooks/use-surface-trigger-space.ts
+
+[parts/surface-trigger.tsx](#partssurface-triggertsx) 의 Title 버튼이 쓰는 키 핸들러 hook(`useInternalSurfaceTriggerSpace`)입니다. `onKeyDown`, `onKeyUp`, `onBlur` 를 돌려주고, 버튼에 그대로 펼칩니다.
+
+### 쓰는 곳
+
+- `parts/surface-trigger.tsx` 의 `TriggerButton`(Card.Title, Item.Title)
+
+### 왜 이렇게
+
+- Firefox 와 WebKit 은 다른 곳에서 누른 Space 를 버튼 위에서 떼도 클릭합니다. Space 가 이 버튼 위에서 눌렸는지 `spaceWentDownHere` 에 기억하고, 아니면 keyup 의 기본 동작을 막습니다.
+- 포커스가 떠나면 기억을 지웁니다. 다시 돌아와 뗀 Space 가 클릭이 되지 않게 합니다.
+
+### 알아둘 것
+
+- 바꾸면 Card 와 Item 의 Title 버튼이 Firefox, WebKit 에서 눌리는 조건이 바뀝니다. `tests/card.test.tsx` 가 확인합니다.
 
 ## surfaces/lib/toggle-surface.ts
 

@@ -38,7 +38,7 @@ import {
 } from './commands';
 import { markTheDraggedBlock, topLevelBlocks } from './extension';
 import { useInternalResizeObserver } from '../../../../hooks/use-resize-observer';
-import { useInternalDragSensors } from '../../../../internal/lib/drag-sensors';
+import { useInternalDragSensors } from '../../../../internal/hooks/use-drag-sensors';
 import { swallowTheClickThatEndsADrag } from '../../../../internal/lib/drag-surface';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { cn, mergeRefs } from '../../../../utils';

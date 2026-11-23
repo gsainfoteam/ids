@@ -154,7 +154,7 @@ const mergedRef = useCallback(
 ### 쓰는 곳
 
 - [text-control](../internal/text-control/README.md) 의 `splitAroundInput`, Accordion, Alert, Avatar, AvatarGroup(`arrange.ts`), Chip, ChipField, Progress, TextArea
-- `containsElementOfType`: Card, Item 이 Title 이 있는지 보고 Title 을 버튼으로 만들지 정할 때([surface.ts](../internal/README.md#libsurfacets))
+- `containsElementOfType`: Card, Item 이 Title 이 있는지 보고 Title 을 버튼으로 만들지 정할 때([use-surface.ts](../internal/README.md#hooksuse-surfacets))
 - `findElementOfType`: `Sidebar.Provider` 가 자식의 `Sidebar` 를 찾아 `variant` 를 읽고, `inset` 이면 `Sidebar.Inset` 을 서버 HTML 부터 Card 로 그릴 때
 - `buttonTypeFor`: Dialog, Drawer, Popover, Menu, Tooltip 의 Trigger 와 `Menu.Command`. `asChild` 자식이 `type` 없는 `<button>` 이면 `"button"` 을 줘서 감싼 폼이 제출되지 않게 합니다. 자식이 `type` 을 적었거나 `<button>` 이 아닌 요소면 건드리지 않습니다. 컴포넌트 자식(`motion.button`)은 무엇을 그릴지 알 수 없어 앱이 `type` 을 적어야 합니다.
 
@@ -282,7 +282,7 @@ function useInternalTemporal(part: string) {
 
 ### 쓰는 곳
 
-- 개발 경고를 내는 모든 곳: [`internal/lib/icon-label.ts`](../internal/README.md#libicon-labelts), `react-hook-form.tsx`, Button, FloatingButton, Toggle, ToggleGroup, Accordion, Avatar, AvatarGroup, Badge, Chip, Alert, Progress, ChipField, Field, Input, PasswordField, Rating, Select, Slider, Spacer, Label, Group, IdsProvider
+- 개발 경고를 내는 모든 곳: [`internal/hooks/use-icon-label.ts`](../internal/README.md#hooksuse-icon-labelts), `react-hook-form.tsx`, Button, FloatingButton, Toggle, ToggleGroup, Accordion, Avatar, AvatarGroup, Badge, Chip, Alert, Progress, ChipField, Field, Input, PasswordField, Rating, Select, Slider, Spacer, Label, Group, IdsProvider
 - 개발 경고를 확인하는 스토리(Button, IconButton, IconToggle 등)
 
 ### 쓰는 법

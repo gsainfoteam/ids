@@ -4,7 +4,7 @@ import { isValidElement, type ComponentProps } from 'react';
 
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
-import { useInternalRegisteredId } from '../../../../internal/lib/surface';
+import { useInternalRegisteredId } from '../../../../internal/hooks/use-registered-id';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { IconButton } from '../../../action/icon-button';
 import { useInternalChipContext } from '../context';

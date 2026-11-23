@@ -5,7 +5,7 @@ import { createContext, use } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../../components/action/icon-button';
-import { useInternalRegisteredId } from '../../lib/surface';
+import { useInternalRegisteredId } from '../../hooks/use-registered-id';
 import { popupStyle } from '../lib/styles';
 
 type FieldPopupHeaderProps = {

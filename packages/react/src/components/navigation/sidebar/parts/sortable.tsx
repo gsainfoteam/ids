@@ -16,7 +16,7 @@ import {
 import { getEventCoordinates } from '@dnd-kit/utilities';
 import { clamp, minBy } from 'es-toolkit';
 
-import { useInternalDragSensors } from '../../../../internal/lib/drag-sensors';
+import { useInternalDragSensors } from '../../../../internal/hooks/use-drag-sensors';
 import {
   swallowTheClickThatEndsADrag,
   swallowTheSpaceKeyupThatWouldPress,
