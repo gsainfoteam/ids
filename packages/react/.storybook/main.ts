@@ -1,3 +1,5 @@
+import { getCodeEditorStaticDirs } from 'storybook-addon-code-editor/getStaticDirs';
+
 import type { StorybookConfig } from '@storybook/react-vite';
 import type { Plugin } from 'vite';
 
@@ -34,4 +36,11 @@ const config: StorybookConfig = {
     return config;
   },
 };
+
+const monacoFilesForTheLiveCodeEditor = getCodeEditorStaticDirs(import.meta.filename);
+config.staticDirs = [
+  ...(Array.isArray(config.staticDirs) ? config.staticDirs : []),
+  ...monacoFilesForTheLiveCodeEditor,
+];
+
 export default config;
