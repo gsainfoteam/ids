@@ -213,9 +213,11 @@ test('the container opens the list; PageDown jumps; an outside value may exceed 
 
 test('in a right-to-left field the arrows are mirrored', async () => {
   const screen = await render(
-    <ChipField aria-label="Skills" defaultValue={['js', 'ts']} style={{ direction: 'rtl' }}>
-      {items}
-    </ChipField>,
+    <div dir="rtl">
+      <ChipField aria-label="Skills" defaultValue={['js', 'ts']}>
+        {items}
+      </ChipField>
+    </div>,
   );
   const input = screen.getByRole('combobox', { name: 'Skills' });
   await userEvent.keyboard('{Tab}');

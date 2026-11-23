@@ -697,20 +697,22 @@ test('orientation lays the label beside the control', async () => {
 
 test('a horizontal FieldGroup lines up its horizontal Fields and leaves a vertical one stacked', async () => {
   const screen = await render(
-    <FieldGroup orientation="horizontal" className="w-96">
-      <Field>
-        <Field.Label>Name</Field.Label>
-        <TextField />
-      </Field>
-      <Field>
-        <Field.Label>Email address</Field.Label>
-        <TextField />
-      </Field>
-      <Field orientation="vertical">
-        <Field.Label>Bio</Field.Label>
-        <TextArea />
-      </Field>
-    </FieldGroup>,
+    <div className="w-96">
+      <FieldGroup orientation="horizontal">
+        <Field>
+          <Field.Label>Name</Field.Label>
+          <TextField />
+        </Field>
+        <Field>
+          <Field.Label>Email address</Field.Label>
+          <TextField />
+        </Field>
+        <Field orientation="vertical">
+          <Field.Label>Bio</Field.Label>
+          <TextArea />
+        </Field>
+      </FieldGroup>
+    </div>,
   );
   const box = (name: string) =>
     screen.getByRole('textbox', { name }).element().getBoundingClientRect();

@@ -7,6 +7,7 @@
 - **붙여넣기 정리.** `tel:` 링크, `+44 (0)20 …` 의 `(0)`, `00` 으로 시작하는 번호, 전각 숫자를 번호로 읽습니다. 국제 번호를 붙여 넣으면 입력돼 있던 내용을 대신합니다.
 - **국가 선택.** `TelField.CountrySelect` 는 Select 위에 만들었습니다. 나라 이름(`미국`), ISO 코드(`US`), 국가 번호(`+1`)로 찾고, `+` 로 시작하는 번호를 넣으면 그 나라로 바뀝니다.
 - **검증.** 덜 입력했거나 있을 수 없는 번호는 native 검증에 걸려서 폼이 제출을 막고 `Field.Error` 가 이유를 보여 줍니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><TelField /></div>`.
 
 ```tsx
 import { Field, TelField } from '@gsainfoteam/ids-react';
@@ -99,14 +100,8 @@ import { Field, TelField } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-| 속성                                             | 뜻                                 |
-| ------------------------------------------------ | ---------------------------------- |
-| `data-focused`, `data-filled`                    | 포커스가 필드 안에 있다, 값이 있다 |
-| `data-invalid`                                   | `invalid`, `aria-invalid`, Field의 오류 |
-| `data-disabled`, `data-readonly`                 | 비활성, 읽기 전용                  |
-| `data-size`, `data-variant`                      | 크기와 variant                     |
-
-- 테두리 컨테이너(`data-tel-field`)에 붙습니다. `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+- 값은 `value` / `defaultValue` / `onValueChange` 로 읽습니다. E.164 문자열입니다.
+- `className` · `style` 은 상태(`focused`, `filled`, `invalid`, `disabled`, `readOnly`, `size`, `variant`)를 받는 함수도 됩니다. IDS 위에 새 디자인을 입힐 때만 씁니다.
 
 ## react-hook-form
 
@@ -138,7 +133,6 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `invalid`                | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |
 | `disabled` / `readOnly`  | 입력과 국가 선택에 함께 적용                                  |
 | `name` / `form`          | hidden input이 E.164 값 하나를 제출한다                        |
-| `className` / `style`    | 컨테이너로 간다. 상태를 받는 함수도 된다                      |
 | 그 외 native 속성, ref    | 실제 input으로 간다. `autoComplete="tel"`, `inputMode="tel"` 기본 |
 
 ## 알아둘 것

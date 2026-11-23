@@ -5,7 +5,6 @@ import { expect, fn } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -35,7 +34,6 @@ const meta = {
     defaultCountry: 'KR',
     variant: 'outline',
     size: 'standard',
-    className: cn('w-72'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TelField>;
@@ -43,17 +41,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-72">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-72">
-      <Field.Label>전화번호</Field.Label>
-      <TelField name="tel" defaultCountry="KR">
-        <TelField.CountrySelect />
-        <TelField.Input />
-      </TelField>
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>전화번호</Field.Label>
+        <TelField name="tel" defaultCountry="KR">
+          <TelField.CountrySelect />
+          <TelField.Input />
+        </TelField>
+      </Field>
+    </div>
   ),
 };
 
@@ -65,41 +73,54 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <TelField
-              size={size}
-              variant={variant}
-              defaultValue="+821012345678"
-              aria-label={`${variant} ${size}`}
-              className="w-60"
-            >
-              <TelField.CountrySelect />
-              <TelField.Input />
-            </TelField>
+            <div className="w-60">
+              <TelField
+                size={size}
+                variant={variant}
+                defaultValue="+821012345678"
+                aria-label={`${variant} ${size}`}
+              >
+                <TelField.CountrySelect />
+                <TelField.Input />
+              </TelField>
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <TelField placeholder="010-0000-0000" aria-label="비어 있음" className="w-60" />
+          <div className="w-60">
+            <TelField placeholder="010-0000-0000" aria-label="비어 있음" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="national">
-          <TelField defaultValue="+821012345678" aria-label="국내 번호" className="w-60" />
+          <div className="w-60">
+            <TelField defaultValue="+821012345678" aria-label="국내 번호" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="other country">
-          <TelField defaultValue="+12025550123" aria-label="해외 번호" className="w-60" />
+          <div className="w-60">
+            <TelField defaultValue="+12025550123" aria-label="해외 번호" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <TelField defaultValue="010-1234" invalid aria-label="잘못됨" className="w-60" />
+          <div className="w-60">
+            <TelField defaultValue="010-1234" invalid aria-label="잘못됨" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <TelField defaultValue="+821012345678" disabled aria-label="비활성" className="w-60">
-            <TelField.CountrySelect />
-            <TelField.Input />
-          </TelField>
+          <div className="w-60">
+            <TelField defaultValue="+821012345678" disabled aria-label="비활성">
+              <TelField.CountrySelect />
+              <TelField.Input />
+            </TelField>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <TelField defaultValue="+821012345678" readOnly aria-label="읽기 전용" className="w-60" />
+          <div className="w-60">
+            <TelField defaultValue="+821012345678" readOnly aria-label="읽기 전용" />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -108,35 +129,44 @@ export const Gallery: Story = {
         description="값은 언제나 E.164입니다. format은 화면에 보이는 모양만 정합니다."
       >
         <Showcase.Row label="auto">
-          <TelField defaultValue="+821012345678" format="auto" aria-label="auto" className="w-60" />
+          <div className="w-60">
+            <TelField defaultValue="+821012345678" format="auto" aria-label="auto" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="international">
-          <TelField
-            defaultValue="+821012345678"
-            format="international"
-            aria-label="international"
-            className="w-60"
-          />
+          <div className="w-60">
+            <TelField
+              defaultValue="+821012345678"
+              format="international"
+              aria-label="international"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="none">
-          <TelField defaultValue="+821012345678" format="none" aria-label="none" className="w-60" />
+          <div className="w-60">
+            <TelField defaultValue="+821012345678" format="none" aria-label="none" />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Composition">
         <Showcase.Row label="icon · Clear">
-          <TelField defaultValue="+821012345678" aria-label="아이콘" className="w-72">
-            <PhoneIcon />
-            <TelField.Input />
-            <TelField.Clear />
-          </TelField>
+          <div className="w-72">
+            <TelField defaultValue="+821012345678" aria-label="아이콘">
+              <PhoneIcon />
+              <TelField.Input />
+              <TelField.Clear />
+            </TelField>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="country">
-          <TelField defaultValue="+442079460958" aria-label="국가 선택" className="w-72">
-            <TelField.CountrySelect />
-            <TelField.Input />
-            <TelField.Clear />
-          </TelField>
+          <div className="w-72">
+            <TelField defaultValue="+442079460958" aria-label="국가 선택">
+              <TelField.CountrySelect />
+              <TelField.Input />
+              <TelField.Clear />
+            </TelField>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -184,10 +214,12 @@ export const ShowTheValueAsE164: Story = {
 
 export const TypeAnInternationalNumber: Story = {
   render: (args) => (
-    <TelField {...args}>
-      <TelField.CountrySelect />
-      <TelField.Input />
-    </TelField>
+    <div className="w-72">
+      <TelField {...args}>
+        <TelField.CountrySelect />
+        <TelField.Input />
+      </TelField>
+    </div>
   ),
   parameters: {
     docs: {
@@ -207,7 +239,11 @@ export const TypeAnInternationalNumber: Story = {
 };
 
 export const PasteANumberInAnyForm: Story = {
-  render: (args) => <TelField {...args} />,
+  render: (args) => (
+    <div className="w-72">
+      <TelField {...args} />
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
@@ -232,7 +268,7 @@ export const RejectAnIncompleteNumber: Story = {
 
     return (
       <form
-        className="flex w-72 flex-col gap-3"
+        className="grid w-72 gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           setSent(String(new FormData(event.currentTarget).get('tel')));

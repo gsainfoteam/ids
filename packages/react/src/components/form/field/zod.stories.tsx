@@ -48,7 +48,7 @@ export const Playground: Story = {
 
     return (
       <FormProvider {...methods}>
-        <form noValidate className="flex w-80 flex-col gap-3" onSubmit={methods.handleSubmit(noop)}>
+        <form noValidate className="grid w-80 gap-3" onSubmit={methods.handleSubmit(noop)}>
           <Field {...args} name="email">
             <Field.Label>이메일</Field.Label>
             <TextField inputMode="email" />
@@ -77,7 +77,7 @@ export const Usage: Story = {
       <FormProvider {...methods}>
         <form
           noValidate
-          className="flex w-80 flex-col gap-3"
+          className="grid w-80 gap-3"
           onSubmit={methods.handleSubmit((values) => setSubmitted(values.email))}
         >
           <Field name="email" required>
@@ -119,33 +119,41 @@ export const Gallery: Story = {
             description="스키마의 메시지가 Field.Error에 나타나고, 컨트롤에 aria-invalid가 붙습니다."
           >
             <Showcase.Row label="min(1)">
-              <Field name="empty" required className="w-80">
-                <Field.Label>가입 이메일</Field.Label>
-                <TextField inputMode="email" />
-                <Field.Error />
-              </Field>
+              <div className="w-80">
+                <Field name="empty" required>
+                  <Field.Label>가입 이메일</Field.Label>
+                  <TextField inputMode="email" />
+                  <Field.Error />
+                </Field>
+              </div>
             </Showcase.Row>
             <Showcase.Row label="email()">
-              <Field name="format" required className="w-80">
-                <Field.Label>연락 이메일</Field.Label>
-                <TextField inputMode="email" />
-                <Field.Error />
-              </Field>
+              <div className="w-80">
+                <Field name="format" required>
+                  <Field.Label>연락 이메일</Field.Label>
+                  <TextField inputMode="email" />
+                  <Field.Error />
+                </Field>
+              </div>
             </Showcase.Row>
             <Showcase.Row label="refine()">
-              <Field name="agreed" required orientation="horizontal" className="w-80">
-                <Field.Label>이용 약관 동의</Field.Label>
-                <input type="checkbox" />
-                <Field.Error />
-              </Field>
+              <div className="w-80">
+                <Field name="agreed" required orientation="horizontal">
+                  <Field.Label>이용 약관 동의</Field.Label>
+                  <input type="checkbox" />
+                  <Field.Error />
+                </Field>
+              </div>
             </Showcase.Row>
             <Showcase.Row label="valid">
-              <Field name="valid" required className="w-80">
-                <Field.Label>확인한 이메일</Field.Label>
-                <TextField inputMode="email" />
-                <Field.Hint>스키마를 통과한 값입니다.</Field.Hint>
-                <Field.Error />
-              </Field>
+              <div className="w-80">
+                <Field name="valid" required>
+                  <Field.Label>확인한 이메일</Field.Label>
+                  <TextField inputMode="email" />
+                  <Field.Hint>스키마를 통과한 값입니다.</Field.Hint>
+                  <Field.Error />
+                </Field>
+              </div>
             </Showcase.Row>
           </Showcase.Section>
         </Showcase>
@@ -183,7 +191,7 @@ export const ValidateASignUpFormWithZod: Story = {
       <FormProvider {...methods}>
         <form
           noValidate
-          className="flex w-80 flex-col gap-3"
+          className="grid w-80 gap-3"
           onSubmit={methods.handleSubmit((values) => setSubmitted(values.account.email))}
         >
           <Field name="account.email" required>

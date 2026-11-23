@@ -52,10 +52,12 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-64">
-      <Field.Label>브랜드 색상</Field.Label>
-      <ColorField name="brand" defaultValue="#3B82F6" />
-    </Field>
+    <div className="w-64">
+      <Field>
+        <Field.Label>브랜드 색상</Field.Label>
+        <ColorField name="brand" defaultValue="#3B82F6" />
+      </Field>
+    </div>
   ),
 };
 
@@ -273,13 +275,13 @@ export const SubmitWithANativeForm: Story = {
 
     return (
       <form
-        className="flex w-72 flex-col items-start gap-4"
+        className="grid w-72 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(String(new FormData(event.currentTarget).get('color')));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>테마 색</Field.Label>
           <ColorField name="color" required>
             <ColorField.Content>
@@ -353,7 +355,7 @@ export const ConnectReactHookForm: Story = {
     return (
       <FormProvider {...methods}>
         <form
-          className="flex w-72 flex-col items-start gap-4"
+          className="grid w-72 gap-4"
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(data.color))}
         >
@@ -361,7 +363,6 @@ export const ConnectReactHookForm: Story = {
             name="color"
             controlMode="value"
             registerOptions={{ required: '색을 고르세요.' }}
-            className="w-full"
           >
             <FormField.Label>포인트 색</FormField.Label>
             <ColorField>

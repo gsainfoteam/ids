@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
 import { Field } from '../field';
@@ -39,7 +38,6 @@ const meta = {
     defaultValue: 1,
     variant: 'outline',
     size: 'standard',
-    className: cn('w-56'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof NumberField>;
@@ -47,14 +45,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-56">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-56">
-      <Field.Label>수량</Field.Label>
-      <NumberField defaultValue={1} min={1} />
-    </Field>
+    <div className="w-56">
+      <Field>
+        <Field.Label>수량</Field.Label>
+        <NumberField defaultValue={1} min={1} />
+      </Field>
+    </div>
   ),
 };
 
@@ -66,32 +74,43 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <NumberField
-              size={size}
-              variant={variant}
-              defaultValue={12}
-              aria-label={`${variant} ${size}`}
-              className="w-48"
-            />
+            <div className="w-48">
+              <NumberField
+                size={size}
+                variant={variant}
+                defaultValue={12}
+                aria-label={`${variant} ${size}`}
+              />
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <NumberField placeholder="0" aria-label="비어 있음" className="w-48" />
+          <div className="w-48">
+            <NumberField placeholder="0" aria-label="비어 있음" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="out of range">
-          <NumberField defaultValue={12} max={10} aria-label="범위 밖" className="w-48" />
+          <div className="w-48">
+            <NumberField defaultValue={12} max={10} aria-label="범위 밖" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="at max">
-          <NumberField defaultValue={10} max={10} aria-label="최댓값" className="w-48" />
+          <div className="w-48">
+            <NumberField defaultValue={10} max={10} aria-label="최댓값" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <NumberField defaultValue={3} disabled aria-label="비활성" className="w-48" />
+          <div className="w-48">
+            <NumberField defaultValue={3} disabled aria-label="비활성" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <NumberField defaultValue={3} readOnly aria-label="읽기 전용" className="w-48" />
+          <div className="w-48">
+            <NumberField defaultValue={3} readOnly aria-label="읽기 전용" />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -100,47 +119,57 @@ export const Gallery: Story = {
         description="부품을 하나도 쓰지 않으면 끝에 위아래 버튼이 붙습니다. Input, Stepper, Increment, Decrement, Clear 중 하나라도 쓰면 쓴 부품만, 쓴 자리에 그립니다."
       >
         <Showcase.Row label="inline">
-          <NumberField defaultValue={2} min={0} aria-label="인원" className="w-40">
-            <NumberField.Decrement />
-            <NumberField.Input className="text-center" />
-            <NumberField.Increment />
-          </NumberField>
-          <NumberField size="tiny" defaultValue={2} min={0} aria-label="인원 tiny" className="w-32">
-            <NumberField.Decrement />
-            <NumberField.Input className="text-center" />
-            <NumberField.Increment />
-          </NumberField>
+          <div className="w-40">
+            <NumberField defaultValue={2} min={0} aria-label="인원">
+              <NumberField.Decrement />
+              <NumberField.Input />
+              <NumberField.Increment />
+            </NumberField>
+          </div>
+          <div className="w-32">
+            <NumberField size="tiny" defaultValue={2} min={0} aria-label="인원 tiny">
+              <NumberField.Decrement />
+              <NumberField.Input />
+              <NumberField.Increment />
+            </NumberField>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="unit · Clear">
-          <NumberField defaultValue={72.5} step={0.1} aria-label="무게" className="w-56">
-            <NumberField.Input />
-            <span>kg</span>
-            <NumberField.Clear />
-            <NumberField.Stepper />
-          </NumberField>
+          <div className="w-56">
+            <NumberField defaultValue={72.5} step={0.1} aria-label="무게">
+              <NumberField.Input />
+              <span>kg</span>
+              <NumberField.Clear />
+              <NumberField.Stepper />
+            </NumberField>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="currency">
-          <NumberField
-            defaultValue={1234.5}
-            formatOptions={{ style: 'currency', currency: 'KRW' }}
-            aria-label="금액"
-            className="w-56"
-          />
+          <div className="w-56">
+            <NumberField
+              defaultValue={1234.5}
+              formatOptions={{ style: 'currency', currency: 'KRW' }}
+              aria-label="금액"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="percent">
-          <NumberField
-            defaultValue={0.125}
-            min={0}
-            max={1}
-            formatOptions={{ style: 'percent', minimumFractionDigits: 1 }}
-            aria-label="비율"
-            className="w-56"
-          />
+          <div className="w-56">
+            <NumberField
+              defaultValue={0.125}
+              min={0}
+              max={1}
+              formatOptions={{ style: 'percent', minimumFractionDigits: 1 }}
+              aria-label="비율"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="no stepper">
-          <NumberField defaultValue={42} aria-label="버튼 없음" className="w-48">
-            <NumberField.Input />
-          </NumberField>
+          <div className="w-48">
+            <NumberField defaultValue={42} aria-label="버튼 없음">
+              <NumberField.Input />
+            </NumberField>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -149,13 +178,15 @@ export const Gallery: Story = {
 
 export const LeaveOutTheButtons: Story = {
   render: () => (
-    <Field className="w-56">
-      <Field.Label>키</Field.Label>
-      <NumberField defaultValue={170} min={0}>
-        <NumberField.Input />
-        <span>cm</span>
-      </NumberField>
-    </Field>
+    <div className="w-56">
+      <Field>
+        <Field.Label>키</Field.Label>
+        <NumberField defaultValue={170} min={0}>
+          <NumberField.Input />
+          <span>cm</span>
+        </NumberField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -176,14 +207,16 @@ export const LeaveOutTheButtons: Story = {
 
 export const PutMinusAndPlusOnTheSides: Story = {
   render: () => (
-    <Field className="w-40">
-      <Field.Label>인원</Field.Label>
-      <NumberField defaultValue={2} min={0}>
-        <NumberField.Decrement />
-        <NumberField.Input className="text-center" />
-        <NumberField.Increment />
-      </NumberField>
-    </Field>
+    <div className="w-40">
+      <Field>
+        <Field.Label>인원</Field.Label>
+        <NumberField defaultValue={2} min={0}>
+          <NumberField.Decrement />
+          <NumberField.Input />
+          <NumberField.Increment />
+        </NumberField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -207,16 +240,18 @@ export const PutMinusAndPlusOnTheSides: Story = {
 
 export const NameTheStepperButtons: Story = {
   render: () => (
-    <Field className="w-56">
-      <Field.Label>참석 인원</Field.Label>
-      <NumberField defaultValue={4} min={1} max={10}>
-        <NumberField.Input />
-        <NumberField.Stepper>
-          <NumberField.Increment aria-label="참석 인원 늘리기" />
-          <NumberField.Decrement aria-label="참석 인원 줄이기" />
-        </NumberField.Stepper>
-      </NumberField>
-    </Field>
+    <div className="w-56">
+      <Field>
+        <Field.Label>참석 인원</Field.Label>
+        <NumberField defaultValue={4} min={1} max={10}>
+          <NumberField.Input />
+          <NumberField.Stepper>
+            <NumberField.Increment aria-label="참석 인원 늘리기" />
+            <NumberField.Decrement aria-label="참석 인원 줄이기" />
+          </NumberField.Stepper>
+        </NumberField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -343,7 +378,7 @@ export const SnapToTheStep: Story = {
 
 export const BlockValuesOutOfRange: Story = {
   render: () => (
-    <form className="flex w-64 flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
+    <form className="grid w-64 gap-3" onSubmit={(event) => event.preventDefault()}>
       <Field>
         <Field.Label>좌석 수</Field.Label>
         <NumberField name="seats" min={1} max={8} defaultValue={12} />

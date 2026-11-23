@@ -157,7 +157,7 @@ export const SubmitWithANativeForm: Story = {
 
     return (
       <form
-        className="flex flex-col items-start gap-4"
+        className="grid w-80 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
@@ -212,7 +212,7 @@ export const ValidateWithReactHookForm: Story = {
     return (
       <FormProvider {...methods}>
         <form
-          className="flex flex-col items-start gap-4"
+          className="grid w-80 gap-4"
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(`검증 완료: ${data.code}`))}
         >
@@ -248,6 +248,7 @@ export const ValidateWithReactHookForm: Story = {
 };
 
 export const DrawYourOwnSlots: Story = {
+  tags: ['custom-design'],
   render: () => (
     <OTPField length={4} aria-label="커스텀 슬롯">
       <OTPField.Group className="gap-3">

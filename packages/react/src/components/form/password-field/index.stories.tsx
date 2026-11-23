@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -38,7 +37,6 @@ const meta = {
     'aria-label': '비밀번호',
     variant: 'outline',
     size: 'standard',
-    className: cn('w-72'),
     onValueChange: fn(),
     onVisibleChange: fn(),
   },
@@ -47,14 +45,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-72">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-72">
-      <Field.Label>비밀번호</Field.Label>
-      <PasswordField name="password" autoComplete="current-password" />
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>비밀번호</Field.Label>
+        <PasswordField name="password" autoComplete="current-password" />
+      </Field>
+    </div>
   ),
 };
 
@@ -66,62 +74,54 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <PasswordField
-              name="password"
-              size={size}
-              variant={variant}
-              defaultValue="infoteam"
-              aria-label={`${variant} ${size}`}
-              className="w-56"
-            />
+            <div className="w-56">
+              <PasswordField
+                name="password"
+                size={size}
+                variant={variant}
+                defaultValue="infoteam"
+                aria-label={`${variant} ${size}`}
+              />
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <PasswordField
-            name="password"
-            placeholder="비밀번호"
-            aria-label="비어 있음"
-            className="w-56"
-          />
+          <div className="w-56">
+            <PasswordField name="password" placeholder="비밀번호" aria-label="비어 있음" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="visible">
-          <PasswordField
-            name="password"
-            defaultValue="infoteam"
-            defaultVisible
-            aria-label="보이는 비밀번호"
-            className="w-56"
-          />
+          <div className="w-56">
+            <PasswordField
+              name="password"
+              defaultValue="infoteam"
+              defaultVisible
+              aria-label="보이는 비밀번호"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <PasswordField
-            name="password"
-            defaultValue="1234"
-            invalid
-            aria-label="잘못됨"
-            className="w-56"
-          />
+          <div className="w-56">
+            <PasswordField name="password" defaultValue="1234" invalid aria-label="잘못됨" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <PasswordField
-            name="password"
-            defaultValue="infoteam"
-            disabled
-            aria-label="비활성"
-            className="w-56"
-          />
+          <div className="w-56">
+            <PasswordField name="password" defaultValue="infoteam" disabled aria-label="비활성" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <PasswordField
-            name="password"
-            defaultValue="infoteam"
-            readOnly
-            aria-label="읽기 전용"
-            className="w-56"
-          />
+          <div className="w-56">
+            <PasswordField
+              name="password"
+              defaultValue="infoteam"
+              readOnly
+              aria-label="읽기 전용"
+            />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -130,46 +130,39 @@ export const Gallery: Story = {
         description="부품을 하나도 쓰지 않으면 Caps Lock 표시와 보기 버튼이 뒤에 붙습니다. Input, CapsLock, VisibilityToggle, Clear 중 하나라도 쓰면 쓴 부품만, 쓴 자리에 그립니다. 아이콘은 부품이 아닙니다."
       >
         <Showcase.Row label="leading icon">
-          <PasswordField name="password" aria-label="아이콘" className="w-72">
-            <LockClosedIcon />
-          </PasswordField>
+          <div className="w-72">
+            <PasswordField name="password" aria-label="아이콘">
+              <LockClosedIcon />
+            </PasswordField>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="Clear">
-          <PasswordField
-            name="password"
-            defaultValue="infoteam"
-            aria-label="지우기"
-            className="w-72"
-          >
-            <KeyIcon />
-            <PasswordField.Input />
-            <PasswordField.Clear />
-            <PasswordField.VisibilityToggle />
-          </PasswordField>
+          <div className="w-72">
+            <PasswordField name="password" defaultValue="infoteam" aria-label="지우기">
+              <KeyIcon />
+              <PasswordField.Input />
+              <PasswordField.Clear />
+              <PasswordField.VisibilityToggle />
+            </PasswordField>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="custom toggle">
-          <PasswordField
-            name="password"
-            defaultValue="infoteam"
-            aria-label="텍스트 토글"
-            className="w-72"
-          >
-            <PasswordField.Input />
-            <PasswordField.VisibilityToggle asChild>
-              <Button variant="ghost">보기</Button>
-            </PasswordField.VisibilityToggle>
-          </PasswordField>
+          <div className="w-72">
+            <PasswordField name="password" defaultValue="infoteam" aria-label="텍스트 토글">
+              <PasswordField.Input />
+              <PasswordField.VisibilityToggle asChild>
+                <Button variant="ghost">보기</Button>
+              </PasswordField.VisibilityToggle>
+            </PasswordField>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="no toggle">
-          <PasswordField
-            name="password"
-            defaultValue="infoteam"
-            aria-label="토글 없음"
-            className="w-72"
-          >
-            <PasswordField.Input />
-            <PasswordField.CapsLock />
-          </PasswordField>
+          <div className="w-72">
+            <PasswordField name="password" defaultValue="infoteam" aria-label="토글 없음">
+              <PasswordField.Input />
+              <PasswordField.CapsLock />
+            </PasswordField>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -240,12 +233,14 @@ export const ShowWhatWasTyped: Story = {
 
 export const WarnWhenCapsLockIsOn: Story = {
   render: (args) => (
-    <PasswordField
-      {...args}
-      placeholder="Caps Lock을 켜 보세요"
-      data-1p-ignore=""
-      data-lpignore="true"
-    />
+    <div className="w-72">
+      <PasswordField
+        {...args}
+        placeholder="Caps Lock을 켜 보세요"
+        data-1p-ignore=""
+        data-lpignore="true"
+      />
+    </div>
   ),
   parameters: {
     docs: {
@@ -269,13 +264,15 @@ export const WarnWhenCapsLockIsOn: Story = {
 
 export const LeaveOutTheVisibilityToggle: Story = {
   render: () => (
-    <Field className="w-72">
-      <Field.Label>결제 비밀번호</Field.Label>
-      <PasswordField name="pin" inputMode="numeric" data-1p-ignore="" data-lpignore="true">
-        <PasswordField.Input />
-        <PasswordField.CapsLock />
-      </PasswordField>
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>결제 비밀번호</Field.Label>
+        <PasswordField name="pin" inputMode="numeric" data-1p-ignore="" data-lpignore="true">
+          <PasswordField.Input />
+          <PasswordField.CapsLock />
+        </PasswordField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -298,13 +295,15 @@ export const LeaveOutTheVisibilityToggle: Story = {
 
 export const LeaveOutTheCapsLockSign: Story = {
   render: () => (
-    <Field className="w-72">
-      <Field.Label>비밀번호</Field.Label>
-      <PasswordField name="password" data-1p-ignore="" data-lpignore="true">
-        <PasswordField.Input />
-        <PasswordField.VisibilityToggle />
-      </PasswordField>
-    </Field>
+    <div className="w-72">
+      <Field>
+        <Field.Label>비밀번호</Field.Label>
+        <PasswordField name="password" data-1p-ignore="" data-lpignore="true">
+          <PasswordField.Input />
+          <PasswordField.VisibilityToggle />
+        </PasswordField>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {

@@ -7,6 +7,7 @@
 - **비밀번호 관리자와 맞춤.** `name` 으로 `current-password` / `new-password` 를 고르고, 폼을 제출할 때는 보이던 비밀번호를 다시 가려서 관리자가 저장을 제안할 수 있게 합니다.
 - **조립.** TextField와 같은 테두리를 씁니다. `PasswordField.Input` 앞뒤에 아이콘이나 버튼을 두고, 파트를 직접 두면 그 자리에 놓입니다.
 - **react-hook-form, TanStack Form.** 실제 `<input>` 하나라 `register()` 가 그대로 되고, `onValueChange` 로 값을 바로 받습니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><PasswordField name="password" /></div>`.
 
 ```tsx
 import { Field, PasswordField } from '@gsainfoteam/ids-react';
@@ -109,14 +110,8 @@ import { Field, PasswordField } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-| 속성                                          | 뜻                                           |
-| --------------------------------------------- | -------------------------------------------- |
-| `data-visible`                                | 비밀번호가 보인다                            |
-| `data-focused`, `data-filled`                 | 포커스가 필드 안에 있다, 값이 있다           |
-| `data-invalid`, `data-disabled`, `data-readonly` | 오류, 비활성, 읽기 전용                   |
-| `data-size`, `data-variant`                   | 크기와 variant                               |
-
-- 테두리 컨테이너(`data-password-field`)에 붙습니다. `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+- 값은 `value` / `defaultValue` / `onValueChange`, 보기 상태는 `visible` / `defaultVisible` / `onVisibleChange` 로 읽습니다.
+- `className` · `style` 은 상태(`visible`, `focused`, `filled`, `invalid`, `disabled`, `readOnly`, `size`, `variant`)를 받는 함수도 됩니다. IDS 위에 새 디자인을 입힐 때만 씁니다.
 
 ## 속성 우선순위
 
@@ -159,7 +154,6 @@ const schema = z
 | `variant`                                | `outline`(기본) / `soft` / `ghost`                            |
 | `size`                                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                                | `aria-invalid` 와 danger 테두리. 명시한 `aria-invalid` 가 우선 |
-| `className` / `style`                    | 컨테이너로 간다. 상태를 받는 함수도 된다                      |
 | 그 외 native 속성, ref                    | 실제 input으로 간다                                           |
 
 ## 알아둘 것

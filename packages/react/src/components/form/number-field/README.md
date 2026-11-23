@@ -8,6 +8,7 @@
 - **격자와 범위.** `step` 을 주면 입력을 마칠 때 `min` 에서 시작하는 격자에 맞추고, 범위를 넘은 값은 범위 안으로 맞춥니다. 범위 밖의 값은 native 검증에도 걸려서 폼이 제출을 막습니다.
 - **로케일 형식과 붙여넣기.** `@internationalized/number` 로 로케일에 맞게 보여 주고 읽습니다. 보이는 글자를 그대로 고치면 되고, 붙여 넣은 `1.234,5 €`, `($123.50)`, `１２`, 아랍 숫자도 숫자로 읽습니다.
 - **모바일 키보드.** 음수가 들어갈 수 있으면 iOS에서도 마이너스가 있는 키보드를 띄우고, 정수만 받으면 숫자 키패드를 띄웁니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><NumberField /></div>`.
 
 ```tsx
 import { Field, NumberField } from '@gsainfoteam/ids-react';
@@ -76,7 +77,7 @@ const [seats, setSeats] = useState<number | null>(2);
 
 <NumberField>
   <NumberField.Decrement />                    {/* 입력 양옆에 −, + */}
-  <NumberField.Input className="text-center" />
+  <NumberField.Input />
   <NumberField.Increment />
 </NumberField>
 
@@ -125,14 +126,8 @@ const [seats, setSeats] = useState<number | null>(2);
 
 ## 상태
 
-| 속성                                             | 뜻                                 |
-| ------------------------------------------------ | ---------------------------------- |
-| `data-focused`, `data-filled`                    | 포커스가 필드 안에 있다, 값이 있다 |
-| `data-invalid`                                   | `invalid`, `aria-invalid`, 범위 밖 |
-| `data-disabled`, `data-readonly`                 | 비활성, 읽기 전용                  |
-| `data-size`, `data-variant`                      | 크기와 variant                     |
-
-- 테두리 컨테이너(`data-number-field`)에 붙습니다. `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+- 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 씁니다. 범위 밖이면 native 검증(`validity`)과 `Field.Error` 가 알립니다.
+- `className` 과 `style` 에 상태(`focused`, `filled`, `invalid`, `disabled`, `readOnly`, `size`, `variant`)를 받는 함수를 줄 수 있습니다. 새 디자인을 만들 때만 씁니다.
 
 ## react-hook-form + Zod
 
@@ -169,7 +164,6 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 | `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |
 | `disabled` / `readOnly`               | 입력과 버튼의 변경을 모두 막는다                              |
 | `name` / `form`                       | hidden input이 숫자 문자열을 제출한다. 빈 값은 `""`           |
-| `className` / `style`                 | 컨테이너로 간다. 상태를 받는 함수도 된다                      |
 | 그 외 native 속성, ref                 | 실제 input으로 간다                                           |
 
 ## 알아둘 것

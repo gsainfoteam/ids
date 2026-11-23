@@ -5,7 +5,6 @@ import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Showcase, holdTheNextCall } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Chip } from '../../data/chip';
 import { Menu } from '../../overlay/menu';
 import { Select } from '../select';
@@ -43,7 +42,6 @@ const meta = {
     size: 'standard',
     status: 'idle',
     disabled: false,
-    className: cn('w-96'),
     onSend: fn(),
     onStop: fn(),
     onValueChange: fn(),
@@ -62,14 +60,22 @@ const button = (canvasElement: HTMLElement, name: string) =>
 const picker = (canvasElement: HTMLElement) =>
   canvasElement.querySelector<HTMLInputElement>('input[type=file]')!;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-96">
+        <Story />
+      </div>
+    ),
+  ],
+};
 
 export const Usage: Story = {
   render: function Render() {
     const [sent, setSent] = useState('');
 
     return (
-      <div className="flex w-96 flex-col gap-3">
+      <div className="grid w-96 gap-3">
         <PromptInput onSend={(message) => setSent(message.text)} />
         <output aria-label="보낸 메시지">{sent}</output>
       </div>
@@ -85,10 +91,12 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <PromptInput size={size} variant={variant} className="w-72">
-              <PromptInput.Input aria-label={`${variant} ${size}`} />
-              <PromptInput.Attach />
-            </PromptInput>
+            <div className="w-72">
+              <PromptInput size={size} variant={variant}>
+                <PromptInput.Input aria-label={`${variant} ${size}`} />
+                <PromptInput.Attach />
+              </PromptInput>
+            </div>
           )}
         />
       </Showcase.Section>
@@ -98,43 +106,55 @@ export const Gallery: Story = {
         description="보내는 동안에는 보내기 버튼이 멈추기 버튼이 됩니다. onStop 이 없으면 스피너를 보이고 눌리지 않습니다."
       >
         <Showcase.Row label="idle">
-          <PromptInput defaultValue="오늘 학식 뭐야?" className="w-72">
-            <PromptInput.Input aria-label="idle" />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput defaultValue="오늘 학식 뭐야?">
+              <PromptInput.Input aria-label="idle" />
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="submitting">
-          <PromptInput status="submitting" className="w-72">
-            <PromptInput.Input aria-label="submitting" />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput status="submitting">
+              <PromptInput.Input aria-label="submitting" />
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="streaming">
-          <PromptInput status="streaming" onStop={() => {}} className="w-72">
-            <PromptInput.Input aria-label="streaming" />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput status="streaming" onStop={() => {}}>
+              <PromptInput.Input aria-label="streaming" />
+            </PromptInput>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="attachments">
-          <PromptInput defaultFiles={[REPORT, NOTES]} className="w-72">
-            <PromptInput.Input aria-label="첨부" />
-            <PromptInput.Attach />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput defaultFiles={[REPORT, NOTES]}>
+              <PromptInput.Input aria-label="첨부" />
+              <PromptInput.Attach />
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="tools">
-          <PromptInput defaultTools={['search']} className="w-72">
-            <PromptInput.Input aria-label="도구" />
-            <PromptInput.ActionMenu />
-            <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
-              웹 검색
-            </PromptInput.Tool>
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput defaultTools={['search']}>
+              <PromptInput.Input aria-label="도구" />
+              <PromptInput.ActionMenu />
+              <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+                웹 검색
+              </PromptInput.Tool>
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <PromptInput disabled defaultValue="보낼 수 없음" className="w-72">
-            <PromptInput.Input aria-label="비활성" />
-            <PromptInput.Attach />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput disabled defaultValue="보낼 수 없음">
+              <PromptInput.Input aria-label="비활성" />
+              <PromptInput.Attach />
+            </PromptInput>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -174,10 +194,12 @@ export const SendAMessage: Story = {
 
 export const AttachFiles: Story = {
   render: (args) => (
-    <PromptInput {...args} accept="image/*,.pdf,.txt" maxCount={3}>
-      <PromptInput.Input placeholder="파일에 대해 물어보세요" />
-      <PromptInput.Attach />
-    </PromptInput>
+    <div className="w-96">
+      <PromptInput {...args} accept="image/*,.pdf,.txt" maxCount={3}>
+        <PromptInput.Input placeholder="파일에 대해 물어보세요" />
+        <PromptInput.Attach />
+      </PromptInput>
+    </div>
   ),
   parameters: {
     docs: {
@@ -212,19 +234,20 @@ export const StopAStreamingReply: Story = {
     const [status, setStatus] = useState<PromptInput.Status>('idle');
 
     return (
-      <PromptInput
-        className={args.className}
-        status={status}
-        onSend={async (message) => {
-          setStatus('streaming');
-          await args.onSend?.(message);
-          setStatus('idle');
-        }}
-        onStop={() => {
-          args.onStop?.();
-          setStatus('idle');
-        }}
-      />
+      <div className="w-96">
+        <PromptInput
+          status={status}
+          onSend={async (message) => {
+            setStatus('streaming');
+            await args.onSend?.(message);
+            setStatus('idle');
+          }}
+          onStop={() => {
+            args.onStop?.();
+            setStatus('idle');
+          }}
+        />
+      </div>
     );
   },
   parameters: {
@@ -258,23 +281,27 @@ export const StopAStreamingReply: Story = {
 
 export const AddToolsToTheBar: Story = {
   render: (args) => (
-    <PromptInput {...args}>
-      <PromptInput.Input placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요" />
-      <PromptInput.ActionMenu>
-        <PromptInput.AddAttachments />
-        <Menu.Item>
-          <CameraIcon />
-          사진 찍기
-        </Menu.Item>
-      </PromptInput.ActionMenu>
-      <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
-        웹 검색
-      </PromptInput.Tool>
-      <Select size="tiny" variant="soft" defaultValue="fast" aria-label="모델" className="w-auto">
-        <Select.Item value="fast">빠른 답</Select.Item>
-        <Select.Item value="deep">깊은 생각</Select.Item>
-      </Select>
-    </PromptInput>
+    <div className="w-96">
+      <PromptInput {...args}>
+        <PromptInput.Input placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요" />
+        <PromptInput.ActionMenu>
+          <PromptInput.AddAttachments />
+          <Menu.Item>
+            <CameraIcon />
+            사진 찍기
+          </Menu.Item>
+        </PromptInput.ActionMenu>
+        <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+          웹 검색
+        </PromptInput.Tool>
+        <div>
+          <Select size="tiny" variant="soft" defaultValue="fast" aria-label="모델">
+            <Select.Item value="fast">빠른 답</Select.Item>
+            <Select.Item value="deep">깊은 생각</Select.Item>
+          </Select>
+        </div>
+      </PromptInput>
+    </div>
   ),
   parameters: {
     docs: {
@@ -303,7 +330,7 @@ export const FillTheInputFromSuggestions: Story = {
     const [draft, setDraft] = useState('');
 
     return (
-      <div className="flex w-96 flex-col gap-3">
+      <div className="grid w-96 gap-3">
         <div className="flex flex-wrap gap-2">
           {SUGGESTIONS.map((suggestion) => (
             <Chip key={suggestion} onClick={() => setDraft(suggestion)}>

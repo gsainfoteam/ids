@@ -64,10 +64,12 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-80">
-      <Field.Label>이력서</Field.Label>
-      <FileField accept=".pdf" />
-    </Field>
+    <div className="w-80">
+      <Field>
+        <Field.Label>이력서</Field.Label>
+        <FileField accept=".pdf" />
+      </Field>
+    </div>
   ),
 };
 
@@ -203,14 +205,14 @@ export const SubmitWithANativeForm: Story = {
 
     return (
       <form
-        className="flex w-80 flex-col items-start gap-4"
+        className="grid w-80 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           const file = new FormData(event.currentTarget).get('resume');
           setSubmitted(file instanceof File ? file.name : String(file));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>이력서</Field.Label>
           <FileField name="resume" accept=".pdf" required />
         </Field>
@@ -255,7 +257,7 @@ export const ValidateWithReactHookForm: Story = {
     return (
       <FormProvider {...methods}>
         <form
-          className="flex w-80 flex-col items-start gap-4"
+          className="grid w-80 gap-4"
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(data.resume?.name ?? ''))}
         >
@@ -263,7 +265,6 @@ export const ValidateWithReactHookForm: Story = {
             name="resume"
             controlMode="value"
             registerOptions={{ required: '파일을 첨부하세요.' }}
-            className="w-full"
           >
             <FormField.Label>이력서</FormField.Label>
             <FileField accept=".pdf" />

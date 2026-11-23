@@ -48,8 +48,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-80">
+        <Story />
+      </div>
+    ),
+  ],
   render: ({ children: _children, ...args }) => (
-    <Field {...args} className="w-80">
+    <Field {...args}>
       <Field.Label>이메일</Field.Label>
       <Field.Description>로그인에 사용합니다.</Field.Description>
       <TextField type="email" placeholder="name@example.com" />
@@ -61,11 +68,13 @@ export const Playground: Story = {
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-80">
-      <Field.Label>이메일</Field.Label>
-      <TextField type="email" placeholder="name@example.com" />
-      <Field.Hint>로그인에 사용합니다.</Field.Hint>
-    </Field>
+    <div className="w-80">
+      <Field>
+        <Field.Label>이메일</Field.Label>
+        <TextField type="email" placeholder="name@example.com" />
+        <Field.Hint>로그인에 사용합니다.</Field.Hint>
+      </Field>
+    </div>
   ),
 };
 
@@ -77,50 +86,67 @@ export const Gallery: Story = {
           rows={sizes}
           columns={orientations}
           render={(size, orientation) => (
-            <Field size={size} orientation={orientation} className="w-80">
-              <Field.Label>이름</Field.Label>
-              <Field.Description>실명으로 적어 주세요.</Field.Description>
-              <TextField placeholder="홍길동" />
-              <Field.Hint>한글 또는 영문</Field.Hint>
-            </Field>
+            <div className="w-80">
+              <Field size={size} orientation={orientation}>
+                <Field.Label>이름</Field.Label>
+                <Field.Description>실명으로 적어 주세요.</Field.Description>
+                <TextField placeholder="홍길동" />
+                <Field.Hint>한글 또는 영문</Field.Hint>
+              </Field>
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="default">
-          <Field className="w-80">
-            <Field.Label>닉네임</Field.Label>
-            <TextField placeholder="닉네임" />
-            <Field.Hint>2자 이상</Field.Hint>
-          </Field>
+          <div className="w-80">
+            <Field>
+              {' '}
+              <Field.Label>닉네임</Field.Label>
+              <TextField placeholder="닉네임" />
+              <Field.Hint>2자 이상</Field.Hint>
+            </Field>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="required">
-          <Field required className="w-80">
-            <Field.Label>닉네임</Field.Label>
-            <TextField placeholder="닉네임" />
-          </Field>
+          <div className="w-80">
+            <Field required>
+              {' '}
+              <Field.Label>닉네임</Field.Label>
+              <TextField placeholder="닉네임" />
+            </Field>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="filled">
-          <Field className="w-80">
-            <Field.Label>닉네임</Field.Label>
-            <TextField defaultValue="인포팀" />
-          </Field>
+          <div className="w-80">
+            <Field>
+              {' '}
+              <Field.Label>닉네임</Field.Label>
+              <TextField defaultValue="인포팀" />
+            </Field>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <Field invalid className="w-80">
-            <Field.Label>닉네임</Field.Label>
-            <TextField defaultValue="a" />
-            <Field.Hint>2자 이상</Field.Hint>
-            <Field.Error>2자 이상 입력하세요.</Field.Error>
-          </Field>
+          <div className="w-80">
+            <Field invalid>
+              {' '}
+              <Field.Label>닉네임</Field.Label>
+              <TextField defaultValue="a" />
+              <Field.Hint>2자 이상</Field.Hint>
+              <Field.Error>2자 이상 입력하세요.</Field.Error>
+            </Field>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <Field disabled className="w-80">
-            <Field.Label>닉네임</Field.Label>
-            <TextField defaultValue="인포팀" />
-            <Field.Hint>변경할 수 없습니다.</Field.Hint>
-          </Field>
+          <div className="w-80">
+            <Field disabled>
+              {' '}
+              <Field.Label>닉네임</Field.Label>
+              <TextField defaultValue="인포팀" />
+              <Field.Hint>변경할 수 없습니다.</Field.Hint>
+            </Field>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -129,31 +155,43 @@ export const Gallery: Story = {
         description="Field는 안에 둔 컨트롤 하나에 라벨, 설명, 오류를 연결합니다."
       >
         <Showcase.Row label="TextArea">
-          <Field className="w-80">
-            <Field.Label>자기소개</Field.Label>
-            <TextArea rows={2} placeholder="자신을 소개해 주세요" />
-          </Field>
+          <div className="w-80">
+            <Field>
+              {' '}
+              <Field.Label>자기소개</Field.Label>
+              <TextArea rows={2} placeholder="자신을 소개해 주세요" />
+            </Field>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="NumberField">
-          <Field className="w-80">
-            <Field.Label>수량</Field.Label>
-            <NumberField defaultValue={1} min={1} />
-          </Field>
+          <div className="w-80">
+            <Field>
+              {' '}
+              <Field.Label>수량</Field.Label>
+              <NumberField defaultValue={1} min={1} />
+            </Field>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="PasswordField">
-          <Field className="w-80">
-            <Field.Label>비밀번호</Field.Label>
-            <PasswordField name="password" />
-          </Field>
+          <div className="w-80">
+            <Field>
+              {' '}
+              <Field.Label>비밀번호</Field.Label>
+              <PasswordField name="password" />
+            </Field>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="native select">
-          <Field orientation="horizontal" className="w-80">
-            <Field.Label>정렬</Field.Label>
-            <select className="rounded-standard inset-ring-neutral h-9 px-2 inset-ring-1">
-              <option>최신순</option>
-              <option>인기순</option>
-            </select>
-          </Field>
+          <div className="w-80">
+            <Field orientation="horizontal">
+              {' '}
+              <Field.Label>정렬</Field.Label>
+              <select className="rounded-standard inset-ring-neutral h-9 px-2 inset-ring-1">
+                <option>최신순</option>
+                <option>인기순</option>
+              </select>
+            </Field>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -162,7 +200,7 @@ export const Gallery: Story = {
 
 export const PlaceTheLabelBesideTheControl: Story = {
   render: () => (
-    <div className="flex w-96 flex-col gap-4">
+    <div className="grid w-96 gap-4">
       <Field orientation="horizontal">
         <Field.Label>이름</Field.Label>
         <TextField placeholder="홍길동" />
@@ -187,12 +225,15 @@ export const PlaceTheLabelBesideTheControl: Story = {
 
 export const UseYourOwnLabelElement: Story = {
   render: () => (
-    <Field required className="w-80">
-      <Field.Label asChild>
-        <label className="font-bold">사용자 이름</label>
-      </Field.Label>
-      <TextField />
-    </Field>
+    <div className="w-80">
+      <Field required>
+        {' '}
+        <Field.Label asChild>
+          <label className="font-bold">사용자 이름</label>
+        </Field.Label>
+        <TextField />
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
@@ -213,7 +254,7 @@ export const ShowTheBrowsersValidationMessage: Story = {
 
     return (
       <form
-        className="flex w-80 flex-col gap-4"
+        className="grid w-80 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(String(new FormData(event.currentTarget).get('email')));
@@ -265,7 +306,7 @@ export const ShowTheBrowsersValidationMessage: Story = {
 
 export const WriteAMessagePerValidityError: Story = {
   render: () => (
-    <form className="flex w-80 flex-col gap-4" onSubmit={(event) => event.preventDefault()}>
+    <form className="grid w-80 gap-4" onSubmit={(event) => event.preventDefault()}>
       <Field>
         <Field.Label>이메일</Field.Label>
         <TextField type="email" required />
@@ -294,30 +335,32 @@ export const WriteAMessagePerValidityError: Story = {
   },
 };
 
-export const StyleByFieldState: Story = {
+export const ReadTheFieldState: Story = {
   render: () => (
-    <Field className="rounded-standard data-focused:bg-block w-80 p-3 transition-colors" required>
-      <Field.Label>닉네임</Field.Label>
-      <TextField placeholder="닉네임" />
-      <Field.Description>
-        {(state) =>
-          [
-            state.focused && 'focused',
-            state.filled && 'filled',
-            state.dirty && 'dirty',
-            state.touched && 'touched',
-          ]
-            .filter(Boolean)
-            .join(' · ') || '아직 아무 상태도 없습니다'
-        }
-      </Field.Description>
-    </Field>
+    <div className="w-80">
+      <Field required>
+        <Field.Label>닉네임</Field.Label>
+        <TextField placeholder="닉네임" />
+        <Field.Description>
+          {(state) =>
+            [
+              state.focused && 'focused',
+              state.filled && 'filled',
+              state.dirty && 'dirty',
+              state.touched && 'touched',
+            ]
+              .filter(Boolean)
+              .join(' · ') || '아직 아무 상태도 없습니다'
+          }
+        </Field.Description>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '루트와 모든 파트에 data-focused, data-filled, data-dirty, data-touched가 붙고, className, style, children은 상태를 받는 함수도 됩니다.',
+          '파트의 children은 Field 상태를 받는 함수도 됩니다. focused, filled, dirty, touched를 읽어 문구를 바꿉니다.',
       },
     },
   },
@@ -345,7 +388,7 @@ export const ConnectReactHookForm: Story = {
       <FormProvider {...methods}>
         <form
           noValidate
-          className="flex w-80 flex-col gap-3"
+          className="grid w-80 gap-3"
           onSubmit={methods.handleSubmit((values) => setSubmitted(values.email))}
         >
           <RhfField name="email" required registerOptions={{ required: '이메일을 입력하세요.' }}>
@@ -404,7 +447,7 @@ export const ConnectTanStackForm: Story = {
     return (
       <form
         noValidate
-        className="flex w-80 flex-col gap-3"
+        className="grid w-80 gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           void form.handleSubmit();

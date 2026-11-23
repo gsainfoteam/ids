@@ -148,6 +148,34 @@ test('native form data, composition events, readOnly/disabled and the resize gri
   await expect.element(shell()).toHaveAttribute('data-invalid', '');
 });
 
+test('fills the width of its parent, and the height of a sized grid parent', async () => {
+  const screen = await render(
+    <div className="flex flex-col items-start gap-4">
+      <div className="w-72">
+        <TextArea aria-label="auto" />
+      </div>
+      <div className="grid h-60 w-72">
+        <TextArea resize="none" aria-label="none">
+          <span>위</span>
+          <TextArea.Input />
+          <span>아래</span>
+        </TextArea>
+      </div>
+    </div>,
+  );
+  const shell = (name: string) => shellOf(screen.getByRole('textbox', { name }).element());
+
+  expect(shell('auto').offsetWidth).toBe(288);
+  expect(shell('none').offsetWidth).toBe(288);
+  expect(shell('none').offsetHeight).toBe(240);
+  const textarea = screen.getByRole('textbox', { name: 'none' }).element() as HTMLElement;
+  const bottomBar = shell('none').querySelector('[data-text-area-bottom]')!;
+  expect(bottomBar.getBoundingClientRect().bottom).toBe(
+    shell('none').getBoundingClientRect().bottom,
+  );
+  expect(textarea.getBoundingClientRect().bottom).toBe(bottomBar.getBoundingClientRect().top);
+});
+
 test('invalid structures and row bounds fail clearly', () => {
   for (const node of [
     <TextArea>
@@ -410,9 +438,11 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', poin
 }
 
 const resizable = (resize: TextArea.Resize) => (
-  <TextArea resize={resize} rows={3} aria-label="메모" className="w-72">
-    <TextArea.Input ref={pinRowMetrics} />
-  </TextArea>
+  <div className="w-72">
+    <TextArea resize={resize} rows={3} aria-label="메모">
+      <TextArea.Input ref={pinRowMetrics} />
+    </TextArea>
+  </div>
 );
 
 const twelveLines = Array.from({ length: 12 }, (_, line) => `줄 ${line + 1}`).join('\n');
@@ -467,9 +497,11 @@ test.each(['ltr', 'rtl'] as const)(
       <div dir={dir} className="flex flex-col items-start gap-12 p-8">
         {MODES.map((mode) => (
           <Fragment key={mode}>
-            <TextArea resize={mode} aria-label={mode} className="w-72">
-              <TextArea.Input style={{ height: 80 }} />
-            </TextArea>
+            <div className="w-72">
+              <TextArea resize={mode} aria-label={mode}>
+                <TextArea.Input style={{ height: 80 }} />
+              </TextArea>
+            </div>
             <Resizable
               direction={mode}
               defaultWidth={288}
@@ -546,9 +578,11 @@ test.each(['ltr', 'rtl'] as const)(
     const screen = await render(
       <div dir={dir} className="flex flex-col items-start gap-16 p-8">
         {MODES.map((mode) => (
-          <TextArea key={mode} resize={mode} aria-label={mode} className="w-72">
-            <TextArea.Input style={{ height: 80 }} />
-          </TextArea>
+          <div key={mode} className="w-72">
+            <TextArea resize={mode} aria-label={mode}>
+              <TextArea.Input style={{ height: 80 }} />
+            </TextArea>
+          </div>
         ))}
       </div>,
     );
@@ -604,22 +638,19 @@ test('the bar controls and the count next to the handle stay pressable in every 
   const onSend = vi.fn();
   const field = (resize: TextArea.Resize, size: (typeof SIZES)[number]) => (
     <div key={`${resize}-${size}`} className="flex flex-col items-start gap-16 p-8">
-      <TextArea resize={resize} size={size} rows={2} aria-label="보낼 글" className="w-72">
-        <TextArea.Input />
-        <TextArea.Count />
-        <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} onClick={onSend} />
-      </TextArea>
-      <TextArea
-        resize={resize}
-        size={size}
-        rows={2}
-        maxLength={100}
-        aria-label="센 글"
-        className="w-72"
-      >
-        <TextArea.Input />
-        <TextArea.Count />
-      </TextArea>
+      <div className="w-72">
+        <TextArea resize={resize} size={size} rows={2} aria-label="보낼 글">
+          <TextArea.Input />
+          <TextArea.Count />
+          <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} onClick={onSend} />
+        </TextArea>
+      </div>
+      <div className="w-72">
+        <TextArea resize={resize} size={size} rows={2} maxLength={100} aria-label="센 글">
+          <TextArea.Input />
+          <TextArea.Count />
+        </TextArea>
+      </div>
     </div>
   );
   const screen = await render(field('vertical', 'standard'));
@@ -651,16 +682,17 @@ test('the scrollbar runs to the rounded corner and stays pressable next to the h
   const field = (resize: TextArea.Resize) => (
     <div className="flex flex-col items-start gap-8 p-8">
       <button type="button">밖</button>
-      <TextArea
-        key={resize}
-        resize={resize}
-        rows={3}
-        aria-label="메모"
-        className="w-72"
-        defaultValue={twelveLines}
-      >
-        <TextArea.Input ref={pinRowMetrics} />
-      </TextArea>
+      <div className="w-72">
+        <TextArea
+          key={resize}
+          resize={resize}
+          rows={3}
+          aria-label="메모"
+          defaultValue={twelveLines}
+        >
+          <TextArea.Input ref={pinRowMetrics} />
+        </TextArea>
+      </div>
     </div>
   );
   const screen = await render(field('vertical'));
@@ -698,14 +730,18 @@ test('the scrollbar runs to the rounded corner and stays pressable next to the h
 test('focus: the edge handle rings like Resizable edge handle, the field keeps its ring off, the corner grip draws along its arc; the handle is the last tab stop', async () => {
   const screen = await render(
     <div className="flex flex-col items-start gap-12 p-8">
-      <TextArea resize="vertical" aria-label="세로" className="w-72">
-        <TextArea.Input />
-        <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
-      </TextArea>
+      <div className="w-72">
+        <TextArea resize="vertical" aria-label="세로">
+          <TextArea.Input />
+          <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
+        </TextArea>
+      </div>
       <Resizable direction="vertical" defaultWidth={288} defaultHeight={80} data-testid="box">
         내용
       </Resizable>
-      <TextArea resize="both" aria-label="양쪽" className="w-72" />
+      <div className="w-72">
+        <TextArea resize="both" aria-label="양쪽" />
+      </div>
     </div>,
   );
   const vertical = shellOf(screen.getByRole('textbox', { name: '세로' }).element());

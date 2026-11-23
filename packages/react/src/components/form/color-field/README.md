@@ -7,6 +7,7 @@
 - **스크린 리더.** 트리거는 DateField 처럼 `role="combobox"`, `aria-haspopup="dialog"` 이고, `브랜드 색상 #3B82F6` 처럼 이름과 값을 함께 읽힙니다. `required` 는 `aria-required`, `readOnly` 는 `aria-readonly` 로 알립니다. 읽을 수 없는 값은 그대로 보이고 `aria-invalid` 가 됩니다.
 - **폼.** `name` 으로 형식에 맞춘 값 하나가 제출되고, `required` 는 브라우저 검증이 막습니다. `<button type="reset">` 은 `defaultValue` 로 되돌립니다.
 - **팝업.** 아래 공간이 모자라면 위로 열리고, 트리거가 보이는 동안은 화면 밖으로 나가지 않습니다. 좁은 화면에서는 모달 하단 시트로 열 수 있습니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-64"><ColorField /></div>`.
 
 ```tsx
 import { ColorField, Field } from '@gsainfoteam/ids-react';
@@ -89,16 +90,15 @@ import { ColorField, Field } from '@gsainfoteam/ids-react';
 - `Trigger`, `Clear`, `Content` 는 각각 하나까지입니다. `Clear` 를 `Trigger` 안에 넣으면 오류입니다.
 - 모든 part 가 `asChild` 를 받습니다. 자식은 props 와 ref 를 해당 element 에 전달해야 합니다.
 
-## 상태와 data 속성
+## 상태
 
-| 요소   | 속성                                                                                                                      |
-| ------ | ------------------------------------------------------------------------------------------------------------------------- |
-| 루트   | `data-open`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-empty`, `data-size`, `data-variant` |
-| 트리거 | `aria-expanded`, `data-placeholder`, `data-readonly`                                                                      |
-| Swatch | `data-empty`                                                                                                              |
-| 팝업   | `role="dialog"`, `data-presentation` (`popover` / `drawer`), `data-side` (`top` / `bottom`)                               |
+```tsx
+<ColorField value={color} onValueChange={setColor} open={open} onOpenChange={setOpen} />
+```
 
-- 루트와 Trigger 의 `className` 은 `ColorField.State` 를 받는 함수도 됩니다.
+- 앱은 값을 `value` / `onValueChange` 로, 열림을 `open` / `onOpenChange` 로 읽습니다. 비어 있는지는 `value === ''` 로 압니다.
+- `disabled`, `readOnly`, `invalid`, `required` 는 앱이 준 값 그대로입니다. 읽을 수 없는 값은 `aria-invalid` 로 알립니다.
+- 새 디자인을 그릴 때만, 루트와 `Trigger` 의 `className` 은 `ColorField.State` 를 받는 함수도 됩니다.
 
 ## 열림 상태
 
@@ -170,12 +170,11 @@ const methods = useForm({ defaultValues: { color: '' } });
 | `disabled` / `readOnly`  | 열기, 변경, 지우기를 막는다                                         |
 | `name` / `form`          | 형식에 맞춘 값 하나를 hidden input 으로                             |
 | `required`               | 브라우저 검증                                                       |
-| `className` / `style`    | 루트. `className` 은 상태를 받는 함수도 된다                        |
 | `ref`, 그 외 native 속성 | 트리거 button (`id`, `aria-*`, `autoFocus`, `onFocus`, `onBlur` 등) |
 
 ## 알아둘 것
 
 - 이름은 `Field.Label` 이나 `aria-label` 로 줍니다. 팝업도 같은 이름으로 읽히고, 이름이 없으면 `색상 선택` 입니다.
-- `Field` 안에서는 값이 바뀌거나 팝업이 열리고 닫힐 때마다 `Field` 가 `data-filled` 와 `data-dirty` 를 다시 읽습니다.
+- `Field` 안에서는 값이 바뀌거나 팝업이 열리고 닫힐 때마다 `Field` 가 채워졌는지와 바뀌었는지를 다시 읽습니다.
 - `onBlur` 는 포커스가 트리거와 팝업을 모두 벗어날 때만 불립니다.
 - 팝업 위치와 폭은 지우기 버튼을 포함한 필드 전체를 기준으로 잡습니다.

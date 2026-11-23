@@ -73,15 +73,17 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-80">
-      <Field.Label>기술</Field.Label>
-      <ChipField name="skills" placeholder="기술 검색">
-        <ChipField.Item value="react">React</ChipField.Item>
-        <ChipField.Item value="vue">Vue</ChipField.Item>
-        <ChipField.Item value="flutter">Flutter</ChipField.Item>
-        <ChipField.Item value="swift">Swift</ChipField.Item>
-      </ChipField>
-    </Field>
+    <div className="w-80">
+      <Field>
+        <Field.Label>기술</Field.Label>
+        <ChipField name="skills" placeholder="기술 검색">
+          <ChipField.Item value="react">React</ChipField.Item>
+          <ChipField.Item value="vue">Vue</ChipField.Item>
+          <ChipField.Item value="flutter">Flutter</ChipField.Item>
+          <ChipField.Item value="swift">Swift</ChipField.Item>
+        </ChipField>
+      </Field>
+    </div>
   ),
 };
 
@@ -413,13 +415,13 @@ export const SubmitWithANativeForm: Story = {
 
     return (
       <form
-        className="flex w-80 flex-col items-start gap-4"
+        className="grid w-80 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(JSON.stringify(new FormData(event.currentTarget).getAll('skills')));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>기술</Field.Label>
           <ChipField name="skills" required>
             <ChipField.Group heading="프론트엔드">
@@ -477,7 +479,7 @@ export const ConnectReactHookForm: Story = {
     return (
       <FormProvider {...methods}>
         <form
-          className="flex w-80 flex-col items-start gap-4"
+          className="grid w-80 gap-4"
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(data.tags.join(',')))}
         >
@@ -485,7 +487,6 @@ export const ConnectReactHookForm: Story = {
             name="tags"
             controlMode="value"
             registerOptions={{ validate: (tags) => tags.length > 0 || '하나 이상 고르세요.' }}
-            className="w-full"
           >
             <FormField.Label>태그</FormField.Label>
             <ChipField>
