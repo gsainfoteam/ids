@@ -124,7 +124,7 @@ sends IDS components and no Tiptap. `tests/use-client.test.ts` lists them in
     chart the app writes; Tooltip, Legend and the screen reader table are IDS's code.
   - rich text editing `@tiptap/*` 3 (MIT parts only: core, react, pm, starter-kit, extensions,
     markdown), imported only by the `@gsainfoteam/ids-react/editor` entry. Only
-    `editor/engine.tsx` imports it at runtime, and `load-engine.ts` loads that with `import()`
+    `editor/parts/engine.tsx` imports it at runtime, and `editor/lib/load-engine.ts` loads that with `import()`
     when an Editor mounts; Markdown goes through `@tiptap/markdown`, loaded the same way only for
     `format="markdown"`. The shell, toolbar and parts are IDS's code and use Tiptap's types only.
     The document schema (nodes, markdown rules, image and link checks) and the text styles live in
@@ -226,7 +226,7 @@ drawer/
   `lib/`. Feature folders a component already had (Editor's `mention/`, RichText's `nodes/`) stay
   as they are. Generated files stay where codegen writes them (`form/editor/messages-catalog.ts`).
 - **Internal hooks are `useInternal*`.** A hook that no public entry exports is named `useInternal`
-  plus the component, part or module it serves (`useInternalDrawer`, `useInternalMenuItem`,
+  plus the component, part or module it serves (`useInternalDrawerContext`, `useInternalMenuItem`,
   `useInternalSliderContext`, `useInternalReducedMotion`). Public hooks keep `useX`
   (`useDrawer`, `useDataTable`, `useTheme`). ESLint fails when a public entry, or a namespace in a
   component's `index.tsx`, exports a `useInternal*` name, and public entries name every export (no
@@ -676,7 +676,7 @@ Every scale has nine steps, read by the same roles in both modes:
   `text-on-neutral-solid` under Lc 75 under the press layer.
 
 A brand or status family builds its two scales from a 50 to 950 ramp (one color through the
-palette model, or the ramp an app passes), by `SCALE_RULES` in `ids-provider/palette-scales.ts`:
+palette model, or the ramp an app passes), by `SCALE_RULES` in `ids-provider/lib/palette-scales.ts`:
 
 - Light 1 to 3 sit on the ramp at the lightness of neutral 1 to 3, 4 is ramp 100 and 5 ramp 200.
   Dark 1 to 5 sit on the ramp at the lightness of the dark neutral step with the same number.
@@ -705,7 +705,7 @@ so there is no shared `--color-<role>` and `bg-on-primary` does not exist. Write
 for a role used as another property, such as `bg-(--ids-color-border-neutral-strong)` on a handle,
 `bg-(--ids-color-text-neutral)` on a dragged handle or `stroke-(--ids-color-bg-base)` around a
 chart dot. A brand family the theme leaves out (`secondary`, `tertiary`) is derived from primary
-(`ids-provider/derived-brands.ts`), so the provider always writes all three.
+(`ids-provider/lib/derived-brands.ts`), so the provider always writes all three.
 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `border-neutral` (neutral step 5), the way shadcn/ui keeps chrome gray and lets
@@ -731,7 +731,7 @@ tinted neutrals and harmonized and fixed statuses, under the hover and press lay
 which `tests/tokens-contrast.test.ts` checks.
 
 **Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
-`colorjs.io/fn`, in `ids-provider/contrast.ts`). The solid starts at 600 and moves to 500 or 700,
+`colorjs.io/fn`, in `ids-provider/lib/contrast.ts`). The solid starts at 600 and moves to 500 or 700,
 then 400 or 800, until white or neutral 950 text reaches Lc 75 at rest and under the press layer;
 the text on it is then computed like every `text-on-*`. WCAG 2's ratio rates dark text on mid-tone
 fills too well, so it is not used, and axe's `color-contrast` rule, which computes it, is off in
@@ -1255,7 +1255,7 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 
 - The app owns its brand colors: `primary` (required), `secondary` and `tertiary`, each one CSS color, a
   `50` to `950` ramp, or `{ light, dark }` scales of nine colors. The provider picks every family's roles for
-  both modes by contrast (`ids-provider/theme-roles.ts`) and writes them as
+  both modes by contrast (`ids-provider/lib/theme-roles.ts`) and writes them as
   `--ids-theme-{mode}-{role}`; `ids.css` maps the current mode's set onto `--ids-color-{role}`.
 - `neutral: 'tinted'` gives the neutral the primary hue at low chroma (`'pure'` by default).
   `status` is `'harmonized'` by default (each status hue turns toward primary by at most 15°, or
@@ -1265,7 +1265,7 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
   red-green color blindness. The thresholds were set from the 17 demo palettes that core used
   to hold and are fixed values now.
 - Chart has no color tokens: a series without `color` takes `bg-primary-solid`, `bg-secondary-solid` and
-  `bg-tertiary-solid` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
+  `bg-tertiary-solid` in config order (`DEFAULT_SERIES` in `data/chart/lib/config.ts`). A fourth draws in
   neutral and warns in development.
 - A `secondary` or `tertiary` the app leaves out is derived from primary, the Material 3 way:
   secondary keeps primary's hue at a third of its chroma ratio, tertiary turns the hue by +60° at
@@ -1349,7 +1349,7 @@ ids_flutter follows ids-react's theme. The design is decided in React; Flutter p
   is `IdsProvider.Scope`. Nested providers inherit what they leave out; a scope with its own `mode`
   or `defaultMode` owns its mode, the others forward `setMode` and `toggleMode` to the owner.
   `IdsMode.system` follows the platform brightness.
-- `lib/src/color` ports `ids-provider/theme-roles.ts`, `contrast.ts` (APCA from colorjs.io),
+- `lib/src/color` ports `ids-provider/lib/theme-roles.ts`, `contrast.ts` (APCA from colorjs.io),
   `derived-brands.ts`, `status.ts` and the `checkIdsTheme` checks line by line, so a theme gives the
   same 8-bit colors on both platforms. `packages/react/tests/flutter-parity.test.ts` writes
   `packages/core/tests/fixtures/theme-roles.json` (17 palettes × pure/tinted × harmonized/fixed ×
