@@ -11,7 +11,7 @@ import {
   type QRCodeGeometryOptions,
   type QRCodeModuleShape,
 } from './qr-path';
-import { qrCodeStyle, type QRCodeTone } from './style';
+import { qrCodeStyle } from './style';
 import { resolveState } from '../../../internal/state-props';
 import { useTranslate } from '../../../internal/translate';
 import { containsElementOfType } from '../../../utils';
@@ -41,11 +41,6 @@ function geometryThatFits(value: string, options: QRCodeGeometryOptions) {
   }
 }
 
-function toneOf(inverted: boolean | undefined): QRCodeTone {
-  if (inverted === undefined) return 'theme';
-  return inverted ? 'light-on-dark' : 'dark-on-light';
-}
-
 export function QRCodeRoot({
   value,
   size = 'standard',
@@ -53,7 +48,7 @@ export function QRCodeRoot({
   shape = 'square',
   finderShape,
   quietZone = STANDARD_QUIET_ZONE,
-  inverted,
+  variant = 'theme',
   className,
   style,
   children,
@@ -100,7 +95,7 @@ export function QRCodeRoot({
   };
   const styles = qrCodeStyle({
     size: typeof size === 'number' ? undefined : size,
-    tone: toneOf(inverted),
+    variant,
     flush: quietZone <= 0,
   });
   const customSize: CSSProperties | undefined =
@@ -115,6 +110,7 @@ export function QRCodeRoot({
         aria-labelledby={ariaLabelledBy}
         {...rest}
         data-qr-code=""
+        data-variant={variant}
         data-shape={shape}
         data-finder-shape={finder}
         data-error-correction={level}

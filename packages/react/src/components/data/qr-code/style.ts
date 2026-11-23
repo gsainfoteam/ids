@@ -2,7 +2,7 @@ import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type QRCodeTone = 'theme' | 'dark-on-light' | 'light-on-dark';
+export type QRCodeVariant = 'theme' | 'light' | 'dark';
 
 export const qrCodeStyle = tv({
   slots: {
@@ -21,23 +21,23 @@ export const qrCodeStyle = tv({
       standard: { root: 'size-32' },
       tiny: { root: 'size-24' },
     } satisfies Record<IdsSize, object>,
-    tone: {
+    variant: {
       theme: {
         root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-neutral-strong))]',
         background: 'fill-[var(--qr-code-background,var(--ids-color-bg-base))]',
       },
-      'dark-on-light': {
+      light: {
         root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code))]',
         background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code))]',
       },
-      'light-on-dark': {
+      dark: {
         root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code-inverse))]',
         background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code-inverse))]',
       },
-    } satisfies Record<QRCodeTone, object>,
+    } satisfies Record<QRCodeVariant, object>,
     flush: {
       true: { root: 'rounded-none' },
     },
   },
-  defaultVariants: { size: 'standard', tone: 'theme' },
+  defaultVariants: { size: 'standard', variant: 'theme' },
 });

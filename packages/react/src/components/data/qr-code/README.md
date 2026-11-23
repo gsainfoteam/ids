@@ -3,7 +3,7 @@
 URL, 텍스트, 연락처를 QR 코드로 그립니다. 행렬은 `uqr` 가 만들고, IDS 가 토큰 색으로 SVG 를 그립니다.
 
 - **SVG 한 장.** 모듈은 `path` 하나, 세 모서리의 파인더는 또 하나입니다. 서버 HTML 에 이미 그려져 있고, 어떤 크기로 늘려도 흐려지지 않습니다.
-- **토큰 색.** `bg-base` 바탕에 `text-neutral-strong` 모듈입니다. 다크 모드에서는 테마를 따라 반전됩니다. 반전이 곤란하면 `inverted={false}` 를 씁니다.
+- **토큰 색.** `bg-base` 바탕에 `text-neutral-strong` 모듈입니다. 다크 모드에서는 테마를 따라 반전됩니다. 반전이 곤란하면 `variant="light"` 를 씁니다.
 - **모양.** 모듈은 `square` / `rounded` / `dots`, 파인더는 `square` / `rounded` / `circle` 입니다.
 - **가운데 로고.** `QRCode.Logo` 를 넣으면 가운데 모듈을 비우고 오류 정정 수준을 H 로 올립니다.
 - **이름.** `role="img"` 이고, 기본 이름은 "QR 코드" 입니다. 긴 URL 을 소리 내어 읽지 않습니다.
@@ -79,9 +79,9 @@ import { QRCode } from '@gsainfoteam/ids-react';
 ## 색과 다크 모드
 
 ```tsx
-<QRCode value={url} />                    // 테마를 따른다. 다크 모드에서는 밝은 모듈, 어두운 바탕
-<QRCode value={url} inverted={false} />   // 어느 모드에서나 밝은 바탕에 어두운 모듈
-<QRCode value={url} inverted />           // 어느 모드에서나 어두운 바탕에 밝은 모듈
+<QRCode value={url} />                    // theme(기본): 테마를 따른다. 다크 모드에서는 밝은 모듈, 어두운 바탕
+<QRCode value={url} variant="light" />    // 어느 모드에서나 밝은 바탕에 어두운 모듈
+<QRCode value={url} variant="dark" />     // 어느 모드에서나 어두운 바탕에 밝은 모듈
 
 <QRCode
   value={url}
@@ -90,7 +90,8 @@ import { QRCode } from '@gsainfoteam/ids-react';
 ```
 
 - QR 표준은 밝은 바탕에 어두운 모듈입니다. iOS 카메라, Google Lens 처럼 요즘 앱은 반전된 코드도 읽지만, 오래된 스캐너나 결제 단말기는 못 읽을 수 있습니다.
-- 어떤 스캐너가 읽을지 모르는 화면(결제, 출입, 인쇄물)에는 `inverted={false}` 를 씁니다. 다크 모드에서 흰 판 위에 코드가 놓입니다.
+- 어떤 스캐너가 읽을지 모르는 화면(결제, 출입, 인쇄물)에는 `variant="light"` 를 씁니다. 다크 모드에서 흰 판 위에 코드가 놓입니다.
+- `light` 는 `bg-qr-code` / `text-qr-code`, `dark` 는 `bg-qr-code-inverse` / `text-qr-code-inverse` 컴포넌트 토큰을 씁니다.
 - 색은 `--qr-code-foreground`, `--qr-code-background` 두 변수로 바꿉니다. 두 색의 대비가 클수록 잘 읽힙니다. 기본 조합은 어느 모드에서나 15:1 이 넘습니다.
 
 ## 접근성
@@ -112,6 +113,7 @@ import { QRCode } from '@gsainfoteam/ids-react';
 
 | 속성                    | 뜻                                        |
 | ----------------------- | ----------------------------------------- |
+| `data-variant`          | `theme` / `light` / `dark`                |
 | `data-shape`            | `square` / `rounded` / `dots`             |
 | `data-finder-shape`     | `square` / `rounded` / `circle`           |
 | `data-error-correction` | 실제로 쓴 수준 `L` / `M` / `Q` / `H`      |
@@ -125,12 +127,12 @@ import { QRCode } from '@gsainfoteam/ids-react';
 | 속성              | 기본 / 동작                                                   |
 | ----------------- | ------------------------------------------------------------- |
 | `value`           | 인코딩할 문자열. UTF-8 로 담는다                              |
+| `variant`         | `theme`(기본, 테마를 따름) / `light` / `dark`(모드와 상관없이) |
 | `size`            | `standard`(128px, 기본) / `tiny`(96px) / 숫자(px)             |
 | `errorCorrection` | `L` / `M`(기본) / `Q` / `H`. 로고가 있으면 기본 `H`           |
 | `shape`           | `square`(기본) / `rounded` / `dots`                           |
 | `finderShape`     | `square` / `rounded` / `circle`. 기본은 `shape` 를 따름       |
 | `quietZone`       | 둘레 빈 칸 수. 기본 `4`                                       |
-| `inverted`        | 없음: 테마를 따름. `false`: 항상 밝은 바탕. `true`: 항상 반전 |
 | `Logo.asChild`    | 기본 `div` 대신 자식 요소에 속성을 합친다                     |
 | 그 외             | 루트 `div` 의 native 속성                                     |
 
