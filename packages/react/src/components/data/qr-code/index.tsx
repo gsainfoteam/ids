@@ -1,14 +1,14 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { QRCodeLogo, type QRCodeLogoProps } from './logo';
 import {
   type QRCodeErrorCorrection,
   type QRCodeFinderShape,
   type QRCodeModuleShape,
-} from './qr-path';
+} from './lib/qr-path';
+import { QRCodeLogo, type QRCodeLogoProps } from './parts/logo';
 import { QRCodeRoot } from './root';
 import { qrCodeStyle, type QRCodeVariant } from './style';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 

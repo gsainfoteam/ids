@@ -45,7 +45,7 @@
 | [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                                                | DateField, TimeField, DateTimeField                                                                                                                                                                                   |
 | [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                                              | TextField, PasswordField, NumberField, TelField, TextArea                                                                                                                                                             |
 | [`surfaces/toggle-surface.ts`](#surfacestoggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
-| [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useTranslate`, `useProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
+| [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useInternalTranslate`, `useInternalProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
 | [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
 | [`use-copy-feedback.ts`](#use-copy-feedbackts)   | 클립보드에 쓰고 1.5초 동안 복사했다고 알리는 hook                                    | CodeBlock.Copy, Message.Copy |
 | [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image |
@@ -73,7 +73,7 @@ Spinner 와 CircularProgress 가 그리는 원호의 SVG 와 치수입니다.
   trackClassName={track()}
 />
 
-// components/feedback/circular-progress/indicator.tsx (CircularProgress.Indicator)
+// components/feedback/circular-progress/parts/indicator.tsx (CircularProgress.Indicator)
 <circle
   {...circleGeometry}           // cx, cy 12, r ARC_RADIUS, strokeWidth 3 (circle.ts)
   strokeDasharray={ARC_CIRCUMFERENCE}
@@ -277,13 +277,13 @@ const dateLocale = resolveLocale(providerLocale); // 'ko-KR' 같은 BCP 47 태�
 // components/data/calendar/root.tsx
 weekStartsOn={weekStartOf(locale)}
 
-// components/data/calendar/day-picker-locale.ts
+// components/data/calendar/lib/day-picker-locale.ts
 formatDay: (date) => formatPart(date, 'day', locale, { day: 'numeric' }),
 
-// components/data/scheduler/toolbar.tsx
+// components/data/scheduler/parts/toolbar.tsx
 <LanguageContext value={{ ...language, locale: withWeekStart(locale, weekStartsOn) }}>
 
-// components/form/date-field/parse.ts
+// components/form/date-field/lib/parse.ts
 const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE);
 ```
 
@@ -302,7 +302,7 @@ const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE
 ### 왜 이렇게
 
 - `resolveLocale` 은 `Intl.getCanonicalLocales` 로 태그를 검사하고 정규형(`ko-kr` → `ko-KR`)을 돌려줍니다. 어떤 태그든 import 없이 됩니다. locale 데이터는 런타임의 ICU 에 이미 있습니다.
-- 인자를 생략하면 `DEFAULT_LOCALE`(`'ko-KR'`)을 씁니다. 날짜와 시간 컴포넌트는 `locale` prop 이 없고 가장 가까운 `IdsProvider` 의 `locale`([translate.ts](#translatets) 의 `useProviderLocale`)을 넘깁니다. 주 시작과 숫자 체계도 그 태그의 `-u-fw-`, `-u-nu-` 확장으로 정합니다.
+- 인자를 생략하면 `DEFAULT_LOCALE`(`'ko-KR'`)을 씁니다. 날짜와 시간 컴포넌트는 `locale` prop 이 없고 가장 가까운 `IdsProvider` 의 `locale`([translate.ts](#translatets) 의 `useInternalProviderLocale`)을 넘깁니다. 주 시작과 숫자 체계도 그 태그의 `-u-fw-`, `-u-nu-` 확장으로 정합니다.
 - `dateFormatter` 는 `@internationalized/date` 의 `DateFormatter` 입니다. 같은 locale 과 옵션의 `Intl.DateTimeFormat` 을 캐시하고, Chrome 의 `hour12` 버그를 피합니다.
 - `withWeekStart` 는 태그에 이미 있는 `-fw-` 를 지우고 `-u-` 확장 안에 다시 적습니다. Scheduler 는 자기 `weekStartsOn` 을 Calendar 에 넘길 prop 이 없어서, 이 태그를 `LanguageContext` 로 내려 줍니다.
 - `periodFirst`, `dateOrder`, `monthNames`, `nativeDigits` 는 locale 마다 한 번 계산합니다(`memoize`).
@@ -359,8 +359,8 @@ dnd-kit 끌기를 시작하는 규칙을 한곳에 둔 hook 입니다. 끌어 �
 ### 쓰는 법
 
 ```tsx
-const sensors = useDragSensors(); // 마우스와 터치
-const sensors = useDragSensors({ touch: false }); // 마우스만
+const sensors = useInternalDragSensors(); // 마우스와 터치
+const sensors = useInternalDragSensors({ touch: false }); // 마우스만
 
 <DndContext sensors={sensors}>...</DndContext>
 ```
@@ -388,7 +388,7 @@ step 계산에 쓰는 정확한 십진수 `Decimal` 입니다. decimal.js 의 `D
 ### 쓰는 법
 
 ```ts
-// components/form/slider/slider-math.ts
+// components/form/slider/lib/slider-math.ts
 const offset = new Decimal(raw).minus(min).toNearest(step, Decimal.ROUND_HALF_CEIL);
 return clamp(offset.plus(min).toNumber(), min, max);
 ```
@@ -600,11 +600,11 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 - 컴포넌트의 `relative` 루트 안에 렌더합니다. 아니면 검증 input 이 가장 가까운 positioned 조상을 덮습니다.
 - `name` 이 없으면 숨은 input 을 그리지 않습니다. 다른 input 이 이미 값을 보내는 컴포넌트는 `name` 을 빼고 씁니다.
 - `disabled` 면 검증 input 을 그리지 않습니다.
-- Field 는 `data-form-value-validator` 가 붙은 input 을 값 계산에서 빼고 유효성만 읽습니다(`components/form/field/control-state.ts` 의 `mirrorsGuardedValue`). 속성 이름을 바꾸면 Field 쪽도 고칩니다. 테스트와 스토리도 이 속성으로 검증 input 을 찾습니다.
+- Field 는 `data-form-value-validator` 가 붙은 input 을 값 계산에서 빼고 유효성만 읽습니다(`components/form/field/lib/control-state.ts` 의 `mirrorsGuardedValue`). 속성 이름을 바꾸면 Field 쪽도 고칩니다. 테스트와 스토리도 이 속성으로 검증 input 을 찾습니다.
 
 ## icon-label.ts
 
-아이콘만 있는 컨트롤의 접근 가능한 이름(`aria-label`)을 아이콘에서 찾는 hook(`useIconLabel`)과 그 헬퍼입니다.
+아이콘만 있는 컨트롤의 접근 가능한 이름(`aria-label`)을 아이콘에서 찾는 hook(`useInternalIconLabel`)과 그 헬퍼입니다.
 
 ### 쓰는 곳
 
@@ -616,15 +616,15 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 ```tsx
 // components/action/icon-button/root.tsx
 const glyph = icon ?? content;
-const label = useIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
+const label = useInternalIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
 
 return render(
   { ...rest, 'aria-label': label ?? rest['aria-label'] /* ... */ },
   glyph,
 );
 
-// components/action/floating-button/use-floating-button.ts
-const label = useIconLabel(
+// components/action/floating-button/hooks/use-floating-button.ts
+const label = useInternalIconLabel(
   'FloatingButton',
   iconOnly ? button.content : undefined,       // 라벨이 보이면 찾을 이름이 없다
   rest,
@@ -684,22 +684,22 @@ export const iconButtonStyle = tv({
 
 `<img>` 를 불러오는 상태(`loading`, `loaded`, `error`)를 다루는 hook 두 개입니다.
 
-- `useImageStatus(src, onStatusChange)`: 지금 `src` 의 상태와, 이미지가 상태를 알리는 `report(src, status)` 를 돌려줍니다. `src` 가 없으면 처음부터 `error` 입니다.
-- `useImageSettledBeforeMount(imageRef, src, report)`: React 가 듣기 전에 이미 끝난 이미지를 마운트 때 읽어 `report` 로 넘깁니다.
+- `useInternalImageStatus(src, onStatusChange)`: 지금 `src` 의 상태와, 이미지가 상태를 알리는 `report(src, status)` 를 돌려줍니다. `src` 가 없으면 처음부터 `error` 입니다.
+- `useInternalImageSettledBeforeMount(imageRef, src, report)`: React 가 듣기 전에 이미 끝난 이미지를 마운트 때 읽어 `report` 로 넘깁니다.
 
 ### 쓰는 곳
 
-- Avatar: 루트가 `useImageStatus`, `Avatar.Image` 가 `useImageSettledBeforeMount`
+- Avatar: 루트가 `useInternalImageStatus`, `Avatar.Image` 가 `useInternalImageSettledBeforeMount`
 - Image: 사진 상자(`root.tsx` 의 `ImageFrame`)가 둘 다. 깨진 `<img>` 는 빼고 `Image.Fallback` 이 `alt` 를 이름으로 가진 그림이 됩니다.
 
 ### 쓰는 법
 
 ```tsx
 // components/data/avatar/root.tsx
-const { status, report } = useImageStatus(imageSrc || undefined, onStatusChange);
+const { status, report } = useInternalImageStatus(imageSrc || undefined, onStatusChange);
 
-// components/data/avatar/image.tsx
-useImageSettledBeforeMount(imageRef, current, report);
+// components/data/avatar/parts/image.tsx
+useInternalImageSettledBeforeMount(imageRef, current, report);
 
 <img
   key={current}                                  // 새 src 는 새 요소
@@ -714,7 +714,7 @@ useImageSettledBeforeMount(imageRef, current, report);
 
 - 상태는 `{ src, status }` 로 기억합니다. `src` 가 바뀐 렌더에서는 기억한 상태 대신 `loading` 을 씁니다. effect 로 되돌리지 않으므로 앞 이미지의 `loaded` 가 새 `src` 와 함께 그려지는 순간이 없습니다.
 - `report` 는 지금 `src` 에서 온 알림만 받습니다(`currentSrc`). 늦게 끝난 앞 이미지의 `error` 가 새 이미지의 상태를 덮지 않습니다.
-- 서버 HTML 의 `<img>` 는 hydration 전에 이미 다 불러왔을 수 있습니다. 그 `load` 는 React 가 듣기 전에 지나갔으므로, `useImageSettledBeforeMount` 가 layout effect 에서 `complete` 와 `naturalWidth` 를 읽습니다. 캐시에서 바로 온 이미지도 같습니다.
+- 서버 HTML 의 `<img>` 는 hydration 전에 이미 다 불러왔을 수 있습니다. 그 `load` 는 React 가 듣기 전에 지나갔으므로, `useInternalImageSettledBeforeMount` 가 layout effect 에서 `complete` 와 `naturalWidth` 를 읽습니다. 캐시에서 바로 온 이미지도 같습니다.
 - 크기를 적지 않은 SVG 는 불러와도 `naturalWidth` 가 0 일 수 있습니다. 그래서 `complete` 인데 폭이 0 이면 `decode()` 의 성공과 실패로 가립니다.
 - `onStatusChange` 는 상태가 바뀐 뒤의 effect 에서 부릅니다. 최신 함수는 ref 로 읽으므로 함수가 바뀌어도 다시 부르지 않습니다.
 
@@ -744,7 +744,7 @@ useImageSettledBeforeMount(imageRef, current, report);
 ### 쓰는 법
 
 ```ts
-// components/form/slider/use-slider.ts
+// components/form/slider/hooks/use-slider.ts
 keyHandler(
   withModifiers({                       // Shift 는 큰 걸음, 다른 수식 키는 무시한다
     ArrowRight: moveTo(at + small),
@@ -755,10 +755,10 @@ keyHandler(
   { dir: isRtl() ? 'rtl' : 'ltr' },     // rtl 이면 ArrowLeft 와 ArrowRight 의 동작을 바꾼다
 )(event);
 
-// components/data/accordion/use-accordion.ts: 수식 키가 눌리면 반응하지 않는다
+// components/data/accordion/hooks/use-accordion.ts: 수식 키가 눌리면 반응하지 않는다
 keyHandler(mapValues(TRIGGER_MOVES, focusTrigger))(event);
 
-// internal/temporal-field/use-temporal-field.ts: false 면 키를 브라우저에 남긴다
+// internal/temporal-field/hooks/use-temporal-field.ts: false 면 키를 브라우저에 남긴다
 Escape: () => {
   if (draft === null || expanded) return false;
   dropDraft();
@@ -859,13 +859,13 @@ formatDefaultMessage('calendar.weekNumber', { week: 3 }); // '3주차'
 - 기본값은 컴포넌트 이름 아래에 중첩한 객체입니다. 키는 점으로 이은 경로(`'calendar.previousMonth'`)이고, `IdsMessageKey` 는 그 잎 경로들의 union 타입입니다. next-intl, i18next 가 중첩 카탈로그를 같은 점 경로로 읽어서, 앱은 `ko.json`, `en.json` 을 `ids` 아래에 그대로 붙일 수 있습니다.
 - 그룹과 키는 알파벳 순서입니다. 두 카탈로그도 같은 순서라 diff 가 읽기 쉽습니다(`tests/messages.test.ts` 가 확인).
 - 값은 ICU 메시지 문자열입니다. 번역(`en.json`)은 `{count, plural, one {…} other {…}}` 같은 복수형을 쓰고, 그것을 포맷하는 것은 앱의 i18n 라이브러리입니다.
-- Editor 의 문구(`editor.*`)는 공용 `messages-catalog.ts` 에 없고 `components/form/editor/messages-catalog.ts` 의 `editorMessages` 에 있습니다. 공용 카탈로그는 문구를 쓰는 모든 컴포넌트가 싣기 때문에, Editor 만 쓰는 문구 3 kB 가 Button, Dialog 의 import 에도 실리지 않게 나눴습니다. Editor 의 컴포넌트는 `useTranslate(editorMessages)` 로 읽습니다. `IdsMessageKey` 는 두 카탈로그의 키를 모두 담습니다.
+- Editor 의 문구(`editor.*`)는 공용 `messages-catalog.ts` 에 없고 `components/form/editor/messages-catalog.ts` 의 `editorMessages` 에 있습니다. 공용 카탈로그는 문구를 쓰는 모든 컴포넌트가 싣기 때문에, Editor 만 쓰는 문구 3 kB 가 Button, Dialog 의 import 에도 실리지 않게 나눴습니다. Editor 의 컴포넌트는 `useInternalTranslate(editorMessages)` 로 읽습니다. `IdsMessageKey` 는 두 카탈로그의 키를 모두 담습니다.
 - 한국어 기본값은 복수형이 필요 없어서 `{name}` 자리만 씁니다. 그래서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). 이 약속은 `tests/messages.test.ts` 가 ICU 파서로 확인합니다.
 
 ### 알아둘 것
 
 - 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`와 `messages/en.json`을 생성합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
-- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 쓰고, `every-message.ts` 가 다시 합칩니다. 카탈로그를 넘기지 않은 `useTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
+- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 쓰고, `every-message.ts` 가 다시 합칩니다. 카탈로그를 넘기지 않은 `useInternalTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 
@@ -880,12 +880,12 @@ JS 로 움직임을 재생하는 코드(Web Animations)가 CSS 의 움직임 규
 ### 쓰는 곳
 
 - [zoom-pan](./zoom-pan/README.md): 확대와 이동의 애니메이션, 관성
-- Image 의 여닫는 효과(`components/data/image/flip.ts`): 썸네일에서 커지고 돌아가는 움직임, 움직임을 줄였을 때의 페이드
+- Image 의 여닫는 효과(`components/data/image/lib/flip.ts`): 썸네일에서 커지고 돌아가는 움직임, 움직임을 줄였을 때의 페이드
 
 ### 쓰는 법
 
 ```ts
-// internal/zoom-pan/engine.ts
+// internal/zoom-pan/lib/engine.ts
 if (prefersReducedMotion(content)) return; // 목표에 바로 둔다
 content.animate(keyframes, { duration: motionDuration(content, 'normal'), easing: SHEET_EASING });
 ```
@@ -898,7 +898,7 @@ content.animate(keyframes, { duration: motionDuration(content, 'normal'), easing
 
 ## paragraph.ts
 
-`<p>` 로 그리는 Description 파트가 쓰는 hook(`useParagraphRef`)입니다. 사용자의 `ref` 와 합친 ref 를 돌려주고, 개발 빌드에서 그 `<p>` 안에 블록 요소가 있으면 한 번 경고합니다.
+`<p>` 로 그리는 Description 파트가 쓰는 hook(`useInternalParagraphRef`)입니다. 사용자의 `ref` 와 합친 ref 를 돌려주고, 개발 빌드에서 그 `<p>` 안에 블록 요소가 있으면 한 번 경고합니다.
 
 ### 쓰는 곳
 
@@ -907,9 +907,9 @@ content.animate(keyframes, { duration: motionDuration(content, 'normal'), easing
 ### 쓰는 법
 
 ```tsx
-// components/data/card/description.tsx
+// components/data/card/parts/description.tsx
 export function CardDescription({ asChild, className, ref, ...props }: CardDescriptionProps) {
-  const paragraphRef = useParagraphRef('Card.Description', ref);
+  const paragraphRef = useInternalParagraphRef('Card.Description', ref);
   const Root = asChild === true ? Slot : 'p';
   return <Root {...props} ref={paragraphRef} /* ... */ />;
 }
@@ -929,18 +929,18 @@ export function CardDescription({ asChild, className, ref, ...props }: CardDescr
 
 ## pressable.ts
 
-`div` 같은 요소가 `button` 처럼 Enter 와 Space 로 눌리게 하는 hook(`usePressable`)과, 클릭이 안쪽 컨트롤에서 시작했는지 보는 함수(`isFromNestedControl`)입니다.
+`div` 같은 요소가 `button` 처럼 Enter 와 Space 로 눌리게 하는 hook(`useInternalPressable`)과, 클릭이 안쪽 컨트롤에서 시작했는지 보는 함수(`isFromNestedControl`)입니다.
 
 ### 쓰는 곳
 
-- [surface.ts](#surfacets) 의 `useSurface`: 누를 수 있는 Card, Item
+- [surface.ts](#surfacets) 의 `useInternalSurface`: 누를 수 있는 Card, Item
 - Button: `asChild` 자식이 `button` 도 `a` 도 아닌 HTML 요소일 때(`kind === 'element'`)
 
 ### 쓰는 법
 
 ```ts
-// components/action/button/use-button.ts
-const press = usePressable<HTMLElement>({
+// components/action/button/hooks/use-button.ts
+const press = useInternalPressable<HTMLElement>({
   enabled: kind === 'element',          // <Button asChild><div /></Button>
   disabled: softDisabled,
   onClick: softDisabled ? blockActivation : onClick,
@@ -979,16 +979,16 @@ const press = usePressable<HTMLElement>({
 
 - Select: `select-options.ts` 의 `collectOptions`(`textOf`), `matchesQuery`, `typeaheadIndex`
 - ChipField: `chip-values.ts` 의 같은 값 판정(`normalizeText`), 제안 거르기(Select 의 `matchesQuery`)
-- Menu: 명령 팔레트 항목의 거르기(`use-command.ts` 의 `useCommandOption`)
+- Menu: 명령 팔레트 항목의 거르기(`use-command.ts` 의 `useInternalCommandOption`)
 - Highlight: 맞은 부분을 `<mark>` 로 나누기(`searchChunks`, `textOf`)
 
 ### 쓰는 법
 
 ```ts
-// components/overlay/menu/use-command.ts
+// components/overlay/menu/hooks/use-command.ts
 const visible = matchesSearch(textValue ?? textOf(children), palette.query);
 
-// components/form/select/select-options.ts
+// components/form/select/lib/select-options.ts
 export const matchesQuery = (option, query) => matchesSearch(option.search, query);
 
 // components/typography/highlight/root.tsx
@@ -1076,20 +1076,20 @@ thumb: [
 
 | 파일            | 내용                                                                                  |
 | --------------- | ------------------------------------------------------------------------------------- |
-| `use-slides.ts` | `useSlides`: Embla 설정, 멈춘 자리(`value`), 트랙과 장의 props, 끌기 허락과 취소      |
+| `use-slides.ts` | `useInternalSlides`: Embla 설정, 멈춘 자리(`value`), 트랙과 장의 props, 끌기 허락과 취소      |
 | `slide-keys.ts` | `moveWithKeys`: 방향키, `Home`, `End` 로 자리를 옮긴다. 쓰는 쪽이 붙일 때만 동작한다  |
 | `announcer.tsx` | `SlidesAnnouncer`: "5장 중 2번째" 알림 영역과, 원하면 보이는 "2 / 5" 카운터           |
 | `layout.ts`     | 뷰포트, 트랙, 장의 클래스(`slidesLayout`)와 엔진이 붙기 전의 추정(`estimateSlides`)   |
 
 ### 쓰는 곳
 
-- Carousel: 모두. `root.tsx` 가 `useSlides`, `moveWithKeys`, `SlidesAnnouncer` 를, `style.ts` 가 `slidesLayout` 을 씁니다.
-- Image 의 뷰어(`components/data/image/viewer-layer.tsx`): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`, `slidesLayout` 의 `track` 과 `slide`. 영역은 `slidesLayout.viewport` 대신 `overflow-x-clip overflow-y-visible` 이라, 확대한 사진이 위의 설명과 아래 도구 막대 쪽으로 넘쳐 보입니다(`overflow-hidden` 이면 그 경계에서 잘린다). "2 / 6" 은 `Image.Viewer.Counter` 가 그리므로 `counter` 를 켜지 않습니다. 확대 중에는 방향키가 사진을 옮기므로 키는 자기 `keyHandler` 로 받고 `moveWithKeys` 를 싣지 않습니다. 확대 중에는 `watchDrag` 가 끌기를 막고, 두 번째 손가락이 닿거나 아래로 쓸기 시작하면 `cancelDrag()` 로 끌던 트랙을 돌려놓습니다.
+- Carousel: 모두. `root.tsx` 가 `useInternalSlides`, `moveWithKeys`, `SlidesAnnouncer` 를, `style.ts` 가 `slidesLayout` 을 씁니다.
+- Image 의 뷰어(`components/data/image/parts/viewer-layer.tsx`): 전체 화면 레이어 안에서 `useInternalSlides`, `SlidesAnnouncer`, `slidesLayout` 의 `track` 과 `slide`. 영역은 `slidesLayout.viewport` 대신 `overflow-x-clip overflow-y-visible` 이라, 확대한 사진이 위의 설명과 아래 도구 막대 쪽으로 넘쳐 보입니다(`overflow-hidden` 이면 그 경계에서 잘린다). "2 / 6" 은 `Image.Viewer.Counter` 가 그리므로 `counter` 를 켜지 않습니다. 확대 중에는 방향키가 사진을 옮기므로 키는 자기 `keyHandler` 로 받고 `moveWithKeys` 를 싣지 않습니다. 확대 중에는 `watchDrag` 가 끌기를 막고, 두 번째 손가락이 닿거나 아래로 쓸기 시작하면 `cancelDrag()` 로 끌던 트랙을 돌려놓습니다.
 
 ### 쓰는 법
 
 ```tsx
-const slides = useSlides({
+const slides = useInternalSlides({
   slideCount: images.length,                     // 서버와 첫 렌더의 장 수. 엔진이 붙으면 트랙의 자식 수
   value, defaultValue, onValueChange,            // 멈춘 자리(스냅) 번호. 0부터
   orientation: 'horizontal',                     // 'vertical'
@@ -1115,7 +1115,7 @@ const slides = useSlides({
 onKeyDown={(event) => moveWithKeys(slides, event)}
 ```
 
-| `useSlides` 가 돌려주는 것                           | 뜻                                                                                        |
+| `useInternalSlides` 가 돌려주는 것                           | 뜻                                                                                        |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `api`                                                | Embla 의 `EmblaCarouselType`. 엔진이 붙기 전(서버, hydration)에는 `undefined`             |
 | `selected`                                           | 멈춘 자리. 자리 수에 맞춘 값                                                              |
@@ -1157,7 +1157,7 @@ onKeyDown={(event) => moveWithKeys(slides, event)}
 - `reInit`(크기 변화, 장 수 변화, `cancelDrag`)은 플러그인을 새로 만듭니다. 재생 상태를 가진 쪽은 `reInit` 이벤트 때 다시 맞춥니다(Carousel 의 `use-carousel-motion.ts`).
 - 세로는 뷰포트에 높이가 있어야 합니다. 높이가 없으면 모든 장이 늘어섭니다.
 - 이 폴더를 바꾸면 Carousel 과 Image.Viewer 가 함께 바뀝니다. `tests/carousel.test.tsx` 의 `engine:` 테스트가 Image.Viewer 가 기대는 동작(끌기 거절, `cancelDrag`, 두 번째 손가락, 키 없음, `touch-action`)을 확인합니다.
-- Embla 9(정식)가 나오면 이 폴더만 옮깁니다. 장 이름과 알림은 Embla 의 접근성 플러그인 대신 `useTranslate` 로 씁니다.
+- Embla 9(정식)가 나오면 이 폴더만 옮깁니다. 장 이름과 알림은 Embla 의 접근성 플러그인 대신 `useInternalTranslate` 로 씁니다.
 
 ## state-props.ts
 
@@ -1208,7 +1208,7 @@ style?: StateValue<CSSProperties | undefined, State>;
 const assertive = announcedAssertively.has(colorScheme);
 <div role={role ?? (assertive ? 'alert' : 'status')} />
 
-// components/feedback/alert/icon.tsx
+// components/feedback/alert/parts/icon.tsx
 const Glyph = statusIcons[state.colorScheme];
 ```
 
@@ -1224,20 +1224,20 @@ const Glyph = statusIcons[state.colorScheme];
 
 ## surface.ts
 
-카드나 목록 행처럼 통째로 누르는 표면의 hook 입니다. `useSurface`(누르기와 인터랙션 상태), `useLabelling`(이름과 설명 연결), `useRegisteredId`(파트의 id 등록) 세 개입니다.
+카드나 목록 행처럼 통째로 누르는 표면의 hook 입니다. `useInternalSurface`(누르기와 인터랙션 상태), `useInternalLabelling`(이름과 설명 연결), `useInternalRegisteredId`(파트의 id 등록) 세 개입니다.
 
 ### 쓰는 곳
 
-- Card(`use-card.ts`), Item(`use-item.ts`): `useSurface`, `useLabelling`
-- Card.Title, Card.Description, Item.Title, Item.Description, Chip.Label: `useRegisteredId(setTitleId, id)` 처럼 등록 함수와 함께
-- Chip.Close: `useRegisteredId(undefined, id)` 로 안정된 id 만 받습니다.
+- Card(`use-card.ts`), Item(`use-item.ts`): `useInternalSurface`, `useInternalLabelling`
+- Card.Title, Card.Description, Item.Title, Item.Description, Chip.Label: `useInternalRegisteredId(setTitleId, id)` 처럼 등록 함수와 함께
+- Chip.Close: `useInternalRegisteredId(undefined, id)` 로 안정된 id 만 받습니다.
 
 ### 쓰는 법
 
 ```tsx
 // components/data/card/root.tsx
 const titleIsTheButton = interactive && !asChild && containsElementOfType(children, CARD_TITLE);
-const { interaction, props, dataProps, labelling, descriptionId, register } = useCard({
+const { interaction, props, dataProps, labelling, descriptionId, register } = useInternalCard({
   interactive,
   asChild,
   disabled,
@@ -1251,7 +1251,7 @@ const { interaction, props, dataProps, labelling, descriptionId, register } = us
   <Root {...rest} {...props} {...labelling} {...dataProps}>...</Root>
 </CardContext>
 
-// components/data/card/title.tsx
+// components/data/card/parts/title.tsx
 <Part {...props} asChild={asChild} id={titleId} kind="title" className={styles.title({ className })}>
   {titleContent({ trigger, asChild, children })}
 </Part>
@@ -1266,7 +1266,7 @@ const { interaction, props, dataProps, labelling, descriptionId, register } = us
 - Title 을 찾는 일은 `containsElementOfType`(utils/children.ts)이 JSX 를 훑어 합니다. layout effect 로 등록된 id 를 기다리지 않으므로 서버 HTML 부터 역할이 맞습니다. 자식이 함수이거나 Title 이 직접 만든 컴포넌트 안에 있으면 찾지 못하고 루트가 버튼이 됩니다.
 - disabled 인 Title 모드 표면은 루트에 `aria-disabled` 를 붙입니다. 흐려진 카드 글자가 비활성 컴포넌트의 일부로 읽히고, axe 도 그 글자의 대비를 재지 않습니다.
 - 누를 수 없는 표면은 hover 나 press 가 없으므로 `data-hovered` 같은 속성을 붙이지 않습니다(`dataProps` 가 빈 객체).
-- 루트가 버튼일 때는 Title 을 이름으로, Description 을 설명으로 씁니다(`aria-labelledby`, `aria-describedby`). 연결하지 않으면 안의 글자가 모두 하나의 긴 이름으로 읽힙니다. Title 모드에서는 버튼의 글자가 곧 이름이고 설명만 `aria-describedby` 로 잇습니다(`useLabelling` 이 돌려주는 `descriptionId`).
+- 루트가 버튼일 때는 Title 을 이름으로, Description 을 설명으로 씁니다(`aria-labelledby`, `aria-describedby`). 연결하지 않으면 안의 글자가 모두 하나의 긴 이름으로 읽힙니다. Title 모드에서는 버튼의 글자가 곧 이름이고 설명만 `aria-describedby` 로 잇습니다(`useInternalLabelling` 이 돌려주는 `descriptionId`).
 - 파트는 마운트돼 있는 동안만 id 를 등록합니다(layout effect 에서 등록, cleanup 에서 `undefined`). 그래서 표면은 실제로 있는 파트만 가리킵니다.
 
 ### 알아둘 것
@@ -1330,7 +1330,7 @@ export const toggleStyle = tv({
 - 색은 [surfaces/control-surface.ts](#surfacescontrol-surfacets) 와 같은 scheme utility 에서 옵니다. `compoundVariants` 가 neutral 의 primary ring 과 상태 계열의 `quietInStatusColor` 를 더합니다.
 - 꺼진 동안의 hover 와 press 는 모든 variant 가 state layer(`state-hover`, `state-press`)입니다. 켜진 동안에는 `data-hovered`, `data-active` 가 붙지 않으므로 층이 켜진 모양을 바꾸지 않습니다.
 - `transparent` 는 `glyphVariant` 에만 있습니다. 글자 Toggle 이 배경 없이 색만 바꾸면 켜짐을 색으로만 알리게 됩니다. IconToggle 은 `icon` 함수로 채운 아이콘을 바꿀 수 있습니다.
-- 꺼진 `transparent` 는 scheme 과 상관없이 `text-neutral-strong` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
+- 꺼진 `transparent` 는 scheme 과 상관없이 `text-neutral-strong` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useInternalToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
 - 켜진 `ghost`, `outline` 은 색 있는 배경을 칠하지 않고 press 층만 남깁니다. 층은 상태 scheme 에서 `state-scheme` 의 계열 채움 12%, 나머지는 글자색 10% 이고, `text-X` 는 그 층 아래에서도 Lc 60 을 지킵니다(IdsProvider 가 확인). 켜진 soft 는 soft 층, 켜진 solid 는 `state-fill` 입니다.
 - 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.
@@ -1348,13 +1348,13 @@ export const toggleStyle = tv({
 ### 쓰는 곳
 
 - `IdsProvider`: `LanguageContext` 를 제공합니다. `translate`, `locale` 을 주지 않은 provider 는 바깥 것을 물려받습니다.
-- 문구를 그리는 모든 컴포넌트와 hook: `useTranslate()`. Editor 는 자기 카탈로그를 넘깁니다(`useTranslate(editorMessages)`).
-- 날짜, 시간, 숫자, 전화번호 컴포넌트: `useProviderLocale()`.
+- 문구를 그리는 모든 컴포넌트와 hook: `useInternalTranslate()`. Editor 는 자기 카탈로그를 넘깁니다(`useInternalTranslate(editorMessages)`).
+- 날짜, 시간, 숫자, 전화번호 컴포넌트: `useInternalProviderLocale()`.
 
 ### 쓰는 법
 
 ```tsx
-const t = useTranslate();
+const t = useInternalTranslate();
 <button aria-label={t('dialog.close')} />;
 t('chipField.remove', { label }); // 값을 끼우는 문구
 
@@ -1385,12 +1385,12 @@ react-hook-form 의 `register()` 처럼 바깥 코드가 `input.checked` 에 직
 ### 쓰는 법
 
 ```ts
-// components/form/checkbox/use-checkbox.ts
-const silently = useCheckedWrites(inputRef, checked === true, (next) => {
+// components/form/checkbox/hooks/use-checkbox.ts
+const silently = useInternalCheckedWrites(inputRef, checked === true, (next) => {
   if (next !== (latest.current === true)) setChecked(next);
 });
 
-useFormReset(inputRef, () => {
+useInternalFormReset(inputRef, () => {
   // ...
   silently(() => {
     input.checked = checkedAfterReset === true;   // 자기 쓰기는 알리지 않는다
@@ -1412,7 +1412,7 @@ useFormReset(inputRef, () => {
 - 마운트할 때 DOM 값이 한 번 그대로 알려집니다. `onWrite` 는 지금 상태와 같은 값을 무시해야 합니다. Checkbox 는 `indeterminate` 를 `false` 로 덮지 않도록 `latest.current === true` 와 비교합니다.
 - 컴포넌트가 `input.checked` 에 직접 쓸 때는 반드시 `silently(() => ...)` 안에서 씁니다. 그 안의 쓰기는 `writingSilently` 로 표시돼 모으지 않습니다. 밖에서 쓰면 자기 쓰기가 바깥 쓰기로 알려져 `onCheckedChange` 가 불립니다.
 - cleanup 은 인스턴스에 있던 descriptor 를 되돌리고, 없었으면 인스턴스 속성을 지워 prototype 의 setter 로 돌아갑니다.
-- 브라우저의 폼 reset 은 JS setter 를 거치지 않으므로 이 hook 이 보지 못합니다. reset 은 [`useFormReset`](../hooks/README.md#use-form-resetts) 이 맡습니다.
+- 브라우저의 폼 reset 은 JS setter 를 거치지 않으므로 이 hook 이 보지 못합니다. reset 은 [`useInternalFormReset`](../hooks/README.md#use-form-resetts) 이 맡습니다.
 
 ## use-copy-feedback.ts
 
@@ -1425,7 +1425,7 @@ useFormReset(inputRef, () => {
 ### 쓰는 법
 
 ```tsx
-const { copied, copy } = useCopyFeedback(() => text ?? readContent());
+const { copied, copy } = useInternalCopyFeedback(() => text ?? readContent());
 
 <IconButton
   aria-label={copied ? t('message.copied') : t('message.copy')}
@@ -1444,4 +1444,4 @@ const { copied, copy } = useCopyFeedback(() => text ?? readContent());
 ### 알아둘 것
 
 - 문구와 `role="status"` 알림은 컴포넌트가 그립니다. 문구 키가 컴포넌트마다 달라서입니다.
-- 클립보드를 쓸 수 없는 환경은 [`useClipboardSupport`](../hooks/README.md#use-clipboard-supportts) 로 먼저 거릅니다. 이 hook 은 그 판정을 하지 않습니다.
+- 클립보드를 쓸 수 없는 환경은 [`useInternalClipboardSupport`](../hooks/README.md#use-clipboard-supportts) 로 먼저 거릅니다. 이 hook 은 그 판정을 하지 않습니다.

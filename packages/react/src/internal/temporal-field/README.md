@@ -4,7 +4,7 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
 
 | 파일                                             | 내용                                                                                                                                                  |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`index.tsx`](#indextsx)                         | `TemporalField`, 파트(`TemporalTrigger`, `TemporalInput`, `TemporalValue`, `TemporalClear`, `TemporalContent`), `useTemporalPicker`, `pickerPart`, `temporalFieldStyle` 의 다시 내보내기 |
+| [`index.tsx`](#indextsx)                         | `TemporalField`, 파트(`TemporalTrigger`, `TemporalInput`, `TemporalValue`, `TemporalClear`, `TemporalContent`), `useInternalTemporalPicker`, `pickerPart`, `temporalFieldStyle` 의 다시 내보내기 |
 | [`style.ts`](#stylets)                           | `temporalFieldStyle`                                                                                                                                  |
 | [`use-temporal-field.ts`](#use-temporal-fieldts) | 값, 열림, 입력 중인 글자, blur, 폼 reset 을 다루는 hook                                                                                               |
 | [`format.ts`](#formatts)                         | 표시 형식(`TemporalFormat`, `formatter`, `dateOptions`, `timeOptions`)                                                                                |
@@ -97,7 +97,7 @@ export namespace DateField {
 - Clear 와 Input 옆 버튼은 [`fieldAction.unpadded`](../README.md#field-surfacets) 입니다. Trigger 가 상자 끝까지 차서 상자에 padding 이 없습니다.
 - 팝업은 `TemporalContent` 가 그립니다(`X.Content`). 그래서 좁은 화면의 모양 `mobileVariant` 는 루트가 아니라 Content 의 prop 이고, Content 의 나머지 속성은 팝업 안 내용 상자에 붙습니다. Content 를 주지 않으면 루트가 빈 Content 를 그립니다.
 - 팝업은 `role="dialog"` 이고 이름은 `messages.title`, `data-temporal-owner` 는 `popupId` 입니다. 머리(`FieldPopupHeader`)는 늘 렌더하고 drawer 에서만 보입니다.
-- `DateField.Calendar`, `TimeField.TimePicker` 같은 picker 파트는 `useTemporalPicker(part)` 로 `{ value, change, close, size }` 를 읽어 값을 잇습니다. 루트의 자식으로 적으면 필드 루트가 `pickerPart(children, type)` 로 찾아 `picker` 에서 그리고, `Content` 의 children 안에 적어도 같은 context 를 읽어 그 자리에 그려집니다. `pickerPart` 는 루트의 자식과 `Content` 의 children 을 함께 찾습니다. 팝업 폭(`monthsToShow`)이나 오늘(`today`)처럼 열기 전에 루트가 알아야 하는 속성이 있기 때문이고, 둘 중 한 곳만 찾으면 다른 곳에 적은 속성이 조용히 무시됩니다.
+- `DateField.Calendar`, `TimeField.TimePicker` 같은 picker 파트는 `useInternalTemporalPicker(part)` 로 `{ value, change, close, size }` 를 읽어 값을 잇습니다. 루트의 자식으로 적으면 필드 루트가 `pickerPart(children, type)` 로 찾아 `picker` 에서 그리고, `Content` 의 children 안에 적어도 같은 context 를 읽어 그 자리에 그려집니다. `pickerPart` 는 루트의 자식과 `Content` 의 children 을 함께 찾습니다. 팝업 폭(`monthsToShow`)이나 오늘(`today`)처럼 열기 전에 루트가 알아야 하는 속성이 있기 때문이고, 둘 중 한 곳만 찾으면 다른 곳에 적은 속성이 조용히 무시됩니다.
 - `panel`, `panelTime`, `panelHint` 는 DateTimeField 의 팝업입니다. 달력 옆에 시계를 두고, 휴대폰에서는 위아래로 쌓습니다(`sm:flex-row`).
 
 ### 알아둘 것
@@ -123,7 +123,7 @@ export namespace DateField {
 ```ts
 // internal/temporal-field/index.tsx
 const { state, input, blocked, popupId, controlRef, rootRef, change, clear, close, toggle, show, onBlur: handleBlur } =
-  useTemporalField<V>({
+  useInternalTemporalField<V>({
     value,
     defaultValue: defaultValue ?? config.empty,
     onValueChange,
@@ -161,7 +161,7 @@ const { state, input, blocked, popupId, controlRef, rootRef, change, clear, clos
 
 - `change(value, { close: true })` 는 값을 넣고 닫으며 포커스를 되돌립니다. `picker` 가 받는 API 입니다.
 - `change` 와 `clear` 는 blocked 면 아무것도 하지 않습니다.
-- reset 의 시점 문제는 [`useFormReset`](../../hooks/README.md#use-form-resetts) 을 봅니다.
+- reset 의 시점 문제는 [`useInternalFormReset`](../../hooks/README.md#use-form-resetts) 을 봅니다.
 
 ## format.ts
 

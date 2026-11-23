@@ -10,7 +10,7 @@ import {
   modulesPath,
   qrCodeGeometry,
   type QRCodeErrorCorrection,
-} from '../src/components/data/qr-code/qr-path';
+} from '../src/components/data/qr-code/lib/qr-path';
 
 const URL_VALUE = 'https://gistory.me/profile/alice';
 const SCALE = 6;

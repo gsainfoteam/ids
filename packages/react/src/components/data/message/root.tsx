@@ -4,15 +4,15 @@ import { isValidElement, use, useCallback, useId, useRef, type ReactNode } from 
 
 import { ArrowPathIcon, ExclamationCircleIcon } from '@heroicons/react/16/solid';
 
-import { MessageActions } from './actions';
-import { MessageAvatar } from './avatar';
-import { MessageContent } from './content';
 import { MessageContext, MessageGroupContext } from './context';
-import { MessageFooter } from './footer';
-import { MessageHeader } from './header';
-import { MessageSide } from './side';
+import { MessageActions } from './parts/actions';
+import { MessageAvatar } from './parts/avatar';
+import { MessageContent } from './parts/content';
+import { MessageFooter } from './parts/footer';
+import { MessageHeader } from './parts/header';
+import { MessageSide } from './parts/side';
 import { messageStyle } from './style';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalTranslate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
 import { Button } from '../../action/button';
 import { Marker } from '../../feedback/marker';
@@ -57,7 +57,7 @@ function Failure({
   styles: ReturnType<typeof messageStyle>;
   onRetry: (() => void) | undefined;
 }) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   return (
     <div data-message-failure="" className={styles.failure()}>

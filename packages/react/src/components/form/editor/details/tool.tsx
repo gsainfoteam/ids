@@ -2,7 +2,7 @@
 
 import { ListCollapse } from 'lucide-react';
 
-import { EditorToggleTool, type EditorToggleSpec, type EditorToolProps } from '../tool';
+import { EditorToggleTool, type EditorToggleSpec, type EditorToolProps } from '../parts/tool';
 
 export type EditorDetailsProps = EditorToolProps;
 

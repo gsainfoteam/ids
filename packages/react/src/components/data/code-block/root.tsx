@@ -11,13 +11,13 @@ import {
 } from 'react';
 
 import { CodeBlockContext } from './context';
-import { CodeBlockCopy } from './copy';
-import { CodeBlockFold } from './fold';
-import { isPlainText } from './highlight';
-import { CodeBlockLineNumbers } from './line-numbers';
+import { useInternalHighlightedLines } from './hooks/use-code-block';
+import { isPlainText } from './lib/highlight';
+import { CodeBlockCopy } from './parts/copy';
+import { CodeBlockFold } from './parts/fold';
+import { CodeBlockLineNumbers } from './parts/line-numbers';
+import { CodeBlockTitle } from './parts/title';
 import { codeBlockStyle } from './style';
-import { CodeBlockTitle } from './title';
-import { useHighlightedLines } from './use-code-block';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { elementTypeOf } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
@@ -65,7 +65,7 @@ export function CodeBlockRoot({
   ...rest
 }: CodeBlock.Props) {
   const { code, title, copy, lineNumbers } = splitChildren(children);
-  const lines = useHighlightedLines(code, language);
+  const lines = useInternalHighlightedLines(code, language);
   const highlighted = new Set(highlight);
   const preId = useId();
   const [expanded, setExpanded] = useControllableState({

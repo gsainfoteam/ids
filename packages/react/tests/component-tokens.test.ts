@@ -2,17 +2,17 @@ import { differenceEuclidean } from 'culori';
 import { describe, expect, test } from 'vitest';
 
 import { paletteHues, palettes } from '../.storybook/palettes';
-import { lightnessContrast } from '../src/components/utility/ids-provider/contrast';
+import { lightnessContrast } from '../src/components/utility/ids-provider/lib/contrast';
 import {
   ACCENT_TEXT_LC,
   MODES,
   TEXT_LC,
   resolveColors,
-} from '../src/components/utility/ids-provider/theme-roles';
+} from '../src/components/utility/ids-provider/lib/theme-roles';
 import { IDS_COLOR_FAMILIES } from '../src/tokens/color-roles';
 import { IDS_COMPONENT_COLORS, IDS_COMPONENT_SHADOWS } from '../src/tokens/component-tokens';
 
-import type { IdsNeutral } from '../src/components/utility/ids-provider/theme';
+import type { IdsNeutral } from '../src/components/utility/ids-provider/lib/theme';
 import type { IdsMode } from '../src/tokens/types';
 
 type ComponentColor = keyof typeof IDS_COMPONENT_COLORS;

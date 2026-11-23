@@ -2,17 +2,17 @@
 
 import { isValidElement, useEffect, useId, useRef, type ReactElement } from 'react';
 
-import { StepperContent } from './content';
 import { StepperContext, StepperIndexContext } from './context';
-import { StepperItem } from './item';
-import { flag } from './step-state';
+import { flag } from './lib/step-state';
+import { StepperContent } from './parts/content';
+import { StepperItem } from './parts/item';
 import { stepperStyle } from './style';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
+import { resolveState } from '../../../internal/lib/state-props';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
-import { useRovingFocus } from '../../utility/group/use-roving-focus';
+import { useInternalRovingFocus } from '../../utility/group/hooks/use-roving-focus';
 
 import type { Stepper } from '.';
 
@@ -45,7 +45,7 @@ export function StepperRoot(props: Stepper.Props) {
     ...rest
   } = props;
 
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const id = useId();
   const listRef = useRef<HTMLOListElement>(null);
   const [current, setCurrent] = useControllableState({
@@ -67,7 +67,7 @@ export function StepperRoot(props: Stepper.Props) {
     : PROGRESS_ONLY_PROPS.filter((name) => props[name] !== undefined).join(', ');
   const unnamedRecord = !progress && ariaLabel === undefined && ariaLabelledBy === undefined;
 
-  const roving = useRovingFocus({
+  const roving = useInternalRovingFocus({
     rootRef: listRef,
     ownItemSelector: `[data-stepper-trigger="${id}"]`,
     orientation,

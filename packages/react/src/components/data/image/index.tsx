@@ -1,25 +1,25 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { ImageViewerCaption, type ImageViewerCaptionProps } from './caption';
-import { ImageViewerClose, type ImageViewerCloseProps } from './close';
-import { ImageViewerCounter, type ImageViewerCounterProps } from './counter';
-import { ImageViewerDownload, type ImageViewerDownloadProps } from './download';
-import { ImageFallback, type ImageFallbackProps } from './fallback';
-import { ImageViewerNext, type ImageViewerNextProps } from './next';
-import { ImagePlaceholder, type ImagePlaceholderProps } from './placeholder';
-import { ImageViewerPrev, type ImageViewerPrevProps } from './prev';
+import { ImageViewerCaption, type ImageViewerCaptionProps } from './parts/caption';
+import { ImageViewerClose, type ImageViewerCloseProps } from './parts/close';
+import { ImageViewerCounter, type ImageViewerCounterProps } from './parts/counter';
+import { ImageViewerDownload, type ImageViewerDownloadProps } from './parts/download';
+import { ImageFallback, type ImageFallbackProps } from './parts/fallback';
+import { ImageViewerNext, type ImageViewerNextProps } from './parts/next';
+import { ImagePlaceholder, type ImagePlaceholderProps } from './parts/placeholder';
+import { ImageViewerPrev, type ImageViewerPrevProps } from './parts/prev';
+import { ImageViewerSeparator, type ImageViewerSeparatorProps } from './parts/separator';
+import { ImageViewerShare, type ImageViewerShareProps } from './parts/share';
+import { ImageViewerThumbnails, type ImageViewerThumbnailsProps } from './parts/thumbnails';
+import { ImageViewerToolbar, type ImageViewerToolbarProps } from './parts/toolbar';
+import { ImageViewer, type ImageViewerItem, type ImageViewerProps } from './parts/viewer';
+import { ImageViewerZoomIn, type ImageViewerZoomInProps } from './parts/zoom-in';
+import { ImageViewerZoomOut, type ImageViewerZoomOutProps } from './parts/zoom-out';
+import { ImageViewerZoomReset, type ImageViewerZoomResetProps } from './parts/zoom-reset';
 import { ImageRoot } from './root';
-import { ImageViewerSeparator, type ImageViewerSeparatorProps } from './separator';
-import { ImageViewerShare, type ImageViewerShareProps } from './share';
 import { imageStyle } from './style';
-import { ImageViewerThumbnails, type ImageViewerThumbnailsProps } from './thumbnails';
-import { ImageViewerToolbar, type ImageViewerToolbarProps } from './toolbar';
-import { ImageViewer, type ImageViewerItem, type ImageViewerProps } from './viewer';
-import { ImageViewerZoomIn, type ImageViewerZoomInProps } from './zoom-in';
-import { ImageViewerZoomOut, type ImageViewerZoomOutProps } from './zoom-out';
-import { ImageViewerZoomReset, type ImageViewerZoomResetProps } from './zoom-reset';
-import { type ImageStatus } from '../../../internal/image-status';
-import { type StateValue } from '../../../internal/state-props';
+import { type ImageStatus } from '../../../internal/lib/image-status';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 export function Image(props: Image.Props) {
   return <ImageRoot {...props} />;
@@ -155,4 +155,4 @@ export namespace Image {
   export const Style = imageStyle;
 }
 
-export type { ImageViewerItem } from './viewer';
+export type { ImageViewerItem } from './parts/viewer';

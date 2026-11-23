@@ -4,7 +4,7 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { QRCodeArea } from './qr-path';
+import type { QRCodeArea } from './lib/qr-path';
 import type { qrCodeStyle } from './style';
 
 type Context = {
@@ -15,7 +15,7 @@ type Context = {
 
 export const QRCodeContext = createContext<Context | null>(null);
 
-export function useQRCodeContext(part: string) {
+export function useInternalQRCodeContext(part: string) {
   const context = use(QRCodeContext);
   invariant(context, `\`<${part}>\` must be used inside \`<QRCode>\`.`);
   return context;

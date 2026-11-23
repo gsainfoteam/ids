@@ -27,7 +27,10 @@ const isReexportOnly = (code: string) =>
     );
 
 const RICH_TEXT = 'components/typography/rich-text/';
-const RENDERED_ONLY_ON_THE_SERVER = new Set([`${RICH_TEXT}index.tsx`, `${RICH_TEXT}render.tsx`]);
+const RENDERED_ONLY_ON_THE_SERVER = new Set([
+  `${RICH_TEXT}index.tsx`,
+  `${RICH_TEXT}parts/render.tsx`,
+]);
 const isRenderedOnlyOnTheServer = (file: string) =>
   RENDERED_ONLY_ON_THE_SERVER.has(file) || file.startsWith(`${RICH_TEXT}nodes/`);
 

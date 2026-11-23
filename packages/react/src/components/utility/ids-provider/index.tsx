@@ -1,8 +1,8 @@
+import { IdsProviderScope, type IdsProviderScopeProps } from './parts/scope';
 import { IdsProviderRoot, type IdsProviderRootProps } from './root';
-import { IdsProviderScope, type IdsProviderScopeProps } from './scope';
 
-import type { IdsTheme } from './theme';
-import type { ThemeContextValue, ThemeMode } from './use-ids-provider';
+import type { ThemeContextValue, ThemeMode } from './hooks/use-ids-provider';
+import type { IdsTheme } from './lib/theme';
 
 export function IdsProvider(props: IdsProvider.Props) {
   return <IdsProviderRoot {...props} />;
@@ -21,12 +21,12 @@ export namespace IdsProvider {
   }
 }
 
-export { ThemeContext } from './use-ids-provider';
-export { useTheme } from './use-theme';
-export { defineIdsTheme } from './theme';
-export { checkIdsTheme } from './theme-variables';
-export { createIdsPalette } from './palette-scales';
-export { createIdsRamp } from './palette-seed';
+export { ThemeContext } from './hooks/use-ids-provider';
+export { useTheme } from './hooks/use-theme';
+export { defineIdsTheme } from './lib/theme';
+export { checkIdsTheme } from './lib/theme-variables';
+export { createIdsPalette } from './lib/palette-scales';
+export { createIdsRamp } from './lib/palette-seed';
 export type {
   IdsBrandFamily,
   IdsColorFamily,
@@ -43,5 +43,5 @@ export type {
   IdsTheme,
   IdsThemeColor,
   IdsThemeOverrides,
-} from './theme';
-export type { IdsThemeIssue } from './theme-roles';
+} from './lib/theme';
+export type { IdsThemeIssue } from './lib/theme-roles';

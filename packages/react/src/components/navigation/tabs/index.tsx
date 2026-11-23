@@ -1,8 +1,8 @@
-import { TabsContent, type TabsContentProps, type TabsContentState } from './content';
-import { TabsList, type TabsListProps } from './list';
+import { TabsContent, type TabsContentProps, type TabsContentState } from './parts/content';
+import { TabsList, type TabsListProps } from './parts/list';
+import { TabsTrigger, type TabsTriggerProps, type TabsTriggerState } from './parts/trigger';
 import { TabsRoot, type TabsProps, type TabsRenderProps, type TabsState } from './root';
 import { tabsStyle } from './style';
-import { TabsTrigger, type TabsTriggerProps, type TabsTriggerState } from './trigger';
 
 import type { TabsActivationMode, TabsVariant, TabsColorScheme, TabsOrientation } from './context';
 

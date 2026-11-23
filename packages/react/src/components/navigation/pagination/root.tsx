@@ -1,10 +1,10 @@
 'use client';
 
 import { PaginationContext, type PaginationContextValue } from './context';
-import { PaginationList } from './list';
+import { useInternalPagination } from './hooks/use-pagination';
+import { PaginationList } from './parts/list';
 import { paginationStyle } from './style';
-import { usePagination } from './use-pagination';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalTranslate } from '../../../internal/translate';
 import { mergeEventHandlers, mergeRefs } from '../../../utils';
 
 import type { Pagination } from '.';
@@ -26,8 +26,8 @@ export function PaginationRoot({
   children,
   ...props
 }: Pagination.Props) {
-  const t = useTranslate();
-  const pagination = usePagination({
+  const t = useInternalTranslate();
+  const pagination = useInternalPagination({
     page: pageProp,
     defaultPage,
     onPageChange,

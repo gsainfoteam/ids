@@ -2,13 +2,13 @@
 
 import { isValidElement, useCallback, useState, type ReactNode } from 'react';
 
-import { ChipClose } from './close';
 import { ChipContext } from './context';
-import { ChipLabel } from './label';
+import { useInternalChip } from './hooks/use-chip';
+import { ChipClose } from './parts/close';
+import { ChipLabel } from './parts/label';
 import { chipStyle } from './style';
-import { useChip } from './use-chip';
 import { interactiveDataProps, useInteractive } from '../../../hooks/use-interactive';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { elementTypeOf, flattenFragments, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
@@ -71,7 +71,7 @@ export function ChipRoot({
   onInteractionChange,
   ...rest
 }: Chip.Props) {
-  const chip = useChip({
+  const chip = useInternalChip({
     selected,
     defaultSelected,
     onSelectedChange,

@@ -17,8 +17,8 @@
 | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | `textControlStyle`, `TextControlContext`, `TextControlClear`, `Adornments`, `splitAroundInput`, `countOf`, `writesNoneOf`, `stateAttributes` | TextField, PasswordField, NumberField, TelField           |
 | `insetButtons`, `stateAttributes`                                                                                            | TextArea                                                  |
-| `useTextControl`, `useMergedRef`, `isInvalid`                                                                                | TextField, PasswordField, NumberField, TelField, TextArea |
-| `useInputValue`                                                                                                              | TextField, PasswordField, TextArea                        |
+| `useInternalTextControl`, `useInternalMergedRef`, `isInvalid`                                                                                | TextField, PasswordField, NumberField, TelField, TextArea |
+| `useInternalInputValue`                                                                                                              | TextField, PasswordField, TextArea                        |
 | `replaceInput`                                                                                                               | TelField                                                  |
 
 - TextField 는 `textControlStyle` 을 그대로 `TextField.Style` 로 쓰고, PasswordField, NumberField, TelField 는 `tv({ extend: textControlStyle })` 로 넓힙니다.
@@ -37,7 +37,7 @@ const { items, leading, input, trailing } = splitAroundInput<TextField.Input.Pro
   () => <TextFieldInput />,
   'TextField',
 );
-const field = useTextField({
+const field = useInternalTextField({
   rootProps,
   input: input.props,
   disabled,
@@ -93,8 +93,8 @@ const styles = textControlStyle({ variant, size });
 ### 쓰는 법
 
 ```ts
-// components/form/text-field/use-text-field.ts
-const control = useTextControl({ inputRef, disabled, readOnly, clearable });
+// components/form/text-field/hooks/use-text-field.ts
+const control = useInternalTextControl({ inputRef, disabled, readOnly, clearable });
 
 const inputProps = {
   ...native,
@@ -129,8 +129,8 @@ return {
 ### 쓰는 법
 
 ```ts
-// components/form/text-field/use-text-field.ts
-const observed = useInputValue(
+// components/form/text-field/hooks/use-text-field.ts
+const observed = useInternalInputValue(
   inputRef,
   String(native.value ?? native.defaultValue ?? ''),
   notify ?? undefined,                     // FieldNotifyContext: Field 가 값을 다시 읽는다
@@ -154,7 +154,7 @@ onChange: (event: ChangeEvent<HTMLInputElement>) => {
 ### 알아둘 것
 
 - 브라우저의 폼 reset 은 JS setter 를 거치지 않습니다. reset 은 `reset` 이벤트로만 압니다.
-- 폼 reset 을 한 task 미루는 이유는 [`useFormReset`](../../hooks/README.md#use-form-resetts) 과 같습니다. 사용자가 누른 reset 버튼에서는 microtask 가 값 복원 전에 돕니다.
+- 폼 reset 을 한 task 미루는 이유는 [`useInternalFormReset`](../../hooks/README.md#use-form-resetts) 과 같습니다. 사용자가 누른 reset 버튼에서는 microtask 가 값 복원 전에 돕니다.
 - NumberField 와 TelField 는 이 hook 을 쓰지 않고 값을 자기 state 로 가집니다.
 
 ## use-merged-ref.ts
@@ -162,8 +162,8 @@ onChange: (event: ChangeEvent<HTMLInputElement>) => {
 ### 쓰는 법
 
 ```ts
-// components/form/number-field/use-number-field.ts
-const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
+// components/form/number-field/hooks/use-number-field.ts
+const ref = useInternalMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
 
 function assertInput(node: HTMLInputElement) {
   invariant(node.tagName === 'INPUT', '`<NumberField.Input asChild>` must forward its ref to an input.');
@@ -183,13 +183,13 @@ function assertInput(node: HTMLInputElement) {
 ### 쓰는 법
 
 ```ts
-// internal/text-control/use-text-control.ts
+// internal/text-control/hooks/use-text-control.ts
 const clear = () => {
   const input = inputRef.current;
   if (input && !disabled && !readOnly) clearInput(input);
 };
 
-// components/form/tel-field/use-tel-field.ts: 국제 번호 전체를 붙여넣으면
+// components/form/tel-field/hooks/use-tel-field.ts: 국제 번호 전체를 붙여넣으면
 event.preventDefault();
 replaceInput(event.currentTarget, pasted);
 ```

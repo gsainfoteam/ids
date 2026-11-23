@@ -4,8 +4,8 @@ import { createContext, use, type ReactNode } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { SidebarDrop } from './lib/tree';
 import type { SidebarCollapsibleMode, SidebarVariant, sidebarStyle } from './style';
-import type { SidebarDrop } from './tree';
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
 export type SidebarControls = {
@@ -66,7 +66,7 @@ export type SidebarSortableValue = {
 
 export const SidebarSortableContext = createContext<SidebarSortableValue | null>(null);
 
-export function useSidebarContext(part: string) {
+export function useInternalSidebarContext(part: string) {
   const context = use(SidebarContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Sidebar>\`.`);
   return context;
@@ -79,7 +79,7 @@ const NOTHING_PUBLISHED: PublishedSidebar = {
   variant: 'sidebar',
 };
 
-export function useSidebarControls(part: string): SidebarControls & { inside: boolean } {
+export function useInternalSidebarControls(part: string): SidebarControls & { inside: boolean } {
   const sidebar = use(SidebarContext);
   const provider = use(SidebarProviderContext);
   invariant(

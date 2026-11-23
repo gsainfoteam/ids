@@ -9,9 +9,9 @@ import {
 } from 'react';
 
 import { CheckboxGroupContext } from './context';
-import { useCheckboxGroup } from './use-checkbox-group';
-import { FormValue } from '../../../internal/form-value';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalCheckboxGroup } from './hooks/use-checkbox-group';
+import { FormValue } from '../../../internal/parts/form-value';
+import { useInternalTranslate } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { Checkbox } from '../checkbox';
 import { checkboxGroupStyle } from './style';
@@ -115,7 +115,7 @@ export function CheckboxGroupRoot<T extends string>({
   'aria-required': _unsupportedByRoleGroup,
   ...rest
 }: CheckboxGroupProps<T>) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   const {
     value,
@@ -127,7 +127,7 @@ export function CheckboxGroupRoot<T extends string>({
     anchorRef,
     rootRef,
     forwardRootFocusToBox,
-  } = useCheckboxGroup<T>({ value: valueProp, defaultValue, onValueChange, ref });
+  } = useInternalCheckboxGroup<T>({ value: valueProp, defaultValue, onValueChange, ref });
   const ariaInvalid = rest['aria-invalid'] ?? invalid;
   const state: CheckboxGroupState = {
     value,

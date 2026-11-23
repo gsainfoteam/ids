@@ -7,7 +7,7 @@
 
 | 파일                       | 내용                                                                                              |
 | -------------------------- | ------------------------------------------------------------------------------------------------- |
-| [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `useDrawerPresentation` 의 다시 내보내기 |
+| [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `useInternalDrawerPresentation` 의 다시 내보내기 |
 | [`styles.ts`](#stylests)   | `popupStyle`                                                                                      |
 | [`header.tsx`](#headertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                                                |
 | [`search.tsx`](#searchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                                                           |
@@ -18,13 +18,13 @@
 
 | 컴포넌트                                      | 가져가는 것                                                                    |
 | --------------------------------------------- | ------------------------------------------------------------------------------ |
-| Select                                        | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch` |
-| ChipField                                     | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch` |
-| ColorField                                    | `FieldPopup`, `FieldPopupHeader`, `useDrawerPresentation`                      |
+| Select                                        | `FieldPopup`, `useInternalDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch` |
+| ChipField                                     | `FieldPopup`, `useInternalDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch` |
+| ColorField                                    | `FieldPopup`, `FieldPopupHeader`, `useInternalDrawerPresentation`                      |
 | [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`                                               |
 | Menu                                          | `FieldPopupSearch`(명령 팔레트의 `Menu.Search`)                                |
 
-- `search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/search` 에서 직접 가져옵니다.
+- `search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/parts/search` 에서 직접 가져옵니다.
 
 ## index.tsx
 
@@ -45,7 +45,7 @@
   </FieldPopup>
 )}
 
-// components/form/select/use-select.ts: 활성 옵션을 목록 안에서 보이게
+// components/form/select/hooks/use-select.ts: 활성 옵션을 목록 안에서 보이게
 revealPopupOption(node, { center: !revealed.current });   // 처음 열 때만 가운데로
 revealed.current = true;
 ```
@@ -62,11 +62,11 @@ revealed.current = true;
 ### 왜 이렇게
 
 - 팝업은 portal 없이 제자리에 렌더하고 `popover="manual"` 로 native top layer 에 올립니다. DOM 위치가 그대로라 IDS theme(`data-mode` 와 Provider 의 테마 변수)을 물려받고, top layer 라서 조상의 `overflow` 에 잘리지 않습니다.
-- 레이어는 popover 일 때 `popup`, drawer 일 때 `modal` 입니다([`useLayer`](../overlay/README.md#layer-stackts)). 열린 채 drawer 로 바뀌면 다시 등록되어 스택 맨 위로 갑니다.
+- 레이어는 popover 일 때 `popup`, drawer 일 때 `modal` 입니다([`useInternalLayer`](../overlay/README.md#layer-stackts)). 열린 채 drawer 로 바뀌면 다시 등록되어 스택 맨 위로 갑니다.
 
 #### popover
 
-- [`useAnchored`](../overlay/README.md#use-anchoredts) 가 anchor 를 따라갑니다. 방금 놓인 쪽을 지키고, 높이를 처음부터 상한으로 두고, 화면 안에 남깁니다.
+- [`useInternalAnchored`](../overlay/README.md#use-anchoredts) 가 anchor 를 따라갑니다. 방금 놓인 쪽을 지키고, 높이를 처음부터 상한으로 두고, 화면 안에 남깁니다.
 - 폭은 `preferredWidth`(기본 240px)와 anchor 폭 중 큰 쪽, `matchWidth` 면 anchor 폭입니다. 높이는 120px 와 `maxHeight` 사이입니다.
 - 첫 배치가 끝나면(`isPositioned`) 미뤄 둔 가운데 맞추기를 합니다([revealPopupOption](#revealpopupoption)).
 
@@ -106,8 +106,8 @@ revealed.current = true;
 
 ### 알아둘 것
 
-- `onClose` 는 `useLayer` 가 부를 때마다 최신 값을 읽습니다. 렌더마다 새 함수를 넘겨도 다시 등록하지 않습니다.
-- 팝업의 `data-field-popup` 은 Field 가 읽습니다. Field 는 이 안의 input(검색 상자)을 필드의 값으로 세지 않습니다(`components/form/field/control-state.ts` 의 `isInPopupOf`). `revealPopupOption` 도 이 속성으로 팝업을 찾습니다.
+- `onClose` 는 `useInternalLayer` 가 부를 때마다 최신 값을 읽습니다. 렌더마다 새 함수를 넘겨도 다시 등록하지 않습니다.
+- 팝업의 `data-field-popup` 은 Field 가 읽습니다. Field 는 이 안의 input(검색 상자)을 필드의 값으로 세지 않습니다(`components/form/field/lib/control-state.ts` 의 `isInPopupOf`). `revealPopupOption` 도 이 속성으로 팝업을 찾습니다.
 - 팝업은 `[popover]` 라서, 다른 필드의 셸 안에 렌더돼도(TelField 안의 국가 Select) 그 셸의 `focus-ring` 이 팝업 안 input 의 포커스로 켜지지 않습니다. CSS 패키지의 `focus-ring` 이 셸 안 `[popover]` 에 든 `data-field-input`, `data-text-field-input`, `data-text-area-input` 을 뺍니다.
 - `data-presentation`, `data-side` 는 Select, ColorField README 에 적힌 공개 상태 속성입니다. 이름을 바꾸면 그 README 도 고칩니다.
 - `FieldPopup` 에 준 `ref` 는 요소에 닿지 않습니다. `ModalLayer` 의 `RemoveScroll` 이 자식의 ref 를 자기 것으로 바꿉니다. 요소가 필요하면 `data-*` 속성과 `closest` 로 찾습니다(Select 의 `data-select-popup`, ChipField 의 `data-chip-field-popup`).
@@ -126,7 +126,7 @@ const styles = popupStyle({ presentation });   // 'popover' | 'drawer'
 </ScrollArea>
 {drawer && <div className={styles.backdrop()} />}
 
-// internal/field-popup/header.tsx
+// internal/field-popup/parts/header.tsx
 const styles = popupStyle();
 <div className={styles.header()}><h2 id={titleId} className={styles.title()}>{title}</h2></div>
 ```
@@ -167,7 +167,7 @@ const styles = popupStyle();
 ### 쓰는 법
 
 ```tsx
-// components/form/select/search-field.tsx (Select.SearchField)
+// components/form/select/parts/search-field.tsx (Select.SearchField)
 <FieldPopupSearch
   {...own}
   controls={ids.listbox}                 // 검색어가 거르는 listbox 의 id

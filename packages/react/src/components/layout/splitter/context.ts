@@ -4,20 +4,20 @@ import { createContext, use, type Context } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { SplitterOrientation, useInternalSplitter } from './hooks/use-splitter';
 import type { splitterStyle } from './style';
-import type { SplitterOrientation, useSplitter } from './use-splitter';
 
 type SplitterContextValue = {
   orientation: SplitterOrientation;
   styles: ReturnType<typeof splitterStyle>;
-  splitter: ReturnType<typeof useSplitter>;
+  splitter: ReturnType<typeof useInternalSplitter>;
 };
 
 export const SplitterContext = createContext<SplitterContextValue | null>(null);
 export const PanelIndexContext = createContext<number | null>(null);
 export const HandleIndexContext = createContext<number | null>(null);
 
-export function useSplitterPart(part: string, indexContext: Context<number | null>) {
+export function useInternalSplitterPart(part: string, indexContext: Context<number | null>) {
   const context = use(SplitterContext);
   invariant(context, `${part} must be rendered inside Splitter.`);
   const index = use(indexContext);

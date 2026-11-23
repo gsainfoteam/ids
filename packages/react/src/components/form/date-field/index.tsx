@@ -1,4 +1,4 @@
-import { DateFieldCalendar, type DateFieldCalendarProps } from './calendar';
+import { DateFieldCalendar, type DateFieldCalendarProps } from './parts/calendar';
 import { DateFieldRoot, type DateFieldProps } from './root';
 import {
   TemporalClear,
@@ -14,7 +14,7 @@ import {
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
 import { temporalFieldStyle } from '../../../internal/temporal-field/style';
-import { type CalendarValue } from '../../data/calendar/date';
+import { type CalendarValue } from '../../data/calendar/lib/date';
 
 export function DateField(props: DateFieldProps) {
   return <DateFieldRoot {...props} />;
@@ -42,4 +42,4 @@ export namespace DateField {
 }
 
 export type { DateFieldFormat, DateFieldProps } from './root';
-export type { DateFieldCalendarProps } from './calendar';
+export type { DateFieldCalendarProps } from './parts/calendar';

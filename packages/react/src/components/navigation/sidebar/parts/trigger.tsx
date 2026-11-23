@@ -1,0 +1,97 @@
+'use client';
+
+import { use, type MouseEvent } from 'react';
+
+import {
+  Bars3Icon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
+
+import { useInternalTranslate } from '../../../../internal/translate';
+import { cn } from '../../../../utils';
+import { IconButton } from '../../../action/icon-button';
+import { Drawer } from '../../../overlay/drawer';
+import { Tooltip } from '../../../overlay/tooltip';
+import { Kbd } from '../../../typography/kbd';
+import { SidebarContext, useInternalSidebarControls } from '../context';
+import { toggleSidebar, useInternalSmallScreen } from '../hooks/use-sidebar';
+
+export type SidebarTriggerProps = Omit<
+  IconButton.Props,
+  'icon' | 'asChild' | 'children' | 'aria-expanded'
+> & { icon?: IconButton.Props['icon'] };
+
+export function SidebarTrigger({
+  icon,
+  className,
+  onClick,
+  variant = 'outline',
+  ...props
+}: SidebarTriggerProps) {
+  const t = useInternalTranslate();
+  const controls = useInternalSidebarControls('Sidebar.Trigger');
+  const sidebar = use(SidebarContext);
+  const small = useInternalSmallScreen();
+
+  if (sidebar?.presentation === 'drawer')
+    return (
+      <Drawer.Close asChild>
+        <IconButton
+          size="tiny"
+          {...props}
+          variant={variant}
+          aria-label={t('drawer.close')}
+          icon={<XMarkIcon />}
+          data-sidebar-trigger=""
+          className={className}
+          onClick={onClick}
+        />
+      </Drawer.Close>
+    );
+  if (sidebar?.presentation === 'panel' && !controls.collapsible) return null;
+
+  const opensDrawer = small;
+  const expanded = opensDrawer ? controls.mobileOpen : !controls.collapsed;
+  const label = opensDrawer
+    ? t('sidebar.open')
+    : controls.collapsed
+      ? t('sidebar.expand')
+      : t('sidebar.collapse');
+  const defaultIcon = opensDrawer ? (
+    <Bars3Icon />
+  ) : controls.collapsed ? (
+    <ChevronDoubleRightIcon />
+  ) : (
+    <ChevronDoubleLeftIcon />
+  );
+  const onlyOpensTheDrawer = !controls.collapsible;
+
+  return (
+    <Tooltip>
+      <Tooltip.Trigger asChild>
+        <IconButton
+          size="tiny"
+          {...props}
+          variant={variant}
+          aria-label={props['aria-label'] ?? label}
+          aria-expanded={expanded}
+          icon={icon ?? defaultIcon}
+          data-sidebar-trigger=""
+          className={cn(onlyOpensTheDrawer && 'sm:hidden', className)}
+          onClick={(event: MouseEvent<HTMLButtonElement>) => {
+            onClick?.(event);
+            if (!event.defaultPrevented) toggleSidebar(controls, small);
+          }}
+        />
+      </Tooltip.Trigger>
+      <Tooltip.Content side={controls.inside ? 'right' : 'bottom'}>
+        {label}
+        {controls.shortcut && <Kbd keys={controls.shortcut} />}
+      </Tooltip.Content>
+    </Tooltip>
+  );
+}
+
+SidebarTrigger.displayName = 'Sidebar.Trigger';

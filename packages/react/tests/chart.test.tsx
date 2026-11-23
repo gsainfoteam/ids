@@ -21,7 +21,7 @@ import { render } from 'vitest-browser-react';
 import { AspectRatio, Button, IdsProvider } from '../src';
 import { testTheme } from './theme';
 import { Chart } from '../src/chart';
-import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
+import { resolveColors } from '../src/components/utility/ids-provider/lib/theme-roles';
 
 const ROWS = [
   { day: '월', web: 1240, app: 860 },

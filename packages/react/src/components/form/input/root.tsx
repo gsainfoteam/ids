@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
-import { useTranslate } from '../../../internal/translate';
+import { useInternalTranslate } from '../../../internal/translate';
 import { isDevelopment } from '../../../utils/dev';
 import { NumberField, type NumberFieldProps } from '../number-field';
 import { PasswordField, type PasswordFieldProps } from '../password-field';
@@ -30,7 +30,7 @@ const leaveAddressesAsTyped = {
 } as const;
 
 export function InputRoot(props: InputProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   const { type = 'text' } = props;
   const supported = SUPPORTED.includes(type);

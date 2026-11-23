@@ -1,6 +1,6 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { HighlightMark, type HighlightMarkProps } from './mark';
+import { HighlightMark, type HighlightMarkProps } from './parts/mark';
 import { HighlightRoot } from './root';
 import { highlightStyle } from './style';
 

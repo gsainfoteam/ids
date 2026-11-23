@@ -2,22 +2,22 @@
 
 import { use, type ComponentProps, type ReactNode } from 'react';
 
-import { ColorPickerAlphaSlider } from './alpha-slider';
-import { ColorPickerArea } from './area';
-import { PickerContext, PickerDefaultsContext, usePicker } from './context';
-import { ColorPickerCopy } from './copy';
-import { ColorPickerEyeDropper } from './eye-dropper';
-import { ColorPickerHueSlider } from './hue-slider';
-import { ColorPickerInput } from './input';
+import { PickerContext, PickerDefaultsContext, useInternalPicker } from './context';
+import { useInternalColorPicker } from './hooks/use-color-picker';
+import { ColorPickerAlphaSlider } from './parts/alpha-slider';
+import { ColorPickerArea } from './parts/area';
+import { ColorPickerCopy } from './parts/copy';
+import { ColorPickerEyeDropper } from './parts/eye-dropper';
+import { ColorPickerHueSlider } from './parts/hue-slider';
+import { ColorPickerInput } from './parts/input';
+import { ColorPickerSwatches } from './parts/swatches';
 import { colorPickerStyle } from './style';
-import { ColorPickerSwatches } from './swatches';
-import { useColorPicker } from './use-color-picker';
-import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
+import { resolveState } from '../../../internal/lib/state-props';
+import { useInternalTranslate } from '../../../internal/translate';
 import { containsElementOfType } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
-import type { ColorFormat } from './color';
+import type { ColorFormat } from './lib/color';
 import type { IdsSize } from '../../../tokens/types';
 
 export type ColorPickerSwatchOption = string | { value: string; label?: string };
@@ -58,12 +58,12 @@ export function ColorPickerRoot({
   children,
   ...props
 }: ColorPickerProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const defaults = use(PickerDefaultsContext);
   const alpha = defaults.alpha ?? containsElementOfType(children, ALPHA_SLIDER);
   const swatches = defaults.swatches;
 
-  const picker = useColorPicker({
+  const picker = useInternalColorPicker({
     value,
     defaultValue,
     onValueChange,
@@ -97,7 +97,7 @@ export function ColorPickerRoot({
 }
 
 function DefaultLayout() {
-  const c = usePicker('ColorPicker');
+  const c = useInternalPicker('ColorPicker');
   return (
     <>
       <ColorPickerArea />

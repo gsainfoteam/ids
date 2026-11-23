@@ -13,27 +13,27 @@ import {
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { isNotNil } from 'es-toolkit';
 
-import { ChipContent, type ChipContentProps } from './content';
-import { ChipContext, useChip, type InputAttributes } from './context';
-import { ChipCreate } from './create';
-import { ChipEmpty } from './empty';
-import { ChipGroup, OPTION_KINDS } from './group';
-import { ChipInput, type ChipInputProps } from './input';
-import { isType } from './is-type';
-import { ChipItem } from './item';
-import { ChipLimit } from './limit';
+import { ChipContext, useInternalChip, type InputAttributes } from './context';
+import { useInternalChipField } from './hooks/use-chip-field';
+import { isType } from './lib/is-type';
+import { ChipContent, type ChipContentProps } from './parts/content';
+import { ChipCreate } from './parts/create';
+import { ChipEmpty } from './parts/empty';
+import { ChipGroup, OPTION_KINDS } from './parts/group';
+import { ChipInput, type ChipInputProps } from './parts/input';
+import { ChipItem } from './parts/item';
+import { ChipLimit } from './parts/limit';
 import { chipFieldStyle } from './style';
-import { useChipField } from './use-chip-field';
-import { FieldPopup, useDrawerPresentation } from '../../../internal/field-popup';
-import { FormValue } from '../../../internal/form-value';
-import { resolveState } from '../../../internal/state-props';
-import { type FieldTriggerVariant } from '../../../internal/surfaces/field-surface';
-import { useTranslate } from '../../../internal/translate';
+import { FieldPopup, useInternalDrawerPresentation } from '../../../internal/field-popup';
+import { resolveState } from '../../../internal/lib/state-props';
+import { FormValue } from '../../../internal/parts/form-value';
+import { type FieldTriggerVariant } from '../../../internal/surfaces/lib/field-surface';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant, isNodeFromAnyWindow } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Chip } from '../../data/chip';
 import { useFieldSize } from '../field/context';
-import { collectOptions, slotChildren } from '../select/select-options';
+import { collectOptions, slotChildren } from '../select/lib/select-options';
 
 import type { ChipField } from '.';
 
@@ -155,7 +155,7 @@ export function ChipFieldRoot({
   style,
   ...rootInputProps
 }: ChipField.Props) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const removeLabel = removeLabelProp ?? ((label: string) => t('chipField.remove', { label }));
 
   const {
@@ -185,8 +185,8 @@ export function ChipFieldRoot({
   const ariaInvalid = merged['aria-invalid'] ?? invalid;
   const isInvalid = ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false';
 
-  const drawer = useDrawerPresentation(mobileVariant);
-  const { rootRef, inputRef, drawerInputRef, ...field } = useChipField({
+  const drawer = useInternalDrawerPresentation(mobileVariant);
+  const { rootRef, inputRef, drawerInputRef, ...field } = useInternalChipField({
     value,
     defaultValue,
     onValueChange,
@@ -355,7 +355,7 @@ export function ChipFieldRoot({
 }
 
 function Chips() {
-  const c = useChip('Chips');
+  const c = useInternalChip('Chips');
   return c.field.state.selected.map((item) => {
     const option = c.options.find((candidate) => candidate.value === item);
     const label = option?.label ?? item;

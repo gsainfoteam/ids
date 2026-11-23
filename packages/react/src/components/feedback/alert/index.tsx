@@ -1,13 +1,13 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { AlertActions, type AlertActionsProps } from './actions';
-import { AlertClose, type AlertCloseProps } from './close';
-import { AlertDescription, type AlertDescriptionProps } from './description';
-import { AlertIcon, type AlertIconProps } from './icon';
+import { AlertActions, type AlertActionsProps } from './parts/actions';
+import { AlertClose, type AlertCloseProps } from './parts/close';
+import { AlertDescription, type AlertDescriptionProps } from './parts/description';
+import { AlertIcon, type AlertIconProps } from './parts/icon';
+import { AlertTitle, type AlertTitleProps } from './parts/title';
 import { AlertRoot } from './root';
 import { alertStyle } from './style';
-import { AlertTitle, type AlertTitleProps } from './title';
-import { type StatusColorScheme } from '../../../internal/status-palette';
+import { type StatusColorScheme } from '../../../internal/lib/status-palette';
 
 export function Alert(props: Alert.Props) {
   return <AlertRoot {...props} />;

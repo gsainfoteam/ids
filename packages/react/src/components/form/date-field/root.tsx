@@ -2,10 +2,10 @@
 
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
-import { DateFieldCalendar, type DateFieldCalendarProps } from './calendar';
 import { DateFieldContext } from './context';
-import { describeDates, isEmptyDates, sameDates, serializeDates } from './date-value';
-import { dateInputHint, parseDateText } from './parse';
+import { describeDates, isEmptyDates, sameDates, serializeDates } from './lib/date-value';
+import { dateInputHint, parseDateText } from './lib/parse';
+import { DateFieldCalendar, type DateFieldCalendarProps } from './parts/calendar';
 import { resolveLocale } from '../../../internal/date-locale';
 import {
   pickerPart,
@@ -16,8 +16,8 @@ import {
   dateOptions,
   formatter,
   type TemporalFormat,
-} from '../../../internal/temporal-field/format';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+} from '../../../internal/temporal-field/lib/format';
+import { useInternalProviderLocale, useInternalTranslate } from '../../../internal/translate';
 import {
   emptyValue,
   isBlocked,
@@ -26,8 +26,8 @@ import {
   type CalendarValue,
   type DateLimits,
   type DateSelection,
-} from '../../data/calendar/date';
-import { toUtcDate } from '../../data/calendar/day-picker-bridge';
+} from '../../data/calendar/lib/date';
+import { toUtcDate } from '../../data/calendar/lib/day-picker-bridge';
 import { useFieldSize } from '../field/context';
 
 import type { CalendarDate } from '@internationalized/date';
@@ -50,8 +50,8 @@ export type DateFieldProps = Omit<
 const PICKER_PARTS = new Set<unknown>([DateFieldCalendar]);
 
 export function DateFieldRoot(props: DateFieldProps) {
-  const t = useTranslate();
-  const providerLocale = useProviderLocale();
+  const t = useInternalTranslate();
+  const providerLocale = useInternalProviderLocale();
 
   const {
     selectionMode = 'single',

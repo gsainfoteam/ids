@@ -29,7 +29,7 @@
 ### 쓰는 법
 
 ```ts
-// internal/surfaces/field-surface.ts: 공유 조각은 cn('...') 값의 객체
+// internal/surfaces/lib/field-surface.ts: 공유 조각은 cn('...') 값의 객체
 export const fieldAction = {
   base: cn(
     'shrink-0 text-neutral',
@@ -39,7 +39,7 @@ export const fieldAction = {
   // ...
 };
 
-// internal/arc.tsx: 클래스와 변수를 합칠 때도 템플릿 문자열이 아니라 cn
+// internal/parts/arc.tsx: 클래스와 변수를 합칠 때도 템플릿 문자열이 아니라 cn
 className={cn('origin-center -rotate-90', indicatorClassName)}
 ```
 
@@ -107,7 +107,7 @@ props 를 합치는 함수입니다: `mergeProps`, `mergeEventHandlers`, `mergeR
 ### 쓰는 곳
 
 - `mergeProps`: Slot, 각 컴포넌트의 `asChild` 파트, [`part()`](#partts), text-control 의 Clear, 필드 hook(`use-text-field.ts` 등)
-- `mergeRefs`: ref 를 둘 이상 붙이는 곳(Spinner, Button, 그룹 컴포넌트, 필드 hook, text-control 의 `useMergedRef`)
+- `mergeRefs`: ref 를 둘 이상 붙이는 곳(Spinner, Button, 그룹 컴포넌트, 필드 hook, text-control 의 `useInternalMergedRef`)
 - `mergeEventHandlers`: Alert, Calendar, ColorField, ColorPicker, Label
 - `mergeObjects`: `mergeProps` 의 `style`
 
@@ -192,7 +192,7 @@ const indexes = items.flatMap((child, index) =>
 ### 쓰는 법
 
 ```tsx
-// components/form/select/icon.tsx (Select.Icon)
+// components/form/select/parts/icon.tsx (Select.Icon)
 return part(
   'span',
   asChild,
@@ -227,10 +227,10 @@ DOM 이벤트를 다루는 작은 함수입니다: `isNodeFromAnyWindow`, `keepF
 // components/form/select/root.tsx: 포커스가 자기 팝업 안으로 갔는지
 const inPopup = isNodeFromAnyWindow(next) && (next as Element).closest?.(popupSelector);
 
-// components/form/chip-field/item.tsx: 옵션을 눌러도 포커스가 input 에 남는다
+// components/form/chip-field/parts/item.tsx: 옵션을 눌러도 포커스가 input 에 남는다
 { onPointerDown: keepFocusWhereItIs }
 
-// components/layout/scroll-area/use-scroll-area.ts: thumb 을 끄는 동안 막대 밖의 포인터도 받는다
+// components/layout/scroll-area/hooks/use-scroll-area.ts: thumb 을 끄는 동안 막대 밖의 포인터도 받는다
 tryCapturePointer(bar, event.pointerId);
 ```
 
@@ -258,7 +258,7 @@ tryCapturePointer(bar, event.pointerId);
 
 ```ts
 // internal/temporal-field/index.tsx
-function useTemporal(part: string) {
+function useInternalTemporal(part: string) {
   const context = use(TemporalContext);
   invariant(context, `${part} must be inside its field.`);
   return context;                        // asserts condition 이라 여기서 null 이 아니다
@@ -282,13 +282,13 @@ function useTemporal(part: string) {
 
 ### 쓰는 곳
 
-- 개발 경고를 내는 모든 곳: [`internal/icon-label.ts`](../internal/README.md#icon-labelts), `react-hook-form.tsx`, Button, FloatingButton, Toggle, ToggleGroup, Accordion, Avatar, AvatarGroup, Badge, Chip, Alert, Progress, ChipField, Field, Input, PasswordField, Rating, Select, Slider, Spacer, Label, Group, IdsProvider
+- 개발 경고를 내는 모든 곳: [`internal/lib/icon-label.ts`](../internal/README.md#icon-labelts), `react-hook-form.tsx`, Button, FloatingButton, Toggle, ToggleGroup, Accordion, Avatar, AvatarGroup, Badge, Chip, Alert, Progress, ChipField, Field, Input, PasswordField, Rating, Select, Slider, Spacer, Label, Group, IdsProvider
 - 개발 경고를 확인하는 스토리(Button, IconButton, IconToggle 등)
 
 ### 쓰는 법
 
 ```ts
-// components/action/floating-button/use-floating-button.ts
+// components/action/floating-button/hooks/use-floating-button.ts
 useLayoutEffect(() => {
   const node = nodeRef.current;
   if (!isDevelopment || !node || node.hidden) return;

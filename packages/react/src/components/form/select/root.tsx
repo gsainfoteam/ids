@@ -12,27 +12,27 @@ import {
   type ReactNode,
 } from 'react';
 
-import { SelectClear } from './clear';
-import { SelectContent, type SelectContentProps } from './content';
 import { SelectContext } from './context';
-import { SelectEmpty } from './empty';
-import { OPTION_KINDS, SelectGroup } from './group';
-import { SelectIcon } from './icon';
-import { isType } from './is-type';
-import { SelectItem } from './item';
-import { SelectItemIndicator } from './item-indicator';
-import { SelectSearchField } from './search-field';
-import { collectOptions, slotChildren } from './select-options';
-import { SelectSeparator } from './separator';
+import { useInternalSelect, type SelectValue as SelectSelection } from './hooks/use-select';
+import { isType } from './lib/is-type';
+import { collectOptions, slotChildren } from './lib/select-options';
+import { SelectClear } from './parts/clear';
+import { SelectContent, type SelectContentProps } from './parts/content';
+import { SelectEmpty } from './parts/empty';
+import { OPTION_KINDS, SelectGroup } from './parts/group';
+import { SelectIcon } from './parts/icon';
+import { SelectItem } from './parts/item';
+import { SelectItemIndicator } from './parts/item-indicator';
+import { SelectSearchField } from './parts/search-field';
+import { SelectSeparator } from './parts/separator';
+import { SelectTrigger } from './parts/trigger';
+import { SelectValue } from './parts/value';
 import { selectStyle } from './style';
-import { SelectTrigger } from './trigger';
-import { useSelect, type SelectValue as SelectSelection } from './use-select';
-import { SelectValue } from './value';
-import { FieldPopup, useDrawerPresentation } from '../../../internal/field-popup';
-import { FormValue } from '../../../internal/form-value';
-import { resolveState } from '../../../internal/state-props';
-import { type FieldTriggerVariant } from '../../../internal/surfaces/field-surface';
-import { useTranslate } from '../../../internal/translate';
+import { FieldPopup, useInternalDrawerPresentation } from '../../../internal/field-popup';
+import { resolveState } from '../../../internal/lib/state-props';
+import { FormValue } from '../../../internal/parts/form-value';
+import { type FieldTriggerVariant } from '../../../internal/surfaces/lib/field-surface';
+import { useInternalTranslate } from '../../../internal/translate';
 import {
   elementTypeOf,
   flattenFragments,
@@ -125,7 +125,7 @@ const isForeignComponent = (node: ReactNode): boolean =>
     : typeof elementTypeOf(node) === 'function' && !PARTS.has(elementTypeOf(node)));
 
 export function SelectRoot(props: SelectProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   const {
     selectionMode = 'single',
@@ -197,8 +197,8 @@ export function SelectRoot(props: SelectProps) {
 
   const mobileVariant = (contents[0] as ReactElement<SelectContentProps> | undefined)?.props
     .mobileVariant;
-  const drawer = useDrawerPresentation(mobileVariant);
-  const select = useSelect({
+  const drawer = useInternalDrawerPresentation(mobileVariant);
+  const select = useInternalSelect({
     multiple,
     value,
     defaultValue,

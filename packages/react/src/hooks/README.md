@@ -3,14 +3,14 @@
 여러 컴포넌트가 함께 쓰는 hook 입니다.
 
 - `use-interactive.ts` 의 hook, 함수, 상수, 타입과 `useControllableState` 는 `src/index.ts` 가 내보내는 공개 API 입니다. 이름이나 시그니처를 바꾸면 breaking change 입니다.
-- `useFormReset` 은 내보내지 않습니다.
+- `useInternalFormReset` 은 내보내지 않습니다.
 
 | 파일                                                     | 내용                                                 | 쓰는 곳                                                              |
 | -------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- |
 | [`use-clipboard-support.ts`](#use-clipboard-supportts)   | `navigator.clipboard.writeText` 가 있는지            | ColorPicker, CodeBlock 과 Message 의 복사 버튼                      |
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
-| [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/surface.ts` |
+| [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/lib/surface.ts` |
 | [`use-reduced-motion.ts`](#use-reduced-motionts)         | 동작 줄이기 설정(`prefers-reduced-motion`)           | Marquee, Carousel(`internal/slides`)                                 |
 
 ## use-clipboard-support.ts
@@ -24,8 +24,8 @@
 ### 쓰는 법
 
 ```ts
-// components/data/code-block/copy.tsx
-const supported = useClipboardSupport();
+// components/data/code-block/parts/copy.tsx
+const supported = useInternalClipboardSupport();
 if (!supported) return null;
 ```
 
@@ -51,7 +51,7 @@ if (!supported) return null;
 ### 쓰는 법
 
 ```ts
-// components/form/radio-group/use-radio-group.ts
+// components/form/radio-group/hooks/use-radio-group.ts
 const [value, setValue] = useControllableState<T | null>({
   value: valueProp,
   defaultValue,
@@ -59,7 +59,7 @@ const [value, setValue] = useControllableState<T | null>({
 });
 const controlled = valueProp !== undefined;
 
-useFormReset(rootRef, () => {
+useInternalFormReset(rootRef, () => {
   if (!controlled) setValue(defaultValue, { silent: true });   // reset 은 편집이 아니다
 });
 ```
@@ -85,13 +85,13 @@ useFormReset(rootRef, () => {
 ### 쓰는 곳
 
 - Checkbox, CheckboxGroup, ChipField, ColorField, FileField, NumberField, OTPField, Radio, RadioGroup, Rating, Select, Slider, TelField, ToggleGroup, [`internal/temporal-field`](../internal/temporal-field/README.md)
-- PasswordField 와 Field 는 `reset` 리스너를 따로 둡니다. text-control 의 `useInputValue` 도 `reset` 을 직접 듣습니다.
+- PasswordField 와 Field 는 `reset` 리스너를 따로 둡니다. text-control 의 `useInternalInputValue` 도 `reset` 을 직접 듣습니다.
 
 ### 쓰는 법
 
 ```ts
-// internal/temporal-field/use-temporal-field.ts
-useFormReset(controlRef, () => {
+// internal/temporal-field/hooks/use-temporal-field.ts
+useInternalFormReset(controlRef, () => {
   setValue(options.defaultValue, { silent: true });
   dropDraft();
   setOpen(false);
@@ -120,18 +120,18 @@ useFormReset(controlRef, () => {
 | 이름                                        | 쓰는 곳                                                                                                        |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `useInteractiveProps`                       | Button 의 `use-button.ts`. Button, IconButton, Toggle, IconToggle, FloatingButton 이 이 hook 을 거친다         |
-| `useInteractive`                            | Checkbox, Radio, Chip, Accordion.Trigger, [`internal/surface.ts`](../internal/README.md#surfacets)(Card, Item) |
-| `interactiveDataProps`                      | Chip, Accordion.Trigger, `internal/surface.ts`, `useInteractiveProps`                                          |
+| `useInteractive`                            | Checkbox, Radio, Chip, Accordion.Trigger, [`internal/lib/surface.ts`](../internal/README.md#surfacets)(Card, Item) |
+| `interactiveDataProps`                      | Chip, Accordion.Trigger, `internal/lib/surface.ts`, `useInteractiveProps`                                          |
 | `WithInteractiveValues`, `InteractiveState` | Button, IconButton, Toggle, IconToggle, FloatingButton 의 Props                                                |
 | `INTERACTIVE_STATE_DEFAULTS`                | InteractiveState foundation 스토리                                                                             |
 
 ### 쓰는 법
 
 ```tsx
-// components/action/button/use-button.ts: prop 을 풀고, 핸들러와 data-* 를 한 번에 받는다
+// components/action/button/hooks/use-button.ts: prop 을 풀고, 핸들러와 data-* 를 한 번에 받는다
 const { state, handlers, dataProps, props: resolved } = useInteractiveProps<HTMLElement, P>(props);
 
-// components/data/accordion/trigger.tsx: 상태만 필요하면 useInteractive
+// components/data/accordion/parts/trigger.tsx: 상태만 필요하면 useInteractive
 const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
   disabled: item.state.disabled,
   onKeyDown: (event) => {
@@ -178,7 +178,7 @@ const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
 
 ```ts
 // components/data/marquee/root.tsx
-const reduced = useReducedMotion();
+const reduced = useInternalReducedMotion();
 const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
 ```
 
@@ -191,4 +191,4 @@ const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
 ### 알아둘 것
 
 - 모양은 이 hook 이 아니라 CSS 의 `motion-reduce:` variant 가 먼저 정합니다. hook 은 hydration 뒤에야 `true` 가 되므로, 서버 HTML 의 첫 그림부터 맞으려면 CSS 가 같은 조건을 맡아야 합니다. hook 은 요소를 그릴지 말지(복제본), 상태가 무엇인지처럼 CSS 가 못 하는 일만 합니다.
-- Carousel 은 자동 넘김의 기본값을 `playing` 이 아니라 "고르지 않음(`undefined`)" 으로 두고, 고르지 않은 동안만 이 hook 의 값을 따릅니다. 첫 렌더의 `false` 가 재생 상태로 굳지 않게 하려는 것입니다(`components/data/carousel/use-carousel-motion.ts`).
+- Carousel 은 자동 넘김의 기본값을 `playing` 이 아니라 "고르지 않음(`undefined`)" 으로 두고, 고르지 않은 동안만 이 hook 의 값을 따릅니다. 첫 렌더의 `false` 가 재생 상태로 굳지 않게 하려는 것입니다(`components/data/carousel/hooks/use-carousel-motion.ts`).

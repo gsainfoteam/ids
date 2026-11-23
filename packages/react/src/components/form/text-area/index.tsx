@@ -1,16 +1,16 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { TextAreaCount, type TextAreaCountProps } from './count';
-import { TextAreaInput, type TextAreaInputPartProps } from './input';
+import { type TextAreaInputProps, type TextAreaResize } from './hooks/use-text-area';
+import { type StateValue } from './lib/state-value';
+import { TextAreaCount, type TextAreaCountProps } from './parts/count';
+import { TextAreaInput, type TextAreaInputPartProps } from './parts/input';
 import {
   TextAreaRoot,
   type TextAreaVariant,
   type TextAreaState,
   type TextAreaCountState,
 } from './root';
-import { type StateValue } from './state-value';
 import { textAreaStyle } from './style';
-import { type TextAreaInputProps, type TextAreaResize } from './use-text-area';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -49,6 +49,6 @@ export namespace TextArea {
 }
 
 export type { TextAreaVariant, TextAreaState, TextAreaCountState } from './root';
-export type { TextAreaInputProps, TextAreaResize } from './use-text-area';
+export type { TextAreaInputProps, TextAreaResize } from './hooks/use-text-area';
 
 export type TextAreaProps = TextArea.Props;

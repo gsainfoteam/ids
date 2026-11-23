@@ -5,8 +5,8 @@ import { createContext, use, type KeyboardEvent } from 'react';
 import { invariant } from '../../../utils';
 
 import type { ChipColorScheme } from '.';
+import type { ChipRemoveEvent } from './hooks/use-chip';
 import type { chipStyle } from './style';
-import type { ChipRemoveEvent } from './use-chip';
 import type { IdsSize } from '../../../tokens/types';
 
 type Context = {
@@ -23,7 +23,7 @@ type Context = {
 
 export const ChipContext = createContext<Context | null>(null);
 
-export function useChipContext(part: string) {
+export function useInternalChipContext(part: string) {
   const context = use(ChipContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Chip>\`.`);
   return context;

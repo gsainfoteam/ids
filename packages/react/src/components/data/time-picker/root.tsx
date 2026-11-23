@@ -2,18 +2,18 @@
 
 import { isValidElement, type ComponentProps, type CSSProperties } from 'react';
 
-import { TimePickerColumn } from './column';
 import { TimePickerContext } from './context';
-import { TimePickerPeriod } from './period';
+import { useInternalTimePicker, type TimePickerState } from './hooks/use-time-picker';
+import { defaultUnits } from './lib/units';
+import { TimePickerColumn } from './parts/column';
+import { TimePickerPeriod } from './parts/period';
 import { timePickerStyle } from './style';
-import { defaultUnits } from './units';
-import { useTimePicker, type TimePickerState } from './use-time-picker';
 import { periodFirst, resolveLocale } from '../../../internal/date-locale';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+import { useInternalProviderLocale, useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
-import type { HourCycle, TimePrecision, TimeUnit } from './time';
+import type { HourCycle, TimePrecision, TimeUnit } from './lib/time';
 import type { IdsSize } from '../../../tokens/types';
 import type { Time } from '@internationalized/date';
 
@@ -61,11 +61,11 @@ export function TimePickerRoot({
   children,
   ...props
 }: TimePickerProps) {
-  const t = useTranslate();
-  const providerLocale = useProviderLocale();
+  const t = useInternalTranslate();
+  const providerLocale = useInternalProviderLocale();
 
   const resolvedLocale = resolveLocale(providerLocale);
-  const api = useTimePicker({
+  const api = useInternalTimePicker({
     value,
     defaultValue,
     onValueChange,

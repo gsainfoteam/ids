@@ -18,9 +18,9 @@
 | 가져가는 것                                                           | 쓰는 곳                                             |
 | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `resizeKeyMap`, `separatorProps`, `resizeHandle`                      | DataTable 의 열 너비 핸들                           |
-| `useMeasuredAxes`, `ResizeEdge`, `ResizeGrip`                         | Resizable(가장자리 손잡이와 모서리 손잡이)          |
-| `useMeasuredAxes`, `ResizeEdge`, `ResizeGrip`(`band="outward"`)       | TextArea 의 크기 조절 손잡이                        |
-| `useResizeDrag`, `resizeKeyMap`, `separatorProps`, `resizeHandle`     | Splitter 의 패널 사이 핸들                          |
+| `useInternalMeasuredAxes`, `ResizeEdge`, `ResizeGrip`                         | Resizable(가장자리 손잡이와 모서리 손잡이)          |
+| `useInternalMeasuredAxes`, `ResizeEdge`, `ResizeGrip`(`band="outward"`)       | TextArea 의 크기 조절 손잡이                        |
+| `useInternalResizeDrag`, `resizeKeyMap`, `separatorProps`, `resizeHandle`     | Splitter 의 패널 사이 핸들                          |
 | `data-resize-handle` 속성                                             | Drawer 의 끌기 제외, `pressable.ts` 의 안쪽 컨트롤 |
 
 - 크기를 가진 상태(열 너비, 요소 크기, 패널 크기)는 쓰는 쪽이 가집니다. 이 모듈은 값을 받아 다음 값을 계산하고 알려 줄 뿐입니다.
@@ -33,7 +33,7 @@
 ### 쓰는 법
 
 ```tsx
-// components/data/data-table/column-header.tsx
+// components/data/data-table/parts/column-header.tsx
 const range = { value: size, min, max };
 
 <div
@@ -53,7 +53,7 @@ const range = { value: size, min, max };
 | `Home` / `End`    | `min` / `max`    | `min` / `max`      |
 
 ```ts
-// components/layout/splitter/use-splitter.ts: 방향키의 걸음을 직접 받는다
+// components/layout/splitter/hooks/use-splitter.ts: 방향키의 걸음을 직접 받는다
 const stepBy = (px: number) =>
   moveHandleTo(handle, sizes, keyTarget(sizes, constraints, handle, (px * 100) / length));
 
@@ -84,7 +84,7 @@ resizeKeyMap(
 
 - `measureAxis(element, dimension)` 는 그려진 크기(`offsetWidth`, `offsetHeight`. `content-box` 면 padding 과 border 를 뺀 값)와 CSS 의 `min-*`, `max-*` 가운데 px 인 값을 돌려줍니다. `%` 나 `min-content` 는 읽을 수 없어 `0` 과 `Infinity` 로 둡니다.
 - `holdResizeCursor(document, cursor)` 는 끄는 동안 `<html>` 에 크기 조절 커서와 `user-select: none` 을 걸고, 되돌리는 함수를 돌려줍니다. 포인터가 손잡이 밖으로 나가도 커서가 바뀌지 않고, 끄는 길의 글자가 선택되지 않습니다.
-- `markDragged`, `isBeingDragged` 는 끄는 중인 요소를 `WeakSet` 에 적습니다. `useMeasuredAxes` 가 끄는 동안의 크기 변화를 state 로 옮기지 않게 합니다.
+- `markDragged`, `isBeingDragged` 는 끄는 중인 요소를 `WeakSet` 에 적습니다. `useInternalMeasuredAxes` 가 끄는 동안의 크기 변화를 state 로 옮기지 않게 합니다.
 - `innerEndEndRadius(element)` 는 `border-end-end-radius`(LTR 오른쪽 아래, RTL 왼쪽 아래)를 읽어, 짧은 변의 절반으로 자르고, 그 모서리의 테두리 두께(`border-inline-end-width`, `border-block-end-width` 중 큰 쪽)를 뺀 안쪽 반지름입니다. `%` 는 가로 값은 폭, 세로 값은 높이에 대해 풀고, 타원 반지름은 둘 중 작은 쪽을 씁니다.
 - `endEndCornerExponent(element)` 는 같은 모서리의 `corner-*-shape` 를 [corner-shape.ts](../README.md#corner-shapets) 로 읽어 초타원 지수를 돌려줍니다. `round` 는 2, `squircle` 은 4 입니다.
 
@@ -93,7 +93,7 @@ resizeKeyMap(
 ### 쓰는 법
 
 ```ts
-const drag = useResizeDrag({
+const drag = useInternalResizeDrag({
   axes: 'inline',                        // 'inline' | 'block' | 'both' → ew / ns / nwse(RTL 이면 nesw) 커서
   disabled,
   onStart: (handle) => { /* 시작 크기를 적어 둔다. handle 은 누른 손잡이 요소 */ },
@@ -141,15 +141,15 @@ type ResizeAxis = {
 
 ```tsx
 // edge.tsx: 한 축의 가장자리 손잡이
-const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
+const separator = useInternalAxisSeparator(axis, { disabled, onDraggingChange });
 <div {...separator} aria-label={props['aria-label'] ?? separator['aria-label']} />
 ```
 
-- `useMeasuredAxes({ width, height })` 는 `ResizeObserver` 로 그려진 크기와 CSS px 한계를 state 로 둡니다. 크기를 주지 않은 축의 `aria-valuenow` 와, CSS 한계가 들어간 `aria-valuemin` `aria-valuemax` 가 여기서 옵니다. 끄는 동안은 읽지 않습니다.
-- `useAxesDrag(axes, { disabled, onDraggingChange })` 는 `useResizeDrag` 를 축에 잇습니다. 시작할 때 그려진 크기와 한계를 재고, 프레임마다 요소의 `style.width` / `style.height` 에 바로 쓰고, 끝에는 인라인 값을 시작 전으로 되돌린 뒤 `flushSync` 로 `resize` 를 부릅니다. 제어 컴포넌트의 부모가 값을 받지 않으면 요소는 원래 크기로 남습니다.
+- `useInternalMeasuredAxes({ width, height })` 는 `ResizeObserver` 로 그려진 크기와 CSS px 한계를 state 로 둡니다. 크기를 주지 않은 축의 `aria-valuenow` 와, CSS 한계가 들어간 `aria-valuemin` `aria-valuemax` 가 여기서 옵니다. 끄는 동안은 읽지 않습니다.
+- `useInternalAxesDrag(axes, { disabled, onDraggingChange })` 는 `useInternalResizeDrag` 를 축에 잇습니다. 시작할 때 그려진 크기와 한계를 재고, 프레임마다 요소의 `style.width` / `style.height` 에 바로 쓰고, 끝에는 인라인 값을 시작 전으로 되돌린 뒤 `flushSync` 로 `resize` 를 부릅니다. 제어 컴포넌트의 부모가 값을 받지 않으면 요소는 원래 크기로 남습니다.
 - `axisKeyMap(axis, resizeTo?)` 는 누른 순간의 그려진 크기로 `resizeKeyMap` 을 만듭니다.
-- `useAxisSeparator(axis, options)` 는 한 축의 separator 에 필요한 것(ARIA, 끌기, 키, `Enter` 되돌리기)을 한 번에 돌려줍니다.
-- `useCornerShape(corner)` 는 `corner` 요소의 `innerEndEndRadius` 와 `endEndCornerExponent` 를 `{ radius, exponent }` state 로 둡니다. 마운트할 때와 `ResizeObserver` 가 크기 변화를 알릴 때 읽고, 부른 컴포넌트가 다시 렌더될 때마다 한 번 더 읽습니다. 요소가 아직 없으면 `null` 입니다.
+- `useInternalAxisSeparator(axis, options)` 는 한 축의 separator 에 필요한 것(ARIA, 끌기, 키, `Enter` 되돌리기)을 한 번에 돌려줍니다.
+- `useInternalCornerShape(corner)` 는 `corner` 요소의 `innerEndEndRadius` 와 `endEndCornerExponent` 를 `{ radius, exponent }` state 로 둡니다. 마운트할 때와 `ResizeObserver` 가 크기 변화를 알릴 때 읽고, 부른 컴포넌트가 다시 렌더될 때마다 한 번 더 읽습니다. 요소가 아직 없으면 `null` 입니다.
 
 ### 왜 이렇게
 
@@ -163,7 +163,7 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 가장자리 손잡이입니다. 손잡이 자신이 `role="separator"`(이름 "너비" 또는 "높이")이고 Tab 에 멈춥니다.
 
 ```tsx
-// components/layout/resizable/handle.tsx
+// components/layout/resizable/parts/handle.tsx
 <ResizeEdge
   axis={direction === 'horizontal' ? axes.width : axes.height}
   disabled={disabled}
@@ -181,7 +181,7 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 | `height`         | 아래                          | `inset-x-0 -bottom-px h-0.5` | 32x4px                 | `ns-resize` |
 
 - 손잡이 요소는 가장 가까운 positioned 조상(Resizable 의 root, TextArea 의 필드)의 padding 상자 가장자리를 가운데에 둔 2px 띠이고, 막대는 그 가운데에 그립니다. 막대는 요소 밖으로 2px 나옵니다.
-- ARIA, 끌기, 키, `Enter` 되돌리기는 `useAxisSeparator` 입니다. `data-resize-edge` 가 붙습니다.
+- ARIA, 끌기, 키, `Enter` 되돌리기는 `useInternalAxisSeparator` 입니다. `data-resize-edge` 가 붙습니다.
 - `className` 은 `resizeEdgeStyle` 에 합쳐 겹치는 클래스(위치, 크기, `before:hidden`)를 이깁니다. `asChild` 면 자식 요소가 손잡이가 됩니다.
 - 포커스는 손잡이 요소의 `focus-ring` 입니다. 가장자리 전체를 따라 3px 링이 생깁니다.
 
@@ -248,7 +248,7 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 모서리 손잡이입니다. 손잡이는 `role="group"`(이름 "크기 조절")이고, 안에 숨은 separator 둘(너비, 높이)이 roving tabindex 로 Tab 한 칸을 나눠 씁니다.
 
 ```tsx
-// components/layout/resizable/handle.tsx
+// components/layout/resizable/parts/handle.tsx
 <ResizeGrip
   axes={[axes.width, axes.height]}
   corner={element}                       // 호가 따라갈 모서리의 요소. 손잡이의 positioned 조상
@@ -262,7 +262,7 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 
 - 손잡이는 가장 가까운 positioned 조상의 끝 아래 꼭짓점에 스스로 섭니다(`absolute end-0 bottom-0`). `corner` 는 그 조상이어야 호가 모서리와 같은 중심이 됩니다.
 - 두 축의 요소가 달라도 됩니다. 축마다 `target` 이 있어, TextArea 는 높이를 textarea 에, 너비를 필드 전체에 씁니다.
-- 반지름과 모양은 `useCornerShape(corner)` 로 읽습니다. 읽기 전에는(서버 렌더, 첫 렌더) 호를 그리지 않고 separator 만 둡니다.
+- 반지름과 모양은 `useInternalCornerShape(corner)` 로 읽습니다. 읽기 전에는(서버 렌더, 첫 렌더) 호를 그리지 않고 separator 만 둡니다.
 - `←` `→` 가 너비를 바꾸고 너비 separator 로, `↑` `↓` 가 높이를 바꾸고 높이 separator 로 포커스를 옮깁니다. 값을 바꾼 뒤(`flushSync`) 포커스를 옮기므로, 포커스는 늘 값이 이미 바뀐 separator 에 있어 스크린 리더가 바뀐 값을 읽습니다. `Home` `End` 는 포커스한 축, `Enter` 와 두 번 누르기는 두 축 모두를 되돌립니다.
 - 포인터로는 두 축을 함께 끕니다.
 

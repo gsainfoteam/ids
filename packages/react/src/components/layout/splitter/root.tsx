@@ -10,11 +10,11 @@ import {
 } from 'react';
 
 import { HandleIndexContext, PanelIndexContext, SplitterContext } from './context';
-import { SplitterHandle, type SplitterHandleProps } from './handle';
-import { sameSize } from './layout';
-import { SplitterPanel, type SplitterPanelProps } from './panel';
+import { useInternalSplitter, type SplitterOrientation } from './hooks/use-splitter';
+import { sameSize } from './lib/layout';
+import { SplitterHandle, type SplitterHandleProps } from './parts/handle';
+import { SplitterPanel, type SplitterPanelProps } from './parts/panel';
 import { splitterStyle } from './style';
-import { useSplitter, type SplitterOrientation } from './use-splitter';
 import { elementTypeOf, flattenFragments, mergeProps, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -82,7 +82,7 @@ function arrange(children: ReactNode) {
   return { panels: panels.map((panel) => panel.props), placed, handleIds, stray };
 }
 
-function useDevelopmentWarning(message: string | false) {
+function useInternalDevelopmentWarning(message: string | false) {
   useEffect(() => {
     if (isDevelopment && message) console.warn(`[IDS] ${message}`);
   }, [message]);
@@ -101,7 +101,7 @@ export function SplitterRoot({
   ...props
 }: SplitterProps) {
   const layout = arrange(children);
-  const splitter = useSplitter({
+  const splitter = useInternalSplitter({
     id,
     orientation,
     value,
@@ -124,16 +124,16 @@ export function SplitterRoot({
   );
   const defaultTotal = givenDefaults.reduce((total, size) => total + size, 0);
 
-  useDevelopmentWarning(
+  useInternalDevelopmentWarning(
     panelCount < FEWEST_PANELS &&
       `Splitter needs at least two Splitter.Panel children; it has ${panelCount}.`,
   );
-  useDevelopmentWarning(
+  useInternalDevelopmentWarning(
     defaultTotal > WHOLE &&
       !sameSize(defaultTotal, WHOLE) &&
       `Splitter: the default sizes add up to ${defaultTotal}%, past 100%. They are scaled down to fit.`,
   );
-  useDevelopmentWarning(
+  useInternalDevelopmentWarning(
     layout.stray > 0 &&
       `Splitter: ${layout.stray} Splitter.Handle not drawn. A handle goes between two panels, one per gap.`,
   );

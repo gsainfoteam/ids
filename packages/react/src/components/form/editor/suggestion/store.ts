@@ -1,6 +1,6 @@
 import { matchesKeyboardEvent, type Hotkey } from '@tanstack/react-hotkeys';
 
-import { isComposingKey } from '../../../../internal/keys';
+import { isComposingKey } from '../../../../internal/lib/keys';
 
 import type { PluginKey } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';

@@ -4,7 +4,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { useDrawer } from './use-drawer';
+import { useDrawer } from './hooks/use-drawer';
 import { Button } from '../../action/button';
 import { FloatingButton } from '../../action/floating-button';
 import { Select } from '../../form/select';

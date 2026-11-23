@@ -1,9 +1,9 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { type AvatarGroupLayout, type AvatarGroupStacking } from './arrange';
+import { type AvatarGroupLayout, type AvatarGroupStacking } from './lib/arrange';
 import { AvatarGroupRoot, AvatarGroupOverflow } from './root';
 import { avatarGroupStyle } from './style';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -52,4 +52,4 @@ export namespace AvatarGroup {
 
   export const Style = avatarGroupStyle;
 }
-export type { AvatarGroupLayout, AvatarGroupStacking } from './arrange';
+export type { AvatarGroupLayout, AvatarGroupStacking } from './lib/arrange';

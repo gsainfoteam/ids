@@ -10,14 +10,14 @@ import {
   type SidebarContextValue,
   type SidebarControls,
 } from './context';
-import { SidebarFooter } from './footer';
-import { SidebarList } from './group';
-import { SidebarHeader } from './header';
-import { SidebarItem } from './item';
+import { DEFAULT_SHORTCUT, useInternalSidebar } from './hooks/use-sidebar';
+import { SidebarFooter } from './parts/footer';
+import { SidebarList } from './parts/group';
+import { SidebarHeader } from './parts/header';
+import { SidebarItem } from './parts/item';
+import { SidebarTrigger } from './parts/trigger';
 import { sidebarStyle, type SidebarCollapsibleMode, type SidebarPanelState } from './style';
-import { SidebarTrigger } from './trigger';
-import { DEFAULT_SHORTCUT, useSidebar } from './use-sidebar';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalTranslate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
 import { Card } from '../../data/card';
 import { Divider } from '../../layout/divider';
@@ -80,10 +80,10 @@ export function SidebarRoot({
   'aria-label': ariaLabel,
   ...props
 }: Sidebar.Props) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const provider = use(SidebarProviderContext);
   const collapsible = collapsibleProp ?? false;
-  const controls = useSidebar({
+  const controls = useInternalSidebar({
     collapsed,
     defaultCollapsed,
     onCollapsedChange,

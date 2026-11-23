@@ -9,15 +9,15 @@ import {
   type ReactNode,
 } from 'react';
 
-import { PromptInputAttachments } from './attachments';
 import { PromptInputContext } from './context';
-import { PromptInputInput, type PromptInputInputProps } from './input';
+import { PromptInputAttachments } from './parts/attachments';
+import { PromptInputInput, type PromptInputInputProps } from './parts/input';
+import { PromptInputSubmit } from './parts/submit';
 import { promptInputStyle } from './style';
-import { PromptInputSubmit } from './submit';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { useFormReset } from '../../../hooks/use-form-reset';
-import { keyHandler } from '../../../internal/keys';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalFormReset } from '../../../hooks/use-form-reset';
+import { keyHandler } from '../../../internal/lib/keys';
+import { useInternalTranslate } from '../../../internal/translate';
 import {
   elementTypeOf,
   flattenFragments,
@@ -28,12 +28,12 @@ import {
 } from '../../../utils';
 import { useFieldSize } from '../field/context';
 import { FileContext } from '../file-field/context';
-import { useFileFieldRoot } from '../file-field/use-file-field-root';
+import { useInternalFileFieldRoot } from '../file-field/hooks/use-file-field-root';
 import { TextArea } from '../text-area';
-import { TextAreaInput } from '../text-area/input';
+import { TextAreaInput } from '../text-area/parts/input';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { FileFieldRejection } from '../file-field/file-rules';
+import type { FileFieldRejection } from '../file-field/lib/file-rules';
 
 export type PromptInputStatus = 'idle' | 'submitting' | 'streaming';
 export type PromptInputVariant = 'outline' | 'soft';
@@ -118,7 +118,7 @@ export function PromptInputRoot({
   ref,
   ...formProps
 }: PromptInputProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const size = useFieldSize(sizeProp) ?? 'standard';
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -136,7 +136,7 @@ export function PromptInputRoot({
   const toggleTool = (tool: string) =>
     setTools(tools.includes(tool) ? tools.filter((on) => on !== tool) : [...tools, tool]);
 
-  const attachments = useFileFieldRoot(
+  const attachments = useInternalFileFieldRoot(
     {
       multiple: true,
       value: files,
@@ -155,7 +155,7 @@ export function PromptInputRoot({
   const canSend = !disabled && !busy && (text.trim() !== '' || files.length > 0);
   const styles = promptInputStyle({ size });
 
-  useFormReset(formRef, () => {
+  useInternalFormReset(formRef, () => {
     setText(defaultValue, { silent: true });
     setFiles(defaultFiles, { silent: true });
     setTools(defaultTools, { silent: true });

@@ -5,8 +5,7 @@ import { useState, type ReactNode } from 'react';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { getLocalTimeZone, today as todayIn, type CalendarDateTime } from '@internationalized/date';
 
-import { DateTimeFieldCalendar, type DateTimeFieldCalendarProps } from './calendar';
-import { DateTimeFieldContext, useDateTimeFieldContext } from './context';
+import { DateTimeFieldContext, useInternalDateTimeFieldContext } from './context';
 import {
   compareDateTimes,
   dayOf,
@@ -16,14 +15,15 @@ import {
   toUtcDateTime,
   validateDateTime,
   type DateTimeLimits,
-} from './date-time';
-import { DateTimeFieldTimePicker } from './time-picker';
+} from './lib/date-time';
+import { DateTimeFieldCalendar, type DateTimeFieldCalendarProps } from './parts/calendar';
+import { DateTimeFieldTimePicker } from './parts/time-picker';
 import { resolveLocale } from '../../../internal/date-locale';
 import {
   pickerPart,
   TemporalField,
   temporalFieldStyle,
-  useTemporalPicker,
+  useInternalTemporalPicker,
   type TemporalFieldProps,
 } from '../../../internal/temporal-field';
 import {
@@ -31,11 +31,15 @@ import {
   formatter,
   timeOptions,
   type TemporalFormat,
-} from '../../../internal/temporal-field/format';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+} from '../../../internal/temporal-field/lib/format';
+import { useInternalProviderLocale, useInternalTranslate } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { type DateMatcher } from '../../data/calendar';
-import { resolveHourCycle, type HourCycle, type TimePrecision } from '../../data/time-picker/time';
+import {
+  resolveHourCycle,
+  type HourCycle,
+  type TimePrecision,
+} from '../../data/time-picker/lib/time';
 import { useFieldSize } from '../field/context';
 
 export type DateTimeFieldProps = Omit<TemporalFieldProps<CalendarDateTime | null>, 'disabled'> & {
@@ -54,9 +58,9 @@ const POPUP_PADDING_AND_BORDER = 26;
 const PICKER_PARTS = new Set<unknown>([DateTimeFieldCalendar, DateTimeFieldTimePicker]);
 
 function Panel({ calendar, timePicker }: { calendar: ReactNode; timePicker: ReactNode }) {
-  const t = useTranslate();
-  const field = useDateTimeFieldContext('DateTimeField');
-  const picker = useTemporalPicker<CalendarDateTime | null>('DateTimeField');
+  const t = useInternalTranslate();
+  const field = useInternalDateTimeFieldContext('DateTimeField');
+  const picker = useInternalTemporalPicker<CalendarDateTime | null>('DateTimeField');
 
   const styles = temporalFieldStyle({ size: picker.size });
   const day = picker.value ? dayOf(picker.value) : field.today;
@@ -83,8 +87,8 @@ export function DateTimeFieldRoot({
   disabled,
   ...props
 }: DateTimeFieldProps) {
-  const t = useTranslate();
-  const providerLocale = useProviderLocale();
+  const t = useInternalTranslate();
+  const providerLocale = useInternalProviderLocale();
   [props.value, props.defaultValue, min, max].forEach(validateDateTime);
   invariant(
     !min || !max || compareDateTimes(min, max) <= 0,

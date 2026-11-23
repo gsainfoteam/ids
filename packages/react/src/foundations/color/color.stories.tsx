@@ -40,13 +40,13 @@ import {
   MARK_LC,
   TEXT_LC,
   lightnessContrast,
-} from '../../components/utility/ids-provider/contrast';
+} from '../../components/utility/ids-provider/lib/contrast';
 import {
   SCALE_STEPS,
   type IdsStatus,
   type IdsThemeOverrides,
-} from '../../components/utility/ids-provider/theme';
-import { resolveColorsOnce } from '../../components/utility/ids-provider/theme-roles';
+} from '../../components/utility/ids-provider/lib/theme';
+import { resolveColorsOnce } from '../../components/utility/ids-provider/lib/theme-roles';
 import {
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,

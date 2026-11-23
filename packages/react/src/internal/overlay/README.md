@@ -4,7 +4,7 @@
 
 | 파일                                     | 내용                                                                     |
 | ---------------------------------------- | ------------------------------------------------------------------------ |
-| [`layer-stack.ts`](#layer-stackts)       | 열린 레이어의 스택과 Escape, 바깥 누르기, 포커스 규칙(`useLayer`)        |
+| [`layer-stack.ts`](#layer-stackts)       | 열린 레이어의 스택과 Escape, 바깥 누르기, 포커스 규칙(`useInternalLayer`)        |
 | [`top-layer.ts`](#top-layerts)           | top layer 에 올리기, 다시 올리기, transition 없이 바꾸기, toaster 올리기 |
 | [`use-presence.ts`](#use-presencets)     | 닫힌 뒤 나가는 애니메이션이 끝날 때까지 남는 mount 상태                  |
 | [`use-anchored.ts`](#use-anchoredts)     | anchor 에 붙는 위치 계산(`@floating-ui/react` 의 `useFloating`)          |
@@ -22,16 +22,16 @@
 | 쓰는 곳                                 | 가져가는 것                                                                                                                                                                                                                  |
 | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                                                                                                           |
-| Alert                                   | `usePresence`                                                                                                                                                                                                                |
-| Dialog                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`                                                                                  |
-| Popover                                 | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `interactions.ts` |
-| Tooltip                                 | `useLayer`, `useAnchored`, `usePresence`, `showInTopLayer`, `focusWasReturned`, `PortalRootContext`, `interactions.ts`                                                                                                       |
-| Chart 의 툴팁                           | `useAnchored`(`glide`), `showInTopLayer` |
-| Menu                                    | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `returnFocusTo`, `focusReturnTarget`, `interactions.ts` |
-| Drawer                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`              |
-| Image 의 뷰어                           | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `returnFocusTo`, `focusReturnTarget`                                                                                                        |
-| Toast                                   | `createExternalStore`, `keepAboveLayers`, `withoutTransitions`, `raiseInTopLayer`, `showInTopLayer`, `supportsPopover`, `usePresence`, `returnFocusTo`, `blurWithin`                                                         |
-| [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`                                                                                            |
+| Alert                                   | `useInternalPresence`                                                                                                                                                                                                                |
+| Dialog                                  | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`                                                                                  |
+| Popover                                 | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `interactions.ts` |
+| Tooltip                                 | `useInternalLayer`, `useInternalAnchored`, `useInternalPresence`, `showInTopLayer`, `focusWasReturned`, `PortalRootContext`, `interactions.ts`                                                                                                       |
+| Chart 의 툴팁                           | `useInternalAnchored`(`glide`), `showInTopLayer` |
+| Menu                                    | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `returnFocusTo`, `focusReturnTarget`, `interactions.ts` |
+| Drawer                                  | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`              |
+| Image 의 뷰어                           | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `returnFocusTo`, `focusReturnTarget`                                                                                                        |
+| Toast                                   | `createExternalStore`, `keepAboveLayers`, `withoutTransitions`, `raiseInTopLayer`, `showInTopLayer`, `supportsPopover`, `useInternalPresence`, `returnFocusTo`, `blurWithin`                                                         |
+| [field-popup](../field-popup/README.md) | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`                                                                                            |
 
 ## 조립하는 법
 
@@ -39,8 +39,8 @@
 
 ```tsx
 const [element, setElement] = useState<HTMLElement | null>(null);
-const presence = usePresence(open, { elements: () => [element, backdrop], onExitComplete });
-const layer = useLayer(open, {
+const presence = useInternalPresence(open, { elements: () => [element, backdrop], onExitComplete });
+const layer = useInternalLayer(open, {
   kind: 'popup',                        // 'modal' | 'popup' | 'tooltip'
   element: () => element,
   anchor: () => trigger,
@@ -49,13 +49,13 @@ const layer = useLayer(open, {
     if (reason === 'escape-key') returnFocusTo(focusReturnTarget(layer));
   },
 });
-useLayoutEffect(() => {                 // useLayer 뒤에 둔다
+useLayoutEffect(() => {                 // useInternalLayer 뒤에 둔다
   if (open && element) initialFocusTarget(element, { holdsFocus: false })?.focus();
 }, [open, element]);
 if (!presence.mounted) return null;
 ```
 
-- `useLayer` 는 초기 포커스를 옮기는 effect 보다 먼저 부릅니다. 스택은 등록할 때의 `activeElement` 를 되돌아갈 곳으로 기억합니다.
+- `useInternalLayer` 는 초기 포커스를 옮기는 effect 보다 먼저 부릅니다. 스택은 등록할 때의 `activeElement` 를 되돌아갈 곳으로 기억합니다.
 - 레이어는 `open` 이 `false` 가 되는 순간 스택을 떠납니다. 나가는 애니메이션 동안은 Escape 와 바깥 누르기를 받지 않습니다.
 - 레이어는 제자리에 렌더하고 `popover="manual"` 로 top layer 에 올립니다. DOM 위치가 그대로라 theme(`data-mode` 와 Provider 의 테마 변수), Field 의 `focusout` 판정, 폼 소속, Tab 순서를 물려받고, top layer 라서 조상의 `transform`, `overflow`, `opacity` 에 갇히지 않습니다.
 
@@ -66,7 +66,7 @@ if (!presence.mounted) return null;
 ### 쓰는 법
 
 ```ts
-const layer = useLayer(open, {
+const layer = useInternalLayer(open, {
   kind: 'modal',
   element: () => contentRef.current,
   anchor: () => triggerRef.current,
@@ -131,7 +131,7 @@ raiseWhatStaysAboveLayers();                   // 레이어를 올린 쪽이 부
 ### 알아둘 것
 
 - Popover API 가 없는 엔진(jsdom 포함)에서는 요소의 `fixed`, `z-50` 클래스가 대신합니다. 레이어 스타일에 두 클래스를 빼지 않습니다.
-- UA 가 `[popover]` 에 주는 `inset: 0`, `margin: auto` 는 anchor 에 붙는 레이어에서 풀어야 합니다. [`useAnchored`](#use-anchoredts) 가 `right`, `bottom` 을 `auto` 로 풀고, 레이어 스타일은 `m-0` 을 둡니다.
+- UA 가 `[popover]` 에 주는 `inset: 0`, `margin: auto` 는 anchor 에 붙는 레이어에서 풀어야 합니다. [`useInternalAnchored`](#use-anchoredts) 가 `right`, `bottom` 을 `auto` 로 풀고, 레이어 스타일은 `m-0` 을 둡니다.
 
 ## use-presence.ts
 
@@ -144,7 +144,7 @@ raiseWhatStaysAboveLayers();                   // 레이어를 올린 쪽이 부
 ### 쓰는 법
 
 ```tsx
-const { mounted, ending } = usePresence(open, {
+const { mounted, ending } = useInternalPresence(open, {
   elements: () => [node, backdrop],     // 애니메이션을 기다릴 요소
   onExitComplete: () => overlayItem.remove(),
   onEnterComplete: () => onOpenChangeComplete(true),   // 들어오는 애니메이션이 끝난 뒤
@@ -174,7 +174,7 @@ if (!mounted) return null;
 ### 쓰는 법
 
 ```ts
-const anchored = useAnchored({
+const anchored = useInternalAnchored({
   open,
   reference: trigger,                  // state 의 요소, 또는 RefObject
   floating: element,
@@ -216,7 +216,7 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 ```tsx
 <ModalLayer
   open={open}
-  layer={layer}                         // useLayer 의 결과
+  layer={layer}                         // useInternalLayer 의 결과
   element={element}                     // state 의 content 요소
   contentRef={setElement}               // content 에 붙는 ref. RemoveScroll 이 content 로 넘긴다
   backdrop={{ className: backdropStyle, ref: setBackdrop }}   // false 면 배경 없음. ref 로 배경 요소를 받는다
@@ -238,19 +238,19 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 ### 알아둘 것
 
 - content 의 ref 는 `contentRef` 로 넘깁니다. `RemoveScroll` 이 자식을 복제하면서 ref 를 덮으므로 자식에 직접 단 ref 는 사라집니다.
-- `context` 를 넘기지 않으면 reference 없는 root context 를 만듭니다. anchor 에 붙는 modal(modal Popover)은 [`useAnchored`](#use-anchoredts) 의 `context` 를 넘깁니다.
+- `context` 를 넘기지 않으면 reference 없는 root context 를 만듭니다. anchor 에 붙는 modal(modal Popover)은 [`useInternalAnchored`](#use-anchoredts) 의 `context` 를 넘깁니다.
 
 ## sheet-viewport.ts
 
 ### 쓰는 곳
 
-- [field-popup](../field-popup/README.md) 과 Select, ChipField, ColorField 의 `useDrawerPresentation`
+- [field-popup](../field-popup/README.md) 과 Select, ChipField, ColorField 의 `useInternalDrawerPresentation`
 - Drawer 의 화면 키보드 올리기(`coveredByKeyboard`, `onViewportChange`)
 
 ### 쓰는 법
 
 ```ts
-const drawer = useDrawerPresentation(mobileVariant);   // 'drawer' 이고 640px 미만이면 true
+const drawer = useInternalDrawerPresentation(mobileVariant);   // 'drawer' 이고 640px 미만이면 true
 
 const stop = onViewportChange(win, () => {
   sheet.style.bottom = `${coveredByKeyboard(win)}px`;
@@ -324,9 +324,9 @@ overlay.unmount('settings');                 // 나가는 애니메이션 없이
 {outermost && <OverlayHost />}
 
 // Dialog 같은 레이어: open 을 받지 않았으면 항목에 붙는다
-const item = useOverlayItem(openProp);          // { open, close, exited } | null
+const item = useInternalOverlayItem(openProp);          // { open, close, exited } | null
 const open = item?.open ?? ownOpen;
-usePresence(open, { onExitComplete: () => item?.exited() });
+useInternalPresence(open, { onExitComplete: () => item?.exited() });
 <OverlayItemContext value={null}>{children}</OverlayItemContext>   // 안쪽 레이어는 붙지 않게
 
 const scoped = useOverlay();                    // 부른 곳의 theme 으로 연다
@@ -336,7 +336,7 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 
 - 항목마다 `display: contents` 인 wrapper 가 `data-mode` 와 연 곳의 테마 변수(`ThemeContext` 의 `variables`)를 가집니다. 항목은 host 의 theme 을 따르고, `useOverlay()` 로 열면 부른 곳의 theme 을 씁니다.
 - host 는 IdsProvider 의 요소 안, children 뒤에 그립니다. `asChild` 면 자식 요소 하나를 지켜야 하므로 요소 옆에 그립니다. 항목이 없으면 아무것도 그리지 않아서 서버 HTML 이 그대로입니다.
-- 레이어는 `open` prop 이 없을 때만 항목에 붙습니다(`useOverlayItem`). 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
+- 레이어는 `open` prop 이 없을 때만 항목에 붙습니다(`useInternalOverlayItem`). 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
 - `PortalRootContext` 는 가장 가까운 IdsProvider 의 요소입니다. Tooltip 이 그 안에 portal 합니다.
 
 ## external-store.ts

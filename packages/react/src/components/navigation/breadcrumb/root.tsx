@@ -3,9 +3,9 @@
 import { isValidElement } from 'react';
 
 import { BreadcrumbContext } from './context';
-import { BreadcrumbList } from './list';
+import { BreadcrumbList } from './parts/list';
 import { breadcrumbStyle } from './style';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Breadcrumb } from '.';
@@ -17,7 +17,7 @@ export function BreadcrumbRoot({
   children,
   ...props
 }: Breadcrumb.Props) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const styles = breadcrumbStyle({ size });
 
   const writesOwnList = flattenFragments(children).some(

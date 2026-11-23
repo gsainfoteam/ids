@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 
 import { EmptyContext } from './context';
-import { EmptyMedia } from './media';
+import { EmptyMedia } from './parts/media';
+import { EmptyTitle } from './parts/title';
 import { emptyStyle } from './style';
-import { EmptyTitle } from './title';
 import { containsElementOfType } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 

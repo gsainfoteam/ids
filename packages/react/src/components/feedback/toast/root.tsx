@@ -4,14 +4,14 @@ import type { CSSProperties } from 'react';
 
 import { parseHotkey, useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
 
+import { useInternalToaster } from './hooks/use-toaster';
+import { ToastView } from './parts/toast-view';
 import { toasterStyle } from './style';
-import { ToastView } from './toast-view';
-import { useToaster } from './use-toaster';
-import { useTranslate } from '../../../internal/translate';
-import { usePlatform } from '../../typography/kbd/use-kbd';
+import { useInternalTranslate } from '../../../internal/translate';
+import { useInternalPlatform } from '../../typography/kbd/hooks/use-kbd';
 
 import type { Toaster } from '.';
-import type { KbdPlatform } from '../../typography/kbd/keys';
+import type { KbdPlatform } from '../../typography/kbd/lib/keys';
 
 const REGION_KEY = 'F6';
 const DEFAULT_HOTKEY: Hotkey = 'Alt+T';
@@ -47,11 +47,11 @@ function ToasterRegion({
   style,
   'aria-label': ariaLabelProp,
 }: Toaster.Props & { explicit: boolean }) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const ariaLabel = ariaLabelProp ?? t('toast.region');
 
-  const toaster = useToaster({ explicit, max, expanded: variant === 'expanded' });
-  const platform = usePlatform(undefined);
+  const toaster = useInternalToaster({ explicit, max, expanded: variant === 'expanded' });
+  const platform = useInternalPlatform(undefined);
 
   if (!toaster.elected) return null;
 

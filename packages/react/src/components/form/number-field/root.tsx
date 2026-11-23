@@ -1,13 +1,13 @@
 'use client';
 
 import { NumberFieldContext } from './context';
-import { NumberFieldDecrement } from './decrement';
-import { NumberFieldIncrement } from './increment';
-import { NumberFieldInput } from './input';
-import { NumberFieldStepper } from './stepper';
+import { useInternalNumberField } from './hooks/use-number-field';
+import { NumberFieldDecrement } from './parts/decrement';
+import { NumberFieldIncrement } from './parts/increment';
+import { NumberFieldInput } from './parts/input';
+import { NumberFieldStepper } from './parts/stepper';
 import { numberFieldStyle } from './style';
-import { useNumberField } from './use-number-field';
-import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/lib/field-surface';
 import {
   Adornments,
   TextControlClear,
@@ -18,7 +18,7 @@ import {
   writesNoneOf,
   type TextControlState,
 } from '../../../internal/text-control';
-import { useProviderLocale } from '../../../internal/translate';
+import { useInternalProviderLocale } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -52,7 +52,7 @@ export function NumberFieldRoot({
   children,
   ...rootProps
 }: NumberField.Props) {
-  const locale = useProviderLocale() ?? 'en-US';
+  const locale = useInternalProviderLocale() ?? 'en-US';
 
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const { items, leading, input, trailing } = splitAroundInput<NumberField.InputProps>(
@@ -68,7 +68,7 @@ export function NumberFieldRoot({
   const own = [NumberFieldStepper, NumberFieldIncrement, NumberFieldDecrement, TextControlClear];
   const drawsDefaultParts = writesNoneOf(items, [NumberFieldInput, ...own]);
 
-  const field = useNumberField({
+  const field = useInternalNumberField({
     rootProps,
     input: input.props,
     value,

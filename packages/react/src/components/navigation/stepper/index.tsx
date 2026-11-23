@@ -1,30 +1,38 @@
 import { type ComponentProps } from 'react';
 
-import { StepperBody, type StepperBodyProps, type StepperBodyState } from './body';
-import { StepperContent, type StepperContentProps, type StepperContentState } from './content';
+import { StepperBody, type StepperBodyProps, type StepperBodyState } from './parts/body';
+import {
+  StepperContent,
+  type StepperContentProps,
+  type StepperContentState,
+} from './parts/content';
 import {
   StepperDescription,
   type StepperDescriptionProps,
   type StepperDescriptionState,
-} from './description';
+} from './parts/description';
 import {
   StepperIndicator,
   type StepperIndicatorProps,
   type StepperIndicatorState,
-} from './indicator';
-import { StepperItem, type StepperItemProps, type StepperItemState } from './item';
-import { StepperRoot, type StepperOrientation } from './root';
+} from './parts/indicator';
+import { StepperItem, type StepperItemProps, type StepperItemState } from './parts/item';
 import {
   StepperSeparator,
   type StepperSeparatorProps,
   type StepperSeparatorState,
-} from './separator';
+} from './parts/separator';
+import { StepperTitle, type StepperTitleProps, type StepperTitleState } from './parts/title';
+import {
+  StepperTrigger,
+  type StepperTriggerProps,
+  type StepperTriggerState,
+} from './parts/trigger';
+import { StepperRoot, type StepperOrientation } from './root';
 import { stepperStyle } from './style';
-import { StepperTitle, type StepperTitleProps, type StepperTitleState } from './title';
-import { StepperTrigger, type StepperTriggerProps, type StepperTriggerState } from './trigger';
-import { type StateRenderProps } from '../../../internal/state-props';
+import { type StateRenderProps } from '../../../internal/lib/state-props';
 
-import type { StepperStatus } from './step-state';
+import type { StepperStatus } from './lib/step-state';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Stepper(props: Stepper.Props) {
@@ -118,4 +126,4 @@ export namespace Stepper {
 }
 
 export type { StepperOrientation } from './root';
-export type { StepperStatus } from './step-state';
+export type { StepperStatus } from './lib/step-state';

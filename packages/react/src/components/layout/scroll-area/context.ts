@@ -5,12 +5,12 @@ import { createContext, use, useEffect } from 'react';
 import { isDevelopment } from '../../../utils/dev';
 
 import type { ScrollArea } from '.';
-import type { Axis, Placement } from './geometry';
-import type { useScrollArea } from './use-scroll-area';
+import type { useInternalScrollArea } from './hooks/use-scroll-area';
+import type { Axis, Placement } from './lib/geometry';
 import type { IdsSize } from '../../../tokens/types';
 
 type AreaContext = {
-  area: ReturnType<typeof useScrollArea>;
+  area: ReturnType<typeof useInternalScrollArea>;
   variant: ScrollArea.Variant;
   size: IdsSize;
   scrolls: ScrollArea.Orientation;
@@ -22,7 +22,7 @@ export const ScrollAreaContext = createContext<AreaContext | null>(null);
 export const PlacementContext = createContext<Placement>('end');
 export const ScrollbarContext = createContext<Axis | null>(null);
 
-export function useAreaContext(part: string) {
+export function useInternalAreaContext(part: string) {
   const context = use(ScrollAreaContext);
 
   useEffect(() => {

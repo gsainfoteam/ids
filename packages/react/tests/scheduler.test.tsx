@@ -19,7 +19,7 @@ import {
   shownDayCount,
   stepOf,
   timedSegmentsOn,
-} from '../src/components/data/scheduler/layout';
+} from '../src/components/data/scheduler/lib/layout';
 
 afterEach(() => {
   vi.useRealTimers();

@@ -13,8 +13,8 @@ import {
   ModalLayer,
   raiseInTopLayer,
   showInTopLayer,
-  useLayer,
-  usePresence,
+  useInternalLayer,
+  useInternalPresence,
   withoutTransitions,
   type DismissReason,
   type Layer,
@@ -56,7 +56,7 @@ function TestLayer({
   children,
 }: TestLayerProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const layer = useLayer(open, {
+  const layer = useInternalLayer(open, {
     kind,
     element: () => ref.current,
     anchor: () => anchor?.current ?? null,
@@ -396,7 +396,7 @@ test('presence waits for the exit, and reopening during it keeps the element', a
   const onExitComplete = vi.fn();
   function Box({ open }: { open: boolean }) {
     const ref = useRef<HTMLDivElement>(null);
-    const { mounted, ending } = usePresence(open, {
+    const { mounted, ending } = useInternalPresence(open, {
       elements: () => [ref.current],
       onExitComplete,
     });
@@ -468,7 +468,11 @@ test('a modal layer: backdrop under the content, the page hidden and locked, Tab
   const onBackdropClick = vi.fn();
   function Modal({ open }: { open: boolean }) {
     const [element, setElement] = useState<HTMLElement | null>(null);
-    const layer = useLayer(open, { kind: 'modal', element: () => element, onDismiss: () => {} });
+    const layer = useInternalLayer(open, {
+      kind: 'modal',
+      element: () => element,
+      onDismiss: () => {},
+    });
     return (
       <ModalLayer
         open={open}

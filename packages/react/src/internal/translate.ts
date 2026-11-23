@@ -17,7 +17,7 @@ export type LanguageContextValue = { translate?: IdsTranslate; locale?: string }
 
 export const LanguageContext = createContext<LanguageContextValue>({});
 
-export function useTranslate(ownCatalog?: MessageTree): Translate {
+export function useInternalTranslate(ownCatalog?: MessageTree): Translate {
   const { translate } = use(LanguageContext);
 
   return useCallback(
@@ -31,6 +31,6 @@ export function useTranslate(ownCatalog?: MessageTree): Translate {
   );
 }
 
-export function useProviderLocale(): string | undefined {
+export function useInternalProviderLocale(): string | undefined {
   return use(LanguageContext).locale;
 }

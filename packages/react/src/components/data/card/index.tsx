@@ -1,16 +1,16 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { CardAction, type CardActionProps } from './action';
-import { CardContent, type CardContentProps } from './content';
-import { CardDescription, type CardDescriptionProps } from './description';
-import { CardFooter, type CardFooterProps } from './footer';
-import { CardHeader, type CardHeaderProps } from './header';
-import { CardMedia, type CardMediaProps } from './media';
-import { type CardPartProps } from './part';
+import { CardAction, type CardActionProps } from './parts/action';
+import { CardContent, type CardContentProps } from './parts/content';
+import { CardDescription, type CardDescriptionProps } from './parts/description';
+import { CardFooter, type CardFooterProps } from './parts/footer';
+import { CardHeader, type CardHeaderProps } from './parts/header';
+import { CardMedia, type CardMediaProps } from './parts/media';
+import { type CardPartProps } from './parts/part';
+import { CardTitle, type CardTitleProps } from './parts/title';
 import { CardRoot, type CardVariant } from './root';
 import { cardStyle } from './style';
-import { CardTitle, type CardTitleProps } from './title';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { InteractiveState } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';

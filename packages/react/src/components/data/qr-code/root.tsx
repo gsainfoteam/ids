@@ -3,17 +3,17 @@
 import { useEffect, useMemo, type CSSProperties } from 'react';
 
 import { QRCodeContext } from './context';
-import { QRCodeLogo } from './logo';
 import {
   qrCodeGeometry,
   type QRCodeFinderShape,
   type QRCodeGeometry,
   type QRCodeGeometryOptions,
   type QRCodeModuleShape,
-} from './qr-path';
+} from './lib/qr-path';
+import { QRCodeLogo } from './parts/logo';
 import { qrCodeStyle } from './style';
-import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
+import { resolveState } from '../../../internal/lib/state-props';
+import { useInternalTranslate } from '../../../internal/translate';
 import { containsElementOfType } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -56,7 +56,7 @@ export function QRCodeRoot({
   'aria-labelledby': ariaLabelledBy,
   ...rest
 }: QRCode.Props) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const hasLogo = containsElementOfType(children, LOGO_PARTS);
   const level = errorCorrection ?? (hasLogo ? 'H' : 'M');
   const finder = finderShape ?? FINDER_FOR_SHAPE[shape];

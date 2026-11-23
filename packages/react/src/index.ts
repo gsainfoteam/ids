@@ -59,7 +59,7 @@ export { MessageGroup } from './components/data/message-group';
 export { Alert } from './components/feedback/alert';
 export { Dialog } from './components/overlay/dialog';
 export { Drawer } from './components/overlay/drawer';
-export { useDrawer } from './components/overlay/drawer/use-drawer';
+export { useDrawer } from './components/overlay/drawer/hooks/use-drawer';
 export { Menu } from './components/overlay/menu';
 export { Popover } from './components/overlay/popover';
 export { Tooltip, TooltipDelayGroup } from './components/overlay/tooltip';

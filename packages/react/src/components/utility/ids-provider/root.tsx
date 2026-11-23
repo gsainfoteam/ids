@@ -2,16 +2,16 @@
 
 import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 
-import { ThemeContext, useIdsProvider, type ThemeMode } from './use-ids-provider';
-import { OverlayHost, PortalRootContext } from '../../../internal/overlay/host';
+import { ThemeContext, useInternalIdsProvider, type ThemeMode } from './hooks/use-ids-provider';
+import { OverlayHost, PortalRootContext } from '../../../internal/overlay/parts/host';
 import { LanguageContext, type IdsTranslate } from '../../../internal/translate';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { DefaultToaster } from '../../feedback/toast';
-import { TooltipDelayGroup } from '../../overlay/tooltip/delay-group';
+import { TooltipDelayGroup } from '../../overlay/tooltip/parts/delay-group';
 import { Slot } from '../slot';
 
-import type { IdsThemeOverrides } from './theme';
+import type { IdsThemeOverrides } from './lib/theme';
 
 export type IdsProviderRootProps = Omit<ComponentProps<'div'>, 'color' | 'translate'> & {
   theme?: IdsThemeOverrides;
@@ -37,12 +37,13 @@ export function IdsProviderRoot({
   children,
   ...rest
 }: IdsProviderRootProps) {
-  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } = useIdsProvider({
-    theme,
-    mode,
-    defaultMode,
-    onModeChange,
-  });
+  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } =
+    useInternalIdsProvider({
+      theme,
+      mode,
+      defaultMode,
+      onModeChange,
+    });
   const inherited = use(LanguageContext);
   const language = useMemo(
     () => ({

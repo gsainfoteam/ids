@@ -24,7 +24,7 @@ type Context = {
 
 export const MessageContext = createContext<Context | null>(null);
 
-export function useMessageContext(part: string) {
+export function useInternalMessageContext(part: string) {
   const context = use(MessageContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Message>\`.`);
   return context;

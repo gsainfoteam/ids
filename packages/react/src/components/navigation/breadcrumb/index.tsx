@@ -1,12 +1,12 @@
 import { type ComponentProps } from 'react';
 
-import { BreadcrumbEllipsis, type BreadcrumbEllipsisProps } from './ellipsis';
-import { BreadcrumbItem, type BreadcrumbItemProps } from './item';
-import { BreadcrumbLink, type BreadcrumbLinkProps } from './link';
-import { BreadcrumbList, type BreadcrumbListProps } from './list';
-import { BreadcrumbPage, type BreadcrumbPageProps } from './page';
+import { BreadcrumbEllipsis, type BreadcrumbEllipsisProps } from './parts/ellipsis';
+import { BreadcrumbItem, type BreadcrumbItemProps } from './parts/item';
+import { BreadcrumbLink, type BreadcrumbLinkProps } from './parts/link';
+import { BreadcrumbList, type BreadcrumbListProps } from './parts/list';
+import { BreadcrumbPage, type BreadcrumbPageProps } from './parts/page';
+import { BreadcrumbSeparator, type BreadcrumbSeparatorProps } from './parts/separator';
 import { BreadcrumbRoot } from './root';
-import { BreadcrumbSeparator, type BreadcrumbSeparatorProps } from './separator';
 import { breadcrumbStyle } from './style';
 
 import type { IdsSize } from '../../../tokens/types';

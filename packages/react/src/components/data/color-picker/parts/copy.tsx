@@ -1,0 +1,51 @@
+'use client';
+
+import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/16/solid';
+
+import { useInternalClipboardSupport } from '../../../../hooks/use-clipboard-support';
+import { useInternalTranslate } from '../../../../internal/translate';
+import { mergeEventHandlers } from '../../../../utils';
+import { IconButton } from '../../../action/icon-button';
+import { useInternalPicker } from '../context';
+
+import type { ColorPicker } from '..';
+
+export function ColorPickerCopy({
+  className,
+  children,
+  onClick,
+  ...props
+}: ColorPicker.ButtonProps) {
+  const t = useInternalTranslate();
+
+  const c = useInternalPicker('ColorPicker.Copy');
+  const supported = useInternalClipboardSupport();
+  if (!supported) return null;
+  const { copied, parsed } = c.picker.state;
+  return (
+    <>
+      <IconButton
+        {...props}
+        aria-label={
+          props['aria-label'] ?? (copied ? t('colorPicker.copied') : t('colorPicker.copy'))
+        }
+        disabled={c.state.disabled || !parsed}
+        data-color-picker-copy=""
+        data-copied={copied ? '' : undefined}
+        variant="outline"
+        size={c.size}
+        icon={
+          children ??
+          (copied ? <CheckIcon aria-hidden="true" /> : <ClipboardDocumentIcon aria-hidden="true" />)
+        }
+        className={c.styles.tool({ className })}
+        onClick={mergeEventHandlers(onClick, c.picker.actions.copy)}
+      />
+      <span role="status" className={c.styles.channel()}>
+        {copied ? t('colorPicker.copied') : ''}
+      </span>
+    </>
+  );
+}
+
+ColorPickerCopy.displayName = 'ColorPicker.Copy';
