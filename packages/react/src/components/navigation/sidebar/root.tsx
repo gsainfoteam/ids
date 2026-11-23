@@ -1,24 +1,21 @@
 'use client';
 
-import { isValidElement, use, type ReactElement, type ReactNode } from 'react';
+import { use, type ReactElement, type ReactNode } from 'react';
 
 import { noop } from 'es-toolkit';
 
-import {
-  SidebarContext,
-  SidebarProviderContext,
-  type SidebarContextValue,
-  type SidebarControls,
-} from './context';
+import { SidebarContext, SidebarProviderContext, type SidebarContextValue } from './context';
 import { DEFAULT_SHORTCUT, useInternalSidebar } from './hooks/use-sidebar';
+import { isType } from './lib/is-type';
+import { panelStateOf } from './lib/panel-state';
 import { SidebarFooter } from './parts/footer';
 import { SidebarList } from './parts/group';
 import { SidebarHeader } from './parts/header';
 import { SidebarItem } from './parts/item';
 import { SidebarTrigger } from './parts/trigger';
-import { sidebarStyle, type SidebarCollapsibleMode, type SidebarPanelState } from './style';
+import { sidebarStyle } from './style';
 import { useInternalTranslate } from '../../../internal/translate';
-import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
+import { containsElementOfType, flattenFragments } from '../../../utils';
 import { Card } from '../../data/card';
 import { Divider } from '../../layout/divider';
 import { ScrollArea } from '../../layout/scroll-area';
@@ -27,9 +24,6 @@ import { Drawer } from '../../overlay/drawer';
 import type { Sidebar } from '.';
 
 const TRIGGER = new Set<unknown>([SidebarTrigger]);
-
-const isType = (type: unknown) => (node: ReactNode) =>
-  isValidElement(node) && elementTypeOf(node) === type;
 
 function splitChildren(children: ReactNode) {
   const nodes = flattenFragments(children);
@@ -56,14 +50,6 @@ function splitChildren(children: ReactNode) {
     footer: nodes.find(isType(SidebarFooter)),
     body,
   };
-}
-
-function panelStateOf(
-  controls: SidebarControls,
-  collapsible: SidebarCollapsibleMode | false,
-): SidebarPanelState {
-  if (!controls.collapsed) return 'expanded';
-  return collapsible === 'icon' ? 'rail' : 'hidden';
 }
 
 export function SidebarRoot({

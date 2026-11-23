@@ -1,20 +1,11 @@
 'use client';
 
-import { cloneElement, isValidElement, type ReactNode } from 'react';
-
 import { Item } from '../../../data/item';
-import { sidebarStyle, type SidebarIconColorScheme } from '../style';
+import { tintedIcon } from '../lib/tinted-icon';
+import { type SidebarIconColorScheme } from '../style';
 
 import type { SidebarContextValue } from '../context';
-import type { ItemParts } from './item-children';
-
-export function tintedIcon(icon: ReactNode, colorScheme: SidebarIconColorScheme | undefined) {
-  if (!colorScheme || colorScheme === 'neutral') return icon;
-  if (!isValidElement<{ className?: string }>(icon)) return icon;
-  return cloneElement(icon, {
-    className: sidebarStyle({ iconColor: colorScheme }).icon({ className: icon.props.className }),
-  });
-}
+import type { ItemParts } from '../lib/item-children';
 
 export function SidebarRow({
   parts,
