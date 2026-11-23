@@ -100,7 +100,7 @@ export const PC: Story = {
         </Button>
       </div>
 
-      <Tabs defaultValue="open" className="flex flex-col gap-6">
+      <Tabs defaultValue="open">
         <Tabs.List aria-label="청원 상태">
           {STATES.map((state) => (
             <Tabs.Trigger key={state.value} value={state.value}>

@@ -67,9 +67,11 @@ export const PC: Story = {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
         <div className="flex justify-end">
-          <Card variant="soft" className="max-w-[80%]">
-            <Card.Content>가을 축제 부스 준비 계획 세워 줘.</Card.Content>
-          </Card>
+          <div className="max-w-[80%]">
+            <Card variant="soft">
+              <Card.Content>가을 축제 부스 준비 계획 세워 줘.</Card.Content>
+            </Card>
+          </div>
         </div>
 
         <div className="flex gap-3">

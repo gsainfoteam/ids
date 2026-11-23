@@ -119,147 +119,153 @@ export const PC: Story = {
         <Alert.Title>10월 3일 개천절에는 주말 시간표로 다녀요</Alert.Title>
       </Alert>
 
-      <Tabs defaultValue="station" className="flex flex-col gap-6">
-        <Tabs.List aria-label="노선">
-          {ROUTES.map((route) => (
-            <Tabs.Trigger key={route.id} value={route.id}>
-              {route.name}
-            </Tabs.Trigger>
-          ))}
-        </Tabs.List>
+      <Tabs defaultValue="station">
+        <div className="flex flex-col gap-6">
+          <Tabs.List aria-label="노선">
+            {ROUTES.map((route) => (
+              <Tabs.Trigger key={route.id} value={route.id}>
+                {route.name}
+              </Tabs.Trigger>
+            ))}
+          </Tabs.List>
 
-        {ROUTES.map((route) => {
-          const next = route.departures.find((departure) => minutesOf(departure) >= minutesOf(NOW));
-          const wait = next ? minutesOf(next) - minutesOf(NOW) : null;
+          {ROUTES.map((route) => {
+            const next = route.departures.find(
+              (departure) => minutesOf(departure) >= minutesOf(NOW),
+            );
+            const wait = next ? minutesOf(next) - minutesOf(NOW) : null;
 
-          return (
-            <Tabs.Content
-              key={route.id}
-              value={route.id}
-              className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]"
-            >
-              <div className="flex flex-col gap-6">
-                <Card>
-                  <Card.Header>
-                    <Card.Description>
-                      학생회관에서 타요 · {route.name}까지 {route.minutes}분
-                    </Card.Description>
-                    <Card.Title className="text-headline-h3-bold" asChild>
-                      <h2>
-                        {wait === null
-                          ? '오늘은 끝났어요'
-                          : wait === 0
-                            ? '곧 떠나요'
-                            : `${wait}분 뒤`}
-                      </h2>
-                    </Card.Title>
-                    {next && (
-                      <Card.Action>
-                        <Chip variant="soft" colorScheme="primary">{`${next} 출발`}</Chip>
-                      </Card.Action>
-                    )}
-                  </Card.Header>
-                  {wait !== null && (
-                    <Card.Content>
-                      <Progress
-                        value={Math.max(0, 100 - (wait / WAIT_SHOWN_AS_FULL_BAR) * 100)}
-                        aria-label="다음 셔틀까지 남은 시간"
-                      />
-                    </Card.Content>
-                  )}
-                  <Card.Footer>
-                    <Label>
-                      <Switch
-                        onCheckedChange={(checked) => {
-                          if (checked) toast.success('출발 5분 전에 알려 드릴게요');
-                        }}
-                      />
-                      5분 전에 알려 주기
-                    </Label>
-                  </Card.Footer>
-                </Card>
-
-                <Table aria-label={`${route.name} 오늘 시간표`} highlightOnHover>
-                  <Table.Header>
-                    <Table.Row>
-                      <Table.Head>출발</Table.Head>
-                      <Table.Head>도착</Table.Head>
-                      <Table.Head align="end">상태</Table.Head>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {route.departures.map((departure) => {
-                      const gone = minutesOf(departure) < minutesOf(NOW);
-
-                      return (
-                        <Table.Row key={departure} selected={departure === next}>
-                          <Table.Cell>{departure}</Table.Cell>
-                          <Table.Cell>{clockOf(minutesOf(departure) + route.minutes)}</Table.Cell>
-                          <Table.Cell align="end">
-                            {departure === next ? (
-                              <Chip variant="soft" colorScheme="primary">
-                                다음 차
-                              </Chip>
-                            ) : gone ? (
-                              <Chip variant="outline">떠남</Chip>
-                            ) : null}
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })}
-                  </Table.Body>
-                </Table>
-
-                <Card>
-                  <Card.Content>
-                    <Chart config={WAIT_CONFIG}>
-                      <Chart.Title>시간대별 대기 시간</Chart.Title>
-                      <Chart.Description>학생회관 정류장 · 지난 4주 평균</Chart.Description>
-                      <BarChart data={route.waits}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis dataKey="hour" name="시간대" tickLine={false} axisLine={false} />
-                        <YAxis width={28} tickLine={false} axisLine={false} />
-                        <Bar dataKey="wait" radius={4} />
-                        <Chart.Tooltip />
-                      </BarChart>
-                    </Chart>
-                  </Card.Content>
-                </Card>
-              </div>
-
-              <Card>
-                <Card.Header>
-                  <Card.Title asChild>
-                    <h2>정류장</h2>
-                  </Card.Title>
-                  <Card.Description>{route.stops.length}곳 · 다음 셔틀 기준</Card.Description>
-                </Card.Header>
-                <Card.Content>
-                  <Stepper
-                    value={0}
-                    orientation="vertical"
-                    size="tiny"
-                    aria-label={`${route.name} 정류장`}
-                  >
-                    {route.stops.map((stop, index) => (
-                      <Stepper.Item key={stop}>
-                        <Stepper.Title>{stop}</Stepper.Title>
+            return (
+              <Tabs.Content key={route.id} value={route.id}>
+                <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+                  <div className="flex flex-col gap-6">
+                    <Card>
+                      <Card.Header>
+                        <Card.Description>
+                          학생회관에서 타요 · {route.name}까지 {route.minutes}분
+                        </Card.Description>
+                        <Card.Title asChild>
+                          <h2>
+                            <span className="text-headline-h3-bold block">
+                              {wait === null
+                                ? '오늘은 끝났어요'
+                                : wait === 0
+                                  ? '곧 떠나요'
+                                  : `${wait}분 뒤`}
+                            </span>
+                          </h2>
+                        </Card.Title>
                         {next && (
-                          <Stepper.Description>
-                            {clockOf(
-                              minutesOf(next) +
-                                Math.round((route.minutes / (route.stops.length - 1)) * index),
-                            )}
-                          </Stepper.Description>
+                          <Card.Action>
+                            <Chip variant="soft" colorScheme="primary">{`${next} 출발`}</Chip>
+                          </Card.Action>
                         )}
-                      </Stepper.Item>
-                    ))}
-                  </Stepper>
-                </Card.Content>
-              </Card>
-            </Tabs.Content>
-          );
-        })}
+                      </Card.Header>
+                      {wait !== null && (
+                        <Card.Content>
+                          <Progress
+                            value={Math.max(0, 100 - (wait / WAIT_SHOWN_AS_FULL_BAR) * 100)}
+                            aria-label="다음 셔틀까지 남은 시간"
+                          />
+                        </Card.Content>
+                      )}
+                      <Card.Footer>
+                        <Label>
+                          <Switch
+                            onCheckedChange={(checked) => {
+                              if (checked) toast.success('출발 5분 전에 알려 드릴게요');
+                            }}
+                          />
+                          5분 전에 알려 주기
+                        </Label>
+                      </Card.Footer>
+                    </Card>
+
+                    <Table aria-label={`${route.name} 오늘 시간표`} highlightOnHover>
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.Head>출발</Table.Head>
+                          <Table.Head>도착</Table.Head>
+                          <Table.Head align="end">상태</Table.Head>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
+                        {route.departures.map((departure) => {
+                          const gone = minutesOf(departure) < minutesOf(NOW);
+
+                          return (
+                            <Table.Row key={departure} selected={departure === next}>
+                              <Table.Cell>{departure}</Table.Cell>
+                              <Table.Cell>
+                                {clockOf(minutesOf(departure) + route.minutes)}
+                              </Table.Cell>
+                              <Table.Cell align="end">
+                                {departure === next ? (
+                                  <Chip variant="soft" colorScheme="primary">
+                                    다음 차
+                                  </Chip>
+                                ) : gone ? (
+                                  <Chip variant="outline">떠남</Chip>
+                                ) : null}
+                              </Table.Cell>
+                            </Table.Row>
+                          );
+                        })}
+                      </Table.Body>
+                    </Table>
+
+                    <Card>
+                      <Card.Content>
+                        <Chart config={WAIT_CONFIG}>
+                          <Chart.Title>시간대별 대기 시간</Chart.Title>
+                          <Chart.Description>학생회관 정류장 · 지난 4주 평균</Chart.Description>
+                          <BarChart data={route.waits}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="hour" name="시간대" tickLine={false} axisLine={false} />
+                            <YAxis width={28} tickLine={false} axisLine={false} />
+                            <Bar dataKey="wait" radius={4} />
+                            <Chart.Tooltip />
+                          </BarChart>
+                        </Chart>
+                      </Card.Content>
+                    </Card>
+                  </div>
+
+                  <Card>
+                    <Card.Header>
+                      <Card.Title asChild>
+                        <h2>정류장</h2>
+                      </Card.Title>
+                      <Card.Description>{route.stops.length}곳 · 다음 셔틀 기준</Card.Description>
+                    </Card.Header>
+                    <Card.Content>
+                      <Stepper
+                        value={0}
+                        orientation="vertical"
+                        size="tiny"
+                        aria-label={`${route.name} 정류장`}
+                      >
+                        {route.stops.map((stop, index) => (
+                          <Stepper.Item key={stop}>
+                            <Stepper.Title>{stop}</Stepper.Title>
+                            {next && (
+                              <Stepper.Description>
+                                {clockOf(
+                                  minutesOf(next) +
+                                    Math.round((route.minutes / (route.stops.length - 1)) * index),
+                                )}
+                              </Stepper.Description>
+                            )}
+                          </Stepper.Item>
+                        ))}
+                      </Stepper>
+                    </Card.Content>
+                  </Card>
+                </div>
+              </Tabs.Content>
+            );
+          })}
+        </div>
       </Tabs>
     </main>
   ),

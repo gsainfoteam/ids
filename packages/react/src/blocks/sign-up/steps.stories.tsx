@@ -13,6 +13,7 @@ import { Select } from '../../components/form/select';
 import { Switch } from '../../components/form/switch';
 import { TextField } from '../../components/form/text-field';
 import { Divider } from '../../components/layout/divider';
+import { Spacer } from '../../components/layout/spacer';
 import { Stepper } from '../../components/navigation/stepper';
 import { Label } from '../../components/typography/label';
 
@@ -59,18 +60,24 @@ export const PC: Story = {
             <p className="text-body-b2-regular">세 단계면 끝나요. 1분이면 충분해요.</p>
           </div>
 
-          <Stepper value={step} aria-label="가입 단계" className="flex flex-col gap-8">
+          <Stepper value={step} aria-label="가입 단계">
             <Stepper.Item>
               <Stepper.Title>계정</Stepper.Title>
-              <Stepper.Description className="hidden sm:block">메일과 비밀번호</Stepper.Description>
+              <span className="hidden sm:contents">
+                <Stepper.Description>메일과 비밀번호</Stepper.Description>
+              </span>
             </Stepper.Item>
             <Stepper.Item>
               <Stepper.Title>프로필</Stepper.Title>
-              <Stepper.Description className="hidden sm:block">이름과 학과</Stepper.Description>
+              <span className="hidden sm:contents">
+                <Stepper.Description>이름과 학과</Stepper.Description>
+              </span>
             </Stepper.Item>
             <Stepper.Item>
               <Stepper.Title>동의</Stepper.Title>
-              <Stepper.Description className="hidden sm:block">약관과 알림</Stepper.Description>
+              <span className="hidden sm:contents">
+                <Stepper.Description>약관과 알림</Stepper.Description>
+              </span>
             </Stepper.Item>
 
             <Stepper.Content value={0}>
@@ -82,26 +89,33 @@ export const PC: Story = {
                     </Card.Title>
                     <Card.Description>학교 메일로 본인인지 확인해요.</Card.Description>
                   </Card.Header>
-                  <Card.Content className="flex flex-col gap-4">
-                    <Field>
-                      <Field.Label>GIST 메일</Field.Label>
-                      <TextField name="email" autoComplete="username" placeholder="아이디" required>
-                        <TextField.Input />
-                        <span>@gm.gist.ac.kr</span>
-                      </TextField>
-                    </Field>
-                    <Field>
-                      <Field.Label>비밀번호</Field.Label>
-                      <PasswordField
-                        name="password"
-                        autoComplete="new-password"
-                        minLength={8}
-                        required
-                      />
-                      <Field.Hint>8자 이상, 영문과 숫자를 섞어 주세요.</Field.Hint>
-                    </Field>
+                  <Card.Content>
+                    <div className="flex flex-col gap-4">
+                      <Field>
+                        <Field.Label>GIST 메일</Field.Label>
+                        <TextField
+                          name="email"
+                          autoComplete="username"
+                          placeholder="아이디"
+                          required
+                        >
+                          <TextField.Input />
+                          <span>@gm.gist.ac.kr</span>
+                        </TextField>
+                      </Field>
+                      <Field>
+                        <Field.Label>비밀번호</Field.Label>
+                        <PasswordField
+                          name="password"
+                          autoComplete="new-password"
+                          minLength={8}
+                          required
+                        />
+                        <Field.Hint>8자 이상, 영문과 숫자를 섞어 주세요.</Field.Hint>
+                      </Field>
+                    </div>
                   </Card.Content>
-                  <Card.Footer className="justify-end">
+                  <Card.Footer>
                     <Button type="submit">다음</Button>
                   </Card.Footer>
                 </form>
@@ -117,45 +131,48 @@ export const PC: Story = {
                     </Card.Title>
                     <Card.Description>다른 학생에게 보이는 정보예요.</Card.Description>
                   </Card.Header>
-                  <Card.Content className="flex flex-col gap-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
+                  <Card.Content>
+                    <div className="flex flex-col gap-4">
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <Field>
+                          <Field.Label>이름</Field.Label>
+                          <TextField
+                            name="name"
+                            autoComplete="name"
+                            value={name}
+                            onValueChange={setName}
+                            required
+                          />
+                        </Field>
+                        <Field>
+                          <Field.Label>학번</Field.Label>
+                          <TextField
+                            name="studentId"
+                            inputMode="numeric"
+                            pattern="\d{8}"
+                            placeholder="20251234"
+                            required
+                          />
+                        </Field>
+                      </div>
                       <Field>
-                        <Field.Label>이름</Field.Label>
-                        <TextField
-                          name="name"
-                          autoComplete="name"
-                          value={name}
-                          onValueChange={setName}
-                          required
-                        />
-                      </Field>
-                      <Field>
-                        <Field.Label>학번</Field.Label>
-                        <TextField
-                          name="studentId"
-                          inputMode="numeric"
-                          pattern="\d{8}"
-                          placeholder="20251234"
-                          required
-                        />
+                        <Field.Label>학과</Field.Label>
+                        <Select name="major" placeholder="학과를 고르세요" required>
+                          {MAJORS.map(([value, label]) => (
+                            <Select.Item key={value} value={value}>
+                              {label}
+                            </Select.Item>
+                          ))}
+                        </Select>
+                        <Field.Hint>1학년은 기초교육학부를 고르세요.</Field.Hint>
                       </Field>
                     </div>
-                    <Field>
-                      <Field.Label>학과</Field.Label>
-                      <Select name="major" placeholder="학과를 고르세요" required>
-                        {MAJORS.map(([value, label]) => (
-                          <Select.Item key={value} value={value}>
-                            {label}
-                          </Select.Item>
-                        ))}
-                      </Select>
-                      <Field.Hint>1학년은 기초교육학부를 고르세요.</Field.Hint>
-                    </Field>
                   </Card.Content>
-                  <Card.Footer className="justify-between">
+                  <Card.Footer>
                     <Button variant="outline" onClick={() => setStep(0)}>
                       이전
                     </Button>
+                    <Spacer />
                     <Button type="submit">다음</Button>
                   </Card.Footer>
                 </form>
@@ -173,45 +190,48 @@ export const PC: Story = {
                       알림은 가입한 뒤에도 설정에서 바꿀 수 있어요.
                     </Card.Description>
                   </Card.Header>
-                  <Card.Content className="flex flex-col gap-5">
-                    <CheckboxGroup name="terms" aria-label="약관 동의">
-                      {({ All, Item }) => (
-                        <div className="flex flex-col gap-3">
-                          <Label>
-                            <All />
-                            모두 동의해요
-                          </Label>
-                          <Divider />
-                          <Label>
-                            <Item value="service" required />
-                            이용약관 (필수)
-                          </Label>
-                          <Label>
-                            <Item value="privacy" required />
-                            개인정보 수집과 이용 (필수)
-                          </Label>
-                        </div>
-                      )}
-                    </CheckboxGroup>
-                    <Divider />
-                    <div className="flex flex-col gap-3">
+                  <Card.Content>
+                    <div className="flex flex-col gap-5">
+                      <CheckboxGroup name="terms" aria-label="약관 동의">
+                        {({ All, Item }) => (
+                          <div className="flex flex-col gap-3">
+                            <Label>
+                              <All />
+                              모두 동의해요
+                            </Label>
+                            <Divider />
+                            <Label>
+                              <Item value="service" required />
+                              이용약관 (필수)
+                            </Label>
+                            <Label>
+                              <Item value="privacy" required />
+                              개인정보 수집과 이용 (필수)
+                            </Label>
+                          </div>
+                        )}
+                      </CheckboxGroup>
+                      <Divider />
+                      <div className="flex flex-col gap-3">
+                        <Label>
+                          <Switch name="notifyNotices" defaultChecked />
+                          학과 공지를 알림으로 받기
+                        </Label>
+                        <Label>
+                          <Switch name="notifyEvents" />
+                          행사 소식을 메일로 받기
+                        </Label>
+                      </div>
                       <Label>
-                        <Switch name="notifyNotices" defaultChecked />
-                        학과 공지를 알림으로 받기
-                      </Label>
-                      <Label>
-                        <Switch name="notifyEvents" />
-                        행사 소식을 메일로 받기
+                        <Checkbox name="adult" required />만 14세 이상이에요
                       </Label>
                     </div>
-                    <Label>
-                      <Checkbox name="adult" required />만 14세 이상이에요
-                    </Label>
                   </Card.Content>
-                  <Card.Footer className="justify-between">
+                  <Card.Footer>
                     <Button variant="outline" onClick={() => setStep(1)}>
                       이전
                     </Button>
+                    <Spacer />
                     <Button type="submit">가입하기</Button>
                   </Card.Footer>
                 </form>

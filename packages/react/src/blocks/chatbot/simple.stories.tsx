@@ -96,77 +96,85 @@ export const PC: Story = {
         </header>
         <Divider />
 
-        <ScrollArea fade className="min-h-0 flex-1">
-          <ol aria-label="대화" className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-6">
-            <li className="flex justify-end">
-              <Bubble align="end">오늘 학식 뭐야?</Bubble>
-            </li>
+        <div className="flex min-h-0 flex-1 flex-col">
+          <ScrollArea fade>
+            <ol
+              aria-label="대화"
+              className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-6"
+            >
+              <li className="flex justify-end">
+                <Bubble align="end">오늘 학식 뭐야?</Bubble>
+              </li>
 
-            <li className="flex gap-3">
-              {assistant}
-              <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-3">
-                <p>오늘(10월 1일 수요일) 학생식당 점심이에요. 11시 30분부터 1시 30분까지 열어요.</p>
-                <Table aria-label="오늘 점심 메뉴">
-                  <Table.Header>
-                    <Table.Row>
-                      <Table.Head>코너</Table.Head>
-                      <Table.Head>메뉴</Table.Head>
-                      <Table.Head align="end">가격</Table.Head>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {MENU.map((row) => (
-                      <Table.Row key={row.corner}>
-                        <Table.Cell>{row.corner}</Table.Cell>
-                        <Table.Cell>{row.dishes}</Table.Cell>
-                        <Table.Cell align="end">{row.price}</Table.Cell>
+              <li className="flex gap-3">
+                {assistant}
+                <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-3">
+                  <p>
+                    오늘(10월 1일 수요일) 학생식당 점심이에요. 11시 30분부터 1시 30분까지 열어요.
+                  </p>
+                  <Table aria-label="오늘 점심 메뉴">
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.Head>코너</Table.Head>
+                        <Table.Head>메뉴</Table.Head>
+                        <Table.Head align="end">가격</Table.Head>
                       </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                      {MENU.map((row) => (
+                        <Table.Row key={row.corner}>
+                          <Table.Cell>{row.corner}</Table.Cell>
+                          <Table.Cell>{row.dishes}</Table.Cell>
+                          <Table.Cell align="end">{row.price}</Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </Table.Body>
+                  </Table>
+                  <p>저녁은 5시 30분부터예요. 오늘 저녁 메뉴도 알려 드릴까요?</p>
+                  {feedback}
+                </div>
+              </li>
+
+              <li className="flex justify-end">
+                <Bubble align="end">학생회관에서 셔틀은 언제 와?</Bubble>
+              </li>
+
+              <li className="flex gap-3">
+                {assistant}
+                <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-3">
+                  <p>학생회관 정류장에 곧 오는 셔틀이에요.</p>
+                  <ItemGroup variant="separated" size="tiny" aria-label="곧 오는 셔틀">
+                    {SHUTTLES.map((shuttle) => (
+                      <Item key={shuttle.id}>
+                        <Item.Content>
+                          <Item.Title>
+                            {shuttle.time} {shuttle.route}
+                          </Item.Title>
+                        </Item.Content>
+                        <Item.Actions>
+                          <Chip variant="soft" colorScheme="primary">
+                            {shuttle.wait}
+                          </Chip>
+                        </Item.Actions>
+                      </Item>
                     ))}
-                  </Table.Body>
-                </Table>
-                <p>저녁은 5시 30분부터예요. 오늘 저녁 메뉴도 알려 드릴까요?</p>
-                {feedback}
-              </div>
-            </li>
-
-            <li className="flex justify-end">
-              <Bubble align="end">학생회관에서 셔틀은 언제 와?</Bubble>
-            </li>
-
-            <li className="flex gap-3">
-              {assistant}
-              <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-3">
-                <p>학생회관 정류장에 곧 오는 셔틀이에요.</p>
-                <ItemGroup variant="separated" size="tiny" aria-label="곧 오는 셔틀">
-                  {SHUTTLES.map((shuttle) => (
-                    <Item key={shuttle.id}>
-                      <Item.Content>
-                        <Item.Title>
-                          {shuttle.time} {shuttle.route}
-                        </Item.Title>
-                      </Item.Content>
-                      <Item.Actions>
-                        <Chip variant="soft" colorScheme="primary">
-                          {shuttle.wait}
-                        </Chip>
-                      </Item.Actions>
-                    </Item>
-                  ))}
-                </ItemGroup>
-                <Button
-                  variant="soft"
-                  size="tiny"
-                  className="self-start"
-                  onClick={() => toast.success('12:20 셔틀 5분 전에 알려 드릴게요')}
-                >
-                  <BellAlertIcon />
-                  5분 전에 알려 주기
-                </Button>
-                {feedback}
-              </div>
-            </li>
-          </ol>
-        </ScrollArea>
+                  </ItemGroup>
+                  <div className="flex">
+                    <Button
+                      variant="soft"
+                      size="tiny"
+                      onClick={() => toast.success('12:20 셔틀 5분 전에 알려 드릴게요')}
+                    >
+                      <BellAlertIcon />
+                      5분 전에 알려 주기
+                    </Button>
+                  </div>
+                  {feedback}
+                </div>
+              </li>
+            </ol>
+          </ScrollArea>
+        </div>
 
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-4">
           <PromptInput onSend={() => {}}>

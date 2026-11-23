@@ -199,10 +199,8 @@ export const PC: Story = {
                   </Alert>
                 )}
               </li>
-              <li>
-                <Marker pending className="px-2">
-                  시간표 3안을 만드는 중이에요 · 2:05
-                </Marker>
+              <li className="px-2">
+                <Marker pending>시간표 3안을 만드는 중이에요 · 2:05</Marker>
               </li>
             </ol>
 
@@ -240,15 +238,17 @@ export const PC: Story = {
                 </Table>
               </Card.Content>
               <Card.Footer>
-                <Item variant="outline" size="tiny" className="w-auto">
-                  <Item.Media variant="soft">
-                    <DocumentTextIcon />
-                  </Item.Media>
-                  <Item.Content>
-                    <Item.Title>시간표_1안.pdf</Item.Title>
-                    <Item.Description>12학점 · 화요일 오전 비움</Item.Description>
-                  </Item.Content>
-                </Item>
+                <div>
+                  <Item variant="outline" size="tiny">
+                    <Item.Media variant="soft">
+                      <DocumentTextIcon />
+                    </Item.Media>
+                    <Item.Content>
+                      <Item.Title>시간표_1안.pdf</Item.Title>
+                      <Item.Description>12학점 · 화요일 오전 비움</Item.Description>
+                    </Item.Content>
+                  </Item>
+                </div>
               </Card.Footer>
             </Card>
 

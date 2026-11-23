@@ -10,6 +10,7 @@ import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Skeleton } from '../../components/feedback/skeleton';
+import { AspectRatio } from '../../components/layout/aspect-ratio';
 import { Divider } from '../../components/layout/divider';
 import { Popover } from '../../components/overlay/popover';
 
@@ -57,43 +58,47 @@ export const PC: Story = {
                   <IconButton variant="outline" aria-label="알림" icon={<BellIcon />} />
                 </Popover.Trigger>
               </Badge>
-              <Popover.Content className="flex w-80 flex-col gap-3 sm:w-96">
-                <div className="flex items-center justify-between gap-3">
-                  <Popover.Title>알림</Popover.Title>
-                  <Button
-                    variant="outline"
-                    size="tiny"
-                    disabled={unread.length === 0}
-                    onClick={() => setUnread([])}
-                  >
-                    모두 읽음
+              <Popover.Content>
+                <div className="flex w-80 flex-col gap-3 sm:w-96">
+                  <div className="flex items-center justify-between gap-3">
+                    <Popover.Title>알림</Popover.Title>
+                    <Button
+                      variant="outline"
+                      size="tiny"
+                      disabled={unread.length === 0}
+                      onClick={() => setUnread([])}
+                    >
+                      모두 읽음
+                    </Button>
+                  </div>
+                  <ItemGroup size="tiny" aria-label="최근 알림">
+                    {RECENT.map((notification) => (
+                      <Item
+                        key={notification.id}
+                        selected={unread.includes(notification.id)}
+                        onClick={() =>
+                          setUnread(unread.filter((other) => other !== notification.id))
+                        }
+                      >
+                        <Item.Media variant={notification.who ? undefined : 'soft'}>
+                          {notification.who ? (
+                            <Avatar name={notification.who} size="tiny" />
+                          ) : (
+                            <MegaphoneIcon />
+                          )}
+                        </Item.Media>
+                        <Item.Content>
+                          <Item.Title>{notification.text}</Item.Title>
+                          <Item.Description>{notification.time}</Item.Description>
+                        </Item.Content>
+                      </Item>
+                    ))}
+                  </ItemGroup>
+                  <Divider />
+                  <Button asChild variant="soft" size="tiny">
+                    <a href="#notifications">알림 모두 보기</a>
                   </Button>
                 </div>
-                <ItemGroup size="tiny" aria-label="최근 알림">
-                  {RECENT.map((notification) => (
-                    <Item
-                      key={notification.id}
-                      selected={unread.includes(notification.id)}
-                      onClick={() => setUnread(unread.filter((other) => other !== notification.id))}
-                    >
-                      <Item.Media variant={notification.who ? undefined : 'soft'}>
-                        {notification.who ? (
-                          <Avatar name={notification.who} size="tiny" />
-                        ) : (
-                          <MegaphoneIcon />
-                        )}
-                      </Item.Media>
-                      <Item.Content>
-                        <Item.Title>{notification.text}</Item.Title>
-                        <Item.Description>{notification.time}</Item.Description>
-                      </Item.Content>
-                    </Item>
-                  ))}
-                </ItemGroup>
-                <Divider />
-                <Button asChild variant="soft" size="tiny" className="w-full">
-                  <a href="#notifications">알림 모두 보기</a>
-                </Button>
               </Popover.Content>
             </Popover>
             <Avatar name="김지수" size="tiny" />
@@ -102,9 +107,11 @@ export const PC: Story = {
         <Divider />
 
         <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
-          <Skeleton loading className="w-fit">
-            <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
-          </Skeleton>
+          <div className="flex">
+            <Skeleton loading>
+              <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
+            </Skeleton>
+          </div>
           <Skeleton loading>
             <p className="text-body-b3-regular">
               수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
@@ -112,21 +119,27 @@ export const PC: Story = {
             </p>
           </Skeleton>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>수강 신청</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>장학금 안내</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>동아리 모집</Card.Title>
-              </Card>
-            </Skeleton>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>수강 신청</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>장학금 안내</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>동아리 모집</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
           </div>
         </main>
       </div>

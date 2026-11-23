@@ -87,24 +87,26 @@ export const PC: Story = {
         </div>
 
         <div className="grid items-start gap-6 lg:grid-cols-[auto_minmax(0,1fr)]">
-          <Card className="justify-self-start">
-            <Card.Header>
-              <Card.Title asChild>
-                <h2>날짜</h2>
-              </Card.Title>
-              <Card.Description>2주 안의 평일만 고를 수 있어요.</Card.Description>
-            </Card.Header>
-            <Card.Content>
-              <Calendar
-                aria-label="예약 날짜"
-                value={date}
-                onValueChange={setDate}
-                min={TODAY}
-                max={TODAY.add({ days: 14 })}
-                disabled={{ dayOfWeek: [0, 6] }}
-              />
-            </Card.Content>
-          </Card>
+          <div className="justify-self-start">
+            <Card>
+              <Card.Header>
+                <Card.Title asChild>
+                  <h2>날짜</h2>
+                </Card.Title>
+                <Card.Description>2주 안의 평일만 고를 수 있어요.</Card.Description>
+              </Card.Header>
+              <Card.Content>
+                <Calendar
+                  aria-label="예약 날짜"
+                  value={date}
+                  onValueChange={setDate}
+                  min={TODAY}
+                  max={TODAY.add({ days: 14 })}
+                  disabled={{ dayOfWeek: [0, 6] }}
+                />
+              </Card.Content>
+            </Card>
+          </div>
 
           <div className="flex flex-col gap-6">
             <section aria-labelledby="rooms" className="flex flex-col gap-3">
@@ -168,15 +170,16 @@ export const PC: Story = {
                 </Card.Description>
               </Card.Header>
               <Card.Footer>
-                <Button
-                  className="w-full"
-                  disabled={!date || !slot}
-                  onClick={() =>
-                    toast.success('예약했어요', { description: '시작 10분 전에 알려 드릴게요.' })
-                  }
-                >
-                  예약하기
-                </Button>
+                <div className="grid flex-1">
+                  <Button
+                    disabled={!date || !slot}
+                    onClick={() =>
+                      toast.success('예약했어요', { description: '시작 10분 전에 알려 드릴게요.' })
+                    }
+                  >
+                    예약하기
+                  </Button>
+                </div>
               </Card.Footer>
             </Card>
 

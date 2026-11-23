@@ -124,109 +124,111 @@ export const PC: Story = {
               </Card.Action>
             </Card.Header>
 
-            <Card.Content className="flex flex-col gap-6">
-              <div className="grid items-start gap-4 sm:grid-cols-2">
+            <Card.Content>
+              <div className="flex flex-col gap-6">
+                <div className="grid items-start gap-4 sm:grid-cols-2">
+                  <Field>
+                    <Field.Label>이름</Field.Label>
+                    <TextField name="name" value={name} onValueChange={setName} required />
+                  </Field>
+                  <Field>
+                    <Field.Label>모델</Field.Label>
+                    <Select name="model" defaultValue="deep">
+                      <Select.Item value="fast">빠른 모델 · 짧은 답</Select.Item>
+                      <Select.Item value="deep">깊게 생각하는 모델 · 계획과 도구</Select.Item>
+                    </Select>
+                  </Field>
+                </div>
+
                 <Field>
-                  <Field.Label>이름</Field.Label>
-                  <TextField name="name" value={name} onValueChange={setName} required />
+                  <Field.Label>지시문</Field.Label>
+                  <Field.Description>에이전트가 늘 지킬 규칙과 말투를 적어요.</Field.Description>
+                  <TextArea
+                    name="instructions"
+                    rows={6}
+                    maxRows={16}
+                    maxLength={4000}
+                    defaultValue={INSTRUCTIONS}
+                  >
+                    <TextArea.Input />
+                    <TextArea.Count />
+                  </TextArea>
                 </Field>
+
+                <section aria-labelledby="tools" className="flex flex-col gap-3">
+                  <h2 id="tools" className="text-body-b3-semibold">
+                    도구
+                  </h2>
+                  <Card size="tiny">
+                    <ItemGroup aria-labelledby="tools">
+                      {TOOLS.map((tool) => (
+                        <Item key={tool.id}>
+                          <Item.Media variant="soft">{tool.icon}</Item.Media>
+                          <Item.Content>
+                            <Item.Title id={`${tool.id}-title`}>
+                              {tool.title}
+                              {tool.asks && (
+                                <Chip variant="soft" colorScheme="warning">
+                                  물어보고 써요
+                                </Chip>
+                              )}
+                            </Item.Title>
+                            <Item.Description>{tool.description}</Item.Description>
+                          </Item.Content>
+                          <Item.Actions>
+                            <Switch
+                              name={tool.id}
+                              defaultChecked={tool.on}
+                              aria-labelledby={`${tool.id}-title`}
+                            />
+                          </Item.Actions>
+                        </Item>
+                      ))}
+                    </ItemGroup>
+                  </Card>
+                </section>
+
                 <Field>
-                  <Field.Label>모델</Field.Label>
-                  <Select name="model" defaultValue="deep">
-                    <Select.Item value="fast">빠른 모델 · 짧은 답</Select.Item>
-                    <Select.Item value="deep">깊게 생각하는 모델 · 계획과 도구</Select.Item>
-                  </Select>
+                  <Field.Label>지식</Field.Label>
+                  <Field.Description>에이전트가 답할 때 먼저 찾아볼 문서예요.</Field.Description>
+                  <FileDropzone name="knowledge" multiple accept=".pdf,.docx,.txt,.md" />
+                </Field>
+                <ItemGroup variant="separated" size="tiny" aria-label="올린 문서">
+                  {KNOWLEDGE.map((file) => (
+                    <Item key={file.name}>
+                      <Item.Media variant="soft">
+                        <DocumentTextIcon />
+                      </Item.Media>
+                      <Item.Content>
+                        <Item.Title>{file.name}</Item.Title>
+                        <Item.Description>{file.size} · 읽어 둠</Item.Description>
+                      </Item.Content>
+                      <Item.Actions>
+                        <IconButton
+                          variant="outline"
+                          size="tiny"
+                          aria-label={`${file.name} 지우기`}
+                          icon={<TrashIcon />}
+                        />
+                      </Item.Actions>
+                    </Item>
+                  ))}
+                </ItemGroup>
+
+                <Field>
+                  <Field.Label>대화 시작 문장</Field.Label>
+                  <ChipField
+                    name="starters"
+                    value={starters}
+                    onValueChange={setStarters}
+                    onCreate={noop}
+                    placeholder="문장을 적고 Enter"
+                  />
                 </Field>
               </div>
-
-              <Field>
-                <Field.Label>지시문</Field.Label>
-                <Field.Description>에이전트가 늘 지킬 규칙과 말투를 적어요.</Field.Description>
-                <TextArea
-                  name="instructions"
-                  rows={6}
-                  maxRows={16}
-                  maxLength={4000}
-                  defaultValue={INSTRUCTIONS}
-                >
-                  <TextArea.Input />
-                  <TextArea.Count />
-                </TextArea>
-              </Field>
-
-              <section aria-labelledby="tools" className="flex flex-col gap-3">
-                <h2 id="tools" className="text-body-b3-semibold">
-                  도구
-                </h2>
-                <Card size="tiny">
-                  <ItemGroup aria-labelledby="tools">
-                    {TOOLS.map((tool) => (
-                      <Item key={tool.id}>
-                        <Item.Media variant="soft">{tool.icon}</Item.Media>
-                        <Item.Content>
-                          <Item.Title id={`${tool.id}-title`}>
-                            {tool.title}
-                            {tool.asks && (
-                              <Chip variant="soft" colorScheme="warning">
-                                물어보고 써요
-                              </Chip>
-                            )}
-                          </Item.Title>
-                          <Item.Description>{tool.description}</Item.Description>
-                        </Item.Content>
-                        <Item.Actions>
-                          <Switch
-                            name={tool.id}
-                            defaultChecked={tool.on}
-                            aria-labelledby={`${tool.id}-title`}
-                          />
-                        </Item.Actions>
-                      </Item>
-                    ))}
-                  </ItemGroup>
-                </Card>
-              </section>
-
-              <Field>
-                <Field.Label>지식</Field.Label>
-                <Field.Description>에이전트가 답할 때 먼저 찾아볼 문서예요.</Field.Description>
-                <FileDropzone name="knowledge" multiple accept=".pdf,.docx,.txt,.md" />
-              </Field>
-              <ItemGroup variant="separated" size="tiny" aria-label="올린 문서">
-                {KNOWLEDGE.map((file) => (
-                  <Item key={file.name}>
-                    <Item.Media variant="soft">
-                      <DocumentTextIcon />
-                    </Item.Media>
-                    <Item.Content>
-                      <Item.Title>{file.name}</Item.Title>
-                      <Item.Description>{file.size} · 읽어 둠</Item.Description>
-                    </Item.Content>
-                    <Item.Actions>
-                      <IconButton
-                        variant="outline"
-                        size="tiny"
-                        aria-label={`${file.name} 지우기`}
-                        icon={<TrashIcon />}
-                      />
-                    </Item.Actions>
-                  </Item>
-                ))}
-              </ItemGroup>
-
-              <Field>
-                <Field.Label>대화 시작 문장</Field.Label>
-                <ChipField
-                  name="starters"
-                  value={starters}
-                  onValueChange={setStarters}
-                  onCreate={noop}
-                  placeholder="문장을 적고 Enter"
-                />
-              </Field>
             </Card.Content>
 
-            <Card.Footer className="justify-end">
+            <Card.Footer>
               <Button variant="outline" onClick={() => toast('초안을 저장했어요')}>
                 초안 저장
               </Button>
@@ -250,29 +252,29 @@ export const PC: Story = {
                 <Card.Title>{name || '이름 없는 에이전트'}</Card.Title>
                 <Card.Description>사진부 · 깊게 생각하는 모델</Card.Description>
               </Card.Header>
-              <Card.Content className="flex flex-col gap-3">
-                <p>안녕하세요. 행사 공지, 일정, 장소 예약을 도와드릴게요.</p>
-                <div
-                  role="group"
-                  aria-label="대화 시작 문장"
-                  className="flex flex-col items-start gap-2"
-                >
-                  {starters.map((starter) => (
-                    <Chip key={starter} onClick={() => toast(`‘${starter}’로 대화를 시작해요`)}>
-                      {starter}
-                    </Chip>
-                  ))}
+              <Card.Content>
+                <div className="flex flex-col gap-3">
+                  <p>안녕하세요. 행사 공지, 일정, 장소 예약을 도와드릴게요.</p>
+                  <div
+                    role="group"
+                    aria-label="대화 시작 문장"
+                    className="flex flex-col items-start gap-2"
+                  >
+                    {starters.map((starter) => (
+                      <Chip key={starter} onClick={() => toast(`‘${starter}’로 대화를 시작해요`)}>
+                        {starter}
+                      </Chip>
+                    ))}
+                  </div>
                 </div>
               </Card.Content>
               <Card.Footer>
-                <TextField
-                  aria-label="미리 물어보기"
-                  placeholder="미리 물어보기"
-                  className="flex-1"
-                >
-                  <TextField.Input />
-                  <IconButton variant="solid" aria-label="묻기" icon={<ArrowUpIcon />} />
-                </TextField>
+                <div className="min-w-0 flex-1">
+                  <TextField aria-label="미리 물어보기" placeholder="미리 물어보기">
+                    <TextField.Input />
+                    <IconButton variant="solid" aria-label="묻기" icon={<ArrowUpIcon />} />
+                  </TextField>
+                </div>
               </Card.Footer>
             </Card>
           </section>

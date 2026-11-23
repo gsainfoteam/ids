@@ -61,136 +61,148 @@ export const PC: Story = {
     const active = WORKSPACES.find(({ id }) => id === workspace)!;
 
     return (
-      <Sidebar.Provider className="break-keep">
-        <Sidebar
-          value="inbox"
-          variant="inset"
-          collapsible="offcanvas"
-          aria-label="워크스페이스 메뉴"
-        >
-          <Sidebar.Header>
-            <Menu>
-              <Menu.Trigger asChild>
-                <Button variant="outline" className="-ms-2 min-w-0 flex-1">
-                  <Avatar name={active.name} size="tiny" />
-                  {active.name}
-                  <Spacer />
-                  <ChevronUpDownIcon />
-                </Button>
-              </Menu.Trigger>
-              <Menu.Content>
-                <Menu.RadioGroup value={workspace} onValueChange={setWorkspace}>
-                  <Menu.Label>워크스페이스</Menu.Label>
-                  {WORKSPACES.map((item) => (
-                    <Menu.RadioItem key={item.id} value={item.id}>
-                      {item.name}
-                    </Menu.RadioItem>
-                  ))}
-                </Menu.RadioGroup>
-                <Menu.Separator />
-                <Menu.Item>
-                  <PlusIcon />새 워크스페이스
-                </Menu.Item>
-              </Menu.Content>
-            </Menu>
-          </Sidebar.Header>
+      <div className="break-keep">
+        <Sidebar.Provider>
+          <Sidebar
+            value="inbox"
+            variant="inset"
+            collapsible="offcanvas"
+            aria-label="워크스페이스 메뉴"
+          >
+            <Sidebar.Header>
+              <div className="-ms-2 grid min-w-0 flex-1">
+                <Menu>
+                  <Menu.Trigger asChild>
+                    <Button variant="outline">
+                      <Avatar name={active.name} size="tiny" />
+                      {active.name}
+                      <Spacer />
+                      <ChevronUpDownIcon />
+                    </Button>
+                  </Menu.Trigger>
+                  <Menu.Content>
+                    <Menu.RadioGroup value={workspace} onValueChange={setWorkspace}>
+                      <Menu.Label>워크스페이스</Menu.Label>
+                      {WORKSPACES.map((item) => (
+                        <Menu.RadioItem key={item.id} value={item.id}>
+                          {item.name}
+                        </Menu.RadioItem>
+                      ))}
+                    </Menu.RadioGroup>
+                    <Menu.Separator />
+                    <Menu.Item>
+                      <PlusIcon />새 워크스페이스
+                    </Menu.Item>
+                  </Menu.Content>
+                </Menu>
+              </div>
+            </Sidebar.Header>
 
-          <Sidebar.Item>
-            <MagnifyingGlassIcon />
-            찾기
-            <Kbd keys="Mod+K" size="tiny" />
-          </Sidebar.Item>
-          <Sidebar.Item value="inbox" href="#inbox">
-            <InboxIcon />
-            받은 소식
-            <Chip variant="soft" colorScheme="primary">
-              {7}
-            </Chip>
-          </Sidebar.Item>
+            <Sidebar.Item>
+              <MagnifyingGlassIcon />
+              찾기
+              <Kbd keys="Mod+K" size="tiny" />
+            </Sidebar.Item>
+            <Sidebar.Item value="inbox" href="#inbox">
+              <InboxIcon />
+              받은 소식
+              <Chip variant="soft" colorScheme="primary">
+                {7}
+              </Chip>
+            </Sidebar.Item>
 
-          <Sidebar.Group label="즐겨찾기" collapsible>
-            {STARRED.map((page) => (
-              <Sidebar.Item key={page.id} value={page.id} href={`#${page.id}`}>
-                <StarIcon />
-                {page.label}
-              </Sidebar.Item>
-            ))}
-          </Sidebar.Group>
+            <Sidebar.Group label="즐겨찾기" collapsible>
+              {STARRED.map((page) => (
+                <Sidebar.Item key={page.id} value={page.id} href={`#${page.id}`}>
+                  <StarIcon />
+                  {page.label}
+                </Sidebar.Item>
+              ))}
+            </Sidebar.Group>
 
-          <Sidebar.Group label="채널" collapsible>
-            {CHANNELS.map((channel) => (
-              <Sidebar.Item key={channel.id} value={channel.id} href={`#${channel.id}`}>
-                <HashtagIcon />
-                {channel.label}
-                {channel.unread > 0 && <Chip variant="soft">{channel.unread}</Chip>}
-              </Sidebar.Item>
-            ))}
-          </Sidebar.Group>
+            <Sidebar.Group label="채널" collapsible>
+              {CHANNELS.map((channel) => (
+                <Sidebar.Item key={channel.id} value={channel.id} href={`#${channel.id}`}>
+                  <HashtagIcon />
+                  {channel.label}
+                  {channel.unread > 0 && <Chip variant="soft">{channel.unread}</Chip>}
+                </Sidebar.Item>
+              ))}
+            </Sidebar.Group>
 
-          <Sidebar.Footer>
-            <Item size="tiny" variant="outline">
+            <Sidebar.Footer>
+              <Item size="tiny" variant="outline">
+                <Item.Media>
+                  <Avatar name="김지수" size="tiny" />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>김지수</Item.Title>
+                  <Item.Description>jisu@gm.gist.ac.kr</Item.Description>
+                </Item.Content>
+                <Item.Actions>
+                  <IconButton
+                    variant="outline"
+                    size="tiny"
+                    aria-label="설정"
+                    icon={<Cog6ToothIcon />}
+                  />
+                </Item.Actions>
+              </Item>
+            </Sidebar.Footer>
+          </Sidebar>
+
+          <Sidebar.Inset>
+            <Item>
               <Item.Media>
-                <Avatar name="김지수" size="tiny" />
+                <Sidebar.Trigger />
               </Item.Media>
               <Item.Content>
-                <Item.Title>김지수</Item.Title>
-                <Item.Description>jisu@gm.gist.ac.kr</Item.Description>
+                <Item.Title asChild>
+                  <h1>
+                    <span className="text-body-b2-semibold block">받은 소식</span>
+                  </h1>
+                </Item.Title>
+                <Item.Description>{active.name}에서 나에게 온 멘션과 댓글이에요.</Item.Description>
               </Item.Content>
               <Item.Actions>
-                <IconButton
-                  variant="outline"
-                  size="tiny"
-                  aria-label="설정"
-                  icon={<Cog6ToothIcon />}
-                />
+                <Button variant="outline" size="tiny">
+                  모두 읽음
+                </Button>
               </Item.Actions>
             </Item>
-          </Sidebar.Footer>
-        </Sidebar>
-
-        <Sidebar.Inset>
-          <Item className="rounded-none">
-            <Item.Media>
-              <Sidebar.Trigger />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title asChild>
-                <h1 className="text-body-b2-semibold">받은 소식</h1>
-              </Item.Title>
-              <Item.Description>{active.name}에서 나에게 온 멘션과 댓글이에요.</Item.Description>
-            </Item.Content>
-            <Item.Actions>
-              <Button variant="outline" size="tiny">
-                모두 읽음
-              </Button>
-            </Item.Actions>
-          </Item>
-          <Divider />
-          <div className="flex flex-col gap-4 p-4">
-            <Skeleton loading>
-              <p className="text-body-b3-regular">
-                수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
-                확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
-              </p>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="h-24">
-                <Card.Title>수강 신청</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="h-24">
-                <Card.Title>장학금 안내</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="h-24">
-                <Card.Title>동아리 모집</Card.Title>
-              </Card>
-            </Skeleton>
-          </div>
-        </Sidebar.Inset>
-      </Sidebar.Provider>
+            <Divider />
+            <div className="flex flex-col gap-4 p-4">
+              <Skeleton loading>
+                <p className="text-body-b3-regular">
+                  수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
+                  확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
+                </p>
+              </Skeleton>
+              <div className="grid h-24">
+                <Skeleton loading asChild>
+                  <Card>
+                    <Card.Title>수강 신청</Card.Title>
+                  </Card>
+                </Skeleton>
+              </div>
+              <div className="grid h-24">
+                <Skeleton loading asChild>
+                  <Card>
+                    <Card.Title>장학금 안내</Card.Title>
+                  </Card>
+                </Skeleton>
+              </div>
+              <div className="grid h-24">
+                <Skeleton loading asChild>
+                  <Card>
+                    <Card.Title>동아리 모집</Card.Title>
+                  </Card>
+                </Skeleton>
+              </div>
+            </div>
+          </Sidebar.Inset>
+        </Sidebar.Provider>
+      </div>
     );
   },
 };

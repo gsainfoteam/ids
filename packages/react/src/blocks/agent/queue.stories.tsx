@@ -131,7 +131,7 @@ export const PC: Story = {
         <Alert.Description>승인할 때까지 그 작업은 멈춰 있어요.</Alert.Description>
       </Alert>
 
-      <Tabs defaultValue="running" className="flex flex-col gap-6">
+      <Tabs defaultValue="running">
         <Tabs.List aria-label="작업 상태">
           {STATES.map((state) => (
             <Tabs.Trigger key={state.value} value={state.value}>
