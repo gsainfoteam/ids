@@ -6,7 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const tabsStyle = tv({
   slots: {
-    root: 'flex min-w-0',
+    root: 'flex w-full min-w-0',
     list: 'relative flex shrink-0',
     trigger: [
       'relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap select-none',

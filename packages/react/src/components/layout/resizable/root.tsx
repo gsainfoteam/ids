@@ -59,7 +59,7 @@ export function ResizableRoot({
     dragging,
     disabled,
   };
-  const styles = resizableStyle();
+  const styles = resizableStyle({ asChild });
   const size: CSSProperties = {
     ...(resizable.width !== undefined && { width: pixels(resizable.width) }),
     ...(resizable.height !== undefined && { height: pixels(resizable.height) }),
