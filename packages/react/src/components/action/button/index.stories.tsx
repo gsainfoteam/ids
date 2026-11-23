@@ -129,12 +129,12 @@ export const Gallery: Story = {
         <Showcase.Row label="loading">
           {variants.map((variant) => (
             <Button key={variant} variant={variant} disabled aria-busy>
-              <Spinner decorative />
+              <Spinner aria-hidden />
               저장 중
             </Button>
           ))}
           <Button size="tiny" disabled aria-busy>
-            <Spinner decorative />
+            <Spinner aria-hidden />
             저장 중
           </Button>
         </Showcase.Row>
@@ -203,7 +203,7 @@ export const ShowProgressWhileSaving: Story = {
           setSaving(false);
         }}
       >
-        {saving && <Spinner decorative />}
+        {saving && <Spinner aria-hidden />}
         {saving ? '저장 중' : '저장'}
       </Button>
     );

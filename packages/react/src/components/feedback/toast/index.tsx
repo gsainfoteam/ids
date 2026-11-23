@@ -13,21 +13,16 @@ export function Toaster(props: Toaster.Props) {
 
 export namespace Toaster {
   export type Placement =
-    | 'top-left'
-    | 'top-center'
-    | 'top-right'
-    | 'bottom-left'
-    | 'bottom-center'
-    | 'bottom-right';
+    'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 
   export type ColorScheme = StatusColorScheme;
 
+  export type Variant = 'stacked' | 'expanded';
+
   export type Props = {
     placement?: Placement;
+    variant?: Variant;
     max?: number;
-    gap?: number;
-    offset?: number;
-    expand?: boolean;
     hotkey?: Hotkey;
     className?: string;
     style?: CSSProperties;

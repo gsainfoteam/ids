@@ -141,11 +141,10 @@ export const PC: Story = {
               </h2>
               <ToggleGroup
                 variant="outline"
-                attached={false}
                 aria-labelledby="slots"
                 value={slot}
                 onValueChange={setSlot}
-                className="flex-wrap"
+                className="flex-wrap gap-2"
               >
                 {SLOTS.map((option) => (
                   <Toggle key={option} value={option} disabled={TAKEN.includes(option)}>

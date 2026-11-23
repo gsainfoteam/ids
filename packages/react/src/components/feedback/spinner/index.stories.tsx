@@ -23,7 +23,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     size: { control: 'radio', options: [undefined, ...sizes] },
-    decorative: { control: 'radio', options: [undefined, true, false] },
+    'aria-hidden': { control: 'radio', options: [undefined, true, false] },
     'aria-label': { control: 'text' },
   },
   args: {},
@@ -37,6 +37,10 @@ const token = (name: string) =>
   parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => <Spinner />,
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -110,7 +114,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const FollowsControl: Story = {
+export const ShowLoadingInAButton: Story = {
   render: () => (
     <div className="flex items-center gap-3">
       <Button disabled>
@@ -141,7 +145,7 @@ export const FollowsControl: Story = {
   },
 };
 
-export const FollowsField: Story = {
+export const ShowLoadingInAFieldHint: Story = {
   render: () => (
     <Field size="tiny">
       <Field.Label>아이디</Field.Label>
@@ -167,7 +171,7 @@ export const FollowsField: Story = {
   },
 };
 
-export const Announcement: Story = {
+export const AnnounceWhatIsLoading: Story = {
   render: function Render() {
     const [loading, setLoading] = useState(false);
 
@@ -203,7 +207,7 @@ export const Announcement: Story = {
   },
 };
 
-export const SilentInsideControls: Story = {
+export const KeepItQuietInsideAControl: Story = {
   render: () => (
     <div className="flex items-center gap-3">
       <Button disabled aria-busy="true">
@@ -229,17 +233,17 @@ export const SilentInsideControls: Story = {
   },
 };
 
-export const Decorative: Story = {
+export const LetTheTextBesideItSpeak: Story = {
   render: () => (
     <p className="flex items-center gap-2">
-      <Spinner decorative />
+      <Spinner aria-hidden />
       파일을 올리는 중입니다
     </p>
   ),
   parameters: {
     docs: {
       description: {
-        story: '옆 문장이 이미 로딩을 설명하면 decorative로 접근성 트리에서 뺍니다.',
+        story: '옆 문장이 이미 로딩을 설명하면 `aria-hidden`으로 알림을 뺍니다.',
       },
     },
   },

@@ -24,7 +24,6 @@ export namespace FloatingButton {
     colorScheme?: ColorScheme;
     size?: IdsSize;
     placement?: Placement;
-    iconOnly?: boolean;
     children?: ReactNode;
     className?: string;
     style?: CSSProperties;

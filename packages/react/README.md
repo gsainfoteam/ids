@@ -531,7 +531,7 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 |---|---|---|---|
 | `size` | `'standard' \| 'tiny'` | 주변을 따름 | 표시 크기 |
 | `aria-label` | `string` | `'불러오는 중'` | 스크린 리더가 읽을 문장 |
-| `decorative` | `boolean` | 주변을 보고 결정 | `true`면 알리지 않고, `false`면 버튼 안에서도 알림 |
+| `aria-hidden` | `boolean` | 주변을 보고 결정 | `true`면 알리지 않고, `false`면 버튼 안에서도 알림 |
 
 자세한 동작은 `src/components/feedback/spinner/README.md` 를 참고한다.
 

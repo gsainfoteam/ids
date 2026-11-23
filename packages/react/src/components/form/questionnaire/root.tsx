@@ -220,7 +220,6 @@ export function QuestionnaireRoot({
         {children}
         {(showsPrevious || showsSkip || showsForward) && (
           <ButtonGroup
-            attached={false}
             size="tiny"
             aria-label={t('questionnaire.navigation')}
             className={styles.navigation()}

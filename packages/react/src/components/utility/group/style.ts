@@ -3,6 +3,11 @@ import { tv } from '../../../utils';
 import type { GroupOrientation } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
+const GAP_UTILITY = /(?:^|[\s:!])gap-(?:[xy]-)?(?!0(?:\s|$))\S/;
+
+export const spacesItsItems = (className: string | undefined) =>
+  className !== undefined && GAP_UTILITY.test(className);
+
 export const groupStyle = tv({
   slots: {
     root: [

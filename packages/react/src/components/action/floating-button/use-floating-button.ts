@@ -50,17 +50,13 @@ function usePlacementCheck(nodeRef: RefObject<HTMLElement | null>, placement: Fl
 
 type FloatingOwnProps = {
   placement?: FloatingPlacement;
-  iconOnly?: boolean;
 };
 
 export function useFloatingButton<P extends object>(props: P) {
   const button = useButton(props, 'FloatingButton');
-  const {
-    placement = 'bottom-right',
-    iconOnly: iconOnlyProp,
-    ...rest
-  } = button.props as typeof button.props & FloatingOwnProps & { 'aria-label'?: string };
-  const iconOnly = iconOnlyProp ?? visibleText(button.content) === '';
+  const { placement = 'bottom-right', ...rest } = button.props as typeof button.props &
+    FloatingOwnProps & { 'aria-label'?: string };
+  const iconOnly = visibleText(button.content) === '';
   const label = useIconLabel(
     'FloatingButton',
     iconOnly ? button.content : undefined,

@@ -31,7 +31,7 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 
 ```tsx
 <IconButton
-  icon={saving ? <Spinner decorative /> : <CheckIcon />} // 스피너가 아이콘 크기로 들어간다
+  icon={saving ? <Spinner aria-hidden /> : <CheckIcon />} // 스피너가 아이콘 크기로 들어간다
   disabled={saving}
   focusableWhenDisabled // 누른 버튼이 포커스를 지킨다
   aria-busy={saving}

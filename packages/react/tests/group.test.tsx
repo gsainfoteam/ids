@@ -38,7 +38,7 @@ test('the separator is a Divider across the group that overlaps the joined borde
   for (const name of ['h-px', '-my-px']) expect(vertical.classList, name).toContain(name);
 
   const spaced = separator(
-    <ButtonGroup aria-label="저장" attached={false}>
+    <ButtonGroup aria-label="저장" className="gap-2">
       <ButtonGroup.Separator />
     </ButtonGroup>,
   );
@@ -47,11 +47,25 @@ test('the separator is a Divider across the group that overlaps the joined borde
     expect(spaced.classList, `a spaced separator is short: ${name}`).toContain(name);
 
   const tiny = separator(
-    <ButtonGroup aria-label="저장" attached={false} size="tiny" orientation="vertical">
+    <ButtonGroup aria-label="저장" className="gap-2" size="tiny" orientation="vertical">
       <ButtonGroup.Separator />
     </ButtonGroup>,
   );
   for (const name of ['w-4', 'self-center']) expect(tiny.classList, name).toContain(name);
+});
+
+test('any gap in className spaces the items apart, gap-0 keeps them joined', () => {
+  const joinedWith = (className: string) =>
+    separator(
+      <ButtonGroup aria-label="저장" className={className}>
+        <ButtonGroup.Separator />
+      </ButtonGroup>,
+    ).classList.contains('-mx-px');
+
+  for (const className of ['gap-1', 'md:gap-2', 'gap-x-3', 'flex-wrap gap-[6px]', '!gap-2'])
+    expect(joinedWith(className), className).toBe(false);
+  for (const className of ['', 'gap-0', 'flex-wrap', 'has-[>[data-group]]:ms-2'])
+    expect(joinedWith(className), className).toBe(true);
 });
 
 test('inside a single-select ToggleGroup the separator only draws a line', () => {
@@ -180,7 +194,7 @@ test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its
 test('spaced glossy buttons keep their own shadows', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <ButtonGroup aria-label="저장" variant="glossy" attached={false}>
+      <ButtonGroup aria-label="저장" variant="glossy" className="gap-2">
         <Button>저장</Button>
         <Button>더보기</Button>
       </ButtonGroup>

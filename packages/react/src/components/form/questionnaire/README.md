@@ -113,7 +113,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 | 보내기   | 마지막 질문. 글자는 `submitLabel` 로 바꾼다                                |
 
 - 다음과 보내기는 같은 submit 버튼입니다. 질문 안에서 form 이 제출되면 마지막이 아닐 때는 다음 질문으로 넘어갑니다.
-- 이동 버튼은 `ButtonGroup attached={false}` 로 묶여 `aria-label="질문 이동"` 이 붙습니다.
+- 이동 버튼은 간격을 둔(`gap-2`) `ButtonGroup` 으로 묶여 `aria-label="질문 이동"` 이 붙습니다.
 
 ## 고르면 바로 넘어가기
 

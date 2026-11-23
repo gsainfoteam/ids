@@ -13,7 +13,6 @@ export function MessageActions({ className, children, ...props }: MessageActions
 
   return (
     <ButtonGroup
-      attached={false}
       size="tiny"
       variant="outline"
       aria-label={t('message.actions')}

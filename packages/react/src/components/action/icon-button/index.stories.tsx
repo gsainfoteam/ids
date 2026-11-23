@@ -72,6 +72,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <IconButton variant="outline" icon={<TrashIcon />} aria-label="삭제" />,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -124,7 +128,7 @@ export const Gallery: Story = {
                 variant={variant}
                 disabled
                 aria-busy
-                icon={<Spinner decorative />}
+                icon={<Spinner aria-hidden />}
                 aria-label="저장 중"
               />
             )),
@@ -149,7 +153,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const AutomaticLabel: Story = {
+export const NameTheButtonFromItsIcon: Story = {
   render: () => (
     <div className="flex gap-2">
       <IconButton icon={<BellIcon />} />
@@ -177,7 +181,7 @@ export const AutomaticLabel: Story = {
 
 const A_SAVE_TAKES = 800;
 
-export const Loading: Story = {
+export const ShowProgressWhileSaving: Story = {
   args: { onClick: fn(() => new Promise((resolve) => setTimeout(resolve, A_SAVE_TAKES))) },
   render: function Render(args) {
     const [saving, setSaving] = useState(false);
@@ -189,7 +193,7 @@ export const Loading: Story = {
         focusableWhenDisabled
         aria-busy={saving}
         aria-label={saving ? '저장 중' : '저장'}
-        icon={saving ? <Spinner decorative /> : <CheckIcon />}
+        icon={saving ? <Spinner aria-hidden /> : <CheckIcon />}
         onClick={async (event) => {
           setSaving(true);
           await args.onClick?.(event);
@@ -225,7 +229,89 @@ export const Loading: Story = {
   },
 };
 
+export const RenderALink: Story = {
+  render: () => (
+    <IconButton asChild variant="outline" icon={<ArrowTopRightOnSquareIcon />}>
+      <a href="#docs" aria-label="문서 열기" />
+    </IconButton>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'asChild로 링크를 정사각형 아이콘 버튼으로 그립니다. 아이콘은 icon prop으로 줘도 되고 링크 안에 넣어도 됩니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole('link', { name: '문서 열기' });
+    await expect(link).toHaveAttribute('href', '#docs');
+    await expect(link.querySelector('svg')).not.toBeNull();
+    await expect(link.getBoundingClientRect().width).toBe(36);
+  },
+};
+
+export const DrawOnlyTheIcon: Story = {
+  render: () => (
+    <div className="flex items-center gap-1">
+      <IconButton variant="transparent" icon={<MagnifyingGlassIcon />} aria-label="검색" />
+      <IconButton variant="transparent" icon={<EllipsisHorizontalIcon />} aria-label="더보기" />
+      <IconButton
+        variant="transparent"
+        colorScheme="danger"
+        icon={<TrashIcon />}
+        aria-label="삭제"
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'transparent는 아이콘만 그립니다. hover는 불투명도를 70%로, press는 40%로 낮추고, 배경은 어느 상태에서도 칠하지 않습니다. 크기는 다른 variant와 같은 36px, 32px입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const remove = canvas.getByRole('button', { name: '삭제' });
+    await userEvent.hover(remove);
+    await waitFor(() => expect(remove).toHaveAttribute('data-hovered'));
+    await expect(getComputedStyle(remove).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(remove.getBoundingClientRect().width).toBe(36);
+    await userEvent.unhover(remove);
+  },
+};
+
+export const SwapTheIconOnHover: Story = {
+  render: () => (
+    <IconButton
+      aria-label="좋아요"
+      icon={(state) =>
+        state.hovered ? (
+          <HeartIcon data-testid="filled" />
+        ) : (
+          <HeartOutlineIcon data-testid="outline" />
+        )
+      }
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'icon과 aria-label도 상태를 받는 함수가 됩니다. 올려 두면 채운 하트로 바뀝니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByRole('button', { name: '좋아요' });
+    await expect(canvas.getByTestId('outline')).toBeVisible();
+    await userEvent.hover(button);
+    await expect(canvas.getByTestId('filled')).toBeVisible();
+  },
+};
+
 export const Square: Story = {
+  tags: ['verification'],
   render: () => (
     <div className="flex items-center gap-2">
       <IconButton data-testid="standard" variant="outline" icon={<PlusIcon />} aria-label="추가" />
@@ -261,86 +347,5 @@ export const Square: Story = {
       const rect = canvas.getByTestId(id).getBoundingClientRect();
       await expect([rect.width, rect.height]).toEqual([side, side]);
     }
-  },
-};
-
-export const AsLink: Story = {
-  render: () => (
-    <IconButton asChild variant="outline" icon={<ArrowTopRightOnSquareIcon />}>
-      <a href="#docs" aria-label="문서 열기" />
-    </IconButton>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'asChild로 링크를 정사각형 아이콘 버튼으로 그립니다. 아이콘은 icon prop으로 줘도 되고 링크 안에 넣어도 됩니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    const link = canvas.getByRole('link', { name: '문서 열기' });
-    await expect(link).toHaveAttribute('href', '#docs');
-    await expect(link.querySelector('svg')).not.toBeNull();
-    await expect(link.getBoundingClientRect().width).toBe(36);
-  },
-};
-
-export const Transparent: Story = {
-  render: () => (
-    <div className="flex items-center gap-1">
-      <IconButton variant="transparent" icon={<MagnifyingGlassIcon />} aria-label="검색" />
-      <IconButton variant="transparent" icon={<EllipsisHorizontalIcon />} aria-label="더보기" />
-      <IconButton
-        variant="transparent"
-        colorScheme="danger"
-        icon={<TrashIcon />}
-        aria-label="삭제"
-      />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'transparent는 아이콘만 그립니다. hover는 불투명도를 70%로, press는 40%로 낮추고, 배경은 어느 상태에서도 칠하지 않습니다. 크기는 다른 variant와 같은 36px, 32px입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const remove = canvas.getByRole('button', { name: '삭제' });
-    await userEvent.hover(remove);
-    await waitFor(() => expect(remove).toHaveAttribute('data-hovered'));
-    await expect(getComputedStyle(remove).backgroundColor).toBe('rgba(0, 0, 0, 0)');
-    await expect(remove.getBoundingClientRect().width).toBe(36);
-    await userEvent.unhover(remove);
-  },
-};
-
-export const StateIcon: Story = {
-  render: () => (
-    <IconButton
-      aria-label="좋아요"
-      icon={(state) =>
-        state.hovered ? (
-          <HeartIcon data-testid="filled" />
-        ) : (
-          <HeartOutlineIcon data-testid="outline" />
-        )
-      }
-    />
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'icon과 aria-label도 상태를 받는 함수가 됩니다. 올려 두면 채운 하트로 바뀝니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const button = canvas.getByRole('button', { name: '좋아요' });
-    await expect(canvas.getByTestId('outline')).toBeVisible();
-    await userEvent.hover(button);
-    await expect(canvas.getByTestId('filled')).toBeVisible();
   },
 };

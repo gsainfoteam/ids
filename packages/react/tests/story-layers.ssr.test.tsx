@@ -4,11 +4,6 @@ import { describe, expect, test } from 'vitest';
 type StoryFile = Record<string, StoryObj> & { default: Meta };
 
 const NOT_YET_ON_THE_THREE_LAYERS = new Set([
-  'components/action/floating-button/index.stories.tsx',
-  'components/action/icon-button/index.stories.tsx',
-  'components/action/icon-toggle/index.stories.tsx',
-  'components/action/toggle-group/index.stories.tsx',
-  'components/action/toggle/index.stories.tsx',
   'components/data/accordion/index.stories.tsx',
   'components/data/bubble/index.stories.tsx',
   'components/data/calendar/index.stories.tsx',
@@ -26,10 +21,6 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/data/qr-code/index.stories.tsx',
   'components/data/table/index.stories.tsx',
   'components/data/time-picker/index.stories.tsx',
-  'components/feedback/alert/index.stories.tsx',
-  'components/feedback/marker/index.stories.tsx',
-  'components/feedback/spinner/index.stories.tsx',
-  'components/feedback/toast/index.stories.tsx',
   'components/form/checkbox-group/index.stories.tsx',
   'components/form/checkbox/index.stories.tsx',
   'components/form/chip-field/index.stories.tsx',

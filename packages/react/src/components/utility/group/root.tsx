@@ -2,7 +2,7 @@
 
 import { createContext, use, useEffect } from 'react';
 
-import { groupStyle } from './style';
+import { groupStyle, spacesItsItems } from './style';
 import { invariant } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
@@ -45,7 +45,6 @@ export function useGroupNameWarning(
 
 export function GroupRoot({
   orientation = 'horizontal',
-  attached = true,
   size,
   variant,
   separator = 'semantic',
@@ -54,6 +53,7 @@ export function GroupRoot({
   ...rest
 }: Group.Props) {
   const parent = useGroupContext();
+  const attached = !spacesItsItems(className);
   const context: GroupContextValue = {
     orientation,
     attached,

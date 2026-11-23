@@ -40,14 +40,12 @@ const meta = {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
     variant: { control: 'radio', options: variants },
-    attached: { control: 'boolean' },
   },
   args: {
     'aria-label': '보관함 동작',
     orientation: 'horizontal',
     size: 'standard',
     variant: 'outline',
-    attached: true,
   },
   render: (args) => (
     <ButtonGroup {...args}>
@@ -180,8 +178,8 @@ export const Gallery: Story = {
             <Button variant="outline">이동</Button>
           </ButtonGroup>
         </Showcase.Row>
-        <Showcase.Row label="attached=false">
-          <ButtonGroup attached={false} variant="outline" aria-label="필터">
+        <Showcase.Row label="gap-2">
+          <ButtonGroup variant="outline" aria-label="필터" className="gap-2">
             <Button>전체</Button>
             <Button>읽지 않음</Button>
             <Button>
@@ -190,8 +188,8 @@ export const Gallery: Story = {
             </Button>
           </ButtonGroup>
         </Showcase.Row>
-        <Showcase.Row label="attached=false + Separator">
-          <ButtonGroup attached={false} variant="outline" aria-label="사진 넘기기">
+        <Showcase.Row label="gap-2 + Separator">
+          <ButtonGroup variant="outline" aria-label="사진 넘기기" className="gap-2">
             <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
             <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
             <ButtonGroup.Separator />
@@ -200,7 +198,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="in a tray">
           <Card className="concentric-p-1 w-fit flex-row gap-0">
-            <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+            <ButtonGroup variant="ghost" aria-label="사진 보기" className="gap-1">
               <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
               <Button className="tabular-nums">3 / 12</Button>
               <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
@@ -291,7 +289,7 @@ export const BuildASplitButton: Story = {
 export const BuildAToolbar: Story = {
   render: () => (
     <Card className="concentric-p-1 w-fit flex-row gap-0">
-      <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+      <ButtonGroup variant="ghost" aria-label="사진 보기" className="gap-1">
         <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
         <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
         <ButtonGroup.Separator className="mx-1" />

@@ -65,6 +65,15 @@ const copy = {
   danger: ['저장 실패', '네트워크 오류입니다. 다시 시도해 주세요.'],
 } satisfies Record<Alert.ColorScheme, [string, string]>;
 
+export const Usage: Story = {
+  render: () => (
+    <Alert colorScheme="info" className="max-w-md">
+      <Alert.Title>업데이트 가능</Alert.Title>
+      <Alert.Description>v2.5.0이 출시되었습니다.</Alert.Description>
+    </Alert>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -139,7 +148,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Roles: Story = {
+export const ChooseHowItIsAnnounced: Story = {
   render: () => (
     <div className="flex max-w-md flex-col gap-3">
       <Alert colorScheme="info">
@@ -171,7 +180,7 @@ export const Roles: Story = {
   },
 };
 
-export const Dismiss: Story = {
+export const LetTheReaderDismissIt: Story = {
   render: () => (
     <div className="flex max-w-md flex-col items-start gap-3">
       <Alert colorScheme="warning" variant="outline">
@@ -197,37 +206,7 @@ export const Dismiss: Story = {
   },
 };
 
-export const EscapeCloses: Story = {
-  render: () => (
-    <Alert colorScheme="danger" className="max-w-md">
-      <Alert.Title>저장 실패</Alert.Title>
-      <Alert.Actions>
-        <Button size="tiny">다시 시도</Button>
-      </Alert.Actions>
-      <Alert.Close />
-    </Alert>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '포커스가 Alert 안에 있을 때 Escape로 닫습니다. 한글 조합 중에 누른 Escape는 조합만 취소합니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const retry = canvas.getByRole('button', { name: '다시 시도' });
-    retry.focus();
-    retry.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', isComposing: true, bubbles: true }),
-    );
-    await expect(canvas.getByRole('alert')).toBeInTheDocument();
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.queryByRole('alert')).not.toBeInTheDocument());
-  },
-};
-
-export const Controlled: Story = {
+export const ShowItAgainAfterClosing: Story = {
   render: function Render() {
     const [open, setOpen] = useState(true);
 
@@ -256,5 +235,36 @@ export const Controlled: Story = {
     await waitFor(() => expect(canvas.queryByRole('status')).not.toBeInTheDocument());
     await userEvent.click(canvas.getByRole('button', { name: '다시 보이기' }));
     await expect(canvas.getByRole('status')).toHaveTextContent('업로드 완료');
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  render: () => (
+    <Alert colorScheme="danger" className="max-w-md">
+      <Alert.Title>저장 실패</Alert.Title>
+      <Alert.Actions>
+        <Button size="tiny">다시 시도</Button>
+      </Alert.Actions>
+      <Alert.Close />
+    </Alert>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '포커스가 Alert 안에 있을 때 Escape로 닫습니다. 한글 조합 중에 누른 Escape는 조합만 취소합니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const retry = canvas.getByRole('button', { name: '다시 시도' });
+    retry.focus();
+    retry.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', isComposing: true, bubbles: true }),
+    );
+    await expect(canvas.getByRole('alert')).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.queryByRole('alert')).not.toBeInTheDocument());
   },
 };

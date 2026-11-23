@@ -27,7 +27,7 @@ function swipeDirectionsOf(placement: Toaster.Placement): SwipeDirections {
 
 function toastIcon(record: ToastRecord) {
   if (record.icon !== undefined) return record.icon;
-  if (record.loading) return <Spinner decorative />;
+  if (record.loading) return <Spinner aria-hidden />;
   if (record.colorScheme === 'neutral') return null;
   const Glyph = statusIcons[record.colorScheme];
   return <Glyph />;
@@ -95,7 +95,7 @@ export function ToastView({
       style={
         {
           '--toasts-before': place.index,
-          '--offset': `${place.offset}px`,
+          '--heights-before': `${place.heightsBefore}px`,
           '--initial-height': place.height === undefined ? undefined : `${place.height}px`,
           '--toast-z': place.stackOrder,
           ...record.style,

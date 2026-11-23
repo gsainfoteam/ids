@@ -50,7 +50,7 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 <Spinner aria-label="댓글을 불러오는 중" />      // 읽을 문장을 바꾼다
 
 <p>
-  <Spinner decorative /> 파일을 올리는 중입니다  // 옆 문장이 이미 설명한다
+  <Spinner aria-hidden /> 파일을 올리는 중입니다  // 옆 문장이 이미 설명한다
 </p>
 
 <Button disabled aria-busy>
@@ -60,7 +60,7 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 ```
 
 - 알림은 나타나고 100ms 뒤에 적습니다. 스크린 리더는 이미 채워진 채로 나타난 알림 영역을 읽지 않기 때문입니다.
-- `decorative` 를 주지 않으면 주변을 보고 알림 여부를 정합니다. `true` 는 항상 조용하고 `false` 는 버튼 안에서도 알립니다.
+- `aria-hidden` 을 주지 않으면 주변을 보고 알림 여부를 정합니다. `aria-hidden` 은 항상 조용하고 `aria-hidden={false}` 는 버튼 안에서도 알립니다. svg 는 어느 쪽이든 접근성 트리에서 빠집니다.
 
 ## 상태
 
@@ -81,7 +81,7 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 | ------------------ | ------------------------------------------------------------- |
 | `size`             | `standard` / `tiny`. 생략하면 Field → 주변 컨트롤 → 글자 크기 |
 | `aria-label`       | 읽을 문장. 기본 `불러오는 중`                                 |
-| `decorative`       | `true` 면 알리지 않고, `false` 면 버튼 안에서도 알린다        |
+| `aria-hidden`      | `true` 면 알리지 않고, `false` 면 버튼 안에서도 알린다        |
 | `className`        | svg로 간다. 상태를 받는 함수도 된다                           |
 | `ref` / 그 외 속성 | svg로 간다                                                    |
 
@@ -89,4 +89,4 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 
 - 렌더 결과는 `aria-hidden` svg와 화면에 보이지 않는 `role="status"` span 두 요소입니다. 알림이 필요 없으면 span은 사라집니다.
 - 로딩을 알리는 버튼에는 `disabled` 와 함께 `aria-busy` 를 주세요. IDS는 `loading` prop 대신 이 합성을 씁니다.
-- 한 화면에 Spinner를 여러 개 두면 각각 알립니다. 목록의 행마다 두는 경우라면 `decorative` 로 두고 목록 위에 하나만 알리세요.
+- 한 화면에 Spinner를 여러 개 두면 각각 알립니다. 목록의 행마다 두는 경우라면 `aria-hidden` 으로 두고 목록 위에 하나만 알리세요.

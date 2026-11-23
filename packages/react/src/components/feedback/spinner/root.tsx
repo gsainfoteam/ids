@@ -13,9 +13,14 @@ import type { Spinner } from '.';
 
 const SIZE_WHEN_UNSTYLED = '1em';
 
+function hiddenFromScreenReaders(ariaHidden: Spinner.Props['aria-hidden']) {
+  if (ariaHidden === undefined) return undefined;
+  return ariaHidden === true || ariaHidden === 'true';
+}
+
 export function SpinnerRoot({
   size,
-  decorative,
+  'aria-hidden': ariaHidden,
   'aria-label': ariaLabel,
   className,
   ref,
@@ -29,7 +34,7 @@ export function SpinnerRoot({
     (node: SVGSVGElement | null) => mergeRefs(svgRef, ref)(node),
     [ref],
   );
-  const { announcement } = useSpinner(svgRef, decorative);
+  const { announcement } = useSpinner(svgRef, hiddenFromScreenReaders(ariaHidden));
 
   const state: Spinner.State = { size: resolvedSize, announced: announcement === 'announced' };
   const resolvedClassName = typeof className === 'function' ? className(state) : className;

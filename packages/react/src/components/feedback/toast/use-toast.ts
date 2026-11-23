@@ -27,7 +27,7 @@ const MOVEMENT_THAT_PICKS_AN_AXIS = 2;
 
 const POSITION_BEFORE_MEASURING: ToastPosition = {
   index: 0,
-  offset: 0,
+  heightsBefore: 0,
   height: undefined,
   front: true,
   visible: true,

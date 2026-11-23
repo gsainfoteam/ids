@@ -62,6 +62,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <ToggleGroup aria-label="정렬" variant="outline" defaultValue="new">
+      <Toggle value="new">최신</Toggle>
+      <Toggle value="popular">인기</Toggle>
+      <Toggle value="comments">댓글 많은</Toggle>
+    </ToggleGroup>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -143,13 +153,13 @@ export const Gallery: Story = {
             <Toggle value="comments">댓글 많은</Toggle>
           </ToggleGroup>
         </Showcase.Row>
-        <Showcase.Row label="attached=false">
+        <Showcase.Row label="gap-2">
           <ToggleGroup
             aria-label="태그"
             selectionMode="multiple"
-            attached={false}
             variant="outline"
             defaultValue={['react']}
+            className="gap-2"
           >
             <Toggle value="react">React</Toggle>
             <Toggle value="flutter">Flutter</Toggle>
@@ -205,15 +215,14 @@ export const Gallery: Story = {
   ),
 };
 
-export const SpacedWrap: Story = {
+export const WrapSpacedToggles: Story = {
   render: (args) => (
     <ToggleGroup
       aria-label="시작 시간"
-      attached={false}
       variant="outline"
       defaultValue="10:00"
       onValueChange={args.onValueChange}
-      className="max-w-60 flex-wrap"
+      className="max-w-60 flex-wrap gap-2"
     >
       <Toggle value="09:00">09:00</Toggle>
       <Toggle value="10:00">10:00</Toggle>
@@ -225,7 +234,7 @@ export const SpacedWrap: Story = {
     docs: {
       description: {
         story:
-          '띄운 그룹은 줄이 넘어가도 토글이 제 너비를 지킵니다. 붙인 그룹만 넓히면 토글이 폭을 나눠 가집니다.',
+          'className 에 gap 을 주면 토글이 떨어지고, 줄이 넘어가도 제 너비를 지킵니다. 붙인 그룹만 넓히면 토글이 폭을 나눠 가집니다.',
       },
     },
   },
@@ -237,7 +246,7 @@ export const SpacedWrap: Story = {
   },
 };
 
-export const GroupedToggleGroups: Story = {
+export const GroupSeparateSelections: Story = {
   render: () => (
     <ButtonGroup variant="outline" aria-label="서식">
       <ToggleGroup selectionMode="multiple" aria-label="강조" defaultValue={['bold']}>
@@ -274,7 +283,7 @@ export const GroupedToggleGroups: Story = {
   },
 };
 
-export const SplitSelection: Story = {
+export const SplitOneSelectionIntoGroups: Story = {
   args: { onValueChange: fn() },
   render: (args) => (
     <ToggleGroup
@@ -313,97 +322,7 @@ export const SplitSelection: Story = {
   },
 };
 
-export const RadioKeyboard: Story = {
-  render: (args) => (
-    <ToggleGroup
-      aria-label="기간"
-      variant="outline"
-      defaultValue="week"
-      onValueChange={args.onValueChange}
-    >
-      <Toggle value="day">일</Toggle>
-      <Toggle value="week">주</Toggle>
-      <Toggle value="month" disabled>
-        월
-      </Toggle>
-      <Toggle value="year">연</Toggle>
-    </ToggleGroup>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '하나만 고르는 그룹은 라디오 그룹입니다. Tab은 선택된 항목에 멈추고, 화살표가 포커스와 선택을 함께 옮깁니다. 비활성 항목은 건너뛰고 끝에서 처음으로 돌아갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent, args }) => {
-    const [day, week, , year] = canvas.getAllByRole('radio');
-    await expect(canvas.getByRole('radiogroup')).toHaveAccessibleName('기간');
-    await expect(week).toHaveAttribute('tabindex', '0');
-    await expect(day).toHaveAttribute('tabindex', '-1');
-    await userEvent.tab();
-    await expect(week).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(year).toHaveFocus();
-    await expect(year).toHaveAttribute('aria-checked', 'true');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('year');
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(day).toHaveFocus();
-    await expect(day).toHaveAttribute('aria-checked', 'true');
-    await userEvent.keyboard('{End}');
-    await expect(year).toHaveFocus();
-    await userEvent.keyboard(' ');
-    await expect(year).toHaveAttribute('aria-checked', 'false');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(null);
-  },
-};
-
-export const ToolbarKeyboard: Story = {
-  render: () => (
-    <ToggleGroup
-      selectionMode="multiple"
-      aria-label="서식"
-      defaultValue={['bold']}
-      variant="outline"
-    >
-      <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
-      <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
-      <IconToggle value="underline" icon={<UnderlineIcon />} aria-label="밑줄" />
-      <ToggleGroup.Separator />
-      <IconToggle value="strike" icon={<StrikethroughIcon />} aria-label="취소선" />
-    </ToggleGroup>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '여러 개 고르는 그룹은 툴바입니다. 화살표는 포커스만 옮기고 Space와 Enter가 켜고 끕니다. 다시 들어오면 마지막에 있던 항목으로 갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const bold = canvas.getByRole('button', { name: '굵게' });
-    const italic = canvas.getByRole('button', { name: '기울임' });
-    await expect(canvas.getByRole('toolbar')).toHaveAttribute('aria-orientation', 'horizontal');
-    await userEvent.tab();
-    await expect(bold).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
-    await expect(italic).toHaveFocus();
-    await expect(italic).toHaveAttribute('aria-pressed', 'false');
-    await userEvent.keyboard(' ');
-    await expect(italic).toHaveAttribute('aria-pressed', 'true');
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(italic).toHaveFocus();
-    await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
-    await expect(canvas.getByRole('button', { name: '취소선' })).toHaveFocus();
-    await userEvent.tab();
-    await userEvent.tab({ shift: true });
-    await expect(canvas.getByRole('button', { name: '취소선' })).toHaveFocus();
-  },
-};
-
-export const Vertical: Story = {
+export const StackTogglesVertically: Story = {
   render: () => (
     <ToggleGroup
       aria-label="패널"
@@ -438,32 +357,7 @@ export const Vertical: Story = {
   },
 };
 
-export const RightToLeft: Story = {
-  render: () => (
-    <div dir="rtl">
-      <ToggleGroup aria-label="정렬" defaultValue="center" variant="outline">
-        <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
-        <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
-        <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
-      </ToggleGroup>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '오른쪽에서 왼쪽으로 쓰는 화면에서는 왼쪽 화살표가 다음 항목으로 갑니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.tab();
-    await expect(canvas.getByRole('radio', { name: '가운데 정렬' })).toHaveFocus();
-    await userEvent.keyboard('{ArrowLeft}');
-    await expect(canvas.getByRole('radio', { name: '오른쪽 정렬' })).toHaveFocus();
-  },
-};
-
-export const NativeForm: Story = {
+export const SubmitWithAForm: Story = {
   render: function Render() {
     const [result, setResult] = useState('');
 
@@ -536,7 +430,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const Controlled: Story = {
+export const ClearTheSelection: Story = {
   render: function Render() {
     const [view, setView] = useState<'list' | 'grid' | null>('list');
 
@@ -573,7 +467,126 @@ export const Controlled: Story = {
   },
 };
 
+export const KeyboardInARadioGroup: Story = {
+  tags: ['verification'],
+  render: (args) => (
+    <ToggleGroup
+      aria-label="기간"
+      variant="outline"
+      defaultValue="week"
+      onValueChange={args.onValueChange}
+    >
+      <Toggle value="day">일</Toggle>
+      <Toggle value="week">주</Toggle>
+      <Toggle value="month" disabled>
+        월
+      </Toggle>
+      <Toggle value="year">연</Toggle>
+    </ToggleGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '하나만 고르는 그룹은 라디오 그룹입니다. Tab은 선택된 항목에 멈추고, 화살표가 포커스와 선택을 함께 옮깁니다. 비활성 항목은 건너뛰고 끝에서 처음으로 돌아갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    const [day, week, , year] = canvas.getAllByRole('radio');
+    await expect(canvas.getByRole('radiogroup')).toHaveAccessibleName('기간');
+    await expect(week).toHaveAttribute('tabindex', '0');
+    await expect(day).toHaveAttribute('tabindex', '-1');
+    await userEvent.tab();
+    await expect(week).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(year).toHaveFocus();
+    await expect(year).toHaveAttribute('aria-checked', 'true');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('year');
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(day).toHaveFocus();
+    await expect(day).toHaveAttribute('aria-checked', 'true');
+    await userEvent.keyboard('{End}');
+    await expect(year).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect(year).toHaveAttribute('aria-checked', 'false');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(null);
+  },
+};
+
+export const KeyboardInAToolbar: Story = {
+  tags: ['verification'],
+  render: () => (
+    <ToggleGroup
+      selectionMode="multiple"
+      aria-label="서식"
+      defaultValue={['bold']}
+      variant="outline"
+    >
+      <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
+      <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
+      <IconToggle value="underline" icon={<UnderlineIcon />} aria-label="밑줄" />
+      <ToggleGroup.Separator />
+      <IconToggle value="strike" icon={<StrikethroughIcon />} aria-label="취소선" />
+    </ToggleGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '여러 개 고르는 그룹은 툴바입니다. 화살표는 포커스만 옮기고 Space와 Enter가 켜고 끕니다. 다시 들어오면 마지막에 있던 항목으로 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const bold = canvas.getByRole('button', { name: '굵게' });
+    const italic = canvas.getByRole('button', { name: '기울임' });
+    await expect(canvas.getByRole('toolbar')).toHaveAttribute('aria-orientation', 'horizontal');
+    await userEvent.tab();
+    await expect(bold).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(italic).toHaveFocus();
+    await expect(italic).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.keyboard(' ');
+    await expect(italic).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(italic).toHaveFocus();
+    await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
+    await expect(canvas.getByRole('button', { name: '취소선' })).toHaveFocus();
+    await userEvent.tab();
+    await userEvent.tab({ shift: true });
+    await expect(canvas.getByRole('button', { name: '취소선' })).toHaveFocus();
+  },
+};
+
+export const RightToLeft: Story = {
+  tags: ['verification'],
+  render: () => (
+    <div dir="rtl">
+      <ToggleGroup aria-label="정렬" defaultValue="center" variant="outline">
+        <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+        <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+        <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
+      </ToggleGroup>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '오른쪽에서 왼쪽으로 쓰는 화면에서는 왼쪽 화살표가 다음 항목으로 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole('radio', { name: '가운데 정렬' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(canvas.getByRole('radio', { name: '오른쪽 정렬' })).toHaveFocus();
+  },
+};
+
 export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
   render: function Render() {
     const [shown, setShown] = useState(false);
 

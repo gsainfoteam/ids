@@ -34,7 +34,7 @@ import {
 
 export type ToastPosition = {
   index: number;
-  offset: number;
+  heightsBefore: number;
   height: number | undefined;
   front: boolean;
   visible: boolean;
@@ -44,8 +44,7 @@ export type ToastPosition = {
 export type UseToasterOptions = {
   explicit: boolean;
   max: number;
-  gap: number;
-  expand: boolean;
+  expanded: boolean;
 };
 
 const NO_TOASTS: readonly ToastRecord[] = [];
@@ -71,30 +70,29 @@ function naturalHeight(node: HTMLElement) {
 function positionsOf(
   live: readonly ToastRecord[],
   heights: ReadonlyMap<ToastId, number>,
-  gap: number,
   max: number,
 ) {
   const positions = new Map<ToastId, ToastPosition>();
-  let offset = 0;
+  let heightsBefore = 0;
 
   live.forEach((record, index) => {
     const height = heights.get(record.id);
     positions.set(record.id, {
       index,
-      offset,
+      heightsBefore,
       height,
       front: index === 0,
       visible: index < max,
       stackOrder: live.length - index,
     });
 
-    offset += (height ?? 0) + gap;
+    heightsBefore += height ?? 0;
   });
 
   return positions;
 }
 
-export function useToaster({ explicit, max, gap, expand }: UseToasterOptions) {
+export function useToaster({ explicit, max, expanded }: UseToasterOptions) {
   const [host] = useState(() => Symbol('toaster'));
 
   useLayoutEffect(() => registerToaster(host, explicit), [host, explicit]);
@@ -207,7 +205,7 @@ export function useToaster({ explicit, max, gap, expand }: UseToasterOptions) {
     else toastElements.current.delete(id);
   }, []);
 
-  const positions = positionsOf(live, heights, gap, max);
+  const positions = positionsOf(live, heights, max);
   const frontHeight = live[0] ? heights.get(live[0].id) : undefined;
 
   const regionProps = {
@@ -248,7 +246,7 @@ export function useToaster({ explicit, max, gap, expand }: UseToasterOptions) {
     hasLive,
     positions,
     frontHeight,
-    expanded: expand || hovered || pressing || focusWithin,
+    expanded: expanded || hovered || pressing || focusWithin,
     paused: hovered || pressing || focusWithin || tabHidden,
     regionProps,
     registerToast,

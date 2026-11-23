@@ -28,17 +28,17 @@ const QUIET_CONTAINERS = [
 
 export type SpinnerAnnouncement = 'pending' | 'announced' | 'silent';
 
-export function useSpinner(ref: RefObject<Element | null>, decorative: boolean | undefined) {
+export function useSpinner(ref: RefObject<Element | null>, hidden: boolean | undefined) {
   const [phase, setPhase] = useState<SpinnerAnnouncement>('pending');
 
   useEffect(() => {
-    if (decorative === true) return;
+    if (hidden === true) return;
     const timer = setTimeout(() => {
-      const quiet = decorative === undefined && ref.current?.closest(QUIET_CONTAINERS) != null;
+      const quiet = hidden === undefined && ref.current?.closest(QUIET_CONTAINERS) != null;
       setPhase(quiet ? 'silent' : 'announced');
     }, ANNOUNCE_DELAY);
     return () => clearTimeout(timer);
-  }, [ref, decorative]);
+  }, [ref, hidden]);
 
-  return { announcement: decorative === true ? ('silent' as const) : phase };
+  return { announcement: hidden === true ? ('silent' as const) : phase };
 }

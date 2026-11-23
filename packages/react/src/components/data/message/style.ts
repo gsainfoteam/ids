@@ -25,7 +25,7 @@ export const messageStyle = tv({
     hint: 'sr-only',
     failure: 'flex flex-wrap items-center gap-2',
     failureText: 'w-auto text-danger',
-    actions: '',
+    actions: 'gap-2',
     footer: 'flex items-center gap-1 text-caption-c1-regular text-neutral',
   },
   variants: {

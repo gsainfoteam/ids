@@ -27,7 +27,7 @@ export function PromptInputSubmit({ className, onClick, ...props }: PromptInputS
   const icon = stops ? (
     <StopIcon aria-hidden="true" />
   ) : waits ? (
-    <Spinner decorative />
+    <Spinner aria-hidden />
   ) : (
     <ArrowUpIcon aria-hidden="true" />
   );

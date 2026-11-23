@@ -237,7 +237,6 @@ export function QuestionnaireQuestion({
                 name={name}
                 size={questionnaire.size}
                 orientation={orientation}
-                attached={false}
                 aria-labelledby={legendId}
                 className={styles.toggles()}
                 value={draft.choices[0] ?? null}
@@ -251,7 +250,6 @@ export function QuestionnaireQuestion({
                 name={name}
                 size={questionnaire.size}
                 orientation={orientation}
-                attached={false}
                 aria-labelledby={legendId}
                 className={styles.toggles()}
                 value={draft.choices}

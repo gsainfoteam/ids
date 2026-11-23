@@ -148,7 +148,7 @@ export const PC: Story = {
                   <Item key={job.id}>
                     <Item.Media variant="soft">
                       {job.state === 'running' ? (
-                        <Spinner size="tiny" decorative />
+                        <Spinner size="tiny" aria-hidden />
                       ) : job.failed ? (
                         <ExclamationTriangleIcon />
                       ) : job.state === 'done' ? (
