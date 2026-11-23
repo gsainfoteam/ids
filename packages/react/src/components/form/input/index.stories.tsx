@@ -39,6 +39,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>이메일</Field.Label>
+      <Input type="email" name="email" placeholder="name@example.com" />
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -71,15 +80,37 @@ export const Gallery: Story = {
   ),
 };
 
-export const TypeRouting: Story = {
+export const PickTheFieldByType: Story = {
   render: () => (
     <div className="grid w-72 gap-4">
-      {types.map((type) => (
-        <Field key={type}>
-          <Field.Label>{type}</Field.Label>
-          <Input type={type} name={type} />
-        </Field>
-      ))}
+      <Field>
+        <Field.Label>text</Field.Label>
+        <Input type="text" name="text" />
+      </Field>
+      <Field>
+        <Field.Label>email</Field.Label>
+        <Input type="email" name="email" />
+      </Field>
+      <Field>
+        <Field.Label>url</Field.Label>
+        <Input type="url" name="url" />
+      </Field>
+      <Field>
+        <Field.Label>search</Field.Label>
+        <Input type="search" name="search" />
+      </Field>
+      <Field>
+        <Field.Label>password</Field.Label>
+        <Input type="password" name="password" />
+      </Field>
+      <Field>
+        <Field.Label>number</Field.Label>
+        <Input type="number" name="number" />
+      </Field>
+      <Field>
+        <Field.Label>tel</Field.Label>
+        <Input type="tel" name="tel" />
+      </Field>
     </div>
   ),
   parameters: {
@@ -105,7 +136,7 @@ export const TypeRouting: Story = {
   },
 };
 
-export const SearchClear: Story = {
+export const ClearASearch: Story = {
   render: () => (
     <Field className="w-72">
       <Field.Label>검색</Field.Label>

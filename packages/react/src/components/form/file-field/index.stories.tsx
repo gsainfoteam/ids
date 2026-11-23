@@ -62,6 +62,15 @@ const picker = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-80">
+      <Field.Label>이력서</Field.Label>
+      <FileField accept=".pdf" />
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -136,7 +145,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const MultipleAndLimits: Story = {
+export const AcceptSeveralFilesWithLimits: Story = {
   render: function Render() {
     const [files, setFiles] = useState<File[]>([]);
 
@@ -188,7 +197,7 @@ export const MultipleAndLimits: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -238,7 +247,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ resume: File | null }>({ defaultValues: { resume: null } });
     const [result, setResult] = useState('');
@@ -283,11 +292,10 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const CustomItems: Story = {
-  args: { multiple: true, defaultValue: [photo('a.svg'), pdf('b.pdf')] },
-  render: (args) => (
+export const ListEachFileYourWay: Story = {
+  render: () => (
     <div className="w-80">
-      <FileField {...args}>
+      <FileField aria-label="첨부 파일" multiple defaultValue={[photo('a.svg'), pdf('b.pdf')]}>
         <FileField.Trigger />
         <FileField.List>
           {(files) =>

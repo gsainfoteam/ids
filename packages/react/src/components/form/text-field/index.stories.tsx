@@ -57,6 +57,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field className="w-72">
+      <Field.Label>이름</Field.Label>
+      <TextField placeholder="홍길동" />
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: function Render() {
     const [copied, setCopied] = useState(false);
@@ -208,7 +217,7 @@ export const Gallery: Story = {
   },
 };
 
-export const Clearable: Story = {
+export const ClearTheValue: Story = {
   render: (args) => (
     <TextField {...args} defaultValue="인포팀">
       <MagnifyingGlassIcon />
@@ -238,7 +247,7 @@ export const Clearable: Story = {
   },
 };
 
-export const InvalidState: Story = {
+export const ShowAnErrorUnderTheField: Story = {
   render: () => (
     <Field invalid className="w-72">
       <Field.Label>닉네임</Field.Label>
@@ -262,7 +271,7 @@ export const InvalidState: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ConnectReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ defaultValues: { query: '' } });
     const query = useWatch({ control: methods.control, name: 'query' });
@@ -309,7 +318,8 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const PointerFocus: Story = {
+export const PointerFocusFromAnAdornment: Story = {
+  tags: ['verification'],
   render: () => (
     <TextField
       aria-label="포커스 테스트"

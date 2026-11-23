@@ -64,6 +64,19 @@ const picker = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: function Render() {
+    const [sent, setSent] = useState('');
+
+    return (
+      <div className="flex w-96 flex-col gap-3">
+        <PromptInput onSend={(message) => setSent(message.text)} />
+        <output aria-label="보낸 메시지">{sent}</output>
+      </div>
+    );
+  },
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -128,12 +141,12 @@ export const Gallery: Story = {
   ),
 };
 
-export const EnterToSend: Story = {
+export const SendAMessage: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          'Enter 는 보내고 Shift+Enter 는 줄을 바꿉니다. 한글처럼 조합 중인 글자를 확정하는 Enter 는 보내지 않습니다. 보내면 입력이 비워지고, 비어 있으면 Enter 도 보내기 버튼도 보내지 않습니다.',
+          'onSend 는 { text, files, tools } 를 받습니다. Enter 는 보내고 Shift+Enter 는 줄을 바꿉니다. 한글처럼 조합 중인 글자를 확정하는 Enter 는 보내지 않습니다. 보내면 입력이 비워지고, 비어 있으면 Enter 도 보내기 버튼도 보내지 않습니다.',
       },
     },
   },
@@ -159,10 +172,9 @@ export const EnterToSend: Story = {
   },
 };
 
-export const Attachments: Story = {
-  args: { accept: 'image/*,.pdf,.txt', maxCount: 3 },
+export const AttachFiles: Story = {
   render: (args) => (
-    <PromptInput {...args}>
+    <PromptInput {...args} accept="image/*,.pdf,.txt" maxCount={3}>
       <PromptInput.Input placeholder="파일에 대해 물어보세요" />
       <PromptInput.Attach />
     </PromptInput>
@@ -171,7 +183,7 @@ export const Attachments: Story = {
     docs: {
       description: {
         story:
-          'PromptInput.Attach 는 파일을 고르는 버튼입니다. 입력창에 파일을 끌어다 놓거나 붙여넣어도 첨부되고, 첨부한 파일은 위 바에 FileField 목록으로 보입니다. 글 없이 파일만 보내도 됩니다.',
+          'PromptInput.Attach 는 파일을 고르는 버튼이고, accept 와 maxCount 로 받을 파일을 정합니다. 입력창에 파일을 끌어다 놓거나 붙여넣어도 첨부되고, 첨부한 파일은 위 바에 FileField 목록으로 보입니다. 글 없이 파일만 보내도 됩니다.',
       },
     },
   },
@@ -192,7 +204,7 @@ export const Attachments: Story = {
   },
 };
 
-export const Streaming: Story = {
+export const StopAStreamingReply: Story = {
   args: {
     onSend: fn(() => new Promise<void>((resolve) => setTimeout(resolve, A_REPLY_TAKES))),
   },
@@ -244,7 +256,7 @@ export const Streaming: Story = {
   },
 };
 
-export const Tools: Story = {
+export const AddToolsToTheBar: Story = {
   render: (args) => (
     <PromptInput {...args}>
       <PromptInput.Input placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요" />
@@ -274,10 +286,7 @@ export const Tools: Story = {
   },
   play: async ({ canvasElement, userEvent, args }) => {
     await userEvent.click(button(canvasElement, '웹 검색'));
-    await expect(button(canvasElement, '웹 검색')).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    await expect(button(canvasElement, '웹 검색')).toHaveAttribute('aria-pressed', 'true');
 
     await userEvent.type(textbox(canvasElement), '장학금 신청 기간{Enter}');
     await expect(args.onSend).toHaveBeenCalledOnce();
@@ -289,7 +298,7 @@ export const Tools: Story = {
   },
 };
 
-export const Suggestions: Story = {
+export const FillTheInputFromSuggestions: Story = {
   render: function Render(args) {
     const [draft, setDraft] = useState('');
 

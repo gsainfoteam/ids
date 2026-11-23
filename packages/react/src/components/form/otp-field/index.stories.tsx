@@ -50,6 +50,15 @@ const input = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <Field>
+      <Field.Label>인증 코드</Field.Label>
+      <OTPField length={6} />
+    </Field>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -142,50 +151,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Keyboard: Story = {
-  args: { 'aria-label': '인증 코드' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '실제 input 하나라서 전체 선택, 단어 삭제, Shift+화살표 범위, 실행 취소가 브라우저 그대로 동작합니다. 캐럿이 글자 위에 있으면 그 글자를 덮어씁니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, userEvent, args }) => {
-    const field = input(canvasElement);
-    await userEvent.click(field);
-    await userEvent.keyboard('12a34');
-    await expect(field).toHaveValue('1234');
-    await userEvent.keyboard('56');
-    await expect(args.onComplete).toHaveBeenCalledWith('123456');
-    await userEvent.keyboard('{Backspace}');
-    await expect(field).toHaveValue('12345');
-  },
-};
-
-export const Paste: Story = {
-  args: { 'aria-label': '인증 코드' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '전체 코드를 붙여넣으면 어느 칸에서든 전체가 바뀝니다. 일부만 붙여넣으면 선택한 칸부터 덮어씁니다. 하이픈과 공백 같은 허용되지 않는 문자는 빠집니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement, userEvent }) => {
-    const field = input(canvasElement);
-    await userEvent.click(field);
-    await userEvent.paste('123-456');
-    await expect(field).toHaveValue('123456');
-    field.setSelectionRange(2, 3);
-    await userEvent.paste('99');
-    await expect(field).toHaveValue('129956');
-  },
-};
-
-export const NativeForm: Story = {
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
@@ -238,7 +204,7 @@ export const NativeForm: Story = {
 
 const schema = z.object({ code: z.string().length(6, '6자리 코드를 입력하세요.') });
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm({ resolver: zodResolver(schema), defaultValues: { code: '' } });
     const [result, setResult] = useState('');
@@ -281,7 +247,7 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const CustomSlot: Story = {
+export const DrawYourOwnSlots: Story = {
   render: () => (
     <OTPField length={4} aria-label="커스텀 슬롯">
       <OTPField.Group className="gap-3">
@@ -308,5 +274,50 @@ export const CustomSlot: Story = {
           'Slot의 className과 children은 슬롯 상태를 받는 함수도 됩니다. 입력은 여전히 input 하나가 받습니다.',
       },
     },
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  args: { 'aria-label': '인증 코드' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '실제 input 하나라서 전체 선택, 단어 삭제, Shift+화살표 범위, 실행 취소가 브라우저 그대로 동작합니다. 캐럿이 글자 위에 있으면 그 글자를 덮어씁니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent, args }) => {
+    const field = input(canvasElement);
+    await userEvent.click(field);
+    await userEvent.keyboard('12a34');
+    await expect(field).toHaveValue('1234');
+    await userEvent.keyboard('56');
+    await expect(args.onComplete).toHaveBeenCalledWith('123456');
+    await userEvent.keyboard('{Backspace}');
+    await expect(field).toHaveValue('12345');
+  },
+};
+
+export const Paste: Story = {
+  tags: ['verification'],
+  args: { 'aria-label': '인증 코드' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '전체 코드를 붙여넣으면 어느 칸에서든 전체가 바뀝니다. 일부만 붙여넣으면 선택한 칸부터 덮어씁니다. 하이픈과 공백 같은 허용되지 않는 문자는 빠집니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const field = input(canvasElement);
+    await userEvent.click(field);
+    await userEvent.paste('123-456');
+    await expect(field).toHaveValue('123456');
+    field.setSelectionRange(2, 3);
+    await userEvent.paste('99');
+    await expect(field).toHaveValue('129956');
   },
 };
