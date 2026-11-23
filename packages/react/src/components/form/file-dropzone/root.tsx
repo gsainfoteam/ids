@@ -11,6 +11,8 @@ import { useInternalFileFieldRoot } from '../file-field/hooks/use-file-field-roo
 import { isType } from '../file-field/lib/is-type';
 import { FileClear } from '../file-field/parts/clear';
 import { FileList } from '../file-field/parts/list';
+import { FileMessages } from '../file-field/parts/messages';
+import { FilePicker } from '../file-field/parts/picker';
 import { FileTrigger } from '../file-field/parts/trigger';
 
 import type { FileFieldProps, FileFieldState, FileFieldVariant } from '../file-field/root';
@@ -59,9 +61,9 @@ export function FileDropzoneRoot(props: FileDropzoneProps) {
         className={styles.root({ className: resolveState(className, state) })}
         style={style}
       >
-        {picker}
+        <FilePicker {...picker} />
         {composed}
-        {messages}
+        <FileMessages {...messages} />
       </div>
     </FileContext>
   );

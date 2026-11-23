@@ -15,6 +15,8 @@ import { type FileFieldRejection } from './lib/file-rules';
 import { isType } from './lib/is-type';
 import { FileClear } from './parts/clear';
 import { FileList } from './parts/list';
+import { FileMessages } from './parts/messages';
+import { FilePicker } from './parts/picker';
 import { FilePreview } from './parts/preview';
 import { FileTrigger } from './parts/trigger';
 import { FileValue } from './parts/value';
@@ -128,7 +130,7 @@ export function FileFieldRoot(props: FileFieldProps) {
         className={styles.root({ className: resolveState(className, state) })}
         style={style}
       >
-        {picker}
+        <FilePicker {...picker} />
         <div
           data-file-field-control=""
           data-invalid={state.invalid ? '' : undefined}
@@ -138,7 +140,7 @@ export function FileFieldRoot(props: FileFieldProps) {
           {composed.controls}
         </div>
         {composed.others}
-        {messages}
+        <FileMessages {...messages} />
       </div>
     </FileContext>
   );

@@ -2,14 +2,15 @@
 
 import { useCallback, useId, type DragEvent, type MouseEvent } from 'react';
 
-import { describeLimits, fileKey, formatBytes, isFile, isValidAccept } from '../lib/file-rules';
+import { describeLimits, isFile, isValidAccept } from '../lib/file-rules';
 import { filePartsStyle } from '../style';
 import { useInternalFileField, type FileFieldValue } from './use-file-field';
-import { FormValue } from '../../../../internal/parts/form-value';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { invariant, mergeRefs } from '../../../../utils';
 import { useFieldSize } from '../../field/context';
 
+import type { FileMessagesProps } from '../parts/messages';
+import type { FilePickerProps } from '../parts/picker';
 import type { FileFieldProps, FileFieldState } from '../root';
 
 export type FileFieldLook = 'field' | 'dropzone' | 'embedded';
@@ -185,53 +186,29 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     onPaste: handlers.onPaste,
   };
 
-  const picker = (
-    <input
-      {...native}
-      ref={pickerRef}
-      type="file"
-      multiple={multiple}
-      disabled={disabled}
-      form={form}
-      hidden
-      tabIndex={-1}
-      aria-hidden="true"
-      onChange={handlers.onInputChange}
-    />
-  );
+  const picker: FilePickerProps = {
+    native,
+    ref: pickerRef,
+    multiple,
+    disabled,
+    form,
+    onChange: handlers.onInputChange,
+  };
 
-  const messages = (
-    <>
-      {announcesRequired && (
-        <span id={requiredId} hidden>
-          {t('fileField.required')}
-        </span>
-      )}
-      {s.rejections.length > 0 && (
-        <div id={errorId} role="alert">
-          <ul className={styles.rejections()}>
-            {s.rejections.map(({ file, reason }) => (
-              <li key={fileKey(file)}>
-                {file.name}:{' '}
-                {reason === 'type'
-                  ? t('fileField.rejectType')
-                  : reason === 'size'
-                    ? t('fileField.rejectSize', { max: formatBytes(maxSize ?? 0) })
-                    : t('fileField.rejectCount', { max: multiple ? (maxCount ?? 0) : 1 })}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <FormValue
-        form={form}
-        value={s.files.map((file) => file.name)}
-        required={required && !readOnly}
-        disabled={disabled}
-        anchor={triggerRef}
-      />
-    </>
-  );
+  const messages: FileMessagesProps = {
+    announcesRequired,
+    requiredId,
+    errorId,
+    rejections: s.rejections,
+    rejectionsClassName: styles.rejections(),
+    maxSize,
+    maxFiles: multiple ? (maxCount ?? 0) : 1,
+    form,
+    fileNames: s.files.map((file) => file.name),
+    required: required && !readOnly,
+    disabled,
+    anchor: triggerRef,
+  };
 
   return {
     context: {

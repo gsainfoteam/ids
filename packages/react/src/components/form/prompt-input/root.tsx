@@ -29,6 +29,8 @@ import {
 import { useFieldSize } from '../field/context';
 import { FileContext } from '../file-field/context';
 import { useInternalFileFieldRoot } from '../file-field/hooks/use-file-field-root';
+import { FileMessages } from '../file-field/parts/messages';
+import { FilePicker } from '../file-field/parts/picker';
 import { TextArea } from '../text-area';
 import { TextAreaInput } from '../text-area/parts/input';
 
@@ -216,7 +218,7 @@ export function PromptInputRoot({
           className={styles.root({ className })}
           onSubmit={send}
         >
-          {attachments.picker}
+          <FilePicker {...attachments.picker} />
           <TextArea
             variant={variant}
             size={size}
@@ -241,7 +243,7 @@ export function PromptInputRoot({
             />
             {bottom}
           </TextArea>
-          {attachments.messages}
+          <FileMessages {...attachments.messages} />
         </form>
       </FileContext>
     </PromptInputContext>
