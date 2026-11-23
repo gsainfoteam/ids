@@ -123,28 +123,6 @@ test('a top-level Indicator goes inside the default track', () => {
   expect(doc.querySelectorAll('[data-progress-indicator]')).toHaveLength(1);
 });
 
-test('circular: an svg progressbar, center content inside, the Label beside it', () => {
-  const doc = html(
-    <Progress shape="circular" value={40}>
-      <svg id="icon" />
-      <Progress.Label>Downloading</Progress.Label>
-      <Progress.Track className="text-red-100" />
-    </Progress>,
-  );
-  const progressbar = bar(doc);
-  expect(progressbar.querySelectorAll('circle')).toHaveLength(2);
-  expect(progressbar.querySelector('[data-progress-track]')!.getAttribute('class')).toMatch(
-    /text-red-100/,
-  );
-  expect(progressbar.querySelector('#icon'), 'other children render in the center').not.toBeNull();
-  const label = doc.querySelector('[data-progress-label]')!;
-  expect(progressbar.contains(label)).toBe(false);
-  expect(progressbar.getAttribute('aria-labelledby')).toBe(label.id);
-  const arc = progressbar.querySelector('[data-progress-indicator]')!;
-  const dash = Number(arc.getAttribute('stroke-dasharray'));
-  expect(Number(arc.getAttribute('stroke-dashoffset'))).toBeCloseTo(dash * 0.6, 3);
-});
-
 test('className and style can read the state', () => {
   const seen: Progress.State[] = [];
   const doc = html(

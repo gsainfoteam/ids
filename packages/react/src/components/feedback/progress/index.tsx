@@ -14,7 +14,6 @@ export function Progress(props: Progress.Props) {
 }
 
 export namespace Progress {
-  export type Shape = 'linear' | 'circular';
   export type ColorScheme =
     | 'primary'
     | 'secondary'
@@ -32,7 +31,6 @@ export namespace Progress {
     valueLabel: string | undefined;
     indeterminate: boolean;
     complete: boolean;
-    shape: Shape;
     size: IdsSize;
     colorScheme: ColorScheme;
   };
@@ -44,7 +42,6 @@ export namespace Progress {
     value?: number | null;
     max?: number;
     indeterminate?: boolean;
-    shape?: Shape;
     size?: IdsSize;
     colorScheme?: ColorScheme;
     getValueLabel?: (value: number, max: number) => string;

@@ -31,7 +31,6 @@ const NOT_YET_ON_THE_THREE_LAYERS = new Set([
   'components/data/time-picker/index.stories.tsx',
   'components/feedback/alert/index.stories.tsx',
   'components/feedback/marker/index.stories.tsx',
-  'components/feedback/progress/index.stories.tsx',
   'components/feedback/skeleton/index.stories.tsx',
   'components/feedback/spinner/index.stories.tsx',
   'components/feedback/toast/index.stories.tsx',

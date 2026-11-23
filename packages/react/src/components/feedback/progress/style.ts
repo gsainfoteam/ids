@@ -5,29 +5,17 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const progressStyle = tv({
   slots: {
-    root: '',
+    root: 'flex w-full flex-col gap-2',
     header: 'flex items-baseline gap-2',
     track: 'relative w-full overflow-hidden rounded-full bg-neutral-soft',
     indicator: 'h-full rounded-full bg-scheme-solid',
-    circle: 'relative inline-flex shrink-0 items-center justify-center',
-    svg: 'size-full',
-    trackCircle: 'text-(--ids-color-bg-neutral-soft)',
-    indicatorCircle: [
-      'origin-center -rotate-90 text-(--ids-color-bg-scheme-solid)',
-      'transition-[stroke-dashoffset] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
-    ],
-    center: 'absolute inset-0 flex items-center justify-center [&_svg]:size-[40%]',
     label: 'min-w-0 truncate text-neutral-strong',
-    value: 'shrink-0 text-neutral tabular-nums',
+    value: 'ms-auto shrink-0 text-neutral tabular-nums',
   },
   variants: {
-    shape: {
-      linear: { root: 'flex w-full flex-col gap-2' },
-      circular: { root: 'inline-flex items-center gap-2' },
-    } satisfies Record<Progress.Shape, object>,
     size: {
-      standard: { track: 'h-2', circle: 'size-10', label: 'text-body-b3-medium' },
-      tiny: { track: 'h-1', circle: 'size-6', label: 'text-caption-c1-medium' },
+      standard: { track: 'h-2', label: 'text-body-b3-medium', value: 'text-body-b3-regular' },
+      tiny: { track: 'h-1', label: 'text-caption-c1-medium', value: 'text-caption-c1-regular' },
     } satisfies Record<IdsSize, object>,
     colorScheme: {
       primary: { root: 'scheme-primary' },
@@ -45,7 +33,6 @@ export const progressStyle = tv({
           'w-1/4 animate-progress-slide rtl:[animation-direction:reverse]',
           'motion-reduce:w-full motion-reduce:animate-none motion-reduce:opacity-40',
         ],
-        svg: 'animate-spin motion-reduce:animate-none',
       },
       false: {
         indicator: [
@@ -56,13 +43,7 @@ export const progressStyle = tv({
       },
     },
   },
-  compoundVariants: [
-    { shape: 'linear', size: 'standard', class: { value: 'ms-auto text-body-b3-regular' } },
-    { shape: 'linear', size: 'tiny', class: { value: 'ms-auto text-caption-c1-regular' } },
-    { shape: 'circular', class: { value: 'text-caption-c2-medium' } },
-  ],
   defaultVariants: {
-    shape: 'linear',
     size: 'standard',
     colorScheme: 'primary',
     indeterminate: false,
