@@ -202,9 +202,6 @@ jobs:
         working-directory: packages/flutter
 
       - run: dart run slang
-        working-directory: packages/flutter
-
-      - run: dart run slang
         working-directory: packages/flutter/example
 
       - run: flutter analyze

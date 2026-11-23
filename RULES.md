@@ -35,8 +35,9 @@ These files are written by `pnpm codegen` (Style Dictionary, message generation 
 - `packages/react/messages/en.json`
 - `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
   `packages/core/color-roles.json`)
-- `packages/flutter/lib/messages/ids_messages.dart`
-- `packages/flutter/messages/ko.i18n.json`
+- `packages/flutter/lib/messages/ids_messages.dart` (`IdsMessagesBase`, one `IdsMessages<Language>`
+  class per `packages/core/messages/<language>.json`, and `IdsLocale`) and
+  `packages/flutter/test/generated/ids_message_readers.dart`
 - `packages/flutter/fonts/*` (`packages/core/fonts.build.mjs` copies them from the `pretendard-gov` and
   `geist` npm packages, so the Flutter fonts move with the versions in `packages/core/package.json`)
 
@@ -1343,6 +1344,13 @@ ids_flutter follows ids-react's theme. The design is decided in React; Flutter p
 - IDS styles stay inside IDS components; Material and Cupertino themes are not touched.
 - Widget parameters follow **Props in Flutter** under Component API.
 
-Flutter strings use the generated `IdsMessages` mixin. Consumers supply a slang object through `translation`; component code falls back per member with `t?.spinnerLabel ?? IdsMessages.ko.spinnerLabel`. Edit `packages/core/messages/ko.json` and `en.json`, then run `pnpm codegen`. Do not hand-edit generated Dart messages or catalogs.
+Flutter strings come from the generated `IdsLocale` (`IdsLocale.ko`, `IdsLocale.en`), which pairs a
+`Locale` with an `IdsMessagesBase`. Consumers pass one as `IdsProvider(locale:)`; without it the
+outermost provider takes the shipped messages in the language of `Localizations.maybeLocaleOf`, or
+`IdsLocale.ko`. Component code reads `IdsProvider.of(context).messages.spinnerLabel`. An app changes
+a few strings by extending a shipped class (`extends IdsMessagesEn`) and adds a language by
+extending `IdsMessagesBase`. Edit `packages/core/messages/<language>.json`, then run
+`pnpm codegen`. Do not hand-edit generated Dart messages.
 
-Before Flutter tests or analysis, run `dart run slang` in both `packages/flutter` and `packages/flutter/example` to generate the service fixtures.
+Before the example's tests or analysis, run `dart run slang` in `packages/flutter/example`, which
+uses slang for its own demo strings.
