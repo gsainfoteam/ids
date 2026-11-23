@@ -8,11 +8,11 @@ import {
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
 } from 'react';
 
 import { noop } from 'es-toolkit';
 
+import { useInternalMediaQuery } from '../../../../hooks/use-media-query';
 import { resolveThemeVariables, type ThemeVariables } from '../lib/theme-variables';
 
 import type { IdsMode } from '../../../../tokens/types';
@@ -48,23 +48,6 @@ const DEFAULT_THEME: ThemeContextValue = {
 export const ThemeContext = createContext<ThemeContextValue>(DEFAULT_THEME);
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
-
-function subscribeToScheme(notify: () => void) {
-  const query = window.matchMedia(DARK_QUERY);
-  query.addEventListener('change', notify);
-  return () => query.removeEventListener('change', notify);
-}
-
-const subscribeToNothing = () => noop;
-
-function useInternalPrefersDark(enabled: boolean) {
-  const supported = typeof window !== 'undefined' && typeof window.matchMedia === 'function';
-  return useSyncExternalStore(
-    enabled && supported ? subscribeToScheme : subscribeToNothing,
-    () => enabled && supported && window.matchMedia(DARK_QUERY).matches,
-    () => false,
-  );
-}
 
 type AxisOptions<T> = {
   owned: boolean;
@@ -144,7 +127,7 @@ export function useInternalIdsProvider({
     setInherited: parent.setMode,
   });
 
-  const prefersDark = useInternalPrefersDark(ownsMode && currentMode === 'system');
+  const prefersDark = useInternalMediaQuery(ownsMode && currentMode === 'system' ? DARK_QUERY : null);
   const resolvedMode: IdsMode = !ownsMode
     ? parent.resolvedMode
     : currentMode === 'system'
