@@ -12,8 +12,8 @@ import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Bubble } from '../../components/data/bubble';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -146,7 +146,9 @@ export const PC: Story = {
                         </Item.Title>
                       </Item.Content>
                       <Item.Actions>
-                        <Badge content={shuttle.wait} variant="soft" colorScheme="primary" />
+                        <Chip variant="soft" colorScheme="primary">
+                          {shuttle.wait}
+                        </Chip>
                       </Item.Actions>
                     </Item>
                   ))}

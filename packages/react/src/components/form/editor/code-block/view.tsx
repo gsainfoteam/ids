@@ -10,7 +10,7 @@ import { Divider } from '../../../layout/divider';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { editorStyle } from '../style';
 
-const styles = codeBlockStyle({ variant: 'outline', wrap: false });
+const styles = codeBlockStyle({ variant: 'outline' });
 const { codePre } = editorStyle();
 
 export function EditorCodeBlockView({ node, editor, updateAttributes }: ReactNodeViewProps) {

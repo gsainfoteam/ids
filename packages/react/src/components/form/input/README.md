@@ -6,6 +6,7 @@
 - **검색 입력.** `search` 에는 돋보기 아이콘과 지우기 버튼이 붙습니다. 지우기는 값이 있을 때만 보이고 Escape도 입력을 비웁니다. 모바일 키보드의 확인 키는 "검색"이 됩니다.
 - **주소 입력.** `email` 과 `url` 은 모바일 키보드가 첫 글자를 대문자로 바꾸거나 맞춤법을 고치지 않게 합니다.
 - **Field 그대로.** 라벨, 설명, 오류 연결과 `size`, `disabled`, `required` 상속은 고른 필드가 받습니다.
+- **너비.** 고른 필드처럼 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><Input /></div>`.
 
 ```tsx
 import { Field, Input } from '@gsainfoteam/ids-react';

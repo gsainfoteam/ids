@@ -10,11 +10,11 @@ import {
   SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
+import { noop } from 'es-toolkit';
 
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { CodeBlock } from '../../components/data/code-block';
@@ -120,7 +120,7 @@ export const PC: Story = {
               </Card.Title>
               <Card.Description>사진부 · 초안은 나만 볼 수 있어요</Card.Description>
               <Card.Action>
-                <Badge content="초안" variant="soft" />
+                <Chip variant="soft">초안</Chip>
               </Card.Action>
             </Card.Header>
 
@@ -167,7 +167,9 @@ export const PC: Story = {
                           <Item.Title id={`${tool.id}-title`}>
                             {tool.title}
                             {tool.asks && (
-                              <Badge content="물어보고 써요" variant="soft" colorScheme="warning" />
+                              <Chip variant="soft" colorScheme="warning">
+                                물어보고 써요
+                              </Chip>
                             )}
                           </Item.Title>
                           <Item.Description>{tool.description}</Item.Description>
@@ -218,7 +220,7 @@ export const PC: Story = {
                   name="starters"
                   value={starters}
                   onValueChange={setStarters}
-                  creatable
+                  onCreate={noop}
                   placeholder="문장을 적고 Enter"
                 />
               </Field>
@@ -279,7 +281,8 @@ export const PC: Story = {
             <h2 id="embed" className="text-body-b3-semibold">
               사이트에 붙이기
             </h2>
-            <CodeBlock language="html" title="동아리 홈페이지의 </body> 앞에">
+            <CodeBlock language="html">
+              <CodeBlock.Title>{'동아리 홈페이지의 </body> 앞에'}</CodeBlock.Title>
               {EMBED}
             </CodeBlock>
           </section>

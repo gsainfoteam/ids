@@ -7,6 +7,7 @@ import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { AspectRatio } from '../../layout/aspect-ratio';
 import { Avatar } from '../avatar';
 import { Chip } from '../chip';
 
@@ -28,22 +29,23 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    interactive: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
   args: { variant: 'outline', size: 'standard' },
   render: (args) => (
-    <Card {...args} className="w-80">
-      <Card.Header>
-        <Card.Title>새 프로젝트 만들기</Card.Title>
-        <Card.Description>프로젝트 정보를 입력해주세요.</Card.Description>
-      </Card.Header>
-      <Card.Content>이름과 설명을 채우면 바로 시작할 수 있습니다.</Card.Content>
-      <Card.Footer className="justify-end">
-        <Button variant="outline">취소</Button>
-        <Button>만들기</Button>
-      </Card.Footer>
-    </Card>
+    <div className="w-80">
+      <Card {...args}>
+        <Card.Header>
+          <Card.Title>새 프로젝트 만들기</Card.Title>
+          <Card.Description>프로젝트 정보를 입력해주세요.</Card.Description>
+        </Card.Header>
+        <Card.Content>이름과 설명을 채우면 바로 시작할 수 있습니다.</Card.Content>
+        <Card.Footer>
+          <Button variant="outline">취소</Button>
+          <Button>만들기</Button>
+        </Card.Footer>
+      </Card>
+    </div>
   ),
 } satisfies Meta<typeof Card>;
 
@@ -51,6 +53,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="w-80">
+      <Card>
+        <Card.Header>
+          <Card.Title>알림 설정</Card.Title>
+          <Card.Description>받을 알림을 고릅니다.</Card.Description>
+        </Card.Header>
+        <Card.Content>메일과 푸시로 받습니다.</Card.Content>
+      </Card>
+    </div>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -60,24 +76,26 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <Card variant={variant} size={size} className="w-56">
-              <Card.Header>
-                <Card.Title>{variant}</Card.Title>
-                <Card.Description>size {size}</Card.Description>
-                <Card.Action>
-                  <IconButton
-                    aria-label="더보기"
-                    variant="outline"
-                    size="tiny"
-                    icon={<EllipsisHorizontalIcon />}
-                  />
-                </Card.Action>
-              </Card.Header>
-              <Card.Content>본문</Card.Content>
-              <Card.Footer>
-                <Button size="tiny">확인</Button>
-              </Card.Footer>
-            </Card>
+            <div className="w-56">
+              <Card variant={variant} size={size}>
+                <Card.Header>
+                  <Card.Title>{variant}</Card.Title>
+                  <Card.Description>size {size}</Card.Description>
+                  <Card.Action>
+                    <IconButton
+                      aria-label="더보기"
+                      variant="outline"
+                      size="tiny"
+                      icon={<EllipsisHorizontalIcon />}
+                    />
+                  </Card.Action>
+                </Card.Header>
+                <Card.Content>본문</Card.Content>
+                <Card.Footer>
+                  <Button size="tiny">확인</Button>
+                </Card.Footer>
+              </Card>
+            </div>
           )}
         />
       </Showcase.Section>
@@ -87,138 +105,181 @@ export const Gallery: Story = {
         description="Card.Media는 가장자리까지 채우고, 닿는 모서리는 카드의 둥근 모서리를 따릅니다. outline의 테두리는 가리지 않습니다."
       >
         <Showcase.Row label="first">
-          <Card className="w-64">
-            <Card.Media className="aspect-video">
-              <img src={PHOTO} alt="" />
-            </Card.Media>
-            <Card.Header>
-              <Card.Title>산책로 사진집</Card.Title>
-              <Card.Description>₩24,000</Card.Description>
-            </Card.Header>
-            <Card.Footer>
-              <Button className="w-full">장바구니</Button>
-            </Card.Footer>
-          </Card>
-          <Card variant="soft" className="w-64">
-            <Card.Media className="aspect-video">
-              <img src={PHOTO} alt="" />
-            </Card.Media>
-            <Card.Header>
-              <Card.Title>산책로 사진집</Card.Title>
-              <Card.Description>₩24,000</Card.Description>
-            </Card.Header>
-            <Card.Footer>
-              <Button className="w-full">장바구니</Button>
-            </Card.Footer>
-          </Card>
+          <div className="w-64">
+            <Card>
+              <Card.Media>
+                <AspectRatio ratio={16 / 9}>
+                  <img src={PHOTO} alt="" />
+                </AspectRatio>
+              </Card.Media>
+              <Card.Header>
+                <Card.Title>산책로 사진집</Card.Title>
+                <Card.Description>₩24,000</Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <div className="grid flex-1">
+                  <Button>장바구니</Button>
+                </div>
+              </Card.Footer>
+            </Card>
+          </div>
+          <div className="w-64">
+            <Card variant="soft">
+              <Card.Media>
+                <AspectRatio ratio={16 / 9}>
+                  <img src={PHOTO} alt="" />
+                </AspectRatio>
+              </Card.Media>
+              <Card.Header>
+                <Card.Title>산책로 사진집</Card.Title>
+                <Card.Description>₩24,000</Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <div className="grid flex-1">
+                  <Button>장바구니</Button>
+                </div>
+              </Card.Footer>
+            </Card>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="middle · last">
-          <Card className="w-64">
-            <Card.Header>
-              <Card.Title>주말 산책</Card.Title>
-              <Card.Description>사진 3장</Card.Description>
-            </Card.Header>
-            <Card.Media className="aspect-video">
-              <img src={PHOTO} alt="" />
-            </Card.Media>
-            <Card.Footer>
-              <Button variant="outline" size="tiny">
-                <HeartIcon />
-                좋아요
-              </Button>
-            </Card.Footer>
-          </Card>
-          <Card className="w-64">
-            <Card.Header>
-              <Card.Title>마지막에 오는 사진</Card.Title>
-            </Card.Header>
-            <Card.Media className="aspect-video">
-              <img src={PHOTO} alt="" />
-            </Card.Media>
-          </Card>
+          <div className="w-64">
+            <Card>
+              <Card.Header>
+                <Card.Title>주말 산책</Card.Title>
+                <Card.Description>사진 3장</Card.Description>
+              </Card.Header>
+              <Card.Media>
+                <AspectRatio ratio={16 / 9}>
+                  <img src={PHOTO} alt="" />
+                </AspectRatio>
+              </Card.Media>
+              <Card.Footer>
+                <Button variant="outline" size="tiny">
+                  <HeartIcon />
+                  좋아요
+                </Button>
+              </Card.Footer>
+            </Card>
+          </div>
+          <div className="w-64">
+            <Card>
+              <Card.Header>
+                <Card.Title>마지막에 오는 사진</Card.Title>
+              </Card.Header>
+              <Card.Media>
+                <AspectRatio ratio={16 / 9}>
+                  <img src={PHOTO} alt="" />
+                </AspectRatio>
+              </Card.Media>
+            </Card>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section
         title="Sections"
-        description="Header에 border-b를 주면 카드 너비만큼 구분선이 그어지고 간격이 맞춰집니다. Footer는 늘 위쪽 선과 옅은 배경의 띠로 카드 바닥을 채웁니다."
+        description="Footer는 늘 위쪽 선과 옅은 배경의 띠로 카드 바닥을 채우고, 버튼을 끝에 모읍니다."
       >
-        <Showcase.Row label="dividers">
-          <Card className="w-72">
-            <Card.Header className="border-b">
-              <Card.Title>알림 설정</Card.Title>
-              <Card.Description>받을 알림을 고릅니다.</Card.Description>
-            </Card.Header>
-            <Card.Content>메일, 푸시, 문자</Card.Content>
-            <Card.Footer className="justify-end">
-              <Button size="tiny">저장</Button>
-            </Card.Footer>
-          </Card>
-        </Showcase.Row>
         <Showcase.Row label="stat">
-          <Card className="w-64">
-            <Card.Header>
-              <Card.Description>이번 달 매출</Card.Description>
-              <Card.Title className="text-headline-h4-bold">₩12,345,678</Card.Title>
-              <Card.Action>
-                <Chip size="tiny" colorScheme="success">
-                  +12.5%
-                </Chip>
-              </Card.Action>
-            </Card.Header>
-          </Card>
+          <div className="w-64">
+            <Card>
+              <Card.Header>
+                <Card.Description>이번 달 매출</Card.Description>
+                <Card.Title>
+                  <span className="text-headline-h4-bold">₩12,345,678</span>
+                </Card.Title>
+                <Card.Action>
+                  <Chip size="tiny" colorScheme="success">
+                    +12.5%
+                  </Chip>
+                </Card.Action>
+              </Card.Header>
+            </Card>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
-      <Showcase.Section title="Interactive">
+      <Showcase.Section
+        title="Interactive"
+        description="onClick 이 있거나 asChild 의 자식에 href 가 있으면 누를 수 있는 카드가 됩니다."
+      >
         <Showcase.Row label="onClick">
-          <Card onClick={() => {}} className="w-64">
-            <Card.Media className="aspect-video">
-              <img src={PHOTO} alt="" />
-            </Card.Media>
-            <Card.Header>
-              <Card.Title>산책로 사진집</Card.Title>
-              <Card.Description>₩24,000</Card.Description>
-            </Card.Header>
-            <Card.Footer>
-              <Button className="w-full">장바구니</Button>
-            </Card.Footer>
-          </Card>
-          <Card onClick={() => {}} disabled className="w-64">
-            <Card.Media className="aspect-video">
-              <img src={PHOTO} alt="" />
-            </Card.Media>
-            <Card.Header>
-              <Card.Title>산책로 사진집</Card.Title>
-              <Card.Description>₩24,000</Card.Description>
-            </Card.Header>
-            <Card.Footer>
-              <Button className="w-full">장바구니</Button>
-            </Card.Footer>
-          </Card>
+          <div className="w-64">
+            <Card onClick={() => {}}>
+              <Card.Media>
+                <AspectRatio ratio={16 / 9}>
+                  <img src={PHOTO} alt="" />
+                </AspectRatio>
+              </Card.Media>
+              <Card.Header>
+                <Card.Title>산책로 사진집</Card.Title>
+                <Card.Description>₩24,000</Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <div className="grid flex-1">
+                  <Button>장바구니</Button>
+                </div>
+              </Card.Footer>
+            </Card>
+          </div>
+          <div className="w-64">
+            <Card onClick={() => {}} disabled>
+              <Card.Media>
+                <AspectRatio ratio={16 / 9}>
+                  <img src={PHOTO} alt="" />
+                </AspectRatio>
+              </Card.Media>
+              <Card.Header>
+                <Card.Title>산책로 사진집</Card.Title>
+                <Card.Description>₩24,000</Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <div className="grid flex-1">
+                  <Button>장바구니</Button>
+                </div>
+              </Card.Footer>
+            </Card>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="asChild link">
+          <div className="w-64">
+            <Card asChild>
+              <a href="#walk">
+                <Card.Header>
+                  <Card.Title>주말 산책</Card.Title>
+                  <Card.Description>사진 3장</Card.Description>
+                </Card.Header>
+              </a>
+            </Card>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Anatomy: Story = {
+export const PutAnActionInTheHeader: Story = {
   render: () => (
-    <Card className="w-80">
-      <Card.Header>
-        <Card.Title>팀 초대</Card.Title>
-        <Card.Description>링크를 가진 사람은 누구나 들어올 수 있습니다.</Card.Description>
-        <Card.Action>
-          <Button variant="outline" size="tiny">
-            링크 복사
-          </Button>
-        </Card.Action>
-      </Card.Header>
-      <Card.Content className="flex items-center gap-2">
-        <Avatar name="Alice Kim" size="tiny" />
-        <span>Alice Kim 외 3명</span>
-      </Card.Content>
-    </Card>
+    <div className="w-80">
+      <Card>
+        <Card.Header>
+          <Card.Title>팀 초대</Card.Title>
+          <Card.Description>링크를 가진 사람은 누구나 들어올 수 있습니다.</Card.Description>
+          <Card.Action>
+            <Button variant="outline" size="tiny">
+              링크 복사
+            </Button>
+          </Card.Action>
+        </Card.Header>
+        <Card.Content>
+          <div className="flex items-center gap-2">
+            <Avatar name="Alice Kim" size="tiny" />
+            <span>Alice Kim 외 3명</span>
+          </div>
+        </Card.Content>
+      </Card>
+    </div>
   ),
   parameters: {
     docs: {
@@ -239,33 +300,45 @@ export const Anatomy: Story = {
   },
 };
 
-export const MediaBleed: Story = {
+export const ShowAPhotoEdgeToEdge: Story = {
   render: () => (
     <div className="flex gap-4">
-      <Card className="w-64">
-        <Card.Media className="aspect-video">
-          <img src={PHOTO} alt="" />
-        </Card.Media>
-        <Card.Header>
-          <Card.Title>산책로 사진집</Card.Title>
-          <Card.Description>₩24,000</Card.Description>
-        </Card.Header>
-        <Card.Footer>
-          <Button className="w-full">장바구니</Button>
-        </Card.Footer>
-      </Card>
-      <Card variant="soft" className="w-64">
-        <Card.Media className="aspect-video">
-          <img src={PHOTO} alt="" />
-        </Card.Media>
-        <Card.Header>
-          <Card.Title>산책로 사진집</Card.Title>
-          <Card.Description>₩24,000</Card.Description>
-        </Card.Header>
-        <Card.Footer>
-          <Button className="w-full">장바구니</Button>
-        </Card.Footer>
-      </Card>
+      <div className="w-64">
+        <Card>
+          <Card.Media>
+            <AspectRatio ratio={16 / 9}>
+              <img src={PHOTO} alt="" />
+            </AspectRatio>
+          </Card.Media>
+          <Card.Header>
+            <Card.Title>산책로 사진집</Card.Title>
+            <Card.Description>₩24,000</Card.Description>
+          </Card.Header>
+          <Card.Footer>
+            <div className="grid flex-1">
+              <Button>장바구니</Button>
+            </div>
+          </Card.Footer>
+        </Card>
+      </div>
+      <div className="w-64">
+        <Card variant="soft">
+          <Card.Media>
+            <AspectRatio ratio={16 / 9}>
+              <img src={PHOTO} alt="" />
+            </AspectRatio>
+          </Card.Media>
+          <Card.Header>
+            <Card.Title>산책로 사진집</Card.Title>
+            <Card.Description>₩24,000</Card.Description>
+          </Card.Header>
+          <Card.Footer>
+            <div className="grid flex-1">
+              <Button>장바구니</Button>
+            </div>
+          </Card.Footer>
+        </Card>
+      </div>
     </div>
   ),
   parameters: {
@@ -288,25 +361,27 @@ export const MediaBleed: Story = {
   },
 };
 
-export const Interactive: Story = {
+export const OpenTheCardFromAnywhere: Story = {
   args: { onClick: fn() },
   render: function Render(args) {
     const [liked, setLiked] = useState(0);
 
     return (
       <div className="flex flex-col items-start gap-3">
-        <Card className="w-72" onClick={args.onClick}>
-          <Card.Header>
-            <Card.Title>디자인 리뷰</Card.Title>
-            <Card.Description>오늘 오후 3시, 회의실 B</Card.Description>
-          </Card.Header>
-          <Card.Footer>
-            <Button variant="outline" size="tiny" onClick={() => setLiked((count) => count + 1)}>
-              <HeartIcon />
-              관심
-            </Button>
-          </Card.Footer>
-        </Card>
+        <div className="w-72">
+          <Card onClick={args.onClick}>
+            <Card.Header>
+              <Card.Title>디자인 리뷰</Card.Title>
+              <Card.Description>오늘 오후 3시, 회의실 B</Card.Description>
+            </Card.Header>
+            <Card.Footer>
+              <Button variant="outline" size="tiny" onClick={() => setLiked((count) => count + 1)}>
+                <HeartIcon />
+                관심
+              </Button>
+            </Card.Footer>
+          </Card>
+        </div>
         <output aria-label="관심 수">{liked}</output>
       </div>
     );
@@ -335,22 +410,24 @@ export const Interactive: Story = {
   },
 };
 
-export const LinkCard: Story = {
+export const MakeTheWholeCardALink: Story = {
   render: () => (
-    <Card asChild className="w-72">
-      <a href="#design-review">
-        <Card.Header>
-          <Card.Title>디자인 리뷰</Card.Title>
-          <Card.Description>회의록 보기</Card.Description>
-        </Card.Header>
-      </a>
-    </Card>
+    <div className="w-72">
+      <Card asChild>
+        <a href="#design-review">
+          <Card.Header>
+            <Card.Title>디자인 리뷰</Card.Title>
+            <Card.Description>회의록 보기</Card.Description>
+          </Card.Header>
+        </a>
+      </Card>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '`asChild` 로 카드 전체를 링크로 만듭니다. 링크는 원래 키보드와 포커스를 갖고 있으므로 role을 덧씌우지 않고, 이름은 제목으로 좁힙니다.',
+          '`asChild` 로 카드 전체를 링크로 만듭니다. 자식에 `href` 가 있으면 누를 수 있는 모양이 따로 켜지지 않아도 붙습니다. 링크는 원래 키보드와 포커스를 갖고 있으므로 role을 덧씌우지 않고, 이름은 제목으로 좁힙니다.',
       },
     },
   },
@@ -363,13 +440,56 @@ export const LinkCard: Story = {
   },
 };
 
-export const Disabled: Story = {
+export const DisableAPressableCard: Story = {
   args: { onClick: fn(), disabled: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`onClick` 이 있는 카드에 `disabled` 를 주면 제목 버튼이 disabled 가 되고 카드는 `aria-disabled` 로 흐려집니다. 카드 어디를 눌러도 불리지 않습니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent, args }) => {
     const title = canvas.getByRole('button', { name: '새 프로젝트 만들기' });
     await expect(title).toBeDisabled();
     await expect(title.closest('[data-card]')).toHaveAttribute('aria-disabled', 'true');
     await userEvent.click(canvas.getByText('프로젝트 정보를 입력해주세요.'));
     await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+export const DrawALineUnderTheHeader: Story = {
+  tags: ['custom-design'],
+  render: () => (
+    <div className="w-72">
+      <Card>
+        <Card.Header className="border-b">
+          <Card.Title>알림 설정</Card.Title>
+          <Card.Description>받을 알림을 고릅니다.</Card.Description>
+        </Card.Header>
+        <Card.Content>메일, 푸시, 문자</Card.Content>
+        <Card.Footer>
+          <Button size="tiny">저장</Button>
+        </Card.Footer>
+      </Card>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '헤더 아래 구분선은 아직 정해진 API 가 없어, 이 이야기만 `Card.Header` 에 `border-b` 를 줍니다. 선은 카드 너비만큼 그어지고 아래 간격이 카드의 간격과 맞습니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const card = canvasElement.querySelector<HTMLElement>('[data-card]')!;
+    const header = card.querySelector<HTMLElement>('[data-card-header]')!;
+    await expect(getComputedStyle(header).borderBottomWidth).toBe('1px');
+    await expect(header.getBoundingClientRect().width).toBeCloseTo(
+      card.getBoundingClientRect().width,
+      0,
+    );
   },
 };

@@ -68,7 +68,6 @@ export type UseNumberFieldOptions = {
   largeStep?: number;
   locale: string;
   formatOptions?: NumberFieldFormatOptions;
-  allowWheelScrub: boolean;
   disabled?: boolean;
   invalid?: boolean;
   clearable: boolean;
@@ -129,7 +128,6 @@ export function useNumberField({
   largeStep,
   locale,
   formatOptions,
-  allowWheelScrub,
   disabled: disabledProp,
   invalid,
   clearable,
@@ -307,19 +305,6 @@ export function useNumberField({
     input.addEventListener('beforeinput', refuseWithCaretInPlace);
     return () => input.removeEventListener('beforeinput', refuseWithCaretInPlace);
   }, []);
-
-  useEffect(() => {
-    const input = inputRef.current;
-    if (!input || !allowWheelScrub) return;
-    const scrubInsteadOfScrolling = (event: WheelEvent) => {
-      if (input.ownerDocument.activeElement !== input || event.ctrlKey || event.metaKey) return;
-      if (Math.abs(event.deltaY) < Math.abs(event.deltaX) || event.deltaY === 0) return;
-      event.preventDefault();
-      latest.current.stepBy(event.deltaY < 0 ? 1 : -1, event.shiftKey ? large : stepSize);
-    };
-    input.addEventListener('wheel', scrubInsteadOfScrolling, { passive: false });
-    return () => input.removeEventListener('wheel', scrubInsteadOfScrolling);
-  }, [allowWheelScrub, large, stepSize]);
 
   useFormReset(inputRef, () => {
     if (value === undefined) setCurrent(defaultValue);

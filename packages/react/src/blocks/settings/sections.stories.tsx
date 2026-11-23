@@ -8,8 +8,8 @@ import {
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
@@ -227,7 +227,9 @@ export const PC: Story = {
                 </Item.Content>
                 <Item.Actions>
                   {device.current ? (
-                    <Badge content="이 기기" variant="soft" colorScheme="primary" />
+                    <Chip variant="soft" colorScheme="primary">
+                      이 기기
+                    </Chip>
                   ) : (
                     <Button
                       variant="outline"

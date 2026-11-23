@@ -9,6 +9,7 @@ import type { colorFieldStyle } from './style';
 import type { useColorField } from './use-color-field';
 import type { IdsSize } from '../../../tokens/types';
 import type { ColorPicker } from '../../data/color-picker';
+import type { PickerDefaults } from '../../data/color-picker/context';
 
 type ColorFieldContextValue = {
   field: Omit<ReturnType<typeof useColorField>, 'rootRef' | 'triggerRef'>;
@@ -16,7 +17,7 @@ type ColorFieldContextValue = {
   placeholder: string;
   triggerProps: Record<string, unknown>;
   valueId: string;
-  picker: ComponentProps<typeof ColorPicker>;
+  picker: ComponentProps<typeof ColorPicker> & PickerDefaults;
   size: IdsSize;
   styles: ReturnType<typeof colorFieldStyle>;
 };

@@ -8,6 +8,7 @@
 - **격자와 범위.** `step` 을 주면 입력을 마칠 때 `min` 에서 시작하는 격자에 맞추고, 범위를 넘은 값은 범위 안으로 맞춥니다. 범위 밖의 값은 native 검증에도 걸려서 폼이 제출을 막습니다.
 - **로케일 형식과 붙여넣기.** `@internationalized/number` 로 로케일에 맞게 보여 주고 읽습니다. 보이는 글자를 그대로 고치면 되고, 붙여 넣은 `1.234,5 €`, `($123.50)`, `１２`, 아랍 숫자도 숫자로 읽습니다.
 - **모바일 키보드.** 음수가 들어갈 수 있으면 iOS에서도 마이너스가 있는 키보드를 띄우고, 정수만 받으면 숫자 키패드를 띄웁니다.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-72"><NumberField /></div>`.
 
 ```tsx
 import { Field, NumberField } from '@gsainfoteam/ids-react';
@@ -68,42 +69,47 @@ const [seats, setSeats] = useState<number | null>(2);
 ## 버튼
 
 ```tsx
-<NumberField />                                {/* 끝에 위아래 버튼이 붙는다 */}
-<NumberField hideStepper />                    {/* 버튼 없이 */}
+<NumberField />                                {/* 파트를 쓰지 않으면 끝에 위아래 버튼이 붙는다 */}
+
+<NumberField>
+  <NumberField.Input />                        {/* 파트를 하나라도 쓰면 쓴 것만 그린다: 버튼 없이 */}
+</NumberField>
 
 <NumberField>
   <NumberField.Decrement />                    {/* 입력 양옆에 −, + */}
-  <NumberField.Input className="text-center" />
+  <NumberField.Input />
   <NumberField.Increment />
 </NumberField>
 
-<NumberField incrementLabel="인원 늘리기" decrementLabel="인원 줄이기" />
+<NumberField>
+  <NumberField.Input />
+  <NumberField.Stepper>                        {/* 위아래 버튼의 이름을 바꾼다 */}
+    <NumberField.Increment aria-label="인원 늘리기" />
+    <NumberField.Decrement aria-label="인원 줄이기" />
+  </NumberField.Stepper>
+</NumberField>
 ```
+
+- 파트는 `Input`, `Stepper`, `Increment`, `Decrement`, `Clear` 입니다. 단위 글자나 아이콘 같은 장식은 파트가 아니라서, 장식만 넣으면 위아래 버튼이 그대로 붙습니다.
+- 버튼의 기본 이름은 "값 늘리기", "값 줄이기" 입니다. `IdsProvider` 의 `translate` 가 `numberField.increment`, `numberField.decrement` 로 바꿉니다.
 
 - 버튼은 탭 순서에 없습니다. 키보드에서는 입력의 ↑↓가 같은 일을 합니다.
 - 경계에 닿으면 그쪽 버튼이 비활성이 됩니다.
 - 누르고 있으면 계속 바뀌고, 떼거나 포인터가 취소되면 멈춥니다.
 
-## 휠
-
-```tsx
-<NumberField allowWheelScrub />                // 포커스가 있을 때만 휠로 증감. Shift는 largeStep
-```
-
-- 켜면 포커스가 있는 입력 위에서 휠이 페이지 대신 값을 바꿉니다. 그래서 기본은 꺼져 있습니다.
-- `Ctrl`·`⌘` + 휠은 브라우저 확대로 남겨 둡니다.
-
 ## 형식
 
 ```tsx
-<NumberField defaultValue={1234.567} locale="de-DE" formatOptions={{ style: 'currency', currency: 'EUR' }} />
-// "1.234,57 €". 포커스해도 이 글자를 그대로 고친다. 값은 1234.567 그대로다
+<IdsProvider theme={theme} locale="de-DE">
+  <NumberField defaultValue={1234.567} formatOptions={{ style: 'currency', currency: 'EUR' }} />
+  {/* "1.234,57 €". 포커스해도 이 글자를 그대로 고친다. 값은 1234.567 그대로다 */}
+</IdsProvider>
 
 <NumberField defaultValue={0.125} formatOptions={{ style: 'percent', minimumFractionDigits: 1 }} />
 // "12.5%". 퍼센트로 입력한다: "25" 나 "25%" 는 0.25
 ```
 
-- `locale` 기본값은 `en-US` 입니다. SSR과 브라우저가 같은 글자를 그리게 하기 위해서입니다.
+- 숫자 형식은 가장 가까운 `IdsProvider` 의 `locale` 을 따르고, 없으면 `en-US` 입니다. SSR과 브라우저가 같은 글자를 그리게 하기 위해서입니다.
 - 형식의 반올림은 보이는 글자와 `aria-valuetext` 에만 씁니다. 글자를 고치지 않으면 값은 그대로입니다.
 - `notation` 은 `standard` 만 됩니다. `1.2E-6` 이나 `1.2K` 는 다시 숫자로 읽을 수 없기 때문입니다.
 
@@ -114,20 +120,14 @@ const [seats, setSeats] = useState<number | null>(2);
   <NumberField.Input />
   <span>kg</span>                              {/* Input 뒤 = 뒤쪽 */}
   <NumberField.Clear />                        {/* 값이 있을 때만. 누르거나 Escape면 null */}
-  <NumberField.Stepper />                      {/* 직접 두면 그 자리에 놓인다 */}
+  <NumberField.Stepper />                      {/* 파트를 썼으니 버튼도 직접 둔다. 둔 자리에 놓인다 */}
 </NumberField>
 ```
 
 ## 상태
 
-| 속성                                             | 뜻                                 |
-| ------------------------------------------------ | ---------------------------------- |
-| `data-focused`, `data-filled`                    | 포커스가 필드 안에 있다, 값이 있다 |
-| `data-invalid`                                   | `invalid`, `aria-invalid`, 범위 밖 |
-| `data-disabled`, `data-readonly`                 | 비활성, 읽기 전용                  |
-| `data-size`, `data-variant`                      | 크기와 variant                     |
-
-- 테두리 컨테이너(`data-number-field`)에 붙습니다. `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+- 값은 `value` / `defaultValue` / `onValueChange` 로 읽고 씁니다. 범위 밖이면 native 검증(`validity`)과 `Field.Error` 가 알립니다.
+- `className` 과 `style` 에 상태(`focused`, `filled`, `invalid`, `disabled`, `readOnly`, `size`, `variant`)를 받는 함수를 줄 수 있습니다. 새 디자인을 만들 때만 씁니다.
 
 ## react-hook-form + Zod
 
@@ -158,16 +158,12 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 | `min` / `max`                         | 제한 없음. `min <= max`                                       |
 | `step`                                | ↑↓ 단위. 주면 격자에 맞춘다                                   |
 | `smallStep` / `largeStep`             | `step` ÷ 10 / `step` × 10. 양수                               |
-| `locale` / `formatOptions`            | `en-US` / `Intl.NumberFormat` 옵션. `notation` 제외           |
-| `allowWheelScrub`                     | `false`                                                       |
-| `hideStepper`                         | `false`. 자동 버튼만 숨긴다                                   |
-| `incrementLabel` / `decrementLabel`   | "값 늘리기" / "값 줄이기"                                     |
+| `formatOptions`                       | `Intl.NumberFormat` 옵션. `notation` 제외. locale 은 provider |
 | `variant`                             | `outline`(기본) / `soft` / `ghost`                            |
 | `size`                                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |
 | `disabled` / `readOnly`               | 입력과 버튼의 변경을 모두 막는다                              |
 | `name` / `form`                       | hidden input이 숫자 문자열을 제출한다. 빈 값은 `""`           |
-| `className` / `style`                 | 컨테이너로 간다. 상태를 받는 함수도 된다                      |
 | 그 외 native 속성, ref                 | 실제 input으로 간다                                           |
 
 ## 알아둘 것

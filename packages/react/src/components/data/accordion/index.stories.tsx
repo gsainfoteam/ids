@@ -72,6 +72,23 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-full max-w-md">
+      <Accordion type="single" defaultValue="shipping">
+        <Accordion.Item value="shipping">
+          <Accordion.Trigger>배송은 얼마나 걸리나요?</Accordion.Trigger>
+          <Accordion.Content>일반 배송 2~3일, 빠른 배송 1일.</Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="returns">
+          <Accordion.Trigger>반품이 가능한가요?</Accordion.Trigger>
+          <Accordion.Content>구매 후 14일 안에 반품할 수 있습니다.</Accordion.Content>
+        </Accordion.Item>
+      </Accordion>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -168,14 +185,14 @@ export const Gallery: Story = {
             <Accordion type="multiple" variant="ghost" defaultValue={['src']}>
               <Accordion.Item value="src">
                 <Accordion.Trigger>
-                  <Accordion.Indicator className="-rotate-90 data-open:rotate-0" />
+                  <Accordion.Indicator />
                   src
                 </Accordion.Trigger>
                 <Accordion.Content>components, hooks, utils</Accordion.Content>
               </Accordion.Item>
               <Accordion.Item value="tests">
                 <Accordion.Trigger>
-                  <Accordion.Indicator className="-rotate-90 data-open:rotate-0" />
+                  <Accordion.Indicator />
                   tests
                 </Accordion.Trigger>
                 <Accordion.Content>accordion.test.mjs</Accordion.Content>
@@ -190,7 +207,7 @@ export const Gallery: Story = {
                 <Accordion.Item key={value} value={value}>
                   <Accordion.Trigger>
                     {value === 'a' ? '회원 혜택' : '포인트 적립'}
-                    <Accordion.Indicator className="rotate-0! transition-none">
+                    <Accordion.Indicator>
                       {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
                     </Accordion.Indicator>
                   </Accordion.Trigger>
@@ -207,7 +224,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Single: Story = {
+export const OpenOneSectionAtATime: Story = {
   args: { defaultValue: undefined },
   parameters: {
     docs: {
@@ -232,7 +249,7 @@ export const Single: Story = {
   },
 };
 
-export const NotCollapsible: Story = {
+export const KeepOneSectionOpen: Story = {
   args: { collapsible: false },
   parameters: {
     docs: {
@@ -253,7 +270,7 @@ export const NotCollapsible: Story = {
   },
 };
 
-export const Multiple: Story = {
+export const OpenAndCloseEverySectionAtOnce: Story = {
   render: function Render() {
     const [opened, setOpened] = useState<string[]>(['general']);
 
@@ -315,7 +332,93 @@ export const Multiple: Story = {
   },
 };
 
+export const DrawPlusAndMinusInsteadOfAChevron: Story = {
+  render: () => (
+    <div className="w-full max-w-md">
+      <Accordion type="single" variant="soft" defaultValue="a">
+        {['a', 'b'].map((value) => (
+          <Accordion.Item key={value} value={value}>
+            <Accordion.Trigger>
+              {value === 'a' ? '회원 혜택' : '포인트 적립'}
+              <Accordion.Indicator>
+                {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
+              </Accordion.Indicator>
+            </Accordion.Trigger>
+            <Accordion.Content>Indicator의 children은 상태를 받는 함수도 됩니다.</Accordion.Content>
+          </Accordion.Item>
+        ))}
+      </Accordion>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Indicator에 children을 주면 기본 chevron 대신 그것을 그립니다. children은 섹션 상태를 받는 함수가 될 수 있어, 열림에 따라 아이콘을 바꿉니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const second = canvas.getByRole('button', { name: /포인트 적립/ });
+    await expect(second.querySelectorAll('svg')).toHaveLength(1);
+    await userEvent.click(second);
+    await expect(second).toHaveAttribute('data-open');
+  },
+};
+
+export const PutTheHeaderInAnH2: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Trigger 는 기본으로 `h3` 안에 놓입니다. 페이지 제목 바로 아래라면 `Accordion.Header asChild` 로 `h2` 를 넣습니다.',
+      },
+    },
+  },
+  render: () => (
+    <Accordion type="single">
+      <Accordion.Item value="shipping">
+        <Accordion.Header asChild>
+          <h2>
+            <Accordion.Trigger>배송은 얼마나 걸리나요?</Accordion.Trigger>
+          </h2>
+        </Accordion.Header>
+        <Accordion.Content>일반 배송 2~3일, 빠른 배송 1일.</Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  ),
+  play: async ({ canvas }) => {
+    const heading = canvas.getByRole('heading', { level: 2, name: /배송은/ });
+    await expect(heading).toContainElement(canvas.getByRole('button', { name: /배송은/ }));
+  },
+};
+
+export const FindInPage: Story = {
+  tags: ['verification'],
+  args: { defaultValue: undefined },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '닫힌 내용은 `hidden="until-found"` 로 숨어 있어 브라우저의 페이지 내 찾기(⌘F)가 찾아냅니다. 찾으면 그 섹션이 저절로 열립니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const returns = () => canvas.getByRole('button', { name: /반품이/ });
+    const panel = () =>
+      canvasElement.querySelector<HTMLElement>(
+        `#${CSS.escape(returns().getAttribute('aria-controls')!)}`,
+      )!;
+    await waitFor(() => expect(panel()).toHaveAttribute('hidden', 'until-found'));
+    panel().dispatchEvent(new Event('beforematch', { bubbles: true }));
+    await waitFor(() => expect(returns()).toHaveAttribute('aria-expanded', 'true'));
+    await expect(panel()).not.toHaveAttribute('hidden');
+  },
+};
+
 export const Keyboard: Story = {
+  tags: ['verification'],
   args: { defaultValue: undefined },
   render: (args) => (
     <div className="w-full max-w-md">
@@ -360,90 +463,5 @@ export const Keyboard: Story = {
     await expect(first).toHaveAttribute('aria-expanded', 'true');
     await userEvent.keyboard(' ');
     await expect(first).toHaveAttribute('aria-expanded', 'false');
-  },
-};
-
-export const FindInPage: Story = {
-  args: { defaultValue: undefined },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '닫힌 내용은 `hidden="until-found"` 로 숨어 있어 브라우저의 페이지 내 찾기(⌘F)가 찾아냅니다. 찾으면 그 섹션이 저절로 열립니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement }) => {
-    const returns = () => canvas.getByRole('button', { name: /반품이/ });
-    const panel = () =>
-      canvasElement.querySelector<HTMLElement>(
-        `#${CSS.escape(returns().getAttribute('aria-controls')!)}`,
-      )!;
-    await waitFor(() => expect(panel()).toHaveAttribute('hidden', 'until-found'));
-    panel().dispatchEvent(new Event('beforematch', { bubbles: true }));
-    await waitFor(() => expect(returns()).toHaveAttribute('aria-expanded', 'true'));
-    await expect(panel()).not.toHaveAttribute('hidden');
-  },
-};
-
-export const CustomIndicator: Story = {
-  render: () => (
-    <div className="w-full max-w-md">
-      <Accordion type="single" variant="soft" defaultValue="a">
-        {['a', 'b'].map((value) => (
-          <Accordion.Item key={value} value={value}>
-            <Accordion.Trigger>
-              {value === 'a' ? '회원 혜택' : '포인트 적립'}
-              <Accordion.Indicator className="rotate-0! transition-none">
-                {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
-              </Accordion.Indicator>
-            </Accordion.Trigger>
-            <Accordion.Content>Indicator의 children은 상태를 받는 함수도 됩니다.</Accordion.Content>
-          </Accordion.Item>
-        ))}
-      </Accordion>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Indicator를 넣으면 기본 chevron 대신 그것을 씁니다. children, className, style은 섹션 상태를 받는 함수가 될 수 있습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const second = canvas.getByRole('button', { name: /포인트 적립/ });
-    await expect(second.querySelectorAll('svg')).toHaveLength(1);
-    await userEvent.click(second);
-    await expect(second).toHaveAttribute('data-open');
-  },
-};
-
-export const HeadingTag: Story = {
-  args: { type: 'single' },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Trigger 는 기본으로 `h3` 안에 놓입니다. 페이지 제목 바로 아래라면 `Accordion.Header asChild` 로 `h2` 를 넣습니다.',
-      },
-    },
-  },
-  render: () => (
-    <Accordion type="single">
-      <Accordion.Item value="shipping">
-        <Accordion.Header asChild>
-          <h2>
-            <Accordion.Trigger>배송은 얼마나 걸리나요?</Accordion.Trigger>
-          </h2>
-        </Accordion.Header>
-        <Accordion.Content>일반 배송 2~3일, 빠른 배송 1일.</Accordion.Content>
-      </Accordion.Item>
-    </Accordion>
-  ),
-  play: async ({ canvas }) => {
-    const heading = canvas.getByRole('heading', { level: 2, name: /배송은/ });
-    await expect(heading).toContainElement(canvas.getByRole('button', { name: /배송은/ }));
   },
 };

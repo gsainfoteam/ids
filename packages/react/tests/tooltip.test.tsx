@@ -22,15 +22,29 @@ function ShownAfterPress({ children }: { children: ReactNode }) {
   return shown ? children : <Button onClick={() => setShown(true)}>Show</Button>;
 }
 
+function Tip({
+  content,
+  side,
+  children,
+  ...props
+}: Tooltip.Props & { content: ReactNode; side?: Tooltip.Side }) {
+  return (
+    <Tooltip {...props}>
+      <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
+      <Tooltip.Content side={side}>{content}</Tooltip.Content>
+    </Tooltip>
+  );
+}
+
 const nextFrames = async (count = 3) => {
   for (let frame = 0; frame < count; frame++) await new Promise(requestAnimationFrame);
 };
 
 test('SSR renders only the trigger', () => {
   const html = renderToString(
-    <Tooltip content="Save changes">
+    <Tip content="Save changes">
       <button type="button">Save</button>
-    </Tooltip>,
+    </Tip>,
   );
   expect(html).toContain('Save');
   expect(html).not.toContain('Save changes');
@@ -40,9 +54,9 @@ test('hovering opens after the delay, and leaving closes', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
     <Scene>
-      <Tooltip content="Save changes" onOpenChange={onOpenChange}>
+      <Tip content="Save changes" onOpenChange={onOpenChange}>
         <Button>Save</Button>
-      </Tooltip>
+      </Tip>
       <Button variant="outline">Elsewhere</Button>
     </Scene>,
   );
@@ -63,9 +77,9 @@ test('the content is portaled into the IdsProvider root and shown in the top lay
     <IdsProvider theme={testTheme} data-testid="root">
       <ul className="space-y-2">
         <li>
-          <Tooltip content="Hint" defaultOpen side="bottom">
+          <Tip content="Hint" defaultOpen side="bottom">
             <Button>Item</Button>
-          </Tooltip>
+          </Tip>
         </li>
       </ul>
     </IdsProvider>,
@@ -81,9 +95,9 @@ test('the content is portaled into the IdsProvider root and shown in the top lay
 test('outside an IdsProvider the content renders in place', async () => {
   const screen = await render(
     <div data-testid="place">
-      <Tooltip content="Hint" defaultOpen>
+      <Tip content="Hint" defaultOpen>
         <button type="button">Item</button>
-      </Tooltip>
+      </Tip>
     </div>,
   );
   const tooltip = screen.getByRole('tooltip');
@@ -96,9 +110,9 @@ test('keyboard focus opens it, and the description joins the one the trigger had
     <Scene>
       <input aria-label="Before" data-1p-ignore data-lpignore="true" />
       <p id="own">Also saves drafts</p>
-      <Tooltip content="Save changes">
+      <Tip content="Save changes">
         <Button aria-describedby="own">Save</Button>
-      </Tooltip>
+      </Tip>
     </Scene>,
   );
   await userEvent.click(screen.getByRole('textbox', { name: 'Before' }));
@@ -118,9 +132,9 @@ test('a press on the trigger closes it, and the focus the press gives does not r
   const onOpenChange = vi.fn();
   const screen = await render(
     <Scene>
-      <Tooltip content="Save changes" openDelay={0} onOpenChange={onOpenChange}>
+      <Tip content="Save changes" openDelay={0} onOpenChange={onOpenChange}>
         <Button>Save</Button>
-      </Tooltip>
+      </Tip>
     </Scene>,
   );
   const trigger = screen.getByRole('button', { name: 'Save' });
@@ -137,9 +151,9 @@ test('a press on the trigger closes it, and the focus the press gives does not r
 test('a hover that arrives after Escape does not reopen it until the pointer leaves the trigger', async () => {
   const screen = await render(
     <Scene>
-      <Tooltip content="Save changes" openDelay={0}>
+      <Tip content="Save changes" openDelay={0}>
         <Button>Save</Button>
-      </Tooltip>
+      </Tip>
       <Button>Elsewhere</Button>
     </Scene>,
   );
@@ -165,9 +179,9 @@ test('Escape closes the tooltip before the dialog it sits in', async () => {
         <Dialog.Content>
           <Dialog.Title>Settings</Dialog.Title>
           <input aria-label="Name" data-1p-ignore data-lpignore="true" />
-          <Tooltip content="Apply now">
+          <Tip content="Apply now">
             <Button>Apply</Button>
-          </Tooltip>
+          </Tip>
         </Dialog.Content>
       </Dialog>
     </Scene>,
@@ -190,9 +204,9 @@ test('opening a modal closes every tooltip', async () => {
   const screen = await render(
     <Scene>
       <ShownAfterPress>
-        <Tooltip content="Unread messages" defaultOpen>
+        <Tip content="Unread messages" defaultOpen>
           <span>Inbox</span>
-        </Tooltip>
+        </Tip>
         <Dialog>
           <Dialog.Trigger>Open settings</Dialog.Trigger>
           <Dialog.Content aria-label="Settings" />
@@ -216,9 +230,9 @@ test('focus that a closing dialog returns to the trigger does not reopen its too
     <Scene>
       <input aria-label="Before" data-1p-ignore data-lpignore="true" />
       <Dialog>
-        <Tooltip content="Change how the app looks">
+        <Tip content="Change how the app looks">
           <Dialog.Trigger>Open settings</Dialog.Trigger>
-        </Tooltip>
+        </Tip>
         <Dialog.Content aria-label="Settings">
           <Dialog.Close>Cancel</Dialog.Close>
         </Dialog.Content>
@@ -249,12 +263,12 @@ test('focus that a closing dialog returns to the trigger does not reopen its too
 test('a group opens the next tooltip at once while one was just open', async () => {
   const screen = await render(
     <Scene>
-      <Tooltip content="Bold">
+      <Tip content="Bold">
         <Button variant="outline">B</Button>
-      </Tooltip>
-      <Tooltip content="Italic">
+      </Tip>
+      <Tip content="Italic">
         <Button variant="outline">I</Button>
-      </Tooltip>
+      </Tip>
     </Scene>,
   );
   await userEvent.hover(screen.getByRole('button', { name: 'B' }));
@@ -269,9 +283,9 @@ test('a group opens the next tooltip at once while one was just open', async () 
 test('disabled never opens', async () => {
   const screen = await render(
     <Scene>
-      <Tooltip content="Save changes" disabled defaultOpen openDelay={0}>
+      <Tip content="Save changes" disabled defaultOpen openDelay={0}>
         <Button>Save</Button>
-      </Tooltip>
+      </Tip>
     </Scene>,
   );
   await userEvent.hover(screen.getByRole('button', { name: 'Save' }));
@@ -313,11 +327,11 @@ test('development warns about a disabled trigger and focusable content', async (
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   await render(
     <Scene>
-      <Tooltip content="Unavailable">
+      <Tip content="Unavailable">
         <button type="button" disabled>
           Save
         </button>
-      </Tooltip>
+      </Tip>
       <Tooltip defaultOpen>
         <Tooltip.Trigger>Help</Tooltip.Trigger>
         <Tooltip.Content>
@@ -340,7 +354,7 @@ test('development warns about a disabled trigger and focusable content', async (
 test('shortcuts in the bubble are tiny keys, described by name', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Tooltip
+      <Tip
         open
         content={
           <>
@@ -349,8 +363,8 @@ test('shortcuts in the bubble are tiny keys, described by name', async () => {
         }
       >
         <button type="button">저장</button>
-      </Tooltip>
-      <Tooltip
+      </Tip>
+      <Tip
         open
         content={
           <>
@@ -359,7 +373,7 @@ test('shortcuts in the bubble are tiny keys, described by name', async () => {
         }
       >
         <button type="button">열기</button>
-      </Tooltip>
+      </Tip>
     </IdsProvider>,
   );
   const save = screen.getByRole('button', { name: '저장' });

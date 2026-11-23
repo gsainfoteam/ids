@@ -16,7 +16,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
-const palette = ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#3B82F6', '#8B5CF6'];
 
 const meta = {
   title: 'Form/ColorField',
@@ -26,8 +25,6 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     format: { control: 'radio', options: ['hex', 'rgb', 'hsl', 'oklch'] },
-    mobileVariant: { control: 'radio', options: ['popover', 'drawer'] },
-    alpha: { control: 'boolean' },
     defaultOpen: { control: 'boolean' },
     invalid: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -36,7 +33,6 @@ const meta = {
   args: {
     'aria-label': '브랜드 색상',
     defaultValue: '#3B82F6',
-    swatches: palette,
     variant: 'outline',
     size: 'standard',
     onValueChange: fn(),
@@ -54,13 +50,50 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-64">
+      <Field>
+        <Field.Label>브랜드 색상</Field.Label>
+        <ColorField name="brand" defaultValue="#3B82F6" />
+      </Field>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
-      <Showcase.Section title="Open" description="팝업 안은 ColorPicker 입니다.">
+      <Showcase.Section
+        title="Open"
+        description="팝업 안은 ColorPicker 입니다. 투명도 슬라이더와 팔레트는 ColorField.Content 에 part 로 넣습니다."
+      >
         <Showcase.Row label="default" className="h-104 items-start">
           <div className="w-64">
-            <ColorField aria-label="열림" defaultValue="#8B5CF6" swatches={palette} defaultOpen />
+            <ColorField aria-label="열림" defaultValue="#8B5CF6" defaultOpen>
+              <ColorField.Content>
+                <ColorPicker.Area />
+                <div className="flex min-w-0 items-center gap-2">
+                  <ColorPicker.EyeDropper />
+                  <div className="grid min-w-0 flex-1 gap-2">
+                    <ColorPicker.HueSlider />
+                    <ColorPicker.AlphaSlider />
+                  </div>
+                </div>
+                <div className="flex min-w-0 items-center gap-2">
+                  <ColorPicker.Input />
+                  <ColorPicker.Copy />
+                </div>
+                <ColorPicker.Swatches>
+                  <ColorPicker.Swatch value="#EF4444" />
+                  <ColorPicker.Swatch value="#F97316" />
+                  <ColorPicker.Swatch value="#EAB308" />
+                  <ColorPicker.Swatch value="#22C55E" />
+                  <ColorPicker.Swatch value="#3B82F6" />
+                  <ColorPicker.Swatch value="#8B5CF6" />
+                </ColorPicker.Swatches>
+              </ColorField.Content>
+            </ColorField>
           </div>
         </Showcase.Row>
       </Showcase.Section>
@@ -90,7 +123,14 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="alpha">
           <div className="w-64">
-            <ColorField aria-label="투명도" alpha defaultValue="#F9731680" />
+            <ColorField aria-label="투명도" defaultValue="#F9731680">
+              <ColorField.Content>
+                <ColorPicker.Area />
+                <ColorPicker.HueSlider />
+                <ColorPicker.AlphaSlider />
+                <ColorPicker.Input />
+              </ColorField.Content>
+            </ColorField>
           </div>
         </Showcase.Row>
         <Showcase.Row label="hsl">
@@ -123,7 +163,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const PickAndClear: Story = {
+export const PickWithTransparencyAndAPalette: Story = {
   render: function Render() {
     const [value, setValue] = useState('#3B82F6');
 
@@ -131,7 +171,30 @@ export const PickAndClear: Story = {
       <div className="grid w-72 gap-3">
         <Field>
           <Field.Label>브랜드 색상</Field.Label>
-          <ColorField value={value} onValueChange={setValue} alpha swatches={palette} />
+          <ColorField value={value} onValueChange={setValue}>
+            <ColorField.Content>
+              <ColorPicker.Area />
+              <div className="flex min-w-0 items-center gap-2">
+                <ColorPicker.EyeDropper />
+                <div className="grid min-w-0 flex-1 gap-2">
+                  <ColorPicker.HueSlider />
+                  <ColorPicker.AlphaSlider />
+                </div>
+              </div>
+              <div className="flex min-w-0 items-center gap-2">
+                <ColorPicker.Input />
+                <ColorPicker.Copy />
+              </div>
+              <ColorPicker.Swatches>
+                <ColorPicker.Swatch value="#EF4444" />
+                <ColorPicker.Swatch value="#F97316" />
+                <ColorPicker.Swatch value="#EAB308" />
+                <ColorPicker.Swatch value="#22C55E" />
+                <ColorPicker.Swatch value="#3B82F6" />
+                <ColorPicker.Swatch value="#8B5CF6" />
+              </ColorPicker.Swatches>
+            </ColorField.Content>
+          </ColorField>
           <Field.Hint>방향키로 채도와 밝기를 조절하세요.</Field.Hint>
         </Field>
         <output aria-label="색상 결과">{value}</output>
@@ -142,7 +205,7 @@ export const PickAndClear: Story = {
     docs: {
       description: {
         story:
-          '트리거를 누르거나 ↓ 를 누르면 팝업이 열리고 포커스가 영역으로 갑니다. 고른 색은 바로 반영되고, Esc 나 바깥을 누르면 닫히며 트리거로 포커스가 돌아옵니다. 지우기 버튼은 값을 비웁니다.',
+          'ColorField.Content 에 ColorPicker part 를 기본 배치대로 쓰고 AlphaSlider 와 Swatches 를 더하면 투명도와 팔레트가 생깁니다. 트리거를 누르거나 ↓ 를 누르면 팝업이 열리고 포커스가 영역으로 갑니다. 고른 색은 바로 반영되고, Esc 나 바깥을 누르면 닫히며 트리거로 포커스가 돌아옵니다. 지우기 버튼은 값을 비웁니다.',
       },
     },
   },
@@ -167,12 +230,19 @@ export const PickAndClear: Story = {
   },
 };
 
-export const Composition: Story = {
+export const ShrinkThePopup: Story = {
   render: () => (
     <div className="grid w-64 gap-3">
-      <ColorField aria-label="팔레트만" defaultValue="#22C55E" swatches={palette}>
+      <ColorField aria-label="팔레트만" defaultValue="#22C55E">
         <ColorField.Content>
-          <ColorPicker.Swatches />
+          <ColorPicker.Swatches>
+            <ColorPicker.Swatch value="#EF4444" />
+            <ColorPicker.Swatch value="#F97316" />
+            <ColorPicker.Swatch value="#EAB308" />
+            <ColorPicker.Swatch value="#22C55E" />
+            <ColorPicker.Swatch value="#3B82F6" />
+            <ColorPicker.Swatch value="#8B5CF6" />
+          </ColorPicker.Swatches>
         </ColorField.Content>
       </ColorField>
       <ColorField aria-label="간단히" defaultValue="#F97316">
@@ -199,21 +269,43 @@ export const Composition: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
     return (
       <form
-        className="flex w-72 flex-col items-start gap-4"
+        className="grid w-72 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitted(String(new FormData(event.currentTarget).get('color')));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>테마 색</Field.Label>
-          <ColorField name="color" required swatches={palette} />
+          <ColorField name="color" required>
+            <ColorField.Content>
+              <ColorPicker.Area />
+              <div className="flex min-w-0 items-center gap-2">
+                <ColorPicker.EyeDropper />
+                <div className="grid min-w-0 flex-1 gap-2">
+                  <ColorPicker.HueSlider />
+                </div>
+              </div>
+              <div className="flex min-w-0 items-center gap-2">
+                <ColorPicker.Input />
+                <ColorPicker.Copy />
+              </div>
+              <ColorPicker.Swatches>
+                <ColorPicker.Swatch value="#EF4444" />
+                <ColorPicker.Swatch value="#F97316" />
+                <ColorPicker.Swatch value="#EAB308" />
+                <ColorPicker.Swatch value="#22C55E" />
+                <ColorPicker.Swatch value="#3B82F6" />
+                <ColorPicker.Swatch value="#8B5CF6" />
+              </ColorPicker.Swatches>
+            </ColorField.Content>
+          </ColorField>
         </Field>
         <div className="flex gap-2">
           <Button type="submit">제출</Button>
@@ -255,7 +347,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ConnectReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ color: string }>({ defaultValues: { color: '' } });
     const [result, setResult] = useState('');
@@ -263,7 +355,7 @@ export const ReactHookForm: Story = {
     return (
       <FormProvider {...methods}>
         <form
-          className="flex w-72 flex-col items-start gap-4"
+          className="grid w-72 gap-4"
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(data.color))}
         >
@@ -271,10 +363,31 @@ export const ReactHookForm: Story = {
             name="color"
             controlMode="value"
             registerOptions={{ required: '색을 고르세요.' }}
-            className="w-full"
           >
             <FormField.Label>포인트 색</FormField.Label>
-            <ColorField swatches={palette} />
+            <ColorField>
+              <ColorField.Content>
+                <ColorPicker.Area />
+                <div className="flex min-w-0 items-center gap-2">
+                  <ColorPicker.EyeDropper />
+                  <div className="grid min-w-0 flex-1 gap-2">
+                    <ColorPicker.HueSlider />
+                  </div>
+                </div>
+                <div className="flex min-w-0 items-center gap-2">
+                  <ColorPicker.Input />
+                  <ColorPicker.Copy />
+                </div>
+                <ColorPicker.Swatches>
+                  <ColorPicker.Swatch value="#EF4444" />
+                  <ColorPicker.Swatch value="#F97316" />
+                  <ColorPicker.Swatch value="#EAB308" />
+                  <ColorPicker.Swatch value="#22C55E" />
+                  <ColorPicker.Swatch value="#3B82F6" />
+                  <ColorPicker.Swatch value="#8B5CF6" />
+                </ColorPicker.Swatches>
+              </ColorField.Content>
+            </ColorField>
             <FormField.Error />
           </FormField>
           <Button type="submit">저장</Button>
@@ -303,13 +416,19 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const Drawer: Story = {
-  args: { mobileVariant: 'drawer' },
+export const OpenAsABottomSheetOnMobile: Story = {
+  render: () => (
+    <div className="w-64">
+      <ColorField aria-label="브랜드 색상" defaultValue="#3B82F6">
+        <ColorField.Content mobileVariant="drawer" />
+      </ColorField>
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          '640px 보다 좁은 화면에서 mobileVariant="drawer" 는 제목과 닫기 버튼이 있는 모달 하단 시트로 엽니다.',
+          '640px 보다 좁은 화면에서 ColorField.Content 에 mobileVariant="drawer" 를 주면 제목과 닫기 버튼이 있는 모달 하단 시트로 엽니다. Content 에 자식이 없으면 기본 배치를 그립니다.',
       },
     },
   },

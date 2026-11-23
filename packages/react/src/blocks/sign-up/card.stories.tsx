@@ -3,8 +3,8 @@ import { useState, type FormEvent } from 'react';
 import { AcademicCapIcon } from '@heroicons/react/24/outline';
 
 import { Button } from '../../components/action/button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { toast } from '../../components/feedback/toast';
 import { CheckboxGroup } from '../../components/form/checkbox-group';
 import { Field } from '../../components/form/field';
@@ -112,11 +112,9 @@ export const PC: Story = {
                       <Label key={term.value}>
                         <Item value={term.value} />
                         {term.label}
-                        <Badge
-                          content={term.required ? '필수' : '선택'}
-                          variant="soft"
-                          colorScheme={term.required ? 'primary' : 'neutral'}
-                        />
+                        <Chip variant="soft" colorScheme={term.required ? 'primary' : 'neutral'}>
+                          {term.required ? '필수' : '선택'}
+                        </Chip>
                       </Label>
                     ))}
                   </div>

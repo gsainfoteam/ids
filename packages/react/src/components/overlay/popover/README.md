@@ -5,7 +5,7 @@
 - **trigger 옆에 붙습니다.** `side`, `align` 쪽에 놓이고, 자리가 모자라면 반대쪽으로 넘어가며 화면 가장자리에서 8px 안쪽에 머뭅니다.
 - **포커스를 옮기지 않습니다.** 열어도 포커스는 trigger 에 남습니다. 안의 입력으로 보내려면 `initialFocus` 나 `data-popup-autofocus` 를 씁니다.
 - **닫는 법.** Escape, 바깥 누르기, 포커스가 밖으로 나갈 때, trigger 를 다시 누를 때, `Popover.Close`. Escape 와 `Popover.Close` 는 포커스를 trigger 로 돌려주고, 바깥 누르기는 누른 곳에 둡니다.
-- **hover 로도 엽니다.** `triggerType="hover"` 면 올려 둔 채 `openDelay` 뒤에 열리고, 포인터가 content 로 건너가는 동안은 닫히지 않습니다.
+- **hover 로도 엽니다.** `triggerType="hover"` 면 올려 둔 채 `Popover.Trigger` 의 `openDelay` 뒤에 열리고, 포인터가 content 로 건너가는 동안은 닫히지 않습니다.
 - **modal.** `modal` 이면 Dialog 처럼 포커스를 가두고 뒤 페이지를 잠급니다.
 - **겹쳐 열 수 있습니다.** 안에서 연 popover 는 위에 쌓이고, 바깥 popover 를 누르면 안쪽만 닫힙니다.
 
@@ -47,10 +47,21 @@ import { Popover } from '@gsainfoteam/ids-react';
 <Popover.Content side="right" align="start" />       // top | right | bottom | left, start | center | end
 <Popover.Content sideOffset={4} alignOffset={-8} />  // px
 <Popover.Content anchor={cellRef} />                 // trigger 대신 다른 요소 옆에 붙는다(요소 또는 ref)
-<Popover.Content className="w-96" />                 // 기본 폭 w-72, 크기 prop 은 없다
 ```
 
-- 놓인 쪽은 `data-side`, `data-align` 으로 읽습니다. 들어오는 애니메이션도 그쪽에서 자랍니다.
+- 폭은 내용을 따릅니다. 크기 prop 도 `className` 도 쓰지 않고, 폭이 필요한 내용은 앱의 요소로 감쌉니다. 화면 폭에서 1rem 씩 남기고 줄바꿈합니다.
+- `Popover.Title` 과 `Popover.Description` 은 18rem(`max-w-72`)에서 줄바꿈합니다. 글만 둔 Popover 가 한 줄로 길게 늘어나지 않습니다.
+
+```tsx
+<Popover.Content>
+  <div className="grid w-80 gap-3">
+    <Popover.Title>알림</Popover.Title>
+    <NotificationList />
+  </div>
+</Popover.Content>
+```
+
+- 들어오는 애니메이션은 실제로 놓인 쪽에서 자랍니다.
 - `anchor` 를 줘도 trigger 가 있으면 누르기와 포커스 되돌리기는 trigger 기준입니다.
 
 ## 열고 닫기
@@ -64,13 +75,13 @@ import { Popover } from '@gsainfoteam/ids-react';
 
 - 포커스를 옮길 곳은 `initialFocus` 선택자, 그다음 `[data-popup-autofocus]` 요소입니다. 둘 다 없으면 옮기지 않습니다.
 - 닫힐 때 포커스가 패널 안에 있었으면 trigger 로 돌아갑니다. 바깥을 눌러 닫으면 누른 곳에 남습니다.
-- 닫히는 애니메이션이 끝날 때까지 요소가 남습니다(`data-ending-style`).
+- 닫히는 애니메이션이 끝날 때까지 요소가 남습니다. 끝난 때는 `onOpenChangeComplete(false)` 로 압니다.
 
 ## hover
 
 ```tsx
-<Popover triggerType="hover" openDelay={200} closeDelay={100}>
-  <Popover.Trigger asChild>
+<Popover triggerType="hover">
+  <Popover.Trigger asChild openDelay={200} closeDelay={100}>
     <a href="/users/42">김지스트</a>
   </Popover.Trigger>
   <Popover.Content>
@@ -79,6 +90,7 @@ import { Popover } from '@gsainfoteam/ids-react';
 </Popover>
 ```
 
+- 기다리는 시간은 hover 에서만 쓰므로 `Popover.Trigger` 가 받습니다. 기본은 `openDelay` 200ms, `closeDelay` 100ms 입니다.
 - trigger 에서 content 로 가는 삼각형 안을 지나는 동안은 닫히지 않습니다(`safePolygon`).
 - trigger 를 누르면(터치, 키보드 Enter 포함) 열리고, 포인터가 떠나도 닫히지 않습니다. Escape 나 바깥 누르기로 닫습니다.
 
@@ -120,13 +132,8 @@ const color = await overlay.open<string>(({ close }) => (
 
 ## 상태
 
-| 속성                | 붙는 곳                                                          |
-| ------------------- | ---------------------------------------------------------------- |
-| `data-open`         | `Popover.Content`                                                |
-| `data-ending-style` | `Popover.Content`. 닫히는 애니메이션 동안                        |
-| `data-side`         | `Popover.Content`. 실제로 놓인 쪽(`top` `right` `bottom` `left`) |
-| `data-align`        | `Popover.Content`. 실제 정렬(`start` `center` `end`)             |
-| `data-popup-open`   | 열려 있는 동안의 `Popover.Trigger`                               |
+- 열림: `open` / `onOpenChange`. 열고 닫는 애니메이션이 끝난 때는 `onOpenChangeComplete` 로 압니다.
+- 들어갈 자리가 없어 실제로 놓인 쪽과 정렬은 읽는 길이 없습니다.
 
 ## 속성
 
@@ -137,8 +144,14 @@ const color = await overlay.open<string>(({ close }) => (
 | `onOpenChangeComplete` | 열고 닫는 애니메이션이 끝난 뒤                         |
 | `modal`                | 기본 `false`. 포커스를 가두고 뒤 페이지를 잠근다       |
 | `triggerType`          | `click`(기본) / `hover`                                |
-| `openDelay`            | hover 로 열리기까지 ms. 기본 `200`                     |
-| `closeDelay`           | hover 가 떠난 뒤 닫히기까지 ms. 기본 `100`             |
+
+`Popover.Trigger`
+
+| 속성         | 기본 / 동작                                |
+| ------------ | ------------------------------------------ |
+| `asChild`    | 자식 요소를 trigger 로 쓴다                |
+| `openDelay`  | hover 로 열리기까지 ms. 기본 `200`         |
+| `closeDelay` | hover 가 떠난 뒤 닫히기까지 ms. 기본 `100` |
 
 `Popover.Content`
 

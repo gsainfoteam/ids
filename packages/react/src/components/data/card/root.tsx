@@ -7,7 +7,7 @@ import { cardStyle } from './style';
 import { CardTitle } from './title';
 import { useCard } from './use-card';
 import { resolveState } from '../../../internal/state-props';
-import { containsElementOfType } from '../../../utils';
+import { containsElementOfType, elementTypeOf } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Card } from '.';
@@ -20,10 +20,14 @@ function flag(on: boolean) {
   return on ? '' : undefined;
 }
 
+function isPressableElement(node: unknown) {
+  if (!isValidElement<{ href?: unknown }>(node)) return false;
+  return elementTypeOf(node) === 'button' || node.props.href != null;
+}
+
 export function CardRoot({
   variant = 'outline',
   size = 'standard',
-  interactive: interactiveProp,
   disabled = false,
   asChild = false,
   className,
@@ -42,9 +46,7 @@ export function CardRoot({
   onInteractionChange,
   ...rest
 }: Card.Props) {
-  const nativeControl =
-    asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
-  const interactive = interactiveProp ?? (onClick != null || nativeControl);
+  const interactive = onClick != null || (asChild && isPressableElement(children));
   const titleIsTheButton = interactive && !asChild && containsElementOfType(children, CARD_TITLE);
   const { interaction, props, dataProps, labelling, descriptionId, register } =
     useCard<HTMLDivElement>({

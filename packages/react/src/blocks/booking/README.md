@@ -7,7 +7,7 @@ Storybook `Blocks/Booking/*`. 날짜와 시간을 골라 예약하는 화면 두
 | `Room`  | 스터디룸 예약. 평일만 고르는 달력, 방 카드, 이미 찬 시간이 꺼진 시작 시간, 예약 내용 요약.       |
 | `Slots` | 면담 시간 잡기. 달력에서 날을 고르면 그날 빈 시간이 나오고, 시간을 고르면 정보 입력, 완료로 간다. |
 
-- **쓰인 컴포넌트.** Calendar, Card, Item, RadioGroup, ToggleGroup, Toggle, Button, Alert, Avatar, Badge, Empty, Field, TextField, TextArea, Divider, toast
+- **쓰인 컴포넌트.** Calendar, Card, Item, RadioGroup, ToggleGroup, Toggle, Button, Alert, Avatar, Chip, Empty, Field, TextField, TextArea, Divider, toast
 - **알아둘 것.**
   - 오늘은 `2026-10-01` 로 고정합니다. 서버와 클라이언트가 같은 달력을 그립니다.
   - 달력은 `min`, `max`, `disabled={{ dayOfWeek: [0, 6] }}` 로 2주 안의 평일만 남깁니다.

@@ -11,6 +11,12 @@ import { DrawerRoot } from './root';
 import { drawerStyle } from './style';
 import { DrawerTitle, type DrawerTitleProps } from './title';
 import { DrawerTrigger, type DrawerTriggerProps } from './trigger';
+import {
+  type DrawerController,
+  type DrawerSnap,
+  type DrawerSnapOptions,
+  type UseDrawerOptions,
+} from './use-drawer';
 
 import type { DrawerSide, SnapPoint as DrawerSnapPoint } from './drawer-gesture';
 
@@ -22,6 +28,10 @@ export namespace Drawer {
   export type Role = 'dialog' | 'alertdialog';
   export type Side = DrawerSide;
   export type SnapPoint = DrawerSnapPoint;
+  export type Options = UseDrawerOptions;
+  export type SnapOptions = DrawerSnapOptions;
+  export type Snap = DrawerSnap;
+  export type Controller = DrawerController;
 
   export type Props = {
     open?: boolean;
@@ -30,15 +40,9 @@ export namespace Drawer {
     onOpenChangeComplete?: (open: boolean) => void;
     dismissible?: boolean;
     role?: Role;
-    hideClose?: boolean;
     side?: Side;
     modal?: boolean;
-    scaleBackground?: boolean;
-    snapPoints?: readonly SnapPoint[];
-    activeSnapPoint?: SnapPoint;
-    defaultActiveSnapPoint?: SnapPoint;
-    onActiveSnapPointChange?: (snapPoint: SnapPoint) => void;
-    fadeFromIndex?: number;
+    drawer?: Controller;
     children?: ReactNode;
   };
 

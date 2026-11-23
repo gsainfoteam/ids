@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, type ComponentProps } from 'react';
 
-import { DrawerClose } from './close';
 import { useDrawerContext } from './context';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
 import { mergeEventHandlers, mergeRefs } from '../../../utils';
@@ -75,10 +74,7 @@ function DrawerPopup({
         onPointerDown={mergeEventHandlers(onPointerDown, drawer.drag.onPointerDown)}
       >
         <ScrollArea.Viewport className={styles.viewport()}>
-          <OverlayItemContext value={null}>
-            {children}
-            {!c.hideClose && <DrawerClose className={styles.close()} />}
-          </OverlayItemContext>
+          <OverlayItemContext value={null}>{children}</OverlayItemContext>
         </ScrollArea.Viewport>
       </div>
     </ScrollArea>

@@ -80,6 +80,7 @@ export const PC: Story = {
                 ))}
               </ul>
             </nav>
+            <Drawer.Close />
           </Drawer.Content>
         </Drawer>
 

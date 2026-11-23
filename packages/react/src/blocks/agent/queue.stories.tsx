@@ -11,8 +11,8 @@ import {
 
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Alert } from '../../components/feedback/alert';
@@ -160,7 +160,11 @@ export const PC: Story = {
                     <Item.Content>
                       <Item.Title>
                         {job.title}
-                        {job.failed && <Badge content="멈춤" variant="soft" colorScheme="danger" />}
+                        {job.failed && (
+                          <Chip variant="soft" colorScheme="danger">
+                            멈춤
+                          </Chip>
+                        )}
                       </Item.Title>
                       <Item.Description>
                         {job.agent} · {job.detail}

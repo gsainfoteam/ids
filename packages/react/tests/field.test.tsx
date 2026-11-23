@@ -684,7 +684,7 @@ test('filled reads checked boxes and the hidden inputs a custom control writes',
   await expect.element(root()).toHaveAttribute('data-dirty');
 });
 
-test('orientation lays the label beside the control; variant stays as an alias', async () => {
+test('orientation lays the label beside the control', async () => {
   const screen = await render(
     <Field orientation="horizontal" aria-label="x">
       <TextField />
@@ -693,30 +693,26 @@ test('orientation lays the label beside the control; variant stays as an alias',
   const root = () => screen.container.querySelector<HTMLElement>('[data-field]')!;
   await expect.element(root()).toHaveAttribute('data-orientation', 'horizontal');
   await expect.element(root()).toHaveClass('grid-cols-[auto_minmax(0,1fr)]');
-  await screen.rerender(
-    <Field variant="horizontal" aria-label="x">
-      <TextField />
-    </Field>,
-  );
-  await expect.element(root()).toHaveAttribute('data-orientation', 'horizontal');
 });
 
 test('a horizontal FieldGroup lines up its horizontal Fields and leaves a vertical one stacked', async () => {
   const screen = await render(
-    <FieldGroup orientation="horizontal" className="w-96">
-      <Field>
-        <Field.Label>Name</Field.Label>
-        <TextField />
-      </Field>
-      <Field>
-        <Field.Label>Email address</Field.Label>
-        <TextField />
-      </Field>
-      <Field orientation="vertical">
-        <Field.Label>Bio</Field.Label>
-        <TextArea />
-      </Field>
-    </FieldGroup>,
+    <div className="w-96">
+      <FieldGroup orientation="horizontal">
+        <Field>
+          <Field.Label>Name</Field.Label>
+          <TextField />
+        </Field>
+        <Field>
+          <Field.Label>Email address</Field.Label>
+          <TextField />
+        </Field>
+        <Field orientation="vertical">
+          <Field.Label>Bio</Field.Label>
+          <TextArea />
+        </Field>
+      </FieldGroup>
+    </div>,
   );
   const box = (name: string) =>
     screen.getByRole('textbox', { name }).element().getBoundingClientRect();

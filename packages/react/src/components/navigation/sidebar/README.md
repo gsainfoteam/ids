@@ -3,14 +3,14 @@
 앱 화면 왼쪽에 붙는 주 메뉴입니다. 묶음, 지금 페이지, 여러 단계의 트리, 끌어서 옮기기, 접기, 단축키, 좁은 화면의 Drawer 를 한 컴포넌트로 다룹니다.
 
 - **구조가 곧 접근성.** `<aside>` 안의 `<nav aria-label>`, 묶음은 `<section aria-labelledby>` 와 `<ul>`, 항목은 `<li>` 안의 링크입니다. 지금 페이지 링크에 `aria-current="page"` 가 붙습니다.
-- **자식 순서로 칸을 나눕니다.** `Sidebar.Item` 의 첫 아이콘은 아이콘 칸, 글자는 라벨, 그 뒤(Badge, Kbd)는 끝 칸입니다.
+- **자식 순서로 칸을 나눕니다.** `Sidebar.Item` 의 첫 아이콘은 아이콘 칸, 글자는 라벨, 그 뒤(Chip, Kbd)는 끝 칸입니다.
 - **아이콘 띠로 접힙니다.** 접으면 라벨은 Tooltip 으로, 하위 메뉴는 Menu 로 뜹니다. `Mod+B` 로 접고 펼칩니다.
 - **데이터로 그리고 끌어서 옮깁니다.** `Sidebar.Group` 에 `items` 와 한 줄을 그리는 함수를 주면 트리를 그리고, `onItemsChange` 를 주면 항목을 끌어 순서를 바꾸고 다른 항목 안으로 넣습니다. 키보드는 Space 로 집고 방향키로 고릅니다.
 - **좁은 화면에서는 Drawer.** 640px 아래에서는 사이드바 대신 왼쪽 Drawer 가 열리고, 항목을 누르면 닫힙니다.
 - **IDS 로 짓습니다.** 끌기는 `@dnd-kit/core`, 항목은 Item, 하위 메뉴는 Accordion 과 Menu, 라벨은 Tooltip, 접기 버튼은 IconButton, 스크롤은 ScrollArea, 선은 Divider, floating 사이드바와 inset 본문의 표면은 Card 입니다.
 
 ```tsx
-import { Badge, Sidebar } from '@gsainfoteam/ids-react';
+import { Chip, Sidebar } from '@gsainfoteam/ids-react';
 
 <Sidebar value={pathname} collapsible>
   <Sidebar.Header>
@@ -21,7 +21,7 @@ import { Badge, Sidebar } from '@gsainfoteam/ids-react';
       <RouterLink to="/inbox">
         <InboxIcon />
         받은편지함
-        <Badge content={3} variant="soft" />
+        <Chip>3</Chip>
       </RouterLink>
     </Sidebar.Item>
   </Sidebar.Group>
@@ -60,7 +60,7 @@ import { Badge, Sidebar } from '@gsainfoteam/ids-react';
 <Sidebar.Item value="/inbox" href="/inbox">       {/* <a href> */}
   <InboxIcon />                                    {/* 첫 아이콘 = 아이콘 칸 */}
   받은편지함                                        {/* 글자 = 라벨 */}
-  <Badge content={3} variant="soft" />             {/* 뒤 = 끝 칸 */}
+  <Chip>3</Chip>                                  {/* 뒤 = 끝 칸 */}
 </Sidebar.Item>
 
 <Sidebar.Item value="/inbox" asChild>              {/* 라우터 링크 */}
@@ -76,7 +76,7 @@ import { Badge, Sidebar } from '@gsainfoteam/ids-react';
 
 - `Sidebar` 의 `value` 와 같은 `value` 의 항목이 지금 페이지입니다. `aria-current="page"` 와 `data-selected` 가 붙고 배경이 칠해집니다.
 - 칸은 자식 순서로 정합니다. 글자보다 앞의 첫 요소가 아이콘, 글자가 라벨, 라벨 뒤의 요소가 끝 칸입니다. 글자가 없으면 아이콘 다음 요소가 라벨입니다.
-- 링크의 이름은 라벨입니다. 끝 칸의 Badge 는 이름에 들어가지 않습니다.
+- 링크의 이름은 라벨입니다. 끝 칸의 Chip 은 이름에 들어가지 않습니다.
 - `asChild` 의 자식은 ref 와 `onClick` 을 받는 링크 하나여야 합니다.
 
 ### 아이콘 색

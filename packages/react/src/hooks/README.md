@@ -177,9 +177,9 @@ const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
 ### 쓰는 법
 
 ```ts
-// components/data/marquee/root.tsx: prop 으로 정했으면 prop 이 이긴다
-const prefersReducedMotion = useReducedMotion();
-const reduced = reducedMotion ?? prefersReducedMotion;
+// components/data/marquee/root.tsx
+const reduced = useReducedMotion();
+const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
 ```
 
 ### 왜 이렇게

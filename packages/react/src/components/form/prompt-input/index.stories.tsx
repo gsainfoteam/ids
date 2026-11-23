@@ -5,7 +5,6 @@ import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Showcase, holdTheNextCall } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Chip } from '../../data/chip';
 import { Menu } from '../../overlay/menu';
 import { Select } from '../select';
@@ -43,7 +42,6 @@ const meta = {
     size: 'standard',
     status: 'idle',
     disabled: false,
-    className: cn('w-96'),
     onSend: fn(),
     onStop: fn(),
     onValueChange: fn(),
@@ -62,7 +60,28 @@ const button = (canvasElement: HTMLElement, name: string) =>
 const picker = (canvasElement: HTMLElement) =>
   canvasElement.querySelector<HTMLInputElement>('input[type=file]')!;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-96">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const Usage: Story = {
+  render: function Render() {
+    const [sent, setSent] = useState('');
+
+    return (
+      <div className="grid w-96 gap-3">
+        <PromptInput onSend={(message) => setSent(message.text)} />
+        <output aria-label="보낸 메시지">{sent}</output>
+      </div>
+    );
+  },
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -72,10 +91,12 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <PromptInput size={size} variant={variant} className="w-72">
-              <PromptInput.Input aria-label={`${variant} ${size}`} />
-              <PromptInput.Attach />
-            </PromptInput>
+            <div className="w-72">
+              <PromptInput size={size} variant={variant}>
+                <PromptInput.Input aria-label={`${variant} ${size}`} />
+                <PromptInput.Attach />
+              </PromptInput>
+            </div>
           )}
         />
       </Showcase.Section>
@@ -85,55 +106,67 @@ export const Gallery: Story = {
         description="보내는 동안에는 보내기 버튼이 멈추기 버튼이 됩니다. onStop 이 없으면 스피너를 보이고 눌리지 않습니다."
       >
         <Showcase.Row label="idle">
-          <PromptInput defaultValue="오늘 학식 뭐야?" className="w-72">
-            <PromptInput.Input aria-label="idle" />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput defaultValue="오늘 학식 뭐야?">
+              <PromptInput.Input aria-label="idle" />
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="submitting">
-          <PromptInput status="submitting" className="w-72">
-            <PromptInput.Input aria-label="submitting" />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput status="submitting">
+              <PromptInput.Input aria-label="submitting" />
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="streaming">
-          <PromptInput status="streaming" onStop={() => {}} className="w-72">
-            <PromptInput.Input aria-label="streaming" />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput status="streaming" onStop={() => {}}>
+              <PromptInput.Input aria-label="streaming" />
+            </PromptInput>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="attachments">
-          <PromptInput defaultFiles={[REPORT, NOTES]} className="w-72">
-            <PromptInput.Input aria-label="첨부" />
-            <PromptInput.Attach />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput defaultFiles={[REPORT, NOTES]}>
+              <PromptInput.Input aria-label="첨부" />
+              <PromptInput.Attach />
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="tools">
-          <PromptInput defaultTools={['search']} className="w-72">
-            <PromptInput.Input aria-label="도구" />
-            <PromptInput.ActionMenu />
-            <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
-              웹 검색
-            </PromptInput.Tool>
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput defaultTools={['search']}>
+              <PromptInput.Input aria-label="도구" />
+              <PromptInput.ActionMenu />
+              <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+                웹 검색
+              </PromptInput.Tool>
+            </PromptInput>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <PromptInput disabled defaultValue="보낼 수 없음" className="w-72">
-            <PromptInput.Input aria-label="비활성" />
-            <PromptInput.Attach />
-          </PromptInput>
+          <div className="w-72">
+            <PromptInput disabled defaultValue="보낼 수 없음">
+              <PromptInput.Input aria-label="비활성" />
+              <PromptInput.Attach />
+            </PromptInput>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const EnterToSend: Story = {
+export const SendAMessage: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          'Enter 는 보내고 Shift+Enter 는 줄을 바꿉니다. 한글처럼 조합 중인 글자를 확정하는 Enter 는 보내지 않습니다. 보내면 입력이 비워지고, 비어 있으면 Enter 도 보내기 버튼도 보내지 않습니다.',
+          'onSend 는 { text, files, tools } 를 받습니다. Enter 는 보내고 Shift+Enter 는 줄을 바꿉니다. 한글처럼 조합 중인 글자를 확정하는 Enter 는 보내지 않습니다. 보내면 입력이 비워지고, 비어 있으면 Enter 도 보내기 버튼도 보내지 않습니다.',
       },
     },
   },
@@ -159,19 +192,20 @@ export const EnterToSend: Story = {
   },
 };
 
-export const Attachments: Story = {
-  args: { accept: 'image/*,.pdf,.txt', maxCount: 3 },
+export const AttachFiles: Story = {
   render: (args) => (
-    <PromptInput {...args}>
-      <PromptInput.Input placeholder="파일에 대해 물어보세요" />
-      <PromptInput.Attach />
-    </PromptInput>
+    <div className="w-96">
+      <PromptInput {...args} accept="image/*,.pdf,.txt" maxCount={3}>
+        <PromptInput.Input placeholder="파일에 대해 물어보세요" />
+        <PromptInput.Attach />
+      </PromptInput>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'PromptInput.Attach 는 파일을 고르는 버튼입니다. 입력창에 파일을 끌어다 놓거나 붙여넣어도 첨부되고, 첨부한 파일은 위 바에 FileField 목록으로 보입니다. 글 없이 파일만 보내도 됩니다.',
+          'PromptInput.Attach 는 파일을 고르는 버튼이고, accept 와 maxCount 로 받을 파일을 정합니다. 입력창에 파일을 끌어다 놓거나 붙여넣어도 첨부되고, 첨부한 파일은 위 바에 FileField 목록으로 보입니다. 글 없이 파일만 보내도 됩니다.',
       },
     },
   },
@@ -192,7 +226,7 @@ export const Attachments: Story = {
   },
 };
 
-export const Streaming: Story = {
+export const StopAStreamingReply: Story = {
   args: {
     onSend: fn(() => new Promise<void>((resolve) => setTimeout(resolve, A_REPLY_TAKES))),
   },
@@ -200,19 +234,20 @@ export const Streaming: Story = {
     const [status, setStatus] = useState<PromptInput.Status>('idle');
 
     return (
-      <PromptInput
-        className={args.className}
-        status={status}
-        onSend={async (message) => {
-          setStatus('streaming');
-          await args.onSend?.(message);
-          setStatus('idle');
-        }}
-        onStop={() => {
-          args.onStop?.();
-          setStatus('idle');
-        }}
-      />
+      <div className="w-96">
+        <PromptInput
+          status={status}
+          onSend={async (message) => {
+            setStatus('streaming');
+            await args.onSend?.(message);
+            setStatus('idle');
+          }}
+          onStop={() => {
+            args.onStop?.();
+            setStatus('idle');
+          }}
+        />
+      </div>
     );
   },
   parameters: {
@@ -244,25 +279,29 @@ export const Streaming: Story = {
   },
 };
 
-export const Tools: Story = {
+export const AddToolsToTheBar: Story = {
   render: (args) => (
-    <PromptInput {...args}>
-      <PromptInput.Input placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요" />
-      <PromptInput.ActionMenu>
-        <PromptInput.AddAttachments />
-        <Menu.Item>
-          <CameraIcon />
-          사진 찍기
-        </Menu.Item>
-      </PromptInput.ActionMenu>
-      <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
-        웹 검색
-      </PromptInput.Tool>
-      <Select size="tiny" variant="soft" defaultValue="fast" aria-label="모델" className="w-auto">
-        <Select.Item value="fast">빠른 답</Select.Item>
-        <Select.Item value="deep">깊은 생각</Select.Item>
-      </Select>
-    </PromptInput>
+    <div className="w-96">
+      <PromptInput {...args}>
+        <PromptInput.Input placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요" />
+        <PromptInput.ActionMenu>
+          <PromptInput.AddAttachments />
+          <Menu.Item>
+            <CameraIcon />
+            사진 찍기
+          </Menu.Item>
+        </PromptInput.ActionMenu>
+        <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+          웹 검색
+        </PromptInput.Tool>
+        <div>
+          <Select size="tiny" variant="soft" defaultValue="fast" aria-label="모델">
+            <Select.Item value="fast">빠른 답</Select.Item>
+            <Select.Item value="deep">깊은 생각</Select.Item>
+          </Select>
+        </div>
+      </PromptInput>
+    </div>
   ),
   parameters: {
     docs: {
@@ -274,10 +313,7 @@ export const Tools: Story = {
   },
   play: async ({ canvasElement, userEvent, args }) => {
     await userEvent.click(button(canvasElement, '웹 검색'));
-    await expect(button(canvasElement, '웹 검색')).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    await expect(button(canvasElement, '웹 검색')).toHaveAttribute('aria-pressed', 'true');
 
     await userEvent.type(textbox(canvasElement), '장학금 신청 기간{Enter}');
     await expect(args.onSend).toHaveBeenCalledOnce();
@@ -289,12 +325,12 @@ export const Tools: Story = {
   },
 };
 
-export const Suggestions: Story = {
+export const FillTheInputFromSuggestions: Story = {
   render: function Render(args) {
     const [draft, setDraft] = useState('');
 
     return (
-      <div className="flex w-96 flex-col gap-3">
+      <div className="grid w-96 gap-3">
         <div className="flex flex-wrap gap-2">
           {SUGGESTIONS.map((suggestion) => (
             <Chip key={suggestion} onClick={() => setDraft(suggestion)}>

@@ -15,7 +15,7 @@ export const insetButtons = {
 
 export const textControlStyle = tv({
   slots: {
-    root: ['inline-flex w-full min-w-0 cursor-text items-center', fieldSurface.base],
+    root: ['flex w-full min-w-0 cursor-text items-center', fieldSurface.base],
     input: [
       'h-full w-full min-w-0 flex-1 bg-transparent outline-none',
       'text-inherit placeholder:text-neutral',

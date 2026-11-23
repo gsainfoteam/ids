@@ -33,35 +33,36 @@ export function PromptInputSubmit({ className, onClick, ...props }: PromptInputS
   );
 
   return (
-    <Tooltip
-      content={
-        stops || waits ? (
+    <Tooltip>
+      <Tooltip.Trigger asChild>
+        <IconButton
+          aria-label={label}
+          {...props}
+          type={stops ? 'button' : 'submit'}
+          variant="solid"
+          size={c.size}
+          icon={icon}
+          disabled={stops ? c.disabled : !c.canSend}
+          focusableWhenDisabled
+          aria-busy={waits || undefined}
+          data-prompt-input-submit=""
+          data-status={c.status}
+          className={c.styles.submit({ className })}
+          onClick={(event) => {
+            onClick?.(event);
+            if (stops && !event.defaultPrevented) c.stop?.();
+          }}
+        />
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        {stops || waits ? (
           label
         ) : (
           <>
             {label} <Kbd keys="Enter" />
           </>
-        )
-      }
-    >
-      <IconButton
-        aria-label={label}
-        {...props}
-        type={stops ? 'button' : 'submit'}
-        variant="solid"
-        size={c.size}
-        icon={icon}
-        disabled={stops ? c.disabled : !c.canSend}
-        focusableWhenDisabled
-        aria-busy={waits || undefined}
-        data-prompt-input-submit=""
-        data-status={c.status}
-        className={c.styles.submit({ className })}
-        onClick={(event) => {
-          onClick?.(event);
-          if (stops && !event.defaultPrevented) c.stop?.();
-        }}
-      />
+        )}
+      </Tooltip.Content>
     </Tooltip>
   );
 }
