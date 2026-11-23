@@ -1,26 +1,13 @@
-import { use, useEffect, useMemo } from 'react';
-
 import { useGlobals } from 'storybook/preview-api';
 
-import { paletteHues, palettes, type PaletteHue } from './palettes';
-import { IdsProvider, defineIdsTheme, useTheme } from '../src/components/utility/ids-provider';
-import { PortalRootContext } from '../src/internal/overlay';
+import { IdsStoryFrame } from './ids-story-frame';
+import { LiveCodeDocsPage } from './live-code';
+import { paletteHues } from './palettes';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
 import '../src/styles.css';
 import './preview.css';
-
-function PaintThePageBehindWideStories() {
-  const { resolvedMode } = useTheme();
-  const provider = use(PortalRootContext);
-
-  useEffect(() => {
-    if (provider) document.body.style.backgroundColor = getComputedStyle(provider).backgroundColor;
-  }, [provider, resolvedMode]);
-
-  return null;
-}
 
 const DERIVED = 'derived';
 
@@ -29,58 +16,52 @@ const WCAG_2_CONTRAST_REPLACED_BY_APCA = 'color-contrast';
 const labelled = (name: string, values: readonly string[]) =>
   values.map((value) => ({ value, title: `${name} ${value}` }));
 
-const brandFamilyFrom = (global: unknown): PaletteHue | undefined =>
-  typeof global === 'string' && global in palettes ? (global as PaletteHue) : undefined;
-
 const withIdsTheme: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
   const oneBlockAmongMany = context.viewMode === 'docs';
   const pageFillsTheCanvas = context.parameters['canvasPadding'] === false;
-  const hue: PaletteHue = globals['idsColor'] in palettes ? globals['idsColor'] : 'blue';
-  const secondary = brandFamilyFrom(globals['idsSecondary']);
-  const tertiary = brandFamilyFrom(globals['idsTertiary']);
-  const cornerShape = globals['idsCornerShape'] === 'squircle' ? 'squircle' : 'round';
-  const neutral = globals['idsNeutral'] === 'tinted' ? 'tinted' : 'pure';
-  const status = globals['idsStatus'] === 'fixed' ? 'fixed' : 'harmonized';
-  const theme = useMemo(
-    () =>
-      defineIdsTheme({
-        primary: palettes[hue],
-        ...(secondary && { secondary: palettes[secondary] }),
-        ...(tertiary && { tertiary: palettes[tertiary] }),
-        neutral,
-        status,
-        cornerShape,
-      }),
-    [hue, secondary, tertiary, neutral, status, cornerShape],
-  );
 
   return (
-    <IdsProvider
-      theme={theme}
-      mode={globals['idsMode'] ?? 'light'}
-      onModeChange={(mode) => updateGlobals({ idsMode: mode })}
-      className={
-        oneBlockAmongMany
-          ? 'rounded-standard bg-base text-neutral-strong w-full p-6'
-          : pageFillsTheCanvas
-            ? 'bg-base text-neutral-strong min-h-screen w-full'
-            : 'bg-base text-neutral-strong min-h-screen w-full p-8'
-      }
+    <IdsStoryFrame
+      globals={globals}
+      updateGlobals={updateGlobals}
+      placement={oneBlockAmongMany ? 'docs' : pageFillsTheCanvas ? 'page' : 'padded'}
     >
-      <PaintThePageBehindWideStories />
       <Story />
-    </IdsProvider>
+    </IdsStoryFrame>
   );
 };
 
 const hideSpyNames = () => '() => {}';
 
+type ElementType =
+  | string
+  | symbol
+  | {
+      displayName?: string;
+      name?: string;
+      render?: { displayName?: string; name?: string };
+      type?: { name?: string };
+    };
+
+const nameInShowCode = ({ type }: { type: ElementType }) => {
+  if (typeof type === 'string') return type;
+  if (typeof type === 'symbol') return type.description ?? 'Unknown';
+  return (
+    type.displayName ||
+    type.render?.displayName ||
+    type.render?.name ||
+    type.type?.name ||
+    type.name ||
+    'Unknown'
+  );
+};
+
 const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
-    docs: { codePanel: true },
-    jsx: { showFunctions: true, functionValue: hideSpyNames },
+    docs: { codePanel: true, page: LiveCodeDocsPage },
+    jsx: { showFunctions: true, functionValue: hideSpyNames, displayName: nameInShowCode },
     backgrounds: { disable: true },
     a11y: {
       options: {

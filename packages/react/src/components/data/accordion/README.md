@@ -24,6 +24,10 @@ import { Accordion } from '@gsainfoteam/ids-react';
 </Accordion>;
 ```
 
+## 크기
+
+- **fill.** 부모의 너비를 다 채웁니다. 너비는 감싸는 요소가 정합니다: `<div className="w-full max-w-md"><Accordion /></div>`.
+
 ## type
 
 ```tsx
@@ -63,14 +67,14 @@ type FaqId = 'shipping' | 'returns';
 
 <Accordion.Trigger>
   회원 혜택
-  <Accordion.Indicator className="rotate-0!">
+  <Accordion.Indicator>
     {(item) => (item.open ? <MinusIcon /> : <PlusIcon />)}
   </Accordion.Indicator>
 </Accordion.Trigger>
 ```
 
-- 기본 chevron은 열리면 180도 돕니다. 회전을 바꾸려면 `data-open:` 으로 덮어씁니다: `className="-rotate-90 data-open:rotate-0"`.
-- `Accordion.Item`, `Trigger`, `Content`, `Indicator` 의 `className`, `style`, `children` 은 섹션 상태를 받는 함수도 됩니다.
+- Indicator 는 열리면 180도 돕니다. 직접 넣은 아이콘도 함께 돕니다.
+- `Indicator` 의 `children` 은 섹션 상태를 받는 함수도 됩니다.
 
 ## heading 수준
 
@@ -113,17 +117,10 @@ type FaqId = 'shipping' | 'returns';
 <Accordion.Item disabled />       // 섹션 하나만 비활성
 ```
 
-## 상태와 data 속성
+## 상태
 
-| 요소        | 속성                                                                                            |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| 루트        | `data-accordion`, `data-variant`, `data-size`, `data-disabled`                                  |
-| `Item`      | `data-state="open \| closed"`, `data-open`, `data-disabled`                                     |
-| `Trigger`   | `data-state`, `data-open`, `data-disabled`, `data-hovered`, `data-active`, `data-focus-visible` |
-| `Content`   | `data-state`, `data-open`                                                                       |
-| `Indicator` | `data-state`, `data-open`                                                                       |
-
-함수로 받는 상태는 `{ value, open, disabled }` 이고, `Trigger` 는 `hovered`, `focusVisible` 같은 인터랙션 상태도 함께 받습니다.
+- 열린 섹션은 `value` / `defaultValue` / `onValueChange` 로 읽고 바꿉니다.
+- 새 디자인을 얹을 때만 `Accordion.Item`, `Trigger`, `Content`, `Indicator` 의 `className`, `style`, `children` 을 상태를 받는 함수로 줍니다. 상태는 `{ value, open, disabled }` 이고, `Trigger` 는 `hovered`, `focusVisible` 같은 인터랙션 상태도 함께 받습니다(`Accordion.Item.State`, `Accordion.Trigger.State`).
 
 ## 속성
 

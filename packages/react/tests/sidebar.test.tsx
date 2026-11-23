@@ -6,7 +6,7 @@ import { afterEach, expect, onTestFinished, test, vi, type Mock } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Badge, IdsProvider, Sidebar } from '../src';
+import { Chip, IdsProvider, Sidebar } from '../src';
 import { skipWithoutCdp } from './engines';
 import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
 import { testTheme } from './theme';
@@ -29,7 +29,7 @@ function Menu() {
         <Sidebar.Item value="/inbox" href="#inbox">
           <InboxIcon />
           받은편지함
-          <Badge content={3} />
+          <Chip variant="solid">3</Chip>
         </Sidebar.Item>
       </Sidebar.Group>
       <Sidebar.Group label="설정">

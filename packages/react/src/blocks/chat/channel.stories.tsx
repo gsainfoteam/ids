@@ -12,8 +12,8 @@ import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { AvatarGroup } from '../../components/data/avatar-group';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { TextArea } from '../../components/form/text-area';
 import { Divider } from '../../components/layout/divider';
@@ -160,7 +160,7 @@ export const PC: Story = {
               </section>
             ))}
             <p className="text-caption-c1-regular flex items-center gap-2">
-              <Badge dot colorScheme="success" aria-hidden />
+              <Chip variant="solid" colorScheme="success" aria-hidden />
               이도윤님이 입력하고 있어요
             </p>
           </div>

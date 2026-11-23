@@ -10,7 +10,6 @@ import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Toggle } from '../../components/action/toggle';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Calendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
 import { Chart } from '../../components/data/chart';
@@ -449,12 +448,9 @@ export const Lab: Story = {
                   {labSchemes.map((colorScheme) => (
                     <div key={colorScheme} className="flex flex-wrap items-center gap-2">
                       {labMarkVariants.map((variant) => (
-                        <Badge
-                          key={variant}
-                          content={colorScheme}
-                          variant={variant}
-                          colorScheme={colorScheme}
-                        />
+                        <Chip key={variant} variant={variant} colorScheme={colorScheme}>
+                          {colorScheme}
+                        </Chip>
                       ))}
                       {labMarkVariants.map((variant) => (
                         <Chip key={variant} variant={variant} colorScheme={colorScheme}>
@@ -611,22 +607,24 @@ export const Lab: Story = {
                 </div>
               </div>
               <div className="grid gap-6 md:grid-cols-2">
-                <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                <Chart config={LAB_CHART_CONFIG} className="w-full">
                   <Chart.Title>막대</Chart.Title>
                   <BarChart data={LAB_CHART_ROWS}>
                     <XAxis dataKey="day" tickLine={false} axisLine={false} />
                     <Bar dataKey="web" radius={4} />
                     <Bar dataKey="app" radius={4} />
                     <Bar dataKey="kiosk" radius={4} />
+                    <Chart.Legend />
                   </BarChart>
                 </Chart>
-                <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                <Chart config={LAB_CHART_CONFIG} className="w-full">
                   <Chart.Title>면</Chart.Title>
                   <AreaChart data={LAB_CHART_ROWS}>
                     <XAxis dataKey="day" tickLine={false} axisLine={false} />
                     <Area dataKey="web" type="monotone" />
                     <Area dataKey="app" type="monotone" />
                     <Area dataKey="kiosk" type="monotone" />
+                    <Chart.Legend />
                   </AreaChart>
                 </Chart>
               </div>

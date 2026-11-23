@@ -16,7 +16,11 @@ import type {
   CarouselAutoplay,
   CarouselAutoScroll,
   CarouselAutoScrollDirection,
-} from './use-carousel-motion';
+  CarouselInstance,
+  CarouselOptions,
+  CarouselPlaying,
+  CarouselSlides,
+} from './use-carousel';
 import type {
   SlidesAlign,
   SlidesOrientation,
@@ -33,6 +37,10 @@ export namespace Carousel {
   export type Orientation = SlidesOrientation;
   export type Align = SlidesAlign;
   export type SlidesToScroll = SlidesPerScroll;
+  export type Options = CarouselOptions;
+  export type Instance = CarouselInstance;
+  export type Slides = CarouselSlides;
+  export type Playing = CarouselPlaying;
   export type Autoplay = CarouselAutoplay;
   export type AutoScroll = CarouselAutoScroll;
   export type AutoScrollDirection = CarouselAutoScrollDirection;
@@ -85,4 +93,6 @@ export namespace Carousel {
   export const Style = carouselStyle;
 }
 
+export { useCarousel } from './use-carousel';
 export type { CarouselProps, CarouselState } from './root';
+export type { CarouselInstance, CarouselOptions } from './use-carousel';

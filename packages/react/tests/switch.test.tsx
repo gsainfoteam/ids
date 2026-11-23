@@ -15,7 +15,7 @@ const thumbOf = (control: Locator) =>
 test('SSR: a native checkbox with role="switch", labelled by Field, className on the track', () => {
   const doc = parse(
     renderToString(
-      <Field size="tiny" variant="horizontal">
+      <Field size="tiny" orientation="horizontal">
         <Field.Label>Dark mode</Field.Label>
         <Switch name="dark" defaultChecked className="my-track" />
         <Field.Description>Applies at once</Field.Description>

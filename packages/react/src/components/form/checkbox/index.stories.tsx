@@ -116,7 +116,7 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="Field">
-          <Field variant="horizontal">
+          <Field orientation="horizontal">
             <Field.Label>자동 로그인</Field.Label>
             <Checkbox defaultChecked />
           </Field>
@@ -280,7 +280,7 @@ export const ValidateWithReactHookForm: Story = {
           className="flex flex-col items-start gap-4"
           onSubmit={methods.handleSubmit(() => setResult('가입 완료'))}
         >
-          <FormField name="terms" variant="horizontal">
+          <FormField name="terms" orientation="horizontal">
             <FormField.Label>약관 동의</FormField.Label>
             <Checkbox />
             <FormField.Error />

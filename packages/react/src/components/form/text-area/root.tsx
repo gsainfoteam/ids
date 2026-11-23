@@ -56,9 +56,7 @@ export function TextAreaRoot({
   disabled,
   invalid,
   onValueChange,
-  autoResize = true,
-  resize,
-  divided = true,
+  resize = 'auto',
   minRows,
   maxRows,
   rows = 3,
@@ -81,21 +79,20 @@ export function TextAreaRoot({
     disabled,
     invalid,
     onValueChange,
-    autoResize,
-    resize,
     minRows,
     maxRows,
     countId: countNode ? countId : undefined,
   });
   const state: TextAreaState = { size, variant, ...field.state };
-  const resizeMode = autoResize ? 'none' : (resize ?? 'vertical');
+  const autoResize = resize === 'auto';
+  const handle = autoResize ? 'none' : resize;
   const { setShell, shell, axes, ...resizing } = useTextAreaResize({
-    resize: resizeMode,
+    resize: handle,
     disabled: field.state.disabled,
     shellId: `ids-text-area-shell-${generatedId}`,
     inputId: field.inputProps.id,
   });
-  const styles = textAreaStyle({ variant, size, resize: resizeMode, divided });
+  const styles = textAreaStyle({ variant, size, resize: handle });
   const resizedWidth = resizing.width === undefined ? undefined : { width: `${resizing.width}px` };
 
   return (

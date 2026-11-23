@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 
 import { FEWEST_DAYS, MOST_DAYS } from './layout';
-import { useTranslate } from '../../../internal/translate';
+import { LanguageContext, useTranslate } from '../../../internal/translate';
 import { NumberField } from '../../form/number-field';
 
 import type { SchedulerContextValue } from './context';
@@ -26,6 +26,7 @@ export function SchedulerDayCountField({
   locale,
 }: SchedulerDayCountFieldProps) {
   const t = useTranslate();
+  const language = use(LanguageContext);
   const [draft, setDraft] = useState<number | null>(dayCount);
   const [committed, setCommitted] = useState(dayCount);
 
@@ -35,26 +36,31 @@ export function SchedulerDayCountField({
   }
 
   return (
-    <NumberField
-      value={draft}
-      onValueChange={(count) => {
-        setDraft(count);
-        if (isDayCount(count)) onDayCountChange(count);
-      }}
-      onBlur={() => {
-        if (!isDayCount(draft)) setDraft(dayCount);
-      }}
-      min={FEWEST_DAYS}
-      max={MOST_DAYS}
-      step={1}
-      locale={locale}
-      formatOptions={DAYS}
-      aria-label={t('scheduler.dayCount')}
-      incrementLabel={t('scheduler.addDay')}
-      decrementLabel={t('scheduler.removeDay')}
-      className={styles.dayCount()}
-      data-1p-ignore
-      data-lpignore="true"
-    />
+    <LanguageContext value={{ ...language, locale }}>
+      <NumberField
+        value={draft}
+        onValueChange={(count) => {
+          setDraft(count);
+          if (isDayCount(count)) onDayCountChange(count);
+        }}
+        onBlur={() => {
+          if (!isDayCount(draft)) setDraft(dayCount);
+        }}
+        min={FEWEST_DAYS}
+        max={MOST_DAYS}
+        step={1}
+        formatOptions={DAYS}
+        aria-label={t('scheduler.dayCount')}
+        className={styles.dayCount()}
+        data-1p-ignore
+        data-lpignore="true"
+      >
+        <NumberField.Input />
+        <NumberField.Stepper>
+          <NumberField.Increment aria-label={t('scheduler.addDay')} />
+          <NumberField.Decrement aria-label={t('scheduler.removeDay')} />
+        </NumberField.Stepper>
+      </NumberField>
+    </LanguageContext>
   );
 }

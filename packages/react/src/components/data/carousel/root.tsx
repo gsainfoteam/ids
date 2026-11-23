@@ -21,20 +21,13 @@ import { CarouselNext } from './next';
 import { CarouselPause } from './pause';
 import { CarouselPrev } from './prev';
 import { carouselStyle } from './style';
-import {
-  useCarouselMotion,
-  useCarouselPlugins,
-  type CarouselAutoplay,
-  type CarouselAutoScroll,
-} from './use-carousel-motion';
+import { useCarouselMotion } from './use-carousel-motion';
 import {
   moveWithKeys,
   SlidesAnnouncer,
   useSlides,
-  type SlidesAlign,
   type SlidesDragEvent,
   type SlidesOrientation,
-  type SlidesPerScroll,
 } from '../../../internal/slides';
 import { resolveState, type StateValue } from '../../../internal/state-props';
 import { useTranslate } from '../../../internal/translate';
@@ -47,6 +40,7 @@ import {
 } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
+import type { CarouselInstance } from './use-carousel';
 import type { IdsSize } from '../../../tokens/types';
 
 export type CarouselState = {
@@ -61,17 +55,8 @@ type CarouselOwnProps = {
   defaultValue?: number;
   onValueChange?: (value: number) => void;
   orientation?: SlidesOrientation;
-  slidesPerView?: number;
-  slidesToScroll?: SlidesPerScroll;
-  align?: SlidesAlign;
-  loop?: boolean;
-  dragFree?: boolean;
   size?: IdsSize;
-  autoplay?: CarouselAutoplay;
-  autoScroll?: CarouselAutoScroll;
-  playing?: boolean;
-  defaultPlaying?: boolean;
-  onPlayingChange?: (playing: boolean) => void;
+  carousel?: CarouselInstance;
   className?: StateValue<string | undefined, CarouselState>;
   style?: StateValue<CSSProperties | undefined, CarouselState>;
   children?: ReactNode;
@@ -99,6 +84,14 @@ const NAVIGATION = new Set<unknown>([
 ]);
 const PAUSE = new Set<unknown>([CarouselPause]);
 const NOT_A_SLIDE = new Set<unknown>([...NAVIGATION, ...PAUSE]);
+
+const ONE_SLIDE_NO_MOTION: CarouselInstance = {
+  slides: {},
+  motion: null,
+  plugins: [],
+  scrollDirection: 'forward',
+  playing: {},
+};
 
 const flag = (on: boolean) => (on ? '' : undefined);
 
@@ -146,17 +139,8 @@ export function CarouselRoot(props: CarouselProps) {
     defaultValue,
     onValueChange,
     orientation = 'horizontal',
-    slidesPerView = 1,
-    slidesToScroll = 1,
-    align = 'start',
-    loop = false,
-    dragFree = false,
     size = 'standard',
-    autoplay,
-    autoScroll,
-    playing: playingProp,
-    defaultPlaying,
-    onPlayingChange,
+    carousel = ONE_SLIDE_NO_MOTION,
     className,
     style,
     children,
@@ -180,29 +164,22 @@ export function CarouselRoot(props: CarouselProps) {
     ? slidesOf(composedContent.props.children, composedContent.props.asChild).length
     : nodes.filter(isSlideLike).length;
 
-  const { motion, plugins, scrollDirection } = useCarouselPlugins({ autoplay, autoScroll });
+  const { motion, plugins, scrollDirection, playing } = carousel;
   const slides = useSlides({
     value,
     defaultValue,
     onValueChange,
     slideCount,
     orientation,
-    align,
-    loop,
-    dragFree,
-    slidesPerView,
-    slidesToScroll,
+    align: carousel.slides.align,
+    loop: carousel.slides.loop,
+    dragFree: carousel.slides.dragFree,
+    slidesPerView: carousel.slides.perView,
+    slidesToScroll: carousel.slides.toScroll,
     watchDrag: startsFromAStep,
     plugins,
   });
-  const rotation = useCarouselMotion({
-    slides,
-    motion,
-    scrollDirection,
-    playing: playingProp,
-    defaultPlaying,
-    onPlayingChange,
-  });
+  const rotation = useCarouselMotion({ slides, motion, scrollDirection, playing });
 
   useEffect(() => {
     if (!focusIndicatorAfterMove.current) return;

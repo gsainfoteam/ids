@@ -29,6 +29,24 @@ const triggerText = () => trigger().element().textContent;
 
 const resetHandlersHaveRun = () => new Promise((resolve) => setTimeout(resolve));
 
+function picker({ alpha = false, swatches = [] as string[] } = {}) {
+  return (
+    <ColorField.Content>
+      <ColorPicker.Area />
+      <ColorPicker.HueSlider />
+      {alpha && <ColorPicker.AlphaSlider />}
+      <ColorPicker.Input />
+      {swatches.length > 0 && (
+        <ColorPicker.Swatches>
+          {swatches.map((value) => (
+            <ColorPicker.Swatch key={value} value={value} />
+          ))}
+        </ColorPicker.Swatches>
+      )}
+    </ColorField.Content>
+  );
+}
+
 function tracked(props: ColorField.Props = {}, children?: ReactNode) {
   const changes: string[] = [];
   const opens: boolean[] = [];
@@ -61,7 +79,9 @@ test('SSR: the value is written in the field format, and the trigger reads label
         <form>
           <Field required>
             <Field.Label>Color</Field.Label>
-            <ColorField name="color" defaultValue={value} format={format} alpha={alpha} />
+            <ColorField name="color" defaultValue={value} format={format}>
+              {picker({ alpha })}
+            </ColorField>
           </Field>
         </form>,
       ),
@@ -114,11 +134,10 @@ test('click or ArrowDown opens a dialog on the first control; Escape closes it b
 });
 
 test('every change reaches onValueChange at once; a typed value waits for Enter', async () => {
-  const state = tracked({
-    defaultValue: '#FF0000',
-    alpha: true,
-    swatches: ['#00FF00', '#0000FF'],
-  });
+  const state = tracked(
+    { defaultValue: '#FF0000' },
+    picker({ alpha: true, swatches: ['#00FF00', '#0000FF'] }),
+  );
   await render(state.node);
   await userEvent.click(trigger());
   await userEvent.click(swatch('#00FF00'));
@@ -233,13 +252,9 @@ test('required is enforced natively, empty is not submitted, reset restores the 
         submitted();
       }}
     >
-      <ColorField
-        aria-label="Color"
-        name="color"
-        required
-        swatches={['#00FF00']}
-        onValueChange={onValueChange}
-      />
+      <ColorField aria-label="Color" name="color" required onValueChange={onValueChange}>
+        {picker({ swatches: ['#00FF00'] })}
+      </ColorField>
       <button type="submit">Submit</button>
     </form>,
   );
@@ -356,7 +371,7 @@ test('a surrounding Field follows the value once the popup closes', async () => 
   const screen = await render(
     <Field>
       <Field.Label>Brand</Field.Label>
-      <ColorField name="color" swatches={['#FF0000']} />
+      <ColorField name="color">{picker({ swatches: ['#FF0000'] })}</ColorField>
     </Field>,
   );
   const flags = () => {
@@ -381,13 +396,13 @@ test('a surrounding Field follows the value once the popup closes', async () => 
 test('Content holds ColorPicker parts, and focus goes to the first one given', async () => {
   const swatchesOnly = (
     <ColorField.Content>
-      <ColorPicker.Swatches />
+      <ColorPicker.Swatches>
+        <ColorPicker.Swatch value="#FF0000" />
+        <ColorPicker.Swatch value="#0000FF" />
+      </ColorPicker.Swatches>
     </ColorField.Content>
   );
-  const state = tracked(
-    { defaultValue: '#0000FF', swatches: ['#FF0000', '#0000FF'] },
-    swatchesOnly,
-  );
+  const state = tracked({ defaultValue: '#0000FF' }, swatchesOnly);
   const screen = await render(state.node);
   await userEvent.click(trigger());
   await expect.element(dialog()).toBeVisible();
@@ -399,9 +414,7 @@ test('Content holds ColorPicker parts, and focus goes to the first one given', a
   await userEvent.keyboard('{Home}');
   expect(state.changes, 'Home chooses the first color').toEqual(['#FF0000']);
   await screen.rerender(
-    <Fragment key="unlisted">
-      {tracked({ defaultValue: '#123456', swatches: ['#FF0000', '#0000FF'] }, swatchesOnly).node}
-    </Fragment>,
+    <Fragment key="unlisted">{tracked({ defaultValue: '#123456' }, swatchesOnly).node}</Fragment>,
   );
   await userEvent.click(trigger());
   await expect
@@ -411,7 +424,7 @@ test('Content holds ColorPicker parts, and focus goes to the first one given', a
     <Fragment key="hue">
       {
         tracked(
-          { defaultValue: '#FF0000', alpha: true },
+          { defaultValue: '#FF0000' },
           <ColorField.Content>
             <ColorPicker.HueSlider />
             <ColorPicker.Input />
@@ -464,7 +477,8 @@ test('parts: a custom trigger, and Clear must sit beside the trigger', async () 
 test('drawer on a small screen: modal dialog with a title and a close button', async () => {
   try {
     await page.viewport(390, 844);
-    const state = tracked({ defaultValue: '#FF0000', mobileVariant: 'drawer' });
+    const drawer = <ColorField.Content mobileVariant="drawer" />;
+    const state = tracked({ defaultValue: '#FF0000' }, drawer);
     const screen = await render(state.node);
     await userEvent.click(trigger());
     await expect.element(dialog()).toHaveAttribute('data-presentation', 'drawer');
@@ -490,9 +504,7 @@ test('drawer on a small screen: modal dialog with a title and a close button', a
       .toHaveFocus();
     await page.viewport(1024, 768);
     await screen.rerender(
-      <Fragment key="wide">
-        {tracked({ defaultValue: '#FF0000', mobileVariant: 'drawer' }).node}
-      </Fragment>,
+      <Fragment key="wide">{tracked({ defaultValue: '#FF0000' }, drawer).node}</Fragment>,
     );
     await userEvent.click(trigger());
     await expect.element(dialog()).toHaveAttribute('data-presentation', 'popover');
@@ -525,7 +537,7 @@ function RHFColor({
           disabled={disabled}
         >
           <RHFField.Label>Color</RHFField.Label>
-          <ColorField swatches={['#FF0000']} />
+          <ColorField>{picker({ swatches: ['#FF0000'] })}</ColorField>
           <RHFField.Error />
         </RHFField>
         <button type="submit">Submit</button>

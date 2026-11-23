@@ -32,8 +32,6 @@ export namespace PasswordField {
     visible?: boolean;
     defaultVisible?: boolean;
     onVisibleChange?: (visible: boolean) => void;
-    hideVisibilityToggle?: boolean;
-    hideCapsLock?: boolean;
     children?: ReactNode;
     className?: StateValue<string | undefined>;
     style?: StateValue<CSSProperties | undefined>;

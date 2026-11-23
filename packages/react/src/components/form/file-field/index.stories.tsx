@@ -62,6 +62,17 @@ const picker = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-80">
+      <Field>
+        <Field.Label>이력서</Field.Label>
+        <FileField accept=".pdf" />
+      </Field>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -136,7 +147,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const MultipleAndLimits: Story = {
+export const AcceptSeveralFilesWithLimits: Story = {
   render: function Render() {
     const [files, setFiles] = useState<File[]>([]);
 
@@ -188,20 +199,20 @@ export const MultipleAndLimits: Story = {
   },
 };
 
-export const NativeForm: Story = {
+export const SubmitWithANativeForm: Story = {
   render: function Render() {
     const [submitted, setSubmitted] = useState<string | null>(null);
 
     return (
       <form
-        className="flex w-80 flex-col items-start gap-4"
+        className="grid w-80 gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           const file = new FormData(event.currentTarget).get('resume');
           setSubmitted(file instanceof File ? file.name : String(file));
         }}
       >
-        <Field className="w-full">
+        <Field>
           <Field.Label>이력서</Field.Label>
           <FileField name="resume" accept=".pdf" required />
         </Field>
@@ -238,7 +249,7 @@ export const NativeForm: Story = {
   },
 };
 
-export const ReactHookForm: Story = {
+export const ValidateWithReactHookForm: Story = {
   render: function Render() {
     const methods = useForm<{ resume: File | null }>({ defaultValues: { resume: null } });
     const [result, setResult] = useState('');
@@ -246,7 +257,7 @@ export const ReactHookForm: Story = {
     return (
       <FormProvider {...methods}>
         <form
-          className="flex w-80 flex-col items-start gap-4"
+          className="grid w-80 gap-4"
           noValidate
           onSubmit={methods.handleSubmit((data) => setResult(data.resume?.name ?? ''))}
         >
@@ -254,7 +265,6 @@ export const ReactHookForm: Story = {
             name="resume"
             controlMode="value"
             registerOptions={{ required: '파일을 첨부하세요.' }}
-            className="w-full"
           >
             <FormField.Label>이력서</FormField.Label>
             <FileField accept=".pdf" />
@@ -283,11 +293,10 @@ export const ReactHookForm: Story = {
   },
 };
 
-export const CustomItems: Story = {
-  args: { multiple: true, defaultValue: [photo('a.svg'), pdf('b.pdf')] },
-  render: (args) => (
+export const ListEachFileYourWay: Story = {
+  render: () => (
     <div className="w-80">
-      <FileField {...args}>
+      <FileField aria-label="첨부 파일" multiple defaultValue={[photo('a.svg'), pdf('b.pdf')]}>
         <FileField.Trigger />
         <FileField.List>
           {(files) =>

@@ -4,8 +4,8 @@ import { ArrowPathIcon, DocumentTextIcon, PhotoIcon, XMarkIcon } from '@heroicon
 
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
@@ -99,7 +99,9 @@ export const PC: Story = {
                   <Item.Actions>
                     {upload.failed ? (
                       <>
-                        <Badge content="실패" variant="soft" colorScheme="danger" />
+                        <Chip variant="soft" colorScheme="danger">
+                          실패
+                        </Chip>
                         <IconButton
                           variant="outline"
                           size="tiny"
@@ -108,7 +110,9 @@ export const PC: Story = {
                         />
                       </>
                     ) : upload.progress === 100 ? (
-                      <Badge content="완료" variant="soft" colorScheme="success" />
+                      <Chip variant="soft" colorScheme="success">
+                        완료
+                      </Chip>
                     ) : (
                       <IconButton
                         variant="outline"

@@ -11,8 +11,8 @@ import {
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
@@ -93,7 +93,7 @@ export const PC: Story = {
               {TASKS.length}개 중 {finished.length}개 했어요
             </Card.Description>
             <Card.Action>
-              <Badge content={`${percent}%`} variant="soft" colorScheme="primary" />
+              <Chip variant="soft" colorScheme="primary">{`${percent}%`}</Chip>
             </Card.Action>
           </Card.Header>
           <Card.Content>
@@ -114,7 +114,9 @@ export const PC: Story = {
                   </Item.Content>
                   <Item.Actions>
                     {done ? (
-                      <Badge content="했어요" variant="soft" colorScheme="success" />
+                      <Chip variant="soft" colorScheme="success">
+                        했어요
+                      </Chip>
                     ) : (
                       <Button
                         variant="soft"

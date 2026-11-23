@@ -1,3 +1,5 @@
+import { type ComponentProps, type ReactElement } from 'react';
+
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
@@ -168,6 +170,44 @@ test('asChild: a link keeps its role, gains the states and is named by the title
   expect(clicks).toEqual(['link']);
 });
 
+const asServerComponentHandsItOver = <T,>(component: T): T =>
+  ({
+    $$typeof: Symbol.for('react.lazy'),
+    _payload: component,
+    _init: (payload: T) => payload,
+  }) as unknown as T;
+
+function RouterLink({ href, children, ...props }: ComponentProps<'a'>) {
+  return (
+    <a {...props} href={href} data-router-link="">
+      {children}
+    </a>
+  );
+}
+
+test('SSR: asChild is pressable when its child has an href or is a button, and only then', () => {
+  const isInteractive = (child: ReactElement) =>
+    parse(renderToString(<Card asChild>{child}</Card>))
+      .querySelector('[data-card]')!
+      .hasAttribute('data-interactive');
+  const LazyLink = asServerComponentHandsItOver(RouterLink);
+
+  expect(isInteractive(<a href="/posts/1">Post</a>), 'a link').toBe(true);
+  expect(isInteractive(<RouterLink href="/posts/1">Post</RouterLink>), 'a router link').toBe(true);
+  expect(
+    isInteractive(<LazyLink href="/posts/1">Post</LazyLink>),
+    'a router link a Server Component hands over',
+  ).toBe(true);
+  expect(isInteractive(<button type="button">Open</button>), 'a button').toBe(true);
+  expect(isInteractive(<a>Not a link</a>), 'an anchor without href').toBe(false);
+  expect(isInteractive(<form />), 'a form').toBe(false);
+  expect(isInteractive(<article />), 'an article').toBe(false);
+  expect(
+    parse(renderToString(anatomy())).querySelector('[data-card]')!.hasAttribute('data-interactive'),
+    'a card with no onClick',
+  ).toBe(false);
+});
+
 test('media bleeds to the edge and takes the corner where it touches one', () => {
   const doc = parse(
     renderToString(
@@ -219,7 +259,7 @@ function withFooter(props: Card.Props = {}, mode: 'light' | 'dark' = 'light') {
           </Card.Action>
         </Card.Header>
         <Card.Content>Agenda</Card.Content>
-        <Card.Footer className="justify-end">
+        <Card.Footer>
           <Button variant="outline">Cancel</Button>
           <Button>Save</Button>
         </Card.Footer>
@@ -239,6 +279,7 @@ test.each(['light', 'dark'] as const)(
     const style = getComputedStyle(footer);
     expect(style.backgroundColor).toBe(colorOf('--ids-color-bg-block', root));
     expect(style.color).toBe(textColorOf('--ids-color-text-neutral-strong', root));
+    expect(style.justifyContent).toBe('flex-end');
     expect(style.borderTopWidth).toBe('1px');
     expect(style.borderTopColor).toBe(colorOf('--ids-color-border-neutral', root));
     expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-surface', root));

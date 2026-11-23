@@ -7,30 +7,27 @@ import { marqueeStyle } from './style';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type MarqueeOrientation = 'horizontal' | 'vertical';
+export type MarqueeDirection = 'start' | 'end' | 'up' | 'down';
 export type MarqueeSpeed = 'slow' | 'normal' | 'fast' | number;
+export type MarqueeVariant = 'fade' | 'plain';
 
 export function Marquee(props: Marquee.Props) {
   return <MarqueeRoot {...props} />;
 }
 
 export namespace Marquee {
-  export type Orientation = MarqueeOrientation;
+  export type Direction = MarqueeDirection;
   export type Speed = MarqueeSpeed;
+  export type Variant = MarqueeVariant;
 
   export type Props = Omit<ComponentProps<'div'>, 'role'> & {
-    orientation?: MarqueeOrientation;
-    reverse?: boolean;
+    direction?: MarqueeDirection;
     speed?: MarqueeSpeed;
     playing?: boolean;
     defaultPlaying?: boolean;
     onPlayingChange?: (playing: boolean) => void;
-    pauseOnHover?: boolean;
-    pauseOnFocus?: boolean;
-    pauseControl?: boolean;
-    fade?: boolean;
+    variant?: MarqueeVariant;
     size?: IdsSize;
-    reducedMotion?: boolean;
   };
 
   export type ItemProps = MarqueeItemProps;

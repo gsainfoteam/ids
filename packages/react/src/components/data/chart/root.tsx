@@ -2,7 +2,6 @@
 
 import {
   cloneElement,
-  createElement,
   isValidElement,
   useEffect,
   useId,
@@ -14,27 +13,16 @@ import {
 import { DEFAULT_SERIES, seriesColor, seriesVariables, uncoloredKeys } from './config';
 import { ChartContext } from './context';
 import { ChartDescription } from './description';
-import {
-  fadedSeriesOf,
-  paintSeries,
-  RECHARTS_CHARTS,
-  RECHARTS_LEGEND,
-  RECHARTS_TOOLTIP,
-  tableOf,
-  type GraphProps,
-} from './graph';
-import { ChartLegend } from './legend';
+import { fadedSeriesOf, paintSeries, RECHARTS_CHARTS, tableOf, type GraphProps } from './graph';
 import { chartStyle } from './style';
 import { ChartTable } from './table';
 import { ChartTitle } from './title';
-import { ChartTooltip } from './tooltip';
 import { useChartSize } from './use-chart-size';
 import { useKeysOverARestingPointer } from './use-keys-over-a-resting-pointer';
 import { DEFAULT_LOCALE } from '../../../internal/messages';
 import { useProviderLocale, useTranslate } from '../../../internal/translate';
-import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
-import { AspectRatio } from '../../layout/aspect-ratio';
 
 import type { Chart } from '.';
 
@@ -47,8 +35,6 @@ type GraphElement = ReactElement<
   }
 >;
 
-const TOOLTIPS: ReadonlySet<unknown> = new Set([ChartTooltip, RECHARTS_TOOLTIP]);
-const LEGENDS: ReadonlySet<unknown> = new Set([ChartLegend, RECHARTS_LEGEND]);
 const CAPTION_PARTS: ReadonlySet<unknown> = new Set([ChartTitle, ChartDescription]);
 const PARTS: ReadonlySet<unknown> = new Set([...CAPTION_PARTS, ChartTable]);
 
@@ -58,7 +44,7 @@ const isElementOf =
     isValidElement(node) && elementTypeOf(node) === type;
 
 const WRAPPED_CHART_WARNING =
-  '[IDS] Chart: its chart child is not a Recharts chart, so Chart cannot add the default Tooltip, Legend and screen reader table. Place the Recharts chart as a direct child, or place Chart.Tooltip, Chart.Legend and Chart.Table yourself.';
+  '[IDS] Chart: its chart child is not a Recharts chart, so Chart cannot paint its series or add the screen reader table. Place the Recharts chart as a direct child, or place Chart.Table yourself.';
 
 const tooManySeriesWarning = (count: number) =>
   `[IDS] Chart: ${count} series have no color, but the default colors are only ${DEFAULT_SERIES.join(', ')}, so the rest draw in neutral. Give the 4th and later series a color in the config.`;
@@ -95,36 +81,19 @@ function fadeDefinitions(keys: string[], fadeIdOf: (key: string) => string, side
   );
 }
 
-function withDefaults(
+function paintedChildren(
   graph: GraphElement,
   config: Chart.Config,
   fadeIdOf: (key: string) => string,
-  { tooltip, legend }: { tooltip: boolean; legend: boolean },
 ) {
   const own = graph.props.children;
   return [
     fadeDefinitions(fadedSeriesOf(own, config), fadeIdOf, graph.props.layout === 'vertical'),
     paintSeries(own, config, fadeIdOf),
-    tooltip && !containsElementOfType(own, TOOLTIPS)
-      ? createElement(ChartTooltip, { key: 'ids-chart-tooltip' })
-      : null,
-    legend && !containsElementOfType(own, LEGENDS)
-      ? createElement(ChartLegend, { key: 'ids-chart-legend' })
-      : null,
   ];
 }
 
-export function ChartRoot({
-  config,
-  ratio = 16 / 9,
-  tooltip = true,
-  legend = true,
-  locale,
-  className,
-  style,
-  children,
-  ...props
-}: Chart.Props) {
+export function ChartRoot({ config, className, style, children, ...props }: Chart.Props) {
   const t = useTranslate();
   const providerLocale = useProviderLocale();
   const id = useId();
@@ -177,7 +146,7 @@ export function ChartRoot({
               : (graph.props['aria-label'] ?? t('chart.label')),
             'aria-describedby': graph.props['aria-describedby'] ?? descriptionId,
           } as Partial<GraphElement['props']>,
-          ...(recognised ? [withDefaults(graph, config, fadeIdOf, { tooltip, legend })] : []),
+          ...(recognised ? [paintedChildren(graph, config, fadeIdOf)] : []),
         )
       : null;
 
@@ -186,7 +155,7 @@ export function ChartRoot({
       value={{
         config,
         styles,
-        locale: locale ?? providerLocale ?? DEFAULT_LOCALE,
+        locale: providerLocale ?? DEFAULT_LOCALE,
         titleId,
         descriptionId,
         table,
@@ -200,15 +169,14 @@ export function ChartRoot({
         style={{ ...seriesVariables(config), ...style }}
       >
         {caption.length > 0 && <figcaption className={styles.caption()}>{caption}</figcaption>}
-        <AspectRatio
+        <div
           ref={frameRef}
-          ratio={ratio}
           data-chart-frame=""
           className={styles.frame()}
           {...keysOverARestingPointer}
         >
           {drawn}
-        </AspectRatio>
+        </div>
         {rest}
         {!hasOwnTable && table && (
           <div className={styles.srTable()}>

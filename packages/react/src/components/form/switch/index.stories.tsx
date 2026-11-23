@@ -95,7 +95,7 @@ export const Gallery: Story = {
           </Label>
         </Showcase.Row>
         <Showcase.Row label="Field">
-          <Field variant="horizontal">
+          <Field orientation="horizontal">
             <Field.Label>다크 모드</Field.Label>
             <Switch />
           </Field>
@@ -217,7 +217,7 @@ export const BindWithReactHookForm: Story = {
           className="flex flex-col items-start gap-4"
           onSubmit={methods.handleSubmit((values) => setResult(JSON.stringify(values)))}
         >
-          <FormField name="autoSave" variant="horizontal">
+          <FormField name="autoSave" orientation="horizontal">
             <FormField.Label>자동 저장</FormField.Label>
             <Switch />
           </FormField>

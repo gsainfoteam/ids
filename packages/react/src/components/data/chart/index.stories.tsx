@@ -20,6 +20,7 @@ import { expect, waitFor, type userEvent as storyUserEvent } from 'storybook/tes
 
 import { Showcase, palettes } from '~story-kit';
 
+import { AspectRatio } from '../../layout/aspect-ratio';
 import { IdsProvider } from '../../utility/ids-provider';
 
 import { Chart } from '.';
@@ -88,12 +89,7 @@ const meta = {
   title: 'Data/Chart',
   component: Chart,
   tags: ['autodocs'],
-  argTypes: {
-    ratio: { control: { type: 'number', min: 0.5, step: 0.1 } },
-    tooltip: { control: 'boolean' },
-    legend: { control: 'boolean' },
-  },
-  args: { config: VISITS_CONFIG, ratio: 16 / 9, tooltip: true, legend: true },
+  args: { config: VISITS_CONFIG },
 } satisfies Meta<typeof Chart>;
 
 export default meta;
@@ -110,154 +106,37 @@ export const Playground: Story = {
           <XAxis dataKey="day" tickLine={false} axisLine={false} />
           <Bar dataKey="web" radius={4} />
           <Bar dataKey="app" radius={4} />
+          <Chart.Tooltip />
+          <Chart.Legend />
         </BarChart>
       </Chart>
     </div>
   ),
 };
 
-export const Gallery: Story = {
+export const Usage: Story = {
   render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="Types"
-        description="막대, 선, 면, 원, 방사형 모두 같은 config 로 색과 이름을 받습니다."
-      >
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <Chart config={VISITS_CONFIG} className="w-80">
-            <Chart.Title>Bar</Chart.Title>
-            <BarChart data={VISITS}>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="day" tickLine={false} axisLine={false} />
-              <Bar dataKey="web" radius={4} />
-              <Bar dataKey="app" radius={4} />
-            </BarChart>
-          </Chart>
-          <Chart config={VISITS_CONFIG} className="w-80">
-            <Chart.Title>Line</Chart.Title>
-            <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="day" tickLine={false} axisLine={false} />
-              <Line dataKey="web" type="monotone" strokeWidth={2} />
-              <Line dataKey="app" type="monotone" strokeWidth={2} />
-            </LineChart>
-          </Chart>
-          <Chart config={VISITS_CONFIG} className="w-80">
-            <Chart.Title>Area</Chart.Title>
-            <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="day" tickLine={false} axisLine={false} />
-              <Area dataKey="web" type="monotone" stackId="visits" />
-              <Area dataKey="app" type="monotone" stackId="visits" />
-            </AreaChart>
-          </Chart>
-          <Chart config={SERVICES_CONFIG} ratio={1} className="w-80">
-            <Chart.Title>Pie</Chart.Title>
-            <PieChart>
-              <Pie data={SHARES} dataKey="visits" nameKey="service" innerRadius="45%" />
-            </PieChart>
-          </Chart>
-          <Chart config={SURVEY_CONFIG} ratio={1} className="w-80" legend={false}>
-            <Chart.Title>Radar</Chart.Title>
-            <RadarChart data={SURVEY}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="topic" />
-              <Radar dataKey="score" fillOpacity={0.4} />
-            </RadarChart>
-          </Chart>
-          <Chart config={SERVICE_VISITS_CONFIG} className="w-80" legend={false}>
-            <Chart.Title>Vertical bar</Chart.Title>
-            <BarChart data={SERVICES} layout="vertical">
-              <XAxis type="number" hide />
-              <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={64} />
-              <Bar dataKey="visits" radius={4} />
-            </BarChart>
-          </Chart>
-        </div>
-      </Showcase.Section>
-      <Showcase.Section
-        title="Series colors"
-        description="color 를 생략한 계열은 차례로 primary, secondary, tertiary 채움을 씁니다. 테마가 primary 만 주면 secondary 와 tertiary 는 primary 에서 만든 색입니다. 네 번째 계열(학식)부터는 config 에서 color 를 고릅니다."
-      >
-        <Chart config={SERVICES_CONFIG} className="w-full max-w-xl" tooltip={false}>
-          <Chart.Title>primary 만</Chart.Title>
-          <BarChart data={SERVICE_TOTALS}>
-            <XAxis dataKey="week" tickLine={false} axisLine={false} />
-            <Bar dataKey="ziggle" radius={4} />
-            <Bar dataKey="gistory" radius={4} />
-            <Bar dataKey="shuttle" radius={4} />
-            <Bar dataKey="cafeteria" radius={4} />
-          </BarChart>
-        </Chart>
-        <IdsProvider.Scope theme={{ secondary: palettes.violet, tertiary: palettes.amber }}>
-          <Chart config={SERVICES_CONFIG} className="w-full max-w-xl" tooltip={false}>
-            <Chart.Title>primary, secondary violet, tertiary amber</Chart.Title>
-            <BarChart data={SERVICE_TOTALS}>
-              <XAxis dataKey="week" tickLine={false} axisLine={false} />
-              <Bar dataKey="ziggle" radius={4} />
-              <Bar dataKey="gistory" radius={4} />
-              <Bar dataKey="shuttle" radius={4} />
-              <Bar dataKey="cafeteria" radius={4} />
-            </BarChart>
-          </Chart>
-        </IdsProvider.Scope>
-      </Showcase.Section>
-      <Showcase.Section
-        title="Indicator"
-        description="Tooltip 과 Legend 가 계열 앞에 두는 표시입니다."
-      >
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-          {(['dot', 'line', 'dashed'] as const).map((indicator) => (
-            <Chart key={indicator} config={VISITS_CONFIG} className="w-72">
-              <Chart.Title>{indicator}</Chart.Title>
-              <BarChart data={VISITS}>
-                <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <Bar dataKey="web" radius={4} />
-                <Bar dataKey="app" radius={4} />
-                <Chart.Tooltip indicator={indicator} defaultIndex={2} active />
-                <Chart.Legend indicator={indicator} />
-              </BarChart>
-            </Chart>
-          ))}
-        </div>
-      </Showcase.Section>
-      <Showcase.Section
-        title="Table"
-        description="Chart.Table 을 두면 같은 데이터를 표로 보여 줍니다."
-      >
-        <Chart config={VISITS_CONFIG} className="w-full max-w-xl" ratio={2}>
-          <Chart.Title>주간 방문</Chart.Title>
-          <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
-            <XAxis dataKey="day" tickLine={false} axisLine={false} />
-            <Line dataKey="web" strokeWidth={2} />
-            <Line dataKey="app" strokeWidth={2} />
-          </LineChart>
-          <Chart.Table size="tiny" />
-        </Chart>
-      </Showcase.Section>
-    </Showcase>
+    <div className="w-full max-w-xl">
+      <Chart config={{ web: { label: '웹' }, app: { label: '앱' } }}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart
+          data={[
+            { day: '월', web: 1240, app: 860 },
+            { day: '화', web: 1380, app: 920 },
+            { day: '수', web: 1120, app: 1040 },
+            { day: '목', web: 1460, app: 980 },
+            { day: '금', web: 1590, app: 1210 },
+          ]}
+        >
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+          <Chart.Tooltip />
+          <Chart.Legend />
+        </BarChart>
+      </Chart>
+    </div>
   ),
-};
-
-export const DefaultTooltipAndLegend: Story = {
-  render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Bar dataKey="app" radius={4} />
-      </BarChart>
-    </Chart>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '차트 안에 Tooltip 이나 Legend 가 없으면 Chart 가 IDS 의 것을 붙입니다. 이름은 config 의 label, 색은 `--chart-<key>` 에서 옵니다. 숫자는 IdsProvider 의 locale 로 씁니다.',
-      },
-    },
-  },
   play: async ({ canvas, canvasElement, userEvent }) => {
     await waitFor(() => {
       const legend = canvasElement.querySelector<HTMLElement>('[data-chart-legend]');
@@ -272,16 +151,422 @@ export const DefaultTooltipAndLegend: Story = {
   },
 };
 
-export const Keyboard: Story = {
+export const Gallery: Story = {
   render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Bar dataKey="app" radius={4} />
-      </BarChart>
-    </Chart>
+    <Showcase>
+      <Showcase.Section
+        title="Types"
+        description="막대, 선, 면, 원, 방사형 모두 같은 config 로 색과 이름을 받습니다."
+      >
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <Chart config={VISITS_CONFIG}>
+            <Chart.Title>Bar</Chart.Title>
+            <BarChart data={VISITS}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="day" tickLine={false} axisLine={false} />
+              <Bar dataKey="web" radius={4} />
+              <Bar dataKey="app" radius={4} />
+              <Chart.Tooltip />
+              <Chart.Legend />
+            </BarChart>
+          </Chart>
+          <Chart config={VISITS_CONFIG}>
+            <Chart.Title>Line</Chart.Title>
+            <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="day" tickLine={false} axisLine={false} />
+              <Line dataKey="web" type="monotone" strokeWidth={2} />
+              <Line dataKey="app" type="monotone" strokeWidth={2} />
+              <Chart.Tooltip />
+              <Chart.Legend />
+            </LineChart>
+          </Chart>
+          <Chart config={VISITS_CONFIG}>
+            <Chart.Title>Area</Chart.Title>
+            <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="day" tickLine={false} axisLine={false} />
+              <Area dataKey="web" type="monotone" stackId="visits" />
+              <Area dataKey="app" type="monotone" stackId="visits" />
+              <Chart.Tooltip />
+              <Chart.Legend />
+            </AreaChart>
+          </Chart>
+          <Chart config={SERVICES_CONFIG}>
+            <Chart.Title>Pie</Chart.Title>
+            <PieChart>
+              <Pie data={SHARES} dataKey="visits" nameKey="service" innerRadius="45%" />
+              <Chart.Tooltip />
+              <Chart.Legend />
+            </PieChart>
+          </Chart>
+          <Chart config={SURVEY_CONFIG}>
+            <Chart.Title>Radar</Chart.Title>
+            <RadarChart data={SURVEY}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="topic" />
+              <Radar dataKey="score" fillOpacity={0.4} />
+              <Chart.Tooltip />
+            </RadarChart>
+          </Chart>
+          <Chart config={SERVICE_VISITS_CONFIG}>
+            <Chart.Title>Vertical bar</Chart.Title>
+            <BarChart data={SERVICES} layout="vertical">
+              <XAxis type="number" hide />
+              <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={64} />
+              <Bar dataKey="visits" radius={4} />
+              <Chart.Tooltip />
+            </BarChart>
+          </Chart>
+        </div>
+      </Showcase.Section>
+      <Showcase.Section
+        title="Series colors"
+        description="color 를 생략한 계열은 차례로 primary, secondary, tertiary 채움을 씁니다. 테마가 primary 만 주면 secondary 와 tertiary 는 primary 에서 만든 색입니다. 네 번째 계열(학식)부터는 config 에서 color 를 고릅니다."
+      >
+        <div className="w-full max-w-xl">
+          <Chart config={SERVICES_CONFIG}>
+            <Chart.Title>primary 만</Chart.Title>
+            <BarChart data={SERVICE_TOTALS}>
+              <XAxis dataKey="week" tickLine={false} axisLine={false} />
+              <Bar dataKey="ziggle" radius={4} />
+              <Bar dataKey="gistory" radius={4} />
+              <Bar dataKey="shuttle" radius={4} />
+              <Bar dataKey="cafeteria" radius={4} />
+              <Chart.Legend />
+            </BarChart>
+          </Chart>
+        </div>
+        <IdsProvider.Scope theme={{ secondary: palettes.violet, tertiary: palettes.amber }}>
+          <div className="w-full max-w-xl">
+            <Chart config={SERVICES_CONFIG}>
+              <Chart.Title>primary, secondary violet, tertiary amber</Chart.Title>
+              <BarChart data={SERVICE_TOTALS}>
+                <XAxis dataKey="week" tickLine={false} axisLine={false} />
+                <Bar dataKey="ziggle" radius={4} />
+                <Bar dataKey="gistory" radius={4} />
+                <Bar dataKey="shuttle" radius={4} />
+                <Bar dataKey="cafeteria" radius={4} />
+                <Chart.Legend />
+              </BarChart>
+            </Chart>
+          </div>
+        </IdsProvider.Scope>
+      </Showcase.Section>
+      <Showcase.Section
+        title="Indicator"
+        description="Tooltip 과 Legend 가 계열 앞에 두는 표시입니다."
+      >
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {(['dot', 'line', 'dashed'] as const).map((indicator) => (
+            <Chart key={indicator} config={VISITS_CONFIG}>
+              <Chart.Title>{indicator}</Chart.Title>
+              <BarChart data={VISITS}>
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <Bar dataKey="web" radius={4} />
+                <Bar dataKey="app" radius={4} />
+                <Chart.Tooltip indicator={indicator} defaultIndex={2} active />
+                <Chart.Legend indicator={indicator} />
+              </BarChart>
+            </Chart>
+          ))}
+        </div>
+      </Showcase.Section>
+      <Showcase.Section
+        title="Size"
+        description="Chart 는 부모의 폭을 채웁니다. 부모가 높이를 주지 않으면 그래프는 16:9 이고, AspectRatio 나 높이가 있는 부모 안에서는 제목을 뺀 나머지를 그래프가 채웁니다."
+      >
+        <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-3">
+          <Chart config={VISITS_CONFIG}>
+            <Chart.Title>기본 16:9</Chart.Title>
+            <BarChart data={VISITS}>
+              <XAxis dataKey="day" tickLine={false} axisLine={false} />
+              <Bar dataKey="web" radius={4} />
+            </BarChart>
+          </Chart>
+          <AspectRatio ratio={1}>
+            <Chart config={VISITS_CONFIG}>
+              <Chart.Title>AspectRatio 1</Chart.Title>
+              <BarChart data={VISITS}>
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <Bar dataKey="web" radius={4} />
+              </BarChart>
+            </Chart>
+          </AspectRatio>
+          <div className="h-48">
+            <Chart config={VISITS_CONFIG}>
+              <Chart.Title>부모 h-48</Chart.Title>
+              <BarChart data={VISITS}>
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <Bar dataKey="web" radius={4} />
+              </BarChart>
+            </Chart>
+          </div>
+        </div>
+      </Showcase.Section>
+      <Showcase.Section
+        title="Table"
+        description="Chart.Table 을 두면 같은 데이터를 표로 보여 줍니다."
+      >
+        <div className="w-full max-w-xl">
+          <Chart config={VISITS_CONFIG}>
+            <Chart.Title>주간 방문</Chart.Title>
+            <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
+              <XAxis dataKey="day" tickLine={false} axisLine={false} />
+              <Line dataKey="web" strokeWidth={2} />
+              <Line dataKey="app" strokeWidth={2} />
+            </LineChart>
+            <Chart.Table size="tiny" />
+          </Chart>
+        </div>
+      </Showcase.Section>
+    </Showcase>
+  ),
+};
+
+export const FormatTheTooltipAndLegend: Story = {
+  render: () => (
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Area dataKey="web" type="monotone" />
+          <Area dataKey="app" type="monotone" />
+          <Chart.Tooltip
+            indicator="line"
+            labelFormatter={(label) => `${label}요일`}
+            formatter={(value) => `${Number(value).toLocaleString('ko-KR')}회`}
+          />
+          <Chart.Legend indicator="line" formatter={(label) => <span>{label} 방문</span>} />
+        </AreaChart>
+      </Chart>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Chart.Tooltip` 과 `Chart.Legend` 의 `indicator` 로 계열 앞 표시를, `formatter` 와 `labelFormatter` 로 글자를 바꿉니다. `content` 를 주면 내용을 통째로 바꿉니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await waitFor(() =>
+      expect(canvasElement.querySelector('[data-chart-legend]')).toHaveTextContent(
+        '웹 방문앱 방문',
+      ),
+    );
+    await pointAtTheMiddle(userEvent, await canvas.findByRole('img', { name: '주간 방문' }));
+    await waitFor(() => expect(tooltipText(canvasElement)).toContain('요일'));
+    await expect(tooltipText(canvasElement)).toMatch(/[\d,]+회/);
+    await expect(
+      canvasElement.querySelectorAll('[data-chart-tooltip] [data-chart-indicator="line"]'),
+    ).toHaveLength(2);
+  },
+};
+
+export const UseTheRechartsTooltip: Story = {
+  render: () => (
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Tooltip
+            cursor={false}
+            contentStyle={{
+              background: 'var(--ids-color-bg-base)',
+              borderColor: 'var(--ids-color-border-neutral)',
+            }}
+            itemStyle={{ color: 'var(--ids-color-text-neutral-strong)' }}
+          />
+        </BarChart>
+      </Chart>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Recharts 의 `Tooltip` 을 그대로 둘 수도 있습니다. 기본 툴팁은 흰 바탕에 값을 계열 색으로 쓰므로, 다크 모드에서 읽히도록 `contentStyle` 과 `itemStyle` 에 IDS 색을 줍니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(canvasElement.querySelector('[data-chart-legend]')).toBeNull();
+    await pointAtTheMiddle(userEvent, await canvas.findByRole('img', { name: '주간 방문' }));
+    await waitFor(() =>
+      expect(canvasElement.querySelector('.recharts-default-tooltip')).not.toBeNull(),
+    );
+    await expect(canvasElement.querySelector('[data-chart-tooltip]')).toBeNull();
+  },
+};
+
+export const PickSeriesColors: Story = {
+  render: () => (
+    <div className="w-full max-w-xl">
+      <Chart
+        config={{
+          income: { label: '수입', color: 'success' },
+          spending: { label: '지출', color: 'danger' },
+        }}
+      >
+        <Chart.Title>월별 회비</Chart.Title>
+        <BarChart
+          data={[
+            { month: '3월', income: 420000, spending: 310000 },
+            { month: '4월', income: 380000, spending: 450000 },
+            { month: '5월', income: 510000, spending: 290000 },
+          ]}
+        >
+          <XAxis dataKey="month" tickLine={false} axisLine={false} />
+          <Bar dataKey="income" radius={4} />
+          <Bar dataKey="spending" radius={4} />
+          <Chart.Tooltip />
+          <Chart.Legend />
+        </BarChart>
+      </Chart>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`color` 에 계열 이름(`primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `neutral`)을 주면 그 계열의 채움을, 그 밖의 문자열은 CSS 색으로 씁니다. 상태 색은 기본 순서에 들지 않고 이렇게 고를 때만 씁니다. 계열은 `var(--chart-<key>)` 로 칠해지고, 막대·선·면에 `fill` 이나 `stroke` 를 직접 주면 그것이 이깁니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const figure = canvasElement.querySelector<HTMLElement>('[data-chart]')!;
+    await expect(figure.style.getPropertyValue('--chart-income')).toBe(
+      'var(--ids-color-bg-success-solid)',
+    );
+    await waitFor(() =>
+      expect(
+        canvasElement.querySelector('.recharts-bar-rectangle path')?.getAttribute('fill'),
+      ).toBe('var(--chart-income)'),
+    );
+  },
+};
+
+export const ShowTheDataAsATable: Story = {
+  render: () => (
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Line dataKey="web" strokeWidth={2} />
+          <Line dataKey="app" strokeWidth={2} />
+        </LineChart>
+        <Chart.Table size="tiny" />
+      </Chart>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Chart.Table` 을 두면 화면에 보이지 않던 표 대신 그 표가 보입니다. Table 의 속성을 그대로 받습니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const tables = canvas.getAllByRole('table');
+    await expect(tables).toHaveLength(1);
+    await expect(tables[0]!.closest('.sr-only')).toBeNull();
+    await expect(tables[0]).toBeVisible();
+  },
+};
+
+export const SetTheHeight: Story = {
+  render: () => (
+    <div className="h-72 w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+          <Chart.Tooltip />
+        </BarChart>
+      </Chart>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '높이는 Chart 를 감싼 요소가 정합니다. Chart 는 부모의 높이(`h-72`)를 채우고, 그래프는 제목을 뺀 나머지를 채웁니다. 부모가 높이를 주지 않으면 그래프는 16:9 입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const graph = await canvas.findByRole('img', { name: '주간 방문' });
+    const figure = canvasElement.querySelector<HTMLElement>('[data-chart]')!;
+    const frame = canvasElement.querySelector<HTMLElement>('[data-chart-frame]')!;
+    await expect(figure.getBoundingClientRect().height).toBe(288);
+    await expect(graph.getAttribute('height')).toBe(
+      String(Math.floor(frame.getBoundingClientRect().height)),
+    );
+    await expect(frame.getBoundingClientRect().bottom).toBeCloseTo(
+      figure.getBoundingClientRect().bottom,
+      0,
+    );
+  },
+};
+
+export const KeepARatio: Story = {
+  render: () => (
+    <div className="w-full max-w-sm">
+      <AspectRatio ratio={1}>
+        <Chart config={SERVICES_CONFIG}>
+          <Chart.Title>서비스별 방문</Chart.Title>
+          <PieChart>
+            <Pie data={SHARES} dataKey="visits" nameKey="service" innerRadius="45%" />
+            <Chart.Tooltip />
+            <Chart.Legend />
+          </PieChart>
+        </Chart>
+      </AspectRatio>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '비율은 Chart 를 `AspectRatio` 로 감싸서 정합니다. Chart 가 AspectRatio 를 채우고, 비율은 제목까지 포함한 Chart 전체의 비율입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await canvas.findByRole('img', { name: '서비스별 방문' });
+    const figure = canvasElement
+      .querySelector<HTMLElement>('[data-chart]')!
+      .getBoundingClientRect();
+    await expect(figure.width).toBeCloseTo(figure.height, 0);
+  },
+};
+
+export const Keyboard: Story = {
+  tags: ['verification'],
+  render: () => (
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <XAxis dataKey="day" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+          <Chart.Tooltip />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
@@ -304,15 +589,18 @@ export const Keyboard: Story = {
 };
 
 export const ScreenReaderTable: Story = {
+  tags: ['verification'],
   render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" name="요일" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Bar dataKey="app" radius={4} />
-      </BarChart>
-    </Chart>
+    <div className="w-full max-w-xl">
+      <Chart config={VISITS_CONFIG}>
+        <Chart.Title>주간 방문</Chart.Title>
+        <BarChart data={VISITS}>
+          <XAxis dataKey="day" name="요일" tickLine={false} axisLine={false} />
+          <Bar dataKey="web" radius={4} />
+          <Bar dataKey="app" radius={4} />
+        </BarChart>
+      </Chart>
+    </div>
   ),
   parameters: {
     docs: {
@@ -332,155 +620,5 @@ export const ScreenReaderTable: Story = {
     ]);
     await expect(canvas.getByRole('rowheader', { name: '금' })).toBeInTheDocument();
     await expect(canvas.getByRole('cell', { name: '1,590' })).toBeInTheDocument();
-  },
-};
-
-export const VisibleTable: Story = {
-  render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl" ratio={2}>
-      <Chart.Title>주간 방문</Chart.Title>
-      <LineChart data={VISITS} margin={{ left: 12, right: 12 }}>
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Line dataKey="web" strokeWidth={2} />
-        <Line dataKey="app" strokeWidth={2} />
-      </LineChart>
-      <Chart.Table size="tiny" />
-    </Chart>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '`Chart.Table` 을 두면 기본 표 대신 그 표가 보입니다. Table 의 속성을 그대로 받습니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    const tables = canvas.getAllByRole('table');
-    await expect(tables).toHaveLength(1);
-    await expect(tables[0]!.closest('.sr-only')).toBeNull();
-    await expect(tables[0]).toBeVisible();
-  },
-};
-
-export const CustomTooltip: Story = {
-  render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl">
-      <Chart.Title>주간 방문</Chart.Title>
-      <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Area dataKey="web" type="monotone" />
-        <Area dataKey="app" type="monotone" />
-        <Chart.Tooltip
-          indicator="line"
-          labelFormatter={(label) => `${label}요일`}
-          formatter={(value) => `${Number(value).toLocaleString('ko-KR')}회`}
-        />
-        <Chart.Legend indicator="line" formatter={(label) => <span>{label} 방문</span>} />
-      </AreaChart>
-    </Chart>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Chart.Tooltip 과 Chart.Legend 를 직접 두면 기본 대신 그것을 씁니다. `indicator`, `formatter` 로 바꾸고, `content` 로 통째로 바꿉니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    await waitFor(() =>
-      expect(canvasElement.querySelector('[data-chart-legend]')).toHaveTextContent(
-        '웹 방문앱 방문',
-      ),
-    );
-    await pointAtTheMiddle(userEvent, await canvas.findByRole('img', { name: '주간 방문' }));
-    await waitFor(() => expect(tooltipText(canvasElement)).toContain('요일'));
-    await expect(tooltipText(canvasElement)).toMatch(/[\d,]+회/);
-    await expect(
-      canvasElement.querySelectorAll('[data-chart-tooltip] [data-chart-indicator="line"]'),
-    ).toHaveLength(2);
-  },
-};
-
-export const RechartsTooltip: Story = {
-  render: () => (
-    <Chart config={VISITS_CONFIG} className="w-full max-w-xl" legend={false}>
-      <Chart.Title>주간 방문</Chart.Title>
-      <BarChart data={VISITS}>
-        <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Bar dataKey="web" radius={4} />
-        <Tooltip
-          cursor={false}
-          contentStyle={{
-            background: 'var(--ids-color-bg-base)',
-            borderColor: 'var(--ids-color-border-neutral)',
-          }}
-          itemStyle={{ color: 'var(--ids-color-text-neutral-strong)' }}
-        />
-      </BarChart>
-    </Chart>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Recharts 의 Tooltip 을 직접 두어도 Chart 는 기본을 더하지 않습니다. `legend={false}` 로 기본 Legend 를 끕니다. Recharts 의 기본 툴팁은 흰 바탕에 값을 계열 색으로 쓰므로, 다크 모드에서 읽히도록 `contentStyle` 과 `itemStyle` 에 IDS 색을 줍니다.',
-      },
-    },
-  },
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    await expect(canvasElement.querySelector('[data-chart-legend]')).toBeNull();
-    await pointAtTheMiddle(userEvent, await canvas.findByRole('img', { name: '주간 방문' }));
-    await waitFor(() =>
-      expect(canvasElement.querySelector('.recharts-default-tooltip')).not.toBeNull(),
-    );
-    await expect(canvasElement.querySelector('[data-chart-tooltip]')).toBeNull();
-  },
-};
-
-export const SeriesColors: Story = {
-  render: () => (
-    <Chart
-      config={{
-        income: { label: '수입', color: 'success' },
-        spending: { label: '지출', color: 'danger' },
-      }}
-      className="w-full max-w-xl"
-    >
-      <Chart.Title>월별 회비</Chart.Title>
-      <BarChart
-        data={[
-          { month: '3월', income: 420000, spending: 310000 },
-          { month: '4월', income: 380000, spending: 450000 },
-          { month: '5월', income: 510000, spending: 290000 },
-        ]}
-      >
-        <XAxis dataKey="month" tickLine={false} axisLine={false} />
-        <Bar dataKey="income" radius={4} />
-        <Bar dataKey="spending" radius={4} />
-      </BarChart>
-    </Chart>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '`color` 에 계열 이름(`primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `neutral`)을 주면 그 계열의 채움을, 그 밖의 문자열은 CSS 색으로 씁니다. 상태 색은 기본 순서에 들지 않고 이렇게 고를 때만 씁니다. 계열은 `var(--chart-<key>)` 로 칠해지고, 막대·선·면에 `fill` 이나 `stroke` 를 직접 주면 그것이 이깁니다.',
-      },
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const figure = canvasElement.querySelector<HTMLElement>('[data-chart]')!;
-    await expect(figure.style.getPropertyValue('--chart-income')).toBe(
-      'var(--ids-color-bg-success-solid)',
-    );
-    await waitFor(() =>
-      expect(
-        canvasElement.querySelector('.recharts-bar-rectangle path')?.getAttribute('fill'),
-      ).toBe('var(--chart-income)'),
-    );
   },
 };

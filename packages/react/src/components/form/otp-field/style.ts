@@ -8,7 +8,7 @@ const noIosFocusZoom = cn('text-base');
 
 export const otpFieldStyle = tv({
   slots: {
-    root: 'group/otp relative inline-flex items-center gap-2 data-disabled:opacity-50',
+    root: 'group/otp relative flex w-full min-w-0 items-center gap-2 data-disabled:opacity-50',
     input: [
       'absolute inset-0 z-10 size-full cursor-text appearance-none border-0 bg-transparent p-0',
       'font-mono',

@@ -8,6 +8,7 @@ export const promptInputStyle = tv({
     textArea: [
       'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
       'group-data-dragging/prompt-input:inset-ring-primary-strong',
+      '[&>[data-text-area-top]]:border-b-0 [&>[data-text-area-bottom]]:border-t-0',
     ],
     attachments: 'w-full py-0.5',
     submit: 'ms-auto!',

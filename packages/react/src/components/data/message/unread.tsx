@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { useMessageContext } from './context';
 import { usePresence } from '../../../internal/overlay';
 import { useTranslate } from '../../../internal/translate';
-import { Badge } from '../badge';
+import { Chip } from '../chip';
 
 function isUnread(unread: number | boolean | undefined): unread is number | true {
   return unread === true || (typeof unread === 'number' && unread > 0);
@@ -30,7 +30,7 @@ export function MessageUnread() {
       className={styles.unread()}
     >
       {lastShown === true ? (
-        <Badge dot colorScheme="primary" aria-hidden="true" />
+        <Chip variant="solid" colorScheme="primary" aria-hidden="true" />
       ) : (
         <span aria-hidden="true">{lastShown}</span>
       )}

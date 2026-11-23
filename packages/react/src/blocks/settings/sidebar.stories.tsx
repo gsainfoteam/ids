@@ -4,8 +4,8 @@ import { BellIcon, LinkIcon, LockClosedIcon, UserCircleIcon } from '@heroicons/r
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -249,7 +249,9 @@ export const PC: Story = {
                       <Item.Title>
                         {app.name}
                         {app.connected && (
-                          <Badge content="연결됨" variant="soft" colorScheme="success" />
+                          <Chip variant="soft" colorScheme="success">
+                            연결됨
+                          </Chip>
                         )}
                       </Item.Title>
                       <Item.Description>{app.description}</Item.Description>
