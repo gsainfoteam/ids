@@ -72,3 +72,24 @@ describe('a Usage story becomes the live code its Docs page starts from', () => 
     expect(html).not.toBe('');
   });
 });
+
+describe('a name the story file declares never passes for a global', () => {
+  test.for([
+    'name',
+    'status',
+    'length',
+    'event',
+    'top',
+    'open',
+    'origin',
+    'Option',
+    'Audio',
+    'Node',
+  ])('%s', (name) => {
+    expect(resolveLiveImport(name)).toBeUndefined();
+  });
+
+  test.for(['Math', 'Date', 'JSON', 'window', 'document', 'console'])('%s is a global', (name) => {
+    expect(resolveLiveImport(name)).toBeNull();
+  });
+});

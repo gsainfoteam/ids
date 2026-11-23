@@ -52,13 +52,71 @@ const WHERE_A_NAME_COMES_FROM: Source[] = [
   { module: '@internationalized/date', exports: InternationalizedDate, takes: isPascalCase },
 ];
 
-const READ_ONLY_IN_A_BROWSER = new Set(['window', 'document', 'navigator', 'location']);
+const JAVASCRIPT_GLOBALS = [
+  'undefined',
+  'NaN',
+  'Infinity',
+  'globalThis',
+  'Object',
+  'Function',
+  'Array',
+  'String',
+  'Number',
+  'Boolean',
+  'Symbol',
+  'BigInt',
+  'Math',
+  'Date',
+  'RegExp',
+  'JSON',
+  'Intl',
+  'Promise',
+  'Map',
+  'Set',
+  'WeakMap',
+  'WeakSet',
+  'Error',
+  'TypeError',
+  'RangeError',
+  'parseInt',
+  'parseFloat',
+  'isNaN',
+  'isFinite',
+  'encodeURIComponent',
+  'decodeURIComponent',
+  'structuredClone',
+  'queueMicrotask',
+];
+
+const BROWSER_GLOBALS = [
+  'window',
+  'document',
+  'navigator',
+  'location',
+  'console',
+  'fetch',
+  'setTimeout',
+  'clearTimeout',
+  'setInterval',
+  'clearInterval',
+  'requestAnimationFrame',
+  'cancelAnimationFrame',
+  'URL',
+  'URLSearchParams',
+  'File',
+  'Blob',
+  'FormData',
+  'AbortController',
+  'alert',
+];
+
+const GLOBALS_A_MODULE_READS = new Set([...JAVASCRIPT_GLOBALS, ...BROWSER_GLOBALS]);
 
 export function resolveLiveImport(name: string) {
   const source = WHERE_A_NAME_COMES_FROM.find(
     ({ exports, takes }) => takes(name) && name in exports,
   );
   if (source) return source.module;
-  if (name in globalThis || READ_ONLY_IN_A_BROWSER.has(name)) return null;
+  if (GLOBALS_A_MODULE_READS.has(name)) return null;
   return undefined;
 }
