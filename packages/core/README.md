@@ -26,7 +26,9 @@ package.json, pubspec.yaml   ─┘   (valibot 검사)   (IR + ir.schema.json)
   - `src/targets/output.ts`: `targets.json` 의 `outputs` 에서 출력 경로를 찾고, 그 파일 자리의 Prettier 설정으로 정리해 쓴다.
   - `dart/`: `flutter/lib/tokens/*.dart`(아래 "Dart 타깃"). `src/targets/dart/run.ts` 가 `dart run` 으로 부른다.
   - `src/fonts/copy.ts`: IR 의 `fonts.bundled` 대로 Flutter 글꼴을 복사한다.
-- 문구는 아직 `messages.build.mjs` 가 따로 만든다(아래 "문구 카탈로그").
+- 문구도 같은 길을 지난다(아래 "문구 카탈로그").
+  - `src/sources/load.ts` 가 `messages/*.json` 을 읽고, `src/ir/messages.ts` 가 IR 의 `messages` 를 만든다.
+  - `src/targets/ts/messages.ts` 가 React 카탈로그와 locale 을, `dart/lib/src/targets/messages.dart` 가 Flutter 문구를 쓴다.
 
 ## 원본
 
@@ -50,6 +52,9 @@ config/
   fonts.json              함께 싣는 글꼴, npm 경로, 라이선스
   palette-model.json      팔레트 모델 계수와 상태 팔레트 이름
   css.json                CSS 타깃이 쓰는 속성 이름, 변형, concentric 패딩, Tailwind 이름공간, 배율
+  messages.json           기본 언어(ko), 카탈로그 이름, 공용 카탈로그에서 빼는 그룹(editor)
+messages/
+  ko.json, en.json        IDS 자체 문구. 언어마다 { language, tag, messages }
 tests/fixtures/theme-roles.json  ids-react 가 쓴 역할 색. Flutter 테스트가 같은 값을 내는지 비교한다
 ```
 
@@ -288,12 +293,21 @@ pnpm --filter @gsainfoteam/ids-react exec vitest run --project node tests/flutte
 
 ## 문구 카탈로그
 
-`messages/<language>.json`(`ko`, `en`)이 IDS 자체 문구의 원본이다. 서비스의 문구는 포함하지 않는다. 파일은 `{ language, tag, messages }`이고, 인자는 `{name}`(문자열)과 `{name, number}`(숫자)만 쓴다. 모든 언어는 ko와 같은 키와 인자를 가져야 한다.
+`messages/<language>.json`(`ko`, `en`)이 IDS 자체 문구의 원본이다. 서비스의 문구는 포함하지 않는다.
 
-`pnpm codegen`(`messages.build.mjs`)이 다음을 생성한다.
+- 파일은 `{ language, tag, messages }` 다. 문구는 ICU MessageFormat 이고 `@formatjs/icu-messageformat-parser` 로 읽는다.
+- 인자는 `{name}`(문자열)과 `{name, number}`(숫자)만 받는다. plural, select, 날짜, 태그는 원본 오류다.
+- IR 을 만들 때 다음을 확인한다. 어긋나면 파일과 키를 적은 `SourceError` 를 던진다.
+  - 모든 언어가 기본 언어(`config/messages.json` 의 `fallback`)와 같은 키와 같은 인자를 가진다.
+  - 키가 그룹과 키 순서대로 정렬돼 있다.
+  - `tag` 가 `language` 의 태그다(`Intl.Locale`).
+  - 두 경로가 같은 이름이 되지 않는다(`a.bC` 와 `aB.c`).
+- IR 의 `messages` 는 언어(`locales`), 카탈로그(`catalogs`), 문구(`entries`)다. 문구마다 경로, 이름, 인자, 언어별 조각(텍스트 또는 인자)을 담는다.
 
-- React: `src/internal/messages-catalog.ts`, Editor의 `messages-catalog.ts`, `src/internal/message-arguments.ts`, `src/locales/<language>.ts`
-- Flutter: `lib/messages/ids_messages.dart`(`IdsMessagesBase`, 언어마다 `IdsMessages<Language>`, `IdsLocale`)와 `test/generated/ids_message_readers.dart`
-- `dialog.close`는 `dialogClose`로, `{label}`은 `required String label`, `{count, number}`는 `required num count`로 바뀐다. 중첩 경로가 같은 Dart 이름이 되면 생성이 실패한다.
+`pnpm codegen` 이 다음을 생성한다.
 
-생성기 테스트: `node --test packages/core/dart-messages.test.mjs`.
+- React(`src/targets/ts/messages.ts`): `src/internal/messages-catalog.ts`, Editor의 `messages-catalog.ts`, `src/internal/message-arguments.ts`, `src/locales/<language>.ts`
+- Flutter(`dart/lib/src/targets/messages.dart`): `lib/messages/ids_messages.dart`(`IdsMessagesBase`, 언어마다 `IdsMessages<Language>`, `IdsLocale`)와 `test/generated/ids_message_readers.dart`
+- `dialog.close`는 `dialogClose`로, `{label}`은 `required String label`, `{count, number}`는 `required num count`로 바뀐다. `language`, `hashCode` 처럼 모든 문구 클래스에 있는 멤버가 되면 Dart 생성이 실패한다.
+
+테스트: `tests/messages.test.ts`.

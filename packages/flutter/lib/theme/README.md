@@ -32,5 +32,5 @@ IdsProvider 와 그 테마 객체입니다. 앱이 넘긴 `IdsTheme` 을 색 역
 - 개발 빌드에서 자기 테마의 문제(`checkIdsTheme`)를 `debugPrint('[IDS] ...')` 로 한 번 알립니다.
 - `locale` 은 `IdsLocale` 하나입니다. 문구(`messages`)와 날짜·숫자 형식(`locale`)을 함께 바꾸고, 다른 `IdsLocale` 로 바꾸면 의존 위젯이 다시 그려집니다. 비교는 `locale` 과 `messages` 의 `==` 입니다.
 - `locale` 이 없으면 부모의 것을 쓰고, 가장 바깥이면 `_localeOfTheApp` 이 `Localizations.maybeLocaleOf` 를 읽습니다. 언어가 같은 실린 문구를 앱의 `Locale` 과 묶고, 없으면 `IdsLocale.ko` 입니다. `Localizations` 에 의존하므로 앱 로케일이 바뀌면 다시 풉니다.
-- `IdsLocale`, `IdsMessagesBase`, `IdsMessagesKo`, `IdsMessagesEn` 은 `packages/core/dart-messages.mjs` 가 만듭니다. 숫자 인자는 각 문구 클래스의 태그(ko-KR, en-US)로 `intl` 의 `NumberFormat` 이 씁니다.
+- `IdsLocale`, `IdsMessagesBase`, `IdsMessagesKo`, `IdsMessagesEn` 은 `packages/core` 의 codegen(`dart/lib/src/targets/messages.dart`)이 만듭니다. 숫자 인자는 각 문구 클래스의 태그(ko-KR, en-US)로 `intl` 의 `NumberFormat` 이 씁니다.
 - Material, Cupertino 테마나 전역 `DefaultTextStyle` 을 넣지 않습니다. IDS 스타일은 IDS 컴포넌트 안에만 머뭅니다.
