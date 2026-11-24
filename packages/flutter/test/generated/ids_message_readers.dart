@@ -220,6 +220,7 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'telField.country': (messages) => messages.telFieldCountry,
   'textArea.limitReached': (messages) => messages.textAreaLimitReached,
   'textArea.remaining': (messages) => messages.textAreaRemaining(remaining: 7),
+  'textField.required': (messages) => messages.textFieldRequired,
   'timePicker.label': (messages) => messages.timePickerLabel,
   'toast.region': (messages) => messages.toastRegion,
 };

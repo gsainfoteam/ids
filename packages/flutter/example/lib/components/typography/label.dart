@@ -18,6 +18,7 @@ final label = WidgetbookComponent(
         ),
         required: context.knobs.boolean(label: 'required'),
         disabled: context.knobs.boolean(label: 'disabled'),
+        invalid: context.knobs.boolean(label: 'invalid'),
         child: Text(
           context.knobs.string(
             label: 'child',

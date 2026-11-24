@@ -285,6 +285,9 @@ export const en = defineIdsLocale({
       "limitReached": "Character limit reached.",
       "remaining": "Characters left: {remaining}"
     },
+    "textField": {
+      "required": "Enter a value."
+    },
     "timePicker": {
       "label": "Time"
     },
