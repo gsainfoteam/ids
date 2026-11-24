@@ -4,24 +4,24 @@ import {
   AccordionContent,
   type AccordionContentProps,
   type AccordionContentState,
-} from './content';
-import { AccordionHeader, type AccordionHeaderProps } from './header';
+} from './parts/content';
+import { AccordionHeader, type AccordionHeaderProps } from './parts/header';
 import {
   AccordionIndicator,
   type AccordionIndicatorProps,
   type AccordionIndicatorState,
-} from './indicator';
-import { AccordionItem, type AccordionItemProps, type AccordionItemState } from './item';
-import { AccordionRoot, type AccordionVariant } from './root';
-import { accordionStyle } from './style';
+} from './parts/indicator';
+import { AccordionItem, type AccordionItemProps, type AccordionItemState } from './parts/item';
 import {
   AccordionTrigger,
   type AccordionTriggerProps,
   type AccordionTriggerState,
-} from './trigger';
-import { type StateRenderProps } from '../../../internal/state-props';
+} from './parts/trigger';
+import { AccordionRoot, type AccordionVariant } from './root';
+import { accordionStyle } from './style';
+import { type StateRenderProps } from '../../../internal/lib/state-props';
 
-import type { AccordionValue } from './accordion-value';
+import type { AccordionValue } from './lib/accordion-value';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Accordion<T extends string = string>(props: Accordion.Props<T>) {

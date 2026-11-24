@@ -1,24 +1,24 @@
 import { type ReactNode } from 'react';
 
-import { DrawerClose, type DrawerCloseProps } from './close';
-import { DrawerContent, type DrawerContentProps } from './content';
-import { DrawerDescription, type DrawerDescriptionProps } from './description';
-import { DrawerFooter, type DrawerFooterProps } from './footer';
-import { DrawerHandle, type DrawerHandleProps } from './handle';
-import { DrawerHeader, type DrawerHeaderProps } from './header';
-import { DrawerOverlay, type DrawerOverlayProps } from './overlay';
-import { DrawerRoot } from './root';
-import { drawerStyle } from './style';
-import { DrawerTitle, type DrawerTitleProps } from './title';
-import { DrawerTrigger, type DrawerTriggerProps } from './trigger';
 import {
   type DrawerController,
   type DrawerSnap,
   type DrawerSnapOptions,
   type UseDrawerOptions,
-} from './use-drawer';
+} from './hooks/use-drawer';
+import { DrawerClose, type DrawerCloseProps } from './parts/close';
+import { DrawerContent, type DrawerContentProps } from './parts/content';
+import { DrawerDescription, type DrawerDescriptionProps } from './parts/description';
+import { DrawerFooter, type DrawerFooterProps } from './parts/footer';
+import { DrawerHandle, type DrawerHandleProps } from './parts/handle';
+import { DrawerHeader, type DrawerHeaderProps } from './parts/header';
+import { DrawerOverlay, type DrawerOverlayProps } from './parts/overlay';
+import { DrawerTitle, type DrawerTitleProps } from './parts/title';
+import { DrawerTrigger, type DrawerTriggerProps } from './parts/trigger';
+import { DrawerRoot } from './root';
+import { drawerStyle } from './style';
 
-import type { DrawerSide, SnapPoint as DrawerSnapPoint } from './drawer-gesture';
+import type { DrawerSide, SnapPoint as DrawerSnapPoint } from './lib/drawer-gesture';
 
 export function Drawer(props: Drawer.Props) {
   return <DrawerRoot {...props} />;

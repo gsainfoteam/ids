@@ -1,18 +1,21 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { NumberFieldDecrement } from './decrement';
-import { NumberFieldIncrement } from './increment';
-import { NumberFieldInput } from './input';
+import {
+  type NumberFieldFormatOptions,
+  type NumberFieldInputProps,
+} from './hooks/use-number-field';
+import { NumberFieldDecrement } from './parts/decrement';
+import { NumberFieldIncrement } from './parts/increment';
+import { NumberFieldInput } from './parts/input';
+import { type NumberFieldStepProps } from './parts/step-button';
+import { NumberFieldStepper, type NumberFieldStepperProps } from './parts/stepper';
 import {
   NumberFieldRoot,
   type StateValue,
   type NumberFieldVariant,
   type NumberFieldState,
 } from './root';
-import { type NumberFieldStepProps } from './step-button';
-import { NumberFieldStepper, type NumberFieldStepperProps } from './stepper';
 import { numberFieldStyle } from './style';
-import { type NumberFieldFormatOptions, type NumberFieldInputProps } from './use-number-field';
 import { TextControlClear, type TextControlClearProps } from '../../../internal/text-control';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -63,6 +66,6 @@ export namespace NumberField {
 }
 
 export type { NumberFieldVariant, NumberFieldState } from './root';
-export type { NumberFieldFormatOptions, NumberFieldInputProps } from './use-number-field';
+export type { NumberFieldFormatOptions, NumberFieldInputProps } from './hooks/use-number-field';
 
 export type NumberFieldProps = NumberField.Props;

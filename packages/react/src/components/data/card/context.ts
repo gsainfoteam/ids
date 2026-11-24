@@ -5,7 +5,7 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { cardStyle } from './style';
-import type { SurfaceTrigger } from '../../../internal/surface-trigger';
+import type { SurfaceTrigger } from '../../../internal/parts/surface-trigger';
 
 type Context = {
   styles: ReturnType<typeof cardStyle>;
@@ -16,7 +16,7 @@ type Context = {
 
 export const CardContext = createContext<Context | null>(null);
 
-export function useCardContext(part: string) {
+export function useInternalCardContext(part: string) {
   const context = use(CardContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Card>\`.`);
   return context;

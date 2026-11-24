@@ -15,7 +15,7 @@ type Context = {
 
 export const AlertContext = createContext<Context | null>(null);
 
-export function useAlertContext(part: string) {
+export function useInternalAlertContext(part: string) {
   const context = use(AlertContext);
   invariant(context, `${part} must be rendered inside Alert.`);
   return context;

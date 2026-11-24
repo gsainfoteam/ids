@@ -1,0 +1,38 @@
+'use client';
+
+import { type ComponentProps, type ReactElement } from 'react';
+
+import { useInternalFile } from '../context';
+import { GhostButton } from './ghost-button';
+import { useInternalTranslate } from '../../../../internal/translate';
+
+export type FileRemoveProps = Omit<ComponentProps<'button'>, 'children'> & {
+  file: File;
+  asChild?: boolean;
+  children?: ReactElement;
+};
+
+export function FileRemove({ file, className, onClick, ...props }: FileRemoveProps) {
+  const t = useInternalTranslate();
+
+  const c = useInternalFile('FileField.Remove');
+  if (c.state.readOnly) return null;
+
+  return (
+    <GhostButton
+      {...props}
+      aria-label={props['aria-label'] ?? t('common.removeItem', { label: file.name })}
+      disabled={c.state.disabled}
+      data-file-field-remove=""
+      size={c.size}
+      owner={c.owner}
+      className={c.styles.itemRemove({ className })}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) c.field.actions.remove(file);
+      }}
+    />
+  );
+}
+
+FileRemove.displayName = 'FileField.Remove';

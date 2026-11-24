@@ -1,4 +1,4 @@
-import { slidesLayout, type SlidesOrientation } from '../../../internal/slides/layout';
+import { slidesLayout, type SlidesOrientation } from '../../../internal/slides/lib/layout';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';

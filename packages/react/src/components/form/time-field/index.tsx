@@ -1,5 +1,5 @@
+import { TimeFieldTimePicker, type TimeFieldTimePickerProps } from './parts/time-picker';
 import { TimeFieldRoot, type TimeFieldProps } from './root';
-import { TimeFieldTimePicker, type TimeFieldTimePickerProps } from './time-picker';
 import {
   TemporalClear,
   TemporalContent,
@@ -39,4 +39,4 @@ export namespace TimeField {
 }
 
 export type { TimeFieldProps } from './root';
-export type { TimeFieldTimePickerProps } from './time-picker';
+export type { TimeFieldTimePickerProps } from './parts/time-picker';

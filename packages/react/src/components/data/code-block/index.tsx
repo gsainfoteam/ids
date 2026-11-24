@@ -1,12 +1,12 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { CodeBlockCopy, type CodeBlockCopyProps } from './copy';
-import { CodeBlockLineNumbers, type CodeBlockLineNumbersProps } from './line-numbers';
+import { CodeBlockCopy, type CodeBlockCopyProps } from './parts/copy';
+import { CodeBlockLineNumbers, type CodeBlockLineNumbersProps } from './parts/line-numbers';
+import { CodeBlockTitle, type CodeBlockTitleProps } from './parts/title';
 import { CodeBlockRoot } from './root';
 import { codeBlockStyle } from './style';
-import { CodeBlockTitle, type CodeBlockTitleProps } from './title';
 
-import type { CodeBlockToken } from './highlight';
+import type { CodeBlockToken } from './lib/highlight';
 
 export function CodeBlock(props: CodeBlock.Props) {
   return <CodeBlockRoot {...props} />;

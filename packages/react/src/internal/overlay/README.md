@@ -4,34 +4,34 @@
 
 | 파일                                     | 내용                                                                     |
 | ---------------------------------------- | ------------------------------------------------------------------------ |
-| [`layer-stack.ts`](#layer-stackts)       | 열린 레이어의 스택과 Escape, 바깥 누르기, 포커스 규칙(`useLayer`)        |
-| [`top-layer.ts`](#top-layerts)           | top layer 에 올리기, 다시 올리기, transition 없이 바꾸기, toaster 올리기 |
-| [`use-presence.ts`](#use-presencets)     | 닫힌 뒤 나가는 애니메이션이 끝날 때까지 남는 mount 상태                  |
-| [`use-anchored.ts`](#use-anchoredts)     | anchor 에 붙는 위치 계산(`@floating-ui/react` 의 `useFloating`)          |
-| [`modal-layer.tsx`](#modal-layertsx)     | modal 의 배경, 포커스 가두기, 나머지 페이지 숨기기, 스크롤 잠금          |
-| [`sheet-viewport.ts`](#sheet-viewportts) | 좁은 화면의 drawer 판정과 화면 키보드 높이                               |
-| [`focus.ts`](#focusts)                   | 초기 포커스, 포커스 되돌리기, 늘 안으로 치는 요소                        |
-| [`store.ts`](#storets)                   | `overlay.open` 의 항목 스토어와 host 선출                                |
-| [`host.tsx`](#hosttsx)                   | 항목을 그리는 `OverlayHost`, 항목에 붙는 binding, portal root            |
-| [`external-store.ts`](#external-storets) | `useSyncExternalStore` 가 읽는 작은 스토어                               |
-| [`interactions.ts`](#interactionsts)     | 컴포넌트가 쓰는 `@floating-ui/react` 의 상호작용 hook 과 파트            |
-| [`styles.ts`](#stylests)                 | 목록 팝업의 표면과 modal 배경의 클래스 조각(`overlayStyles`)             |
+| [`lib/layer-stack.ts`](#liblayer-stackts)       | 열린 레이어의 스택과 Escape, 바깥 누르기, 포커스 규칙(`useInternalLayer`)        |
+| [`lib/top-layer.ts`](#libtop-layerts)           | top layer 에 올리기, 다시 올리기, transition 없이 바꾸기, toaster 올리기 |
+| [`hooks/use-presence.ts`](#hooksuse-presencets)     | 닫힌 뒤 나가는 애니메이션이 끝날 때까지 남는 mount 상태                  |
+| [`hooks/use-anchored.ts`](#hooksuse-anchoredts)     | anchor 에 붙는 위치 계산(`@floating-ui/react` 의 `useFloating`)          |
+| [`parts/modal-layer.tsx`](#partsmodal-layertsx)     | modal 의 배경, 포커스 가두기, 나머지 페이지 숨기기, 스크롤 잠금          |
+| [`lib/sheet-viewport.ts`](#libsheet-viewportts) | 좁은 화면의 drawer 판정과 화면 키보드 높이                               |
+| [`lib/focus.ts`](#libfocusts)                   | 초기 포커스, 포커스 되돌리기, 늘 안으로 치는 요소                        |
+| [`lib/store.ts`](#libstorets)                   | `overlay.open` 의 항목 스토어와 host 선출                                |
+| [`parts/host.tsx`](#partshosttsx)                   | 항목을 그리는 `OverlayHost`, 항목에 붙는 binding, portal root            |
+| [`lib/external-store.ts`](#libexternal-storets) | `useSyncExternalStore` 가 읽는 작은 스토어                               |
+| [`lib/interactions.ts`](#libinteractionsts)     | 컴포넌트가 쓰는 `@floating-ui/react` 의 상호작용 hook 과 파트            |
+| [`lib/styles.ts`](#libstylests)                 | 목록 팝업의 표면과 modal 배경의 클래스 조각(`overlayStyles`)             |
 
 ## 쓰는 곳
 
 | 쓰는 곳                                 | 가져가는 것                                                                                                                                                                                                                  |
 | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                                                                                                           |
-| Alert                                   | `usePresence`                                                                                                                                                                                                                |
-| Dialog                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`                                                                                  |
-| Popover                                 | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `interactions.ts` |
-| Tooltip                                 | `useLayer`, `useAnchored`, `usePresence`, `showInTopLayer`, `focusWasReturned`, `PortalRootContext`, `interactions.ts`                                                                                                       |
-| Chart 의 툴팁                           | `useAnchored`(`glide`), `showInTopLayer` |
-| Menu                                    | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `returnFocusTo`, `focusReturnTarget`, `interactions.ts` |
-| Drawer                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`              |
-| Image 의 뷰어                           | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `returnFocusTo`, `focusReturnTarget`                                                                                                        |
-| Toast                                   | `createExternalStore`, `keepAboveLayers`, `withoutTransitions`, `raiseInTopLayer`, `showInTopLayer`, `supportsPopover`, `usePresence`, `returnFocusTo`, `blurWithin`                                                         |
-| [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`                                                                                            |
+| Alert                                   | `useInternalPresence`                                                                                                                                                                                                                |
+| Dialog                                  | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`                                                                                  |
+| Popover                                 | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `lib/interactions.ts` |
+| Tooltip                                 | `useInternalLayer`, `useInternalAnchored`, `useInternalPresence`, `showInTopLayer`, `focusWasReturned`, `PortalRootContext`, `lib/interactions.ts`                                                                                                       |
+| Chart 의 툴팁                           | `useInternalAnchored`(`glide`), `showInTopLayer` |
+| Menu                                    | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `returnFocusTo`, `focusReturnTarget`, `lib/interactions.ts` |
+| Drawer                                  | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `lib/sheet-viewport.ts`              |
+| Image 의 뷰어                           | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `returnFocusTo`, `focusReturnTarget`                                                                                                        |
+| Toast                                   | `createExternalStore`, `keepAboveLayers`, `withoutTransitions`, `raiseInTopLayer`, `showInTopLayer`, `supportsPopover`, `useInternalPresence`, `returnFocusTo`, `blurWithin`                                                         |
+| [field-popup](../field-popup/README.md) | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `lib/sheet-viewport.ts`                                                                                            |
 
 ## 조립하는 법
 
@@ -39,8 +39,8 @@
 
 ```tsx
 const [element, setElement] = useState<HTMLElement | null>(null);
-const presence = usePresence(open, { elements: () => [element, backdrop], onExitComplete });
-const layer = useLayer(open, {
+const presence = useInternalPresence(open, { elements: () => [element, backdrop], onExitComplete });
+const layer = useInternalLayer(open, {
   kind: 'popup',                        // 'modal' | 'popup' | 'tooltip'
   element: () => element,
   anchor: () => trigger,
@@ -49,24 +49,24 @@ const layer = useLayer(open, {
     if (reason === 'escape-key') returnFocusTo(focusReturnTarget(layer));
   },
 });
-useLayoutEffect(() => {                 // useLayer 뒤에 둔다
+useLayoutEffect(() => {                 // useInternalLayer 뒤에 둔다
   if (open && element) initialFocusTarget(element, { holdsFocus: false })?.focus();
 }, [open, element]);
 if (!presence.mounted) return null;
 ```
 
-- `useLayer` 는 초기 포커스를 옮기는 effect 보다 먼저 부릅니다. 스택은 등록할 때의 `activeElement` 를 되돌아갈 곳으로 기억합니다.
+- `useInternalLayer` 는 초기 포커스를 옮기는 effect 보다 먼저 부릅니다. 스택은 등록할 때의 `activeElement` 를 되돌아갈 곳으로 기억합니다.
 - 레이어는 `open` 이 `false` 가 되는 순간 스택을 떠납니다. 나가는 애니메이션 동안은 Escape 와 바깥 누르기를 받지 않습니다.
 - 레이어는 제자리에 렌더하고 `popover="manual"` 로 top layer 에 올립니다. DOM 위치가 그대로라 theme(`data-mode` 와 Provider 의 테마 변수), Field 의 `focusout` 판정, 폼 소속, Tab 순서를 물려받고, top layer 라서 조상의 `transform`, `overflow`, `opacity` 에 갇히지 않습니다.
 
-## layer-stack.ts
+## lib/layer-stack.ts
 
 열린 레이어의 스택입니다. 문서마다 `keydown`, `pointerdown`, `focusin` 리스너를 하나씩 두고, 열린 순서로 쌓인 레이어를 위에서부터 봅니다.
 
 ### 쓰는 법
 
 ```ts
-const layer = useLayer(open, {
+const layer = useInternalLayer(open, {
   kind: 'modal',
   element: () => contentRef.current,
   anchor: () => triggerRef.current,
@@ -87,12 +87,12 @@ elementsAbove(layer);                            // 이 레이어 위에 열린 
 | R2 바깥 누르기 | `pointerdown`       | 위에서부터 popup 을 `'outside-press'` 로 닫는다. 누른 곳을 품은 레이어나 modal 을 만나면 멈춘다. 닫기 전에 안의 포커스를 blur 한다                         |
 | R3 포커스      | `focusin`           | 맨 위 modal 보다 위의 popup 은 포커스가 밖으로 나가면 `'focus-out'` 으로 닫는다. 맨 위 modal 은 밖으로 나간 포커스를 마지막으로 포커스했던 요소로 되돌린다 |
 | R4 tooltip     | 등록, `pointerdown` | modal 이 열리면 모든 tooltip 을 `'covered'` 로 닫는다. tooltip 은 자기 밖(trigger 포함)을 누르면 닫힌다                                                    |
-| R5 toaster     | top layer           | 스택에 들어가지 않는다. 레이어가 올라온 뒤 [`raiseWhatStaysAboveLayers`](#top-layerts) 가 다시 맨 위로 올린다                                              |
+| R5 toaster     | top layer           | 스택에 들어가지 않는다. 레이어가 올라온 뒤 [`raiseWhatStaysAboveLayers`](#libtop-layerts) 가 다시 맨 위로 올린다                                              |
 
 - "안" 은 레이어 요소, anchor, 위에 열린 레이어(tooltip 제외), toaster(`[data-toaster]`), focus guard(`[data-floating-ui-focus-guard]`) 입니다.
 - R1 은 이미 처리된(`defaultPrevented`) Escape 와 IME 조합 중(`isComposing`, `keyCode 229`)의 Escape 를 건너뜁니다. 안쪽 컨트롤이 Escape 를 먼저 쓰려면 `preventDefault()` 합니다(Alert, TextField 의 지우기).
 - `dismissible: false` 인 레이어가 맨 위면 R1, R2 가 거기서 멈춥니다. 아래 레이어도 닫히지 않습니다.
-- modal 은 `pointerdown` 으로 닫히지 않습니다. 배경의 `click` 으로만 닫히고([`ModalLayer`](#modal-layertsx)), 아래의 popup 도 그대로 둡니다.
+- modal 은 `pointerdown` 으로 닫히지 않습니다. 배경의 `click` 으로만 닫히고([`ModalLayer`](#partsmodal-layertsx)), 아래의 popup 도 그대로 둡니다.
 - R2 가 닫은 레이어는 같은 누르기로 옮겨 가는 포커스로 한 번 더 닫히지 않습니다(`pressedOutside`). 키를 누르거나 다시 누르면 지웁니다.
 - R3 의 되돌리기는 되돌아갈 곳(`focusReturnTarget`), anchor, 위의 레이어, toaster 로 가는 포커스는 막지 않습니다. modal 을 닫으면서 trigger 로 돌려준 포커스를 다시 당기지 않습니다.
 - modal 의 `onPositionChange` 는 등록, 해제 때마다 `covered`(위에 modal 이 있음)와 `modalsBelow` 를 알립니다. 아래 modal 의 `data-nested-open`, 위 modal 의 투명한 배경이 이 값을 씁니다.
@@ -110,7 +110,7 @@ elementsAbove(layer);                            // 이 레이어 위에 열린 
 - 스택은 포커스를 되돌리지 않습니다. `onDismiss` 의 이유를 보고 컴포넌트가 `returnFocusTo(focusReturnTarget(layer))` 를 부릅니다. 바깥 누르기는 포커스가 누른 곳으로 가므로 되돌리지 않습니다.
 - `kind` 가 바뀌면(필드 팝업이 drawer 로 바뀔 때) 다시 등록해서 스택 맨 위로 갑니다.
 
-## top-layer.ts
+## lib/top-layer.ts
 
 ### 쓰는 법
 
@@ -131,9 +131,9 @@ raiseWhatStaysAboveLayers();                   // 레이어를 올린 쪽이 부
 ### 알아둘 것
 
 - Popover API 가 없는 엔진(jsdom 포함)에서는 요소의 `fixed`, `z-50` 클래스가 대신합니다. 레이어 스타일에 두 클래스를 빼지 않습니다.
-- UA 가 `[popover]` 에 주는 `inset: 0`, `margin: auto` 는 anchor 에 붙는 레이어에서 풀어야 합니다. [`useAnchored`](#use-anchoredts) 가 `right`, `bottom` 을 `auto` 로 풀고, 레이어 스타일은 `m-0` 을 둡니다.
+- UA 가 `[popover]` 에 주는 `inset: 0`, `margin: auto` 는 anchor 에 붙는 레이어에서 풀어야 합니다. [`useInternalAnchored`](#hooksuse-anchoredts) 가 `right`, `bottom` 을 `auto` 로 풀고, 레이어 스타일은 `m-0` 을 둡니다.
 
-## use-presence.ts
+## hooks/use-presence.ts
 
 `open` 이 `false` 가 된 뒤에도 나가는 애니메이션이 끝날 때까지 `mounted` 를 `true` 로 둡니다.
 
@@ -144,7 +144,7 @@ raiseWhatStaysAboveLayers();                   // 레이어를 올린 쪽이 부
 ### 쓰는 법
 
 ```tsx
-const { mounted, ending } = usePresence(open, {
+const { mounted, ending } = useInternalPresence(open, {
   elements: () => [node, backdrop],     // 애니메이션을 기다릴 요소
   onExitComplete: () => overlayItem.remove(),
   onEnterComplete: () => onOpenChangeComplete(true),   // 들어오는 애니메이션이 끝난 뒤
@@ -167,14 +167,14 @@ if (!mounted) return null;
 - 테스트는 인라인 `transition-duration` 을 주고 `getAnimations()` 의 애니메이션을 `finish()` 합니다(RULES.md 의 Tests).
 - 막 렌더한 요소를 스타일이 한 번도 계산되기 전에 닫으면 transition 이 생기지 않고 바로 끝납니다.
 
-## use-anchored.ts
+## hooks/use-anchored.ts
 
 `useFloating` 으로 anchor 에 붙는 위치를 계산합니다. 요소는 state 로 넘깁니다(`refs.set*` 를 렌더 중에 부르지 않습니다).
 
 ### 쓰는 법
 
 ```ts
-const anchored = useAnchored({
+const anchored = useInternalAnchored({
   open,
   reference: trigger,                  // state 의 요소, 또는 RefObject
   floating: element,
@@ -207,7 +207,7 @@ const anchored = useAnchored({
 - `autoUpdate` 는 anchor 와 레이어의 스크롤 조상에만 리스너를 둡니다. 레이어 안의 스크롤로는 다시 계산하지 않습니다.
 - `side` 가 열린 채로 바뀌면 다음 flip 까지 반영되지 않습니다.
 
-## modal-layer.tsx
+## parts/modal-layer.tsx
 
 modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, 스크롤 잠금입니다.
 
@@ -216,7 +216,7 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 ```tsx
 <ModalLayer
   open={open}
-  layer={layer}                         // useLayer 의 결과
+  layer={layer}                         // useInternalLayer 의 결과
   element={element}                     // state 의 content 요소
   contentRef={setElement}               // content 에 붙는 ref. RemoveScroll 이 content 로 넘긴다
   backdrop={{ className: backdropStyle, ref: setBackdrop }}   // false 면 배경 없음. ref 로 배경 요소를 받는다
@@ -230,7 +230,7 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 
 - 배경은 content 와 따로 top layer 에 올리는 요소입니다. popover 자신의 `::backdrop` 은 UA 가 `pointer-events: none` 을 강제해서 클릭을 받지 못합니다. 배경을 먼저 올리고 content 를 다시 올려서(`raiseInTopLayer`) content 가 위에 옵니다.
 - 배경은 `pointerdown` 이 아니라 `click` 에서 닫습니다. 누르는 순간 닫으면 배경이 사라진 뒤 click 이 아래 페이지에 떨어지고, 그 누르기가 trigger 로 돌려준 포커스를 옮깁니다.
-- `FloatingFocusManager` 는 가두기만 맡깁니다: `modal`, `closeOnFocusOut={false}`, `initialFocus={-1}`, `returnFocus={false}`. 초기 포커스와 되돌리기는 컴포넌트가 이유를 보고 하고, 밖으로 나간 포커스는 [R3](#layer-stackts) 이 되돌립니다.
+- `FloatingFocusManager` 는 가두기만 맡깁니다: `modal`, `closeOnFocusOut={false}`, `initialFocus={-1}`, `returnFocus={false}`. 초기 포커스와 되돌리기는 컴포넌트가 이유를 보고 하고, 밖으로 나간 포커스는 [R3](#liblayer-stackts) 이 되돌립니다.
 - 나머지 페이지는 `aria-hidden` 으로 숨깁니다(`inert` 가 아님). `inert` 는 toaster 까지 누를 수 없게 합니다. `[aria-live]` 인 toaster 와 `role="status"` 는 floating-ui 가 숨기지 않습니다.
 - 스크롤 잠금은 `react-remove-scroll` 입니다(`body[data-scroll-locked]`). pinch zoom 은 막지 않습니다(`allowPinchZoom`). 위에 열린 레이어는 `shards` 라서 그 안은 스크롤됩니다.
 - 닫히기 시작하면(`open` 이 `false`) 가두기, 숨기기, 잠금을 바로 풉니다. 나가는 애니메이션 동안 trigger 로 돌아간 포커스가 숨겨진 채로 남지 않습니다.
@@ -238,19 +238,19 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 ### 알아둘 것
 
 - content 의 ref 는 `contentRef` 로 넘깁니다. `RemoveScroll` 이 자식을 복제하면서 ref 를 덮으므로 자식에 직접 단 ref 는 사라집니다.
-- `context` 를 넘기지 않으면 reference 없는 root context 를 만듭니다. anchor 에 붙는 modal(modal Popover)은 [`useAnchored`](#use-anchoredts) 의 `context` 를 넘깁니다.
+- `context` 를 넘기지 않으면 reference 없는 root context 를 만듭니다. anchor 에 붙는 modal(modal Popover)은 [`useInternalAnchored`](#hooksuse-anchoredts) 의 `context` 를 넘깁니다.
 
-## sheet-viewport.ts
+## lib/sheet-viewport.ts
 
 ### 쓰는 곳
 
-- [field-popup](../field-popup/README.md) 과 Select, ChipField, ColorField 의 `useDrawerPresentation`
+- [field-popup](../field-popup/README.md) 과 Select, ChipField, ColorField 의 `useInternalDrawerPresentation`
 - Drawer 의 화면 키보드 올리기(`coveredByKeyboard`, `onViewportChange`)
 
 ### 쓰는 법
 
 ```ts
-const drawer = useDrawerPresentation(mobileVariant);   // 'drawer' 이고 640px 미만이면 true
+const drawer = useInternalDrawerPresentation(mobileVariant);   // 'drawer' 이고 640px 미만이면 true
 
 const stop = onViewportChange(win, () => {
   sheet.style.bottom = `${coveredByKeyboard(win)}px`;
@@ -264,7 +264,7 @@ const stop = onViewportChange(win, () => {
 - 서버 렌더 값은 `false` 입니다(`useSyncExternalStore` 의 server snapshot). 서버 HTML 은 늘 popover 입니다.
 - 화면 키보드는 visual viewport 만 줄이고 fixed 요소가 쓰는 layout viewport 는 그대로 둡니다. 키보드가 덮는 만큼(`coveredByKeyboard`) sheet 를 올립니다.
 
-## focus.ts
+## lib/focus.ts
 
 ### 쓰는 법
 
@@ -281,7 +281,7 @@ blurWithin(layerElement);                                    // 치우기 전에
 - 되돌린 포커스는 그 요소가 포커스를 잃을 때까지 표시됩니다. 키보드 Escape 로 닫은 뒤 돌아온 trigger 는 `:focus-visible` 이라 tooltip 이 다시 열리려 하므로, Tooltip 은 `focusWasReturned` 를 보고 열지 않습니다.
 - 브라우저는 포커스된 요소가 DOM 에서 빠질 때 `blur` 를 보내지 않습니다. 레이어를 치우기 전에 `blurWithin` 으로 먼저 blur 해야 Field 의 `onBlur`(검증, touched)가 돕니다.
 
-## store.ts
+## lib/store.ts
 
 `overlay.open` 으로 연 오버레이의 목록입니다. 컴포넌트 밖에서도 부를 수 있고, 닫을 때 넘긴 값으로 Promise 가 풀립니다.
 
@@ -315,18 +315,18 @@ overlay.unmount('settings');                 // 나가는 애니메이션 없이
 - `render` 는 컴포넌트가 아니라 host 가 렌더 중에 부르는 함수입니다. 안에서 hook 을 부르지 않습니다.
 - 스토어는 모듈 상태라 문서(iframe)마다 따로입니다.
 
-## host.tsx
+## parts/host.tsx
 
 ### 쓰는 법
 
 ```tsx
-// components/utility/ids-provider/ids-provider.tsx: 가장 바깥 Provider 만
+// components/utility/ids-provider/root.tsx: 가장 바깥 Provider 만
 {outermost && <OverlayHost />}
 
 // Dialog 같은 레이어: open 을 받지 않았으면 항목에 붙는다
-const item = useOverlayItem(openProp);          // { open, close, exited } | null
+const item = useInternalOverlayItem(openProp);          // { open, close, exited } | null
 const open = item?.open ?? ownOpen;
-usePresence(open, { onExitComplete: () => item?.exited() });
+useInternalPresence(open, { onExitComplete: () => item?.exited() });
 <OverlayItemContext value={null}>{children}</OverlayItemContext>   // 안쪽 레이어는 붙지 않게
 
 const scoped = useOverlay();                    // 부른 곳의 theme 으로 연다
@@ -336,17 +336,17 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 
 - 항목마다 `display: contents` 인 wrapper 가 `data-mode` 와 연 곳의 테마 변수(`ThemeContext` 의 `variables`)를 가집니다. 항목은 host 의 theme 을 따르고, `useOverlay()` 로 열면 부른 곳의 theme 을 씁니다.
 - host 는 IdsProvider 의 요소 안, children 뒤에 그립니다. `asChild` 면 자식 요소 하나를 지켜야 하므로 요소 옆에 그립니다. 항목이 없으면 아무것도 그리지 않아서 서버 HTML 이 그대로입니다.
-- 레이어는 `open` prop 이 없을 때만 항목에 붙습니다(`useOverlayItem`). 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
+- 레이어는 `open` prop 이 없을 때만 항목에 붙습니다(`useInternalOverlayItem`). 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
 - `PortalRootContext` 는 가장 가까운 IdsProvider 의 요소입니다. Tooltip 이 그 안에 portal 합니다.
 
-## external-store.ts
+## lib/external-store.ts
 
 `get`, `set`, `subscribe` 만 있는 스토어입니다. `useSyncExternalStore(store.subscribe, store.get)` 로 읽습니다.
 
 - `set` 은 같은 값(`Object.is`)이면 알리지 않습니다. 목록을 바꿀 때는 새 배열을 넘깁니다.
 - zustand 를 쓰지 않는 이유는 RULES.md 의 What we build 에 있습니다.
 
-## interactions.ts
+## lib/interactions.ts
 
 컴포넌트가 쓰는 `@floating-ui/react` 의 상호작용 hook 과 파트를 다시 내보냅니다. 컴포넌트는 `@floating-ui/react` 를 직접 import 하지 않고 `internal/overlay` 에서 가져옵니다(RULES.md 의 What we build).
 
@@ -356,10 +356,10 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 | Tooltip     | `useHover`, `useFocus`, `useRole`, `useDelayGroup`, `useInteractions`, `FloatingDelayGroup`                                                                                       |
 | Menu        | `FloatingTree`, `FloatingNode`, `FloatingList`, `useListItem`, `useListNavigation`, `useTypeahead`, `useHover`, `safePolygon`, `useClick`, `useFloatingNodeId`, `useInteractions` |
 
-- `useDismiss` 는 내보내지 않습니다. 닫기는 [`layer-stack.ts`](#layer-stackts) 의 일입니다.
+- `useDismiss` 는 내보내지 않습니다. 닫기는 [`lib/layer-stack.ts`](#liblayer-stackts) 의 일입니다.
 - 새 hook 이 필요하면 여기에 더합니다. 버전을 올릴 때 바뀐 API 를 이 파일 하나에서 찾습니다.
 
-## styles.ts
+## lib/styles.ts
 
 레이어들이 같은 모양으로 그리는 클래스 조각입니다. `tv` 슬롯에 넣고, 길이나 이징 같은 다른 점만 뒤에 덧붙입니다.
 

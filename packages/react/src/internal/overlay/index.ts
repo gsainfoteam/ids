@@ -6,37 +6,37 @@ export {
   FOCUS_GUARD,
   POPUP_AUTOFOCUS,
   TOASTER,
-} from './focus';
+} from './lib/focus';
 export {
   elementsAbove,
   focusReturnTarget,
   registerLayer,
-  useLayer,
+  useInternalLayer,
   type DismissReason,
   type Layer,
   type LayerKind,
   type LayerOptions,
   type LayerPosition,
-} from './layer-stack';
-export { createExternalStore, type ExternalStore } from './external-store';
+} from './lib/layer-stack';
+export { createExternalStore, type ExternalStore } from './lib/external-store';
 export {
   OverlayHost,
   OverlayItemContext,
   PortalRootContext,
   useOverlay,
-  useOverlayItem,
+  useInternalOverlayItem,
   type OverlayItemBinding,
-} from './host';
-export * from './interactions';
-export { ModalLayer, type ModalLayerProps } from './modal-layer';
+} from './parts/host';
+export * from './lib/interactions';
+export { ModalLayer, type ModalLayerProps } from './parts/modal-layer';
 export {
   coveredByKeyboard,
   onViewportChange,
-  useDrawerPresentation,
+  useInternalDrawerPresentation,
   visibleHeight,
   DRAWER_BELOW,
   type PopupPresentation,
-} from './sheet-viewport';
+} from './lib/sheet-viewport';
 export {
   keepAboveLayers,
   raiseInTopLayer,
@@ -44,14 +44,19 @@ export {
   showInTopLayer,
   supportsPopover,
   withoutTransitions,
-} from './top-layer';
+} from './lib/top-layer';
 export {
-  useAnchored,
+  useInternalAnchored,
   VIEWPORT_MARGIN,
   type Anchored,
   type AnchoredAlign,
   type AnchoredSide,
   type UseAnchoredOptions,
-} from './use-anchored';
-export { usePresence, type PresenceOptions } from './use-presence';
-export { overlay, type OverlayControls, type OverlayOptions, type OverlayRender } from './store';
+} from './hooks/use-anchored';
+export { useInternalPresence, type PresenceOptions } from './hooks/use-presence';
+export {
+  overlay,
+  type OverlayControls,
+  type OverlayOptions,
+  type OverlayRender,
+} from './lib/store';

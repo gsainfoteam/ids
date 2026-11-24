@@ -18,6 +18,6 @@ export type ToggleGroupContextValue = {
 
 export const ToggleGroupContext = createContext<ToggleGroupContextValue | null>(null);
 
-export function useToggleGroupContext() {
+export function useInternalToggleGroupContext() {
   return use(ToggleGroupContext);
 }

@@ -1,6 +1,6 @@
 import { type ComponentProps } from 'react';
 
-import { BubbleReactions, type BubbleReactionsProps } from './reactions';
+import { BubbleReactions, type BubbleReactionsProps } from './parts/reactions';
 import { BubbleRoot, type BubbleAlign, type BubbleVariant } from './root';
 import { bubbleStyle } from './style';
 

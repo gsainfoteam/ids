@@ -10,18 +10,18 @@ import {
 } from 'react';
 
 import { PlacementContext, ScrollAreaContext } from './context';
-import { ScrollAreaCorner } from './corner';
-import { axisOf, fadedAlong, orientationOf } from './orientation';
-import { ScrollAreaScrollbar } from './scrollbar';
+import { useInternalScrollArea } from './hooks/use-scroll-area';
+import { axisOf, fadedAlong, orientationOf } from './lib/orientation';
+import { ScrollAreaCorner } from './parts/corner';
+import { ScrollAreaScrollbar } from './parts/scrollbar';
+import { ScrollAreaViewport } from './parts/viewport';
 import { scrollAreaStyle } from './style';
-import { useScrollArea } from './use-scroll-area';
-import { ScrollAreaViewport } from './viewport';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { elementTypeOf, flattenFragments, invariant, mergeProps, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
 import type { ScrollArea } from '.';
-import type { Axis, Placement } from './geometry';
+import type { Axis, Placement } from './lib/geometry';
 
 type DeclaredBar = {
   node: ReactElement<ScrollArea.ScrollbarProps>;
@@ -112,7 +112,7 @@ export function ScrollAreaRoot({
 
   const child = asChild ? (children as ReactElement<{ children?: ReactNode }>) : null;
   const layout = arrange(child ? child.props.children : children, orientation);
-  const area = useScrollArea({ axes: layout.axes });
+  const area = useInternalScrollArea({ axes: layout.axes });
 
   const repeated = layout.repeated.map(orientationOf).join(', ');
 

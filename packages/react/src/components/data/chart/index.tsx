@@ -5,25 +5,25 @@ import {
   type ChartConfig,
   type ChartConfigEntry,
   type ChartIndicator,
-} from './config';
-import { ChartDescription, type ChartDescriptionProps } from './description';
+} from './lib/config';
+import { ChartDescription, type ChartDescriptionProps } from './parts/description';
 import {
   ChartLegend,
   ChartLegendContent,
   type ChartLegendContentProps,
   type ChartLegendFormatter,
   type ChartLegendProps,
-} from './legend';
-import { ChartRoot } from './root';
-import { chartStyle } from './style';
-import { ChartTable, type ChartTableProps } from './table';
-import { ChartTitle, type ChartTitleProps } from './title';
+} from './parts/legend';
+import { ChartTable, type ChartTableProps } from './parts/table';
+import { ChartTitle, type ChartTitleProps } from './parts/title';
 import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartTooltipContentProps,
   type ChartTooltipProps,
-} from './tooltip';
+} from './parts/tooltip';
+import { ChartRoot } from './root';
+import { chartStyle } from './style';
 
 export function Chart(props: Chart.Props) {
   return <ChartRoot {...props} />;
@@ -88,4 +88,4 @@ export namespace Chart {
 }
 
 export type ChartProps = Chart.Props;
-export type { ChartColor, ChartConfig, ChartConfigEntry, ChartIndicator } from './config';
+export type { ChartColor, ChartConfig, ChartConfigEntry, ChartIndicator } from './lib/config';

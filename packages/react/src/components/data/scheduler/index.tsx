@@ -1,17 +1,17 @@
-import { SchedulerEvent, type SchedulerEventPartProps } from './event';
 import {
   type SchedulerColorScheme,
   type SchedulerEventChange,
   type SchedulerEventData,
   type SchedulerSlot,
   type SchedulerView,
-} from './layout';
+} from './lib/layout';
+import { SchedulerEvent, type SchedulerEventPartProps } from './parts/event';
 import {
   SchedulerEventMenu,
   SchedulerSlotMenu,
   type SchedulerEventMenuPartProps,
   type SchedulerSlotMenuPartProps,
-} from './menus';
+} from './parts/menus';
 import { SchedulerRoot, type SchedulerProps } from './root';
 import { schedulerStyle } from './style';
 
@@ -56,4 +56,4 @@ export type {
   SchedulerEventData,
   SchedulerSlot,
   SchedulerView,
-} from './layout';
+} from './lib/layout';

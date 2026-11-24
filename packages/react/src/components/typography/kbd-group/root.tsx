@@ -1,8 +1,8 @@
 'use client';
 
 import { kbdGroupStyle } from './style';
-import { resolveState } from '../../../internal/state-props';
-import { KbdGroupContext, useKbd } from '../kbd/use-kbd';
+import { resolveState } from '../../../internal/lib/state-props';
+import { KbdGroupContext, useInternalKbd } from '../kbd/hooks/use-kbd';
 
 import type { KbdGroup } from '.';
 
@@ -14,7 +14,7 @@ export function KbdGroupRoot({
   children,
   ...rest
 }: KbdGroup.Props) {
-  const kbd = useKbd({ size, platform, labels });
+  const kbd = useInternalKbd({ size, platform, labels });
   const state: KbdGroup.State = { size: kbd.size, platform: kbd.platform, combination: true };
 
   return (

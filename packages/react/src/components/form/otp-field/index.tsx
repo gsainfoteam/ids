@@ -1,10 +1,10 @@
-import { OTPFieldCaret, type OTPFieldCaretProps } from './caret';
-import { OTPFieldGroup, type OTPFieldGroupProps } from './group';
+import { type OTPSlotState } from './hooks/use-otp-field';
+import { OTPFieldCaret, type OTPFieldCaretProps } from './parts/caret';
+import { OTPFieldGroup, type OTPFieldGroupProps } from './parts/group';
+import { OTPFieldSeparator, type OTPFieldSeparatorProps } from './parts/separator';
+import { OTPFieldSlot, type OTPFieldSlotProps } from './parts/slot';
 import { OTPFieldRoot, type OTPFieldVariant, type OTPFieldProps } from './root';
-import { OTPFieldSeparator, type OTPFieldSeparatorProps } from './separator';
-import { OTPFieldSlot, type OTPFieldSlotProps } from './slot';
 import { otpFieldStyle } from './style';
-import { type OTPSlotState } from './use-otp-field';
 
 export function OTPField(props: OTPFieldProps) {
   return <OTPFieldRoot {...props} />;
@@ -32,4 +32,4 @@ export namespace OTPField {
 }
 
 export type { OTPFieldVariant, OTPFieldProps } from './root';
-export type { OTPFieldPattern } from './otp-code';
+export type { OTPFieldPattern } from './lib/otp-code';

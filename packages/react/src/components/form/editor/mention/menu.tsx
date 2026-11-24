@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { Avatar } from '../../../data/avatar';
 import { editorMessages } from '../messages-catalog';
 import { editorStyle } from '../style';
@@ -12,7 +12,7 @@ import type { SuggestionStore } from '../suggestion/store';
 const styles = editorStyle();
 
 export function EditorMentionMenu({ store }: { store: SuggestionStore<EditorMention> }) {
-  const t = useTranslate(editorMessages);
+  const t = useInternalTranslate(editorMessages);
 
   return (
     <EditorSuggestionPopup

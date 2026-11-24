@@ -1,5 +1,5 @@
 import { type SegmentedControlOrientation } from './context';
-import { SegmentedControlItem, type SegmentedControlItemProps } from './item';
+import { SegmentedControlItem, type SegmentedControlItemProps } from './parts/item';
 import {
   SegmentedControlRoot,
   type SegmentedControlProps,
@@ -27,5 +27,5 @@ export namespace SegmentedControl {
 }
 
 export type { SegmentedControlOrientation } from './context';
-export type { SegmentedControlItemProps } from './item';
+export type { SegmentedControlItemProps } from './parts/item';
 export type { SegmentedControlProps, SegmentedControlRenderProps } from './root';

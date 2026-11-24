@@ -1,6 +1,6 @@
 import { tv } from '../../../utils';
 
-import type { ChartIndicator } from './config';
+import type { ChartIndicator } from './lib/config';
 
 export const chartStyle = tv({
   slots: {

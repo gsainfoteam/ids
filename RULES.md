@@ -139,7 +139,7 @@ sends IDS components and no Tiptap. `tests/use-client.test.ts` lists them in
     chart the app writes; Tooltip, Legend and the screen reader table are IDS's code.
   - rich text editing `@tiptap/*` 3 (MIT parts only: core, react, pm, starter-kit, extensions,
     markdown), imported only by the `@gsainfoteam/ids-react/editor` entry. Only
-    `editor/engine.tsx` imports it at runtime, and `load-engine.ts` loads that with `import()`
+    `editor/parts/engine.tsx` imports it at runtime, and `editor/lib/load-engine.ts` loads that with `import()`
     when an Editor mounts; Markdown goes through `@tiptap/markdown`, loaded the same way only for
     `format="markdown"`. The shell, toolbar and parts are IDS's code and use Tiptap's types only.
     The document schema (nodes, markdown rules, image and link checks) and the text styles live in
@@ -197,14 +197,17 @@ packages/react/src/
   internal/      shared parts that are not exported:
                    surfaces     surfaces/ (control-surface, toggle-surface, icon-square,
                                 field-surface, slider-surface), surface
-                   fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
-                                temporal-field, form-value, date-locale
+                   fields       text-control (shell, Clear, useInternalMergedRef), field-popup,
+                                list-styles, temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc,
                                 resize-handle, paragraph
                    feedback     status-palette
                    overlays     overlay (layer stack, top layer, presence, anchoring, modal layer)
                    slides       slides (Embla track, slide ARIA, drag cancel, keys, announcer)
                    strings      messages
+                 the root and each module folder split their files into parts/, hooks/ and lib/
+                 like a component folder; the message and locale modules (messages, translate,
+                 every-message, date-locale) stay at the root
   foundations/   token stories with no component, one folder each with a story and a README:
                  Color, Typography, Radius, InteractiveState
   overview/      stories that show IDS as a whole, first in the sidebar: Cover
@@ -218,18 +221,31 @@ public goes into `internal/`, never loose at the root of `components/`.
 
 **Component folder.** Every component keeps `index.tsx`, `root.tsx` and, when it has a `tv` Style,
 `style.ts`. A component with parts, or a `root.tsx` past about 250 lines, is split further into one
-file per part. Menu and Drawer show the shape:
+file per part. The top of the folder holds only `index.tsx`, `root.tsx`, `style.ts`, `context.ts`,
+the README and the stories; every other file goes into a folder named for its kind, made only when
+the component has a file of that kind. Drawer shows the shape:
 
 ```
 drawer/
-  index.tsx      Drawer and `export namespace Drawer`: types, part aliases, Style (server-safe)
-  root.tsx       DrawerRoot: the root's state, context provider and markup ('use client')
-  context.ts     createContext and the guard hook (useDrawerContext)
-  style.ts       drawerStyle = tv({ slots, variants })
-  trigger.tsx    DrawerTrigger, DrawerTriggerProps
-  content.tsx    DrawerContent and the private popup it renders
-  use-drawer.ts  logic hooks and pure helpers keep their own files
+  index.tsx          Drawer and `export namespace Drawer`: types, part aliases, Style (server-safe)
+  root.tsx           DrawerRoot: the root's state, context provider and markup ('use client')
+  context.ts         createContext and the guard hook (useInternalDrawerContext)
+  style.ts           drawerStyle = tv({ slots, variants })
+  parts/             one file per part: trigger.tsx (DrawerTrigger), content.tsx, handle.tsx, ...
+  hooks/             logic hooks, one use-*.ts each: use-drawer.ts, use-drawer-drag.ts
+  lib/               pure modules with no hook and no JSX: drawer-gesture.ts, background-scale.ts
 ```
+
+- **Kind.** A `use-*.ts` file is a hook and goes into `hooks/`; any other `.tsx` draws something
+  and goes into `parts/` (a private piece of a part too); any other `.ts` is pure and goes into
+  `lib/`. Feature folders a component already had (Editor's `mention/`, RichText's `nodes/`) stay
+  as they are. Generated files stay where codegen writes them (`form/editor/messages-catalog.ts`).
+- **Internal hooks are `useInternal*`.** A hook that no public entry exports is named `useInternal`
+  plus the component, part or module it serves (`useInternalDrawerContext`, `useInternalMenuItem`,
+  `useInternalSliderContext`, `useInternalReducedMotion`). Public hooks keep `useX`
+  (`useDrawer`, `useDataTable`, `useTheme`). ESLint fails when a public entry, or a namespace in a
+  component's `index.tsx`, exports a `useInternal*` name, and public entries name every export (no
+  `export *`) so the check sees them all.
 
 - `index.tsx` holds a hook-free root, `return <DrawerRoot {...props} />`, and the namespace only.
   The root's code, its helpers and any part the namespace used to define inline live in
@@ -254,12 +270,13 @@ drawer/
   `index.tsx`, so a component that picks the sub-component out of its children does so in its own
   server-safe `index.tsx`: `ImageGroup` finds `[Image.Viewer, ImageViewer]` and hands it to its
   client `ImageGroupRoot`.
-- Parts and `root.tsx` import `./context`, `./style` and sibling parts directly. They import `'.'`
+- Parts and `root.tsx` import `context`, `style` and sibling parts directly (`../context` from a
+  part). They import `'.'`
   only with `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
   (`elementTypeOf(child) === DrawerOverlay`, a set of part functions) by importing them, never
   through `Drawer.Overlay`.
-- Paths imported from outside the folder (`field/context`, `select/select-options`,
-  `calendar/date`, `drawer/drawer-gesture`) stay where they are.
+- Another component imports a module by its path in the folder (`field/context`,
+  `select/lib/select-options`, `calendar/lib/date`, `drawer/lib/drawer-gesture`).
 
 ## Stories
 
@@ -675,7 +692,7 @@ Every scale has nine steps, read by the same roles in both modes:
   `text-on-neutral-solid` under Lc 75 under the press layer.
 
 A brand or status family builds its two scales from a 50 to 950 ramp (one color through the
-palette model, or the ramp an app passes), by `SCALE_RULES` in `ids-provider/palette-scales.ts`:
+palette model, or the ramp an app passes), by `SCALE_RULES` in `ids-provider/lib/palette-scales.ts`:
 
 - Light 1 to 3 sit on the ramp at the lightness of neutral 1 to 3, 4 is ramp 100 and 5 ramp 200.
   Dark 1 to 5 sit on the ramp at the lightness of the dark neutral step with the same number.
@@ -704,7 +721,7 @@ so there is no shared `--color-<role>` and `bg-on-primary` does not exist. Write
 for a role used as another property, such as `bg-(--ids-color-border-neutral-strong)` on a handle,
 `bg-(--ids-color-text-neutral)` on a dragged handle or `stroke-(--ids-color-bg-base)` around a
 chart dot. A brand family the theme leaves out (`secondary`, `tertiary`) is derived from primary
-(`ids-provider/derived-brands.ts`), so the provider always writes all three.
+(`ids-provider/lib/derived-brands.ts`), so the provider always writes all three.
 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `border-neutral` (neutral step 5), the way shadcn/ui keeps chrome gray and lets
@@ -730,7 +747,7 @@ tinted neutrals and harmonized and fixed statuses, under the hover and press lay
 which `tests/tokens-contrast.test.ts` checks.
 
 **Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
-`colorjs.io/fn`, in `ids-provider/contrast.ts`). The solid starts at 600 and moves to 500 or 700,
+`colorjs.io/fn`, in `ids-provider/lib/contrast.ts`). The solid starts at 600 and moves to 500 or 700,
 then 400 or 800, until white or neutral 950 text reaches Lc 75 at rest and under the press layer;
 the text on it is then computed like every `text-on-*`. WCAG 2's ratio rates dark text on mid-tone
 fills too well, so it is not used, and axe's `color-contrast` rule, which computes it, is off in
@@ -743,7 +760,7 @@ opacity to `--ids-state-layer-hover` and `state-press` to `--ids-state-layer-pre
 to `--ids-state-hover` (6%) and `--ids-state-press` (10%), all from
 `packages/core/tokens/state.tokens.json`. A component writes
 `state-layer data-hovered:state-hover data-active:state-press` (`pressStates` in
-`internal/surfaces/control-surface.ts`), and a selected, current or pressed item that should read as
+`internal/surfaces/lib/control-surface.ts`), and a selected, current or pressed item that should read as
 pressed takes `state-press` (a ghost or outline Toggle, a selected Table row or Item, the current
 ghost Pagination link); an open Menu item or a highlighted option takes `state-hover`. Add
 `--ids-state-opacity` to the element's `transition-[…]` list so the layer fades with the rest.
@@ -779,13 +796,13 @@ layer, soft and accent text under the text-color layer and the family-fill layer
 
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
-`internal/surfaces/field-surface.ts`. Their `variant` is intensity only: `outline` (default,
+`internal/surfaces/lib/field-surface.ts`. Their `variant` is intensity only: `outline` (default,
 `bg-field-outline` with `inset-ring-field-outline`), `soft` (`bg-neutral-soft`) and `ghost` (no fill, no
 border). Put `data-field-input` on the element that takes focus and
 `data-invalid` on the shell; `focus-ring` does the rest.
 
 **A control without a native input still joins the form.** Select, a date trigger, a
-ToggleGroup: render `internal/form-value.tsx` inside the component's `relative` root. It writes one
+ToggleGroup: render `internal/parts/form-value.tsx` inside the component's `relative` root. It writes one
 hidden input per value for FormData and, when `required`, a nameless input covering the control
 so the browser blocks the submit, anchors its message there and hands focus to the control.
 
@@ -887,7 +904,7 @@ Every other prop is an option. The rules for options:
 - **One look prop, `variant`.** There is no `appearance`, `look` or `kind` beside or instead of it:
   two vague names for one idea split the API. When two looks differ in structure, with other parts
   and markup (FileField's field and dropzone), they are two components on one internal hook
-  (`FileField` and `FileDropzone` on `useFileFieldRoot`), never a second look prop.
+  (`FileField` and `FileDropzone` on `useInternalFileFieldRoot`), never a second look prop.
 - **Shape, not role.** A prop names what the reader sees or where it sits (`shape="plain"`,
   `align="end"`), never who it is for (`from="user"`).
 - **Presence, not `show`/`hide`.** An element is drawn because its data or its part is given and
@@ -960,7 +977,7 @@ instead of copying React's names:
 `variant`, `size` and the color prop take the same enums on both platforms. The option count, the
 flag ban, shape over role, presence over `show`/`hide` and `XGroup` apply unchanged.
 
-**Strings.** User-facing strings go through `useTranslate()` with a stable dotted key
+**Strings.** User-facing strings go through `useInternalTranslate()` with a stable dotted key
 (`t('dialog.close')`, `t('textArea.remaining', { remaining })`), never a Korean literal and never
 a module-level read of `messages`, so the nearest `IdsProvider locale` decides the language on
 the server and the client alike. Each language is `packages/core/messages/<language>.json`,
@@ -969,7 +986,7 @@ for a string argument and `{name, number}` for a number, and every language has 
 arguments of `ko.json`, or codegen fails. Run `pnpm codegen` to refresh the catalogs and locales. `IdsMessageKey` is the union of their dotted leaf paths.
 Developer warnings stay English and out of the catalog. A default that has to be a function
 (`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
-take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
+take `locale ?? useInternalProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
 keys and that no Korean literal sits in component code; `tests/translate-<category>.test.tsx`
 renders every story in English and `tests/translate.test.tsx` checks popups, live regions and
 fallbacks.
@@ -979,7 +996,7 @@ component's own basic look that only CSS inside IDS can draw: Button's `solid`, 
 and `ghost`, Tabs' `underline`, `pill`, `enclosed` and `segmented`. A look an app can compose from
 IDS components and props (a Card holding a Tabs, a Field around a SegmentedControl) stays a
 composition and never becomes a prop value. Two components that read alike share an internal
-surface (`internal/surfaces/segment-surface.ts` for SegmentedControl and segmented Tabs) instead of
+surface (`internal/surfaces/lib/segment-surface.ts` for SegmentedControl and segmented Tabs) instead of
 one copying the other's classes.
 
 **Callbacks.** A value callback is `onValueChange(value)`; other state callbacks are
@@ -988,7 +1005,7 @@ signature and only exists where a real input does. react-hook-form's `field.onCh
 Form's `field.handleChange` both accept a plain value, so either binds to `onValueChange`.
 
 - The form library bridges, `src/react-hook-form.tsx` and `src/tanstack-form.tsx`, share
-  `internal/form-bridge.ts`: a native element reports through `onChange`, a component through
+  `internal/lib/form-bridge.ts`: a native element reports through `onChange`, a component through
   `onValueChange` / `onCheckedChange`, and each edit reaches the library once. react-hook-form reads
   a native change event itself; TanStack Form is handed the value. Each library is an optional peer
   imported only by its own entry point.
@@ -1004,7 +1021,7 @@ is drawn again with its old `value`, React sees no change and the keystroke is l
 text controls reread the DOM inside the `onChange` batch (`rereadInOnChangeBatch`); native
 listeners stay for what React does not report, such as a form `reset` or a value written by script.
 
-**Keys.** Widget keys go through `keyHandler` from `internal/keys.ts`: one map from `Hotkey`
+**Keys.** Widget keys go through `keyHandler` from `internal/lib/keys.ts`: one map from `Hotkey`
 strings to actions, with the `defaultPrevented`, IME composition and right-to-left checks done
 once. An action that returns `false` leaves the key to the browser; otherwise the key is
 `preventDefault`ed and never stopped. TanStack matches modifiers exactly, so a key that should
@@ -1026,7 +1043,7 @@ each X what it needs through a context declared in X's own folder (`ItemGroupCon
 **A description is a paragraph.** A `Description` part of prose (Card, Item, Empty, Alert, Field,
 Dialog, Popover) renders a `<p>`; one inside a button (Stepper) stays a `<span>`. Block content
 goes in through `asChild` (`<Card.Description asChild><div>…</div></Card.Description>`), the way a
-Title takes another heading level. `internal/paragraph.ts` warns in development when a block
+Title takes another heading level. `internal/lib/paragraph.ts` warns in development when a block
 element lands inside the `<p>`, which the HTML parser would split apart on the server.
 
 **Group-like controls keep a stable focus target.** RadioGroup, CheckboxGroup, Rating and
@@ -1035,7 +1052,7 @@ checked or first enabled item, so a `<label htmlFor>` and react-hook-form's erro
 somewhere that does not move as the value changes.
 
 **A pressable surface never nests buttons.** A Card or Item with `onClick` presses anywhere on
-its root, but the button keyboards and screen readers reach is its Title (`internal/surface-trigger.tsx`
+its root, but the button keyboards and screen readers reach is its Title (`internal/parts/surface-trigger.tsx`
 renders the title's content in a `<button data-surface-trigger>`, inside the heading when the
 Title is `asChild`). The root stays a plain `div`, so the buttons in `Card.Action`, `Card.Footer`
 and `Item.Actions` are not inside another button. Only a surface with no Title in its JSX
@@ -1064,7 +1081,7 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
   portal and no `<dialog>.showModal()`, which makes every other top-layer element inert (toasts
   included) and has no scroll lock. Tooltip is the one portal: it goes to the nearest IdsProvider
   root so an in-place hint does not shift sibling selectors (`space-*`, `divide-*`, Group seams).
-- **One dismissal engine.** `useLayer` puts every open layer on one stack, ordered by open time.
+- **One dismissal engine.** `useInternalLayer` puts every open layer on one stack, ordered by open time.
   Escape (recognised with TanStack's `matchesKeyboardEvent`, skipped during IME composition) closes
   only the top layer, after inner handlers had their say through `preventDefault`;
   a press outside closes non-modal layers from the top until it reaches one that holds it; focus
@@ -1078,7 +1095,7 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
 - **Modal layers** go through `ModalLayer`: floating-ui's `FloatingFocusManager` holds focus and
   hides the page with `aria-hidden` (never `inert`, which would block the toaster),
   react-remove-scroll locks the scroll.
-- **Exit animations** go through `usePresence`: `data-ending-style` while leaving, the `starting:`
+- **Exit animations** go through `useInternalPresence`: `data-ending-style` while leaving, the `starting:`
   variant for entering, no timers.
 - **`overlay.open`.** A layer without an `open` prop binds to the `overlay.open` item it is
   rendered in, and hands `null` to its children so an inner layer does not bind to the same item.
@@ -1255,7 +1272,7 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 
 - The app owns its brand colors: `primary` (required), `secondary` and `tertiary`, each one CSS color, a
   `50` to `950` ramp, or `{ light, dark }` scales of nine colors. The provider picks every family's roles for
-  both modes by contrast (`ids-provider/theme-roles.ts`) and writes them as
+  both modes by contrast (`ids-provider/lib/theme-roles.ts`) and writes them as
   `--ids-theme-{mode}-{role}`; `ids.css` maps the current mode's set onto `--ids-color-{role}`.
 - `neutral: 'tinted'` gives the neutral the primary hue at low chroma (`'pure'` by default).
   `status` is `'harmonized'` by default (each status hue turns toward primary by at most 15°, or
@@ -1265,7 +1282,7 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
   red-green color blindness. The thresholds were set from the 17 demo palettes that core used
   to hold and are fixed values now.
 - Chart has no color tokens: a series without `color` takes `bg-primary-solid`, `bg-secondary-solid` and
-  `bg-tertiary-solid` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
+  `bg-tertiary-solid` in config order (`DEFAULT_SERIES` in `data/chart/lib/config.ts`). A fourth draws in
   neutral and warns in development.
 - A `secondary` or `tertiary` the app leaves out is derived from primary, the Material 3 way:
   secondary keeps primary's hue at a third of its chroma ratio, tertiary turns the hue by +60° at
@@ -1349,7 +1366,7 @@ ids_flutter follows ids-react's theme. The design is decided in React; Flutter p
   is `IdsProvider.Scope`. Nested providers inherit what they leave out; a scope with its own `mode`
   or `defaultMode` owns its mode, the others forward `setMode` and `toggleMode` to the owner.
   `IdsMode.system` follows the platform brightness.
-- `lib/src/color` ports `ids-provider/theme-roles.ts`, `contrast.ts` (APCA from colorjs.io),
+- `lib/src/color` ports `ids-provider/lib/theme-roles.ts`, `contrast.ts` (APCA from colorjs.io),
   `derived-brands.ts`, `status.ts` and the `checkIdsTheme` checks line by line, so a theme gives the
   same 8-bit colors on both platforms. `packages/react/tests/flutter-parity.test.ts` writes
   `packages/core/tests/fixtures/theme-roles.json` (17 palettes × pure/tinted × harmonized/fixed ×

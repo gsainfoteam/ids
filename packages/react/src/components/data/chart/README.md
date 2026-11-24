@@ -126,7 +126,7 @@ const config = {
 - 맨 위 줄(축의 값, 예: `월`)은 Recharts 가 label 을 넘길 때만 그립니다. 원(`Pie`)처럼 label 이 없는 차트에서는 그 줄이 없고 `labelFormatter` 도 부르지 않습니다.
 - `Chart.Legend` 의 `formatter(label, item, index)` 는 config 의 label 을 받아 바꿉니다.
 - `content` 를 주면 IDS 의 내용 대신 그것을 그립니다. `Chart.TooltipContent`, `Chart.LegendContent` 를 감싸 일부만 바꿀 수도 있습니다.
-- IDS 툴팁 내용은 Card 로 그리고, 가리킨 지점 옆에 IDS 오버레이(`popover`, `useAnchored`)로 띄웁니다. top layer 에 올라가므로 `overflow: hidden` 인 Card 나 ScrollArea 안에서도 잘리지 않고, 화면 끝에서는 반대쪽으로 넘어갑니다.
+- IDS 툴팁 내용은 Card 로 그리고, 가리킨 지점 옆에 IDS 오버레이(`popover`, `useInternalAnchored`)로 띄웁니다. top layer 에 올라가므로 `overflow: hidden` 인 Card 나 ScrollArea 안에서도 잘리지 않고, 화면 끝에서는 반대쪽으로 넘어갑니다.
 - 숫자는 IdsProvider 의 `locale` 로 씁니다. 없으면 `ko-KR` 입니다(`1,590`).
 
 ## 표

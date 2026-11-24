@@ -1,8 +1,8 @@
 import { type ComponentProps } from 'react';
 
-import { type KbdKeys, type KbdLabels, type KbdPlatform } from './keys';
+import { type KbdKeys, type KbdLabels, type KbdPlatform } from './lib/keys';
+import { KbdSeparator, type KbdSeparatorProps } from './parts/separator';
 import { KbdRoot } from './root';
-import { KbdSeparator, type KbdSeparatorProps } from './separator';
 import { kbdStyle } from './style';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -39,4 +39,4 @@ export namespace Kbd {
 
   export const Style = kbdStyle;
 }
-export type { KbdKeys, KbdLabel, KbdLabels, KbdPlatform } from './keys';
+export type { KbdKeys, KbdLabel, KbdLabels, KbdPlatform } from './lib/keys';

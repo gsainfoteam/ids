@@ -1,9 +1,9 @@
-import { CircularProgressIndicator, type CircularProgressIndicatorProps } from './indicator';
-import { CircularProgressLabel, type CircularProgressLabelProps } from './label';
+import { CircularProgressIndicator, type CircularProgressIndicatorProps } from './parts/indicator';
+import { CircularProgressLabel, type CircularProgressLabelProps } from './parts/label';
+import { CircularProgressTrack, type CircularProgressTrackProps } from './parts/track';
+import { CircularProgressValue, type CircularProgressValueProps } from './parts/value';
 import { CircularProgressRoot } from './root';
 import { circularProgressStyle } from './style';
-import { CircularProgressTrack, type CircularProgressTrackProps } from './track';
-import { CircularProgressValue, type CircularProgressValueProps } from './value';
 
 import type { Progress } from '../progress';
 

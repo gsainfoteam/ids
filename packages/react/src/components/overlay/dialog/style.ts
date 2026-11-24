@@ -1,5 +1,5 @@
-import { overlayStyles } from '../../../internal/overlay/styles';
-import { footerBand } from '../../../internal/surfaces/footer-band';
+import { overlayStyles } from '../../../internal/overlay/lib/styles';
+import { footerBand } from '../../../internal/surfaces/lib/footer-band';
 import { cn, tv } from '../../../utils';
 
 const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');

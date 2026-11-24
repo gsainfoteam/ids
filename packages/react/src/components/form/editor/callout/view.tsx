@@ -3,14 +3,14 @@
 import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react';
 
 import { EditorCalloutKindMenu } from './kind-menu';
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { alertStyle } from '../../../feedback/alert/style';
-import { CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
+import { CALLOUT_TITLE } from '../../../typography/rich-text/lib/callout-kinds';
 import { calloutKindOf } from '../../../typography/rich-text/schema/callout';
 import { editorMessages } from '../messages-catalog';
 
 export function EditorCalloutView({ node, editor, getPos, updateAttributes }: ReactNodeViewProps) {
-  const t = useTranslate(editorMessages);
+  const t = useInternalTranslate(editorMessages);
   const kind = calloutKindOf(node.attrs.kind);
   const styles = alertStyle({ colorScheme: kind, variant: 'soft', icon: true });
 

@@ -5,11 +5,11 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { Drawer } from '.';
+import type { useInternalDrawerRoot } from './hooks/use-drawer-root';
 import type { drawerStyle } from './style';
-import type { useDrawerRoot } from './use-drawer-root';
 
 type DrawerContextValue = {
-  drawer: ReturnType<typeof useDrawerRoot>;
+  drawer: ReturnType<typeof useInternalDrawerRoot>;
   role: Drawer.Role;
   side: Drawer.Side;
   modal: boolean;
@@ -24,7 +24,7 @@ type DrawerContextValue = {
 
 export const DrawerContext = createContext<DrawerContextValue | null>(null);
 
-export function useDrawerContext(part: string) {
+export function useInternalDrawerContext(part: string) {
   const context = use(DrawerContext);
   invariant(context, `${part} must be rendered inside Drawer.`);
   return context;

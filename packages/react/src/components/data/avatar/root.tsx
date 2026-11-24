@@ -3,11 +3,11 @@
 import { isValidElement, use, useEffect, type ReactElement } from 'react';
 
 import { AvatarContext, AvatarCutoutContext, AvatarGroupContext } from './context';
-import { AvatarFallback } from './fallback';
-import { AvatarImage, type AvatarImageProps } from './image';
+import { AvatarFallback } from './parts/fallback';
+import { AvatarImage, type AvatarImageProps } from './parts/image';
 import { avatarStyle } from './style';
-import { useImageStatus } from '../../../internal/image-status';
-import { resolveState } from '../../../internal/state-props';
+import { useInternalImageStatus } from '../../../internal/lib/image-status';
+import { resolveState } from '../../../internal/lib/state-props';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -41,7 +41,7 @@ export function AvatarRoot({
     (node) => isValidElement(node) && elementTypeOf(node) === AvatarFallback,
   );
   const imageSrc = image?.props.src ?? src;
-  const { status, report } = useImageStatus(imageSrc || undefined, onStatusChange);
+  const { status, report } = useInternalImageStatus(imageSrc || undefined, onStatusChange);
 
   const decorative = alt === '' || ariaHidden === true || ariaHidden === 'true';
   const label = [ariaLabel, alt, name].find((candidate) => candidate?.trim());

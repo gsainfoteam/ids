@@ -9,17 +9,17 @@ import {
 
 import { PaperClipIcon } from '@heroicons/react/16/solid';
 
-import { FileClear } from './clear';
 import { FileContext } from './context';
-import { type FileFieldRejection } from './file-rules';
-import { isType } from './is-type';
-import { FileList } from './list';
-import { FilePreview } from './preview';
+import { useInternalFileFieldRoot } from './hooks/use-file-field-root';
+import { type FileFieldRejection } from './lib/file-rules';
+import { isType } from './lib/is-type';
+import { FileClear } from './parts/clear';
+import { FileList } from './parts/list';
+import { FilePreview } from './parts/preview';
+import { FileTrigger } from './parts/trigger';
+import { FileValue } from './parts/value';
 import { fileFieldStyle } from './style';
-import { FileTrigger } from './trigger';
-import { useFileFieldRoot } from './use-file-field-root';
-import { FileValue } from './value';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { invariant } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -98,7 +98,7 @@ export function FileFieldRoot(props: FileFieldProps) {
     messages,
     structure: nodes,
     limitsParts,
-  } = useFileFieldRoot(props, 'field');
+  } = useInternalFileFieldRoot(props, 'field');
   const { state } = context;
   const styles = fileFieldStyle({ variant, size: context.size });
   const [first] = context.field.state.files;
