@@ -1,8 +1,6 @@
-'use client';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
-import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
-
-import { elementTypeOf, flattenFragments, invariant, mergeProps } from '../../../../utils';
+import { elementTypeOf, flattenFragments, invariant } from '../../../../utils';
 
 export type SidebarLinkProps = {
   href?: string;
@@ -40,26 +38,6 @@ export function linkChildrenOf({ asChild, children }: SidebarLinkProps): ReactNo
     '`<Sidebar.Item asChild>` needs one link element as its child.',
   );
   return (children as ReactElement<{ children?: ReactNode }>).props.children;
-}
-
-export function linkElementOf(
-  { href, asChild, children }: SidebarLinkProps,
-  props: Record<string, unknown>,
-  content: ReactNode,
-): ReactElement {
-  if (asChild && isValidElement<Record<string, unknown>>(children))
-    return cloneElement(children, mergeProps(children.props, props), content);
-  if (href !== undefined)
-    return (
-      <a {...props} href={href}>
-        {content}
-      </a>
-    );
-  return (
-    <button type="button" {...props}>
-      {content}
-    </button>
-  );
 }
 
 export function containsValue(subItems: ReactElement[], value: string | undefined): boolean {

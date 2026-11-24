@@ -5,9 +5,7 @@ import {
   cloneElement,
   Fragment,
   isValidElement,
-  useEffect,
   useId,
-  useMemo,
   type ComponentProps,
   type ReactElement,
   type ReactNode,
@@ -17,10 +15,10 @@ import { SidebarListContext, useInternalSidebarContext } from '../context';
 import { SidebarItem, type SidebarItemProps } from './item';
 import { SidebarSortable } from './sortable';
 import { elementTypeOf } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
 import { Accordion } from '../../../data/accordion';
+import { useInternalSidebarTree } from '../hooks/use-sidebar-tree';
+import { useInternalSidebarTreeWarnings } from '../hooks/use-sidebar-tree-warnings';
 import {
-  buildTree,
   TREE_KEY_PROP,
   type SidebarMove,
   type SidebarTree,
@@ -124,23 +122,9 @@ function SidebarTreeList<T extends SidebarTreeItem<T>>({
   render: RenderItem<T>;
 }) {
   const { rail, presentation } = useInternalSidebarContext('Sidebar.Group');
-  const tree = useMemo(() => buildTree(items), [items]);
+  const tree = useInternalSidebarTree(items);
   const { rows, everyRowIsAnItem } = renderRows(tree, tree.roots, render);
-  const duplicates = tree.duplicates.join(', ');
-
-  useEffect(() => {
-    if (!isDevelopment || everyRowIsAnItem) return;
-    console.warn(
-      '[IDS] `<Sidebar.Group items>` places each item’s children under the row its function returns, and drags that row. Return a `<Sidebar.Item>` from the function, not a component that renders one.',
-    );
-  }, [everyRowIsAnItem]);
-
-  useEffect(() => {
-    if (!isDevelopment || duplicates === '') return;
-    console.warn(
-      `[IDS] \`<Sidebar.Group items>\` found the id ${duplicates} twice under one parent. Ids only need to differ between siblings, but there they must; the repeated items are left out.`,
-    );
-  }, [duplicates]);
+  useInternalSidebarTreeWarnings(everyRowIsAnItem, tree.duplicates.join(', '));
 
   const list = <SidebarList>{rows}</SidebarList>;
   if (!onItemsChange || rail || presentation === 'drawer') return list;
