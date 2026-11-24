@@ -153,6 +153,12 @@ const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
 - hover 는 `pointerType === 'mouse'` 일 때만 켭니다. 터치에서는 켜지지 않습니다.
 - `focusVisible` 은 focus 때 요소가 `:focus-visible` 인지 읽어 정합니다. Enter 와 Space 의 keydown 은 active 를 켜고 keyup 은 끕니다.
 - 누르는 도중이나 pointer 아래에서 disabled 가 된 컨트롤은 pointerleave, pointerup 을 받지 못합니다(native disabled button 은 pointer 이벤트를 아예 받지 않습니다). 그대로 두면 반응하지 않는 컨트롤에 hover 층(`state-hover`)이 남으므로, `disabled` 가 켜지는 렌더에서 바로 끕니다(`disabledBefore`, `stuckWithoutPointerEvents`).
+- native `:disabled` 인 요소에서 온 blur, keyup, pointerup, pointerleave, pointercancel 은 state 를 `startTransition` 안에서 바꿉니다(`deferPastFormActionWhenDisabled`).
+  - `useFormStatus` 의 `pending` 으로 `disabled` 가 된 submit 버튼이 이 경로를 탑니다. 마우스로 누르면 브라우저가 버튼을 blur 합니다. Chromium 은 disabled 를 거는 commit 안에서, Linux 의 Firefox 는 몇 ms 뒤에 blur 를 보냅니다. Enter 로 누르면 disabled 가 된 버튼이 Enter 의 keyup 을 받습니다.
+  - React 19.2 에서는 action 이 도는 동안 form 안의 컴포넌트가 다시 렌더하면 form 이 bailout 하면서 `HostTransitionContext` 값을 채우지 않습니다. 그러면 `useFormStatus` 가 `pending: false` 를 읽고 버튼이 다시 켜집니다. React 19.3 은 bailout 에서도 값을 채웁니다.
+  - transition 은 진행 중인 async action 이 끝날 때까지 기다렸다가 action 의 결과와 함께 렌더합니다. action 밖에서는 곧바로 렌더하므로 hover 와 focus 상태가 늦게 지워지지 않습니다.
+  - action 이 끝날 때까지 `focusVisible` 이 남으므로, CSS 패키지의 `focus-ring` 은 `:disabled` 요소의 `[data-focus-visible]` 에 ring 을 그리지 않습니다(`packages/core/sd.config.js` 의 `FOCUS_RING_TRIGGERS`). native disabled 요소에 실제 포커스가 있으면 `:focus-visible` 이 ring 을 그립니다.
+  - `tests/compat-form-actions.test.tsx` 의 natively disabled Button 테스트 두 개가 이것을 확인합니다. 하나는 브라우저가 blur 한 뒤에, 다른 하나는 Enter 로 제출하고 포커스를 옮긴 뒤에 `pending` 과 ring 을 단언합니다.
 - `interactiveDataProps` 는 DOM 에 pressed, active, hovered 중 하나만 이 순서의 우선순위로 붙입니다(`pressedOverActiveOverHovered`). 같은 속성(state 층의 불투명도, 배경 등)을 두고 클래스끼리 다투지 않게 하기 위해서입니다. render prop 이 받는 `state` 는 원래 값을 그대로 둡니다.
 - `WithInteractiveValues<P>` 는 prop 을 `T | ((state) => T)` 로 넓힙니다. 이벤트 핸들러, 이미 함수인 prop, `ref`, `disabled`, `key`, `formAction`, `pressed`, `defaultPressed`, `onPressedChange`, `value` 는 넓히지 않습니다.
 - `resolveInteractiveProps` 는 함수인 prop 을 state 로 풉니다. `CALLBACK_PROPS`(`on*`, `formAction`, `ref`)는 state 를 받는 함수가 아니라 콜백이므로 그대로 둡니다.
