@@ -1,4 +1,4 @@
-import { dartMessages, slangMessages } from './dart-messages.mjs';
+import { dartMessageReaders, dartMessages } from './dart-messages.mjs';
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
 const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
@@ -85,5 +85,5 @@ export const ${language} = defineIdsLocale({
   messages: ${JSON.stringify(runtime, null, 2).replaceAll('\n', '\n  ')},
 });\n`);
 
-write('../flutter/lib/messages/ids_messages.dart', dartMessages(korean.runtime));
-write('../flutter/messages/ko.i18n.json', `${JSON.stringify(slangMessages(korean.runtime), null, 2)}\n`);
+write('../flutter/lib/messages/ids_messages.dart', dartMessages(locales));
+write('../flutter/test/generated/ids_message_readers.dart', dartMessageReaders(locales));

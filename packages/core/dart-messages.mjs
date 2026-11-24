@@ -1,15 +1,17 @@
-export function messageEntries(tree, path = []) {
+const DART_TYPES = { number: 'num', string: 'String' };
+const SAMPLE_VALUES = { number: '7', string: "'x'" };
+const MEMBERS_OF_THE_BASE = new Set(['language', 'hashCode', 'runtimeType', 'toString']);
+
+export function messageEntries(tree, argumentTypes, path = []) {
   return Object.entries(tree).flatMap(([key, value]) => {
     if (!/^[a-z][a-zA-Z0-9]*$/.test(key)) throw new Error(`Invalid message key: ${key}`);
     const parts = [...path, key];
     if (typeof value === 'object' && value !== null && !Array.isArray(value))
-      return messageEntries(value, parts);
-    if (typeof value !== 'string') throw new Error(`Invalid message: ${parts.join('.')}`);
-    const parameters = [...new Set([...value.matchAll(/\{([a-z][a-zA-Z0-9]*)\}/g)].map((match) => match[1]))];
-    if (/[{}]/.test(value.replace(/\{([a-z][a-zA-Z0-9]*)\}/g, '')))
-      throw new Error(`Only plain arguments are supported: ${parts.join('.')}`);
+      return messageEntries(value, argumentTypes, parts);
+    const id = parts.join('.');
     const name = parts.map((part, index) => index ? part[0].toUpperCase() + part.slice(1) : part).join('');
-    return [{ name, value, parameters }];
+    const parameters = Object.entries(argumentTypes[id] ?? {}).map(([parameter, type]) => ({ parameter, type }));
+    return [{ id, name, value, parameters }];
   });
 }
 
@@ -21,43 +23,115 @@ const dartLiteral = (value) => value
   .replaceAll('\r', '\\r')
   .replaceAll('\t', '\\t');
 
-export function dartMessages(tree) {
-  const entries = messageEntries(tree);
+const signature = ({ name, parameters }) => parameters.length
+  ? `${name}({${parameters.map(({ parameter, type }) => `required ${DART_TYPES[type]} ${parameter}`).join(', ')}})`
+  : `get ${name}`;
+
+const expressionOf = ({ value, parameters }) => {
+  const types = Object.fromEntries(parameters.map(({ parameter, type }) => [parameter, type]));
+  const interpolated = dartLiteral(value).replace(
+    /\{([a-z][a-zA-Z0-9]*)\}/g,
+    (placeholder, parameter, offset, whole) => {
+      if (types[parameter] === 'number') return `\${_number(${parameter})}`;
+      const runsOn = /[a-zA-Z0-9_]/.test(whole[offset + placeholder.length] ?? '');
+      return runsOn ? `\${${parameter}}` : `\$${parameter}`;
+    },
+  );
+  return `'${interpolated}'`;
+};
+
+const className = (language) => `IdsMessages${language[0].toUpperCase()}${language.slice(1)}`;
+
+const localeExpression = (tag) => {
+  const { language, script, region } = new Intl.Locale(tag);
+  const subtags = [`languageCode: '${language}'`];
+  if (script) subtags.push(`scriptCode: '${script}'`);
+  if (region) subtags.push(`countryCode: '${region}'`);
+  return `Locale.fromSubtags(${subtags.join(', ')})`;
+};
+
+export function dartMessages(locales) {
+  const [{ argumentTypes }] = locales;
+  const contract = messageEntries(locales[0].runtime, argumentTypes);
   const names = new Set();
-  for (const { name } of entries) {
-    if (names.has(name) || name === 'ko') throw new Error(`Duplicate or reserved Dart member: ${name}`);
+  for (const { id, name } of contract) {
+    if (MEMBERS_OF_THE_BASE.has(name)) throw new Error(`Reserved Dart member: ${name}`);
+    if (names.has(name)) throw new Error(`Duplicate Dart member ${name}: ${id}`);
     names.add(name);
   }
-  const signature = ({ name, parameters }) => parameters.length
-    ? `${name}({${parameters.map((parameter) => `required Object ${parameter}`).join(', ')}})`
-    : `get ${name}`;
-  const defaults = entries.map((entry) => {
-    const value = dartLiteral(entry.value).replace(/\{([a-z][a-zA-Z0-9]*)\}/g, (_, name) => '${_format(' + name + ')}');
-    const singleArgument = entry.value.match(/^\{([a-z][a-zA-Z0-9]*)\}$/);
-    const expression = singleArgument ? `_format(${singleArgument[1]})` : `'${value}'`;
-    return `  @override\n  String ${signature(entry)} => ${expression};`;
-  }).join('\n\n');
-  return `import 'package:intl/intl.dart';
 
-mixin IdsMessages {
-  static const ko = IdsKoreanMessages._();
+  const languageClass = ({ language, tag, runtime }) => {
+    const entries = messageEntries(runtime, argumentTypes);
+    const members = entries.map((entry) => `  @override\n  String ${signature(entry)} => ${expressionOf(entry)};`);
+    return `class ${className(language)} extends IdsMessagesBase {
+  const ${className(language)}();
 
-${entries.map((entry) => `  String? ${signature(entry)} => null;`).join('\n\n')}
+  static final _numbers = NumberFormat.decimalPattern('${tag.replaceAll('-', '_')}');
+
+  static String _number(num value) => _numbers.format(value);
+
+  @override
+  String get language => '${language}';
+
+${members.join('\n\n')}
+}`;
+  };
+
+  return `import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+
+abstract class IdsMessagesBase {
+  const IdsMessagesBase();
+
+  String get language;
+
+${contract.map((entry) => `  String ${signature(entry)};`).join('\n\n')}
 }
 
-final class IdsKoreanMessages with IdsMessages {
-  const IdsKoreanMessages._();
+${locales.map(languageClass).join('\n\n')}
 
-  static final _numbers = NumberFormat.decimalPattern('ko_KR');
+@immutable
+class IdsLocale {
+  IdsLocale({required this.locale, required this.messages})
+    : assert(
+        locale.languageCode == messages.language,
+        'IdsLocale: the locale \${locale.toLanguageTag()} is not in the language of its messages (\${messages.language}).',
+      );
 
-  static String _format(Object value) =>
-      value is num ? _numbers.format(value) : value.toString();
+${locales.map(({ language, tag }) => `  static final ${language} = IdsLocale(\n    locale: ${localeExpression(tag)},\n    messages: const ${className(language)}(),\n  );`).join('\n\n')}
 
-${defaults}
+  static final List<IdsLocale> values = [${locales.map(({ language }) => language).join(', ')}];
+
+  final Locale locale;
+  final IdsMessagesBase messages;
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsLocale && other.locale == locale && other.messages == messages;
+
+  @override
+  int get hashCode => Object.hash(locale, messages);
 }
 `;
 }
 
-export function slangMessages(tree) {
-  return { 'ids(singleInterface=IdsMessages)': Object.fromEntries(messageEntries(tree).map(({ name, value }) => [name, value])) };
+export function dartMessageReaders(locales) {
+  const { runtime, argumentTypes } = locales[0];
+  const readers = messageEntries(runtime, argumentTypes).map(({ id, name, parameters }) => {
+    const call = parameters.length
+      ? `messages.${name}(${parameters.map(({ parameter, type }) => `${parameter}: ${SAMPLE_VALUES[type]}`).join(', ')})`
+      : `messages.${name}`;
+    return `  '${id}': (messages) => ${call},`;
+  });
+  const samples = Object.entries(SAMPLE_VALUES).map(([type, value]) => `  '${type}': '${value.replaceAll("'", '')}',`);
+  return `import 'package:ids_flutter/ids.dart';
+
+const sampleArguments = <String, String>{
+${samples.join('\n')}
+};
+
+final messageReaders = <String, String Function(IdsMessagesBase)>{
+${readers.join('\n')}
+};
+`;
 }
