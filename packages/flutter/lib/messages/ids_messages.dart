@@ -16,6 +16,8 @@ abstract class IdsMessagesBase {
 
   String get carouselRoleDescription;
 
+  String get checkboxRequired;
+
   String get colorPickerAlpha;
 
   String get colorPickerArea;
@@ -465,6 +467,9 @@ class IdsMessagesEn extends IdsMessagesBase {
 
   @override
   String get carouselRoleDescription => 'carousel';
+
+  @override
+  String get checkboxRequired => 'Select this item.';
 
   @override
   String get colorPickerAlpha => 'Opacity';
@@ -1127,6 +1132,9 @@ class IdsMessagesKo extends IdsMessagesBase {
 
   @override
   String get carouselRoleDescription => '캐러셀';
+
+  @override
+  String get checkboxRequired => '이 항목을 선택하세요.';
 
   @override
   String get colorPickerAlpha => '투명도';

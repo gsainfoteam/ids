@@ -18,6 +18,9 @@ export const ko = defineIdsLocale({
       "indicator": "{index}번째 슬라이드로",
       "roleDescription": "캐러셀"
     },
+    "checkbox": {
+      "required": "이 항목을 선택하세요."
+    },
     "colorPicker": {
       "alpha": "투명도",
       "area": "채도와 밝기",

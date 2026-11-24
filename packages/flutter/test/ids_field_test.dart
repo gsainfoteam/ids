@@ -116,6 +116,64 @@ void main() {
       }
     });
 
+    testWidgets('horizontal fields wrap labels and stack helper text below', (
+      tester,
+    ) async {
+      const label = 'A long label that needs to wrap';
+      const control = Key('horizontal control');
+      await pump(
+        tester,
+        const SizedBox(
+          width: 220,
+          child: IdsField(
+            orientation: Axis.horizontal,
+            invalid: true,
+            children: [
+              IdsFieldLabel(child: Text(label)),
+              IdsFieldDescription(child: Text('Description')),
+              SizedBox(key: control, width: 100, height: 36),
+              IdsFieldHint(child: Text('Hint')),
+              IdsFieldError(child: Text('Error')),
+            ],
+          ),
+        ),
+      );
+      final labelRect = tester.getRect(find.text(label));
+      final controlRect = tester.getRect(find.byKey(control));
+      final description = tester.getRect(find.text('Description'));
+      expect(labelRect.height, greaterThan(36));
+      expect(controlRect.left, greaterThan(labelRect.right));
+      expect(description.top, greaterThan(labelRect.bottom));
+      expect(
+        tester.getTopLeft(find.text('Error')).dy,
+        greaterThan(description.bottom),
+      );
+      expect(find.text('Hint'), findsNothing);
+    });
+
+    testWidgets('a short horizontal label sits next to the control', (
+      tester,
+    ) async {
+      const control = Key('checkbox control');
+      await pump(
+        tester,
+        const SizedBox(
+          width: 250,
+          child: IdsField(
+            orientation: Axis.horizontal,
+            children: [
+              IdsFieldLabel(child: Text('Label')),
+              IdsCheckbox(key: control),
+            ],
+          ),
+        ),
+      );
+      expect(
+        tester.getTopLeft(find.byKey(control)).dx,
+        tester.getTopRight(find.text('Label')).dx + 8,
+      );
+    });
+
     testWidgets('description, hint and error inherit the field text size', (
       tester,
     ) async {
