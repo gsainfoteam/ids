@@ -267,9 +267,11 @@ export const StackADrawerOnADrawer: Story = {
             안에서 연 서랍이 위에 쌓이고, 아래 서랍은 뒤로 물러납니다.
           </Drawer.Description>
         </Drawer.Header>
-        <Select aria-label="언어" mobileVariant="drawer" defaultValue="ko">
-          <Select.Item value="ko">한국어</Select.Item>
-          <Select.Item value="en">English</Select.Item>
+        <Select aria-label="언어" defaultValue="ko">
+          <Select.Content mobileVariant="drawer">
+            <Select.Item value="ko">한국어</Select.Item>
+            <Select.Item value="en">English</Select.Item>
+          </Select.Content>
         </Select>
         <Drawer side="bottom">
           <Drawer.Trigger asChild>

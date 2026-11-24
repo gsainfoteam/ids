@@ -17,7 +17,8 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
   <Bubble variant="solid">요약해 줘</Bubble>
 </Message>
 
-<Message name="지글봇" avatar="/bot.png" time={sentAt}>
+<Message name="지글봇" time={sentAt}>
+  <Message.Avatar src="/bot.png" />
   <Marker>웹 검색 3건</Marker>
   요약입니다.
   <Message.Actions />
@@ -32,8 +33,14 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 </Message>
 
 <MessageGroup align="start" aria-label="김지수의 메시지">
-  <Message name="김지수" avatar={src} time={t1}><Bubble>학식 메뉴 알려 줘</Bubble></Message>
-  <Message name="김지수" avatar={src} time={t2}><Bubble>오늘 거</Bubble></Message>
+  <Message name="김지수" time={t1}>
+    <Message.Avatar src={src} />
+    <Bubble>학식 메뉴 알려 줘</Bubble>
+  </Message>
+  <Message name="김지수" time={t2}>
+    <Message.Avatar src={src} />
+    <Bubble>오늘 거</Bubble>
+  </Message>
 </MessageGroup>
 ```
 
@@ -41,7 +48,6 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 | --------- | -------------------------------------------- | -------------------------------- |
 | `align`   | `'start' \| 'end'`                           | `'start'`                        |
 | `name`    | `string`                                     | -                                |
-| `avatar`  | `string \| ReactNode`                        | -                                |
 | `time`    | `Date`                                       | -                                |
 | `locale`  | `string`                                     | IdsProvider 의 locale, `ko-KR`   |
 | `status`  | `'sent' \| 'pending' \| 'error'`             | `'sent'`                         |
@@ -51,8 +57,8 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 ## 파트
 
 ```tsx
-<Message name="김지수" avatar={src} time={sentAt}>
-  <Message.Avatar />          {/* avatar 가 있으면 저절로. 직접 두면 이니셜로도 그린다 */}
+<Message name="김지수" time={sentAt}>
+  <Message.Avatar src={src} /> {/* 둘 때만 그린다. Avatar 의 props 를 받는다 */}
   <Message.Header />          {/* name 이나 time 이 있으면 저절로 */}
   <Message.Content>…</Message.Content>  {/* 파트가 아닌 자식이 저절로 들어간다 */}
   <Message.Actions />         {/* 자식이 없으면 복사 버튼 */}
@@ -89,13 +95,19 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 ## 보낸 사람
 
 ```tsx
-<Message name="김지수" avatar="/jisu.png">…</Message>     {/* src. 못 불러오면 이니셜 */}
-<Message name="Alice Kim"><Message.Avatar />…</Message>   {/* 그림 없이 이니셜 */}
-<Message avatar={<Avatar size="tiny" name="도우미">…</Avatar>}>…</Message>  {/* 노드를 그대로 */}
+<Message name="김지수"><Message.Avatar src="/jisu.png" />…</Message>  {/* src. 못 불러오면 이니셜 */}
+<Message name="Alice Kim"><Message.Avatar />…</Message>              {/* 그림 없이 이니셜 */}
+<Message name="도우미">
+  <Message.Avatar size="tiny">                                         {/* Avatar 의 자식을 그대로 */}
+    <Avatar.Fallback><SparklesIcon /></Avatar.Fallback>
+  </Message.Avatar>
+  …
+</Message>
 ```
 
-- 아바타는 `avatar` 를 주거나 `<Message.Avatar />` 를 둘 때만 그립니다. 이름이나 `align` 으로 숨기지 않습니다. 내 아바타를 빼려면 `avatar` 를 주지 않습니다.
-- 아바타는 Avatar `standard`(40px) 입니다. 다른 크기는 노드로 넘기거나 `<Message.Avatar size="tiny" />` 로 바꿉니다.
+- 아바타는 `<Message.Avatar />` 를 둘 때만 그립니다. 이름이나 `align` 으로 숨기지 않습니다. 내 아바타를 빼려면 `Message.Avatar` 를 두지 않습니다.
+- `Message.Avatar` 는 Avatar 의 props 와 자식을 받고, `name` 은 Message 의 `name` 을 씁니다.
+- 아바타는 Avatar `standard`(40px) 입니다. 다른 크기는 `<Message.Avatar size="tiny" />` 로 바꿉니다.
 - 아바타는 `aria-hidden` 입니다. 이름은 머리가 읽힙니다.
 - `name` 이 있으면 메시지(`article`)의 이름이 됩니다. `name` 이 없으면 이름 없는 `article` 입니다.
 

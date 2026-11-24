@@ -1,6 +1,13 @@
 'use client';
 
-import { useId, useState, type ComponentProps, type ReactNode } from 'react';
+import {
+  isValidElement,
+  useId,
+  useState,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 import {
   getLocalTimeZone,
@@ -23,6 +30,12 @@ import {
   type SchedulerSlot,
   type SchedulerView,
 } from './layout';
+import {
+  SchedulerEventMenu,
+  SchedulerSlotMenu,
+  type SchedulerEventMenuPartProps,
+  type SchedulerSlotMenuPartProps,
+} from './menus';
 import { SchedulerMonth } from './month';
 import { schedulerStyle } from './style';
 import { SchedulerToolbar } from './toolbar';
@@ -30,6 +43,7 @@ import { useNow } from './use-now';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
 import { useProviderLocale, useTranslate } from '../../../internal/translate';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { validateDate } from '../calendar/date';
 
 export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = Omit<
@@ -50,13 +64,31 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
   weekStartsOn?: WeekDay;
   now?: CalendarDateTime;
   onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
-  eventMenu?: (event: E) => ReactNode;
-  slotMenu?: (slot: SchedulerSlot) => ReactNode;
   onSlotSelect?: (slot: SchedulerSlot) => void;
-  children?: (event: E) => ReactNode;
+  children?: SchedulerChild<E> | readonly SchedulerChild<E>[];
 };
 
+type SchedulerChild<E extends SchedulerEventData> =
+  ((event: E) => ReactNode) | ReactElement | null | undefined | false;
+
 const defaultEvent = () => <SchedulerEvent />;
+
+function propsOfPart<P>(parts: ReactNode[], type: unknown) {
+  const found = parts.find((node) => isValidElement(node) && elementTypeOf(node) === type);
+  return (found as ReactElement<P> | undefined)?.props;
+}
+
+function splitChildren<E extends SchedulerEventData>(children: SchedulerProps<E>['children']) {
+  const list: readonly SchedulerChild<E>[] = Array.isArray(children) ? children : [children];
+  const renderEvent = list.find((child) => typeof child === 'function');
+  const parts = flattenFragments(list.filter((child) => typeof child !== 'function'));
+
+  return {
+    renderEvent: renderEvent ?? defaultEvent,
+    eventMenu: propsOfPart<SchedulerEventMenuPartProps<E>>(parts, SchedulerEventMenu)?.children,
+    slotMenu: propsOfPart<SchedulerSlotMenuPartProps>(parts, SchedulerSlotMenu)?.children,
+  };
+}
 
 export function SchedulerRoot<E extends SchedulerEventData>({
   events,
@@ -73,10 +105,8 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   weekStartsOn,
   now: nowProp,
   onEventChange,
-  eventMenu,
-  slotMenu,
   onSlotSelect,
-  children = defaultEvent,
+  children,
   className,
   'aria-label': ariaLabel,
   'aria-describedby': ariaDescribedBy,
@@ -85,6 +115,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   [dateProp, defaultDate].forEach((date) => validateDate(date, 'Scheduler'));
 
   const t = useTranslate();
+  const { renderEvent, eventMenu, slotMenu } = splitChildren(children);
   const providerLocale = useProviderLocale();
   const resolvedLocale = resolveLocale(locale ?? providerLocale);
   const weekStart = weekStartsOn ?? weekStartOf(resolvedLocale);
@@ -150,7 +181,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
             month={date}
             events={events}
             today={today}
-            renderEvent={children}
+            renderEvent={renderEvent}
             eventMenu={eventMenu}
             slotMenu={slotMenu}
             onSlotSelect={onSlotSelect}
@@ -169,7 +200,7 @@ export function SchedulerRoot<E extends SchedulerEventData>({
             events={events}
             today={today}
             now={now}
-            renderEvent={children}
+            renderEvent={renderEvent}
             onEventChange={onEventChange}
             eventMenu={eventMenu}
             slotMenu={slotMenu}
