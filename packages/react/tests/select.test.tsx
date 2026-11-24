@@ -181,7 +181,7 @@ test('search, live empty state, multiple toggles in list order, outside dismissa
   const trigger = screen.getByRole('combobox', { name: 'Fruit' });
   const listbox = screen.getByRole('listbox');
   await userEvent.click(trigger);
-  const search = screen.getByRole('combobox', { name: '옵션 검색' });
+  const search = screen.getByRole('combobox', { name: '검색' });
   await expect.element(search).toHaveFocus();
   await expect.element(search).toHaveAttribute('data-select-search');
   const shell = page.elementLocator(search.element().closest('[data-text-field]')!);
@@ -283,13 +283,18 @@ test('multiple values read as two labels and a count that never truncates', asyn
 test('Clear returns a single select to null and focuses the trigger; hidden when read-only', async () => {
   const onValueChange = vi.fn();
   const screen = await render(
-    <Select aria-label="Fruit" defaultValue="apple" onValueChange={onValueChange}>
+    <Select
+      aria-label="Fruit"
+      defaultValue="apple"
+      placeholder="선택하세요"
+      onValueChange={onValueChange}
+    >
       <Select.Clear />
       {items}
     </Select>,
   );
   const trigger = screen.getByRole('combobox', { name: 'Fruit' });
-  const clear = screen.getByRole('button', { name: '선택 지우기' });
+  const clear = screen.getByRole('button', { name: '지우기' });
   await expect.element(clear).toHaveAttribute('type', 'button');
   await expect.element(clear).toHaveAttribute('data-variant', 'ghost');
   await expect.element(clear).toHaveClass('size-7', 'me-1');
@@ -422,7 +427,7 @@ test('react-hook-form value mode binds onValueChange, focuses on error, resets a
             disabled={disabled}
           >
             <RHFField.Label>Fruit</RHFField.Label>
-            <Select>{items}</Select>
+            <Select placeholder="선택하세요">{items}</Select>
             <RHFField.Error />
           </RHFField>
           <button type="submit">Submit</button>
@@ -538,7 +543,7 @@ test('the popup flips above a trigger near the bottom, stays on screen and leave
   expect(popup.getBoundingClientRect().width).toBe(240);
   expect(popup.getBoundingClientRect().right).toBe(viewportWidth - 8);
   const tallHeight = popup.getBoundingClientRect().height;
-  await userEvent.fill(screen.getByRole('combobox', { name: '옵션 검색' }), 'Fruit 3');
+  await userEvent.fill(screen.getByRole('combobox', { name: '검색' }), 'Fruit 3');
   await expect.poll(() => popup.getBoundingClientRect().height).toBeLessThan(tallHeight);
   expect(popup.getBoundingClientRect().height).toBeLessThan(
     window.innerHeight - 8 - anchor.getBoundingClientRect().bottom - 4,
@@ -609,7 +614,7 @@ test('search ignores case, width and accents; IME keys are left alone', async ()
     </Select>,
   );
   await userEvent.click(screen.getByRole('combobox', { name: 'Country' }));
-  const search = screen.getByRole('combobox', { name: '옵션 검색' });
+  const search = screen.getByRole('combobox', { name: '검색' });
   const shown = () =>
     screen
       .getByRole('option')
@@ -652,7 +657,7 @@ test('Separator is a decorative Divider, left out while searching', async () => 
   expect(rule.getBoundingClientRect().width).toBe(
     screen.getByRole('listbox').element().getBoundingClientRect().width,
   );
-  await userEvent.fill(screen.getByRole('combobox', { name: '옵션 검색' }), 'a');
+  await userEvent.fill(screen.getByRole('combobox', { name: '검색' }), 'a');
   expect(screen.container.querySelector('[data-select-separator]')).toBeNull();
 });
 
@@ -699,7 +704,7 @@ test('the list is named by the field label; onBlur waits until focus leaves trig
   await userEvent.keyboard('{Tab}');
   await expect.element(trigger).toHaveFocus();
   await userEvent.click(trigger);
-  await expect.element(screen.getByRole('combobox', { name: '옵션 검색' })).toHaveFocus();
+  await expect.element(screen.getByRole('combobox', { name: '검색' })).toHaveFocus();
   const listbox = screen.getByRole('listbox');
   await expect
     .element(listbox)

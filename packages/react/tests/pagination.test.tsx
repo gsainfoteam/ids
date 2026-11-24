@@ -12,8 +12,8 @@ const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html
 
 const nav = () => page.getByRole('navigation', { name: '페이지 탐색' });
 const pageButton = (n: number) => page.getByRole('button', { name: `${n}페이지`, exact: true });
-const previous = () => page.getByRole('button', { name: '이전 페이지' });
-const next = () => page.getByRole('button', { name: '다음 페이지' });
+const previous = () => page.getByRole('button', { name: '이전' });
+const next = () => page.getByRole('button', { name: '다음' });
 const labels = () =>
   [...document.querySelectorAll('[data-pagination-item]')].map((item) =>
     item.querySelector('[data-pagination-ellipsis]')
@@ -41,7 +41,9 @@ function RouterLink({
 }
 
 test('SSR: a named nav landmark holding a list, the current page and disabled ends', () => {
-  const doc = parse(renderToString(<Pagination defaultPage={1} pageCount={20} />));
+  const doc = parse(
+    renderToString(<Pagination aria-label="페이지 탐색" defaultPage={1} pageCount={20} />),
+  );
   const landmark = doc.querySelector('nav')!;
   expect(landmark.getAttribute('aria-label')).toBe('페이지 탐색');
   expect(landmark.querySelector(':scope > ul')).not.toBeNull();
@@ -57,7 +59,7 @@ test('SSR: a named nav landmark holding a list, the current page and disabled en
 
 test('button mode: pages, previous and next move the page and report it', async () => {
   const onPageChange = vi.fn();
-  await render(<Pagination pageCount={20} onPageChange={onPageChange} />);
+  await render(<Pagination aria-label="페이지 탐색" pageCount={20} onPageChange={onPageChange} />);
 
   await expect.element(nav()).toBeInTheDocument();
   await expect.element(previous()).toBeDisabled();
@@ -85,19 +87,30 @@ test('button mode: pages, previous and next move the page and report it', async 
 
 test('controlled: the page stays until the owner changes it', async () => {
   const onPageChange = vi.fn();
-  const screen = await render(<Pagination page={3} pageCount={5} onPageChange={onPageChange} />);
+  const screen = await render(
+    <Pagination aria-label="페이지 탐색" page={3} pageCount={5} onPageChange={onPageChange} />,
+  );
 
   await userEvent.click(next());
   expect(onPageChange).toHaveBeenCalledWith(4);
   await expect.element(pageButton(3)).toHaveAttribute('aria-current', 'page');
 
-  await screen.rerender(<Pagination page={4} pageCount={5} onPageChange={onPageChange} />);
+  await screen.rerender(
+    <Pagination aria-label="페이지 탐색" page={4} pageCount={5} onPageChange={onPageChange} />,
+  );
   await expect.element(pageButton(4)).toHaveAttribute('aria-current', 'page');
 });
 
 test('keyboard: arrows step, Home and End jump, and focus follows the current page', async () => {
   const onPageChange = vi.fn();
-  await render(<Pagination defaultPage={3} pageCount={10} onPageChange={onPageChange} />);
+  await render(
+    <Pagination
+      aria-label="페이지 탐색"
+      defaultPage={3}
+      pageCount={10}
+      onPageChange={onPageChange}
+    />,
+  );
 
   await userEvent.click(pageButton(3));
   await expect.element(pageButton(3)).toHaveFocus();
@@ -124,7 +137,7 @@ test('keyboard: arrows step, Home and End jump, and focus follows the current pa
 });
 
 test('keyboard: on previous or next, the arrows keep focus on that button', async () => {
-  await render(<Pagination defaultPage={5} pageCount={10} />);
+  await render(<Pagination aria-label="페이지 탐색" defaultPage={5} pageCount={10} />);
 
   await userEvent.click(next());
   await expect.element(pageButton(6)).toHaveAttribute('aria-current', 'page');
@@ -138,7 +151,14 @@ test('keyboard: on previous or next, the arrows keep focus on that button', asyn
 
 test('keyboard: modified arrows and IME are left alone', async () => {
   const onPageChange = vi.fn();
-  await render(<Pagination defaultPage={5} pageCount={10} onPageChange={onPageChange} />);
+  await render(
+    <Pagination
+      aria-label="페이지 탐색"
+      defaultPage={5}
+      pageCount={10}
+      onPageChange={onPageChange}
+    />,
+  );
 
   await userEvent.click(pageButton(5));
   await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
@@ -148,7 +168,7 @@ test('keyboard: modified arrows and IME are left alone', async () => {
 test('keyboard: right-to-left swaps the arrows and flips the chevrons', async () => {
   await render(
     <div dir="rtl">
-      <Pagination defaultPage={5} pageCount={10} />
+      <Pagination aria-label="페이지 탐색" defaultPage={5} pageCount={10} />
     </div>,
   );
 
@@ -166,6 +186,7 @@ test('link mode: getHref renders anchors and the disabled end has no href', asyn
   const onPageChange = vi.fn();
   await render(
     <Pagination
+      aria-label="페이지 탐색"
       defaultPage={1}
       pageCount={5}
       getHref={(n) => `#page-${n}`}
@@ -178,12 +199,10 @@ test('link mode: getHref renders anchors and the disabled end has no href', asyn
   await expect.element(link(1)).toHaveAttribute('aria-current', 'page');
   await expect.element(link(3)).toHaveAttribute('href', '#page-3');
 
-  const disabledPrevious = page.getByRole('link', { name: '이전 페이지' });
+  const disabledPrevious = page.getByRole('link', { name: '이전' });
   await expect.element(disabledPrevious).toHaveAttribute('aria-disabled', 'true');
   await expect.element(disabledPrevious).not.toHaveAttribute('href');
-  await expect
-    .element(page.getByRole('link', { name: '다음 페이지' }))
-    .toHaveAttribute('href', '#page-2');
+  await expect.element(page.getByRole('link', { name: '다음' })).toHaveAttribute('href', '#page-2');
 
   await userEvent.click(link(3));
   expect(onPageChange).toHaveBeenLastCalledWith(3);
@@ -198,7 +217,7 @@ test('link mode: asChild wraps a router link and fills in the page number and ch
   function Routed() {
     const [current, setCurrent] = useState(4);
     return (
-      <Pagination page={current} pageCount={10}>
+      <Pagination aria-label="페이지 탐색" page={current} pageCount={10}>
         <Pagination.List>
           {(entry) => {
             if (entry.type === 'ellipsis') return <Pagination.Ellipsis />;
@@ -231,7 +250,7 @@ test('link mode: asChild wraps a router link and fills in the page number and ch
   await expect.element(link(4)).toHaveAttribute('href', '/posts?page=4');
   expect(document.querySelector('[data-pagination-previous] svg')).not.toBeNull();
 
-  await userEvent.click(page.getByRole('link', { name: '다음 페이지' }));
+  await userEvent.click(page.getByRole('link', { name: '다음' }));
   expect(navigate).toHaveBeenLastCalledWith('/posts?page=5');
   await expect.element(link(5)).toHaveAttribute('aria-current', 'page');
 
@@ -243,7 +262,7 @@ test('link mode: asChild wraps a router link and fills in the page number and ch
 
 test('composition: static parts and a render function may return their own Item', async () => {
   await render(
-    <Pagination defaultPage={2} pageCount={3}>
+    <Pagination aria-label="페이지 탐색" defaultPage={2} pageCount={3}>
       <Pagination.List>
         <Pagination.Item>
           <Pagination.Previous />
@@ -268,7 +287,7 @@ test('composition: static parts and a render function may return their own Item'
   await expect.element(next()).toBeDisabled();
 
   const screen = await render(
-    <Pagination defaultPage={1} pageCount={2}>
+    <Pagination aria-label="페이지 탐색" defaultPage={1} pageCount={2}>
       <Pagination.List>
         {(entry) => (
           <Pagination.Item className="custom-item">
@@ -283,14 +302,22 @@ test('composition: static parts and a render function may return their own Item'
 });
 
 test('variant styles the current page, size reaches every control, disabled stops them all', async () => {
-  await render(<Pagination defaultPage={2} pageCount={3} variant="outline" size="tiny" />);
+  await render(
+    <Pagination
+      aria-label="페이지 탐색"
+      defaultPage={2}
+      pageCount={3}
+      variant="outline"
+      size="tiny"
+    />,
+  );
 
   await expect.element(pageButton(2)).toHaveAttribute('data-variant', 'outline');
   await expect.element(pageButton(1)).toHaveAttribute('data-variant', 'ghost');
   for (const control of document.querySelectorAll('[data-pagination-control]'))
     expect(control.getAttribute('data-size')).toBe('tiny');
 
-  await render(<Pagination defaultPage={2} pageCount={3} disabled />);
+  await render(<Pagination aria-label="페이지 탐색" defaultPage={2} pageCount={3} disabled />);
   const controls = [...document.querySelectorAll<HTMLButtonElement>('nav[data-disabled] button')];
   expect(controls).toHaveLength(5);
   expect(controls.every((control) => control.disabled)).toBe(true);
@@ -334,26 +361,25 @@ test('the current page is primary subtle by default; ghost marks it with primary
 
 test('out-of-range pages clamp and warn in development', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-  await render(<Pagination page={9} pageCount={5} />);
+  await render(<Pagination aria-label="페이지 탐색" page={9} pageCount={5} />);
 
   await expect.element(pageButton(5)).toHaveAttribute('aria-current', 'page');
   expect(warn).toHaveBeenCalledWith('[IDS] Pagination: page (9) is greater than pageCount (5).');
 
   warn.mockClear();
-  await render(<Pagination page={0} pageCount={5} />);
+  await render(<Pagination aria-label="페이지 탐색" page={0} pageCount={5} />);
   expect(warn).toHaveBeenCalledWith('[IDS] Pagination: page (0) must be 1 or greater.');
 
   warn.mockClear();
-  await render(<Pagination page={1} pageCount={0} />);
+  await render(<Pagination aria-label="페이지 탐색" page={1} pageCount={0} />);
   expect(warn).not.toHaveBeenCalled();
   warn.mockRestore();
 });
 
-test('labels follow the provider translation', async () => {
+test('the app names the landmark and the parts follow the provider translation', async () => {
   const english: Record<string, string> = {
-    'pagination.label': 'Pagination',
-    'pagination.previous': 'Previous page',
-    'pagination.next': 'Next page',
+    'common.previous': 'Previous page',
+    'common.next': 'Next page',
   };
   await render(
     <IdsProvider
@@ -362,7 +388,7 @@ test('labels follow the provider translation', async () => {
         key === 'pagination.page' ? `Page ${values?.page}` : english[key]
       }
     >
-      <Pagination defaultPage={1} pageCount={3} />
+      <Pagination aria-label="Pagination" defaultPage={1} pageCount={3} />
     </IdsProvider>,
   );
 

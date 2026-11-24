@@ -564,6 +564,7 @@ export const Cover: Story = {
               <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                 <Card size="tiny" className={cn(tile, 'items-center')}>
                   <Calendar
+                    aria-label="달력"
                     defaultMonth={new CalendarDate(2026, 12, 1)}
                     defaultValue={new CalendarDate(2026, 12, 24)}
                   />
@@ -949,7 +950,13 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.purple }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
-                      <Pagination defaultPage={2} pageCount={4} size="tiny" variant="soft" />
+                      <Pagination
+                        aria-label="페이지 탐색"
+                        defaultPage={2}
+                        pageCount={4}
+                        size="tiny"
+                        variant="soft"
+                      />
                     </Card>
                   </IdsProvider.Scope>
 
@@ -1176,6 +1183,7 @@ export const Cover: Story = {
                   <IdsProvider.Scope theme={{ primary: palettes.blue }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
                       <Calendar
+                        aria-label="달력"
                         selectionMode="range"
                         defaultMonth={new CalendarDate(2026, 10, 1)}
                         defaultValue={{
@@ -1198,7 +1206,12 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
-                      <Pagination defaultPage={3} pageCount={8} size="tiny" />
+                      <Pagination
+                        aria-label="페이지 탐색"
+                        defaultPage={3}
+                        pageCount={8}
+                        size="tiny"
+                      />
                     </Card>
                   </IdsProvider.Scope>
 
@@ -1770,6 +1783,7 @@ export const Cover: Story = {
               <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                 <Card size="tiny" className={cn(tile, 'items-center')}>
                   <Calendar
+                    aria-label="달력"
                     defaultMonth={new CalendarDate(2026, 11, 1)}
                     defaultValue={new CalendarDate(2026, 11, 20)}
                   />

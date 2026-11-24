@@ -27,7 +27,7 @@ export function CodeBlockCopy({ className, children, onClick, ...props }: CodeBl
     <>
       <IconButton
         {...props}
-        aria-label={props['aria-label'] ?? (copied ? t('codeBlock.copied') : t('codeBlock.copy'))}
+        aria-label={props['aria-label'] ?? (copied ? t('common.copied') : t('common.copy'))}
         data-copied={copied ? '' : undefined}
         variant="outline"
         size="tiny"
@@ -39,7 +39,7 @@ export function CodeBlockCopy({ className, children, onClick, ...props }: CodeBl
         onClick={mergeEventHandlers(onClick, copy)}
       />
       <span role="status" className={styles.status()}>
-        {copied ? t('codeBlock.copied') : ''}
+        {copied ? t('common.copied') : ''}
       </span>
     </>
   );

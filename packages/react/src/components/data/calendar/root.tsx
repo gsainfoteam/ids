@@ -24,10 +24,11 @@ import { calendarStyle } from './style';
 import { useCalendar, type CalendarState } from './use-calendar';
 import { CalendarWeekNumber, type CalendarWeekNumberProps } from './week-number';
 import { resolveLocale, weekStartOf } from '../../../internal/date-locale';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+import { useIntlWords, useProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant, mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
+import type { AccessibleName } from '../../../internal/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
 import type { CalendarDate } from '@internationalized/date';
 
@@ -59,6 +60,7 @@ export type CalendarOptions = {
 };
 
 export type CalendarProps = NativeProps &
+  AccessibleName &
   CalendarOptions &
   DateSelection & {
     className?: string | ((state: CalendarState) => string | undefined);
@@ -103,8 +105,8 @@ function calendarParts(children: ReactNode) {
 }
 
 export function CalendarRoot(props: CalendarProps) {
-  const t = useTranslate();
   const providerLocale = useProviderLocale();
+  const words = useIntlWords(providerLocale);
   const {
     selectionMode = 'single',
     value,
@@ -218,7 +220,7 @@ export function CalendarRoot(props: CalendarProps) {
           range_end: styles.rangeEnd(),
           hidden: styles.hidden(),
         }}
-        labels={dayPickerLabels(locale, t)}
+        labels={dayPickerLabels(locale, words)}
         formatters={dayPickerFormatters(locale)}
         components={dayPickerParts}
         onDayMouseEnter={api.onDayMouseEnter}

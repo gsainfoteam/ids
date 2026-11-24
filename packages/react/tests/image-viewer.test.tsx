@@ -197,8 +197,8 @@ test('with loop the arrows wrap around, and in a right-to-left page they are mir
 test('previous and next step through the images and turn disabled at the ends', async () => {
   await render(<Gallery />);
   await openAt('First');
-  const previous = page.getByRole('button', { name: '이전 사진' });
-  const next = page.getByRole('button', { name: '다음 사진' });
+  const previous = page.getByRole('button', { name: '이전' });
+  const next = page.getByRole('button', { name: '다음' });
 
   await expect.element(previous).toBeDisabled();
   await userEvent.click(next);
@@ -231,7 +231,7 @@ test('keys and buttons zoom the image, arrows pan it while zoomed, and a new ima
   await userEvent.click(zoomIn);
   await expect.poll(() => scaleOf(currentBox())).toBe(2);
 
-  await userEvent.click(page.getByRole('button', { name: '다음 사진' }));
+  await userEvent.click(page.getByRole('button', { name: '다음' }));
   await expect.poll(counter).toHaveTextContent('3 / 3');
   expect(onZoomChange).toHaveBeenLastCalledWith(1);
   await expect.poll(() => scaleOf(currentBox())).toBe(1);
@@ -252,8 +252,8 @@ test('the default viewer is a caption and one toolbar, with thumbnails left to c
     control.getAttribute('aria-label'),
   );
   expect(names).toEqual([
-    '이전 사진',
-    '다음 사진',
+    '이전',
+    '다음',
     '축소',
     '100%, 화면에 맞추기',
     '확대',
@@ -517,16 +517,31 @@ test('a standalone viewer takes items, and overlay.open opens one and removes it
   await expect.poll(() => document.querySelector('[data-overlay-item]')).toBeNull();
 });
 
-test('an image that cannot load shows a notice in its place', async () => {
+test('an image that cannot load shows an icon named by its alt in its place', async () => {
   await render(
     <IdsProvider theme={testTheme}>
       <Image.Viewer items={[{ src: 'data:image/png;base64,broken', alt: 'Broken' }]} defaultOpen />
     </IdsProvider>,
   );
 
+  await expect.element(page.getByRole('img', { name: 'Broken' })).toBeVisible();
+  expect(document.querySelector('[data-image-viewer-notice]')?.textContent).toBe('');
+  expect(document.querySelector('[data-image-viewer-picture]')).toBeNull();
+});
+
+test('Image.Viewer.Fallback writes the text beside the icon of an image that cannot load', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>
+      <Image.Viewer items={[{ src: 'data:image/png;base64,broken', alt: 'Broken' }]} defaultOpen>
+        <Image.Viewer.Fallback>사진을 불러오지 못했습니다</Image.Viewer.Fallback>
+        <Image.Viewer.Toolbar />
+      </Image.Viewer>
+    </IdsProvider>,
+  );
+
   await expect.element(page.getByText('사진을 불러오지 못했습니다')).toBeVisible();
   await expect.element(page.getByRole('img', { name: 'Broken' })).toBeVisible();
-  expect(document.querySelector('[data-image-viewer-picture]')).toBeNull();
+  await expect.element(page.getByRole('button', { name: '닫기' })).toBeVisible();
 });
 
 test('state passed to a viewer inside a group warns in development, since the group owns it', async () => {

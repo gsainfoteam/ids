@@ -3,7 +3,7 @@
 import { type ComponentProps, type MouseEvent } from 'react';
 
 import { useImageViewerContext } from './context';
-import { useTranslate } from '../../../internal/translate';
+import { useIntlWords, useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 
 import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
@@ -24,7 +24,8 @@ export function ImageViewerZoomReset({
 }: ImageViewerZoomResetProps) {
   const viewer = useImageViewerContext('Image.Viewer.ZoomReset');
   const t = useTranslate();
-  const percent = Math.round(viewer.zoom * 100);
+  const words = useIntlWords();
+  const percent = words.percent(Math.round(viewer.zoom * 100));
 
   return (
     <Button
@@ -41,7 +42,7 @@ export function ImageViewerZoomReset({
         if (!event.defaultPrevented) viewer.resetZoom();
       }}
     >
-      {t('image.zoomLevel', { percent })}
+      {percent}
     </Button>
   );
 }

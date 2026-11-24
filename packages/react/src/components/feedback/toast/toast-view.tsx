@@ -110,7 +110,7 @@ export function ToastView({
         )}
         <div className={styles.content()}>
           <div data-toast-title="" className={styles.title()}>
-            {record.message ?? (record.loading ? t('toast.loading') : null)}
+            {record.message ?? (record.loading ? t('common.loading') : null)}
           </div>
           {record.description != null && (
             <div data-toast-description="" className={styles.description()}>
@@ -130,7 +130,7 @@ export function ToastView({
           </Button>
         )}
         <IconButton
-          aria-label={t('toast.close')}
+          aria-label={t('common.close')}
           variant="ghost"
           colorScheme="neutral"
           icon={<XMarkIcon />}

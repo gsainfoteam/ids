@@ -20,6 +20,7 @@ const meta = {
     maxItems: { control: { type: 'number', min: 1 } },
   },
   args: {
+    'aria-label': '이동 경로',
     size: 'standard',
   },
   render: (args) => (
@@ -67,7 +68,7 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Breadcrumb>
+    <Breadcrumb aria-label="이동 경로">
       <Breadcrumb.Item>
         <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
       </Breadcrumb.Item>
@@ -218,7 +219,7 @@ export const LinkWithYourRouter: Story = {
 
     return (
       <div className="flex flex-col gap-3">
-        <Breadcrumb>
+        <Breadcrumb aria-label="이동 경로">
           <Breadcrumb.Item>
             <Breadcrumb.Link asChild>
               <RouterLink to="/" onNavigate={setPath}>
@@ -261,7 +262,7 @@ export const LinkWithYourRouter: Story = {
 
 export const CollapseALongTrail: Story = {
   render: () => (
-    <Breadcrumb maxItems={3}>
+    <Breadcrumb aria-label="이동 경로" maxItems={3}>
       <Breadcrumb.Item>
         <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
       </Breadcrumb.Item>
@@ -308,7 +309,7 @@ export const PickWhichCrumbsFold: Story = {
 
     return (
       <div className="flex flex-col gap-3">
-        <Breadcrumb>
+        <Breadcrumb aria-label="이동 경로">
           <Breadcrumb.Item>
             <Breadcrumb.Link asChild>
               <RouterLink to="/" onNavigate={setPath}>
@@ -360,7 +361,7 @@ export const PickWhichCrumbsFold: Story = {
 
 export const ChangeTheSeparator: Story = {
   render: () => (
-    <Breadcrumb>
+    <Breadcrumb aria-label="이동 경로">
       <Breadcrumb.Item>
         <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
       </Breadcrumb.Item>
@@ -418,7 +419,7 @@ export const RightToLeft: Story = {
 export const CollapseWrittenSeparators: Story = {
   tags: ['verification'],
   render: () => (
-    <Breadcrumb maxItems={3}>
+    <Breadcrumb aria-label="이동 경로" maxItems={3}>
       <Breadcrumb.Item>
         <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
       </Breadcrumb.Item>

@@ -3,14 +3,16 @@
 import { use } from 'react';
 
 import { DataTableToolbarContext, useDataTableContext } from './context';
-import { useTranslate } from '../../../internal/translate';
+import { useIntlWords } from '../../../internal/translate';
 import { Pagination } from '../../navigation/pagination';
+
+import type { AccessibleName } from '../../../internal/accessible-name';
 
 export type DataTablePaginationProps = { className?: string };
 
 export function DataTablePagination({ className }: DataTablePaginationProps) {
-  const t = useTranslate();
-  const { table, styles, size } = useDataTableContext();
+  const words = useIntlWords();
+  const { table, styles, size, labelling } = useDataTableContext();
   const inToolbar = use(DataTableToolbarContext);
 
   const pageCount = Math.max(table.getPageCount(), 1);
@@ -18,6 +20,10 @@ export function DataTablePagination({ className }: DataTablePaginationProps) {
 
   const pager = (
     <Pagination
+      {...({
+        'aria-label': labelling['aria-label'],
+        'aria-labelledby': labelling['aria-labelledby'],
+      } as AccessibleName)}
       page={page}
       pageCount={pageCount}
       onPageChange={(next) => table.setPageIndex(next - 1)}
@@ -34,7 +40,7 @@ export function DataTablePagination({ className }: DataTablePaginationProps) {
         </Pagination.Item>
         <Pagination.Item>
           <span aria-live="polite" data-data-table-page="" className={styles.page()}>
-            {t('dataTable.page', { page, count: pageCount })}
+            {words.ratio(page, pageCount)}
           </span>
         </Pagination.Item>
         <Pagination.Item>

@@ -32,7 +32,7 @@ export function DrawerClose({ asChild, children, className, onClick, ...props }:
   if (children == null)
     return (
       <IconButton
-        aria-label={t('drawer.close')}
+        aria-label={t('common.close')}
         {...props}
         className={styles.close({ className })}
         variant="ghost"

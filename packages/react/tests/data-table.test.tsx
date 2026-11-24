@@ -93,7 +93,7 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', x: n
   });
 }
 
-test('SSR: header, rows and the Korean empty text render on the server', () => {
+test('SSR: header, rows and the empty cell render on the server', () => {
   const doc = new DOMParser().parseFromString(renderToString(table({ data: [] })), 'text/html');
   expect(doc.querySelector('table')!.getAttribute('aria-label')).toBe('People');
   expect([...doc.querySelectorAll('thead th')].map((th) => th.textContent)).toEqual([
@@ -101,7 +101,7 @@ test('SSR: header, rows and the Korean empty text render on the server', () => {
     'Age',
   ]);
   const message = doc.querySelector<HTMLElement>('[data-data-table-message]')!;
-  expect(message.textContent).toBe('데이터가 없습니다.');
+  expect(message.textContent).toBe('');
   expect(message.getAttribute('colspan')).toBe('2');
 });
 
@@ -396,25 +396,25 @@ test('pagination: ten rows a page, the buttons move and keep focus at the ends',
   const screen = await render(
     table({ data: manyPeople(23), pagination: { onValueChange: onPaginationChange } }),
   );
-  const status = screen.getByText(/\/ 3 페이지$/);
+  const status = screen.getByText(/\/ 3$/);
 
-  await expect.element(status).toHaveTextContent('1 / 3 페이지');
+  await expect.element(status).toHaveTextContent('1 / 3');
   expect(screen.container.querySelectorAll('tbody tr')).toHaveLength(10);
   await expect
-    .element(screen.getByRole('button', { name: '이전 페이지' }))
+    .element(screen.getByRole('button', { name: '이전' }))
     .toHaveAttribute('aria-disabled', 'true');
 
-  await userEvent.click(screen.getByRole('button', { name: '다음 페이지' }));
+  await userEvent.click(screen.getByRole('button', { name: '다음' }));
   expect(onPaginationChange).toHaveBeenLastCalledWith({ pageIndex: 1, pageSize: 10 });
-  await expect.element(status).toHaveTextContent('2 / 3 페이지');
+  await expect.element(status).toHaveTextContent('2 / 3');
 
   await userEvent.click(screen.getByRole('button', { name: '마지막 페이지' }));
-  await expect.element(status).toHaveTextContent('3 / 3 페이지');
+  await expect.element(status).toHaveTextContent('3 / 3');
   expect(screen.container.querySelectorAll('tbody tr')).toHaveLength(3);
   await expect.element(screen.getByRole('button', { name: '마지막 페이지' })).toHaveFocus();
 
   await userEvent.click(screen.getByRole('button', { name: '첫 페이지' }));
-  await expect.element(status).toHaveTextContent('1 / 3 페이지');
+  await expect.element(status).toHaveTextContent('1 / 3');
 });
 
 test('server pagination draws the rows it is given and counts pages from rowCount', async () => {
@@ -440,9 +440,9 @@ test('server pagination draws the rows it is given and counts pages from rowCoun
   }
   const screen = await render(<Server />);
 
-  await expect.element(screen.getByText('1 / 3 페이지')).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: '다음 페이지' }));
-  await expect.element(screen.getByText('2 / 3 페이지')).toBeVisible();
+  await expect.element(screen.getByText('1 / 3')).toBeVisible();
+  await userEvent.click(screen.getByRole('button', { name: '다음' }));
+  await expect.element(screen.getByText('2 / 3')).toBeVisible();
   expect(namesInOrder(screen.container)).toEqual(['Linus', 'Ken']);
 });
 
@@ -548,12 +548,11 @@ test('every string speaks the translation', async () => {
 
   await expect.element(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeVisible();
   await userEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
-  await expect.element(screen.getByText('12 rows selected')).toBeVisible();
-  await expect.element(screen.getByText('Page 1 of 2')).toBeVisible();
-  await expect.element(screen.getByRole('button', { name: 'Next page' })).toBeVisible();
+  await expect.element(screen.getByText('12 selected')).toBeVisible();
+  await expect.element(screen.getByText('1 / 2')).toBeVisible();
+  await expect.element(screen.getByRole('button', { name: 'Next' })).toBeVisible();
   await expect
     .element(screen.getByRole('separator', { name: 'Name column width' }))
     .toBeInTheDocument();
-  await expect.element(screen.getByRole('navigation', { name: 'Pagination' })).toBeVisible();
-  await expect.element(screen.getByText('No data.')).toBeVisible();
+  await expect.element(screen.getByRole('navigation', { name: 'People' })).toBeVisible();
 });

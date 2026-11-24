@@ -120,9 +120,13 @@ export const PC: Story = {
                             {choice.label}
                           </Questionnaire.Option>
                         ))}
-                        <Questionnaire.Other placeholder="다른 답이 있으면 적어 주세요" />
+                        <Questionnaire.Other
+                          aria-label="직접 입력"
+                          placeholder="다른 답이 있으면 적어 주세요"
+                        />
                       </Questionnaire.Question>
                     ))}
+                    <Questionnaire.Skip>건너뛰기</Questionnaire.Skip>
                     <Questionnaire.Submit>계획 세우기</Questionnaire.Submit>
                   </Questionnaire>
                 </Card.Content>

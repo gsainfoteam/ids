@@ -55,33 +55,29 @@ export function SchedulerToolbar({
   const [picking, setPicking] = useState(false);
   const step = stepOf(view, dayCount);
   const range = format.range(view, days, date);
-  const previousLabel = {
-    month: t('scheduler.previousMonth'),
-    week: t('scheduler.previousWeek'),
-    days: t('scheduler.previousDays', { count: dayCount }),
-    day: t('scheduler.previousDay'),
-  }[view];
-  const nextLabel = {
-    month: t('scheduler.nextMonth'),
-    week: t('scheduler.nextWeek'),
-    days: t('scheduler.nextDays', { count: dayCount }),
-    day: t('scheduler.nextDay'),
-  }[view];
+  const { words, capitalized } = format;
+  const stepLabel = (direction: number) =>
+    ({
+      month: words.relative(direction, 'month'),
+      week: words.relative(direction, 'week'),
+      days: words.relative(direction * dayCount, 'day', 'always'),
+      day: words.relative(direction, 'day', 'always'),
+    })[view];
 
   return (
     <div className={styles.toolbar()} data-scheduler-toolbar="">
       <ButtonGroup variant="outline" aria-label={t('scheduler.navigation')}>
         <IconButton
           icon={<ChevronLeftIcon aria-hidden="true" className="rtl:-scale-x-100" />}
-          aria-label={previousLabel}
+          aria-label={stepLabel(-1)}
           onClick={() => onDateChange(date.subtract(step))}
         />
         <Button onClick={() => onDateChange(today ?? todayIn(getLocalTimeZone()))}>
-          {t('scheduler.today')}
+          {capitalized(words.relative(0, 'day'))}
         </Button>
         <IconButton
           icon={<ChevronRightIcon aria-hidden="true" className="rtl:-scale-x-100" />}
-          aria-label={nextLabel}
+          aria-label={stepLabel(1)}
           onClick={() => onDateChange(date.add(step))}
         />
       </ButtonGroup>
@@ -101,6 +97,7 @@ export function SchedulerToolbar({
         >
           <LanguageContext value={{ ...language, locale: withWeekStart(locale, weekStartsOn) }}>
             <Calendar
+              aria-label={t('scheduler.goToDate')}
               value={date}
               defaultMonth={date}
               today={today}
@@ -132,10 +129,10 @@ export function SchedulerToolbar({
           value={view}
           onValueChange={(next) => next && onViewChange(next as SchedulerView)}
         >
-          <Toggle value="month">{t('scheduler.month')}</Toggle>
-          <Toggle value="week">{t('scheduler.week')}</Toggle>
-          <Toggle value="days">{t('scheduler.days', { count: dayCount })}</Toggle>
-          <Toggle value="day">{t('scheduler.day')}</Toggle>
+          <Toggle value="month">{capitalized(words.field('month'))}</Toggle>
+          <Toggle value="week">{capitalized(words.field('weekOfYear'))}</Toggle>
+          <Toggle value="days">{capitalized(words.days(dayCount))}</Toggle>
+          <Toggle value="day">{capitalized(words.field('day'))}</Toggle>
         </ToggleGroup>
       </div>
     </div>

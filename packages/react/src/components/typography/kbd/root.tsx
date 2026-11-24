@@ -102,7 +102,7 @@ export function KbdRoot({ keys, size, platform, labels, className, children, ...
     ordered.length === 1 ? (
       <Face keyInfo={ordered[0]!} name={name} iconClassName={styles.glyph()} />
     ) : typeof children === 'string' ? (
-      splitGlyphs(children, kbd.platform).map((segment, index) =>
+      splitGlyphs(children).map((segment, index) =>
         segment.label === undefined ? (
           segment.text
         ) : (
