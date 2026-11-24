@@ -1,8 +1,9 @@
 'use client';
 
-import { cloneElement, isValidElement, type MouseEvent, type ReactNode } from 'react';
+import { createElement, type MouseEvent, type ReactNode } from 'react';
 
 import { useInternalPaginationContext } from '../context';
+import { opensElsewhere, withFallbackContent } from '../lib/control';
 
 type ControlOptions = {
   part: string;
@@ -13,16 +14,6 @@ type ControlOptions = {
   fallback: ReactNode;
   onClick: ((event: MouseEvent<HTMLElement>) => void) | undefined;
 };
-
-const opensElsewhere = (event: MouseEvent<HTMLElement>) =>
-  event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
-
-function withFallbackContent(asChild: boolean, children: ReactNode, fallback: ReactNode) {
-  if (!asChild) return children ?? fallback;
-  if (isValidElement<{ children?: ReactNode }>(children) && children.props.children == null)
-    return cloneElement(children, undefined, fallback);
-  return children;
-}
 
 export function useInternalPaginationControl({
   part,
@@ -58,6 +49,6 @@ export function useInternalPaginationControl({
       'data-pagination-control': '',
       'data-page': target,
     },
-    content: rendersOwnAnchor ? <a href={href}>{content}</a> : content,
+    content: rendersOwnAnchor ? createElement('a', { href }, content) : content,
   };
 }

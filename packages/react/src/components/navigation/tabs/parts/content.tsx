@@ -1,19 +1,10 @@
 'use client';
 
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useLayoutEffect,
-  useRef,
-  type ComponentProps,
-} from 'react';
-
-import { flushSync } from 'react-dom';
+import { type ComponentProps } from 'react';
 
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
-import { mergeRefs } from '../../../../utils';
-import { contentIdOf, triggerIdOf, useInternalTabsContext } from '../context';
+import { contentIdOf, triggerIdOf } from '../context';
+import { useInternalTabsContent } from '../hooks/use-tabs-content';
 
 export type TabsContentState = { value: string; selected: boolean };
 
@@ -26,26 +17,6 @@ export type TabsContentProps<T extends string = string> = Omit<
     forceMount?: boolean;
   };
 
-function useInternalFoundInPage(mounted: boolean, hidden: boolean, onFound: () => void) {
-  const panelRef = useRef<HTMLDivElement>(null);
-  const found = useEffectEvent(onFound);
-
-  useLayoutEffect(() => {
-    const panel = panelRef.current;
-    if (panel && hidden) panel.setAttribute('hidden', 'until-found');
-  }, [hidden]);
-
-  useLayoutEffect(() => {
-    const panel = panelRef.current;
-    if (!panel) return;
-    const selectBeforeBrowserScrolls = () => flushSync(() => found());
-    panel.addEventListener('beforematch', selectBeforeBrowserScrolls);
-    return () => panel.removeEventListener('beforematch', selectBeforeBrowserScrolls);
-  }, [mounted]);
-
-  return panelRef;
-}
-
 export function TabsContent<T extends string = string>({
   value,
   forceMount = false,
@@ -55,17 +26,10 @@ export function TabsContent<T extends string = string>({
   ref,
   ...rest
 }: TabsContentProps<T>) {
-  const tabs = useInternalTabsContext('Tabs.Content');
-  const { registerContent } = tabs;
-  useEffect(() => registerContent(value, forceMount), [registerContent, value, forceMount]);
-
-  const selected = tabs.value === value;
-  const hidden = !selected;
-  const mounted = selected || forceMount;
-  const panelRef = useInternalFoundInPage(mounted, hidden, () => tabs.select(value));
-  const mergedRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(panelRef, ref)(node),
-    [panelRef, ref],
+  const { tabs, selected, hidden, mounted, mergedRef } = useInternalTabsContent(
+    value,
+    forceMount,
+    ref,
   );
 
   if (!mounted) return null;

@@ -3,13 +3,14 @@
 import { use, type ComponentProps, type ReactNode } from 'react';
 
 import { SidebarListContext, SidebarSortableContext, useInternalSidebarContext } from '../context';
-import { linkChildrenOf, linkElementOf, splitItemChildren } from './item-children';
+import { linkElementOf } from './link-element';
 import { SidebarRow } from './row';
 import { SidebarDragFrame } from './sortable';
 import { Item } from '../../../data/item';
 import { Tooltip } from '../../../overlay/tooltip';
 import { type SidebarIconColorScheme } from '../style';
 import { SidebarAccordionSubmenu, SidebarMenuSubmenu } from './submenu';
+import { linkChildrenOf, splitItemChildren } from '../lib/item-children';
 import { TREE_KEY_PROP } from '../lib/tree';
 
 export type SidebarItemProps = Omit<ComponentProps<'a'>, 'children' | 'href'> & {

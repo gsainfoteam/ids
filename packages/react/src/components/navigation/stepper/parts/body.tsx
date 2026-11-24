@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, type ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
-import { isDevelopment } from '../../../../utils/dev';
 import { Slot } from '../../../utility/slot';
 import { useInternalItemContext, useInternalRootContext } from '../context';
+import { useInternalStepperBodyWarning } from '../hooks/use-stepper-body-warning';
 import { statusAttributes } from '../lib/step-state';
 
 import type { StepperItemState } from './item';
@@ -20,14 +20,7 @@ export type StepperBodyProps = Omit<ComponentProps<'div'>, 'children' | 'classNa
 export function StepperBody({ asChild, className, style, children, ...rest }: StepperBodyProps) {
   const root = useInternalRootContext('Stepper.Body');
   const { state } = useInternalItemContext('Stepper.Body');
-  const hasNoRoomBesideTheSteps = root.orientation === 'horizontal';
-
-  useEffect(() => {
-    if (isDevelopment && hasNoRoomBesideTheSteps)
-      console.warn(
-        '[IDS] Stepper: Stepper.Body is hidden in a horizontal Stepper, where the steps sit side by side. Use orientation="vertical", or show the content outside the Stepper.',
-      );
-  }, [hasNoRoomBesideTheSteps]);
+  useInternalStepperBodyWarning(root.orientation === 'horizontal');
 
   const props = {
     ...rest,
