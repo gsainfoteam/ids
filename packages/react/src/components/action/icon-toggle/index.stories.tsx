@@ -52,6 +52,7 @@ const meta = {
     colorScheme: { control: 'select', options: colorSchemes },
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
+    focusableWhenDisabled: { control: 'boolean' },
     icon: { control: false },
     asChild: { table: { disable: true } },
   },
@@ -229,8 +230,13 @@ export const NameTheToggleFromItsIcon: Story = {
 };
 
 export const FillTheIconWhenPressed: Story = {
-  render: () => (
+  args: {
+    style: (state) =>
+      state.pressed ? { backgroundColor: 'var(--ids-color-bg-danger-soft)' } : undefined,
+  },
+  render: (args) => (
     <IconToggle
+      {...args}
       aria-label="좋아요"
       variant="soft"
       colorScheme="danger"

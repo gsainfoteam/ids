@@ -225,6 +225,18 @@
       "italic": "Italic",
       "underline": "Underline",
       "strikethrough": "Strikethrough"
+    },
+    "iconToggleSample": {
+      "favorite": "Favorite",
+      "theoffstateisunderstated": "The off state is understated. The variant determines the on state.",
+      "bold": "Bold",
+      "italic": "Italic",
+      "like": "Like",
+      "listView": "List view",
+      "gridView": "Grid view",
+      "grid": "Grid",
+      "list": "List",
+      "star": "Star"
     }
   },
   "examples": {

@@ -386,6 +386,13 @@ IdsCheckboxGroup<String>.withParts(
 `IdsToggleGroup<T>`와 `IdsToggleGroup<T>.multiple`은 문자열이나 enum 같은 값을
 선택 콜백과 폼 저장까지 같은 타입으로 전달한다.
 
+## IconToggle
+
+`IdsIconToggle`은 `IdsToggle`과 같은 눌림 상태를 가진 정사각형 아이콘 버튼이다.
+`semanticLabel` 또는 아이콘의 접근성 이름을 제공한다. `IdsIconToggle.builder`로
+눌림 상태에 따라 아이콘을 바꿀 수 있고, `IdsToggleGroup` 안에서는 `value`로
+그룹의 선택을 따른다.
+
 ## IconButton
 
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며
