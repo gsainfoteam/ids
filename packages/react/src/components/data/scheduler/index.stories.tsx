@@ -353,24 +353,14 @@ export const Gallery: Story = {
         <Showcase.Row label="en-US">
           <div className="[--scheduler-height:--spacing(96)]">
             <IdsProvider.Scope locale={en}>
-              <Scheduler
-                events={EVENTS}
-                defaultDate={TODAY}
-                now={NOW}
-                aria-label="en-US"
-              />
+              <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="en-US" />
             </IdsProvider.Scope>
           </div>
         </Showcase.Row>
         <Showcase.Row label="de-DE">
           <div className="[--scheduler-height:--spacing(96)]">
             <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
-              <Scheduler
-                events={EVENTS}
-                defaultDate={TODAY}
-                now={NOW}
-                aria-label="de-DE"
-              />
+              <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="de-DE" />
             </IdsProvider.Scope>
           </div>
         </Showcase.Row>
