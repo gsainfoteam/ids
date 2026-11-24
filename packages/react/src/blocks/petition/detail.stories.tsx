@@ -151,30 +151,39 @@ export const PC: Story = {
             <Card>
               <Card.Header>
                 <Card.Description>목표 {count.format(GOAL)}명</Card.Description>
-                <Card.Title className="text-headline-h3-bold">
-                  {count.format(total)}명 동의
+                <Card.Title asChild>
+                  <h3>
+                    <span className="text-headline-h3-bold block">
+                      {count.format(total)}명 동의
+                    </span>
+                  </h3>
                 </Card.Title>
               </Card.Header>
-              <Card.Content className="flex flex-col gap-3">
-                <Progress value={(total / GOAL) * 100}>
-                  <Progress.Label>{count.format(GOAL - total)}명 남았어요</Progress.Label>
-                  <Progress.Value />
-                </Progress>
-                <p className="text-body-b3-regular">오늘 38명이 동의했어요 · 20일 남음</p>
+              <Card.Content>
+                <div className="flex flex-col gap-3">
+                  <Progress value={(total / GOAL) * 100}>
+                    <Progress.Label>{count.format(GOAL - total)}명 남았어요</Progress.Label>
+                    <Progress.Value />
+                  </Progress>
+                  <p className="text-body-b3-regular">오늘 38명이 동의했어요 · 20일 남음</p>
+                </div>
               </Card.Content>
               <Card.Footer>
-                <Button
-                  variant={signed ? 'soft' : 'solid'}
-                  className="flex-1"
-                  onClick={() => {
-                    setSigned(!signed);
-                    if (!signed)
-                      toast.success('동의했어요', { description: '답변이 나오면 알려 드릴게요.' });
-                  }}
-                >
-                  {signed ? <CheckIcon /> : <HandRaisedIcon />}
-                  {signed ? '동의했어요' : '동의하기'}
-                </Button>
+                <div className="grid flex-1">
+                  <Button
+                    variant={signed ? 'soft' : 'solid'}
+                    onClick={() => {
+                      setSigned(!signed);
+                      if (!signed)
+                        toast.success('동의했어요', {
+                          description: '답변이 나오면 알려 드릴게요.',
+                        });
+                    }}
+                  >
+                    {signed ? <CheckIcon /> : <HandRaisedIcon />}
+                    {signed ? '동의했어요' : '동의하기'}
+                  </Button>
+                </div>
                 <IconButton
                   variant="outline"
                   aria-label="주소 복사"

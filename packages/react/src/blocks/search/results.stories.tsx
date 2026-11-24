@@ -122,18 +122,19 @@ export const PC: Story = {
     return (
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
         <form role="search" onSubmit={search} className="flex gap-2">
-          <TextField
-            type="search"
-            aria-label="인포팀에서 찾기"
-            placeholder="인포팀에서 찾기"
-            value={draft}
-            onValueChange={setDraft}
-            className="flex-1"
-          >
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-            <TextField.Clear />
-          </TextField>
+          <div className="min-w-0 flex-1">
+            <TextField
+              type="search"
+              aria-label="인포팀에서 찾기"
+              placeholder="인포팀에서 찾기"
+              value={draft}
+              onValueChange={setDraft}
+            >
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+              <TextField.Clear />
+            </TextField>
+          </div>
           <Button type="submit">찾기</Button>
         </form>
 
@@ -141,61 +142,63 @@ export const PC: Story = {
           {query === '' ? '찾을 낱말을 적어 주세요.' : `‘${query}’ 검색 결과 ${found.length}개`}
         </p>
 
-        <Tabs defaultValue="all" className="flex flex-col gap-6">
-          <Tabs.List aria-label="결과 종류">
-            {KINDS.map((kind) => (
-              <Tabs.Trigger key={kind.value} value={kind.value}>
-                {kind.label}{' '}
-                {kind.value === 'all'
-                  ? found.length
-                  : found.filter((result) => result.kind === kind.value).length}
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
+        <Tabs defaultValue="all">
+          <div className="flex flex-col gap-6">
+            <Tabs.List aria-label="결과 종류">
+              {KINDS.map((kind) => (
+                <Tabs.Trigger key={kind.value} value={kind.value}>
+                  {kind.label}{' '}
+                  {kind.value === 'all'
+                    ? found.length
+                    : found.filter((result) => result.kind === kind.value).length}
+                </Tabs.Trigger>
+              ))}
+            </Tabs.List>
 
-          {KINDS.map((kind) => {
-            const ofKind = found.filter(
-              (result) => kind.value === 'all' || result.kind === kind.value,
-            );
+            {KINDS.map((kind) => {
+              const ofKind = found.filter(
+                (result) => kind.value === 'all' || result.kind === kind.value,
+              );
 
-            return (
-              <Tabs.Content key={kind.value} value={kind.value} className="flex flex-col gap-6">
-                {ofKind.length === 0 ? (
-                  <Empty>
-                    <Empty.Media>
-                      <MagnifyingGlassIcon />
-                    </Empty.Media>
-                    <Empty.Title>찾는 결과가 없어요</Empty.Title>
-                    <Empty.Description>
-                      낱말을 줄이거나 아래 추천 검색어로 찾아 보세요.
-                    </Empty.Description>
-                  </Empty>
-                ) : (
-                  <Card size="tiny">
-                    <ItemGroup aria-label={`${kind.label} 결과`}>
-                      {ofKind.map((result) => (
-                        <Item key={result.id} asChild>
-                          <a href={`#${result.id}`}>
-                            <Item.Media variant="soft">
-                              {result.icon ?? <Avatar name={result.person} size="tiny" />}
-                            </Item.Media>
-                            <Item.Content>
-                              <Item.Title>
-                                <Highlight query={query}>{result.title}</Highlight>
-                              </Item.Title>
-                              <Item.Description>
-                                <Highlight query={query}>{result.description}</Highlight>
-                              </Item.Description>
-                            </Item.Content>
-                          </a>
-                        </Item>
-                      ))}
-                    </ItemGroup>
-                  </Card>
-                )}
-              </Tabs.Content>
-            );
-          })}
+              return (
+                <Tabs.Content key={kind.value} value={kind.value}>
+                  {ofKind.length === 0 ? (
+                    <Empty>
+                      <Empty.Media>
+                        <MagnifyingGlassIcon />
+                      </Empty.Media>
+                      <Empty.Title>찾는 결과가 없어요</Empty.Title>
+                      <Empty.Description>
+                        낱말을 줄이거나 아래 추천 검색어로 찾아 보세요.
+                      </Empty.Description>
+                    </Empty>
+                  ) : (
+                    <Card size="tiny">
+                      <ItemGroup aria-label={`${kind.label} 결과`}>
+                        {ofKind.map((result) => (
+                          <Item key={result.id} asChild>
+                            <a href={`#${result.id}`}>
+                              <Item.Media variant="soft">
+                                {result.icon ?? <Avatar name={result.person} size="tiny" />}
+                              </Item.Media>
+                              <Item.Content>
+                                <Item.Title>
+                                  <Highlight query={query}>{result.title}</Highlight>
+                                </Item.Title>
+                                <Item.Description>
+                                  <Highlight query={query}>{result.description}</Highlight>
+                                </Item.Description>
+                              </Item.Content>
+                            </a>
+                          </Item>
+                        ))}
+                      </ItemGroup>
+                    </Card>
+                  )}
+                </Tabs.Content>
+              );
+            })}
+          </div>
         </Tabs>
 
         <section aria-labelledby="suggestions" className="flex flex-col gap-3">

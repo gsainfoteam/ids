@@ -78,7 +78,7 @@ export const PC: Story = {
                   <Field.Label>비밀번호</Field.Label>
                   <PasswordField name="password" autoComplete="current-password" required />
                 </Field>
-                <Button type="submit" disabled={signingIn} className="w-full">
+                <Button type="submit" disabled={signingIn}>
                   {signingIn && <Spinner />}
                   {signingIn ? '로그인하는 중' : '로그인'}
                 </Button>
@@ -86,7 +86,7 @@ export const PC: Story = {
 
               <Divider>또는</Divider>
 
-              <Button variant="outline" className="w-full">
+              <Button variant="outline">
                 <AcademicCapIcon />
                 GIST 계정으로 계속하기
               </Button>
@@ -100,8 +100,8 @@ export const PC: Story = {
         </div>
 
         <div aria-hidden className="hidden p-3 lg:flex">
-          <Card variant="soft" className="flex-1 justify-center">
-            <div className="mx-auto flex w-full max-w-sm flex-col gap-10">
+          <Card variant="soft">
+            <div className="m-auto flex w-full max-w-sm flex-col gap-10">
               <div className="flex flex-col gap-3">
                 <Card>
                   <Card.Header>

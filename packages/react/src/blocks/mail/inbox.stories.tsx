@@ -149,7 +149,7 @@ export const PC: Story = {
 
     const folders = (
       <nav aria-label="편지함" className="flex flex-col gap-4 p-3">
-        <Button asChild className="w-full">
+        <Button asChild>
           <a href="#compose">
             <PencilSquareIcon />
             편지 쓰기
@@ -187,100 +187,107 @@ export const PC: Story = {
     );
 
     const list = (
-      <ScrollArea fade className="h-full">
-        <ItemGroup aria-label="받은 메일" className="p-2">
-          {MAILS.map((mail) => (
-            <Item key={mail.id} selected={mail.id === openId} onClick={() => open(mail.id)}>
-              <Item.Content>
-                <Item.Title>
-                  {mail.from}
-                  {unread.includes(mail.id) && (
-                    <Chip variant="solid" colorScheme="primary" aria-label="읽지 않음" />
-                  )}
-                </Item.Title>
-                <Item.Description>
-                  {mail.receivedAt} · {mail.subject}
-                </Item.Description>
-              </Item.Content>
-            </Item>
-          ))}
-        </ItemGroup>
-      </ScrollArea>
+      <div className="flex h-full flex-col">
+        <ScrollArea fade>
+          <div className="p-2">
+            <ItemGroup aria-label="받은 메일">
+              {MAILS.map((mail) => (
+                <Item key={mail.id} selected={mail.id === openId} onClick={() => open(mail.id)}>
+                  <Item.Content>
+                    <Item.Title>
+                      {mail.from}
+                      {unread.includes(mail.id) && (
+                        <Chip variant="solid" colorScheme="primary" aria-label="읽지 않음" />
+                      )}
+                    </Item.Title>
+                    <Item.Description>
+                      {mail.receivedAt} · {mail.subject}
+                    </Item.Description>
+                  </Item.Content>
+                </Item>
+              ))}
+            </ItemGroup>
+          </div>
+        </ScrollArea>
+      </div>
     );
 
     const reading = opened && (
-      <ScrollArea fade className="h-full">
-        <article className="flex flex-col gap-6 p-4 md:p-6">
-          <div className="flex items-center gap-2">
-            <IconButton
-              variant="outline"
-              aria-label="목록으로"
-              icon={<ChevronLeftIcon />}
-              onClick={() => setOpenId(null)}
-              className="md:hidden"
-            />
-            <div className="ms-auto flex gap-2">
-              <IconButton variant="outline" aria-label="답장" icon={<ArrowUturnLeftIcon />} />
-              <IconButton
-                variant="outline"
-                aria-label="보관"
-                icon={<ArchiveBoxIcon />}
-                onClick={() => toast('보관함으로 옮겼어요')}
-              />
-              <IconButton
-                variant="outline"
-                colorScheme="danger"
-                aria-label="삭제"
-                icon={<TrashIcon />}
-                onClick={() => toast('휴지통으로 옮겼어요')}
-              />
+      <div className="flex h-full flex-col">
+        <ScrollArea fade>
+          <article className="flex flex-col gap-6 p-4 md:p-6">
+            <div className="flex items-center gap-2">
+              <div className="flex md:hidden">
+                <IconButton
+                  variant="outline"
+                  aria-label="목록으로"
+                  icon={<ChevronLeftIcon />}
+                  onClick={() => setOpenId(null)}
+                />
+              </div>
+              <div className="ms-auto flex gap-2">
+                <IconButton variant="outline" aria-label="답장" icon={<ArrowUturnLeftIcon />} />
+                <IconButton
+                  variant="outline"
+                  aria-label="보관"
+                  icon={<ArchiveBoxIcon />}
+                  onClick={() => toast('보관함으로 옮겼어요')}
+                />
+                <IconButton
+                  variant="outline"
+                  colorScheme="danger"
+                  aria-label="삭제"
+                  icon={<TrashIcon />}
+                  onClick={() => toast('휴지통으로 옮겼어요')}
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-3">
-            {opened.label && (
-              <Chip variant="soft" className="self-start">
-                {opened.label}
-              </Chip>
-            )}
-            <h2 className="text-headline-h4-bold">{opened.subject}</h2>
-            <Item variant="soft" size="tiny">
-              <Item.Media>
-                <Avatar name={opened.from} size="tiny" />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>{opened.from}</Item.Title>
-                <Item.Description>
-                  {opened.email} · {opened.receivedAt}
-                </Item.Description>
-              </Item.Content>
-            </Item>
-          </div>
+            <div className="flex flex-col gap-3">
+              {opened.label && (
+                <div className="flex">
+                  <Chip variant="soft">{opened.label}</Chip>
+                </div>
+              )}
+              <h2 className="text-headline-h4-bold">{opened.subject}</h2>
+              <Item variant="soft" size="tiny">
+                <Item.Media>
+                  <Avatar name={opened.from} size="tiny" />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>{opened.from}</Item.Title>
+                  <Item.Description>
+                    {opened.email} · {opened.receivedAt}
+                  </Item.Description>
+                </Item.Content>
+              </Item>
+            </div>
 
-          <div className="text-body-b2-regular flex flex-col gap-3">
-            {opened.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
+            <div className="text-body-b2-regular flex flex-col gap-3">
+              {opened.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
 
-          <form onSubmit={sendReply}>
-            <TextArea
-              aria-label={`${opened.from}에게 답장`}
-              placeholder={`${opened.from}에게 답장`}
-              rows={3}
-              value={reply}
-              onValueChange={setReply}
-            >
-              <TextArea.Input />
-              <Spacer />
-              <Button type="submit" size="tiny" disabled={reply.trim() === ''}>
-                <PaperAirplaneIcon />
-                보내기
-              </Button>
-            </TextArea>
-          </form>
-        </article>
-      </ScrollArea>
+            <form onSubmit={sendReply}>
+              <TextArea
+                aria-label={`${opened.from}에게 답장`}
+                placeholder={`${opened.from}에게 답장`}
+                rows={3}
+                value={reply}
+                onValueChange={setReply}
+              >
+                <TextArea.Input />
+                <Spacer />
+                <Button type="submit" size="tiny" disabled={reply.trim() === ''}>
+                  <PaperAirplaneIcon />
+                  보내기
+                </Button>
+              </TextArea>
+            </form>
+          </article>
+        </ScrollArea>
+      </div>
     );
 
     return (
@@ -288,39 +295,42 @@ export const PC: Story = {
         <header className="flex items-center gap-3 px-4 py-3">
           <h1 className="text-body-b1-bold">메일</h1>
           <Chip variant="soft" colorScheme="primary">{`안 읽은 메일 ${unread.length}`}</Chip>
-          <IconButton
-            asChild
-            variant="outline"
-            aria-label="편지 쓰기"
-            icon={<PencilSquareIcon />}
-            className="ms-auto md:hidden"
-          >
-            <a href="#compose" />
-          </IconButton>
+          <div className="ms-auto flex md:hidden">
+            <IconButton
+              asChild
+              variant="outline"
+              aria-label="편지 쓰기"
+              icon={<PencilSquareIcon />}
+            >
+              <a href="#compose" />
+            </IconButton>
+          </div>
         </header>
         <Divider />
 
-        <Splitter aria-label="메일" className="hidden md:flex">
-          <Splitter.Panel defaultSize={20} minSize={14} maxSize={28}>
-            {folders}
-          </Splitter.Panel>
-          <Splitter.Panel defaultSize={32} minSize={24}>
-            {list}
-          </Splitter.Panel>
-          <Splitter.Panel minSize={30}>
-            {reading ?? (
-              <div className="flex h-full items-center justify-center p-6">
-                <Empty variant="soft">
-                  <Empty.Media variant="outline">
-                    <EnvelopeOpenIcon />
-                  </Empty.Media>
-                  <Empty.Title>읽을 메일을 고르세요</Empty.Title>
-                  <Empty.Description>안 읽은 메일이 {unread.length}통 있어요.</Empty.Description>
-                </Empty>
-              </div>
-            )}
-          </Splitter.Panel>
-        </Splitter>
+        <div className="hidden min-h-0 flex-1 md:flex">
+          <Splitter aria-label="메일">
+            <Splitter.Panel defaultSize={20} minSize={14} maxSize={28}>
+              {folders}
+            </Splitter.Panel>
+            <Splitter.Panel defaultSize={32} minSize={24}>
+              {list}
+            </Splitter.Panel>
+            <Splitter.Panel minSize={30}>
+              {reading ?? (
+                <div className="flex h-full items-center justify-center p-6">
+                  <Empty variant="soft">
+                    <Empty.Media variant="outline">
+                      <EnvelopeOpenIcon />
+                    </Empty.Media>
+                    <Empty.Title>읽을 메일을 고르세요</Empty.Title>
+                    <Empty.Description>안 읽은 메일이 {unread.length}통 있어요.</Empty.Description>
+                  </Empty>
+                </div>
+              )}
+            </Splitter.Panel>
+          </Splitter>
+        </div>
 
         <div className="min-h-0 flex-1 md:hidden">{opened ? reading : list}</div>
       </div>
