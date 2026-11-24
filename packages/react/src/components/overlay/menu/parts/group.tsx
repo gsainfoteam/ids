@@ -1,20 +1,19 @@
 'use client';
 
-import { use, useId, useState } from 'react';
+import { use } from 'react';
 
 import { mergeProps, part } from '../../../../utils';
 import { CommandContext, GroupContext } from '../context';
+import { useInternalMenuGroupLabel } from '../hooks/use-menu-group-label';
+import { useInternalMenuSection } from '../hooks/use-menu-section';
 import { menuStyle } from '../style';
 
 import type { Menu } from '..';
 
 export function MenuGroup({ asChild, className, children, ...props }: Menu.GroupProps) {
   const palette = use(CommandContext);
-  const labelId = useId();
-  const [labelled, setLabelled] = useState(false);
-  const [element, setElement] = useState<HTMLElement | null>(null);
-
-  const hidden = !!element && !!palette?.hiddenSections.has(element);
+  const { labelId, labelled, setLabelled } = useInternalMenuGroupLabel();
+  const section = useInternalMenuSection(palette);
 
   return (
     <GroupContext value={{ labelId, setLabelled }}>
@@ -23,9 +22,9 @@ export function MenuGroup({ asChild, className, children, ...props }: Menu.Group
         asChild,
         children,
         mergeProps(props, {
-          ref: palette ? setElement : undefined,
+          ref: section.ref,
           role: 'group',
-          hidden: hidden || undefined,
+          hidden: section.hidden || undefined,
           'aria-labelledby': props['aria-labelledby'] ?? (labelled ? labelId : undefined),
           'data-menu-group': '',
           className: menuStyle().group({ className }),

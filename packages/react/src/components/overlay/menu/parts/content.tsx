@@ -1,16 +1,10 @@
 'use client';
 
-import { use, useLayoutEffect, type ComponentProps, type KeyboardEvent } from 'react';
+import { use, type ComponentProps, type KeyboardEvent } from 'react';
 
 import { CommandContent } from './command';
 import { keyHandler, withModifiers } from '../../../../internal/lib/keys';
-import {
-  FloatingList,
-  OverlayItemContext,
-  raiseWhatStaysAboveLayers,
-  showInTopLayer,
-  type AnchoredSide,
-} from '../../../../internal/overlay';
+import { FloatingList, OverlayItemContext } from '../../../../internal/overlay';
 import { mergeProps } from '../../../../utils';
 import { ScrollArea } from '../../../layout/scroll-area';
 import {
@@ -20,42 +14,20 @@ import {
   useInternalContentContext,
   useInternalMenuContext,
 } from '../context';
-import { type MenuLevel, type MenuPlacement } from '../hooks/use-menu';
+import { type MenuLevel } from '../hooks/use-menu';
+import { useInternalMenuPlacement } from '../hooks/use-menu-placement';
+import { useInternalMenuTopLayer } from '../hooks/use-menu-top-layer';
+import { awayFromParent } from '../lib/submenu-side';
 import { menuStyle } from '../style';
 
 import type { Menu } from '..';
-
-function useInternalPlacement(
-  level: MenuLevel,
-  { side, align, sideOffset, alignOffset }: MenuPlacement,
-) {
-  const { setPlacement } = level;
-
-  useLayoutEffect(() => {
-    setPlacement({ side, align, sideOffset, alignOffset });
-  }, [setPlacement, side, align, sideOffset, alignOffset]);
-}
-
-const continuesSideways = (side: AnchoredSide) => side === 'left' || side === 'right';
-
-function awayFromParent(parent: MenuLevel): AnchoredSide {
-  const parentSide = parent.anchored.side;
-
-  return parent.nested && continuesSideways(parentSide) ? parentSide : 'right';
-}
 
 type PopupProps = Menu.ContentProps & { level: MenuLevel; name: ComponentProps<'div'> };
 
 function MenuPopup({ level, name, className, style, children, ...props }: PopupProps) {
   const { root } = useInternalMenuContext('Menu.Content');
-  const { content } = level;
 
-  useLayoutEffect(() => {
-    if (!content) return;
-
-    showInTopLayer(content);
-    raiseWhatStaysAboveLayers();
-  }, [content]);
+  useInternalMenuTopLayer(level.content);
 
   const floating = level.getFloatingProps();
   const navigate = floating.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
@@ -135,7 +107,7 @@ function RootMenuContent({
   const { root, triggerType } = useInternalMenuContext('Menu.Content');
   const atPointer = triggerType === 'contextmenu';
 
-  useInternalPlacement(root, {
+  useInternalMenuPlacement(root, {
     side: side ?? (atPointer ? 'right' : 'bottom'),
     align,
     sideOffset: sideOffset ?? (atPointer ? 2 : 4),
@@ -163,7 +135,7 @@ function NestedMenuContent({
   const { level } = useInternalMenuContext('Menu.Content');
   const parent = useInternalContentContext('Menu.Content');
 
-  useInternalPlacement(level, {
+  useInternalMenuPlacement(level, {
     side: side ?? awayFromParent(parent),
     align,
     sideOffset,

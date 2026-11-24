@@ -4,11 +4,9 @@ import { isValidElement, type ComponentProps, type PointerEvent } from 'react';
 
 import { buttonTypeFor, mergeProps, part } from '../../../../utils';
 import { useInternalTooltipContext } from '../context';
+import { joinIds } from '../lib/join-ids';
 
 export type TooltipTriggerProps = ComponentProps<'button'> & { asChild?: boolean };
-
-const joinIds = (...ids: Array<unknown>) =>
-  ids.filter((id) => typeof id === 'string' && id !== '').join(' ') || undefined;
 
 export function TooltipTrigger({ asChild, children, ...props }: TooltipTriggerProps) {
   const { tooltip } = useInternalTooltipContext('Tooltip.Trigger');
