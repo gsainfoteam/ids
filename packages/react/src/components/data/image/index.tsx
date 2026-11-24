@@ -30,8 +30,12 @@ export namespace Image {
 
   export type State = { status: ImageStatus; preview: boolean };
 
-  export type Props = Omit<ComponentProps<'img'>, 'alt' | 'className' | 'style' | 'children'> & {
+  export type Props = Omit<
+    ComponentProps<'img'>,
+    'alt' | 'src' | 'className' | 'style' | 'children'
+  > & {
     alt: string;
+    src?: string;
     ratio?: number;
     preview?: boolean;
     previewSrc?: string;

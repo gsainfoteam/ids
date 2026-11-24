@@ -6,6 +6,7 @@ import {
   useId,
   useLayoutEffect,
   useRef,
+  type FocusEvent,
   type Ref,
   type RefCallback,
 } from 'react';
@@ -140,6 +141,12 @@ export function useToggleGroup({
       if (!known.has(entry)) console.warn(`[IDS] ToggleGroup: no toggle has the value "${entry}".`);
   }, [itemValues, selectedKey]);
 
+  const forwardRootFocusToItem = (event: FocusEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    const enabled = roving.elements.current.filter((item) => !item.disabled);
+    (enabled.find((item) => selected.includes(item.value)) ?? enabled[0])?.element.focus();
+  };
+
   const context: ToggleGroupContextValue = {
     id,
     selectionMode,
@@ -156,6 +163,7 @@ export function useToggleGroup({
     context,
     rootProps: {
       ref: setRoot,
+      tabIndex: -1,
       role: single ? 'radiogroup' : 'toolbar',
       'aria-orientation': orientation,
       'aria-disabled': disabled || undefined,
@@ -164,5 +172,6 @@ export function useToggleGroup({
       'data-disabled': disabled ? '' : undefined,
     },
     formValue: { name, form, value: selected, required, disabled, anchor: anchorRef },
+    forwardRootFocusToItem,
   };
 }
