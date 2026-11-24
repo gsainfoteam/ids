@@ -76,12 +76,13 @@ class _IdsSpinnerState extends State<IdsSpinner>
   Widget build(BuildContext context) {
     final icon = IconTheme.of(context);
     final scope = IdsProvider.maybeOf(context);
-    final t = scope?.translation;
-    final ko = IdsMessages.ko;
+    final messages = (scope?.locale ?? IdsLocale.ko).messages;
     final inheritedIcon = context
         .dependOnInheritedWidgetOfExactType<IconTheme>();
     final color =
-        inheritedIcon?.data.color ?? scope?.colors.textNeutralStrong ?? icon.color!;
+        inheritedIcon?.data.color ??
+        scope?.colors.textNeutralStrong ??
+        icon.color!;
     final size = _sizes[widget.size] ?? icon.size!;
     final arc = CustomPaint(
       size: Size.square(scope?.dimension(size) ?? size),
@@ -104,9 +105,7 @@ class _IdsSpinnerState extends State<IdsSpinner>
     if (widget.decorative) return spinning;
     return Semantics(
       liveRegion: true,
-      label: _announced
-          ? widget.semanticLabel ?? t?.commonLoading ?? ko.commonLoading
-          : null,
+      label: _announced ? widget.semanticLabel ?? messages.commonLoading : null,
       child: spinning,
     );
   }

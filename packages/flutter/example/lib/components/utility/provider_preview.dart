@@ -12,15 +12,13 @@ class ProviderPreview extends StatelessWidget {
     super.key,
     required this.theme,
     required this.mode,
-    this.translation,
-    this.locale = const Locale('ko', 'KR'),
+    this.locale,
     this.textScale,
   });
 
   final IdsTheme theme;
   final IdsMode mode;
-  final IdsMessages? translation;
-  final Locale locale;
+  final IdsLocale? locale;
   final double? textScale;
 
   @override
@@ -28,8 +26,7 @@ class ProviderPreview extends StatelessWidget {
     final child = IdsProvider(
       theme: theme,
       mode: mode,
-      translation: translation,
-      locale: locale,
+      locale: locale ?? IdsLocale.ko,
       child: Builder(
         builder: (context) {
           final ids = IdsProvider.of(context);
@@ -49,7 +46,7 @@ class ProviderPreview extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     spacing: 16,
                     children: [
-                      Text('IDS locale: ${ids.locale}'),
+                      Text('IDS locale: ${ids.locale.locale.toLanguageTag()}'),
                       Text('Mode: ${ids.mode.name} → ${ids.resolvedMode.name}'),
                       Text(
                         'Text scale: ${MediaQuery.textScalerOf(context).scale(16) / 16}',
@@ -70,16 +67,10 @@ class ProviderPreview extends StatelessWidget {
                       ),
                       for (final family in IdsColorRoles.families)
                         FamilySwatch(family: family, colors: colors),
-                      Text(
-                        ids.translation?.commonLoading ??
-                            IdsMessages.ko.commonLoading,
-                      ),
+                      Text(ids.messages.commonLoading),
                       const IdsSpinner(),
                       const IdsDivider(),
-                      Text(
-                        ids.translation?.commonClose ??
-                            IdsMessages.ko.commonClose,
-                      ),
+                      Text(ids.messages.commonClose),
                     ],
                   ),
                 ),
