@@ -38,6 +38,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => (
+    <div className="flex w-80 break-keep">
+      <Bubble>오늘 학식 뭐야?</Bubble>
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase className="break-keep">
@@ -168,7 +176,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const FitsTheLongestLine: Story = {
+export const FitTheBoxToTheLongestLine: Story = {
   render: () => (
     <div data-testid="column" className="flex w-80 break-keep">
       <Bubble>{LONG}</Bubble>
@@ -197,7 +205,7 @@ export const FitsTheLongestLine: Story = {
   },
 };
 
-export const Reactions: Story = {
+export const ReactToAMessage: Story = {
   render: () => (
     <div className="flex w-80">
       <Bubble>
@@ -233,7 +241,7 @@ export const Reactions: Story = {
   },
 };
 
-export const Conversation: Story = {
+export const LayOutAConversation: Story = {
   render: () => (
     <ol aria-label="대화" className="flex w-96 flex-col gap-3 break-keep">
       <li className="flex justify-end">

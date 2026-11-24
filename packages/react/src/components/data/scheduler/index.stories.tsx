@@ -660,7 +660,7 @@ export const AddRightClickMenus: Story = {
     docs: {
       description: {
         story:
-          '`eventMenu` 는 일정을 우클릭했을 때, `slotMenu` 는 빈 시간 칸을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 빈 칸은 포인터 아래의 30분 `{ start, end }` 로 넘어옵니다. 메뉴를 주지 않은 곳은 브라우저 메뉴가 그대로 뜹니다. 이 스토리는 `onEventChange` 도 줘서, 메뉴와 함께 일정을 끌어 옮기고 길이를 바꿀 수 있습니다.',
+          '`Scheduler.EventMenu` 는 일정을 우클릭했을 때, `Scheduler.SlotMenu` 는 빈 시간 칸을 우클릭했을 때 열 `Menu.Item` 들을 children 함수로 돌려줍니다. 빈 칸은 포인터 아래의 30분 `{ start, end }` 로 넘어옵니다. 메뉴를 주지 않은 곳은 브라우저 메뉴가 그대로 뜹니다. 이 스토리는 `onEventChange` 도 줘서, 메뉴와 함께 일정을 끌어 옮기고 길이를 바꿀 수 있습니다.',
       },
     },
   },
@@ -680,44 +680,48 @@ export const AddRightClickMenus: Story = {
               previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
             )
           }
-          eventMenu={(event) => (
-            <>
-              <Menu.Item onSelect={() => setDone(`${event.title} 열기`)}>
-                <ArrowTopRightOnSquareIcon />
-                열기
-              </Menu.Item>
-              <Menu.Item onSelect={() => setDone(`${event.title} 복제`)}>
-                <DocumentDuplicateIcon />
-                복제
-              </Menu.Item>
-              <Menu.Separator />
-              <Menu.Item
-                onSelect={() => {
-                  setEvents((previous) => previous.filter((item) => item.id !== event.id));
-                  setDone(`${event.title} 삭제`);
-                }}
-              >
-                <TrashIcon />
-                삭제
-              </Menu.Item>
-            </>
-          )}
-          slotMenu={({ start, end }) => (
-            <Menu.Item
-              onSelect={() => {
-                setEvents((previous) => [
-                  ...previous,
-                  { id: `new-${start.toString()}`, title: '새 일정', start, end },
-                ]);
-                setDone(`새 일정 ${start.toString()} – ${end.toString()}`);
-              }}
-            >
-              <PlusIcon />
-              여기에 일정 만들기
-            </Menu.Item>
-          )}
         >
           {(event) => <Scheduler.Event onClick={() => setDone(event.title)} />}
+          <Scheduler.EventMenu>
+            {(event) => (
+              <>
+                <Menu.Item onSelect={() => setDone(`${event.title} 열기`)}>
+                  <ArrowTopRightOnSquareIcon />
+                  열기
+                </Menu.Item>
+                <Menu.Item onSelect={() => setDone(`${event.title} 복제`)}>
+                  <DocumentDuplicateIcon />
+                  복제
+                </Menu.Item>
+                <Menu.Separator />
+                <Menu.Item
+                  onSelect={() => {
+                    setEvents((previous) => previous.filter((item) => item.id !== event.id));
+                    setDone(`${event.title} 삭제`);
+                  }}
+                >
+                  <TrashIcon />
+                  삭제
+                </Menu.Item>
+              </>
+            )}
+          </Scheduler.EventMenu>
+          <Scheduler.SlotMenu>
+            {({ start, end }) => (
+              <Menu.Item
+                onSelect={() => {
+                  setEvents((previous) => [
+                    ...previous,
+                    { id: `new-${start.toString()}`, title: '새 일정', start, end },
+                  ]);
+                  setDone(`새 일정 ${start.toString()} – ${end.toString()}`);
+                }}
+              >
+                <PlusIcon />
+                여기에 일정 만들기
+              </Menu.Item>
+            )}
+          </Scheduler.SlotMenu>
         </Scheduler>
         <p className="text-body-b3-regular" data-testid="done">
           {done}

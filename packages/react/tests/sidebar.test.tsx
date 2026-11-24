@@ -80,7 +80,7 @@ test('collapsible adds a collapse button to the header that hides the labels and
   const onCollapsedChange = vi.fn();
   const screen = await render(
     ui(
-      <Sidebar aria-label="사이드바" value="/" collapsible onCollapsedChange={onCollapsedChange}>
+      <Sidebar aria-label="사이드바" value="/" collapsible="icon" onCollapsedChange={onCollapsedChange}>
         <Sidebar.Header>로고</Sidebar.Header>
         <Menu />
       </Sidebar>,
@@ -106,7 +106,7 @@ test('Mod+B collapses and expands, and persist writes the state to a cookie', as
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar aria-label="사이드바" collapsible persist="sidebar">
+      <Sidebar aria-label="사이드바" collapsible="icon" persist="sidebar">
         <Menu />
       </Sidebar>,
     ),
@@ -128,7 +128,7 @@ test('Mod+B typed in a text field stays with the field', async () => {
   const screen = await render(
     ui(
       <div className="flex">
-        <Sidebar aria-label="사이드바" collapsible onCollapsedChange={onCollapsedChange}>
+        <Sidebar aria-label="사이드바" collapsible="icon" onCollapsedChange={onCollapsedChange}>
           <Menu />
         </Sidebar>
         <main>
@@ -148,7 +148,7 @@ test('Mod+B typed in a text field stays with the field', async () => {
 test('defaultCollapsed renders the icon rail in the server HTML', () => {
   const html = renderToString(
     ui(
-      <Sidebar aria-label="사이드바" collapsible defaultCollapsed>
+      <Sidebar aria-label="사이드바" collapsible="icon" defaultCollapsed>
         <Menu />
       </Sidebar>,
     ),
@@ -184,7 +184,7 @@ test('a nested item opens as an accordion, and as a menu in the icon rail', asyn
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar aria-label="사이드바" value="/settings/alerts" collapsible>
+      <Sidebar aria-label="사이드바" value="/settings/alerts" collapsible="icon">
         <Menu />
       </Sidebar>,
     ),
@@ -324,7 +324,7 @@ test('items nest to any depth, as accordions in the panel and as nested menus in
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar aria-label="사이드바" value="frontend-issues" collapsible>
+      <Sidebar aria-label="사이드바" value="frontend-issues" collapsible="icon">
         <Sidebar.Item value="info">
           <HomeIcon />
           인포팀

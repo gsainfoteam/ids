@@ -104,17 +104,30 @@ const region = cn('concentric-p-4 inset-ring-1 inset-ring-neutral');
 
 export const Playground: Story = {
   render: (args) => (
-    <IdsProvider {...args} className={region}>
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Button>저장</Button>
-          <Button variant="soft">임시 저장</Button>
-          <Button variant="outline">취소</Button>
-          <Chip variant="outline">초안</Chip>
+    <IdsProvider {...args} asChild>
+      <div className={region}>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button>저장</Button>
+            <Button variant="soft">임시 저장</Button>
+            <Button variant="outline">취소</Button>
+            <Chip variant="outline">초안</Chip>
+          </div>
+          <TextField aria-label="제목" placeholder="제목" />
+          <Checkbox defaultChecked aria-label="알림 받기" />
+          <Readout />
         </div>
-        <TextField aria-label="제목" placeholder="제목" />
-        <Checkbox defaultChecked aria-label="알림 받기" />
-        <Readout />
+      </div>
+    </IdsProvider>
+  ),
+};
+
+export const Usage: Story = {
+  render: () => (
+    <IdsProvider theme={defineIdsTheme({ primary: '#0d9488' })}>
+      <div className="flex gap-2">
+        <Button>저장</Button>
+        <Button variant="soft">임시 저장</Button>
       </div>
     </IdsProvider>
   ),
@@ -131,12 +144,14 @@ export const Gallery: Story = {
           rows={paletteHues}
           columns={modes}
           render={(hue, mode) => (
-            <IdsProvider.Scope theme={{ primary: palettes[hue] }} mode={mode} className={region}>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button>저장</Button>
-                <Button variant="soft">임시 저장</Button>
-                <Button variant="outline">취소</Button>
-                <Chip variant="outline">초안</Chip>
+            <IdsProvider.Scope theme={{ primary: palettes[hue] }} mode={mode} asChild>
+              <div className={region}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button>저장</Button>
+                  <Button variant="soft">임시 저장</Button>
+                  <Button variant="outline">취소</Button>
+                  <Chip variant="outline">초안</Chip>
+                </div>
               </div>
             </IdsProvider.Scope>
           )}
@@ -150,11 +165,13 @@ export const Gallery: Story = {
           rows={seeds}
           columns={modes}
           render={(seed, mode) => (
-            <IdsProvider.Scope theme={{ primary: seed }} mode={mode} className={region}>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button>저장</Button>
-                <Button variant="soft">임시 저장</Button>
-                <Chip variant="outline">초안</Chip>
+            <IdsProvider.Scope theme={{ primary: seed }} mode={mode} asChild>
+              <div className={region}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button>저장</Button>
+                  <Button variant="soft">임시 저장</Button>
+                  <Chip variant="outline">초안</Chip>
+                </div>
               </div>
             </IdsProvider.Scope>
           )}
@@ -168,17 +185,19 @@ export const Gallery: Story = {
           rows={Object.keys(brandSets) as (keyof typeof brandSets)[]}
           columns={modes}
           render={(set, mode) => (
-            <IdsProvider.Scope theme={brandSets[set]} mode={mode} className={region}>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button>primary</Button>
-                <Button colorScheme="secondary">secondary</Button>
-                <Button colorScheme="tertiary">tertiary</Button>
-                <Chip variant="soft" colorScheme="secondary">
-                  soft
-                </Chip>
-                <Chip variant="outline" colorScheme="tertiary">
-                  outline
-                </Chip>
+            <IdsProvider.Scope theme={brandSets[set]} mode={mode} asChild>
+              <div className={region}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button>primary</Button>
+                  <Button colorScheme="secondary">secondary</Button>
+                  <Button colorScheme="tertiary">tertiary</Button>
+                  <Chip variant="soft" colorScheme="secondary">
+                    soft
+                  </Chip>
+                  <Chip variant="outline" colorScheme="tertiary">
+                    outline
+                  </Chip>
+                </div>
               </div>
             </IdsProvider.Scope>
           )}
@@ -197,24 +216,28 @@ export const Gallery: Story = {
                     key={`${neutral}:${mode}`}
                     theme={{ primary: palettes[hue], neutral }}
                     mode={mode}
-                    className="bg-base text-neutral-strong"
+                    asChild
                   >
-                    <Card className="w-56">
-                      <Card.Header>
-                        <Card.Title>
-                          {neutral} · {mode}
-                        </Card.Title>
-                        <Card.Description>구조선과 보조 글자</Card.Description>
-                      </Card.Header>
-                      <Card.Content className="flex flex-wrap gap-2">
-                        <Button variant="soft" colorScheme="neutral">
-                          취소
-                        </Button>
-                        <Chip variant="soft" colorScheme="neutral">
-                          초안
-                        </Chip>
-                      </Card.Content>
-                    </Card>
+                    <div className="w-56">
+                      <Card>
+                        <Card.Header>
+                          <Card.Title>
+                            {neutral} · {mode}
+                          </Card.Title>
+                          <Card.Description>구조선과 보조 글자</Card.Description>
+                        </Card.Header>
+                        <Card.Content>
+                          <div className="flex flex-wrap gap-2">
+                            <Button variant="soft" colorScheme="neutral">
+                              취소
+                            </Button>
+                            <Chip variant="soft" colorScheme="neutral">
+                              초안
+                            </Chip>
+                          </div>
+                        </Card.Content>
+                      </Card>
+                    </div>
                   </IdsProvider.Scope>
                 )),
               )}
@@ -230,18 +253,20 @@ export const Gallery: Story = {
           rows={tintedPrimaries}
           columns={statusModes}
           render={(hue, status) => (
-            <IdsProvider.Scope theme={{ primary: palettes[hue], status }} className={region}>
-              <div className="flex flex-wrap items-center gap-2">
-                {statusFamilies.map((family) => (
-                  <Chip variant="solid" key={family} colorScheme={family}>
-                    {family}
-                  </Chip>
-                ))}
-                {statusFamilies.map((family) => (
-                  <Chip key={family} variant="soft" colorScheme={family}>
-                    {family}
-                  </Chip>
-                ))}
+            <IdsProvider.Scope theme={{ primary: palettes[hue], status }} asChild>
+              <div className={region}>
+                <div className="flex flex-wrap items-center gap-2">
+                  {statusFamilies.map((family) => (
+                    <Chip variant="solid" key={family} colorScheme={family}>
+                      {family}
+                    </Chip>
+                  ))}
+                  {statusFamilies.map((family) => (
+                    <Chip key={family} variant="soft" colorScheme={family}>
+                      {family}
+                    </Chip>
+                  ))}
+                </div>
               </div>
             </IdsProvider.Scope>
           )}
@@ -253,11 +278,15 @@ export const Gallery: Story = {
       >
         {scales.map((scale) => (
           <Showcase.Row key={scale} label={`×${scale}`}>
-            <IdsProvider.Scope theme={{ scale }} className="flex flex-wrap items-center gap-2">
-              <Button>저장</Button>
-              <TextField aria-label={`제목 ${scale}`} placeholder="제목" className="w-40" />
-              <Checkbox defaultChecked aria-label={`선택 ${scale}`} />
-              <Chip variant="solid">새 글</Chip>
+            <IdsProvider.Scope theme={{ scale }} asChild>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <div className="w-40">
+                  <TextField aria-label={`제목 ${scale}`} placeholder="제목" />
+                </div>
+                <Checkbox defaultChecked aria-label={`선택 ${scale}`} />
+                <Chip variant="solid">새 글</Chip>
+              </div>
             </IdsProvider.Scope>
           </Showcase.Row>
         ))}
@@ -268,13 +297,19 @@ export const Gallery: Story = {
       >
         {[0, 6, 10, 14, 18].map((radius) => (
           <Showcase.Row key={radius} label={`${radius}px`}>
-            <IdsProvider.Scope theme={{ radius }} className="flex flex-wrap items-center gap-2">
-              <Button>저장</Button>
-              <TextField aria-label={`제목 ${radius}`} placeholder="제목" className="w-40" />
-              <Checkbox defaultChecked aria-label={`선택 ${radius}`} />
-              <Card size="tiny" className="w-40">
-                <Card.Title>카드</Card.Title>
-              </Card>
+            <IdsProvider.Scope theme={{ radius }} asChild>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <div className="w-40">
+                  <TextField aria-label={`제목 ${radius}`} placeholder="제목" />
+                </div>
+                <Checkbox defaultChecked aria-label={`선택 ${radius}`} />
+                <div className="w-40">
+                  <Card size="tiny">
+                    <Card.Title>카드</Card.Title>
+                  </Card>
+                </div>
+              </div>
             </IdsProvider.Scope>
           </Showcase.Row>
         ))}
@@ -285,16 +320,17 @@ export const Gallery: Story = {
       >
         {(['round', 'squircle'] as const).map((cornerShape) => (
           <Showcase.Row key={cornerShape} label={cornerShape}>
-            <IdsProvider.Scope
-              theme={{ radius: 14, cornerShape }}
-              className="flex flex-wrap items-center gap-2"
-            >
-              <Button>저장</Button>
-              <Button variant="soft">임시 저장</Button>
-              <Chip variant="solid">새 글</Chip>
-              <Card size="tiny" className="w-40">
-                <Card.Title>카드</Card.Title>
-              </Card>
+            <IdsProvider.Scope theme={{ radius: 14, cornerShape }} asChild>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <Button variant="soft">임시 저장</Button>
+                <Chip variant="solid">새 글</Chip>
+                <div className="w-40">
+                  <Card size="tiny">
+                    <Card.Title>카드</Card.Title>
+                  </Card>
+                </div>
+              </div>
             </IdsProvider.Scope>
           </Showcase.Row>
         ))}
@@ -325,7 +361,7 @@ function ModeSwitcher() {
   );
 }
 
-export const Controlled: Story = {
+export const ControlTheModeFromTheApp: Story = {
   render: function Render() {
     const [mode, setMode] = useState<IdsProvider.Mode>('light');
 
@@ -335,17 +371,19 @@ export const Controlled: Story = {
           theme={defineIdsTheme({ primary: palettes.blue })}
           mode={mode}
           onModeChange={setMode}
-          className={region}
           data-testid="provider"
+          asChild
         >
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Button>저장</Button>
-              <Button variant="soft">임시 저장</Button>
-              <Button variant="outline">취소</Button>
+          <div className={region}>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <Button variant="soft">임시 저장</Button>
+                <Button variant="outline">취소</Button>
+              </div>
+              <Readout />
+              <ModeSwitcher />
             </div>
-            <Readout />
-            <ModeSwitcher />
           </div>
         </IdsProvider>
         <output aria-label="부모 상태" className="text-caption-c1-regular font-mono">
@@ -373,22 +411,24 @@ export const Controlled: Story = {
   },
 };
 
-export const SystemMode: Story = {
+export const FollowTheSystemMode: Story = {
   render: () => (
     <IdsProvider
       theme={defineIdsTheme({ primary: palettes.blue })}
       defaultMode="system"
-      className={region}
       data-testid="provider"
+      asChild
     >
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Button>저장</Button>
-          <Button variant="soft">임시 저장</Button>
-          <Button variant="outline">취소</Button>
+      <div className={region}>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button>저장</Button>
+            <Button variant="soft">임시 저장</Button>
+            <Button variant="outline">취소</Button>
+          </div>
+          <Readout />
+          <ModeSwitcher />
         </div>
-        <Readout />
-        <ModeSwitcher />
       </div>
     </IdsProvider>
   ),
@@ -409,41 +449,47 @@ export const SystemMode: Story = {
   },
 };
 
-export const Scope: Story = {
+export const ChangePartOfTheTheme: Story = {
   render: () => (
     <IdsProvider
       theme={defineIdsTheme({ primary: palettes.blue })}
       defaultMode="light"
-      className={region}
       data-testid="outer"
+      asChild
     >
-      <div className="flex flex-col gap-4">
-        <Readout />
-        <IdsProvider.Scope mode="dark" className={region} data-testid="dark">
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Button>저장</Button>
-              <Button variant="soft">임시 저장</Button>
-              <Button variant="outline">취소</Button>
+      <div className={region}>
+        <div className="flex flex-col gap-4">
+          <Readout />
+          <IdsProvider.Scope mode="dark" data-testid="dark" asChild>
+            <div className={region}>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button>저장</Button>
+                  <Button variant="soft">임시 저장</Button>
+                  <Button variant="outline">취소</Button>
+                </div>
+                <Readout />
+              </div>
             </div>
-            <Readout />
-          </div>
-        </IdsProvider.Scope>
-        <IdsProvider.Scope
-          theme={{ primary: palettes.orange, radius: 16 }}
-          className={region}
-          data-testid="orange"
-        >
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Button>저장</Button>
-              <Button variant="soft">임시 저장</Button>
-              <Button variant="outline">취소</Button>
+          </IdsProvider.Scope>
+          <IdsProvider.Scope
+            theme={{ primary: palettes.orange, radius: 16 }}
+            data-testid="orange"
+            asChild
+          >
+            <div className={region}>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button>저장</Button>
+                  <Button variant="soft">임시 저장</Button>
+                  <Button variant="outline">취소</Button>
+                </div>
+                <Readout />
+                <ModeSwitcher />
+              </div>
             </div>
-            <Readout />
-            <ModeSwitcher />
-          </div>
-        </IdsProvider.Scope>
+          </IdsProvider.Scope>
+        </div>
       </div>
     </IdsProvider>
   ),
@@ -471,7 +517,7 @@ export const Scope: Story = {
   },
 };
 
-export const AsChild: Story = {
+export const ThemeAnElementWithoutAWrapper: Story = {
   render: () => (
     <IdsProvider.Scope asChild theme={{ primary: palettes.green }} mode="dark">
       <section aria-label="녹색 영역" className={region}>
@@ -489,7 +535,8 @@ export const AsChild: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'asChild면 감싸는 div 없이 자식 요소에 data-mode 와 테마 변수를 바로 붙입니다.',
+        story:
+          '`asChild` 면 감싸는 div 없이 자식 요소에 모드와 테마를 바로 씁니다. 영역에 이름을 주거나 시맨틱 태그를 쓸 때 고릅니다.',
       },
     },
   },

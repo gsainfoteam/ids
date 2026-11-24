@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, use, type ReactNode, type RefObject } from 'react';
+import { createContext, use, type RefObject } from 'react';
 
 import { invariant } from '../../../utils';
 
@@ -11,7 +11,6 @@ type Context = {
   styles: ReturnType<typeof messageStyle>;
   align: MessageAlign;
   name: string | undefined;
-  avatar: string | ReactNode;
   time: Date | undefined;
   status: MessageStatus;
   unread: number | boolean | undefined;

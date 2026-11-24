@@ -3,16 +3,7 @@ import { describe, expect, test } from 'vitest';
 
 type StoryFile = Record<string, StoryObj> & { default: Meta };
 
-const NOT_YET_ON_THE_THREE_LAYERS = new Set([
-  'components/data/bubble/index.stories.tsx',
-  'components/data/chip/index.stories.tsx',
-  'components/data/image/index.stories.tsx',
-  'components/data/item/index.stories.tsx',
-  'components/data/table/index.stories.tsx',
-  'components/form/editor/index.stories.tsx',
-  'components/layout/scroll-area/index.stories.tsx',
-  'components/utility/ids-provider/index.stories.tsx',
-]);
+const NOT_YET_ON_THE_THREE_LAYERS = new Set<string>();
 
 const BASIC = ['Playground', 'Usage', 'Gallery'];
 const VERIFICATION = 'verification';
@@ -94,9 +85,6 @@ for (const file of files) {
   }
 
   test(`${file} is on the three layers`, () => {
-    expect(
-      layerProblems(module, source),
-      `${file} breaks the story layers`,
-    ).toEqual([]);
+    expect(layerProblems(module, source), `${file} breaks the story layers`).toEqual([]);
   });
 }

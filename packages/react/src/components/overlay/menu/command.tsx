@@ -18,7 +18,7 @@ import { selectItem } from './use-menu-item';
 import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
 import { useTranslate } from '../../../internal/translate';
-import { elementTypeOf, flattenFragments, mergeProps, part } from '../../../utils';
+import { buttonTypeFor, elementTypeOf, flattenFragments, mergeProps, part } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { ScrollArea } from '../../layout/scroll-area';
 
@@ -70,7 +70,7 @@ export function CommandTrigger({
     children,
     mergeProps(props, {
       ref: palette.setTrigger,
-      type: asChild ? undefined : 'button',
+      type: buttonTypeFor(asChild, children),
       'aria-haspopup': 'dialog',
       'aria-expanded': palette.open,
       'aria-controls': palette.open ? palette.ids.content : undefined,

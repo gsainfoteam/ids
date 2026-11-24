@@ -170,19 +170,24 @@ export function useOTPField({
     return () => input.removeEventListener('beforeinput', insertWhereTheCaretBelongs);
   }, [accepts]);
 
-  const committedCode = useRef(code);
   const writingOurselves = useRef(false);
-  const adoptOutsideWrite = useRef((_raw: string) => {});
+  const writesToWeigh = useRef<string[]>([]);
+  const weighOutsideWrites = useRef(() => {});
   useLayoutEffect(() => {
-    committedCode.current = code;
-    adoptOutsideWrite.current = (raw) => {
+    weighOutsideWrites.current = () => {
+      const pending = writesToWeigh.current;
+      writesToWeigh.current = [];
       if (composing.current) return;
-      const next = Array.from(clean(raw)).slice(0, length).join('');
-      if (next !== committedCode.current) commit(next);
+      const lastWriteNotFromReact = pending
+        .map((raw) => Array.from(clean(raw)).slice(0, length).join(''))
+        .reverse()
+        .find((next) => next !== code);
+      if (lastWriteNotFromReact !== undefined) commit(lastWriteNotFromReact);
     };
+    weighOutsideWrites.current();
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const input = inputRef.current;
     if (!input) return;
     const own = Object.getOwnPropertyDescriptor(input, 'value');
@@ -198,9 +203,14 @@ export function useOTPField({
       set(next: string) {
         set.call(this, next);
         if (writingOurselves.current) return;
-        queueMicrotask(() => adoptOutsideWrite.current(get.call(input)));
+        writesToWeigh.current.push(get.call(input));
+        const firstSinceLastWeighing = writesToWeigh.current.length === 1;
+        if (firstSinceLastWeighing) queueMicrotask(() => weighOutsideWrites.current());
       },
     });
+    const writtenBeforeWrapping = get.call(input);
+    writesToWeigh.current.push(writtenBeforeWrapping);
+    weighOutsideWrites.current();
     return () => {
       if (own) Object.defineProperty(input, 'value', own);
       else Reflect.deleteProperty(input, 'value');

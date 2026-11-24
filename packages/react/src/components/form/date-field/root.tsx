@@ -21,6 +21,7 @@ import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import {
   emptyValue,
   isBlocked,
+  validateDate,
   validateValue,
   type CalendarValue,
   type DateLimits,
@@ -67,6 +68,7 @@ export function DateFieldRoot(props: DateFieldProps) {
   const empty = emptyValue(selectionMode);
   if (value !== undefined) validateValue(value, selectionMode);
   if (defaultValue !== undefined) validateValue(defaultValue, selectionMode);
+  [min, max].forEach((limit) => validateDate(limit, 'DateField'));
 
   const dateLocale = resolveLocale(providerLocale);
   const formatDate = formatter(format, dateLocale, {

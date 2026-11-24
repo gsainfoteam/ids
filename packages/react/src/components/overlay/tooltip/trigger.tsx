@@ -3,7 +3,7 @@
 import { isValidElement, type ComponentProps, type PointerEvent } from 'react';
 
 import { useTooltipContext } from './context';
-import { mergeProps, part } from '../../../utils';
+import { buttonTypeFor, mergeProps, part } from '../../../utils';
 
 export type TooltipTriggerProps = ComponentProps<'button'> & { asChild?: boolean };
 
@@ -30,7 +30,7 @@ export function TooltipTrigger({ asChild, children, ...props }: TooltipTriggerPr
     mergeProps(props, {
       ...reference,
       ref: tooltip.setTrigger,
-      type: asChild ? undefined : 'button',
+      type: buttonTypeFor(asChild, children),
       'aria-describedby': joinIds(ownDescription, reference['aria-describedby']),
       'data-popup-open': tooltip.open ? '' : undefined,
     }),
