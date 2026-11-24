@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, useState, type ComponentProps, type RefObject } from 'react';
 
-import { popupStyle } from './styles';
+import { popupStyle } from './lib/styles';
 import { ScrollArea } from '../../components/layout/scroll-area';
 import {
   coveredByKeyboard,
@@ -11,16 +11,16 @@ import {
   onViewportChange,
   raiseWhatStaysAboveLayers,
   showInTopLayer,
-  useAnchored,
-  useDrawerPresentation,
-  useLayer,
+  useInternalAnchored,
+  useInternalDrawerPresentation,
+  useInternalLayer,
   visibleHeight,
   VIEWPORT_MARGIN,
   type PopupPresentation,
 } from '../overlay';
 
-export { FieldPopupHeader } from './header';
-export { useDrawerPresentation, type PopupPresentation } from '../overlay';
+export { FieldPopupHeader } from './parts/header';
+export { useInternalDrawerPresentation, type PopupPresentation } from '../overlay';
 
 export type PopupSide = 'top' | 'bottom';
 export type PopupAlign = 'start' | 'end';
@@ -62,12 +62,12 @@ export function FieldPopup({
   ...props
 }: FieldPopupProps) {
   const [popup, setPopup] = useState<HTMLElement | null>(null);
-  const drawer = useDrawerPresentation(mobileVariant);
+  const drawer = useInternalDrawerPresentation(mobileVariant);
   const presentation: PopupPresentation = drawer ? 'drawer' : 'popover';
   const initialFocusDone = useRef(false);
   const [stacked, setStacked] = useState(false);
 
-  const layer = useLayer(true, {
+  const layer = useInternalLayer(true, {
     kind: drawer ? 'modal' : 'popup',
     element: () => popup,
     anchor: () => anchor.current,
@@ -75,7 +75,7 @@ export function FieldPopup({
     onPositionChange: ({ modalsBelow }) => setStacked(modalsBelow > 0),
   });
 
-  const anchored = useAnchored({
+  const anchored = useInternalAnchored({
     open: true,
     reference: anchor,
     floating: popup,

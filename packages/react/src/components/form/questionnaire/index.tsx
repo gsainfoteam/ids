@@ -2,23 +2,23 @@ import {
   type QuestionnaireAnswer,
   type QuestionnaireAnswers,
   type QuestionnaireSelectionMode,
-} from './answers';
-import { QuestionnaireDescription, type QuestionnaireDescriptionProps } from './description';
-import { QuestionnaireOption, type QuestionnaireOptionProps } from './option';
-import { QuestionnaireOther, type QuestionnaireOtherProps } from './other';
-import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './question';
+} from './lib/answers';
+import { QuestionnaireDescription, type QuestionnaireDescriptionProps } from './parts/description';
+import { QuestionnaireOption, type QuestionnaireOptionProps } from './parts/option';
+import { QuestionnaireOther, type QuestionnaireOtherProps } from './parts/other';
+import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './parts/question';
+import { QuestionnaireSkip, type QuestionnaireSkipProps } from './parts/skip';
+import {
+  QuestionnaireSubmit,
+  type QuestionnaireSubmitProps,
+  type QuestionnaireSubmitState,
+} from './parts/submit';
 import { QuestionnaireRoot, type QuestionnaireProps } from './root';
-import { QuestionnaireSkip, type QuestionnaireSkipProps } from './skip';
 import {
   questionnaireStyle,
   type QuestionnaireVariant,
   type QuestionnaireOrientation,
 } from './style';
-import {
-  QuestionnaireSubmit,
-  type QuestionnaireSubmitProps,
-  type QuestionnaireSubmitState,
-} from './submit';
 
 export function Questionnaire(props: QuestionnaireProps) {
   return <QuestionnaireRoot {...props} />;
@@ -78,6 +78,6 @@ export type {
   QuestionnaireAnswer,
   QuestionnaireAnswers,
   QuestionnaireSelectionMode,
-} from './answers';
+} from './lib/answers';
 export type { QuestionnaireVariant, QuestionnaireOrientation } from './style';
 export type { QuestionnaireProps } from './root';

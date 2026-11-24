@@ -1,5 +1,8 @@
-import { ColorFieldClear, type ColorFieldClearProps } from './clear';
-import { ColorFieldContent, type ColorFieldContentProps } from './content';
+import { ColorFieldClear, type ColorFieldClearProps } from './parts/clear';
+import { ColorFieldContent, type ColorFieldContentProps } from './parts/content';
+import { ColorFieldSwatch, type ColorFieldSwatchProps } from './parts/swatch';
+import { ColorFieldTrigger, type ColorFieldTriggerProps } from './parts/trigger';
+import { ColorFieldValue, type ColorFieldValueProps } from './parts/value';
 import {
   ColorFieldRoot,
   type ColorFieldVariant,
@@ -7,9 +10,6 @@ import {
   type ColorFieldProps,
 } from './root';
 import { colorFieldStyle } from './style';
-import { ColorFieldSwatch, type ColorFieldSwatchProps } from './swatch';
-import { ColorFieldTrigger, type ColorFieldTriggerProps } from './trigger';
-import { ColorFieldValue, type ColorFieldValueProps } from './value';
 
 export function ColorField(props: ColorFieldProps) {
   return <ColorFieldRoot {...props} />;
@@ -35,4 +35,4 @@ export namespace ColorField {
 }
 
 export type { ColorFieldVariant, ColorFieldState, ColorFieldProps } from './root';
-export type { ColorFormat } from '../../data/color-picker/color';
+export type { ColorFormat } from '../../data/color-picker/lib/color';

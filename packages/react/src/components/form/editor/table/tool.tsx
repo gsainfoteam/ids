@@ -2,15 +2,20 @@
 
 import { Table } from 'lucide-react';
 
-import { useTranslate } from '../../../../internal/translate';
-import { IconButton } from '../../../action/icon-button';
-import { useEditorContext } from '../context';
-import { editorMessages } from '../messages-catalog';
-import { extensionIsLoaded, hasExtension, useEditorToolProps, type EditorToolProps } from '../tool';
-import { useEditorSelector } from '../use-editor-selector';
 import { EditorTableEditMenu } from './edit-menu';
-import { insertTable, NEW_TABLE_SIZE } from './insert';
 import { EditorTableSizePicker } from './size-picker';
+import { useInternalTranslate } from '../../../../internal/translate';
+import { IconButton } from '../../../action/icon-button';
+import { useInternalEditorContext } from '../context';
+import { useInternalEditorSelector } from '../hooks/use-editor-selector';
+import { editorMessages } from '../messages-catalog';
+import { insertTable, NEW_TABLE_SIZE } from './insert';
+import {
+  extensionIsLoaded,
+  hasExtension,
+  useInternalEditorToolProps,
+  type EditorToolProps,
+} from '../parts/tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
@@ -25,11 +30,11 @@ function tableState(editor: TiptapEditor) {
 }
 
 export function EditorTable({ icon, 'aria-label': ariaLabel, className }: EditorTableProps) {
-  const t = useTranslate(editorMessages);
-  const { editor, editable } = useEditorContext('Editor.Table');
-  const tool = useEditorToolProps('Table');
+  const t = useInternalTranslate(editorMessages);
+  const { editor, editable } = useInternalEditorContext('Editor.Table');
+  const tool = useInternalEditorToolProps('Table');
   const loaded = extensionIsLoaded(editor, 'Table', 'table');
-  const { inTable, insertable } = useEditorSelector(editor, tableState, {
+  const { inTable, insertable } = useInternalEditorSelector(editor, tableState, {
     inTable: false,
     insertable: false,
   });

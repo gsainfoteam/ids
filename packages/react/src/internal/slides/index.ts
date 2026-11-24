@@ -1,5 +1,5 @@
 export {
-  useSlides,
+  useInternalSlides,
   type SlideProps,
   type Slides,
   type SlidesDirection,
@@ -7,9 +7,9 @@ export {
   type SlideState,
   type SlidesOptions,
   type SlidesWatchDrag,
-} from './use-slides';
-export { SlidesAnnouncer, type SlidesAnnouncerProps } from './announcer';
-export { moveWithKeys } from './slide-keys';
+} from './hooks/use-slides';
+export { SlidesAnnouncer, type SlidesAnnouncerProps } from './parts/announcer';
+export { moveWithKeys } from './lib/slide-keys';
 export {
   estimateSlides,
   slidesLayout,
@@ -17,4 +17,4 @@ export {
   type SlidesEstimate,
   type SlidesOrientation,
   type SlidesPerScroll,
-} from './layout';
+} from './lib/layout';

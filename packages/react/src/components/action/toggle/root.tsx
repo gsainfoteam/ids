@@ -1,18 +1,18 @@
 'use client';
 
+import { useInternalToggle } from './hooks/use-toggle';
 import { toggleStyle } from './style';
-import { useToggle } from './use-toggle';
-import { useGroupContext } from '../../utility/group';
+import { useInternalGroupContext } from '../../utility/group';
 
 import type { Toggle } from '.';
 
 export function ToggleRoot(props: Toggle.Props) {
-  const layout = useGroupContext();
+  const layout = useInternalGroupContext();
   const {
     props: { variant: ownVariant, colorScheme, size, className, style, ...rest },
     toggleProps,
     render,
-  } = useToggle(props, 'Toggle');
+  } = useInternalToggle(props, 'Toggle');
   const variant = ownVariant ?? layout?.variant ?? 'outline';
   const resolvedSize = size ?? layout?.size ?? 'standard';
 

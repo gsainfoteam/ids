@@ -7,8 +7,8 @@ import { render } from 'vitest-browser-react';
 import { CodeBlock, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
-import { isLazy, LAZY_NAMES } from '../src/components/data/code-block/highlight';
-import { LAZY_LANGUAGES } from '../src/components/data/code-block/lazy-languages';
+import { isLazy, LAZY_NAMES } from '../src/components/data/code-block/lib/highlight';
+import { LAZY_LANGUAGES } from '../src/components/data/code-block/lib/lazy-languages';
 
 const SAVE = `export function Save() {
   return <Button>저장</Button>;

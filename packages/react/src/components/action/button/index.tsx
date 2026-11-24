@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { ButtonRoot } from './root';
 import { buttonStyle } from './style';
-import { type ControlColorScheme } from '../../../internal/surfaces/control-surface';
+import { type ControlColorScheme } from '../../../internal/surfaces/lib/control-surface';
 
 import type { InteractiveState, WithInteractiveValues } from '../../../hooks/use-interactive';
 import type { IdsSize, IdsVariant } from '../../../tokens/types';

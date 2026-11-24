@@ -1,4 +1,4 @@
-import { overlayStyles } from '../../../internal/overlay/styles';
+import { overlayStyles } from '../../../internal/overlay/lib/styles';
 import { cn, tv } from '../../../utils';
 
 const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');

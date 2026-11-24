@@ -3,10 +3,10 @@
 import { isValidElement } from 'react';
 
 import { CardContext } from './context';
+import { useInternalCard } from './hooks/use-card';
+import { CardTitle } from './parts/title';
 import { cardStyle } from './style';
-import { CardTitle } from './title';
-import { useCard } from './use-card';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { containsElementOfType, elementTypeOf } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
@@ -49,7 +49,7 @@ export function CardRoot({
   const interactive = onClick != null || (asChild && isPressableElement(children));
   const titleIsTheButton = interactive && !asChild && containsElementOfType(children, CARD_TITLE);
   const { interaction, props, dataProps, labelling, descriptionId, register } =
-    useCard<HTMLDivElement>({
+    useInternalCard<HTMLDivElement>({
       interactive,
       asChild,
       disabled,

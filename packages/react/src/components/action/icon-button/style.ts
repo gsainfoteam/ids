@@ -1,5 +1,5 @@
-import { controlSurface } from '../../../internal/surfaces/control-surface';
-import { iconSquare } from '../../../internal/surfaces/icon-square';
+import { controlSurface } from '../../../internal/surfaces/lib/control-surface';
+import { iconSquare } from '../../../internal/surfaces/lib/icon-square';
 import { tv } from '../../../utils';
 
 export const iconButtonStyle = tv({

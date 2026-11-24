@@ -3,9 +3,9 @@
 import { isValidElement, useState, type ReactElement, type ReactNode } from 'react';
 
 import { DrawerContext } from './context';
-import { DrawerOverlay, type DrawerOverlayProps } from './overlay';
+import { useInternalDrawerRoot } from './hooks/use-drawer-root';
+import { DrawerOverlay, type DrawerOverlayProps } from './parts/overlay';
 import { drawerStyle } from './style';
-import { useDrawerRoot } from './use-drawer-root';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Drawer } from '.';
@@ -27,7 +27,7 @@ export function DrawerRoot({
 }: Drawer.Props) {
   const snap = controller?.snap ?? null;
 
-  const drawer = useDrawerRoot({
+  const drawer = useInternalDrawerRoot({
     open,
     defaultOpen,
     onOpenChange,

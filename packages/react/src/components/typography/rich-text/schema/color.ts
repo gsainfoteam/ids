@@ -7,7 +7,7 @@ import {
 } from '@tiptap/core';
 import { Highlight } from '@tiptap/extension-highlight';
 
-import { isDocumentColor, type DocumentColor } from '../document-colors';
+import { isDocumentColor, type DocumentColor } from '../lib/document-colors';
 
 const colorAttribute = {
   color: {

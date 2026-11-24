@@ -2,15 +2,15 @@
 
 import { isValidElement, useCallback, useEffect, type ReactElement, type ReactNode } from 'react';
 
-import { AlertClose } from './close';
 import { AlertContext } from './context';
-import { AlertDescription } from './description';
-import { AlertIcon } from './icon';
-import { resolve } from './part-props';
+import { useInternalAlert } from './hooks/use-alert';
+import { resolve } from './lib/part-props';
+import { AlertClose } from './parts/close';
+import { AlertDescription } from './parts/description';
+import { AlertIcon } from './parts/icon';
+import { AlertTitle } from './parts/title';
 import { alertStyle } from './style';
-import { AlertTitle } from './title';
-import { useAlert } from './use-alert';
-import { announcedAssertively } from '../../../internal/status-palette';
+import { announcedAssertively } from '../../../internal/lib/status-palette';
 import { elementTypeOf, flattenFragments, mergeEventHandlers, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -49,7 +49,7 @@ export function AlertRoot({
     ending,
     close: requestClose,
     onKeyDown: onAlertKeyDown,
-  } = useAlert({ open, defaultOpen, onOpenChange, dismissible });
+  } = useInternalAlert({ open, defaultOpen, onOpenChange, dismissible });
   const mergedRef = useCallback(
     (node: HTMLDivElement | null) => mergeRefs(setNode, ref)(node),
     [setNode, ref],

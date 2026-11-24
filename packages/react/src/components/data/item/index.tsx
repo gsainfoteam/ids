@@ -1,15 +1,15 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { ItemActions, type ItemActionsProps } from './actions';
-import { ItemContent, type ItemContentProps } from './content';
-import { ItemDescription, type ItemDescriptionProps } from './description';
-import { ItemMedia, type ItemMediaProps } from './media';
-import { type ItemPartProps } from './part';
+import { ItemActions, type ItemActionsProps } from './parts/actions';
+import { ItemContent, type ItemContentProps } from './parts/content';
+import { ItemDescription, type ItemDescriptionProps } from './parts/description';
+import { ItemMedia, type ItemMediaProps } from './parts/media';
+import { type ItemPartProps } from './parts/part';
+import { ItemSeparator, type ItemSeparatorProps } from './parts/separator';
+import { ItemTitle, type ItemTitleProps } from './parts/title';
 import { ItemRoot, type ItemVariant } from './root';
-import { ItemSeparator, type ItemSeparatorProps } from './separator';
 import { itemStyle } from './style';
-import { ItemTitle, type ItemTitleProps } from './title';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { InteractiveState } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';

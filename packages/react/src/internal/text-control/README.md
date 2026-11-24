@@ -6,10 +6,10 @@
 | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | [`index.tsx`](#indextsx)                     | context, 상태 속성, 자식 나누기, `Adornments`, `TextControlClear`, 다른 파일의 다시 내보내기 |
 | [`style.ts`](#stylets)                       | `insetButtons`, `textControlStyle`                                                           |
-| [`use-text-control.ts`](#use-text-controlts) | 셸의 포커스, 셸 누르기, Escape 로 지우기                                                     |
-| [`use-input-value.ts`](#use-input-valuets)   | input 의 DOM 값을 따라가는 hook                                                              |
-| [`use-merged-ref.ts`](#use-merged-refts)     | ref 를 렌더마다 새로 만들지 않고 합치는 hook                                                 |
-| [`clear-input.ts`](#clear-inputts)           | 진짜 편집으로 값을 지우고 바꾸는 함수                                                        |
+| [`hooks/use-text-control.ts`](#hooksuse-text-controlts) | 셸의 포커스, 셸 누르기, Escape 로 지우기                                                     |
+| [`hooks/use-input-value.ts`](#hooksuse-input-valuets)   | input 의 DOM 값을 따라가는 hook                                                              |
+| [`hooks/use-merged-ref.ts`](#hooksuse-merged-refts)     | ref 를 렌더마다 새로 만들지 않고 합치는 hook                                                 |
+| [`lib/clear-input.ts`](#libclear-inputts)           | 진짜 편집으로 값을 지우고 바꾸는 함수                                                        |
 
 ## 쓰는 곳
 
@@ -17,8 +17,8 @@
 | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | `textControlStyle`, `TextControlContext`, `TextControlClear`, `Adornments`, `splitAroundInput`, `countOf`, `writesNoneOf`, `stateAttributes` | TextField, PasswordField, NumberField, TelField           |
 | `insetButtons`, `stateAttributes`                                                                                            | TextArea                                                  |
-| `useTextControl`, `useMergedRef`, `isInvalid`                                                                                | TextField, PasswordField, NumberField, TelField, TextArea |
-| `useInputValue`                                                                                                              | TextField, PasswordField, TextArea                        |
+| `useInternalTextControl`, `useInternalMergedRef`, `isInvalid`                                                                                | TextField, PasswordField, NumberField, TelField, TextArea |
+| `useInternalInputValue`                                                                                                              | TextField, PasswordField, TextArea                        |
 | `replaceInput`                                                                                                               | TelField                                                  |
 
 - TextField 는 `textControlStyle` 을 그대로 `TextField.Style` 로 쓰고, PasswordField, NumberField, TelField 는 `tv({ extend: textControlStyle })` 로 넓힙니다.
@@ -37,7 +37,7 @@ const { items, leading, input, trailing } = splitAroundInput<TextField.Input.Pro
   () => <TextFieldInput />,
   'TextField',
 );
-const field = useTextField({
+const field = useInternalTextField({
   rootProps,
   input: input.props,
   disabled,
@@ -88,13 +88,13 @@ const styles = textControlStyle({ variant, size });
 
 - 여기에 hook 이나 컴포넌트를 두지 않습니다. 클라이언트 모듈로 옮기면 서버 컴포넌트에서 `TextField.Style` 과 `NumberField` 등의 `style.ts` 가 client reference 를 받아 `tv({ extend })` 에서 깨집니다(`tests/server-components.test.ts`).
 
-## use-text-control.ts
+## hooks/use-text-control.ts
 
 ### 쓰는 법
 
 ```ts
-// components/form/text-field/use-text-field.ts
-const control = useTextControl({ inputRef, disabled, readOnly, clearable });
+// components/form/text-field/hooks/use-text-field.ts
+const control = useInternalTextControl({ inputRef, disabled, readOnly, clearable });
 
 const inputProps = {
   ...native,
@@ -124,13 +124,13 @@ return {
 - `onEscape` 는 각 필드가 input 의 `onKeyDown` 에서 앱의 핸들러 뒤에 부릅니다. 앱의 핸들러가 `preventDefault()` 하면 지우지 않습니다.
 - TextArea 는 `clearable` 을 넘기지 않아 Escape 로 지우지 않습니다.
 
-## use-input-value.ts
+## hooks/use-input-value.ts
 
 ### 쓰는 법
 
 ```ts
-// components/form/text-field/use-text-field.ts
-const observed = useInputValue(
+// components/form/text-field/hooks/use-text-field.ts
+const observed = useInternalInputValue(
   inputRef,
   String(native.value ?? native.defaultValue ?? ''),
   notify ?? undefined,                     // FieldNotifyContext: Field 가 값을 다시 읽는다
@@ -154,16 +154,16 @@ onChange: (event: ChangeEvent<HTMLInputElement>) => {
 ### 알아둘 것
 
 - 브라우저의 폼 reset 은 JS setter 를 거치지 않습니다. reset 은 `reset` 이벤트로만 압니다.
-- 폼 reset 을 한 task 미루는 이유는 [`useFormReset`](../../hooks/README.md#use-form-resetts) 과 같습니다. 사용자가 누른 reset 버튼에서는 microtask 가 값 복원 전에 돕니다.
+- 폼 reset 을 한 task 미루는 이유는 [`useInternalFormReset`](../../hooks/README.md#use-form-resetts) 과 같습니다. 사용자가 누른 reset 버튼에서는 microtask 가 값 복원 전에 돕니다.
 - NumberField 와 TelField 는 이 hook 을 쓰지 않고 값을 자기 state 로 가집니다.
 
-## use-merged-ref.ts
+## hooks/use-merged-ref.ts
 
 ### 쓰는 법
 
 ```ts
-// components/form/number-field/use-number-field.ts
-const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
+// components/form/number-field/hooks/use-number-field.ts
+const ref = useInternalMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
 
 function assertInput(node: HTMLInputElement) {
   invariant(node.tagName === 'INPUT', '`<NumberField.Input asChild>` must forward its ref to an input.');
@@ -178,18 +178,18 @@ function assertInput(node: HTMLInputElement) {
 - React 19 이전 방식의 wrapper(react-textarea-autosize 의 composed ref)는 ref 가 돌려준 cleanup 을 버리고 `null` 을 넘겨 뗍니다. 그래서 `null` 이 오면 그때 cleanup 을 돌립니다(`wrapperIgnoredCleanup`).
 - cleanup 은 한 번만 돕니다. React 가 돌려받은 cleanup 을 부르든 wrapper 가 `null` 을 넘기든 먼저 온 쪽이 돌리고, 나중 쪽은 아무것도 하지 않습니다(`detach.current !== run`).
 
-## clear-input.ts
+## lib/clear-input.ts
 
 ### 쓰는 법
 
 ```ts
-// internal/text-control/use-text-control.ts
+// internal/text-control/hooks/use-text-control.ts
 const clear = () => {
   const input = inputRef.current;
   if (input && !disabled && !readOnly) clearInput(input);
 };
 
-// components/form/tel-field/use-tel-field.ts: 국제 번호 전체를 붙여넣으면
+// components/form/tel-field/hooks/use-tel-field.ts: 국제 번호 전체를 붙여넣으면
 event.preventDefault();
 replaceInput(event.currentTarget, pasted);
 ```

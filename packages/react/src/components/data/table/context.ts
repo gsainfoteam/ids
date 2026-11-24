@@ -19,7 +19,7 @@ type Context = {
 export const TableContext = createContext<Context | null>(null);
 export const TableSectionContext = createContext<TableSection>('body');
 
-export function useTableContext(part: string) {
+export function useInternalTableContext(part: string) {
   const context = use(TableContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Table>\`.`);
   return context;

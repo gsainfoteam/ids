@@ -16,7 +16,7 @@ type Context = {
 
 export const ProgressContext = createContext<Context | null>(null);
 
-export function useProgressContext(part: string) {
+export function useInternalProgressContext(part: string) {
   const context = use(ProgressContext);
   invariant(context, `${part} must be rendered inside Progress.`);
   return context;

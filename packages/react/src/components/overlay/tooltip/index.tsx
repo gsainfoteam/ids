@@ -1,11 +1,11 @@
 import { type ReactNode } from 'react';
 
-import { TooltipArrow, type TooltipArrowProps } from './arrow';
-import { TooltipContent, type TooltipContentProps } from './content';
+import { type UseTooltipOptions } from './hooks/use-tooltip';
+import { TooltipArrow, type TooltipArrowProps } from './parts/arrow';
+import { TooltipContent, type TooltipContentProps } from './parts/content';
+import { TooltipTrigger, type TooltipTriggerProps } from './parts/trigger';
 import { TooltipRoot } from './root';
 import { tooltipStyle } from './style';
-import { TooltipTrigger, type TooltipTriggerProps } from './trigger';
-import { type UseTooltipOptions } from './use-tooltip';
 
 import type { AnchoredAlign, AnchoredSide } from '../../../internal/overlay';
 
@@ -38,4 +38,4 @@ export namespace Tooltip {
 
   export const Style = tooltipStyle;
 }
-export { TooltipDelayGroup } from './delay-group';
+export { TooltipDelayGroup } from './parts/delay-group';

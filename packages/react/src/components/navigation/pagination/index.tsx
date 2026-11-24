@@ -1,19 +1,19 @@
 import type { ComponentProps, ReactNode } from 'react';
 
-import { PaginationEllipsis, type PaginationEllipsisProps } from './ellipsis';
-import { PaginationFirst, type PaginationFirstProps } from './first';
-import { PaginationItem, type PaginationItemProps } from './item';
-import { PaginationLast, type PaginationLastProps } from './last';
-import { PaginationLink, type PaginationLinkProps } from './link';
-import { PaginationList, type PaginationListProps } from './list';
-import { PaginationNext, type PaginationNextProps } from './next';
-import { PaginationPrevious, type PaginationPreviousProps } from './previous';
-import { type PaginationEntry } from './range';
+import { type PaginationEntry } from './lib/range';
+import { PaginationEllipsis, type PaginationEllipsisProps } from './parts/ellipsis';
+import { PaginationFirst, type PaginationFirstProps } from './parts/first';
+import { PaginationItem, type PaginationItemProps } from './parts/item';
+import { PaginationLast, type PaginationLastProps } from './parts/last';
+import { PaginationLink, type PaginationLinkProps } from './parts/link';
+import { PaginationList, type PaginationListProps } from './parts/list';
+import { PaginationNext, type PaginationNextProps } from './parts/next';
+import { PaginationPrevious, type PaginationPreviousProps } from './parts/previous';
 import { PaginationRoot } from './root';
 import { paginationStyle } from './style';
 
-import type { AccessibleName } from '../../../internal/accessible-name';
-import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
+import type { AccessibleName } from '../../../internal/lib/accessible-name';
+import type { SurfaceVariant } from '../../../internal/surfaces/lib/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Pagination(props: Pagination.Props) {

@@ -1,23 +1,23 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { SidebarFooter, type SidebarFooterProps } from './footer';
+import { SidebarFooter, type SidebarFooterProps } from './parts/footer';
 import {
   SidebarGroup,
   type SidebarGroupItemState,
   type SidebarGroupItemsProps,
   type SidebarGroupProps,
-} from './group';
-import { SidebarHeader, type SidebarHeaderProps } from './header';
-import { SidebarInset, type SidebarInsetProps } from './inset';
-import { SidebarItem, type SidebarItemProps } from './item';
-import { SidebarProvider, type SidebarProviderProps } from './provider';
+} from './parts/group';
+import { SidebarHeader, type SidebarHeaderProps } from './parts/header';
+import { SidebarInset, type SidebarInsetProps } from './parts/inset';
+import { SidebarItem, type SidebarItemProps } from './parts/item';
+import { SidebarProvider, type SidebarProviderProps } from './parts/provider';
+import { SidebarTrigger, type SidebarTriggerProps } from './parts/trigger';
 import { SidebarRoot } from './root';
 import { sidebarStyle, type SidebarCollapsibleMode, type SidebarVariant } from './style';
-import { SidebarTrigger, type SidebarTriggerProps } from './trigger';
 import { findElementOfType } from '../../../utils';
 
-import type { SidebarMove, SidebarPlace, SidebarTreeItem } from './tree';
-import type { AccessibleName } from '../../../internal/accessible-name';
+import type { SidebarMove, SidebarPlace, SidebarTreeItem } from './lib/tree';
+import type { AccessibleName } from '../../../internal/lib/accessible-name';
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
 export function Sidebar(props: Sidebar.Props) {

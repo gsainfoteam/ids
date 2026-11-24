@@ -12,8 +12,8 @@ import {
 import { imageGroupStyle } from './style';
 import { flattenFragments, invariant, mergeRefs } from '../../../utils';
 import { ImageGroupContext } from '../image/context';
-import { useImageGroup } from '../image/use-image-group';
-import { ImageViewer } from '../image/viewer';
+import { useInternalImageGroup } from '../image/hooks/use-image-group';
+import { ImageViewer } from '../image/parts/viewer';
 
 import type { ImageGroup } from '.';
 
@@ -45,7 +45,7 @@ export function ImageGroupRoot({
     'ImageGroup: columns must be a positive whole number.',
   );
 
-  const group = useImageGroup({
+  const group = useInternalImageGroup({
     value,
     defaultValue,
     onValueChange,

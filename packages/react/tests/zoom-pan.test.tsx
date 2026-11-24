@@ -20,7 +20,7 @@ import {
   settle,
   wheelZoomFactor,
   zoomAround,
-} from '../src/internal/zoom-pan/math';
+} from '../src/internal/zoom-pan/lib/math';
 
 type Point = { x: number; y: number };
 type Size = { width: number; height: number };

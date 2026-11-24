@@ -3,10 +3,10 @@
 import { isValidElement, use } from 'react';
 
 import { ItemContext, ItemGroupContext } from './context';
+import { useInternalItem } from './hooks/use-item';
+import { ItemTitle } from './parts/title';
 import { itemStyle } from './style';
-import { ItemTitle } from './title';
-import { useItem } from './use-item';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { containsElementOfType } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
@@ -54,27 +54,28 @@ export function ItemRoot({
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
   const titleIsTheButton = interactive && !asChild && containsElementOfType(children, ITEM_TITLE);
-  const { interaction, props, dataProps, labelling, trigger, register } = useItem<HTMLDivElement>({
-    interactive,
-    asChild,
-    disabled,
-    titleIsTheButton,
-    selected,
-    current: isCurrent(rest['aria-current']),
-    handlers: {
-      onClick,
-      onKeyDown,
-      onKeyUp,
-      onFocus,
-      onBlur,
-      onPointerEnter,
-      onPointerLeave,
-      onPointerDown,
-      onPointerUp,
-      onPointerCancel,
-      onInteractionChange,
-    },
-  });
+  const { interaction, props, dataProps, labelling, trigger, register } =
+    useInternalItem<HTMLDivElement>({
+      interactive,
+      asChild,
+      disabled,
+      titleIsTheButton,
+      selected,
+      current: isCurrent(rest['aria-current']),
+      handlers: {
+        onClick,
+        onKeyDown,
+        onKeyUp,
+        onFocus,
+        onBlur,
+        onPointerEnter,
+        onPointerLeave,
+        onPointerDown,
+        onPointerUp,
+        onPointerCancel,
+        onInteractionChange,
+      },
+    });
   const state: Item.State = { ...interaction, interactive, selected: selected === true };
   const styles = itemStyle({ variant, size: resolvedSize, interactive });
   const Root = asChild ? Slot : 'div';

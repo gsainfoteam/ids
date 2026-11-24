@@ -4,7 +4,7 @@ import { createContext, use, type ReactNode } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { DataTableFeatures } from './features';
+import type { DataTableFeatures } from './lib/features';
 import type { dataTableStyle, DataTableVariant } from './style';
 import type { IdsSize } from '../../../tokens/types';
 import type { ReactTable } from '@tanstack/react-table';
@@ -33,7 +33,7 @@ type Context = {
 export const DataTableContext = createContext<Context | null>(null);
 export const DataTableToolbarContext = createContext(false);
 
-export function useDataTableContext() {
+export function useInternalDataTableContext() {
   const context = use(DataTableContext);
   invariant(context, 'DataTable parts render only inside `<DataTable>`.');
   return context;

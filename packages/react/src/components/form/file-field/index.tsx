@@ -1,11 +1,13 @@
-import { FileClear, type FileClearProps } from './clear';
-import { type FileFieldRejection } from './file-rules';
-import { FileItem, type FileItemProps } from './item';
-import { FileLimits, type FileFieldLimits, type FileLimitsProps } from './limits';
-import { FileList, type FileListProps } from './list';
-import { FilePreview, type FilePreviewProps } from './preview';
-import { FileRejection, type FileRejectionProps } from './rejection';
-import { FileRemove, type FileRemoveProps } from './remove';
+import { type FileFieldRejection } from './lib/file-rules';
+import { FileClear, type FileClearProps } from './parts/clear';
+import { FileItem, type FileItemProps } from './parts/item';
+import { FileLimits, type FileFieldLimits, type FileLimitsProps } from './parts/limits';
+import { FileList, type FileListProps } from './parts/list';
+import { FilePreview, type FilePreviewProps } from './parts/preview';
+import { FileRejection, type FileRejectionProps } from './parts/rejection';
+import { FileRemove, type FileRemoveProps } from './parts/remove';
+import { FileTrigger, type FileTriggerProps } from './parts/trigger';
+import { FileValue, type FileValueProps } from './parts/value';
 import {
   FileFieldRoot,
   type FileFieldVariant,
@@ -14,8 +16,6 @@ import {
   type FileFieldProps,
 } from './root';
 import { fileFieldStyle } from './style';
-import { FileTrigger, type FileTriggerProps } from './trigger';
-import { FileValue, type FileValueProps } from './value';
 
 export function FileField(props: FileFieldProps) {
   return <FileFieldRoot {...props} />;
@@ -53,5 +53,5 @@ export namespace FileField {
 }
 
 export type { FileFieldVariant, FileFieldState, FileFieldItemState, FileFieldProps } from './root';
-export type { FileFieldRejection } from './file-rules';
-export type { FileFieldLimits } from './limits';
+export type { FileFieldRejection } from './lib/file-rules';
+export type { FileFieldLimits } from './parts/limits';

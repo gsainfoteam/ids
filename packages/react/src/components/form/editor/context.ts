@@ -4,8 +4,8 @@ import { createContext, use, type KeyboardEvent, type ReactNode } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { EditorFormat } from './lib/value';
 import type { editorStyle } from './style';
-import type { EditorFormat } from './value';
 import type { IdsSize } from '../../../tokens/types';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 import type { EditorContent } from '@tiptap/react';
@@ -34,7 +34,7 @@ export type EditorContextValue = {
 
 export const EditorContext = createContext<EditorContextValue | null>(null);
 
-export function useEditorContext(part: string) {
+export function useInternalEditorContext(part: string) {
   const context = use(EditorContext);
   invariant(context != null, `\`<${part}>\` must be used inside \`<Editor>\`.`);
   return context;

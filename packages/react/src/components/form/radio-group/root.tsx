@@ -9,8 +9,8 @@ import {
 } from 'react';
 
 import { RadioGroupContext } from './context';
+import { useInternalRadioGroup } from './hooks/use-radio-group';
 import { radioGroupStyle } from './style';
-import { useRadioGroup } from './use-radio-group';
 import { Radio } from '../radio';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -87,7 +87,7 @@ export function RadioGroupRoot<T extends string>({
 }: RadioGroupProps<T>) {
   const generatedName = useId();
   const groupName = name ?? generatedName;
-  const { value, select, rootRef, forwardRootFocusToRadio, moveToEnd } = useRadioGroup<T>({
+  const { value, select, rootRef, forwardRootFocusToRadio, moveToEnd } = useInternalRadioGroup<T>({
     value: valueProp,
     defaultValue,
     onValueChange,

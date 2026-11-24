@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { describe, expect, test } from 'vitest';
 
 import { paletteHues, palettes } from '../.storybook/palettes';
-import { lightnessContrast } from '../src/components/utility/ids-provider/contrast';
+import { lightnessContrast } from '../src/components/utility/ids-provider/lib/contrast';
 import {
   ACCENT_TEXT_LC,
   FILL_LAYER,
@@ -18,7 +18,7 @@ import {
   tintLayer,
   underStateLayers,
   type StateLayer,
-} from '../src/components/utility/ids-provider/theme-roles';
+} from '../src/components/utility/ids-provider/lib/theme-roles';
 import {
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,
@@ -28,7 +28,7 @@ import {
 } from '../src/tokens/color-roles';
 import { IDS_COMPONENT_COLORS } from '../src/tokens/component-tokens';
 
-import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provider/theme';
+import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provider/lib/theme';
 import type { IdsMode } from '../src/tokens/types';
 
 const resolveCss = (entry: string) => createRequire(import.meta.url).resolve(entry);

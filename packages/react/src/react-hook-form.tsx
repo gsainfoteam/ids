@@ -14,7 +14,7 @@ import {
   mergeBinding,
   valueReports,
   withoutDefaults,
-} from './internal/form-bridge';
+} from './internal/lib/form-bridge';
 import { isDevelopment } from './utils/dev';
 
 type ControlledOptions = Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;

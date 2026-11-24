@@ -2,7 +2,7 @@
 
 import { InformationCircleIcon } from '@heroicons/react/16/solid';
 
-import { EditorToggleTool, type EditorToggleSpec, type EditorToolProps } from '../tool';
+import { EditorToggleTool, type EditorToggleSpec, type EditorToolProps } from '../parts/tool';
 
 export type EditorCalloutProps = EditorToolProps;
 

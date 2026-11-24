@@ -1,0 +1,65 @@
+'use client';
+
+import { cloneElement, isValidElement, type KeyboardEvent } from 'react';
+
+import { useInternalSelectContext } from '../context';
+import { SelectEmpty } from './empty';
+import { SelectSearchField } from './search-field';
+import { type PopupPresentation } from '../../../../internal/field-popup';
+import { flattenFragments, mergeProps, part } from '../../../../utils';
+import { ScrollArea } from '../../../layout/scroll-area';
+import { isType } from '../lib/is-type';
+import { slotChildren } from '../lib/select-options';
+
+import type { BoxProps } from '../lib/box-props';
+
+export type SelectContentProps = BoxProps & { mobileVariant?: PopupPresentation };
+
+export function SelectContent({
+  asChild,
+  children,
+  className,
+  mobileVariant: _readByTheRoot,
+  ...props
+}: SelectContentProps) {
+  const c = useInternalSelectContext('Select.Content');
+  const { state: s, ids } = c.select;
+
+  const nodes = flattenFragments(slotChildren(children, asChild));
+  const search = nodes.filter(isType(SelectSearchField));
+  const empty = nodes.filter(isType(SelectEmpty));
+  const items = nodes.filter((node) => !search.includes(node) && !empty.includes(node));
+  const owner = s.focusOwner === 'list';
+
+  return (
+    <>
+      {search}
+      <ScrollArea fade="y" className={c.styles.listArea()}>
+        <ScrollArea.Viewport asChild>
+          {part(
+            'div',
+            asChild,
+            asChild && isValidElement(children) ? cloneElement(children, {}, items) : items,
+            mergeProps(props, {
+              ...c.listLabel,
+              id: ids.listbox,
+              role: 'listbox',
+              'aria-multiselectable': c.state.multiple || undefined,
+              'aria-activedescendant':
+                owner && s.activeValue !== undefined ? ids.option(s.activeValue) : undefined,
+              tabIndex: owner ? 0 : undefined,
+              'data-popup-autofocus': owner ? '' : undefined,
+              onKeyDown: owner
+                ? (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'list')
+                : undefined,
+              className: c.styles.listbox({ className }),
+            }),
+          )}
+        </ScrollArea.Viewport>
+      </ScrollArea>
+      {empty}
+    </>
+  );
+}
+
+SelectContent.displayName = 'Select.Content';

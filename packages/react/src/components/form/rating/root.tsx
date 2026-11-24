@@ -11,13 +11,16 @@ import {
 
 import { StarIcon } from '@heroicons/react/24/solid';
 
-import { RatingItem, type RatingItemProps } from './item';
-import { resolve, type StateProp } from './state-prop';
+import { isCheckedScore, useInternalRating } from './hooks/use-rating';
+import { resolve, type StateProp } from './lib/state-prop';
+import { RatingItem, type RatingItemProps } from './parts/item';
 import { ratingStyle, type RatingOptionPlacement } from './style';
-import { isCheckedScore, useRating } from './use-rating';
-import { hasAccessibleName, useUnnamedWarning } from '../../../internal/accessible-name';
-import { FormValue } from '../../../internal/form-value';
-import { useTranslate } from '../../../internal/translate';
+import {
+  hasAccessibleName,
+  useInternalUnnamedWarning,
+} from '../../../internal/lib/accessible-name';
+import { FormValue } from '../../../internal/parts/form-value';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -94,7 +97,7 @@ export function RatingRoot({
   'aria-required': ariaRequired,
   ...rest
 }: RatingProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const getValueLabel =
     getValueLabelProp ?? ((value: number, max: number) => t('rating.valueLabel', { value, max }));
 
@@ -123,7 +126,7 @@ export function RatingRoot({
 
   const interactive = !readOnly && !disabled;
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const rating = useRating({
+  const rating = useInternalRating({
     value,
     defaultValue,
     onValueChange,
@@ -160,7 +163,7 @@ export function RatingRoot({
   const scoreId = `${id ?? generatedId}-score`;
   const groupName = name ?? generatedId;
   const formOwner = name === undefined && form === undefined ? NO_FORM_OWNER : form;
-  useUnnamedWarning(
+  useInternalUnnamedWarning(
     'Rating',
     !readOnly && !hasAccessibleName({ 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby }),
   );

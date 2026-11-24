@@ -1,0 +1,66 @@
+'use client';
+
+import { type ComponentProps } from 'react';
+
+import { ArrowUpIcon, StopIcon } from '@heroicons/react/16/solid';
+
+import { useInternalTranslate } from '../../../../internal/translate';
+import { IconButton } from '../../../action/icon-button';
+import { Spinner } from '../../../feedback/spinner';
+import { Tooltip } from '../../../overlay/tooltip';
+import { Kbd } from '../../../typography/kbd';
+import { useInternalPromptInputContext } from '../context';
+
+export type PromptInputSubmitProps = Omit<ComponentProps<'button'>, 'children' | 'type'>;
+
+export function PromptInputSubmit({ className, onClick, ...props }: PromptInputSubmitProps) {
+  const t = useInternalTranslate();
+  const c = useInternalPromptInputContext('PromptInput.Submit');
+
+  const stops = c.busy && c.stop !== undefined;
+  const waits = c.busy && !stops;
+  const label = stops ? t('promptInput.stop') : waits ? t('common.sending') : t('promptInput.send');
+  const icon = stops ? (
+    <StopIcon aria-hidden="true" />
+  ) : waits ? (
+    <Spinner aria-hidden />
+  ) : (
+    <ArrowUpIcon aria-hidden="true" />
+  );
+
+  return (
+    <Tooltip>
+      <Tooltip.Trigger asChild>
+        <IconButton
+          aria-label={label}
+          {...props}
+          type={stops ? 'button' : 'submit'}
+          variant="solid"
+          size={c.size}
+          icon={icon}
+          disabled={stops ? c.disabled : !c.canSend}
+          focusableWhenDisabled
+          aria-busy={waits || undefined}
+          data-prompt-input-submit=""
+          data-status={c.status}
+          className={c.styles.submit({ className })}
+          onClick={(event) => {
+            onClick?.(event);
+            if (stops && !event.defaultPrevented) c.stop?.();
+          }}
+        />
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        {stops || waits ? (
+          label
+        ) : (
+          <>
+            {label} <Kbd keys="Enter" />
+          </>
+        )}
+      </Tooltip.Content>
+    </Tooltip>
+  );
+}
+
+PromptInputSubmit.displayName = 'PromptInput.Submit';
