@@ -1,23 +1,18 @@
 'use client';
 
-import { useEffect, useRef, type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 import { useInternalTranslate } from '../../../../internal/translate';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { useInternalImageViewerContext } from '../context';
+import { useInternalImageViewerCurrentThumbnail } from '../hooks/use-image-viewer-current-thumbnail';
 
 export type ImageViewerThumbnailsProps = Omit<ComponentProps<'div'>, 'children'>;
 
 export function ImageViewerThumbnails({ className, ...rest }: ImageViewerThumbnailsProps) {
   const viewer = useInternalImageViewerContext('Image.Viewer.Thumbnails');
   const t = useInternalTranslate();
-  const listRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    listRef.current
-      ?.querySelector<HTMLElement>('[data-current]')
-      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  }, [viewer.index]);
+  const listRef = useInternalImageViewerCurrentThumbnail(viewer.index);
 
   if (viewer.count <= 1) return null;
 
