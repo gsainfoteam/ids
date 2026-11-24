@@ -4,7 +4,6 @@ import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Showcase, holdTheNextCall } from '~story-kit';
 
-import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -74,7 +73,6 @@ const meta = {
     size: 'standard',
     'aria-label': '본문',
     defaultValue: NOTICE,
-    className: cn('w-[36rem] max-w-full'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof Editor>;
@@ -120,7 +118,24 @@ const pictureFile = () => new File(['<svg/>'], '지도.png', { type: 'image/png'
 
 const modifierKey = () => (/Mac|iP(hone|[oa]d)/.test(navigator.platform) ? 'Meta' : 'Control');
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  render: (args) => (
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args} />
+    </div>
+  ),
+};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="w-[36rem] max-w-full">
+      <Field>
+        <Field.Label>본문</Field.Label>
+        <Editor defaultValue="<p>가을 축제 부스를 모집합니다.</p>" />
+      </Field>
+    </div>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -130,20 +145,21 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <Editor
-              size={size}
-              variant={variant}
-              aria-label={`${variant} ${size}`}
-              defaultValue="<p>가을 축제 <strong>부스</strong>를 모집합니다.</p>"
-              className="w-96"
-            >
-              <Editor.Bold />
-              <Editor.Italic />
-              <Editor.Strike />
-              <Editor.Separator />
-              <Editor.Link />
-              <Editor.Content />
-            </Editor>
+            <div className="w-96">
+              <Editor
+                size={size}
+                variant={variant}
+                aria-label={`${variant} ${size}`}
+                defaultValue="<p>가을 축제 <strong>부스</strong>를 모집합니다.</p>"
+              >
+                <Editor.Bold />
+                <Editor.Italic />
+                <Editor.Strike />
+                <Editor.Separator />
+                <Editor.Link />
+                <Editor.Content />
+              </Editor>
+            </div>
           )}
         />
       </Showcase.Section>
@@ -153,25 +169,31 @@ export const Gallery: Story = {
         description="자식이 없으면 기본 툴바가 붙습니다. Content 앞의 파트는 위 툴바, 뒤의 파트는 아래 바가 됩니다."
       >
         <Showcase.Row label="default">
-          <Editor aria-label="기본 툴바" defaultValue={NOTICE} className="w-[36rem]" />
+          <div className="w-[36rem]">
+            <Editor aria-label="기본 툴바" defaultValue={NOTICE} />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="custom">
-          <Editor aria-label="고른 툴바" maxLength={200} className="w-[36rem]">
-            <Editor.BlockType levels={[2, 3, 4]} />
-            <Editor.Separator />
-            <Editor.Bold />
-            <Editor.Italic />
-            <Editor.Underline />
-            <Editor.Code />
-            <Editor.Content placeholder="200자까지 쓸 수 있습니다" />
-            <Editor.Count />
-          </Editor>
+          <div className="w-[36rem]">
+            <Editor aria-label="고른 툴바" maxLength={200}>
+              <Editor.BlockType levels={[2, 3, 4]} />
+              <Editor.Separator />
+              <Editor.Bold />
+              <Editor.Italic />
+              <Editor.Underline />
+              <Editor.Code />
+              <Editor.Content placeholder="200자까지 쓸 수 있습니다" />
+              <Editor.Count />
+            </Editor>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="content only">
-          <Editor aria-label="본문만" className="w-[36rem]">
-            <Editor.Content placeholder="툴바 없이 단축키로 서식을 넣습니다" />
-            <Editor.BubbleMenu />
-          </Editor>
+          <div className="w-[36rem]">
+            <Editor aria-label="본문만">
+              <Editor.Content placeholder="툴바 없이 단축키로 서식을 넣습니다" />
+              <Editor.BubbleMenu />
+            </Editor>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -180,74 +202,83 @@ export const Gallery: Story = {
         description="형광펜, 할 일 목록, 구분선, 정렬은 부품을 넣으면 그 확장이 함께 실립니다. 그림은 onImageUpload 가 있을 때만 툴바에 나옵니다."
       >
         <Showcase.Row label="every tool">
-          <Editor
-            aria-label="모든 도구"
-            defaultValue={TOOLS_NOTICE}
-            onImageUpload={async () => PICTURE}
-            className="w-[40rem]"
-          >
-            <Editor.BlockType />
-            <Editor.Separator />
-            <Editor.Bold />
-            <Editor.Italic />
-            <Editor.Highlight />
-            <Editor.Link />
-            <Editor.Separator />
-            <Editor.BulletList />
-            <Editor.OrderedList />
-            <Editor.TaskList />
-            <Editor.Separator />
-            <Editor.TextAlign />
-            <Editor.Separator />
-            <Editor.Image />
-            <Editor.HorizontalRule />
-            <Editor.Table />
-            <Editor.Content />
-          </Editor>
+          <div className="w-[40rem]">
+            <Editor
+              aria-label="모든 도구"
+              defaultValue={TOOLS_NOTICE}
+              onImageUpload={async () => PICTURE}
+            >
+              <Editor.BlockType />
+              <Editor.Separator />
+              <Editor.Bold />
+              <Editor.Italic />
+              <Editor.Highlight />
+              <Editor.Link />
+              <Editor.Separator />
+              <Editor.BulletList />
+              <Editor.OrderedList />
+              <Editor.TaskList />
+              <Editor.Separator />
+              <Editor.TextAlign />
+              <Editor.Separator />
+              <Editor.Image />
+              <Editor.HorizontalRule />
+              <Editor.Table />
+              <Editor.Content />
+            </Editor>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="default with upload">
-          <Editor
-            aria-label="업로드가 있는 기본 툴바"
-            onImageUpload={async () => PICTURE}
-            className="w-[40rem]"
-          />
+          <div className="w-[40rem]">
+            <Editor aria-label="업로드가 있는 기본 툴바" onImageUpload={async () => PICTURE} />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="placeholder">
-          <Editor aria-label="비어 있음" className="w-96">
-            <Editor.Bold />
-            <Editor.Italic />
-            <Editor.Content placeholder="내용을 입력하세요" />
-          </Editor>
+          <div className="w-96">
+            <Editor aria-label="비어 있음">
+              <Editor.Bold />
+              <Editor.Italic />
+              <Editor.Content placeholder="내용을 입력하세요" />
+            </Editor>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <Editor aria-label="비활성" disabled defaultValue={NOTICE} className="w-96" />
+          <div className="w-96">
+            <Editor aria-label="비활성" disabled defaultValue={NOTICE} />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
-          <Editor aria-label="읽기 전용" readOnly defaultValue={NOTICE} className="w-96" />
+          <div className="w-96">
+            <Editor aria-label="읽기 전용" readOnly defaultValue={NOTICE} />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <Editor aria-label="오류" invalid className="w-96">
-            <Editor.Bold />
-            <Editor.Italic />
-            <Editor.Content placeholder="본문을 입력하세요" />
-          </Editor>
+          <div className="w-96">
+            <Editor aria-label="오류" invalid>
+              <Editor.Bold />
+              <Editor.Italic />
+              <Editor.Content placeholder="본문을 입력하세요" />
+            </Editor>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Typing: Story = {
+export const ReportWhatIsTyped: Story = {
   args: { defaultValue: undefined, 'aria-label': '메모' },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.Italic />
-      <Editor.Content placeholder="메모를 남기세요" />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.Italic />
+        <Editor.Content placeholder="메모를 남기세요" />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -266,14 +297,16 @@ export const Typing: Story = {
   },
 };
 
-export const BoldShortcut: Story = {
+export const FormatWithShortcuts: Story = {
   args: { defaultValue: '<p>굵게 만들 글</p>', 'aria-label': '단축키' },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.Italic />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.Italic />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -299,17 +332,19 @@ export const BoldShortcut: Story = {
   },
 };
 
-export const Link: Story = {
+export const LinkSelectedText: Story = {
   args: {
     defaultValue: '<p>자세한 일정은 안내 페이지에서 확인하세요.</p>',
     'aria-label': '링크 본문',
   },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.Link />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.Link />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -335,7 +370,7 @@ export const Link: Story = {
   },
 };
 
-export const Formats: Story = {
+export const SaveAsHtmlMarkdownOrJson: Story = {
   render: function Render() {
     const [markdown, setMarkdown] = useState(
       '## 회의록\n\n- **안건**: 축제 부스\n- 결정: 다음 주에',
@@ -411,7 +446,7 @@ export const Formats: Story = {
   },
 };
 
-export const Document: Story = {
+export const ReadALongDocument: Story = {
   render: () => (
     <div className="grid w-full max-w-5xl gap-6 lg:grid-cols-2">
       {variants.map((variant) => (
@@ -460,7 +495,7 @@ export const Document: Story = {
   },
 };
 
-export const FormSubmitAndReset: Story = {
+export const SubmitAndResetAForm: Story = {
   args: { onValueChange: fn() },
   render: function Render(args) {
     const [submitted, setSubmitted] = useState('');
@@ -521,18 +556,20 @@ export const FormSubmitAndReset: Story = {
   },
 };
 
-export const ImageUpload: Story = {
+export const UploadImages: Story = {
   args: {
     defaultValue: '<p>학생회관 가는 길</p>',
     'aria-label': '그림 본문',
     onImageUpload: fn(async () => PICTURE),
   },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.Image />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.Image />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -571,14 +608,16 @@ export const ImageUpload: Story = {
   },
 };
 
-export const Highlight: Story = {
+export const HighlightText: Story = {
   args: { defaultValue: '<p>마감은 3월 5일입니다.</p>', 'aria-label': '형광펜 본문' },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.Highlight />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.Highlight />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -601,14 +640,16 @@ export const Highlight: Story = {
   },
 };
 
-export const Color: Story = {
+export const ColorText: Story = {
   args: { defaultValue: '<p>마감은 3월 5일입니다.</p>', 'aria-label': '색 본문' },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.Color />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.Color />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -633,14 +674,16 @@ export const Color: Story = {
   },
 };
 
-export const TaskList: Story = {
+export const AddATaskList: Story = {
   args: { defaultValue: '<p>부스 신청</p>', 'aria-label': '할 일 본문' },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.BulletList />
-      <Editor.TaskList />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.BulletList />
+        <Editor.TaskList />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -666,14 +709,16 @@ export const TaskList: Story = {
   },
 };
 
-export const HorizontalRule: Story = {
+export const InsertADivider: Story = {
   args: { defaultValue: '<p>1부</p>', 'aria-label': '구분선 본문' },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.HorizontalRule />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.HorizontalRule />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -694,18 +739,20 @@ export const HorizontalRule: Story = {
   },
 };
 
-export const Table: Story = {
+export const InsertATable: Story = {
   args: {
     defaultValue:
       '<table><tbody><tr><th><p>시간</p></th><th><p>순서</p></th></tr><tr><td><p>10:00</p></td><td><p>개회</p></td></tr></tbody></table><p></p>',
     'aria-label': '표 본문',
   },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Bold />
-      <Editor.Table />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Bold />
+        <Editor.Table />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -729,7 +776,7 @@ export const Table: Story = {
   },
 };
 
-export const CalloutAndDetails: Story = {
+export const AddCalloutsAndToggles: Story = {
   args: {
     format: 'markdown',
     defaultValue:
@@ -737,11 +784,13 @@ export const CalloutAndDetails: Story = {
     'aria-label': '안내 본문',
   },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.Callout />
-      <Editor.Details />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.Callout />
+        <Editor.Details />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -760,22 +809,24 @@ export const CalloutAndDetails: Story = {
   },
 };
 
-export const SlashMenuAndMentions: Story = {
+export const InsertBlocksAndMentions: Story = {
   args: {
     format: 'markdown',
     defaultValue: '',
     'aria-label': '회의록 본문',
   },
   render: (args) => (
-    <Editor
-      {...args}
-      mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
-    >
-      <Editor.Callout />
-      <Editor.Details />
-      <Editor.Table />
-      <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor
+        {...args}
+        mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
+      >
+        <Editor.Callout />
+        <Editor.Details />
+        <Editor.Table />
+        <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -796,7 +847,7 @@ export const SlashMenuAndMentions: Story = {
   },
 };
 
-export const BlockEditor: Story = {
+export const EditBlockByBlock: Story = {
   args: {
     type: 'block',
     format: 'markdown',
@@ -804,9 +855,11 @@ export const BlockEditor: Story = {
     'aria-label': '블록 본문',
   },
   render: (args) => (
-    <Editor {...args} className="w-[40rem]">
-      <Editor.Content placeholder="/ 로 블록을 넣으세요" />
-    </Editor>
+    <div className="w-[40rem]">
+      <Editor {...args}>
+        <Editor.Content placeholder="/ 로 블록을 넣으세요" />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -828,15 +881,17 @@ export const BlockEditor: Story = {
   },
 };
 
-export const TextAlign: Story = {
+export const AlignText: Story = {
   args: { defaultValue: '<p>행사 안내</p>', 'aria-label': '정렬 본문' },
   render: (args) => (
-    <Editor {...args}>
-      <Editor.BlockType />
-      <Editor.Separator />
-      <Editor.TextAlign />
-      <Editor.Content />
-    </Editor>
+    <div className="w-[36rem] max-w-full">
+      <Editor {...args}>
+        <Editor.BlockType />
+        <Editor.Separator />
+        <Editor.TextAlign />
+        <Editor.Content />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {
@@ -862,7 +917,7 @@ export const TextAlign: Story = {
   },
 };
 
-export const FullDocument: Story = {
+export const UseEveryTool: Story = {
   args: {
     'aria-label': '문서 본문',
     defaultValue: [
@@ -878,42 +933,43 @@ export const FullDocument: Story = {
     ].join(''),
   },
   render: (args) => (
-    <Editor
-      {...args}
-      className="w-[48rem]"
-      onImageUpload={async () => PICTURE}
-      mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
-    >
-      <Editor.BlockType />
-      <Editor.Separator />
-      <Editor.Bold />
-      <Editor.Italic />
-      <Editor.Underline />
-      <Editor.Strike />
-      <Editor.Code />
-      <Editor.Highlight />
-      <Editor.Color />
-      <Editor.Subscript />
-      <Editor.Superscript />
-      <Editor.Link />
-      <Editor.Separator />
-      <Editor.BulletList />
-      <Editor.OrderedList />
-      <Editor.TaskList />
-      <Editor.Blockquote />
-      <Editor.CodeBlock />
-      <Editor.Separator />
-      <Editor.TextAlign />
-      <Editor.Separator />
-      <Editor.Image />
-      <Editor.Table />
-      <Editor.Callout />
-      <Editor.Details />
-      <Editor.HorizontalRule />
-      <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
-      <Editor.BubbleMenu />
-      <Editor.Count />
-    </Editor>
+    <div className="w-[48rem]">
+      <Editor
+        {...args}
+        onImageUpload={async () => PICTURE}
+        mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
+      >
+        <Editor.BlockType />
+        <Editor.Separator />
+        <Editor.Bold />
+        <Editor.Italic />
+        <Editor.Underline />
+        <Editor.Strike />
+        <Editor.Code />
+        <Editor.Highlight />
+        <Editor.Color />
+        <Editor.Subscript />
+        <Editor.Superscript />
+        <Editor.Link />
+        <Editor.Separator />
+        <Editor.BulletList />
+        <Editor.OrderedList />
+        <Editor.TaskList />
+        <Editor.Blockquote />
+        <Editor.CodeBlock />
+        <Editor.Separator />
+        <Editor.TextAlign />
+        <Editor.Separator />
+        <Editor.Image />
+        <Editor.Table />
+        <Editor.Callout />
+        <Editor.Details />
+        <Editor.HorizontalRule />
+        <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+        <Editor.BubbleMenu />
+        <Editor.Count />
+      </Editor>
+    </div>
   ),
   parameters: {
     docs: {

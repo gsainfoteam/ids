@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -98,15 +100,34 @@ const startClearOfBothEdges = (viewport: HTMLElement | null) => {
 
 export const Playground: Story = {
   render: (args) => (
-    <ScrollArea {...args} className={frame}>
-      {args.orientation === 'vertical' ? (
-        <Text />
-      ) : args.orientation === 'horizontal' ? (
-        <Wide />
-      ) : (
-        <Grid />
-      )}
+    <ScrollArea {...args} asChild>
+      <div className={frame}>
+        {args.orientation === 'vertical' ? (
+          <Text />
+        ) : args.orientation === 'horizontal' ? (
+          <Wide />
+        ) : (
+          <Grid />
+        )}
+      </div>
     </ScrollArea>
+  ),
+};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="text-body-b3-regular flex h-40 w-56 flex-col">
+      <ScrollArea aria-label="안내">
+        <div className="flex flex-col gap-3">
+          <p>스크롤 영역은 브라우저의 스크롤을 그대로 씁니다.</p>
+          <p>휠, 트랙패드, 터치, 키보드가 평소처럼 움직입니다.</p>
+          <p>운영체제의 회색 막대 대신 내용 위에 얇은 막대를 그립니다.</p>
+          <p>막대는 폭을 차지하지 않아서 내용이 밀리지 않습니다.</p>
+          <p>막대를 끌면 내용이 따라옵니다.</p>
+          <p>트랙을 누르면 누른 쪽으로 한 쪽씩 넘어갑니다.</p>
+        </div>
+      </ScrollArea>
+    </div>
   ),
 };
 
@@ -121,8 +142,10 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <ScrollArea variant={variant} size={size} className={frame}>
-              <Text />
+            <ScrollArea variant={variant} size={size} asChild>
+              <div className={frame}>
+                <Text />
+              </div>
             </ScrollArea>
           )}
         />
@@ -130,18 +153,24 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Orientation">
         <Showcase.Row label="vertical">
-          <ScrollArea variant="always" className={frame}>
-            <Text />
+          <ScrollArea variant="always" asChild>
+            <div className={frame}>
+              <Text />
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="horizontal">
-          <ScrollArea variant="always" orientation="horizontal" className="w-72">
-            <Wide />
+          <ScrollArea variant="always" orientation="horizontal" asChild>
+            <div className="w-72">
+              <Wide />
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="both">
-          <ScrollArea variant="always" orientation="both" className={frame}>
-            <Grid />
+          <ScrollArea variant="always" orientation="both" asChild>
+            <div className={frame}>
+              <Grid />
+            </div>
           </ScrollArea>
         </Showcase.Row>
       </Showcase.Section>
@@ -151,23 +180,29 @@ export const Gallery: Story = {
         description="내용 뒤에 선언한 막대는 기본 자리(끝, 아래), 앞에 선언한 막대는 반대편(시작, 위)에 섭니다."
       >
         <Showcase.Row label="after">
-          <ScrollArea variant="always" className={frame}>
-            <Grid />
-            <ScrollArea.Scrollbar orientation="vertical" />
-            <ScrollArea.Scrollbar orientation="horizontal" />
+          <ScrollArea variant="always" asChild>
+            <div className={frame}>
+              <Grid />
+              <ScrollArea.Scrollbar orientation="vertical" />
+              <ScrollArea.Scrollbar orientation="horizontal" />
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="before">
-          <ScrollArea variant="always" className={frame}>
-            <ScrollArea.Scrollbar orientation="vertical" />
-            <ScrollArea.Scrollbar orientation="horizontal" />
-            <Grid />
+          <ScrollArea variant="always" asChild>
+            <div className={frame}>
+              <ScrollArea.Scrollbar orientation="vertical" />
+              <ScrollArea.Scrollbar orientation="horizontal" />
+              <Grid />
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl">
-            <ScrollArea variant="always" orientation="both" className={frame}>
-              <Grid />
+            <ScrollArea variant="always" orientation="both" asChild>
+              <div className={frame}>
+                <Grid />
+              </div>
             </ScrollArea>
           </div>
         </Showcase.Row>
@@ -198,47 +233,59 @@ export const Gallery: Story = {
         description="내용이 더 남은 가장자리만 흐립니다. 흐린 폭은 가려진 거리만큼 자라 standard 24px, tiny 16px 에서 멈춥니다. 여기서는 모두 양쪽 끝에서 떨어진 자리에서 시작합니다."
       >
         <Showcase.Row label="vertical">
-          <ScrollArea fade variant="always" className={frame}>
-            <ScrollArea.Viewport ref={startClearOfBothEdges}>
-              <Text />
-            </ScrollArea.Viewport>
+          <ScrollArea fade variant="always" asChild>
+            <div className={frame}>
+              <ScrollArea.Viewport ref={startClearOfBothEdges}>
+                <Text />
+              </ScrollArea.Viewport>
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="horizontal">
-          <ScrollArea fade variant="always" orientation="horizontal" className="w-72">
-            <ScrollArea.Viewport ref={startClearOfBothEdges}>
-              <Wide />
-            </ScrollArea.Viewport>
+          <ScrollArea fade variant="always" orientation="horizontal" asChild>
+            <div className="w-72">
+              <ScrollArea.Viewport ref={startClearOfBothEdges}>
+                <Wide />
+              </ScrollArea.Viewport>
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="both">
-          <ScrollArea fade variant="always" orientation="both" className={frame}>
-            <ScrollArea.Viewport ref={startClearOfBothEdges}>
-              <Grid />
-            </ScrollArea.Viewport>
+          <ScrollArea fade variant="always" orientation="both" asChild>
+            <div className={frame}>
+              <ScrollArea.Viewport ref={startClearOfBothEdges}>
+                <Grid />
+              </ScrollArea.Viewport>
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl">
-            <ScrollArea fade variant="always" orientation="both" className={frame}>
-              <ScrollArea.Viewport ref={startClearOfBothEdges}>
-                <Grid />
-              </ScrollArea.Viewport>
+            <ScrollArea fade variant="always" orientation="both" asChild>
+              <div className={frame}>
+                <ScrollArea.Viewport ref={startClearOfBothEdges}>
+                  <Grid />
+                </ScrollArea.Viewport>
+              </div>
             </ScrollArea>
           </div>
         </Showcase.Row>
         <Showcase.Row label="tiny">
-          <ScrollArea fade size="tiny" variant="always" className={frame}>
-            <ScrollArea.Viewport ref={startClearOfBothEdges}>
-              <Text />
-            </ScrollArea.Viewport>
+          <ScrollArea fade size="tiny" variant="always" asChild>
+            <div className={frame}>
+              <ScrollArea.Viewport ref={startClearOfBothEdges}>
+                <Text />
+              </ScrollArea.Viewport>
+            </div>
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="none">
-          <ScrollArea fade="x" variant="none" orientation="horizontal" className="w-72">
-            <ScrollArea.Viewport ref={startClearOfBothEdges}>
-              <Wide />
-            </ScrollArea.Viewport>
+          <ScrollArea fade="x" variant="none" orientation="horizontal" asChild>
+            <div className="w-72">
+              <ScrollArea.Viewport ref={startClearOfBothEdges}>
+                <Wide />
+              </ScrollArea.Viewport>
+            </div>
           </ScrollArea>
         </Showcase.Row>
       </Showcase.Section>
@@ -246,14 +293,14 @@ export const Gallery: Story = {
       <Showcase.Section title="Dark mode" description="막대 색은 scrollbar-* 토큰을 따릅니다.">
         <Showcase.Row>
           {(['light', 'dark'] as const).map((mode) => (
-            <IdsProvider.Scope
-              key={mode}
-              mode={mode}
-              className="rounded-standard bg-base text-neutral-strong p-4"
-            >
-              <ScrollArea variant="always" className={frame}>
-                <Text />
-              </ScrollArea>
+            <IdsProvider.Scope key={mode} mode={mode} asChild>
+              <div className="rounded-standard bg-base text-neutral-strong p-4">
+                <ScrollArea variant="always" asChild>
+                  <div className={frame}>
+                    <Text />
+                  </div>
+                </ScrollArea>
+              </div>
             </IdsProvider.Scope>
           ))}
         </Showcase.Row>
@@ -262,10 +309,12 @@ export const Gallery: Story = {
   ),
 };
 
-export const KeyboardScrolling: Story = {
+export const ReadLongTextWithTheKeyboard: Story = {
   render: () => (
-    <ScrollArea aria-label="약관" className={frame}>
-      <Text />
+    <ScrollArea aria-label="약관" asChild>
+      <div className={frame}>
+        <Text />
+      </div>
     </ScrollArea>
   ),
   parameters: {
@@ -285,12 +334,14 @@ export const KeyboardScrolling: Story = {
   },
 };
 
-export const DeclarationOrder: Story = {
+export const PutAScrollbarOnTheStartSide: Story = {
   render: () => (
-    <ScrollArea variant="always" className={frame}>
-      <ScrollArea.Scrollbar orientation="vertical" />
-      <Grid />
-      <ScrollArea.Scrollbar orientation="horizontal" />
+    <ScrollArea variant="always" asChild>
+      <div className={frame}>
+        <ScrollArea.Scrollbar orientation="vertical" />
+        <Grid />
+        <ScrollArea.Scrollbar orientation="horizontal" />
+      </div>
     </ScrollArea>
   ),
   parameters: {
@@ -313,7 +364,7 @@ export const DeclarationOrder: Story = {
   },
 };
 
-export const RoundedPopup: Story = {
+export const ScrollARoundedPopup: Story = {
   render: () => (
     <ScrollArea asChild variant="always">
       <div role="region" aria-label="알림" className={panel}>
@@ -345,24 +396,26 @@ export const RoundedPopup: Story = {
   },
 };
 
-export const ListboxAsViewport: Story = {
+export const ScrollAListboxItself: Story = {
   render: () => (
-    <ScrollArea className={cn(frame, 'h-48')}>
-      <ScrollArea.Viewport asChild>
-        <div role="listbox" aria-label="도시" className="flex flex-col p-1">
-          {Array.from({ length: 30 }, (_, index) => (
-            <div
-              key={index}
-              role="option"
-              aria-selected={index === 0}
-              tabIndex={index === 0 ? 0 : -1}
-              className="focus-ring rounded-standard aria-selected:bg-neutral-soft px-2.5 py-1.5"
-            >
-              도시 {index + 1}
-            </div>
-          ))}
-        </div>
-      </ScrollArea.Viewport>
+    <ScrollArea asChild>
+      <div className={cn(frame, 'h-48')}>
+        <ScrollArea.Viewport asChild>
+          <div role="listbox" aria-label="도시" className="flex flex-col p-1">
+            {Array.from({ length: 30 }, (_, index) => (
+              <div
+                key={index}
+                role="option"
+                aria-selected={index === 0}
+                tabIndex={index === 0 ? 0 : -1}
+                className="focus-ring rounded-standard aria-selected:bg-neutral-soft px-2.5 py-1.5"
+              >
+                도시 {index + 1}
+              </div>
+            ))}
+          </div>
+        </ScrollArea.Viewport>
+      </div>
     </ScrollArea>
   ),
   parameters: {
@@ -386,17 +439,19 @@ export const ListboxAsViewport: Story = {
   },
 };
 
-export const FadeEdges: Story = {
+export const FadeTheEdgesThatHideContent: Story = {
   render: () => (
-    <ScrollArea fade className={frame}>
-      <Text />
+    <ScrollArea fade asChild>
+      <div className={frame}>
+        <Text />
+      </div>
     </ScrollArea>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '`fade` 는 내용이 더 남은 가장자리만 흐립니다. 맨 위에서는 위가 선명하고, 내리면 위가 흐려지고, 끝에 닿으면 아래가 선명해집니다. viewport 의 `data-overflow-y-start`, `data-overflow-y-end` 도 같은 때 붙고 떨어집니다.',
+          '`fade` 는 내용이 더 남은 가장자리만 흐립니다. 맨 위에서는 위가 선명하고, 내리면 위가 흐려지고, 끝에 닿으면 아래가 선명해집니다.',
       },
     },
   },
@@ -415,22 +470,37 @@ export const FadeEdges: Story = {
   },
 };
 
-export const OverflowEdges: Story = {
-  render: () => (
-    <div className="group/panel rounded-standard text-body-b3-regular border-neutral flex h-56 w-64 flex-col border">
-      <div className="text-body-b3-medium group-has-data-overflow-y-start/panel:border-neutral border-b border-transparent px-3 py-2">
-        공지
+export const DrawALineOnceTheTopIsHidden: Story = {
+  render: function Render() {
+    const [topHidden, setTopHidden] = useState(false);
+
+    return (
+      <div className="rounded-standard text-body-b3-regular border-neutral flex h-56 w-64 flex-col border">
+        <div
+          className={cn(
+            'text-body-b3-medium border-b px-3 py-2',
+            topHidden ? 'border-neutral' : 'border-transparent',
+          )}
+        >
+          공지
+        </div>
+        <ScrollArea asChild>
+          <div className="min-h-0 grow rounded-b-[inherit]">
+            <ScrollArea.Viewport
+              onScroll={(event) => setTopHidden(event.currentTarget.scrollTop > 0)}
+            >
+              <Text />
+            </ScrollArea.Viewport>
+          </div>
+        </ScrollArea>
       </div>
-      <ScrollArea className="min-h-0 grow rounded-b-[inherit]">
-        <Text />
-      </ScrollArea>
-    </div>
-  ),
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          'viewport 의 `data-overflow-*` 속성과 `--scroll-area-overflow-*` 변수는 `fade` 없이도 붙습니다. 여기서는 위로 가려진 내용이 생기면 머리 아래에 선을 긋습니다.',
+          '`ScrollArea.Viewport` 는 스크롤하는 요소라서 `onScroll` 로 `scrollTop` 을 읽을 수 있습니다. 여기서는 위로 가려진 내용이 생기면 머리 아래에 선을 긋습니다. `fade` 없이 가장자리를 알리는 방법입니다.',
       },
     },
   },
@@ -442,42 +512,40 @@ export const OverflowEdges: Story = {
 
     viewport().scrollTop = CLEAR_OF_BOTH_EDGES;
     await waitFor(() => expect(viewport()).toHaveAttribute('data-overflow-y-start'));
-    await expect(rule()).not.toBe(clear);
+    await waitFor(() => expect(rule()).not.toBe(clear));
   },
 };
 
-export const PinnedEdges: Story = {
+export const StartTheBarsAfterStickyHeaders: Story = {
   render: () => (
-    <ScrollArea
-      orientation="both"
-      variant="always"
-      className="rounded-standard border-neutral text-body-b3-regular h-56 w-72 border"
-    >
-      <div className="w-[36rem]">
-        <div
-          data-scroll-area-pinned="top"
-          className="bg-block border-neutral sticky top-0 z-10 flex border-b"
-        >
-          <div className="bg-block border-neutral sticky start-0 w-16 shrink-0 border-e px-2 py-2">
-            시각
+    <ScrollArea orientation="both" variant="always" asChild>
+      <div className="rounded-standard border-neutral text-body-b3-regular h-56 w-72 border">
+        <div className="w-[36rem]">
+          <div
+            data-scroll-area-pinned="top"
+            className="bg-block border-neutral sticky top-0 z-10 flex border-b"
+          >
+            <div className="bg-block border-neutral sticky start-0 w-16 shrink-0 border-e px-2 py-2">
+              시각
+            </div>
+            {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
+              <div key={day} className="flex-1 px-2 py-2">
+                {day}
+              </div>
+            ))}
           </div>
-          {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
-            <div key={day} className="flex-1 px-2 py-2">
-              {day}
+          {Array.from({ length: 12 }, (_, hour) => (
+            <div key={hour} className="flex h-10">
+              <div
+                data-scroll-area-pinned="start"
+                className="bg-block border-neutral sticky start-0 w-16 shrink-0 border-e px-2"
+              >
+                {hour + 9}시
+              </div>
+              <div className="flex-1" />
             </div>
           ))}
         </div>
-        {Array.from({ length: 12 }, (_, hour) => (
-          <div key={hour} className="flex h-10">
-            <div
-              data-scroll-area-pinned="start"
-              className="bg-block border-neutral sticky start-0 w-16 shrink-0 border-e px-2"
-            >
-              {hour + 9}시
-            </div>
-            <div className="flex-1" />
-          </div>
-        ))}
       </div>
     </ScrollArea>
   ),
@@ -504,19 +572,23 @@ export const PinnedEdges: Story = {
   },
 };
 
-export const CustomThumb: Story = {
+export const RestyleTheThumb: Story = {
+  tags: ['custom-design'],
   render: () => (
-    <ScrollArea variant="auto" className={frame}>
-      <Text />
-      <ScrollArea.Scrollbar>
-        <ScrollArea.Thumb className="bg-primary-solid hover:bg-primary-solid" />
-      </ScrollArea.Scrollbar>
+    <ScrollArea variant="auto" asChild>
+      <div className={frame}>
+        <Text />
+        <ScrollArea.Scrollbar>
+          <ScrollArea.Thumb className="bg-primary-solid hover:bg-primary-solid" />
+        </ScrollArea.Scrollbar>
+      </div>
     </ScrollArea>
   ),
   parameters: {
     docs: {
       description: {
-        story: '`ScrollArea.Scrollbar` 와 `ScrollArea.Thumb` 에 클래스를 넘겨 모양을 바꿉니다.',
+        story:
+          'IDS 위에 새로 그린 디자인입니다(`custom-design`). `ScrollArea.Scrollbar` 와 `ScrollArea.Thumb` 에 클래스를 넘겨 모양을 바꿉니다.',
       },
     },
   },

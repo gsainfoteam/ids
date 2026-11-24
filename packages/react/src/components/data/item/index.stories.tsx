@@ -46,23 +46,25 @@ const meta = {
   },
   args: { variant: 'outline', size: 'standard' },
   render: (args) => (
-    <Item {...args} className="w-96">
-      <Item.Media>
-        <Avatar name="김철수" />
-      </Item.Media>
-      <Item.Content>
-        <Item.Title>김철수</Item.Title>
-        <Item.Description>kim@example.com</Item.Description>
-      </Item.Content>
-      <Item.Actions>
-        <IconButton
-          aria-label="더보기"
-          variant="ghost"
-          size="tiny"
-          icon={<EllipsisVerticalIcon />}
-        />
-      </Item.Actions>
-    </Item>
+    <div className="w-96">
+      <Item {...args}>
+        <Item.Media>
+          <Avatar name="김철수" />
+        </Item.Media>
+        <Item.Content>
+          <Item.Title>김철수</Item.Title>
+          <Item.Description>kim@example.com</Item.Description>
+        </Item.Content>
+        <Item.Actions>
+          <IconButton
+            aria-label="더보기"
+            variant="ghost"
+            size="tiny"
+            icon={<EllipsisVerticalIcon />}
+          />
+        </Item.Actions>
+      </Item>
+    </div>
   ),
 } satisfies Meta<typeof Item>;
 
@@ -70,6 +72,22 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="w-80">
+      <Item variant="outline">
+        <Item.Media>
+          <Avatar name="김철수" />
+        </Item.Media>
+        <Item.Content>
+          <Item.Title>김철수</Item.Title>
+          <Item.Description>kim@example.com</Item.Description>
+        </Item.Content>
+      </Item>
+    </div>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -79,15 +97,17 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <Item variant={variant} size={size} className="w-64">
-              <Item.Media variant="soft">
-                <BellIcon />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>{variant}</Item.Title>
-                <Item.Description>size {size}</Item.Description>
-              </Item.Content>
-            </Item>
+            <div className="w-64">
+              <Item variant={variant} size={size}>
+                <Item.Media variant="soft">
+                  <BellIcon />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>{variant}</Item.Title>
+                  <Item.Description>size {size}</Item.Description>
+                </Item.Content>
+              </Item>
+            </div>
           )}
         />
       </Showcase.Section>
@@ -97,20 +117,22 @@ export const Gallery: Story = {
           rows={sizes}
           columns={['title', 'one line', 'two lines'] as const}
           render={(size, text) => (
-            <Item variant="outline" size={size} className="w-64">
-              <Item.Media variant="soft">
-                <BellIcon />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>알림</Item.Title>
-                {text === 'one line' && <Item.Description>새 댓글 3개</Item.Description>}
-                {text === 'two lines' && (
-                  <Item.Description>
-                    새 댓글 3개와 멘션 1개가 있습니다. 확인하지 않은 알림이 더 있습니다.
-                  </Item.Description>
-                )}
-              </Item.Content>
-            </Item>
+            <div className="w-64">
+              <Item variant="outline" size={size}>
+                <Item.Media variant="soft">
+                  <BellIcon />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>알림</Item.Title>
+                  {text === 'one line' && <Item.Description>새 댓글 3개</Item.Description>}
+                  {text === 'two lines' && (
+                    <Item.Description>
+                      새 댓글 3개와 멘션 1개가 있습니다. 확인하지 않은 알림이 더 있습니다.
+                    </Item.Description>
+                  )}
+                </Item.Content>
+              </Item>
+            </div>
           )}
         />
       </Showcase.Section>
@@ -118,134 +140,156 @@ export const Gallery: Story = {
       <Showcase.Section title="Media">
         <Showcase.Row label="icon">
           {variants.map((variant) => (
-            <Item key={variant} variant="outline" className="w-56">
-              <Item.Media variant={variant}>
-                <InboxIcon />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>media {variant}</Item.Title>
-              </Item.Content>
-            </Item>
+            <div key={variant} className="w-56">
+              <Item variant="outline">
+                <Item.Media variant={variant}>
+                  <InboxIcon />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>media {variant}</Item.Title>
+                </Item.Content>
+              </Item>
+            </div>
           ))}
         </Showcase.Row>
         <Showcase.Row label="description">
           {variants.map((variant) => (
-            <Item key={variant} variant="outline" className="w-56">
-              <Item.Media variant={variant}>
-                <InboxIcon />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>media {variant}</Item.Title>
-                <Item.Description>받은 편지 12통</Item.Description>
-              </Item.Content>
-            </Item>
+            <div key={variant} className="w-56">
+              <Item variant="outline">
+                <Item.Media variant={variant}>
+                  <InboxIcon />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>media {variant}</Item.Title>
+                  <Item.Description>받은 편지 12통</Item.Description>
+                </Item.Content>
+              </Item>
+            </div>
           ))}
         </Showcase.Row>
         <Showcase.Row label="image">
           {(['soft', 'outline'] as const).map((variant) => (
-            <Item key={variant} variant="outline" className="w-56">
-              <Item.Media variant={variant}>
-                <img src={photo} alt="" />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>image {variant}</Item.Title>
-              </Item.Content>
-            </Item>
+            <div key={variant} className="w-56">
+              <Item variant="outline">
+                <Item.Media variant={variant}>
+                  <img src={photo} alt="" />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>image {variant}</Item.Title>
+                </Item.Content>
+              </Item>
+            </div>
           ))}
         </Showcase.Row>
         <Showcase.Row label="avatar group">
-          <Item variant="outline" className="w-80">
-            <Item.Media>
-              <AvatarGroup size="tiny" max={3} aria-label="채팅 멤버">
-                {['Alice Kim', 'Bob Lee', 'Carol Park', '류현승'].map((name) => (
-                  <Avatar key={name} name={name} />
-                ))}
-              </AvatarGroup>
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>디자인 시스템</Item.Title>
-              <Item.Description>토큰 정리 끝났습니다</Item.Description>
-            </Item.Content>
-            <Item.Actions>
-              <Chip variant="solid">{3}</Chip>
-            </Item.Actions>
-          </Item>
+          <div className="w-80">
+            <Item variant="outline">
+              <Item.Media>
+                <AvatarGroup size="tiny" max={3} aria-label="채팅 멤버">
+                  {['Alice Kim', 'Bob Lee', 'Carol Park', '류현승'].map((name) => (
+                    <Avatar key={name} name={name} />
+                  ))}
+                </AvatarGroup>
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>디자인 시스템</Item.Title>
+                <Item.Description>토큰 정리 끝났습니다</Item.Description>
+              </Item.Content>
+              <Item.Actions>
+                <Chip variant="solid">{3}</Chip>
+              </Item.Actions>
+            </Item>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="two lines">
-          <Item variant="outline" className="w-80">
-            <Item.Media variant="soft">
-              <DocumentIcon />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>회의록.md</Item.Title>
-              <Item.Description>
-                설명이 두 줄을 넘으면 말줄임표로 줄고, 타일은 행 높이에 비례해 커집니다. 이 문장은
-                일부러 길게 썼습니다.
-              </Item.Description>
-            </Item.Content>
-            <Item.Content className="text-caption-c1-regular text-neutral items-end">
-              2분 전
-            </Item.Content>
-          </Item>
+          <div className="w-80">
+            <Item variant="outline">
+              <Item.Media variant="soft">
+                <DocumentIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>회의록.md</Item.Title>
+                <Item.Description>
+                  설명이 두 줄을 넘으면 말줄임표로 줄고, 타일은 행 높이에 비례해 커집니다. 이 문장은
+                  일부러 길게 썼습니다.
+                </Item.Description>
+              </Item.Content>
+              <Item.Content>
+                <Item.Description>2분 전</Item.Description>
+              </Item.Content>
+            </Item>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="truncate">
-          <Item variant="outline" className="w-80">
-            <Item.Media variant="soft">
-              <DocumentIcon />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title truncate>2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf</Item.Title>
-              <Item.Description>2.4 MB</Item.Description>
-            </Item.Content>
-          </Item>
+          <div className="w-80">
+            <Item variant="outline">
+              <Item.Media variant="soft">
+                <DocumentIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title truncate>
+                  2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf
+                </Item.Title>
+                <Item.Description>2.4 MB</Item.Description>
+              </Item.Content>
+            </Item>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="interactive">
-          <Item onClick={() => {}} className="w-56">
-            <Item.Media>
-              <Cog6ToothIcon />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>설정</Item.Title>
-            </Item.Content>
-            <Item.Actions>
-              <Kbd size="tiny">⌘,</Kbd>
-            </Item.Actions>
-          </Item>
+          <div className="w-56">
+            <Item onClick={() => {}}>
+              <Item.Media>
+                <Cog6ToothIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>설정</Item.Title>
+              </Item.Content>
+              <Item.Actions>
+                <Kbd size="tiny">⌘,</Kbd>
+              </Item.Actions>
+            </Item>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="selected">
-          <Item selected onClick={() => {}} className="w-56">
-            <Item.Media>
-              <HomeIcon />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>홈</Item.Title>
-            </Item.Content>
-          </Item>
-          <Item selected variant="soft" className="w-56">
-            <Item.Content>
-              <Item.Title>soft · selected</Item.Title>
-            </Item.Content>
-          </Item>
+          <div className="w-56">
+            <Item selected onClick={() => {}}>
+              <Item.Media>
+                <HomeIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>홈</Item.Title>
+              </Item.Content>
+            </Item>
+          </div>
+          <div className="w-56">
+            <Item selected variant="soft">
+              <Item.Content>
+                <Item.Title>soft · selected</Item.Title>
+              </Item.Content>
+            </Item>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <Item disabled onClick={() => {}} className="w-56">
-            <Item.Media>
-              <MoonIcon />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>다크 모드</Item.Title>
-            </Item.Content>
-          </Item>
+          <div className="w-56">
+            <Item disabled onClick={() => {}}>
+              <Item.Media>
+                <MoonIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>다크 모드</Item.Title>
+              </Item.Content>
+            </Item>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const Interactive: Story = {
+export const OpenARowOnPress: Story = {
   args: { onClick: fn() },
   render: function Render(args) {
     const [archived, setArchived] = useState(0);
@@ -296,31 +340,33 @@ export const Interactive: Story = {
   },
 };
 
-export const Selectable: Story = {
+export const SelectARow: Story = {
   render: function Render() {
     const files = ['보고서.pdf', '예산안.xlsx', '회의록.md'];
     const [selected, setSelected] = useState(files[0]);
 
     return (
-      <ItemGroup className="w-80" aria-label="파일">
-        {files.map((file) => (
-          <Item key={file} selected={selected === file} onClick={() => setSelected(file)}>
-            <Item.Media>
-              <DocumentIcon />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>{file}</Item.Title>
-            </Item.Content>
-          </Item>
-        ))}
-      </ItemGroup>
+      <div className="w-80">
+        <ItemGroup aria-label="파일">
+          {files.map((file) => (
+            <Item key={file} selected={selected === file} onClick={() => setSelected(file)}>
+              <Item.Media>
+                <DocumentIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>{file}</Item.Title>
+              </Item.Content>
+            </Item>
+          ))}
+        </ItemGroup>
+      </div>
     );
   },
   parameters: {
     docs: {
       description: {
         story:
-          '`selected` 는 옅은 배경과 `data-selected` 를 붙이고, 버튼인 행에서는 `aria-pressed` 로 알립니다. Item.Group은 `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다.',
+          '`selected` 는 행에 press 층을 깔고, 버튼인 행에서는 `aria-pressed` 로 알립니다. ItemGroup은 `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다.',
       },
     },
   },
@@ -338,32 +384,34 @@ export const Selectable: Story = {
   },
 };
 
-export const LinkRow: Story = {
+export const LinkARowToAPage: Story = {
   render: () => (
-    <ItemGroup className="w-80" aria-label="자주 찾는 페이지">
-      <Item asChild>
-        <a href="#notices">
-          <Item.Content>
-            <Item.Title>공지</Item.Title>
-            <Item.Description>학사, 장학, 행사 소식</Item.Description>
-          </Item.Content>
-          <Item.Actions>
-            <ChevronRightIcon aria-hidden className="rtl:-scale-x-100" />
-          </Item.Actions>
-        </a>
-      </Item>
-      <Item asChild>
-        <a href="#shuttle">
-          <Item.Content>
-            <Item.Title>셔틀</Item.Title>
-            <Item.Description>오늘 운행 시간표</Item.Description>
-          </Item.Content>
-          <Item.Actions>
-            <ChevronRightIcon aria-hidden className="rtl:-scale-x-100" />
-          </Item.Actions>
-        </a>
-      </Item>
-    </ItemGroup>
+    <div className="w-80">
+      <ItemGroup aria-label="자주 찾는 페이지">
+        <Item asChild>
+          <a href="#notices">
+            <Item.Content>
+              <Item.Title>공지</Item.Title>
+              <Item.Description>학사, 장학, 행사 소식</Item.Description>
+            </Item.Content>
+            <Item.Actions>
+              <ChevronRightIcon aria-hidden className="rtl:-scale-x-100" />
+            </Item.Actions>
+          </a>
+        </Item>
+        <Item asChild>
+          <a href="#shuttle">
+            <Item.Content>
+              <Item.Title>셔틀</Item.Title>
+              <Item.Description>오늘 운행 시간표</Item.Description>
+            </Item.Content>
+            <Item.Actions>
+              <ChevronRightIcon aria-hidden className="rtl:-scale-x-100" />
+            </Item.Actions>
+          </a>
+        </Item>
+      </ItemGroup>
+    </div>
   ),
   parameters: {
     docs: {
@@ -381,46 +429,48 @@ export const LinkRow: Story = {
   },
 };
 
-export const Navigation: Story = {
+export const BuildANavigationList: Story = {
   render: () => (
-    <ItemGroup variant="ghost" size="tiny" className="w-56" aria-label="메뉴">
-      <Item asChild selected aria-current="page">
-        <a href="#home">
-          <Item.Media>
-            <HomeIcon />
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>홈</Item.Title>
-          </Item.Content>
-        </a>
-      </Item>
-      <Item asChild>
-        <a href="#inbox">
-          <Item.Media>
-            <InboxIcon />
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>받은 편지함</Item.Title>
-          </Item.Content>
-          <Item.Actions>
-            <Chip size="tiny" variant="soft" colorScheme="primary">
-              {12}
-            </Chip>
-          </Item.Actions>
-        </a>
-      </Item>
-      <Item.Separator />
-      <Item asChild>
-        <a href="#settings">
-          <Item.Media>
-            <Cog6ToothIcon />
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>설정</Item.Title>
-          </Item.Content>
-        </a>
-      </Item>
-    </ItemGroup>
+    <div className="w-56">
+      <ItemGroup variant="ghost" size="tiny" aria-label="메뉴">
+        <Item asChild selected aria-current="page">
+          <a href="#home">
+            <Item.Media>
+              <HomeIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>홈</Item.Title>
+            </Item.Content>
+          </a>
+        </Item>
+        <Item asChild>
+          <a href="#inbox">
+            <Item.Media>
+              <InboxIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>받은 편지함</Item.Title>
+            </Item.Content>
+            <Item.Actions>
+              <Chip size="tiny" variant="soft" colorScheme="primary">
+                {12}
+              </Chip>
+            </Item.Actions>
+          </a>
+        </Item>
+        <Item.Separator />
+        <Item asChild>
+          <a href="#settings">
+            <Item.Media>
+              <Cog6ToothIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>설정</Item.Title>
+            </Item.Content>
+          </a>
+        </Item>
+      </ItemGroup>
+    </div>
   ),
   parameters: {
     docs: {
@@ -446,7 +496,7 @@ const attachments = [
   { name: '회의록.md', size: '3 KB' },
 ];
 
-export const Attachments: Story = {
+export const ListAttachedFiles: Story = {
   render: () => (
     <div className="grid w-80">
       <ItemGroup variant="separated" aria-label="첨부 파일">
