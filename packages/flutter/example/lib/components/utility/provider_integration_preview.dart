@@ -129,7 +129,7 @@ class _ScopeReadoutState extends State<ScopeReadout> {
                 style: text,
               ),
               Text(
-                '${ids.translation?.spinnerLabel ?? IdsMessages.ko.spinnerLabel} / ${ids.translation?.dialogClose ?? IdsMessages.ko.dialogClose}',
+                '${ids.translation?.commonLoading ?? IdsMessages.ko.commonLoading} / ${ids.translation?.commonClose ?? IdsMessages.ko.commonClose}',
                 style: text,
               ),
               TextButton(

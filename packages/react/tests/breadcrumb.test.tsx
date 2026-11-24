@@ -1,4 +1,4 @@
-import { type ComponentProps } from 'react';
+import { type ComponentProps, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
@@ -52,7 +52,7 @@ const visibleTrail = (nav: Element) =>
 test('renders a named nav landmark holding an ordered list with the current page marked', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb>{crumbs(['Home', 'Products', 'Laptop'])}</Breadcrumb>
+      <Breadcrumb aria-label="이동 경로">{crumbs(['Home', 'Products', 'Laptop'])}</Breadcrumb>
     </IdsProvider>,
   );
 
@@ -78,7 +78,7 @@ test('an aria-label replaces the default name', async () => {
 test('puts a hidden separator between crumbs and none after the last', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb>
+      <Breadcrumb aria-label="이동 경로">
         <>{crumbs(['Home', 'Products'])}</>
         <Breadcrumb.Item>
           <Breadcrumb.Page>Laptop</Breadcrumb.Page>
@@ -155,7 +155,7 @@ test('maxItems keeps the first and the last maxItems - 1 crumbs and folds the re
   const navigate = vi.fn();
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb maxItems={3}>
+      <Breadcrumb aria-label="이동 경로" maxItems={3}>
         <Breadcrumb.Item>
           <Breadcrumb.Link href="#home">Home</Breadcrumb.Link>
         </Breadcrumb.Item>
@@ -205,7 +205,7 @@ test('maxItems keeps the first and the last maxItems - 1 crumbs and folds the re
 test('maxItems folds a trail with written Separators and drops the separators of hidden crumbs', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb maxItems={3}>
+      <Breadcrumb aria-label="이동 경로" maxItems={3}>
         {slashed(['Home', 'Docs', 'Components', 'Navigation', 'Page'])}
       </Breadcrumb>
     </IdsProvider>,
@@ -247,7 +247,7 @@ test('a router link placed through asChild keeps its own element and takes the l
   const navigate = vi.fn();
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb>
+      <Breadcrumb aria-label="이동 경로">
         <Breadcrumb.Item>
           <Breadcrumb.Link asChild className="custom">
             <RouterLink to="/products" onNavigate={navigate}>
@@ -293,11 +293,13 @@ test('size sets the text scale of the trail', async () => {
   expect(fontSize('tiny')).toBeLessThan(fontSize('standard'));
 });
 
-test('the English catalog names the landmark and the menu button', async () => {
-  const english = { 'breadcrumb.label': 'Breadcrumb', 'breadcrumb.more': 'Show hidden path' };
+test('the app names the landmark and the English catalog names the menu button', async () => {
+  const english = { 'breadcrumb.more': 'Show hidden path' };
   const screen = await render(
     <IdsProvider theme={testTheme} translate={(key) => english[key as keyof typeof english] ?? key}>
-      <Breadcrumb maxItems={2}>{crumbs(['Home', 'Docs', 'Page'])}</Breadcrumb>
+      <Breadcrumb aria-label="Breadcrumb" maxItems={2}>
+        {crumbs(['Home', 'Docs', 'Page'])}
+      </Breadcrumb>
     </IdsProvider>,
   );
 
@@ -310,7 +312,9 @@ test('the English catalog names the landmark and the menu button', async () => {
 test('server HTML already holds the landmark, the list and the current page', () => {
   const html = renderToString(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb maxItems={2}>{crumbs(['Home', 'Docs', 'Page'])}</Breadcrumb>
+      <Breadcrumb aria-label="이동 경로" maxItems={2}>
+        {crumbs(['Home', 'Docs', 'Page'])}
+      </Breadcrumb>
     </IdsProvider>,
   );
   const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -328,10 +332,24 @@ test('warns in development when the trail is empty', async () => {
 
   await render(
     <IdsProvider theme={testTheme}>
-      <Breadcrumb />
+      <Breadcrumb aria-label="이동 경로" />
     </IdsProvider>,
   );
 
   expect(warn).toHaveBeenCalledWith(expect.stringContaining('[IDS] Breadcrumb'));
   await expect.element(page.getByRole('navigation')).toBeInTheDocument();
+});
+
+test('warns in development when the landmark has no name', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  onTestFinished(() => warn.mockRestore());
+  const Unnamed = Breadcrumb as (props: ComponentProps<'nav'>) => ReactNode;
+
+  await render(
+    <IdsProvider theme={testTheme}>
+      <Unnamed>{crumbs(['Home', 'Page'])}</Unnamed>
+    </IdsProvider>,
+  );
+
+  expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
 });

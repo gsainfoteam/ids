@@ -10,6 +10,7 @@
 
 | 모듈                                             | 내용                                                                                  | 쓰는 곳                                                                                                                                                                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`accessible-name.ts`](#accessible-namets)       | 이름이 꼭 필요한 컴포넌트의 `AccessibleName` 타입과 이름 없음 경고                    | Breadcrumb, Calendar, Chart, MessageScroller, OTPField, Pagination, PromptInput, QRCode, Rating, Scheduler, Sidebar, Stepper, `temporal-field/` |
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, CircularProgress                                                                                                                                                                                             |
 | [`surfaces/control-surface.ts`](#surfacescontrol-surfacets)       | 버튼류 컨트롤의 클래스 조각, scheme 클래스, compound variant                          | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
 | [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer, Badge                                                                                                                                                                                     |
@@ -27,6 +28,7 @@
 | [`surfaces/icon-square.ts`](#surfacesicon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
 | [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar, Image                                                                                                                                                                                                         |
 | [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
+| [`intl-words.ts`](#intl-wordsts)                 | 문구 대신 Intl 이 만드는 낱말: 상대 날짜, 날짜 칸 이름, 백분율, 단위, `a / b`          | Calendar, Scheduler, TimePicker, ColorPicker, Image, DataTable, Splitter, `resize-handle/`, `slides/`, TextArea, Select |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
 | [`motion.ts`](#motionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | Image, `zoom-pan/` |
@@ -49,6 +51,40 @@
 | [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
 | [`use-copy-feedback.ts`](#use-copy-feedbackts)   | 클립보드에 쓰고 1.5초 동안 복사했다고 알리는 hook                                    | CodeBlock.Copy, Message.Copy |
 | [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image |
+
+## accessible-name.ts
+
+스스로 이름을 지을 수 없는 컴포넌트(랜드마크, 목록, 그림)가 앱에게서 이름을 받게 하는 타입과 경고입니다.
+
+### 쓰는 곳
+
+- Breadcrumb, Calendar, MessageScroller, Pagination, PromptInput, QRCode, Scheduler, Sidebar, Stepper: props 타입에 `AccessibleName` 을 더하고 루트에서 `useRequiredName` 을 부릅니다.
+- Chart, OTPField, Rating: 타입은 그대로 두고 `useUnnamedWarning` 만 부릅니다. Field 안에서는 Field.Label 이 `aria-labelledby` 로 이름을 주고, Chart 는 Chart.Title 이 이름이 되기 때문입니다.
+- `temporal-field/`: DateField, DateTimeField 의 팝업 Calendar 에 필드의 이름을 넘기는 `picker.name` 의 타입입니다.
+
+### 쓰는 법
+
+```tsx
+// components/navigation/pagination/index.tsx
+export type Props = Omit<ComponentProps<'nav'>, 'onChange'> & AccessibleName & { ... };
+
+// components/navigation/pagination/root.tsx
+useRequiredName('Pagination', props);
+
+// components/form/rating/root.tsx
+useUnnamedWarning('Rating', !readOnly && !hasAccessibleName({ 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby }));
+```
+
+### 왜 이렇게
+
+- `AccessibleName` 은 `aria-label` 과 `aria-labelledby` 중 하나만 받는 union 입니다. 둘 다 없으면 타입 오류라, 앱이 이름을 잊지 않습니다. 기본 문구는 두지 않습니다. "페이지 탐색" 같은 기본값은 한 화면에 둘이 있으면 구분되지 않고, 화면의 맥락을 모릅니다.
+- 타입을 우회한 호출(JavaScript, 캐스트, 빈 문자열)을 위해 개발 모드에서 한 번 경고합니다. 빈 칸만 있는 문자열도 이름이 없는 것으로 봅니다.
+- 경고는 `isDevelopment` 로 거르므로 배포 빌드에서는 사라집니다. 컴포넌트마다 한 번만 냅니다(`componentsWarnedAbout`).
+
+### 알아둘 것
+
+- `Omit<Props, ...>` 은 union 을 하나로 합쳐 이름을 선택 사항으로 바꿉니다. 파트 타입을 루트 타입에서 `Omit` 으로 만들 때는 이름이 필수가 아니게 됩니다.
+- union 을 펼친(`{...props}`) 뒤에 `aria-label` 을 따로 적으면 타입 오류가 납니다. 이름을 한 객체 안에 넣어 펼칩니다.
 
 ## arc.tsx
 
@@ -554,7 +590,6 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 - 값(`name`)과 `required`: Select, ChipField, ColorField, ToggleGroup, [temporal-field](./temporal-field/README.md)
 - 값만: Slider
 - `required` 만: CheckboxGroup, FileField. 값은 각 Checkbox 와 `<input type="file">` 이 이미 FormData 에 넣습니다.
-- `message`: CheckboxGroup (`t('checkboxGroup.required')`)
 
 ### 쓰는 법
 
@@ -573,14 +608,13 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
   />
 </div>
 
-// components/form/checkbox-group/root.tsx: name 없이 required 와 문구만
+// components/form/checkbox-group/root.tsx: name 없이 required 만
 <FormValue
   value={value}
   form={form}
   required={required && !readOnly}
   disabled={disabled}
   anchor={anchorRef}
-  message={t('checkboxGroup.required')}
 />
 ```
 
@@ -592,7 +626,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 - 브라우저가 말풍선을 보여 주려고 이 input 에 포커스를 주면 `passFocusToControlOnceTheBrowserHasReported` 가 다음 프레임에 포커스를 `anchor` 로 넘깁니다.
 - 한 프레임 기다리는 까닭은 Firefox 입니다. Firefox 는 포커스를 준 뒤에 말풍선을 띄우고, 이 input 의 blur 로 말풍선을 닫습니다. 포커스 이벤트 안에서 바로 넘기면 blur 가 말풍선보다 먼저 일어나서 말풍선이 닫히지 않고 화면에 남습니다. 남은 말풍선은 그 자리의 클릭을 삼킵니다(`tests/date-field.test.tsx` 의 "after a blocked submit the page under the browser message still takes clicks"). 그래서 포커스는 제출 뒤 한 프레임 늦게 컨트롤에 옵니다. 테스트와 스토리는 `expect.element` 나 `waitFor` 로 기다립니다.
 - `readOnly` 와 `disabled` 도 검증을 막습니다. 그래서 React 가 제어 input 에 요구하는 `onChange` 는 `readOnly` 대신 빈 함수(`readOnlyWouldBarValidation`)로 줍니다.
-- `message` 를 주면 `setCustomValidity` 로 브라우저 문구를 바꿉니다. 브라우저 문구는 글 상자를 위한 말이라 체크박스 묶음이나 평점에는 맞지 않습니다.
+- 문구는 브라우저의 기본 "필수" 문구입니다. 브라우저가 사용자의 언어로 쓰므로 IDS 는 문구를 두지 않습니다. 앱 문구는 `Field.Error match="valueMissing"` 으로 씁니다.
 - 빈 문자열은 값으로 치지 않습니다(`filled`). RULES.md 의 Forms 규칙대로 `FormValue` 는 빈 문자열을 제출하지 않습니다.
 
 ### 알아둘 것
@@ -785,6 +819,38 @@ Escape: () => {
 - 표의 첫 번째로 맞은 키 하나만 돕니다. 같은 키를 두 번 적지 않습니다.
 - 조합 중 Escape 를 건너뛰어야 IME 가 조합을 취소하는 Escape 로 필드가 지워지거나 레이어가 닫히지 않습니다. `evenWhileComposing` 은 Button 의 비활성 차단, 메뉴의 Tab 처럼 전에도 검사하지 않던 곳에만 씁니다.
 
+## intl-words.ts
+
+문구 카탈로그에 두지 않는 낱말을 Intl 로 만드는 순수 함수 `intlWords(locale)` 입니다. 컴포넌트는 `translate.ts` 의 `useIntlWords(locale?)` 로 읽습니다.
+
+### 쓰는 곳
+
+- Calendar(`day-picker-locale.ts`), Scheduler, TimePicker, ColorPicker, Image, DataTable, Splitter, `resize-handle/`, `slides/`, TextArea, Editor 의 글자 수, Select 의 `+3`
+
+### 쓰는 법
+
+```ts
+const words = useIntlWords(locale);
+words.relative(0, 'day');          // '오늘', 'today'
+words.relative(1, 'month');        // '다음 달', 'next month'
+words.relative(-3, 'day', 'always'); // '3일 전', '3 days ago'
+words.field('hour');               // '시', 'hour'
+words.percent(42);                 // '42%'
+words.signed(3);                   // '+3'
+words.ratio(1200, 2000);           // '1,200 / 2,000'
+```
+
+### 왜 이렇게
+
+- 이 낱말은 언어마다 Intl 이 이미 알고 있습니다. 카탈로그에 두면 앱이 언어를 하나 더할 때마다 다시 번역해야 하고, 번역이 locale 의 숫자, 날짜 형식과 어긋날 수 있습니다.
+- `day` 단위의 이전, 다음은 `numeric: 'always'` 로 씁니다. `'auto'` 는 `내일`, `어제` 를 돌려주는데, 보고 있는 날이 오늘이 아니면 틀린 말입니다.
+- formatter 는 locale 과 옵션마다 한 번 만들어 둡니다(`memoize`).
+
+### 알아둘 것
+
+- 영어 `DisplayNames` 는 소문자를 돌려줍니다(`hour`). 화면에 보이는 칸 이름은 컴포넌트가 첫 글자만 locale 대문자로 바꿉니다.
+- `px` 은 Intl 의 단위가 아니라서 `pixels` 는 숫자 뒤에 `px` 을 붙입니다.
+
 ## list-styles.ts
 
 팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 선택 체크, 스크롤 목록과 그 ScrollArea, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
@@ -845,20 +911,23 @@ slots: {
 
 ```ts
 export const messages = {
-  calendar: { nextMonth: '다음 달', previousMonth: '이전 달', weekNumber: '{week}주차' },
-  dialog: { close: '닫기' },
+  common: { close: '닫기', removeItem: '{label} 삭제' },
+  rating: { valueLabel: '{max}점 만점에 {value}점' },
 } as const;
 
-type IdsMessageKey = 'calendar.nextMonth' | 'calendar.previousMonth' | 'calendar.weekNumber' | 'dialog.close';
+type IdsMessageKey = 'common.close' | 'common.removeItem' | 'rating.valueLabel';
 
-formatDefaultMessage('calendar.weekNumber', { week: 3 }); // '3주차'
+formatDefaultMessage('common.removeItem', { label: '사과' }); // '사과 삭제'
 ```
 
 ### 왜 이렇게
 
 - 기본값은 컴포넌트 이름 아래에 중첩한 객체입니다. 키는 점으로 이은 경로(`'calendar.previousMonth'`)이고, `IdsMessageKey` 는 그 잎 경로들의 union 타입입니다. next-intl, i18next 가 중첩 카탈로그를 같은 점 경로로 읽어서, 앱은 `ko.json`, `en.json` 을 `ids` 아래에 그대로 붙일 수 있습니다.
 - 그룹과 키는 알파벳 순서입니다. 두 카탈로그도 같은 순서라 diff 가 읽기 쉽습니다(`tests/messages.test.ts` 가 확인).
-- 값은 ICU 메시지 문자열입니다. 번역(`en.json`)은 `{count, plural, one {…} other {…}}` 같은 복수형을 쓰고, 그것을 포맷하는 것은 앱의 i18n 라이브러리입니다.
+- 값은 `{name}` 자리만 쓰는 문자열입니다. 영어도 복수형 없이 읽히게 썼습니다(`'{count} selected'`). 한국어 조사가 붙는 자리는 문장을 바꿔 조사가 필요 없게 썼습니다(`'옮겼습니다: {item}'`).
+- 여러 컴포넌트가 같은 말을 쓰면 `common.*` 하나를 씁니다(`common.close`, `common.clear`, `common.drag.start`). 컴포넌트 이름이 붙은 그룹은 그 컴포넌트만 쓰는 말입니다.
+- 화면에 보이는 글(placeholder, 빈 결과, 검증 문구, 버튼 글)은 카탈로그에 없습니다. 앱이 part 의 children 이나 `placeholder` 로 씁니다. 카탈로그에는 IDS 가 스스로 그리는 컨트롤의 이름과 스크린 리더 안내만 있습니다.
+- Intl 이 만드는 낱말(오늘, 다음 달, 시, 분, `42%`)은 카탈로그에 없고 [intl-words.ts](#intl-wordsts) 가 만듭니다.
 - Editor 의 문구(`editor.*`)는 공용 `messages-catalog.ts` 에 없고 `components/form/editor/messages-catalog.ts` 의 `editorMessages` 에 있습니다. 공용 카탈로그는 문구를 쓰는 모든 컴포넌트가 싣기 때문에, Editor 만 쓰는 문구 3 kB 가 Button, Dialog 의 import 에도 실리지 않게 나눴습니다. Editor 의 컴포넌트는 `useTranslate(editorMessages)` 로 읽습니다. `IdsMessageKey` 는 두 카탈로그의 키를 모두 담습니다.
 - 한국어 기본값은 복수형이 필요 없어서 `{name}` 자리만 씁니다. 그래서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). 이 약속은 `tests/messages.test.ts` 가 ICU 파서로 확인합니다.
 

@@ -10,6 +10,7 @@ import { QRCodeRoot } from './root';
 import { qrCodeStyle, type QRCodeVariant } from './style';
 import { type StateValue } from '../../../internal/state-props';
 
+import type { AccessibleName } from '../../../internal/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
 
 export function QRCode(props: QRCode.Props) {
@@ -29,18 +30,19 @@ export namespace QRCode {
     finderShape: QRCodeFinderShape;
   };
 
-  export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children' | 'role'> & {
-    value: string;
-    variant?: QRCodeVariant;
-    size?: IdsSize | number;
-    errorCorrection?: QRCodeErrorCorrection;
-    shape?: QRCodeModuleShape;
-    finderShape?: QRCodeFinderShape;
-    quietZone?: number;
-    className?: StateValue<string | undefined, State>;
-    style?: StateValue<CSSProperties | undefined, State>;
-    children?: ReactNode;
-  };
+  export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children' | 'role'> &
+    AccessibleName & {
+      value: string;
+      variant?: QRCodeVariant;
+      size?: IdsSize | number;
+      errorCorrection?: QRCodeErrorCorrection;
+      shape?: QRCodeModuleShape;
+      finderShape?: QRCodeFinderShape;
+      quietZone?: number;
+      className?: StateValue<string | undefined, State>;
+      style?: StateValue<CSSProperties | undefined, State>;
+      children?: ReactNode;
+    };
 
   export const Logo = QRCodeLogo;
   export namespace Logo {

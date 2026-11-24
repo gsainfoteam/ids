@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
-import { expect, test, vi } from 'vitest';
+import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
@@ -69,7 +69,10 @@ function Chat({
 
   return (
     <IdsProvider theme={testTheme}>
-      <MessageScroller {...props} className="h-64 w-80">
+      <MessageScroller
+        {...({ 'aria-label': '메시지', ...props } as MessageScroller.Props)}
+        className="h-64 w-80"
+      >
         {messages.map((message, index) => (
           <div key={message.id}>
             <p className="h-8">{message.text}</p>
@@ -301,9 +304,30 @@ test('a part outside MessageScroller throws', () => {
   expect(() => renderToString(<MessageScroller.List />)).toThrow(/inside `<MessageScroller>`/);
   expect(() =>
     renderToString(
-      <MessageScroller>
+      <MessageScroller aria-label="메시지">
         <MessageScroller.List>안</MessageScroller.List>밖
       </MessageScroller>,
     ),
   ).toThrow(/either inside/);
+});
+
+test('has no default name and warns in development without one', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  onTestFinished(() => warn.mockRestore());
+  const Unnamed = MessageScroller as (props: ComponentProps<'div'>) => ReactNode;
+
+  await render(
+    <IdsProvider theme={testTheme}>
+      <div className="h-64">
+        <Unnamed>
+          <p>메시지</p>
+        </Unnamed>
+      </div>
+    </IdsProvider>,
+  );
+
+  expect(viewport().hasAttribute('aria-label')).toBe(false);
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('MessageScroller: it has no accessible name'),
+  );
 });

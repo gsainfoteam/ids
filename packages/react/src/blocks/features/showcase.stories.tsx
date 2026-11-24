@@ -27,9 +27,11 @@ export const PC: Story = {
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-4 py-20 break-keep sm:px-6">
       <section aria-labelledby="board" className="grid items-center gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
-          <Chip variant="soft" colorScheme="primary" className="self-start">
-            게시판
-          </Chip>
+          <div className="flex">
+            <Chip variant="soft" colorScheme="primary">
+              게시판
+            </Chip>
+          </div>
           <h2 id="board" className="text-headline-h2-bold">
             놓치면 안 되는 공지만 먼저
           </h2>
@@ -37,12 +39,14 @@ export const PC: Story = {
             학사, 장학, 행사 게시판 중 구독한 곳의 새 글을 모아 보여 줘요. 마감이 가까운 글은 맨
             위로 올라와요.
           </p>
-          <Button asChild variant="outline" className="self-start">
-            <a href="#board">
-              게시판 보기
-              <ArrowRightIcon />
-            </a>
-          </Button>
+          <div className="flex">
+            <Button asChild variant="outline">
+              <a href="#board">
+                게시판 보기
+                <ArrowRightIcon />
+              </a>
+            </Button>
+          </div>
         </div>
         <Card variant="soft" aria-hidden>
           <Card>
@@ -73,40 +77,46 @@ export const PC: Story = {
       </section>
 
       <section aria-labelledby="shuttle" className="grid items-center gap-10 lg:grid-cols-2">
-        <Card variant="soft" aria-hidden className="lg:order-first">
-          <Card>
-            <Card.Header>
-              <Card.Description>학생회관 정류장</Card.Description>
-              <Card.Title>6분 뒤 광주송정역행</Card.Title>
-              <Card.Action>
-                <Chip variant="soft" colorScheme="primary">
-                  12:20
-                </Chip>
-              </Card.Action>
-            </Card.Header>
-            <Card.Content className="flex flex-col gap-4">
-              <Progress value={80} aria-label="다음 셔틀까지" />
-              <Stepper progress={false} orientation="vertical" size="tiny" aria-label="정류장">
-                <Stepper.Item completed>
-                  <Stepper.Title>학생회관</Stepper.Title>
-                  <Stepper.Description>12:20 출발</Stepper.Description>
-                </Stepper.Item>
-                <Stepper.Item>
-                  <Stepper.Title>기숙사 A동</Stepper.Title>
-                  <Stepper.Description>12:26</Stepper.Description>
-                </Stepper.Item>
-                <Stepper.Item>
-                  <Stepper.Title>광주송정역</Stepper.Title>
-                  <Stepper.Description>12:45 도착</Stepper.Description>
-                </Stepper.Item>
-              </Stepper>
-            </Card.Content>
+        <div className="lg:order-first">
+          <Card variant="soft" aria-hidden>
+            <Card>
+              <Card.Header>
+                <Card.Description>학생회관 정류장</Card.Description>
+                <Card.Title>6분 뒤 광주송정역행</Card.Title>
+                <Card.Action>
+                  <Chip variant="soft" colorScheme="primary">
+                    12:20
+                  </Chip>
+                </Card.Action>
+              </Card.Header>
+              <Card.Content>
+                <div className="flex flex-col gap-4">
+                  <Progress value={80} aria-label="다음 셔틀까지" />
+                  <Stepper progress={false} orientation="vertical" size="tiny" aria-label="정류장">
+                    <Stepper.Item completed>
+                      <Stepper.Title>학생회관</Stepper.Title>
+                      <Stepper.Description>12:20 출발</Stepper.Description>
+                    </Stepper.Item>
+                    <Stepper.Item>
+                      <Stepper.Title>기숙사 A동</Stepper.Title>
+                      <Stepper.Description>12:26</Stepper.Description>
+                    </Stepper.Item>
+                    <Stepper.Item>
+                      <Stepper.Title>광주송정역</Stepper.Title>
+                      <Stepper.Description>12:45 도착</Stepper.Description>
+                    </Stepper.Item>
+                  </Stepper>
+                </div>
+              </Card.Content>
+            </Card>
           </Card>
-        </Card>
+        </div>
         <div className="flex flex-col gap-4">
-          <Chip variant="soft" colorScheme="primary" className="self-start">
-            셔틀
-          </Chip>
+          <div className="flex">
+            <Chip variant="soft" colorScheme="primary">
+              셔틀
+            </Chip>
+          </div>
           <h2 id="shuttle" className="text-headline-h2-bold">
             정류장에서 기다리지 않게
           </h2>
@@ -114,26 +124,32 @@ export const PC: Story = {
             다음 셔틀까지 남은 시간과 정류장별 도착 시간을 보여 줘요. 5분 전에 알림을 받을 수도
             있어요.
           </p>
-          <Button asChild variant="outline" className="self-start">
-            <a href="#shuttle">셔틀 시간표 보기</a>
-          </Button>
+          <div className="flex">
+            <Button asChild variant="outline">
+              <a href="#shuttle">셔틀 시간표 보기</a>
+            </Button>
+          </div>
         </div>
       </section>
 
       <section aria-labelledby="people" className="grid items-center gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
-          <Chip variant="soft" colorScheme="primary" className="self-start">
-            동아리
-          </Chip>
+          <div className="flex">
+            <Chip variant="soft" colorScheme="primary">
+              동아리
+            </Chip>
+          </div>
           <h2 id="people" className="text-headline-h2-bold">
             동아리 사람들과 한곳에서
           </h2>
           <p className="text-body-b1-regular">
             채널에서 이야기하고, 자료실에 파일을 모으고, 행사를 만들어 신청을 받아요.
           </p>
-          <Button asChild variant="outline" className="self-start">
-            <a href="#clubs">동아리 찾기</a>
-          </Button>
+          <div className="flex">
+            <Button asChild variant="outline">
+              <a href="#clubs">동아리 찾기</a>
+            </Button>
+          </div>
         </div>
         <Card variant="soft" aria-hidden>
           <Card>

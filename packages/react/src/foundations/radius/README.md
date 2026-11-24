@@ -7,7 +7,7 @@
 - **16px 에서 멈춤.** 여백이 크거나 상자가 겹쳐도 `container`(16px)를 넘지 않습니다.
 
 ```tsx
-<Button className="rounded-standard" />        // 모든 컨트롤 (기본값)
+<button className="rounded-standard" />        // 모든 컨트롤 (Button 과 필드의 기본값)
 <span className="rounded-indicator size-4" />  // 24px 미만의 작은 상자: 체크박스, Kbd
 <span className="rounded-full" />              // 알약, 원
 

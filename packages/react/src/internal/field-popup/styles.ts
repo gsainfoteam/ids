@@ -10,9 +10,7 @@ export const popupStyle = tv({
     ],
     viewport: 'flex flex-col p-1 [overflow-anchor:none]',
     backdrop: [overlayStyles.backdrop, 'touch-none overflow-hidden duration-(--ids-motion-normal)'],
-    header:
-      '-mt-1 mb-2 hidden items-center justify-between ps-1 in-data-[presentation=drawer]:flex',
-    title: 'text-body-b3-medium',
+    header: '-mt-1 mb-2 hidden items-center justify-end in-data-[presentation=drawer]:flex',
   },
   variants: {
     presentation: {

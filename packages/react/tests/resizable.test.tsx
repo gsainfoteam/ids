@@ -98,12 +98,13 @@ test('SSR: the default handle follows the direction and carries its ARIA from th
       separator.getAttribute('tabindex'),
     ]),
   ).toEqual([
-    ['너비', 'vertical', '400', '200', '400px', 'panel', '0'],
-    ['높이', 'horizontal', '300', '0', '300px', 'panel', '-1'],
+    ['크기 조절', 'vertical', '400', '200', '400px', 'panel', '0'],
+    ['크기 조절', 'horizontal', '300', '0', '300px', 'panel', '-1'],
   ]);
 
   const horizontal = html('horizontal').querySelector('[role="separator"]')!;
-  expect(horizontal.getAttribute('aria-label')).toBe('너비');
+  expect(horizontal.getAttribute('aria-label')).toBe('크기 조절');
+  expect(horizontal.getAttribute('aria-orientation')).toBe('vertical');
   expect(horizontal.hasAttribute('aria-valuemax')).toBe(false);
   expect(html('horizontal').querySelectorAll('[role="separator"]')).toHaveLength(1);
 
@@ -123,7 +124,7 @@ test('an edge handle resizes by keys: 16px steps, 64px with Shift, Home and End 
       내용
     </Sized>,
   );
-  const handle = screen.getByRole('separator', { name: '너비' });
+  const handle = screen.getByRole('separator', { name: '크기 조절' });
   const width = () => box(screen).offsetWidth;
 
   await userEvent.keyboard('{Tab}');
@@ -154,8 +155,8 @@ test('the corner grip is one tab stop whose arrows resize each axis and move foc
     </Sized>,
   );
   const grip = screen.getByRole('group', { name: '크기 조절' });
-  const width = screen.getByRole('separator', { name: '너비' });
-  const height = screen.getByRole('separator', { name: '높이' });
+  const width = grip.getByRole('separator').nth(0);
+  const height = grip.getByRole('separator').nth(1);
   const halo = () => grip.element().querySelector('[data-resize-grip-halo]')!;
   const arcColor = () => getComputedStyle(arcOf(grip.element())!).stroke;
 
@@ -331,7 +332,7 @@ test('controlled: the size moves only when the app writes it back', async () => 
   }
 
   const screen = await render(<Controlled accept={false} />);
-  const handle = screen.getByRole('separator', { name: '너비' });
+  const handle = screen.getByRole('separator', { name: '크기 조절' });
   handle.element().focus();
   await userEvent.keyboard('{ArrowRight}');
   expect(onWidthChange).toHaveBeenLastCalledWith(216);
@@ -339,7 +340,7 @@ test('controlled: the size moves only when the app writes it back', async () => 
   expect(box(screen).offsetWidth).toBe(200);
 
   await screen.rerender(<Controlled key="accepts" accept />);
-  screen.getByRole('separator', { name: '너비' }).element().focus();
+  screen.getByRole('separator', { name: '크기 조절' }).element().focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect.poll(() => box(screen).offsetWidth).toBe(216);
   await expect.element(box(screen)).toHaveTextContent('216');
@@ -357,7 +358,7 @@ test('dragging an edge follows the pointer, writes the DOM each frame and report
       내용
     </Sized>,
   );
-  const handle = () => screen.getByRole('separator', { name: '너비' }).element();
+  const handle = () => screen.getByRole('separator', { name: '크기 조절' }).element();
   const start = centerOf(handle());
 
   await mouse('mousePressed', start);
@@ -394,7 +395,7 @@ test('Escape during a drag restores the starting size; a double click resets', a
       내용
     </Sized>,
   );
-  const handle = () => screen.getByRole('separator', { name: '너비' }).element();
+  const handle = () => screen.getByRole('separator', { name: '크기 조절' }).element();
   const start = centerOf(handle());
 
   await mouse('mousePressed', start);
@@ -449,7 +450,7 @@ test('right to left: the handle sits on the left, the arrow away from the box wi
       </Sized>
     </div>,
   );
-  const handle = () => screen.getByRole('separator', { name: '너비' }).element();
+  const handle = () => screen.getByRole('separator', { name: '크기 조절' }).element();
   const root = box(screen).getBoundingClientRect();
   expect(Math.abs(centerOf(handle()).x - root.left)).toBeLessThanOrEqual(1);
 
@@ -477,7 +478,7 @@ test('without a size the element keeps its natural size until resized, and Enter
       </Sized>
     </div>,
   );
-  const handle = screen.getByRole('separator', { name: '너비' });
+  const handle = screen.getByRole('separator', { name: '크기 조절' });
   await expect.element(handle).toHaveAttribute('aria-valuenow', '288');
   expect(box(screen).style.width).toBe('');
 
@@ -496,7 +497,7 @@ test('min and max bound the keys and Home and End go to them', async () => {
       내용
     </Sized>,
   );
-  const handle = screen.getByRole('separator', { name: '높이' });
+  const handle = screen.getByRole('separator', { name: '크기 조절' });
   await expect.element(handle).toHaveAttribute('aria-valuemin', '80');
   await expect.element(handle).toHaveAttribute('aria-valuemax', '128');
 
@@ -546,7 +547,7 @@ test('disabled handles leave the tab order and ignore the pointer', async (conte
       <button type="button">뒤</button>
     </>,
   );
-  const handle = screen.getByRole('separator', { name: '너비' });
+  const handle = screen.getByRole('separator', { name: '크기 조절' });
   await expect.element(handle).toHaveAttribute('aria-disabled', 'true');
   await expect.element(handle).not.toHaveAttribute('tabindex');
 

@@ -20,7 +20,7 @@ import { FileTrigger } from './trigger';
 import { useFileFieldRoot } from './use-file-field-root';
 import { FileValue } from './value';
 import { resolveState } from '../../../internal/state-props';
-import { flattenFragments, invariant } from '../../../utils';
+import { invariant } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -90,13 +90,19 @@ export type FileFieldProps = BaseProps &
   );
 
 export function FileFieldRoot(props: FileFieldProps) {
-  const { variant = 'outline', multiple = false, children, className, style } = props;
-  const { context, rootProps, picker, messages } = useFileFieldRoot(props, 'field');
+  const { variant = 'outline', multiple = false, className, style } = props;
+  const {
+    context,
+    rootProps,
+    picker,
+    messages,
+    structure: nodes,
+    limitsParts,
+  } = useFileFieldRoot(props, 'field');
   const { state } = context;
   const styles = fileFieldStyle({ variant, size: context.size });
   const [first] = context.field.state.files;
 
-  const nodes = flattenFragments(children);
   invariant(
     !nodes.length || nodes.filter(isType(FileTrigger)).length === 1,
     'FileField: explicit children require exactly one Trigger.',
@@ -137,6 +143,7 @@ export function FileFieldRoot(props: FileFieldProps) {
         >
           {composed.controls}
         </div>
+        {limitsParts}
         {composed.others}
         {messages}
       </div>

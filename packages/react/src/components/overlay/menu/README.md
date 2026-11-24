@@ -61,11 +61,11 @@ import { Menu } from '@gsainfoteam/ids-react';
 | `Menu.Label`         | 묶음의 제목. 고를 수 없다                                                                         |
 | `Menu.Separator`     | 구분선                                                                                            |
 | `Menu.Shortcut`      | 항목 끝의 단축키 표시. `Kbd` 라서 `keys="Mod+C"` 가 운영체제에 맞게 그려진다                      |
-| `Menu.Search`        | 명령 팔레트의 검색 상자(`combobox`). 적지 않으면 기본 검색 상자가 들어간다                        |
-| `Menu.Empty`         | 명령 팔레트에서 맞는 항목이 없을 때의 문구. 기본 "결과가 없습니다."                               |
+| `Menu.Search`        | 명령 팔레트의 검색 상자(`combobox`). 적지 않으면 기본 검색 상자가 들어간다. `placeholder` 기본값은 없다                        |
+| `Menu.Empty`         | 명령 팔레트에서 맞는 항목이 없을 때 자식을 보인다. 기본 문구는 없다                               |
 
 - `Menu.Content` 는 trigger 의 글자를 이름으로 씁니다(`aria-labelledby`). 우클릭 메뉴는 이름을 붙일 trigger 가 없으므로 `aria-label` 을 줍니다.
-- 하위 메뉴의 이름은 "〇〇 하위 메뉴" 입니다.
+- 하위 메뉴는 그 `Menu.Trigger` 를 이름으로 씁니다(`aria-labelledby`). 하위 메뉴라는 것은 trigger 의 `aria-haspopup` 이 알립니다.
 
 ## 하위 메뉴
 

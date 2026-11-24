@@ -33,6 +33,7 @@ const meta = {
     readOnly: { control: 'boolean' },
   },
   args: {
+    'aria-label': '인증 코드',
     length: 6,
     variant: 'outline',
     size: 'standard',

@@ -120,53 +120,55 @@ export const PC: Story = {
               </Card.Title>
               <Card.Description>다른 학생에게 보이는 정보예요.</Card.Description>
             </Card.Header>
-            <Card.Content className="flex flex-col gap-5">
-              <div className="flex items-center gap-4">
-                <Avatar name="김지수" />
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="tiny">
-                    사진 바꾸기
-                  </Button>
-                  <Button variant="outline" size="tiny" colorScheme="danger">
-                    지우기
-                  </Button>
+            <Card.Content>
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center gap-4">
+                  <Avatar name="김지수" />
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="tiny">
+                      사진 바꾸기
+                    </Button>
+                    <Button variant="outline" size="tiny" colorScheme="danger">
+                      지우기
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="grid items-start gap-4 sm:grid-cols-2">
+                <div className="grid items-start gap-4 sm:grid-cols-2">
+                  <Field>
+                    <Field.Label>이름</Field.Label>
+                    <TextField name="name" defaultValue="김지수" autoComplete="name" required />
+                  </Field>
+                  <Field>
+                    <Field.Label>닉네임</Field.Label>
+                    <TextField name="nickname" defaultValue="jisu" />
+                    <Field.Hint>게시판에 이 이름으로 보여요.</Field.Hint>
+                  </Field>
+                </div>
                 <Field>
-                  <Field.Label>이름</Field.Label>
-                  <TextField name="name" defaultValue="김지수" autoComplete="name" required />
+                  <Field.Label>학과</Field.Label>
+                  <Select name="major" defaultValue="전기전자컴퓨터공학과">
+                    {MAJORS.map((major) => (
+                      <Select.Item key={major} value={major}>
+                        {major}
+                      </Select.Item>
+                    ))}
+                  </Select>
                 </Field>
                 <Field>
-                  <Field.Label>닉네임</Field.Label>
-                  <TextField name="nickname" defaultValue="jisu" />
-                  <Field.Hint>게시판에 이 이름으로 보여요.</Field.Hint>
+                  <Field.Label>소개</Field.Label>
+                  <TextArea
+                    name="bio"
+                    rows={3}
+                    maxLength={160}
+                    defaultValue="웹 프론트엔드와 디자인 시스템을 좋아해요. 인포팀에서 Ziggle 을 만들어요."
+                  >
+                    <TextArea.Input />
+                    <TextArea.Count />
+                  </TextArea>
                 </Field>
               </div>
-              <Field>
-                <Field.Label>학과</Field.Label>
-                <Select name="major" defaultValue="전기전자컴퓨터공학과">
-                  {MAJORS.map((major) => (
-                    <Select.Item key={major} value={major}>
-                      {major}
-                    </Select.Item>
-                  ))}
-                </Select>
-              </Field>
-              <Field>
-                <Field.Label>소개</Field.Label>
-                <TextArea
-                  name="bio"
-                  rows={3}
-                  maxLength={160}
-                  defaultValue="웹 프론트엔드와 디자인 시스템을 좋아해요. 인포팀에서 Ziggle 을 만들어요."
-                >
-                  <TextArea.Input />
-                  <TextArea.Count />
-                </TextArea>
-              </Field>
             </Card.Content>
-            <Card.Footer className="justify-end">
+            <Card.Footer>
               <Button type="submit">저장</Button>
             </Card.Footer>
           </form>
@@ -255,7 +257,7 @@ export const PC: Story = {
               글과 댓글, 예약 기록이 모두 지워지고 되돌릴 수 없어요.
             </Card.Description>
           </Card.Header>
-          <Card.Footer className="justify-end">
+          <Card.Footer>
             <Dialog onOpenChange={() => setConfirmation('')}>
               <Dialog.Trigger asChild>
                 <Button variant="outline" colorScheme="danger">

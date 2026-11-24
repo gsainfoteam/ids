@@ -56,9 +56,9 @@ export const PC: Story = {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
         <div className="flex flex-col gap-3">
-          <Chip variant="soft" className="self-start">
-            익명
-          </Chip>
+          <div className="flex">
+            <Chip variant="soft">익명</Chip>
+          </div>
           <h1 className="text-headline-h3-bold">EC3101 알고리즘 강의 평가</h1>
           <p className="text-body-b2-regular">
             답은 이름 없이 모아서, 성적이 공개된 뒤에 교수님께 전달돼요. 3분이면 끝나요.
@@ -201,9 +201,11 @@ export const PC: Story = {
             </Card.Content>
           </Card>
 
-          <Button type="submit" className="self-end" disabled={overall === 0}>
-            평가 보내기
-          </Button>
+          <div className="flex justify-end">
+            <Button type="submit" disabled={overall === 0}>
+              평가 보내기
+            </Button>
+          </div>
         </form>
       </main>
     );

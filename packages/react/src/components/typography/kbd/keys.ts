@@ -20,7 +20,7 @@ export type KbdLabel = IdsMessageKey extends infer Key
   : never;
 export type KbdLabels = Partial<Record<KbdLabel, string>>;
 
-type Face = { glyph: string; label: KbdLabel };
+type Face = { glyph: string; label?: KbdLabel };
 type Spec = Record<KbdPlatform, Face>;
 
 const MODIFIERS_IN_MENU_ORDER: Record<KbdPlatform, readonly CanonicalModifier[]> = {
@@ -31,78 +31,50 @@ const MODIFIERS_IN_MENU_ORDER: Record<KbdPlatform, readonly CanonicalModifier[]>
 
 const LETTER_OR_DIGIT_CODE = /^(?:Key|Digit)(.)$/;
 
+const symbol = (glyph: string, label: KbdLabel): Face => ({ glyph, label });
+const text = (glyph: string): Face => ({ glyph });
+
 const onMacAndElsewhere = (mac: Face, elsewhere: Face): Spec => ({
   mac,
   windows: elsewhere,
   linux: elsewhere,
 });
 
-const everywhere = (glyph: string, label: KbdLabel) =>
-  onMacAndElsewhere({ glyph, label }, { glyph, label });
+const everywhere = (face: Face) => onMacAndElsewhere(face, face);
 
 const KEYS: Record<string, Spec> = {
-  Meta: {
-    mac: { glyph: '⌘', label: 'command' },
-    windows: { glyph: 'Win', label: 'windows' },
-    linux: { glyph: 'Super', label: 'super' },
-  },
-  Control: onMacAndElsewhere({ glyph: '⌃', label: 'control' }, { glyph: 'Ctrl', label: 'control' }),
-  Alt: onMacAndElsewhere({ glyph: '⌥', label: 'option' }, { glyph: 'Alt', label: 'alt' }),
-  Shift: onMacAndElsewhere({ glyph: '⇧', label: 'shift' }, { glyph: 'Shift', label: 'shift' }),
-  Enter: onMacAndElsewhere({ glyph: '↩', label: 'return' }, { glyph: 'Enter', label: 'enter' }),
-  Backspace: onMacAndElsewhere(
-    { glyph: '⌫', label: 'macDelete' },
-    { glyph: 'Backspace', label: 'backspace' },
-  ),
-  Delete: onMacAndElsewhere(
-    { glyph: '⌦', label: 'forwardDelete' },
-    { glyph: 'Del', label: 'delete' },
-  ),
-  Escape: everywhere('Esc', 'escape'),
-  Tab: onMacAndElsewhere({ glyph: '⇥', label: 'tab' }, { glyph: 'Tab', label: 'tab' }),
-  Space: everywhere('Space', 'space'),
-  CapsLock: onMacAndElsewhere(
-    { glyph: '⇪', label: 'capsLock' },
-    { glyph: 'Caps Lock', label: 'capsLock' },
-  ),
-  ArrowUp: everywhere('↑', 'up'),
-  ArrowDown: everywhere('↓', 'down'),
-  ArrowLeft: everywhere('←', 'left'),
-  ArrowRight: everywhere('→', 'right'),
-  PageUp: onMacAndElsewhere({ glyph: '⇞', label: 'pageUp' }, { glyph: 'PgUp', label: 'pageUp' }),
-  PageDown: onMacAndElsewhere(
-    { glyph: '⇟', label: 'pageDown' },
-    { glyph: 'PgDn', label: 'pageDown' },
-  ),
-  Home: onMacAndElsewhere({ glyph: '↖', label: 'home' }, { glyph: 'Home', label: 'home' }),
-  End: onMacAndElsewhere({ glyph: '↘', label: 'end' }, { glyph: 'End', label: 'end' }),
-  Fn: everywhere('fn', 'fn'),
+  Meta: { mac: symbol('⌘', 'command'), windows: text('Win'), linux: text('Super') },
+  Control: onMacAndElsewhere(symbol('⌃', 'control'), text('Ctrl')),
+  Alt: onMacAndElsewhere(symbol('⌥', 'option'), text('Alt')),
+  Shift: onMacAndElsewhere(symbol('⇧', 'shift'), text('Shift')),
+  Enter: onMacAndElsewhere(symbol('↩', 'return'), text('Enter')),
+  Backspace: onMacAndElsewhere(symbol('⌫', 'macDelete'), text('Backspace')),
+  Delete: onMacAndElsewhere(symbol('⌦', 'forwardDelete'), text('Del')),
+  Escape: everywhere(text('Esc')),
+  CapsLock: everywhere(text('Caps Lock')),
+  ArrowUp: everywhere(symbol('↑', 'up')),
+  ArrowDown: everywhere(symbol('↓', 'down')),
+  ArrowLeft: everywhere(symbol('←', 'left')),
+  ArrowRight: everywhere(symbol('→', 'right')),
+  PageUp: everywhere(text('PgUp')),
+  PageDown: everywhere(text('PgDn')),
+  Fn: everywhere(text('fn')),
 };
 
-type GlyphLabel = KbdLabel | { mac: KbdLabel; elsewhere: KbdLabel };
-
-const GLYPHS: Record<string, GlyphLabel> = {
+const GLYPHS: Record<string, KbdLabel> = {
   '⌘': 'command',
   '⌃': 'control',
   '⌥': 'option',
   '⇧': 'shift',
   '↩': 'return',
   '⏎': 'return',
-  '↵': 'enter',
-  '⌫': { mac: 'macDelete', elsewhere: 'backspace' },
+  '↵': 'return',
+  '⌫': 'macDelete',
   '⌦': 'forwardDelete',
-  '⎋': 'escape',
-  '⇥': 'tab',
-  '⇪': 'capsLock',
-  '␣': 'space',
   '↑': 'up',
   '↓': 'down',
   '←': 'left',
   '→': 'right',
-  '⇞': 'pageUp',
-  '⇟': 'pageDown',
-  '↖': 'home',
-  '↘': 'end',
 };
 
 export type ResolvedKey = { id: string; glyph: string; label: KbdLabel | undefined };
@@ -140,12 +112,10 @@ export function orderedKeys(keys: KbdKeys, platform: KbdPlatform): ResolvedKey[]
 
 export type GlyphSegment = { text: string; label: KbdLabel | undefined };
 
-export function splitGlyphs(text: string, platform: KbdPlatform): GlyphSegment[] {
+export function splitGlyphs(written: string): GlyphSegment[] {
   const segments: GlyphSegment[] = [];
-  for (const character of Array.from(text)) {
-    const entry = GLYPHS[character];
-    const label =
-      typeof entry === 'object' ? (platform === 'mac' ? entry.mac : entry.elsewhere) : entry;
+  for (const character of Array.from(written)) {
+    const label = GLYPHS[character];
     const last = segments.at(-1);
     if (label === undefined && last && last.label === undefined) last.text += character;
     else segments.push({ text: character, label });

@@ -2,12 +2,15 @@
 
 import { useCallback, useId, type DragEvent, type MouseEvent } from 'react';
 
-import { describeLimits, fileKey, formatBytes, isFile, isValidAccept } from './file-rules';
+import { FileRejectionContext } from './context';
+import { fileKey, isFile, isValidAccept } from './file-rules';
+import { isType } from './is-type';
+import { FileLimits, type FileFieldLimits } from './limits';
+import { FileRejection } from './rejection';
 import { filePartsStyle } from './style';
 import { useFileField, type FileFieldValue } from './use-file-field';
 import { FormValue } from '../../../internal/form-value';
-import { useTranslate } from '../../../internal/translate';
-import { invariant, mergeRefs } from '../../../utils';
+import { flattenFragments, invariant, mergeRefs } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { FileFieldProps, FileFieldState } from './root';
@@ -21,8 +24,6 @@ const joinIds = (...ids: Array<string | undefined | false>) =>
   ids.filter(Boolean).join(' ') || undefined;
 
 export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
-  const t = useTranslate();
-
   const {
     multiple = false,
     value,
@@ -35,7 +36,7 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
     maxCount,
     onReject,
     placeholder,
-    children: _children,
+    children,
     className: _className,
     style: _style,
     ref: forwardedRef,
@@ -57,7 +58,7 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': ariaDescribedby,
     'aria-invalid': ariaInvalid,
-    'aria-required': ariaRequired,
+    'aria-required': _ariaRequired,
     ...native
   } = props;
   const owner = componentNameOf(look);
@@ -100,21 +101,21 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
     [rootRef],
   );
 
+  const nodes = flattenFragments(children);
+  const limitsParts = nodes.filter(isType(FileLimits));
+  const rejectionPart = nodes.find(isType(FileRejection));
+  const structure = nodes.filter((node) => !limitsParts.includes(node) && node !== rejectionPart);
+
   const uid = useId();
   const id = providedId ?? `ids-file-${uid}`;
   const errorId = `${id}-rejections`;
   const limitsId = `${id}-limits`;
-  const requiredId = `${id}-required`;
-  const announcesRequired =
-    ariaRequired === undefined ? required : ariaRequired === true || ariaRequired === 'true';
-  const limits = describeLimits(
-    {
-      tokens: s.tokens,
-      maxSize,
-      maxCount: multiple ? maxCount : undefined,
-    },
-    t,
-  );
+  const limits: FileFieldLimits = {
+    accept: s.tokens,
+    maxSize,
+    maxCount: multiple ? maxCount : undefined,
+  };
+  const listsRejections = !!rejectionPart && s.rejections.length > 0;
   const showsInvalid =
     s.rejections.length > 0 ? true : (ariaInvalid ?? invalid) === true || ariaInvalid === 'true';
   const state: FileFieldState = {
@@ -141,9 +142,8 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': joinIds(
       ariaDescribedby,
-      look === 'dropzone' && !!limits && limitsId,
-      s.rejections.length > 0 && errorId,
-      announcesRequired && requiredId,
+      limitsParts.length > 0 && limitsId,
+      listsRejections && errorId,
     ),
     'aria-invalid': s.rejections.length ? true : (ariaInvalid ?? (invalid || undefined)),
     'aria-disabled': readOnly || undefined,
@@ -202,23 +202,13 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
 
   const messages = (
     <>
-      {announcesRequired && (
-        <span id={requiredId} hidden>
-          {t('fileField.required')}
-        </span>
-      )}
-      {s.rejections.length > 0 && (
+      {listsRejections && (
         <div id={errorId} role="alert">
           <ul className={styles.rejections()}>
-            {s.rejections.map(({ file, reason }) => (
-              <li key={fileKey(file)}>
-                {file.name}:{' '}
-                {reason === 'type'
-                  ? t('fileField.rejectType')
-                  : reason === 'size'
-                    ? t('fileField.rejectSize', { max: formatBytes(maxSize ?? 0) })
-                    : t('fileField.rejectCount', { max: multiple ? (maxCount ?? 0) : 1 })}
-              </li>
+            {s.rejections.map((rejection) => (
+              <FileRejectionContext key={fileKey(rejection.file)} value={rejection}>
+                {rejectionPart}
+              </FileRejectionContext>
             ))}
           </ul>
         </div>
@@ -239,8 +229,7 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
       field,
       state,
       size: resolvedSize,
-      placeholder:
-        placeholder ?? (look === 'dropzone' ? t('fileField.dropzone') : t('fileField.placeholder')),
+      placeholder,
       limits,
       limitsId,
       triggerProps,
@@ -249,5 +238,7 @@ export function useFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
     rootProps,
     picker,
     messages,
+    structure,
+    limitsParts,
   };
 }
