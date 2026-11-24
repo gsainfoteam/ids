@@ -3,7 +3,7 @@ import { useActionState, type ReactElement } from 'react';
 import { CalendarDate } from '@internationalized/date';
 import { useFormStatus } from 'react-dom';
 import { describe, expect, test, vi } from 'vitest';
-import { page, server, userEvent, type Locator } from 'vitest/browser';
+import { page, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import {
@@ -346,26 +346,58 @@ test('useFormStatus reads pending while the action runs, then the form resets', 
   await expect.element(labelled('textbox')).toHaveValue('hello');
 });
 
-const CHROMIUM_BLURS_A_BUTTON_IT_DISABLES = server.browser === 'chromium';
+test('useFormStatus stays pending after the browser blurs the Button it natively disables', async () => {
+  const held = deferred();
+  await render(
+    <form aria-label={FORM_LABEL} action={() => held.promise}>
+      <SendDisabledNatively />
+    </form>,
+  );
+  const button = page.getByRole('button');
 
-(CHROMIUM_BLURS_A_BUTTON_IT_DISABLES ? test.fails : test)(
-  'useFormStatus stays pending under a natively disabled Button (fails in Chromium: disabling it blurs it, its onBlur setState makes React drop pending)',
-  async () => {
-    const held = deferred();
-    await render(
+  await userEvent.click(button);
+
+  await expect.element(button).not.toHaveFocus();
+  await expect.element(button).toHaveAccessibleName('Sending');
+  await expect.element(button).toBeDisabled();
+
+  held.resolve();
+
+  await expect.element(button).toHaveAccessibleName('Send');
+  await expect.element(button).toBeEnabled();
+  await expect.element(button).not.toHaveAttribute('data-focused');
+});
+
+test('a Button submitted from the keyboard stays pending and its focus ring leaves with the focus', async () => {
+  const held = deferred();
+  await render(
+    <>
       <form aria-label={FORM_LABEL} action={() => held.promise}>
         <SendDisabledNatively />
-      </form>,
-    );
+      </form>
+      <Button disabled>Idle</Button>
+      <p>Elsewhere</p>
+    </>,
+  );
+  const button = page.getByRole('button', { name: /^Send/ });
+  const shadowOf = (name: string) =>
+    getComputedStyle(page.getByRole('button', { name }).element()).boxShadow;
 
-    await userEvent.click(page.getByRole('button', { name: 'Send' }));
+  await userEvent.keyboard('{Tab}');
+  await expect.element(button).toHaveFocus();
+  await userEvent.keyboard('{Enter}');
 
-    try {
-      await expect
-        .element(page.getByRole('button', { name: 'Sending' }), { timeout: 2000 })
-        .toBeDisabled();
-    } finally {
-      held.resolve();
-    }
-  },
-);
+  await expect.element(button).toHaveAccessibleName('Sending');
+  await expect.element(button).toBeDisabled();
+
+  await userEvent.click(page.getByText('Elsewhere'));
+
+  await expect.element(button).not.toHaveFocus();
+  await expect.element(button).toHaveAccessibleName('Sending');
+  expect(shadowOf('Sending')).toBe(shadowOf('Idle'));
+
+  held.resolve();
+
+  await expect.element(button).toHaveAccessibleName('Send');
+  await expect.element(button).not.toHaveAttribute('data-focus-visible');
+});
