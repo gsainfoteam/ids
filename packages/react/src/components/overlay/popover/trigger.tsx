@@ -4,7 +4,7 @@ import { useLayoutEffect, type ComponentProps, type MouseEvent } from 'react';
 
 import { usePopoverContext } from './context';
 import { DEFAULT_HOVER_DELAYS } from './use-popover';
-import { mergeProps, part } from '../../../utils';
+import { buttonTypeFor, mergeProps, part } from '../../../utils';
 
 export type PopoverTriggerProps = ComponentProps<'button'> & {
   asChild?: boolean;
@@ -32,7 +32,7 @@ export function PopoverTrigger({
     children,
     mergeProps(mergeProps(props, popover.getReferenceProps()), {
       ref: popover.setTrigger,
-      type: asChild ? undefined : 'button',
+      type: buttonTypeFor(asChild, children),
       'aria-haspopup': 'dialog',
       'aria-expanded': popover.open,
       'aria-controls': popover.open ? popover.ids.content : undefined,

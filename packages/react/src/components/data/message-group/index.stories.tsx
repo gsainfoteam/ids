@@ -34,13 +34,16 @@ const meta = {
   render: (args) => (
     <div className="w-96 break-keep">
       <MessageGroup {...args}>
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        <Message name="김지수" time={SENT_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>학식 메뉴 알려 줘</Bubble>
         </Message>
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        <Message name="김지수" time={SENT_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>오늘 거</Bubble>
         </Message>
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        <Message name="김지수" time={SENT_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>2학생회관 기준으로</Bubble>
         </Message>
       </MessageGroup>
@@ -57,10 +60,12 @@ export const Usage: Story = {
   render: () => (
     <div className="w-96 break-keep">
       <MessageGroup aria-label="김지수의 메시지">
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        <Message name="김지수" time={SENT_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>학식 메뉴 알려 줘</Bubble>
         </Message>
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        <Message name="김지수" time={SENT_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>오늘 거</Bubble>
         </Message>
       </MessageGroup>
@@ -78,13 +83,16 @@ export const Gallery: Story = {
         <Showcase.Row label="start">
           <div className="w-96 break-keep">
             <MessageGroup align="start" aria-label="김지수의 메시지">
-              <Message name="김지수" avatar={JISU} time={SENT_AT}>
+              <Message name="김지수" time={SENT_AT}>
+                <Message.Avatar src={JISU} />
                 <Bubble>학식 메뉴 알려 줘</Bubble>
               </Message>
-              <Message name="김지수" avatar={JISU} time={SENT_AT}>
+              <Message name="김지수" time={SENT_AT}>
+                <Message.Avatar src={JISU} />
                 <Bubble>오늘 거</Bubble>
               </Message>
-              <Message name="김지수" avatar={JISU} time={SENT_AT}>
+              <Message name="김지수" time={SENT_AT}>
+                <Message.Avatar src={JISU} />
                 <Bubble>2학생회관 기준으로</Bubble>
               </Message>
             </MessageGroup>
@@ -128,13 +136,16 @@ export const GroupMessagesFromOnePerson: Story = {
   render: () => (
     <div className="w-96 break-keep">
       <MessageGroup align="start" aria-label="김지수의 메시지">
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        <Message name="김지수" time={SENT_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>학식 메뉴 알려 줘</Bubble>
         </Message>
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
+        <Message name="김지수" time={SENT_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>오늘 거</Bubble>
         </Message>
-        <Message name="김지수" avatar={JISU} time={ANSWERED_AT}>
+        <Message name="김지수" time={ANSWERED_AT}>
+          <Message.Avatar src={JISU} />
           <Bubble>2층 식당</Bubble>
         </Message>
       </MessageGroup>

@@ -25,7 +25,7 @@ import { Field, FieldGroup, TextField } from '@gsainfoteam/ids-react';
 | ------------- | ---------------------------- | ---------- |
 | `orientation` | `'vertical' \| 'horizontal'` | `vertical` |
 
-`<div>` 의 나머지 속성은 루트로 갑니다. 루트에는 `data-field-group` 과 `data-orientation` 이 붙습니다.
+`<div>` 의 나머지 속성은 루트로 갑니다.
 
 ## 간격
 

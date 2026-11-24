@@ -903,7 +903,7 @@ Every other prop is an option. The rules for options:
   those props to the element and cannot reach a value inside a hook. Screen state (sorting, page,
   column widths) stays in the hook.
 - **Existing props that break this rule are debt, not precedent.** Some components still carry
-  them (Table's `striped`, Dialog's `hideClose`), and other sections
+  them (Table's `striped`), and other sections
   of this file may still describe them. A new prop follows this rule, never their example.
 
 ```tsx

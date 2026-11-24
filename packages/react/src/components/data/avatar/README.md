@@ -2,12 +2,12 @@
 
 사람이나 조직을 사진, 이니셜, 아이콘 순서로 보여 주는 동그란 표시입니다.
 
-- **이미지 상태.** 불러오는 중, 불러옴, 실패를 `data-status` 로 알리고 `onStatusChange` 로 넘겨줍니다.
+- **이미지 상태.** 불러오는 중, 불러옴, 실패를 `onStatusChange` 로 알립니다.
 - **깜빡임 없는 fallback.** 이미지를 불러오는 동안 600ms를 기다렸다가 이니셜을 보여 주므로, 빨리 오는 이미지 앞에 글자가 번쩍이지 않습니다. 이미지가 없거나 깨지면 바로 보여 줍니다.
 - **깨진 이미지는 빠진다.** 실패한 `<img>` 는 DOM에서 빠지고 이니셜이 자리를 채웁니다. 깨진 이미지 아이콘은 보이지 않습니다.
 - **SSR과 캐시.** 하이드레이션 전에 이미 불러온 이미지도 알아채고, 새 `src` 는 새 요소라 앞사람의 사진이 남지 않습니다.
 - **이니셜.** 한글 이름은 성 한 글자, 그 밖에는 앞 두 단어의 첫 글자입니다. 이모지나 악센트는 반으로 잘리지 않습니다.
-- **비율을 지키는 글자.** 크기를 `className` 으로 바꿔도 이니셜이 함께 커집니다.
+- **비율을 지키는 글자.** 새 디자인에서 크기를 `className` 으로 바꿔도 이니셜이 함께 커집니다.
 
 ```tsx
 import { Avatar } from '@gsainfoteam/ids-react';
@@ -43,7 +43,6 @@ import { Avatar } from '@gsainfoteam/ids-react';
   src={user.photo}
   name={user.name}
   onStatusChange={(status) => log(status)}           // 'loading' | 'loaded' | 'error'
-  className={(state) => (state.status === 'loaded' ? 'ring-2' : undefined)}
 />
 
 <Avatar name={user.name}>
@@ -51,7 +50,7 @@ import { Avatar } from '@gsainfoteam/ids-react';
 </Avatar>
 ```
 
-| `data-status` | 뜻                                   |
+| `status`      | 뜻                                   |
 | ------------- | ------------------------------------ |
 | `loading`     | 이미지를 불러오는 중                 |
 | `loaded`      | 이미지를 그렸다                      |
@@ -63,7 +62,12 @@ import { Avatar } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Avatar size="tiny" />           // standard(40px, 기본) / tiny(24px)
-<Avatar className="size-20" />   // 그 밖의 크기. 이니셜도 비율에 맞게 커진다
+```
+
+- 그 밖의 크기는 IDS 밖의 새 디자인입니다. 이때는 `className` 으로 크기를 주고, 이니셜도 비율에 맞게 커집니다.
+
+```tsx custom-design
+<Avatar className="size-20" />
 ```
 
 - 늘 원입니다. 조직 로고나 상품 사진도 원 안에 그립니다. `Item` 의 행에서 네모난 타일이 필요하면 `Item.Media variant="soft"` 에 아이콘이나 이미지를 넣습니다.
@@ -80,15 +84,24 @@ import { Avatar } from '@gsainfoteam/ids-react';
 - 이름은 `aria-label`, `alt`, `name` 순서로 정합니다.
 - `alt=""` 는 `<img alt="">` 처럼 장식용이라는 뜻입니다. 스크린 리더가 이름을 두 번 읽지 않도록 숨깁니다.
 
-## 상태와 data 속성
+## 상태
 
-| 속성          | 뜻                                |
-| ------------- | --------------------------------- |
-| `data-status` | `loading` / `loaded` / `error`    |
-| `data-size`   | `standard` / `tiny`               |
-| `data-cutout` | 그룹에서 겹친 쪽: `start` / `end` |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-함수로 받는 상태는 `{ status, size }` 입니다. 루트의 `className`, `style` 과 `Avatar.Image`, `Avatar.Fallback` 의 `className`, `style`, `Fallback` 의 `children` 이 받습니다.
+- 이미지 상태(`loading` / `loaded` / `error`)는 `onStatusChange` 로 받습니다.
+- 크기는 앱이 넘긴 `size` 이고, `AvatarGroup` 안에서 직접 주지 않으면 그룹의 `size` 입니다.
+- `Avatar.Fallback` 의 `children` 은 `Avatar.State`(`status`, `size`)를 받는 함수가 될 수 있습니다.
+- 새 디자인(`custom-design`)에서만 루트와 `Avatar.Image`, `Avatar.Fallback` 의 `className`, `style` 에 `Avatar.State` 를 받는 함수를 줍니다.
+
+```tsx custom-design
+<Avatar
+  src={user.photo}
+  name={user.name}
+  className={(state) => (state.status === 'loaded' ? 'ring-2' : undefined)}
+/>
+```
+
+- 런타임으로 읽을 수 없는 상태: `AvatarGroup` 에서 겹쳐 오려진 쪽(`start` / `end`).
 
 ## 속성
 

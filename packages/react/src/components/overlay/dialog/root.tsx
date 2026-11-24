@@ -20,7 +20,6 @@ export function DialogRoot({
   onOpenChangeComplete,
   dismissible = true,
   role = 'dialog',
-  hideClose = false,
   children,
 }: Dialog.Props) {
   const dialog = useDialog({ open, defaultOpen, onOpenChange, onOpenChangeComplete, dismissible });
@@ -37,7 +36,6 @@ export function DialogRoot({
         dialog,
         role,
         dismissible,
-        hideClose,
         overlay: overlay?.props,
         titled,
         setTitled,

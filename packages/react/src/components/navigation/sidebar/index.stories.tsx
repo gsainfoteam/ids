@@ -60,7 +60,7 @@ import { Sidebar } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['sidebar', 'floating', 'inset'] as const;
-const collapsibles = [false, 'icon', 'offcanvas'] as const;
+const collapsibles = { none: undefined, icon: 'icon', offcanvas: 'offcanvas' } as const;
 
 const meta = {
   title: 'Navigation/Sidebar',
@@ -69,7 +69,7 @@ const meta = {
   parameters: { canvasPadding: false },
   argTypes: {
     variant: { control: 'radio', options: variants },
-    collapsible: { control: 'radio', options: collapsibles },
+    collapsible: { control: 'radio', options: Object.keys(collapsibles), mapping: collapsibles },
     value: { control: 'text' },
   },
   args: {
@@ -280,7 +280,7 @@ export const Gallery: Story = {
               <Sidebar
                 value="/"
                 variant={variant}
-                collapsible
+                collapsible="icon"
                 defaultCollapsed
                 shortcut={false}
                 aria-label={`접힌 ${variant} 메뉴`}
@@ -321,7 +321,7 @@ export const Gallery: Story = {
           <Sidebar.Provider className="h-[30rem] min-h-0 overflow-hidden">
             <Sidebar
               value="/settings/alerts"
-              collapsible
+              collapsible="icon"
               shortcut={false}
               aria-label="파트 메뉴"
               className="h-full"

@@ -115,13 +115,13 @@ export function NumberFieldRoot({
           />
           {drawsDefaultParts && <NumberFieldStepper />}
         </div>
-        {field.hiddenInputName && (
+        {field.hiddenInputName && field.value != null && (
           <input
             type="hidden"
             name={field.hiddenInputName}
             form={field.form}
             disabled={state.disabled}
-            value={field.value ?? ''}
+            value={field.value}
           />
         )}
       </TextControlContext>

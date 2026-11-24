@@ -20,11 +20,6 @@ const ONCE_PER_PRESS_OUTSIDE_INPUTS = {
   stopPropagation: false,
 } as const;
 
-export function collapsibleModeOf(collapsible: boolean | SidebarCollapsibleMode | undefined) {
-  if (collapsible === true) return 'icon';
-  return collapsible ?? false;
-}
-
 export function useSmallScreen() {
   return useDrawerPresentation('drawer');
 }

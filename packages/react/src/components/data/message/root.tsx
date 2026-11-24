@@ -78,7 +78,6 @@ function Failure({
 export function MessageRoot({
   align: alignProp,
   name,
-  avatar,
   time,
   locale,
   status = 'sent',
@@ -105,7 +104,6 @@ export function MessageRoot({
   const labelled = name !== undefined || childrenOf(header) != null;
   const styles = messageStyle({ align, first, bubbled, status });
 
-  const drawnAvatar = part(MessageAvatar) ?? (avatar != null ? <MessageAvatar /> : null);
   const drawnHeader =
     header ??
     (name !== undefined || (timeIn === 'header' && time !== undefined) ? <MessageHeader /> : null);
@@ -119,7 +117,6 @@ export function MessageRoot({
         styles,
         align,
         name,
-        avatar,
         time,
         locale,
         status,
@@ -143,7 +140,7 @@ export function MessageRoot({
             data-last={group !== null && last ? '' : undefined}
             className={styles.root({ className })}
           >
-            {drawnAvatar}
+            {part(MessageAvatar)}
             <div className={styles.column()}>
               {drawnHeader}
               <div className={styles.body()}>

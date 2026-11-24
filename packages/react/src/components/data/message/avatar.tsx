@@ -1,23 +1,16 @@
 'use client';
 
-import { isValidElement } from 'react';
-
 import { useMessageContext } from './context';
 import { Avatar } from '../avatar';
 
 export type MessageAvatarProps = Avatar.Props;
 
 export function MessageAvatar(props: MessageAvatarProps) {
-  const { styles, avatar, name } = useMessageContext('Message.Avatar');
-  const given = Object.keys(props).length > 0;
+  const { styles, name } = useMessageContext('Message.Avatar');
 
   return (
     <span aria-hidden="true" data-message-avatar="" className={styles.avatar()}>
-      {isValidElement(avatar) && !given ? (
-        avatar
-      ) : (
-        <Avatar src={typeof avatar === 'string' ? avatar : undefined} name={name} {...props} />
-      )}
+      <Avatar name={name} {...props} />
     </span>
   );
 }
