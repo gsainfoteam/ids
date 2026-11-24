@@ -3,6 +3,7 @@ import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'catalog/addons.dart';
+import 'components/button_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -14,6 +15,12 @@ final directories = <WidgetbookNode>[
     name: 'Components',
     isInitiallyExpanded: true,
     children: [
+      WidgetbookFolder(
+        name: 'Action',
+        children: [
+          WidgetbookComponent(name: 'IdsButton', useCases: buttonUseCases),
+        ],
+      ),
       WidgetbookFolder(name: 'Form', children: [field]),
       WidgetbookFolder(name: 'Feedback', children: [spinner]),
       WidgetbookFolder(name: 'Layout', children: [divider]),

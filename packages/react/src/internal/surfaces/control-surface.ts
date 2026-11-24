@@ -1,19 +1,11 @@
 import { IDS_STATUS_FAMILIES } from '../../tokens/color-roles';
 import { cn } from '../../utils/cn';
 
-import type { IdsSize, IdsVariant } from '../../tokens/types';
+import type { IdsColorScheme, IdsSize, IdsVariant } from '../../tokens/types';
 
 export type SurfaceVariant = Exclude<IdsVariant, 'transparent'>;
 
-export type ControlColorScheme =
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'neutral'
-  | 'danger'
-  | 'success'
-  | 'warning'
-  | 'info';
+export type ControlColorScheme = IdsColorScheme;
 
 const schemes = {
   primary: cn('scheme-primary'),

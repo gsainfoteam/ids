@@ -25,6 +25,20 @@
     },
     "spinner": {
       "loadingList": "Loading the list"
+    },
+    "buttonSample": {
+      "newPost": "New post",
+      "next": "Next",
+      "export": "Export",
+      "delete": "Delete",
+      "saving": "Saving",
+      "link": "Link",
+      "disabledLink": "Disabled link",
+      "confirm": "Confirm",
+      "save": "Save"
+    },
+    "themedSample": {
+      "linkDestination": "Link destination"
     }
   },
   "examples": {
