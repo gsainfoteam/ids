@@ -30,5 +30,7 @@ IdsProvider 와 그 테마 객체입니다. 앱이 넘긴 `IdsTheme` 을 색 역
 - `IdsProviderScope` 는 부모 테마에 자기 `IdsThemeOverrides` 를 덮습니다(`merge`). 풀린 색은 병합한 테마로 캐시하므로 radius 만 바꾼 scope 는 부모와 같은 색을 다시 계산하지 않습니다. 색 필드를 쓴 scope 만 색 경고를 냅니다.
 - `mode` 나 `defaultMode` 를 가진 provider 가 모드를 소유합니다. 나머지는 `setMode`, `toggleMode` 를 소유한 조상에게 넘깁니다. `IdsMode.system` 은 플랫폼 밝기를 구독합니다.
 - 개발 빌드에서 자기 테마의 문제(`checkIdsTheme`)를 `debugPrint('[IDS] ...')` 로 한 번 알립니다.
-- `locale` 은 날짜와 숫자 형식에만 씁니다. 번역은 `translation` 객체가 정하고, 객체를 바꾸면 의존 위젯이 다시 그려집니다. 같은 객체를 고쳐 쓰는 것은 지원하지 않습니다.
+- `locale` 은 `IdsLocale` 하나입니다. 문구(`messages`)와 날짜·숫자 형식(`locale`)을 함께 바꾸고, 다른 `IdsLocale` 로 바꾸면 의존 위젯이 다시 그려집니다. 비교는 `locale` 과 `messages` 의 `==` 입니다.
+- `locale` 이 없으면 부모의 것을 쓰고, 가장 바깥이면 `_localeOfTheApp` 이 `Localizations.maybeLocaleOf` 를 읽습니다. 언어가 같은 실린 문구를 앱의 `Locale` 과 묶고, 없으면 `IdsLocale.ko` 입니다. `Localizations` 에 의존하므로 앱 로케일이 바뀌면 다시 풉니다.
+- `IdsLocale`, `IdsMessagesBase`, `IdsMessagesKo`, `IdsMessagesEn` 은 `packages/core/dart-messages.mjs` 가 만듭니다. 숫자 인자는 각 문구 클래스의 태그(ko-KR, en-US)로 `intl` 의 `NumberFormat` 이 씁니다.
 - Material, Cupertino 테마나 전역 `DefaultTextStyle` 을 넣지 않습니다. IDS 스타일은 IDS 컴포넌트 안에만 머뭅니다.
