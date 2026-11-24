@@ -482,7 +482,12 @@ test('the Caps Lock indicator follows the modifier state while the input has foc
     .spyOn(KeyboardEvent.prototype, 'getModifierState')
     .mockImplementation((key) => key === 'CapsLock' && capsLockOn);
   try {
-    const screen = await render(<PasswordField aria-label="Password" name="password" />);
+    const screen = await render(
+      <PasswordField aria-label="Password" name="password">
+        <PasswordField.Input />
+        <PasswordField.CapsLock label="Caps Lock이 켜져 있습니다." />
+      </PasswordField>,
+    );
     const input = screen.getByLabelText('Password');
     const indicator = screen.getByTitle('Caps Lock이 켜져 있습니다.');
     const status = screen.getByRole('status');
@@ -615,4 +620,21 @@ test('typing hints default off, and the toggle icon can follow the state', async
   expect(icon().dataset.icon).toBe('closed');
   await userEvent.click(screen.getByRole('button', { name: SHOW }));
   expect(icon().dataset.icon).toBe('open');
+});
+
+test('the default Caps Lock indicator has no text of its own', async () => {
+  const modifierState = vi
+    .spyOn(KeyboardEvent.prototype, 'getModifierState')
+    .mockImplementation((key) => key === 'CapsLock');
+  try {
+    const screen = await render(<PasswordField aria-label="Password" name="password" />);
+    node(screen.getByLabelText('Password')).focus();
+    await userEvent.keyboard('a');
+    const indicator = () => screen.container.querySelector('[data-password-field-caps-lock]');
+    await expect.poll(indicator).not.toBeNull();
+    expect(indicator()!.hasAttribute('title')).toBe(false);
+    await expect.element(screen.getByRole('status')).toBeEmptyDOMElement();
+  } finally {
+    modifierState.mockRestore();
+  }
 });

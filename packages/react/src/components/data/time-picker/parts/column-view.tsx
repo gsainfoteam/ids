@@ -2,12 +2,12 @@
 
 import { useId } from 'react';
 
-import { useInternalTranslate } from '../../../../internal/translate';
+import { useInternalIntlWords } from '../../../../internal/translate';
 import { mergeProps, part } from '../../../../utils';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { useInternalTimePickerContext } from '../context';
 import { useInternalTimeColumn } from '../hooks/use-time-picker';
-import { unitMessageKey } from '../lib/units';
+import { unitName } from '../lib/units';
 import { withDefault } from '../lib/with-default';
 
 import type { TimePickerColumnProps } from './column';
@@ -19,10 +19,10 @@ export function ColumnView({
   children,
   ...props
 }: Omit<TimePickerColumnProps, 'unit'> & { unit: TimeUnit }) {
-  const t = useInternalTranslate();
   const c = useInternalTimePickerContext(
     unit === 'period' ? 'TimePicker.Period' : 'TimePicker.Column',
   );
+  const words = useInternalIntlWords(c.locale);
   const id = useId();
   const column = useInternalTimeColumn(c, unit);
   const options = column.options.map((option) => (
@@ -51,7 +51,7 @@ export function ColumnView({
     mergeProps(props, {
       ref: column.node,
       role: 'listbox',
-      'aria-label': props['aria-label'] ?? t(unitMessageKey[unit]),
+      'aria-label': props['aria-label'] ?? unitName(unit, words, c.locale),
       'aria-orientation': 'vertical',
       'aria-disabled': c.state.disabled || undefined,
       'aria-readonly': c.state.readOnly || undefined,

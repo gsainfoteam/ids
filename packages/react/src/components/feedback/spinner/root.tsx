@@ -46,7 +46,7 @@ export function SpinnerRoot({
       />
       {announcement !== 'silent' && (
         <span role="status" className="sr-only">
-          {announcement === 'announced' ? (ariaLabel ?? t('spinner.label')) : null}
+          {announcement === 'announced' ? (ariaLabel ?? t('common.loading')) : null}
         </span>
       )}
     </>

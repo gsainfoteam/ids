@@ -29,13 +29,15 @@ const meta = {
           어떤 말투로 쓸까요?
           <Questionnaire.Option value="formal">격식</Questionnaire.Option>
           <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-          <Questionnaire.Other />
+          <Questionnaire.Other aria-label="직접 입력" />
         </Questionnaire.Question>
         <Questionnaire.Question name="topics" selectionMode="multiple" optional>
           무엇을 넣을까요?
           <Questionnaire.Option value="summary">요약</Questionnaire.Option>
           <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
         </Questionnaire.Question>
+        <Questionnaire.Skip>건너뛰기</Questionnaire.Skip>
+        <Questionnaire.Submit>보내기</Questionnaire.Submit>
       </>
     ),
   },
@@ -74,6 +76,7 @@ export const Usage: Story = {
           <Questionnaire.Option value="short">짧게</Questionnaire.Option>
           <Questionnaire.Option value="long">길게</Questionnaire.Option>
         </Questionnaire.Question>
+        <Questionnaire.Submit>보내기</Questionnaire.Submit>
       </Questionnaire>
     </div>
   ),
@@ -96,13 +99,14 @@ export const Gallery: Story = {
                   <Questionnaire.Option value="casual" description="동아리 단톡방">
                     편하게
                   </Questionnaire.Option>
-                  <Questionnaire.Other />
+                  <Questionnaire.Other aria-label="직접 입력" />
                 </Questionnaire.Question>
                 <Questionnaire.Question name="length">
                   얼마나 길게 쓸까요?
                   <Questionnaire.Option value="short">짧게</Questionnaire.Option>
                   <Questionnaire.Option value="long">길게</Questionnaire.Option>
                 </Questionnaire.Question>
+                <Questionnaire.Submit>보내기</Questionnaire.Submit>
               </Questionnaire>
             </div>
           </Showcase.Row>
@@ -118,6 +122,7 @@ export const Gallery: Story = {
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
               </Questionnaire.Question>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -128,8 +133,10 @@ export const Gallery: Story = {
                 무엇을 넣을까요?
                 <Questionnaire.Option value="summary">요약</Questionnaire.Option>
                 <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
-                <Questionnaire.Other />
+                <Questionnaire.Other aria-label="직접 입력" />
               </Questionnaire.Question>
+              <Questionnaire.Skip>건너뛰기</Questionnaire.Skip>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -144,6 +151,7 @@ export const Gallery: Story = {
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
               </Questionnaire.Question>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -157,6 +165,7 @@ export const Gallery: Story = {
                   통로
                 </Questionnaire.Option>
               </Questionnaire.Question>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -167,8 +176,9 @@ export const Gallery: Story = {
                 어떤 말투로 쓸까요?
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-                <Questionnaire.Other />
+                <Questionnaire.Other aria-label="직접 입력" />
               </Questionnaire.Question>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -183,8 +193,9 @@ export const Gallery: Story = {
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
                 <Questionnaire.Option value="cute">귀엽게</Questionnaire.Option>
-                <Questionnaire.Other />
+                <Questionnaire.Other aria-label="직접 입력" />
               </Questionnaire.Question>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -205,6 +216,7 @@ export const Gallery: Story = {
                   엽서
                 </Questionnaire.Option>
               </Questionnaire.Question>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -220,6 +232,7 @@ export const Gallery: Story = {
                 <Questionnaire.Option value="셔틀">셔틀 시간표</Questionnaire.Option>
                 <Questionnaire.Option value="도서관">도서관 빈자리</Questionnaire.Option>
               </Questionnaire.Question>
+              <Questionnaire.Submit>보내기</Questionnaire.Submit>
             </Questionnaire>
           </div>
         </Showcase.Row>
@@ -251,8 +264,9 @@ export const AskSeveralQuestionsInSteps: Story = {
           어떤 굿즈를 팔까요?
           <Questionnaire.Option value="sticker">스티커</Questionnaire.Option>
           <Questionnaire.Option value="keyring">키링</Questionnaire.Option>
-          <Questionnaire.Other />
+          <Questionnaire.Other aria-label="직접 입력" />
         </Questionnaire.Question>
+        <Questionnaire.Skip>건너뛰기</Questionnaire.Skip>
         <Questionnaire.Submit>계획 세우기</Questionnaire.Submit>
       </>
     ),
@@ -261,7 +275,7 @@ export const AskSeveralQuestionsInSteps: Story = {
     docs: {
       description: {
         story:
-          '질문이 여럿이면 위에 Progress 가 붙고, 한 번에 한 질문만 보입니다. 답하지 않은 필수 질문에서는 다음 버튼이 꺼져 있고, optional 질문에는 건너뛰기가 붙습니다. 마지막 질문의 버튼 글자는 Questionnaire.Submit 의 children 으로 바꿉니다. 마지막 질문에서 보내면 onComplete 가 건너뛴 질문을 뺀 답을 받습니다.',
+          '질문이 여럿이면 위에 Progress 가 붙고, 한 번에 한 질문만 보입니다. 답하지 않은 필수 질문에서는 다음 버튼이 꺼져 있고, optional 질문에는 Questionnaire.Skip 에 쓴 건너뛰기 버튼이 붙습니다. 이전과 다음은 아이콘 버튼이고, 마지막 질문의 버튼 글자는 Questionnaire.Submit 의 children 입니다. 마지막 질문에서 보내면 onComplete 가 건너뛴 질문을 뺀 답을 받습니다.',
       },
     },
   },
@@ -305,7 +319,7 @@ export const LetPeopleWriteTheirOwnAnswer: Story = {
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
         <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-        <Questionnaire.Other placeholder="예: 반말로 짧게" />
+        <Questionnaire.Other aria-label="직접 입력" placeholder="예: 반말로 짧게" />
       </Questionnaire.Question>
     ),
   },
@@ -341,7 +355,7 @@ export const StartOverWithAFormReset: Story = {
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
         <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-        <Questionnaire.Other />
+        <Questionnaire.Other aria-label="직접 입력" />
       </Questionnaire.Question>
       <Questionnaire.Question name="length">
         얼마나 길게 쓸까요?
@@ -351,6 +365,7 @@ export const StartOverWithAFormReset: Story = {
       <Button type="reset" variant="outline">
         처음부터
       </Button>
+      <Questionnaire.Submit>보내기</Questionnaire.Submit>
     </Questionnaire>
   ),
   parameters: {
@@ -392,6 +407,7 @@ export const SuggestPromptsToStartAChat: Story = {
               <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
               <Questionnaire.Option value="도서관 빈자리 있어?">도서관 빈자리</Questionnaire.Option>
             </Questionnaire.Question>
+            <Questionnaire.Submit>보내기</Questionnaire.Submit>
           </Questionnaire>
         </Card.Content>
       </Card>

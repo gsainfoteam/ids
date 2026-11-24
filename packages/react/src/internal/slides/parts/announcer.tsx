@@ -1,6 +1,6 @@
 'use client';
 
-import { useInternalTranslate } from '../../translate';
+import { useInternalIntlWords, useInternalTranslate } from '../../translate';
 
 import type { Slides } from '../hooks/use-slides';
 
@@ -18,6 +18,7 @@ export function SlidesAnnouncer({
   className,
 }: SlidesAnnouncerProps) {
   const t = useInternalTranslate();
+  const words = useInternalIntlWords();
   const position = { index: slides.firstSlideOf(slides.selected) + 1, count: slides.slideCount };
   const hasSlides = slides.slideCount > 0;
 
@@ -28,7 +29,9 @@ export function SlidesAnnouncer({
       data-slides-announcer=""
       className={className}
     >
-      {hasSlides && counter && <span aria-hidden="true">{t('slides.counter', position)}</span>}
+      {hasSlides && counter && (
+        <span aria-hidden="true">{words.ratio(position.index, position.count)}</span>
+      )}
       {hasSlides && (
         <span className={counter ? 'sr-only' : undefined}>{t('slides.slide', position)}</span>
       )}

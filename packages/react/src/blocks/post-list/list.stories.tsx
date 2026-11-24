@@ -336,7 +336,12 @@ export const PC: Story = {
                 )}
 
                 {pageCount > 1 && (
-                  <Pagination page={page} pageCount={pageCount} onPageChange={setPage} />
+                  <Pagination
+                    aria-label="글 목록 페이지"
+                    page={page}
+                    pageCount={pageCount}
+                    onPageChange={setPage}
+                  />
                 )}
               </div>
             </Tabs.Content>

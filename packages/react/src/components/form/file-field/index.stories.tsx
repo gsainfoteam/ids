@@ -42,6 +42,7 @@ const meta = {
   },
   args: {
     'aria-label': '첨부 파일',
+    placeholder: '파일 선택',
     variant: 'outline',
     size: 'standard',
     onValueChange: fn(),
@@ -67,7 +68,7 @@ export const Usage: Story = {
     <div className="w-80">
       <Field>
         <Field.Label>이력서</Field.Label>
-        <FileField accept=".pdf" />
+        <FileField accept=".pdf" placeholder="PDF 파일 선택" />
       </Field>
     </div>
   ),
@@ -96,7 +97,7 @@ export const Gallery: Story = {
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
           <div className="w-80">
-            <FileField aria-label="비어 있음" />
+            <FileField aria-label="비어 있음" placeholder="파일 선택" />
           </div>
         </Showcase.Row>
         <Showcase.Row label="image">
@@ -129,7 +130,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-80">
-            <FileField aria-label="잘못됨" invalid />
+            <FileField aria-label="잘못됨" placeholder="파일 선택" invalid />
           </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
@@ -163,8 +164,24 @@ export const AcceptSeveralFilesWithLimits: Story = {
             maxSize={20}
             maxCount={2}
             name="attachments"
+            placeholder="텍스트 파일 선택"
             data-testid="file-picker"
-          />
+          >
+            <FileField.Limits>
+              {({ maxSize, maxCount }) => `TXT · 파일당 최대 ${maxSize} B · 최대 ${maxCount}개`}
+            </FileField.Limits>
+            <FileField.Rejection>
+              {({ file, reason }) =>
+                `${file.name}: ${
+                  reason === 'type'
+                    ? '텍스트 파일만 올릴 수 있습니다.'
+                    : reason === 'size'
+                      ? '20 B보다 큽니다.'
+                      : '최대 2개까지 고를 수 있습니다.'
+                }`
+              }
+            </FileField.Rejection>
+          </FileField>
           <Field.Hint>실제 업로드는 하지 않습니다.</Field.Hint>
         </Field>
         <output aria-label="파일 결과">{files.map((file) => file.name).join(', ')}</output>
@@ -175,7 +192,7 @@ export const AcceptSeveralFilesWithLimits: Story = {
     docs: {
       description: {
         story:
-          '여러 파일은 목록에 쌓이고, 같은 파일은 다시 넣지 않습니다. accept, maxSize, maxCount 에 걸린 파일은 이유와 함께 알리고 나머지만 받습니다. 목록에서 지우면 포커스가 다음 파일로 갑니다.',
+          '여러 파일은 목록에 쌓이고, 같은 파일은 다시 넣지 않습니다. accept, maxSize, maxCount 에 걸린 파일은 빼고 나머지만 받습니다. FileField.Limits 의 자식 함수는 { accept, maxSize, maxCount } 를 받아 규칙을 적고, FileField.Rejection 의 자식 함수는 거부된 파일마다 { file, reason } 을 받아 이유를 적습니다. 목록에서 지우면 포커스가 다음 파일로 갑니다.',
       },
     },
   },

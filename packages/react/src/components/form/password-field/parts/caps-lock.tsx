@@ -4,7 +4,6 @@ import { type ComponentProps, type ReactNode } from 'react';
 
 import { ArrowBigUpDash } from 'lucide-react';
 
-import { useInternalTranslate } from '../../../../internal/translate';
 import { useInternalPasswordContext } from '../context';
 
 export type PasswordFieldCapsLockProps = Omit<ComponentProps<'span'>, 'children'> & {
@@ -26,24 +25,22 @@ export function PasswordFieldCapsLock({
   children,
   ...props
 }: PasswordFieldCapsLockProps) {
-  const t = useInternalTranslate();
-
   const { capsLock, styles } = useInternalPasswordContext('CapsLock');
-  const text = label ?? t('passwordField.capsLock');
+
   return (
     <>
       {capsLock && (
         <span
           {...props}
           aria-hidden="true"
-          title={text}
+          title={label}
           data-password-field-caps-lock=""
           className={styles.capsLock({ className })}
         >
           {children ?? <ArrowBigUpDash />}
         </span>
       )}
-      <AlwaysMountedStatus>{capsLock ? text : ''}</AlwaysMountedStatus>
+      <AlwaysMountedStatus>{capsLock ? (label ?? '') : ''}</AlwaysMountedStatus>
     </>
   );
 }

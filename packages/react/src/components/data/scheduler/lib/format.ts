@@ -1,6 +1,7 @@
 import { memoize } from 'es-toolkit';
 
 import { dateFormatter, numberFormatter } from '../../../../internal/date-locale';
+import { intlWords } from '../../../../internal/lib/intl-words';
 
 import type { SchedulerView } from './layout';
 import type { CalendarDate, CalendarDateTime } from '@internationalized/date';
@@ -44,8 +45,11 @@ export const schedulerFormat = memoize((locale: string) => {
   });
   const month = dateFormatter(locale, { year: 'numeric', month: 'long', timeZone: WALL_CLOCK });
   const digits = numberFormatter(locale, { useGrouping: false });
+  const words = intlWords(locale);
 
   return {
+    words,
+    capitalized: (text: string) => text.charAt(0).toLocaleUpperCase(locale) + text.slice(1),
     weekday: (day: CalendarDate) => weekday.format(onTheWall(day)),
     dayNumber: (day: CalendarDate) => digits.format(day.day),
     fullDate: (day: CalendarDate) => fullDate.format(onTheWall(day)),

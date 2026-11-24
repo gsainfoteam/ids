@@ -225,15 +225,15 @@ useCarousel({ autoplay: { value: playing, onValueChange: setPlaying } });
 | `autoplay.onValueChange`              | `(playing: boolean) => void`. 멈춤 버튼을 누를 때           |
 | `Carousel.Content`                    | 잘라 보이는 영역과 트랙. `asChild`                          |
 | `Carousel.Slide`                      | 한 장. `asChild`, `aria-label` 로 이름을 바꿀 수 있다       |
-| `Carousel.Prev` / `Carousel.Next`     | `IconButton` 속성. 이름 "이전 슬라이드" / "다음 슬라이드"   |
+| `Carousel.Prev` / `Carousel.Next`     | `IconButton` 속성. 이름 "이전" / "다음"   |
 | `Carousel.Indicators`                 | 점의 줄. 자식은 노드 또는 `(index) => ReactNode`            |
 | `Carousel.Indicator`                  | `index` 필수. 이름 "N번째 슬라이드로"                       |
-| `Carousel.Pause`                      | `IconToggle` 속성. 이름 "자동 넘김 멈춤", 눌림이 멈춤       |
+| `Carousel.Pause`                      | `IconToggle` 속성. 이름 "일시 정지", 눌림이 멈춤       |
 
 ## 알아둘 것
 
 - 이름이 없거나, `Carousel.Slide` 가 `Carousel.Content` 밖에 있거나, `autoplay` 와 `autoScroll` 을 함께 주면 개발 모드에서 콘솔에 경고합니다.
-- 문구("캐러셀", "슬라이드", "5장 중 2번째", "이전 슬라이드" 등)는 `IdsProvider translate` 의 `carousel.*`, `slides.*` 키로 바꿉니다.
+- 문구("캐러셀", "슬라이드", "5장 중 2번째", "이전" 등)는 `IdsProvider locale` 의 `carousel.*`, `slides.*` 키로 바꿉니다.
 - 서버 HTML 에는 `gap` 값이 없어서, 간격을 두고 여러 장을 보이는 캐러셀은 엔진이 붙을 때 장의 폭이 간격만큼 한 번 줄어듭니다.
 - `loop` 에서 `align="center"` 인 첫 자리는 엔진이 붙기 전까지 앞쪽 장을 끌어오지 못해 왼쪽에 붙어 보입니다.
 - 버튼으로 넘기는 움직임은 약 270ms 에 자리를 잡습니다(`--ids-motion-normal` 에 가장 가까운 Embla 값). 끌기는 손을 뗀 속도를 따릅니다. `prefers-reduced-motion` 이면 버튼, 점, 키는 움직임 없이 바로 넘깁니다.

@@ -36,7 +36,7 @@ export function SchedulerDayCountField({
   }
 
   return (
-    <LanguageContext value={{ ...language, locale }}>
+    <LanguageContext value={{ ...language, tag: locale }}>
       <NumberField
         value={draft}
         onValueChange={(count) => {

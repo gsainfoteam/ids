@@ -1,6 +1,6 @@
 import { dateFormatter, formatPart, numberFormatter } from '../../../../internal/date-locale';
 
-import type { Translate } from '../../../../internal/translate';
+import type { IntlWords } from '../../../../internal/lib/intl-words';
 import type { Formatters, Labels, Modifiers } from 'react-day-picker';
 
 const MONTH_AND_YEAR = { year: 'numeric', month: 'long' } as const;
@@ -35,24 +35,20 @@ export function dayPickerFormatters(locale: string): Partial<Formatters> {
   };
 }
 
-export function dayPickerLabels(locale: string, t: Translate): Partial<Labels> {
+export function dayPickerLabels(locale: string, words: IntlWords): Partial<Labels> {
   const formats = localeFormats(locale);
   const describeDay = (date: Date, modifiers: Partial<Modifiers> | undefined) =>
-    [
-      modifiers?.today && t('calendar.today'),
-      formats.fullDate.format(date),
-      modifiers?.selected && t('calendar.selected'),
-    ]
+    [modifiers?.today && words.relative(0, 'day'), formats.fullDate.format(date)]
       .filter(Boolean)
       .join(', ');
 
   return {
-    labelPrevious: () => t('calendar.previousMonth'),
-    labelNext: () => t('calendar.nextMonth'),
-    labelMonthDropdown: () => t('calendar.month'),
-    labelYearDropdown: () => t('calendar.year'),
-    labelWeekNumber: (week) => t('calendar.weekNumber', { week }),
-    labelWeekNumberHeader: () => t('calendar.weekNumberHeader'),
+    labelPrevious: () => words.relative(-1, 'month'),
+    labelNext: () => words.relative(1, 'month'),
+    labelMonthDropdown: () => words.field('month'),
+    labelYearDropdown: () => words.field('year'),
+    labelWeekNumber: (week) => formats.weekNumber.format(week),
+    labelWeekNumberHeader: () => words.field('weekOfYear'),
     labelGrid: (month) => formats.monthAndYear.format(month),
     labelWeekday: (weekday) => formats.weekdayLong.format(weekday),
     labelDayButton: (date, modifiers) => describeDay(date, modifiers),

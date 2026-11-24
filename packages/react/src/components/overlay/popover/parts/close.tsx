@@ -27,7 +27,7 @@ export function PopoverClose({ asChild, children, onClick, ...props }: PopoverCl
   if (children == null)
     return (
       <IconButton
-        aria-label={t('popover.close')}
+        aria-label={t('common.close')}
         {...props}
         variant="ghost"
         size="tiny"

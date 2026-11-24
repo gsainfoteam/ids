@@ -35,8 +35,8 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 ```tsx
 <TimeField />                                   // ko-KR: 오후 2:30
 <TimeField hourCycle="24h" />                   // 14:30. 시계도 24시간제
-<IdsProvider.Scope locale="en-US"><TimeField /></IdsProvider.Scope>                  // 2:30 PM
-<IdsProvider.Scope locale="ja-JP"><TimeField hourCycle="12h" /></IdsProvider.Scope>  // 午後2:30
+<IdsProvider.Scope locale={en}><TimeField /></IdsProvider.Scope>                  // 2:30 PM
+<IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}><TimeField hourCycle="12h" /></IdsProvider.Scope>  // 午後2:30
 <TimeField precision="hour" />                  // 오후 2시
 <TimeField format={{ hour: '2-digit', minute: '2-digit' }} />   // Intl 옵션. 오후 02:30
 <TimeField format={{ timeStyle: 'short' }} hourCycle="24h" />   // hourCycle 이 옵션에도 간다
@@ -102,7 +102,7 @@ const schema = z.object({
 <TimeField value={time} onValueChange={setTime}>
   <TimeField.Trigger>
     <ClockIcon />
-    <TimeField.Value /> {/* 값이나 placeholder(시간 선택) */}
+    <TimeField.Value /> {/* 값이나 placeholder */}
   </TimeField.Trigger>
   <TimeField.Clear />
   <TimeField.Content>{/* 기본은 TimeField.TimePicker */}</TimeField.Content>
@@ -142,7 +142,7 @@ const schema = z.object({
 | `format`                                   | locale 시각. Intl 옵션이나 `(time, locale) => string`   |
 | `hourCycle`                                | locale 시간제. `12h` / `24h`. 표시와 시계 모두          |
 | `precision` / `step` / `min` / `max`       | `minute` / `1`. `min` / `max` 는 `Time`. 시계로 간다    |
-| `placeholder`                              | `시간 선택`                                             |
+| `placeholder`                              | 기본 없음                                               |
 | `name` / `form` / `required`               | 숨은 값 입력과 브라우저 검증                            |
 | `disabled` / `readOnly`                    | 열기, 고르기, Clear 를 막는다                           |
 | `invalid`                                  | danger 테두리와 링. Field 의 `aria-invalid` 가 우선     |

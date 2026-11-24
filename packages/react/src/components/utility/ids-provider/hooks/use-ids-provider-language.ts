@@ -1,20 +1,19 @@
 'use client';
 
-import { use, useMemo } from 'react';
+import { use, useEffect, useMemo } from 'react';
 
-import { LanguageContext, type IdsTranslate } from '../../../../internal/translate';
+import { warnWhenTagLeavesLanguage } from '../../../../internal/date-locale';
+import { LanguageContext } from '../../../../internal/translate';
 
-export function useInternalIdsProviderLanguage(
-  translate: IdsTranslate | undefined,
-  locale: string | undefined,
-) {
+import type { IdsLocale } from '../../../../internal/locale';
+
+export function useInternalIdsProviderLanguage(locale: IdsLocale | undefined) {
   const inherited = use(LanguageContext);
+  const language = useMemo(() => (locale ? { locale } : inherited), [locale, inherited]);
 
-  return useMemo(
-    () => ({
-      translate: translate ?? inherited.translate,
-      locale: locale ?? inherited.locale,
-    }),
-    [translate, locale, inherited.translate, inherited.locale],
-  );
+  useEffect(() => {
+    if (locale) warnWhenTagLeavesLanguage(locale);
+  }, [locale]);
+
+  return language;
 }

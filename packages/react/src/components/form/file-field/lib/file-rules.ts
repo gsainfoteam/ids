@@ -1,7 +1,3 @@
-import { uniq } from 'es-toolkit';
-
-import type { Translate } from '../../../../internal/translate';
-
 export type FileFieldRejection = { file: File; reason: 'type' | 'size' | 'count' };
 
 const EXTENSION = /^\.[a-z0-9][a-z0-9._-]*$/;
@@ -69,38 +65,6 @@ export function formatBytes(bytes: number) {
   }
   const rounded = unit === 0 || value >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
   return `${rounded} ${UNITS[unit]}`;
-}
-
-const NAMED_KINDS = ['image', 'video', 'audio', 'text'] as const;
-
-const isNamedKind = (kind: string): kind is (typeof NAMED_KINDS)[number] =>
-  (NAMED_KINDS as readonly string[]).includes(kind);
-
-function describeToken(token: string, t: Translate) {
-  if (token.startsWith('.')) return token.slice(1).toUpperCase();
-  const [kind, subtype] = token.split('/');
-  if (subtype === '*') return isNamedKind(kind) ? t(`fileField.kinds.${kind}`) : kind;
-  return subtype.replace(/^x-/, '').toUpperCase();
-}
-
-export function describeLimits(
-  {
-    tokens,
-    maxSize,
-    maxCount,
-  }: {
-    tokens: string[];
-    maxSize?: number;
-    maxCount?: number;
-  },
-  t: Translate,
-) {
-  const parts = [
-    tokens.length ? uniq(tokens.map((token) => describeToken(token, t))).join(', ') : null,
-    maxSize !== undefined ? t('fileField.limitSize', { max: formatBytes(maxSize) }) : null,
-    maxCount !== undefined ? t('fileField.limitCount', { count: maxCount }) : null,
-  ];
-  return parts.filter(Boolean).join(' · ');
 }
 
 type ReceiveOptions = {

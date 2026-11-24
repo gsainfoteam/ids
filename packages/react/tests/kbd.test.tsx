@@ -72,7 +72,7 @@ test('Mod is ⌘ on a Mac and Ctrl elsewhere, with platform order and joiners', 
   for (const platform of ['windows', 'linux'] as const) {
     const elsewhere = group(<Kbd keys="Mod+Shift+K" platform={platform} />);
     expect(visible(elsewhere), platform).toBe('Ctrl+Shift+K');
-    expect(spoken(elsewhere), platform).toBe('컨트롤 + 시프트 + K');
+    expect(spoken(elsewhere), platform).toBe('Ctrl + Shift + K');
     expect(elsewhere.dataset.platform).toBe(platform);
   }
 });
@@ -84,9 +84,9 @@ test('Meta is ⌘ on a Mac, Win on Windows and Super on Linux, each in its menu 
   expect(visible(all('mac'))).toBe('⌃⌥⇧⌘K');
   expect(spoken(all('mac'))).toBe('컨트롤 옵션 시프트 커맨드 K');
   expect(visible(all('windows'))).toBe('Win+Ctrl+Alt+Shift+K');
-  expect(spoken(all('windows'))).toBe('윈도우 + 컨트롤 + 알트 + 시프트 + K');
+  expect(spoken(all('windows'))).toBe('Win + Ctrl + Alt + Shift + K');
   expect(visible(all('linux'))).toBe('Super+Ctrl+Alt+Shift+K');
-  expect(spoken(all('linux'))).toBe('슈퍼 + 컨트롤 + 알트 + 시프트 + K');
+  expect(spoken(all('linux'))).toBe('Super + Ctrl + Alt + Shift + K');
 });
 
 test('the server renders the Windows form, the client switches to ⌘ on a Mac', async () => {
@@ -142,6 +142,33 @@ test('keys are drawn by their TanStack names, and unknown keys as written', () =
   expect(text('Mod')).toBe('Ctrl');
 });
 
+test('keys drawn as text are read as their text, with no spoken name of their own', () => {
+  const cap = (keys: Kbd.Keys, platform: Kbd.Platform) =>
+    doc(<Kbd keys={keys} platform={platform} />).querySelector('kbd')!;
+
+  for (const platform of ['mac', 'windows', 'linux'] as const) {
+    const faces = (['Tab', 'CapsLock', 'PageUp', 'PageDown', 'Home', 'End'] as const).map((key) =>
+      cap(key, platform),
+    );
+    expect(faces.map(visible), platform).toEqual([
+      'Tab',
+      'Caps Lock',
+      'PgUp',
+      'PgDn',
+      'Home',
+      'End',
+    ]);
+    expect(faces.map(spoken), platform).toEqual(faces.map(visible));
+    expect(
+      faces.every((face) => face.querySelector('.sr-only') === null),
+      platform,
+    ).toBe(true);
+  }
+  expect(spoken(cap('Escape', 'mac'))).toBe('Esc');
+  expect(spoken(cap('Enter', 'windows'))).toBe('Enter');
+  expect(spoken(cap('Enter', 'mac'))).toBe('리턴');
+});
+
 test('glyphs written as children are hidden and named', () => {
   const kbd = doc(<Kbd platform="mac">⇧⌘P</Kbd>).querySelector('kbd')!;
   expect(visible(kbd)).toBe('⇧⌘P');
@@ -152,11 +179,11 @@ test('glyphs written as children are hidden and named', () => {
 
 test('labels override the spoken names, a Kbd.Separator replaces the joiner', () => {
   const kbd = doc(
-    <Kbd keys="Mod+K" platform="windows" labels={{ control: 'Control' }}>
+    <Kbd keys="Mod+K" platform="mac" labels={{ command: 'Command' }}>
       <Kbd.Separator>then</Kbd.Separator>
     </Kbd>,
   ).querySelector('[data-kbd-group]')!;
-  expect(spoken(kbd)).toBe('Control then K');
+  expect(spoken(kbd)).toBe('Command then K');
   expect(kbd.querySelectorAll('[data-kbd-separator]')).toHaveLength(1);
 
   const mac = doc(

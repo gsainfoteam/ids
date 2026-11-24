@@ -18,7 +18,7 @@ export function ImageViewerNext({ className, ...props }: ImageViewerNextProps) {
       {...props}
       data-image-viewer-step="next"
       className={viewer.styles.next({ className })}
-      label={t('image.next')}
+      label={t('common.next')}
       glyph={<ChevronRightIcon aria-hidden="true" />}
       act={viewer.next}
       unavailable={!viewer.canNext}

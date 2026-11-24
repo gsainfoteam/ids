@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
 
@@ -27,6 +28,7 @@ const meta = {
     readOnly: { control: 'boolean' },
   },
   args: {
+    'aria-label': '달력',
     today,
     size: 'standard',
     monthsToShow: 1,
@@ -47,7 +49,11 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Calendar defaultValue={new CalendarDate(2026, 9, 18)} today={new CalendarDate(2026, 9, 15)} />
+    <Calendar
+      aria-label="달력"
+      defaultValue={new CalendarDate(2026, 9, 18)}
+      today={new CalendarDate(2026, 9, 15)}
+    />
   ),
 };
 
@@ -77,10 +83,13 @@ export const Gallery: Story = {
           columns={modes}
           render={(size, mode) => (
             <Calendar
-              {...({ selectionMode: mode, ...valueFor[mode] } as Calendar.Props)}
+              {...({
+                selectionMode: mode,
+                ...valueFor[mode],
+                'aria-label': `${mode} ${size}`,
+              } as Calendar.Props)}
               size={size}
               today={today}
-              aria-label={`${mode} ${size}`}
             />
           )}
         />
@@ -145,17 +154,17 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Locale">
         <Showcase.Row label="en-US">
-          <IdsProvider.Scope locale="en-US">
+          <IdsProvider.Scope locale={en}>
             <Calendar today={today} aria-label="English" />
           </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="de-DE">
-          <IdsProvider.Scope locale="de-DE">
+          <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
             <Calendar today={today} aria-label="Deutsch" />
           </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="ar-EG-u-nu-arab · rtl">
-          <IdsProvider.Scope locale="ar-EG-u-nu-arab" dir="rtl">
+          <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }} dir="rtl">
             <Calendar today={today} aria-label="العربية" />
           </IdsProvider.Scope>
         </Showcase.Row>
@@ -171,6 +180,7 @@ export const PickARange: Story = {
     return (
       <div className="flex flex-col gap-3">
         <Calendar
+          aria-label="달력"
           selectionMode="range"
           value={range}
           onValueChange={setRange}
@@ -246,11 +256,11 @@ export const JumpToAFarYearWithDropdowns: Story = {
     },
   },
   play: async ({ canvas, canvasElement, args, userEvent }) => {
-    await userEvent.selectOptions(canvas.getByRole('combobox', { name: '연도' }), '1995');
+    await userEvent.selectOptions(canvas.getByRole('combobox', { name: '년' }), '1995');
     await expect(args.onMonthChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 9, 1));
     await userEvent.selectOptions(canvas.getByRole('combobox', { name: '월' }), '0');
     await expect(grid(canvasElement)).toHaveAccessibleName('1995년 1월');
-    await userEvent.click(canvas.getByRole('button', { name: '이전 달' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지난달' }));
     await expect(grid(canvasElement)).toHaveAccessibleName('1994년 12월');
   },
 };
@@ -276,7 +286,7 @@ export const BlockDaysOutsideLimits: Story = {
     await userEvent.click(day(canvasElement, '2026-09-19'));
     await userEvent.keyboard('{ArrowRight}');
     await waitFor(() => expect(focusedDay()).toBe('2026-09-21'));
-    const previous = canvas.getByRole('button', { name: '이전 달' });
+    const previous = canvas.getByRole('button', { name: '지난달' });
     await expect(previous).toHaveAttribute('aria-disabled', 'true');
     const next = canvas.getByRole('button', { name: '다음 달' });
     await userEvent.click(next);
@@ -302,7 +312,12 @@ export const MarkDaysWithEvents: Story = {
     const busy = !!date && events.some((event) => event.compare(date) === 0);
 
     return (
-      <Calendar value={date} onValueChange={setDate} today={new CalendarDate(2026, 9, 15)}>
+      <Calendar
+        aria-label="달력"
+        value={date}
+        onValueChange={setDate}
+        today={new CalendarDate(2026, 9, 15)}
+      >
         <Calendar.Day modifiers={{ event: events }}>
           {(day, state) => (
             <>
@@ -342,7 +357,7 @@ export const MarkDaysWithEvents: Story = {
 
 export const LabelTheFirstDayOfAMonth: Story = {
   render: () => (
-    <Calendar today={new CalendarDate(2026, 9, 15)}>
+    <Calendar aria-label="달력" today={new CalendarDate(2026, 9, 15)}>
       <Calendar.Day>{(date) => (date.day === 1 ? `${date.month}/1` : date.day)}</Calendar.Day>
     </Calendar>
   ),
@@ -383,6 +398,7 @@ export const GoBackToToday: Story = {
           오늘
         </Button>
         <Calendar
+          aria-label="달력"
           value={date}
           onValueChange={setDate}
           month={month}
@@ -411,7 +427,7 @@ export const GoBackToToday: Story = {
 
 export const ShowWeekNumbers: Story = {
   render: () => (
-    <Calendar today={new CalendarDate(2026, 9, 15)}>
+    <Calendar aria-label="달력" today={new CalendarDate(2026, 9, 15)}>
       <Calendar.WeekNumber />
     </Calendar>
   ),
@@ -425,29 +441,26 @@ export const ShowWeekNumbers: Story = {
   },
   play: async ({ canvasElement }) => {
     await expect(canvasElement.querySelectorAll('[role=rowheader]')).toHaveLength(6);
-    await expect(canvasElement.querySelector('th[scope=col]')).toHaveAttribute(
-      'aria-label',
-      '주차',
-    );
+    await expect(canvasElement.querySelector('th[scope=col]')).toHaveAttribute('aria-label', '주');
   },
 };
 
 export const FollowTheLocale: Story = {
   render: () => (
     <div className="flex flex-wrap gap-8">
-      <IdsProvider.Scope locale="en-US">
+      <IdsProvider.Scope locale={en}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="English" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="en-US-u-fw-mon">
+      <IdsProvider.Scope locale={{ ...en, tag: 'en-US-u-fw-mon' }}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Monday first" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="ja-JP">
+      <IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="日本語" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="de-DE">
+      <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Deutsch" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="ar-EG-u-nu-arab" dir="rtl">
+      <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }} dir="rtl">
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="العربية" />
       </IdsProvider.Scope>
     </div>
@@ -456,7 +469,7 @@ export const FollowTheLocale: Story = {
     docs: {
       description: {
         story:
-          'Calendar 는 가장 가까운 IdsProvider 의 locale 을 따릅니다. locale 은 BCP 47 태그이고, 달 이름, 요일, 날짜 이름은 브라우저의 Intl 로 그리므로 import 할 locale 데이터가 없습니다. 주 시작은 locale 을 따르고 -u-fw- 확장(en-US-u-fw-mon)으로 바꿉니다. 숫자 체계는 -u-nu- 확장(ar-EG-u-nu-arab)으로 바꿉니다. 버튼 이름은 IDS 메시지를 씁니다.',
+          'Calendar 는 가장 가까운 IdsProvider 의 locale 을 따릅니다. locale 은 BCP 47 태그이고, 달 이름, 요일, 날짜 이름은 브라우저의 Intl 로 그리므로 import 할 locale 데이터가 없습니다. 주 시작은 locale 을 따르고 -u-fw- 확장(en-US-u-fw-mon)으로 바꿉니다. 숫자 체계는 -u-nu- 확장(ar-EG-u-nu-arab)으로 바꿉니다. 달 이동 버튼과 연도, 월 목록의 이름도 Intl 로 그려 locale 을 따릅니다.',
       },
     },
   },

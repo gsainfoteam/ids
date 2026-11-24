@@ -105,7 +105,7 @@ class _IdsSpinnerState extends State<IdsSpinner>
     return Semantics(
       liveRegion: true,
       label: _announced
-          ? widget.semanticLabel ?? t?.spinnerLabel ?? ko.spinnerLabel
+          ? widget.semanticLabel ?? t?.commonLoading ?? ko.commonLoading
           : null,
       child: spinning,
     );

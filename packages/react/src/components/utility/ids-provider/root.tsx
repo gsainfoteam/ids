@@ -7,30 +7,32 @@ import { useInternalIdsProviderElement } from './hooks/use-ids-provider-element'
 import { useInternalIdsProviderLanguage } from './hooks/use-ids-provider-language';
 import { useInternalIdsProviderWarnings } from './hooks/use-ids-provider-warnings';
 import { OverlayHost, PortalRootContext } from '../../../internal/overlay/parts/host';
-import { LanguageContext, type IdsTranslate } from '../../../internal/translate';
+import { LanguageContext } from '../../../internal/translate';
 import { cn } from '../../../utils';
 import { DefaultToaster } from '../../feedback/toast';
 import { TooltipDelayGroup } from '../../overlay/tooltip/parts/delay-group';
 import { Slot } from '../slot';
 
 import type { IdsThemeOverrides } from './lib/theme';
+import type { IdsLocale } from '../../../internal/locale';
 
-export type IdsProviderRootProps = Omit<ComponentProps<'div'>, 'color' | 'translate'> & {
+export type IdsProviderRootProps<Language extends string = string> = Omit<
+  ComponentProps<'div'>,
+  'color'
+> & {
   theme?: IdsThemeOverrides;
   mode?: ThemeMode;
   defaultMode?: ThemeMode;
   onModeChange?: (mode: ThemeMode) => void;
-  translate?: IdsTranslate;
-  locale?: string;
+  locale?: IdsLocale<Language>;
   asChild?: boolean;
 };
 
-export function IdsProviderRoot({
+export function IdsProviderRoot<const Language extends string = string>({
   theme,
   mode,
   defaultMode,
   onModeChange,
-  translate,
   locale,
   asChild = false,
   className,
@@ -38,7 +40,7 @@ export function IdsProviderRoot({
   ref,
   children,
   ...rest
-}: IdsProviderRootProps) {
+}: IdsProviderRootProps<Language>) {
   const { context, ownVariables, ownScale, issues, outermost, paintsSurface } =
     useInternalIdsProvider({
       theme,
@@ -46,7 +48,7 @@ export function IdsProviderRoot({
       defaultMode,
       onModeChange,
     });
-  const language = useInternalIdsProviderLanguage(translate, locale);
+  const language = useInternalIdsProviderLanguage(locale);
   const { elementRef, element, mergedRef } = useInternalIdsProviderElement(ref);
 
   useInternalIdsProviderWarnings(context, issues, elementRef);
