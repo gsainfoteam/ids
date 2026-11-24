@@ -57,10 +57,12 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Field className="w-80">
-      <Field.Label>첨부 파일</Field.Label>
-      <FileDropzone placeholder="파일을 끌어다 놓거나 눌러서 고르세요" />
-    </Field>
+    <div className="w-80">
+      <Field>
+        <Field.Label>첨부 파일</Field.Label>
+        <FileDropzone placeholder="파일을 끌어다 놓거나 눌러서 고르세요" />
+      </Field>
+    </div>
   ),
 };
 
@@ -137,27 +139,29 @@ export const LimitTypeSizeAndCount: Story = {
     maxCount: 2,
   },
   render: (args) => (
-    <Field className="w-96">
-      <Field.Label>증빙 자료</Field.Label>
-      <FileDropzone {...args}>
-        <FileDropzone.Limits>
-          {({ maxSize, maxCount }) =>
-            `PDF, 이미지 · 파일당 최대 ${(maxSize ?? 0) / 1024} KB · 최대 ${maxCount}개`
-          }
-        </FileDropzone.Limits>
-        <FileDropzone.Rejection>
-          {({ file, reason }) =>
-            `${file.name}: ${
-              reason === 'type'
-                ? 'PDF 나 이미지만 올릴 수 있습니다.'
-                : reason === 'size'
-                  ? '1 KB보다 큽니다.'
-                  : '최대 2개까지 고를 수 있습니다.'
-            }`
-          }
-        </FileDropzone.Rejection>
-      </FileDropzone>
-    </Field>
+    <div className="w-96">
+      <Field>
+        <Field.Label>증빙 자료</Field.Label>
+        <FileDropzone {...args}>
+          <FileDropzone.Limits>
+            {({ maxSize, maxCount }) =>
+              `PDF, 이미지 · 파일당 최대 ${(maxSize ?? 0) / 1024} KB · 최대 ${maxCount}개`
+            }
+          </FileDropzone.Limits>
+          <FileDropzone.Rejection>
+            {({ file, reason }) =>
+              `${file.name}: ${
+                reason === 'type'
+                  ? 'PDF 나 이미지만 올릴 수 있습니다.'
+                  : reason === 'size'
+                    ? '1 KB보다 큽니다.'
+                    : '최대 2개까지 고를 수 있습니다.'
+              }`
+            }
+          </FileDropzone.Rejection>
+        </FileDropzone>
+      </Field>
+    </div>
   ),
   parameters: {
     docs: {

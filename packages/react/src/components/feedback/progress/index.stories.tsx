@@ -42,19 +42,23 @@ const bar = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {
   render: (args) => (
-    <Progress {...args} className="max-w-md">
-      <Progress.Label>업로드 중</Progress.Label>
-      <Progress.Value />
-    </Progress>
+    <div className="max-w-md">
+      <Progress {...args}>
+        <Progress.Label>업로드 중</Progress.Label>
+        <Progress.Value />
+      </Progress>
+    </div>
   ),
 };
 
 export const Usage: Story = {
   render: () => (
-    <Progress value={65} className="max-w-md">
-      <Progress.Label>사진 올리는 중</Progress.Label>
-      <Progress.Value />
-    </Progress>
+    <div className="max-w-md">
+      <Progress value={65}>
+        <Progress.Label>사진 올리는 중</Progress.Label>
+        <Progress.Value />
+      </Progress>
+    </div>
   ),
   play: async ({ canvas }) => {
     const progressbar = canvas.getByRole('progressbar', { name: '사진 올리는 중' });
@@ -116,15 +120,6 @@ export const Gallery: Story = {
             </Progress>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="custom parts">
-          <div className="w-64">
-            <Progress value={72} aria-label="그라데이션">
-              <Progress.Track className="h-3">
-                <Progress.Indicator className="from-info to-success bg-linear-to-r" />
-              </Progress.Track>
-            </Progress>
-          </div>
-        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
@@ -134,15 +129,16 @@ const megabytes = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 
 export const ShowBytesInsteadOfAPercent: Story = {
   render: () => (
-    <Progress
-      value={2_411_724}
-      max={8_388_608}
-      getValueLabel={(value, max) => `${megabytes(value)} / ${megabytes(max)}`}
-      className="max-w-md"
-    >
-      <Progress.Label>보고서.pdf</Progress.Label>
-      <Progress.Value />
-    </Progress>
+    <div className="max-w-md">
+      <Progress
+        value={2_411_724}
+        max={8_388_608}
+        getValueLabel={(value, max) => `${megabytes(value)} / ${megabytes(max)}`}
+      >
+        <Progress.Label>보고서.pdf</Progress.Label>
+        <Progress.Value />
+      </Progress>
+    </div>
   ),
   parameters: {
     docs: {
@@ -192,10 +188,12 @@ export const FollowALiveValue: Story = {
     }, []);
 
     return (
-      <Progress value={value} colorScheme={value >= 100 ? 'success' : 'primary'} className="w-64">
-        <Progress.Label>동기화</Progress.Label>
-        <Progress.Value />
-      </Progress>
+      <div className="w-64">
+        <Progress value={value} colorScheme={value >= 100 ? 'success' : 'primary'}>
+          <Progress.Label>동기화</Progress.Label>
+          <Progress.Value />
+        </Progress>
+      </div>
     );
   },
   parameters: {
