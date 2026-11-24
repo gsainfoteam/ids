@@ -6,13 +6,12 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/16/solid';
 import { flushSync } from 'react-dom';
 
 import { useInternalTranslate } from '../../../../internal/translate';
-import { Button } from '../../../action/button';
+import { IconButton } from '../../../action/icon-button';
 
 type CodeBlockFoldProps = {
   className: string;
   controls: string;
   expanded: boolean;
-  hiddenLines: number;
   onExpandedChange: (expanded: boolean) => void;
 };
 
@@ -20,7 +19,6 @@ export function CodeBlockFold({
   className,
   controls,
   expanded,
-  hiddenLines,
   onExpandedChange,
 }: CodeBlockFoldProps) {
   const t = useInternalTranslate();
@@ -33,17 +31,18 @@ export function CodeBlockFold({
 
   return (
     <div className={className}>
-      <Button
+      <IconButton
         ref={button}
         variant="outline"
         size="tiny"
+        aria-label={expanded ? t('common.collapse') : t('common.expand')}
         aria-expanded={expanded}
         aria-controls={controls}
+        icon={
+          expanded ? <ChevronUpIcon aria-hidden="true" /> : <ChevronDownIcon aria-hidden="true" />
+        }
         onClick={expanded ? keepButtonInViewAfterCollapse : () => onExpandedChange(true)}
-      >
-        {expanded ? t('codeBlock.collapse') : t('codeBlock.expand', { count: hiddenLines })}
-        {expanded ? <ChevronUpIcon aria-hidden="true" /> : <ChevronDownIcon aria-hidden="true" />}
-      </Button>
+      />
     </div>
   );
 }

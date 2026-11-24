@@ -4,7 +4,7 @@ import { useInternalTemporalPicker } from '../../../../internal/temporal-field';
 import { Calendar, CalendarPickContext } from '../../../data/calendar';
 import { useInternalDateFieldContext } from '../context';
 
-import type { CalendarValue } from '../../../data/calendar/lib/date';
+import type { CalendarValue, DateSelection } from '../../../data/calendar/lib/date';
 
 export type DateFieldCalendarProps = Omit<
   Calendar.Props,
@@ -18,6 +18,8 @@ export type DateFieldCalendarProps = Omit<
   | 'readOnly'
   | 'size'
   | 'autoFocus'
+  | 'aria-label'
+  | 'aria-labelledby'
 >;
 
 export function DateFieldCalendar(props: DateFieldCalendarProps) {
@@ -33,7 +35,8 @@ export function DateFieldCalendar(props: DateFieldCalendarProps) {
           selectionMode: field.selectionMode,
           value: picker.value,
           onValueChange: picker.change,
-        } as Calendar.Props)}
+        } as DateSelection)}
+        {...picker.name}
         min={field.min}
         max={field.max}
         disabled={field.disabled === true ? undefined : field.disabled}

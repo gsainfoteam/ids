@@ -35,12 +35,12 @@ function transfer(files: File[]) {
 }
 
 test('the default composition is a form with a labelled textarea and a send button', async () => {
-  const screen = await render(<PromptInput onSend={vi.fn()} />);
+  const screen = await render(<PromptInput aria-label="메시지" onSend={vi.fn()} />);
   const form = screen.container.querySelector('form')!;
 
   expect(form).toHaveAttribute('data-prompt-input');
   expect(form).toHaveAttribute('data-status', 'idle');
-  await expect.element(textbox()).toHaveAttribute('placeholder', '메시지를 입력하세요');
+  await expect.element(textbox()).not.toHaveAttribute('placeholder');
   await expect.element(textbox()).toHaveAttribute('enterkeyhint', 'send');
   await expect.element(textbox()).toHaveAttribute('rows', '2');
   await expect.element(sendButton()).toHaveAttribute('type', 'submit');
@@ -54,7 +54,7 @@ test('the default composition is a form with a labelled textarea and a send butt
 
 test('Enter sends and clears, Shift+Enter breaks the line, empty or blank text is not sent', async () => {
   const onSend = vi.fn();
-  await render(<PromptInput onSend={onSend} />);
+  await render(<PromptInput aria-label="메시지" onSend={onSend} />);
 
   await userEvent.click(textbox());
   await userEvent.keyboard('   {Enter}');
@@ -74,7 +74,7 @@ test('Enter sends and clears, Shift+Enter breaks the line, empty or blank text i
 test('Enter that commits an IME composition does not send', async (context) => {
   skipWithoutCdp(context);
   const onSend = vi.fn();
-  await render(<PromptInput onSend={onSend} />);
+  await render(<PromptInput aria-label="메시지" onSend={onSend} />);
   await userEvent.click(textbox());
 
   const ime = cdp();
@@ -98,7 +98,13 @@ test('while busy, Enter keeps the draft and the button or Escape stops, or it wa
   const onSend = vi.fn();
   const onStop = vi.fn();
   const screen = await render(
-    <PromptInput status="streaming" onSend={onSend} onStop={onStop} defaultValue="next" />,
+    <PromptInput
+      aria-label="메시지"
+      status="streaming"
+      onSend={onSend}
+      onStop={onStop}
+      defaultValue="next"
+    />,
   );
 
   await userEvent.click(textbox());
@@ -113,7 +119,9 @@ test('while busy, Enter keeps the draft and the button or Escape stops, or it wa
   await userEvent.keyboard('{Escape}');
   expect(onStop).toHaveBeenCalledTimes(2);
 
-  await screen.rerender(<PromptInput status="submitting" onSend={onSend} defaultValue="next" />);
+  await screen.rerender(
+    <PromptInput aria-label="메시지" status="submitting" onSend={onSend} defaultValue="next" />,
+  );
   const waiting = page.getByRole('button', { name: '보내는 중', exact: true });
   await expect.element(waiting).toHaveAttribute('type', 'submit');
   await expect.element(waiting).toHaveAttribute('aria-busy', 'true');
@@ -135,6 +143,7 @@ test('the send button keeps focus as it turns into the stop button and back', as
     const [status, setStatus] = useState<PromptInput.Status>('idle');
     return (
       <PromptInput
+        aria-label="메시지"
         status={status}
         defaultValue="hello"
         onSend={() => setStatus('streaming')}
@@ -154,8 +163,15 @@ test('the send button keeps focus as it turns into the stop button and back', as
 test('attachments: picked and dropped files list in the top bar and go with the message', async () => {
   const onSend = vi.fn();
   const onFilesChange = vi.fn();
+  const onReject = vi.fn();
   const screen = await render(
-    <PromptInput onSend={onSend} onFilesChange={onFilesChange} accept=".pdf">
+    <PromptInput
+      aria-label="메시지"
+      onSend={onSend}
+      onFilesChange={onFilesChange}
+      onReject={onReject}
+      accept=".pdf"
+    >
       <PromptInput.Input />
       <PromptInput.Attach />
     </PromptInput>,
@@ -193,7 +209,11 @@ test('attachments: picked and dropped files list in the top bar and go with the 
         dataTransfer: transfer([new File(['x'], 'x.png', { type: 'image/png' })]),
       }),
     );
-  await expect.element(page.getByRole('alert')).toMatchTextContent(/x\.png/);
+  await expect
+    .poll(() => onReject.mock.lastCall?.[0])
+    .toEqual([
+      expect.objectContaining({ file: expect.objectContaining({ name: 'x.png' }), reason: 'type' }),
+    ]);
 
   await userEvent.click(page.getByRole('button', { name: 'b.pdf 삭제', exact: true }));
   await expect.poll(attachedNames).toEqual(['a.pdf']);
@@ -210,7 +230,7 @@ test('attachments: picked and dropped files list in the top bar and go with the 
 
 test('a file pasted into the textarea is attached, pasted text is typed', async (context) => {
   skipInFirefox(context, FIREFOX_DROPS_SYNTHETIC_CLIPBOARD_DATA);
-  await render(<PromptInput onSend={vi.fn()} />);
+  await render(<PromptInput aria-label="메시지" onSend={vi.fn()} />);
 
   await userEvent.click(textbox());
   const pasted = new ClipboardEvent('paste', {
@@ -229,7 +249,7 @@ test('controlled value reports the cleared text and parts may be placed by hand'
   function Controlled() {
     const [value, setValue] = useState('draft');
     return (
-      <PromptInput value={value} onValueChange={setValue} onSend={onSend}>
+      <PromptInput aria-label="메시지" value={value} onValueChange={setValue} onSend={onSend}>
         <PromptInput.Attachments aria-label="Files" />
         <PromptInput.Input aria-label="Question" maxRows={3} />
         <PromptInput.Submit aria-label="Ask" />
@@ -257,6 +277,7 @@ test('onSubmit may cancel sending, and without onSend the form submits natively'
   const submitted = vi.fn();
   const screen = await render(
     <PromptInput
+      aria-label="메시지"
       defaultValue="hi"
       onSend={onSend}
       onSubmit={(event) => {
@@ -282,7 +303,7 @@ test('onSubmit may cancel sending, and without onSend the form submits natively'
   document.addEventListener('submit', observeAfterReact);
   try {
     await screen.rerender(
-      <PromptInput defaultValue="hi">
+      <PromptInput aria-label="메시지" defaultValue="hi">
         <PromptInput.Input name="prompt" />
       </PromptInput>,
     );
@@ -299,7 +320,7 @@ test('tools toggle, go with every message and stay on after sending', async () =
   const onSend = vi.fn();
   const onToolsChange = vi.fn();
   await render(
-    <PromptInput onSend={onSend} onToolsChange={onToolsChange}>
+    <PromptInput aria-label="메시지" onSend={onSend} onToolsChange={onToolsChange}>
       <PromptInput.Input />
       <PromptInput.Tool value="search">웹 검색</PromptInput.Tool>
       <PromptInput.Tool value="sources">출처 보기</PromptInput.Tool>
@@ -324,7 +345,7 @@ test('tools toggle, go with every message and stay on after sending', async () =
 
 test('the action menu opens the file picker from its default item', async () => {
   const screen = await render(
-    <PromptInput onSend={vi.fn()}>
+    <PromptInput aria-label="메시지" onSend={vi.fn()}>
       <PromptInput.Input />
       <PromptInput.ActionMenu />
     </PromptInput>,
@@ -343,7 +364,7 @@ test('the action menu opens the file picker from its default item', async () => 
 
 test('the bars join the input with no line between them', async () => {
   const screen = await render(
-    <PromptInput defaultFiles={[pdf()]}>
+    <PromptInput aria-label="메시지" defaultFiles={[pdf()]}>
       <PromptInput.Input />
       <PromptInput.Attach />
     </PromptInput>,
@@ -359,6 +380,7 @@ test('form reset restores the default text, files and tools without reporting th
   const onValueChange = vi.fn();
   const screen = await render(
     <PromptInput
+      aria-label="메시지"
       defaultValue="start"
       defaultFiles={[pdf()]}
       defaultTools={['search']}
@@ -387,7 +409,7 @@ test('form reset restores the default text, files and tools without reporting th
 test('disabled turns off the textarea, the attach button and sending', async () => {
   const onSend = vi.fn();
   await render(
-    <PromptInput disabled defaultValue="locked" onSend={onSend}>
+    <PromptInput aria-label="메시지" disabled defaultValue="locked" onSend={onSend}>
       <PromptInput.Input />
       <PromptInput.Attach />
     </PromptInput>,
@@ -403,7 +425,7 @@ test('disabled turns off the textarea, the attach button and sending', async () 
 test('server markup holds the form, the textarea and the send button', () => {
   const doc = parse(
     renderToString(
-      <PromptInput defaultValue="hello" accept="image/*">
+      <PromptInput aria-label="메시지" defaultValue="hello" accept="image/*">
         <PromptInput.Input placeholder="Ask" />
         <PromptInput.Attach />
       </PromptInput>,

@@ -24,13 +24,12 @@ export function TemporalContent({ asChild, children, mobileVariant, ...props }: 
       initialFocusSelector={c.popup.initialFocusSelector}
       role="dialog"
       id={c.popup.id}
-      label={c.messages.title}
+      {...c.popup.name}
       data-temporal-owner={c.popup.id}
       className="concentric-p-3"
       onBlur={c.onBlur as (event: FocusEvent<HTMLDivElement>) => void}
     >
       <FieldPopupHeader
-        title={c.messages.title}
         closeLabel={c.messages.close}
         autoFocus
         onClose={() => c.picker.close(true)}

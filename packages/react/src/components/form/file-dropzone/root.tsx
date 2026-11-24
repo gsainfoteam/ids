@@ -4,8 +4,7 @@ import { ArrowUpTrayIcon } from '@heroicons/react/16/solid';
 
 import { fileDropzoneStyle } from './style';
 import { resolveState } from '../../../internal/lib/state-props';
-import { useInternalTranslate } from '../../../internal/translate';
-import { flattenFragments, invariant } from '../../../utils';
+import { invariant } from '../../../utils';
 import { FileContext } from '../file-field/context';
 import { useInternalFileFieldRoot } from '../file-field/hooks/use-file-field-root';
 import { isType } from '../file-field/lib/is-type';
@@ -20,14 +19,18 @@ export type FileDropzoneState = FileFieldState;
 export type FileDropzoneProps = FileFieldProps;
 
 export function FileDropzoneRoot(props: FileDropzoneProps) {
-  const t = useInternalTranslate();
-
-  const { variant = 'outline', children, className, style } = props;
-  const { context, rootProps, picker, messages } = useInternalFileFieldRoot(props, 'dropzone');
-  const { state, limits, limitsId, placeholder } = context;
+  const { variant = 'outline', className, style } = props;
+  const {
+    context,
+    rootProps,
+    picker,
+    messages,
+    structure: nodes,
+    limitsParts,
+  } = useInternalFileFieldRoot(props, 'dropzone');
+  const { state, placeholder } = context;
   const styles = fileDropzoneStyle({ variant, size: context.size });
 
-  const nodes = flattenFragments(children);
   invariant(
     !nodes.length || nodes.filter(isType(FileTrigger)).length === 1,
     'FileDropzone: explicit children require exactly one Trigger.',
@@ -41,14 +44,8 @@ export function FileDropzoneRoot(props: FileDropzoneProps) {
   const triggerContent = (
     <>
       <ArrowUpTrayIcon aria-hidden="true" className={styles.dropIcon()} />
-      <span className={styles.title()}>
-        {state.dragging ? t('fileField.dropzoneActive') : placeholder}
-      </span>
-      {limits && (
-        <span id={limitsId} className={styles.hint()}>
-          {limits}
-        </span>
-      )}
+      {placeholder && <span className={styles.title()}>{placeholder}</span>}
+      {limitsParts}
     </>
   );
 

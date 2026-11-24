@@ -77,7 +77,16 @@ export function useInternalTemporalFieldRoot<V>({
     onBlur,
   });
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const picker: TemporalPickerApi<V> = { value: state.value, change, close, size: resolvedSize };
+  const fieldName = native['aria-labelledby']
+    ? { 'aria-labelledby': native['aria-labelledby'] }
+    : { 'aria-label': native['aria-label'] ?? '' };
+  const picker: TemporalPickerApi<V> = {
+    value: state.value,
+    change,
+    close,
+    size: resolvedSize,
+    name: fieldName,
+  };
   const styles = temporalFieldStyle({ variant, size: resolvedSize, disabled });
   const slots = splitTemporalChildren(children, config.pickerParts, !!config.parse);
 
@@ -94,7 +103,7 @@ export function useInternalTemporalFieldRoot<V>({
     'aria-invalid': state.invalid || undefined,
     'aria-required': native['aria-required'] ?? (required || undefined),
     'aria-readonly': readOnly || undefined,
-     
+
     ref: mergeRefs(controlRef, ref),
   };
   const trigger = slots.hasInput
@@ -160,13 +169,14 @@ export function useInternalTemporalFieldRoot<V>({
     clear,
     onBlur: handleBlur,
     trigger,
-    text: state.empty ? (placeholder ?? config.messages.placeholder) : config.display(state.value),
+    text: state.empty ? (placeholder ?? '') : config.display(state.value),
     icon: config.icon,
     messages: config.messages,
     content: () => config.picker(picker),
     picker: picker as TemporalPickerApi<unknown>,
     popup: {
       id: popupId,
+      name: fieldName,
       anchor: rootRef,
       preferredWidth: config.preferredWidth,
       initialFocusSelector: config.initialFocusSelector,

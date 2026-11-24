@@ -90,7 +90,8 @@ import { Field, TelField } from '@gsainfoteam/ids-react';
   <Field>
     <Field.Label>연락처</Field.Label>
     <TelField name="tel" required />
-    <Field.Error />                    {/* "올바른 전화번호를 입력하세요." */}
+    <Field.Error />                    {/* 기본 "올바른 값이 아닙니다." */}
+    <Field.Error match="customError">올바른 전화번호를 입력하세요.</Field.Error> {/* 앱 문구 */}
   </Field>
 </form>
 ```

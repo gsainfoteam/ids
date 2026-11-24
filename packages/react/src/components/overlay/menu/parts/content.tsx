@@ -11,7 +11,6 @@ import {
   showInTopLayer,
   type AnchoredSide,
 } from '../../../../internal/overlay';
-import { useInternalTranslate } from '../../../../internal/translate';
 import { mergeProps } from '../../../../utils';
 import { ScrollArea } from '../../../layout/scroll-area';
 import {
@@ -161,8 +160,6 @@ function NestedMenuContent({
   alignOffset = -5,
   ...props
 }: Menu.ContentProps) {
-  const t = useInternalTranslate();
-
   const { level } = useInternalMenuContext('Menu.Content');
   const parent = useInternalContentContext('Menu.Content');
 
@@ -175,9 +172,11 @@ function NestedMenuContent({
 
   if (!level.mounted) return null;
 
-  const label = level.trigger?.textContent?.trim() ?? '';
-
   return (
-    <MenuPopup {...props} level={level} name={{ 'aria-label': t('menu.submenu', { label }) }} />
+    <MenuPopup
+      {...props}
+      level={level}
+      name={{ 'aria-labelledby': level.trigger?.id || undefined }}
+    />
   );
 }

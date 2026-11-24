@@ -163,7 +163,7 @@ export function useInternalTelField({
   });
 
   const holdsIncompleteNumber = current !== '' && !isCompletePhone(current);
-  const validity = holdsIncompleteNumber ? t('telField.invalid') : '';
+  const validity = holdsIncompleteNumber ? t('common.invalid') : '';
   useLayoutEffect(() => {
     inputRef.current?.setCustomValidity(validity);
     notify?.();

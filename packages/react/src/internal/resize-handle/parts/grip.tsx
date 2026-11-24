@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 import { invariant, mergeProps } from '../../../utils';
-import { useInternalTranslate } from '../../translate';
+import { useInternalIntlWords, useInternalTranslate } from '../../translate';
 import { useInternalAxesDrag, useInternalCornerShape } from '../hooks/use-resize-axes';
 import { useInternalResizeGripSeparators } from '../hooks/use-resize-grip-separators';
 import {
@@ -91,6 +91,7 @@ export function ResizeGrip({
   ...props
 }: ResizeGripProps) {
   const t = useInternalTranslate();
+  const words = useInternalIntlWords();
   const custom = asChild || children != null;
   const shape = useInternalCornerShape(corner);
   const arc = shape === null || custom ? null : gripArc(shape.radius, band, shape.exponent);
@@ -101,7 +102,7 @@ export function ResizeGrip({
   const hiddenSeparators = axes.map((axis) => (
     <div
       key={axis.dimension}
-      {...axisSeparatorProps(axis, t, disabled)}
+      {...axisSeparatorProps(axis, t, words, disabled)}
       {...separator(axis)}
       className={styles.separator()}
     />
@@ -110,7 +111,7 @@ export function ResizeGrip({
   const group = mergeProps(props, {
     ...drag.dragProps,
     role: 'group',
-    'aria-label': props['aria-label'] ?? t('resizable.handle'),
+    'aria-label': props['aria-label'] ?? t('common.resize'),
     'aria-disabled': disabled || undefined,
     'data-resize-grip': '',
     'data-disabled': disabled ? '' : undefined,

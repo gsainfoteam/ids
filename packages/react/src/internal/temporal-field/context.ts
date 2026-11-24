@@ -15,6 +15,7 @@ import type { TemporalFieldApi, TemporalFieldState } from './hooks/use-temporal-
 import type { TemporalMessages, TemporalPickerApi } from './lib/types';
 import type { temporalFieldStyle } from './style';
 import type { IdsSize } from '../../tokens/types';
+import type { AccessibleName } from '../lib/accessible-name';
 
 export type TemporalContextValue = {
   state: TemporalFieldState<unknown>;
@@ -33,6 +34,7 @@ export type TemporalContextValue = {
   picker: TemporalPickerApi<unknown>;
   popup: {
     id: string;
+    name: AccessibleName;
     anchor: RefObject<HTMLDivElement | null>;
     preferredWidth: number | undefined;
     initialFocusSelector: string;

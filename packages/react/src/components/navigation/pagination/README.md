@@ -12,15 +12,15 @@ import { Pagination } from '@gsainfoteam/ids-react';
 
 const [page, setPage] = useState(1);
 
-<Pagination page={page} pageCount={data.totalPages} onPageChange={setPage} />;
+<Pagination aria-label="페이지 탐색" page={page} pageCount={data.totalPages} onPageChange={setPage} />;
 ```
 
 ## 버튼 모드
 
 ```tsx
-<Pagination defaultPage={1} pageCount={20} />                          // 비제어
-<Pagination page={page} pageCount={20} onPageChange={setPage} />       // 제어
-<Pagination page={page} pageCount={Math.ceil(total / pageSize)} ... /> // 항목 수로 계산
+<Pagination aria-label="페이지 탐색" defaultPage={1} pageCount={20} />                           // 비제어
+<Pagination aria-label="페이지 탐색" page={page} pageCount={20} onPageChange={setPage} />        // 제어
+<Pagination aria-label="페이지 탐색" page={page} pageCount={Math.ceil(total / pageSize)} ... />  // 항목 수로 계산
 ```
 
 - 페이지는 1부터 셉니다. 범위 밖의 `page` 는 가까운 끝으로 맞춰 그리고, 개발 모드에서 콘솔에 경고합니다.
@@ -30,7 +30,7 @@ const [page, setPage] = useState(1);
 ## 링크 모드
 
 ```tsx
-<Pagination page={page} pageCount={20} getHref={(page) => `/posts?page=${page}`} />
+<Pagination aria-label="페이지 탐색" page={page} pageCount={20} getHref={(page) => `/posts?page=${page}`} />
 ```
 
 - 페이지마다 `<a href>` 를 그립니다. 서버가 그린 HTML 에도 주소가 있어 새 탭으로 열리고 검색 엔진이 따라갑니다.
@@ -44,7 +44,7 @@ const [page, setPage] = useState(1);
 ```tsx
 import { Link } from '@tanstack/react-router';
 
-<Pagination page={page} pageCount={20}>
+<Pagination aria-label="페이지 탐색" page={page} pageCount={20}>
   <Pagination.List>
     {(entry) => {
       if (entry.type === 'ellipsis') return <Pagination.Ellipsis />;
@@ -72,10 +72,10 @@ import { Link } from '@tanstack/react-router';
 ## 생략 규칙
 
 ```tsx
-<Pagination page={7} pageCount={20} />                    // 1 … 6 7 8 … 20
-<Pagination page={10} pageCount={20} siblingCount={2} />  // 1 … 8 9 10 11 12 … 20
-<Pagination page={10} pageCount={20} boundaryCount={2} /> // 1 2 … 9 10 11 … 19 20
-<Pagination page={10} pageCount={20} boundaryCount={0} /> // … 9 10 11 …
+<Pagination aria-label="페이지 탐색" page={7} pageCount={20} />                     // 1 … 6 7 8 … 20
+<Pagination aria-label="페이지 탐색" page={10} pageCount={20} siblingCount={2} />   // 1 … 8 9 10 11 12 … 20
+<Pagination aria-label="페이지 탐색" page={10} pageCount={20} boundaryCount={2} />  // 1 2 … 9 10 11 … 19 20
+<Pagination aria-label="페이지 탐색" page={10} pageCount={20} boundaryCount={0} />  // … 9 10 11 …
 ```
 
 - `siblingCount`(기본 1)는 현재 페이지 양옆에, `boundaryCount`(기본 1)는 양 끝에 늘 보일 페이지 수입니다.
@@ -85,7 +85,7 @@ import { Link } from '@tanstack/react-router';
 ## 파트 조합
 
 ```tsx
-<Pagination defaultPage={2} pageCount={3}>
+<Pagination aria-label="페이지 탐색" defaultPage={2} pageCount={3}>
   <Pagination.List>
     <Pagination.Item>
       <Pagination.Previous icon={<ArrowLongLeftIcon />} />
@@ -111,7 +111,7 @@ import { Link } from '@tanstack/react-router';
 ## 처음과 끝
 
 ```tsx
-<Pagination page={page} pageCount={20} onPageChange={setPage}>
+<Pagination aria-label="페이지 탐색" page={page} pageCount={20} onPageChange={setPage}>
   <Pagination.List>
     <Pagination.Item><Pagination.First focusableWhenDisabled /></Pagination.Item>
     <Pagination.Item><Pagination.Previous focusableWhenDisabled /></Pagination.Item>
@@ -128,10 +128,10 @@ import { Link } from '@tanstack/react-router';
 ## 모양
 
 ```tsx
-<Pagination pageCount={20} />                   {/* 현재 페이지는 primary soft */}
-<Pagination pageCount={20} variant="solid" />    {/* 현재 페이지만. 나머지는 ghost */}
-<Pagination pageCount={20} size="tiny" />
-<Pagination pageCount={20} disabled />           {/* 모든 버튼을 끈다 */}
+<Pagination aria-label="페이지 탐색" pageCount={20} />                  {/* 현재 페이지는 primary soft */}
+<Pagination aria-label="페이지 탐색" pageCount={20} variant="solid" />  {/* 현재 페이지만. 나머지는 ghost */}
+<Pagination aria-label="페이지 탐색" pageCount={20} size="tiny" />
+<Pagination aria-label="페이지 탐색" pageCount={20} disabled />         {/* 모든 버튼을 끈다 */}
 ```
 
 - 현재 페이지는 기본으로 `bg-primary-soft` 과 `text-on-primary-soft` 입니다. DataTable 의 선택한 행과 같은 색입니다.
@@ -141,7 +141,7 @@ import { Link } from '@tanstack/react-router';
 
 ```tsx
 <div className="w-80">
-  <Pagination pageCount={20} />  {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
+  <Pagination aria-label="페이지 탐색" pageCount={20} />  {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
 </div>
 ```
 
@@ -176,8 +176,8 @@ import { Link } from '@tanstack/react-router';
 | `variant`               | 현재 페이지의 Button variant. `soft`(기본)                    |
 | `disabled`              | 모든 버튼과 링크를 끈다                                       |
 | `Pagination.Link`       | `page` 필수. `asChild`, 자식이 없으면 번호                    |
-| `Pagination.Previous`   | `icon`, `asChild`. 이름은 "이전 페이지"                       |
-| `Pagination.Next`       | `icon`, `asChild`. 이름은 "다음 페이지"                       |
+| `Pagination.Previous`   | `icon`, `asChild`. 이름은 "이전"                              |
+| `Pagination.Next`       | `icon`, `asChild`. 이름은 "다음"                              |
 | `Pagination.First`      | `icon`, `asChild`. 이름은 "첫 페이지"                         |
 | `Pagination.Last`       | `icon`, `asChild`. 이름은 "마지막 페이지"                     |
 | `focusableWhenDisabled` | 화살표 네 개. 끝에 닿아도 포커스와 탭 순서를 지킨다           |
@@ -188,5 +188,6 @@ import { Link } from '@tanstack/react-router';
 ## 알아둘 것
 
 - `getHref` 와 `Pagination.List` 의 함수는 함수라서 Server Component 에서 넘길 수 없습니다. 서버에서 그리는 페이지는 이 부분만 클라이언트 컴포넌트로 둡니다.
-- 이름("페이지 탐색", "3페이지", "이전 페이지", "다음 페이지", "첫 페이지", "마지막 페이지")은 `IdsProvider translate` 의 `pagination.*` 키로 바꿉니다. 한 화면에 페이지네이션이 둘이면 `aria-label` 로 구분합니다.
+- `aria-label` 은 필수입니다(`aria-label="페이지 탐색"`). 보이는 제목이 이름이면 그 `id` 를 `aria-labelledby` 로 줍니다. 한 화면에 페이지네이션이 둘이면 서로 다른 이름을 줍니다. 이름이 없으면 개발 모드에서 경고합니다.
+- 버튼 이름("3페이지", "이전", "다음", "첫 페이지", "마지막 페이지")은 `IdsProvider locale` 의 `pagination.page`, `common.previous`, `common.next`, `pagination.first`, `pagination.last` 키로 바꿉니다.
 - 항목 수로 "41-60 / 1,000" 같은 안내를 적는 파트는 없습니다. 옆에 글자로 둡니다.

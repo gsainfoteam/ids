@@ -3,7 +3,6 @@
 import { DateFormatter } from '@internationalized/date';
 import { memoize } from 'es-toolkit';
 
-import { DEFAULT_LOCALE } from '../../../../internal/messages';
 import { useInternalProviderLocale } from '../../../../internal/translate';
 import { useInternalMessageContext } from '../context';
 
@@ -12,12 +11,12 @@ const clockOf = memoize(
 );
 
 export function MessageTime({ time }: { time: Date }) {
-  const { styles, locale } = useInternalMessageContext('Message');
-  const providerLocale = useInternalProviderLocale();
+  const { styles } = useInternalMessageContext('Message');
+  const locale = useInternalProviderLocale();
 
   return (
     <time dateTime={time.toISOString()} suppressHydrationWarning className={styles.time()}>
-      {clockOf(locale ?? providerLocale ?? DEFAULT_LOCALE).format(time)}
+      {clockOf(locale).format(time)}
     </time>
   );
 }

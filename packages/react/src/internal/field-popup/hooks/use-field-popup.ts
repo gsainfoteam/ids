@@ -42,7 +42,6 @@ export function useInternalFieldPopup({
   const [popup, setPopup] = useState<HTMLElement | null>(null);
   const drawer = useInternalDrawerPresentation(mobileVariant);
   const presentation: PopupPresentation = drawer ? 'drawer' : 'popover';
-  const [titleId, setTitleId] = useState<string>();
   const [stacked, setStacked] = useState(false);
 
   const layer = useInternalLayer(true, {
@@ -68,5 +67,5 @@ export function useInternalFieldPopup({
   useInternalFieldPopupPlacement(popup, drawer, anchored.isPositioned);
   useInternalFieldPopupInitialFocus(popup, drawer, initialFocusSelector);
 
-  return { popup, setPopup, drawer, presentation, layer, anchored, titleId, setTitleId, stacked };
+  return { popup, setPopup, drawer, presentation, layer, anchored, stacked };
 }

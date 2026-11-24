@@ -2,7 +2,11 @@
 
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { useInternalTranslate, type Translate } from '../../../../internal/translate';
+import {
+  useInternalIntlWords,
+  useInternalTranslate,
+  type Translate,
+} from '../../../../internal/translate';
 import { useInternalTextAreaContext } from '../context';
 import { countState, useInternalCountAnnouncement, type CountState } from '../hooks/use-text-area';
 import { resolve, type StateValue } from '../lib/state-value';
@@ -30,6 +34,7 @@ export function TextAreaCount({
   ...props
 }: TextAreaCountProps) {
   const t = useInternalTranslate();
+  const words = useInternalIntlWords();
   const { count, countId, styles } = useInternalTextAreaContext('TextArea.Count');
 
   const state = countState(count.length, count.maxLength, threshold);
@@ -49,8 +54,8 @@ export function TextAreaCount({
       >
         {children === undefined
           ? state.maxLength === undefined
-            ? t('textArea.count', { count: state.count })
-            : t('textArea.countOfMax', { count: state.count, maxLength: state.maxLength })
+            ? words.number(state.count)
+            : words.ratio(state.count, state.maxLength)
           : resolve(children, state)}
       </span>
       <span role="status" className="sr-only">

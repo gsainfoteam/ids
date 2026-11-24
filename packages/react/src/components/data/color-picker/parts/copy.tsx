@@ -26,9 +26,7 @@ export function ColorPickerCopy({
     <>
       <IconButton
         {...props}
-        aria-label={
-          props['aria-label'] ?? (copied ? t('colorPicker.copied') : t('colorPicker.copy'))
-        }
+        aria-label={props['aria-label'] ?? (copied ? t('common.copied') : t('common.copy'))}
         disabled={c.state.disabled || !parsed}
         data-color-picker-copy=""
         data-copied={copied ? '' : undefined}
@@ -42,7 +40,7 @@ export function ColorPickerCopy({
         onClick={mergeEventHandlers(onClick, c.picker.actions.copy)}
       />
       <span role="status" className={c.styles.channel()}>
-        {copied ? t('colorPicker.copied') : ''}
+        {copied ? t('common.copied') : ''}
       </span>
     </>
   );

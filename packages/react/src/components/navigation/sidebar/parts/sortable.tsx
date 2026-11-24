@@ -256,7 +256,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
 
     const drops: SidebarDrop[] = [];
     if (drop.position === 'after')
-      for (let outer: typeof node | undefined = node; outer; ) {
+      for (let outer: typeof node | undefined = node; outer;) {
         drops.push({ key: outer.key, position: 'after' });
         if (outer.parent === null || siblingKeysOf(tree, outer.parent).at(-1) !== outer.key) break;
         outer = tree.nodes.get(outer.parent);
@@ -264,7 +264,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
     else {
       drops.push(drop);
       let inner = siblingKeysOf(tree, node.parent)[node.index - 1];
-      for (; inner !== undefined; ) {
+      for (; inner !== undefined;) {
         const last = tree.nodes.get(inner)?.children.filter(isVisible).at(-1);
         if (last === undefined) break;
         drops.push({ key: last, position: 'after' });
@@ -311,11 +311,11 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
   };
 
   const announcements: Announcements = {
-    onDragStart: ({ active }) => t('sidebar.drag.start', { item: labelOf(active.id) }),
+    onDragStart: ({ active }) => t('common.drag.start', { item: labelOf(active.id) }),
     onDragOver: () => undefined,
     onDragEnd: ({ active, over }) =>
-      t(over ? 'sidebar.drag.end' : 'sidebar.drag.cancel', { item: labelOf(active.id) }),
-    onDragCancel: ({ active }) => t('sidebar.drag.cancel', { item: labelOf(active.id) }),
+      t(over ? 'common.drag.end' : 'common.drag.cancel', { item: labelOf(active.id) }),
+    onDragCancel: ({ active }) => t('common.drag.cancel', { item: labelOf(active.id) }),
   };
 
   const value: SidebarSortableValue = {
@@ -333,7 +333,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
       const stops = keyboardStops(tree, key, isVisible, isAllowed);
       pending.current = null;
       setGrab({ key, stops, at: stops.findIndex((stop) => stop.move === null) });
-      setAnnouncement(t('sidebar.drag.start', { item: labelOf(key) }));
+      setAnnouncement(t('common.drag.start', { item: labelOf(key) }));
     },
     step: (direction) => {
       if (!grab) return;
@@ -347,11 +347,11 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
     release: () => {
       const move = grab?.stops[grab.at]?.move;
       const label = labelOf(grab?.key ?? '');
-      endGrab(t(move ? 'sidebar.drag.end' : 'sidebar.drag.cancel', { item: label }));
+      endGrab(t(move ? 'common.drag.end' : 'common.drag.cancel', { item: label }));
       if (move) commit(move, true);
     },
     cancel: () => {
-      if (grab) endGrab(t('sidebar.drag.cancel', { item: labelOf(grab.key) }));
+      if (grab) endGrab(t('common.drag.cancel', { item: labelOf(grab.key) }));
     },
   };
 

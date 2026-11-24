@@ -3,6 +3,7 @@ import { type ComponentProps, type ComponentType, type CSSProperties, type React
 import { type FieldSurfaceVariant } from '../../surfaces/lib/field-surface';
 
 import type { IdsSize } from '../../../tokens/types';
+import type { AccessibleName } from '../../lib/accessible-name';
 import type { TemporalChange, TemporalFieldState } from '../hooks/use-temporal-field';
 
 export type TemporalFieldProps<V> = Omit<
@@ -29,8 +30,6 @@ export type TemporalFieldProps<V> = Omit<
 };
 
 export type TemporalMessages = {
-  placeholder: string;
-  title: string;
   clear: string;
   close: string;
   open?: string;
@@ -41,6 +40,7 @@ export type TemporalPickerApi<V> = {
   change: TemporalChange<V>;
   close: (restoreFocus: boolean) => void;
   size: IdsSize;
+  name: AccessibleName;
 };
 
 export type TemporalPicker<V> = (api: TemporalPickerApi<V>) => ReactNode;

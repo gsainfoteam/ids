@@ -37,6 +37,7 @@ const meta = {
   },
   args: {
     'aria-label': '첨부 파일',
+    placeholder: '파일을 끌어다 놓거나 눌러서 고르세요',
     variant: 'outline',
     size: 'standard',
     onValueChange: fn(),
@@ -59,7 +60,7 @@ export const Usage: Story = {
     <div className="w-80">
       <Field>
         <Field.Label>첨부 파일</Field.Label>
-        <FileDropzone />
+        <FileDropzone placeholder="파일을 끌어다 놓거나 눌러서 고르세요" />
       </Field>
     </div>
   ),
@@ -70,7 +71,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Variant × Size"
-        description="허용 형식과 크기 제한은 영역 안에 미리 보입니다."
+        description="FileDropzone.Limits 에 쓴 허용 형식과 크기 제한은 영역 안에 미리 보입니다."
       >
         <Showcase.Matrix
           rows={sizes}
@@ -84,8 +85,11 @@ export const Gallery: Story = {
                 accept="image/*,.pdf"
                 maxSize={5 * 1024 * 1024}
                 maxCount={3}
+                placeholder="파일을 끌어다 놓으세요"
                 aria-label={`${variant} ${size}`}
-              />
+              >
+                <FileDropzone.Limits>이미지, PDF · 파일당 최대 5 MB · 최대 3개</FileDropzone.Limits>
+              </FileDropzone>
             </div>
           )}
         />
@@ -108,12 +112,12 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-80">
-            <FileDropzone aria-label="잘못됨" invalid />
+            <FileDropzone aria-label="잘못됨" placeholder="파일을 끌어다 놓으세요" invalid />
           </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
           <div className="w-80">
-            <FileDropzone aria-label="비활성" disabled />
+            <FileDropzone aria-label="비활성" placeholder="파일을 끌어다 놓으세요" disabled />
           </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly" className="items-start">
@@ -138,7 +142,24 @@ export const LimitTypeSizeAndCount: Story = {
     <div className="w-96">
       <Field>
         <Field.Label>증빙 자료</Field.Label>
-        <FileDropzone {...args} />
+        <FileDropzone {...args}>
+          <FileDropzone.Limits>
+            {({ maxSize, maxCount }) =>
+              `PDF, 이미지 · 파일당 최대 ${(maxSize ?? 0) / 1024} KB · 최대 ${maxCount}개`
+            }
+          </FileDropzone.Limits>
+          <FileDropzone.Rejection>
+            {({ file, reason }) =>
+              `${file.name}: ${
+                reason === 'type'
+                  ? 'PDF 나 이미지만 올릴 수 있습니다.'
+                  : reason === 'size'
+                    ? '1 KB보다 큽니다.'
+                    : '최대 2개까지 고를 수 있습니다.'
+              }`
+            }
+          </FileDropzone.Rejection>
+        </FileDropzone>
       </Field>
     </div>
   ),
@@ -146,7 +167,7 @@ export const LimitTypeSizeAndCount: Story = {
     docs: {
       description: {
         story:
-          'accept, maxSize, maxCount 를 주면 고르기 전에 규칙이 영역 안에 보이고, 트리거의 aria-describedby 로 읽힙니다. 규칙에 걸린 파일은 이유와 함께 알리고 나머지만 받습니다.',
+          'FileDropzone.Limits 의 자식 함수는 { accept, maxSize, maxCount } 를 받아 고르기 전에 규칙을 영역 안에 적고, 그 글은 트리거의 aria-describedby 로 읽힙니다. 규칙에 걸린 파일은 빼고 나머지만 받으며, FileDropzone.Rejection 의 자식 함수가 거부된 파일마다 { file, reason } 을 받아 이유를 적습니다.',
       },
     },
   },

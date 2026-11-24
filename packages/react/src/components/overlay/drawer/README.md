@@ -50,7 +50,7 @@ import { Drawer } from '@gsainfoteam/ids-react';
 
 - 모든 파트는 생략할 수 있습니다. `Drawer.Title` 이 없으면 `Drawer.Content` 에 `aria-label` 을 줍니다. 둘 다 없으면 개발 모드에서 경고합니다.
 - 모서리의 닫기 버튼(X)은 `Drawer.Close` 를 children 없이 쓸 때만 그립니다. 그 버튼은 패널 오른쪽 위에 붙습니다. Tab 순서가 내용 다음이 되도록 `Drawer.Content` 의 마지막에 둡니다.
-- `Drawer.Handle` 은 snap point 가 두 개 이상일 때만 버튼(`aria-label="끌어서 크기 조절"`)입니다. 그 밖에는 스크린 리더에게 숨긴 그림입니다. 열 때의 첫 포커스는 손잡이를 건너뜁니다.
+- `Drawer.Handle` 은 snap point 가 두 개 이상일 때만 버튼(`aria-label="크기 조절"`)입니다. 그 밖에는 스크린 리더에게 숨긴 그림입니다. 열 때의 첫 포커스는 손잡이를 건너뜁니다.
 
 ## 가장자리와 크기
 

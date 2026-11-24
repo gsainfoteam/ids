@@ -1,8 +1,8 @@
 {
   "ids(singleInterface=IdsMessages)": {
-    "dialogClose": "Close",
-    "spinnerLabel": "Loading",
-    "chipFieldRemove": "Remove {label}",
-    "textAreaRemaining": "{remaining} characters left"
+    "commonClose": "Close",
+    "commonLoading": "Loading",
+    "commonRemoveItem": "Remove {label}",
+    "textAreaRemaining": "Characters left: {remaining}"
   }
 }
