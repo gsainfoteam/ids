@@ -7,9 +7,7 @@ export type CarouselNextProps = CarouselStepProps;
 
 export function CarouselNext(props: CarouselNextProps) {
   const t = useTranslate();
-  return (
-    <CarouselStep {...props} part="Carousel.Next" direction="next" label={t('carousel.next')} />
-  );
+  return <CarouselStep {...props} part="Carousel.Next" direction="next" label={t('common.next')} />;
 }
 
 CarouselNext.displayName = 'Carousel.Next';

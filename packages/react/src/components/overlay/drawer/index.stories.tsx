@@ -244,7 +244,7 @@ export const StopAtSnapPoints: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '경로 보기' }));
-    const handle = await canvas.findByRole('button', { name: '끌어서 크기 조절' });
+    const handle = await canvas.findByRole('button', { name: '크기 조절' });
     handle.focus();
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(canvas.getByText('지금 높이: 420px')).toBeInTheDocument());

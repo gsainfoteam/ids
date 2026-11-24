@@ -24,7 +24,7 @@ import {
   type ResizeDelta,
   type UseResizeDragOptions,
 } from '../../../internal/resize-handle';
-import { useTranslate } from '../../../internal/translate';
+import { useIntlWords, useTranslate } from '../../../internal/translate';
 
 export type SplitterOrientation = 'horizontal' | 'vertical';
 
@@ -113,6 +113,7 @@ export function useSplitter({
   handleIds,
 }: UseSplitterOptions) {
   const t = useTranslate();
+  const words = useIntlWords();
   const generatedId = useId();
   const baseId = id ?? `splitter-${generatedId}`;
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -289,12 +290,10 @@ export function useSplitter({
           value: now,
           min: Math.round(range.min),
           max: Math.round(range.max),
-          valueText: collapsed[index]
-            ? t('splitter.collapsed')
-            : t('splitter.value', { value: now }),
+          valueText: words.percent(now),
           controls: panelProps[index]?.id,
         }),
-        'aria-label': t('splitter.handle'),
+        'aria-label': t('common.resize'),
         'data-splitter-handle': '',
         onKeyDown: onHandleKeyDown(index),
         onKeyUp: endGesture,
@@ -309,7 +308,7 @@ export function useSplitter({
           : {
               collapsed: collapsed[target] ?? false,
               before: target === index,
-              label: collapsed[target] ? t('splitter.expand') : t('splitter.collapse'),
+              label: collapsed[target] ? t('common.expand') : t('common.collapse'),
               controls: panelProps[target]?.id,
               onClick: () => settle(() => togglePanel(target)),
             },

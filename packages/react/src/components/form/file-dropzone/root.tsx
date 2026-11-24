@@ -4,8 +4,7 @@ import { ArrowUpTrayIcon } from '@heroicons/react/16/solid';
 
 import { fileDropzoneStyle } from './style';
 import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
-import { flattenFragments, invariant } from '../../../utils';
+import { invariant } from '../../../utils';
 import { FileClear } from '../file-field/clear';
 import { FileContext } from '../file-field/context';
 import { isType } from '../file-field/is-type';
@@ -20,14 +19,18 @@ export type FileDropzoneState = FileFieldState;
 export type FileDropzoneProps = FileFieldProps;
 
 export function FileDropzoneRoot(props: FileDropzoneProps) {
-  const t = useTranslate();
-
-  const { variant = 'outline', children, className, style } = props;
-  const { context, rootProps, picker, messages } = useFileFieldRoot(props, 'dropzone');
-  const { state, limits, limitsId, placeholder } = context;
+  const { variant = 'outline', className, style } = props;
+  const {
+    context,
+    rootProps,
+    picker,
+    messages,
+    structure: nodes,
+    limitsParts,
+  } = useFileFieldRoot(props, 'dropzone');
+  const { state, placeholder } = context;
   const styles = fileDropzoneStyle({ variant, size: context.size });
 
-  const nodes = flattenFragments(children);
   invariant(
     !nodes.length || nodes.filter(isType(FileTrigger)).length === 1,
     'FileDropzone: explicit children require exactly one Trigger.',
@@ -41,14 +44,8 @@ export function FileDropzoneRoot(props: FileDropzoneProps) {
   const triggerContent = (
     <>
       <ArrowUpTrayIcon aria-hidden="true" className={styles.dropIcon()} />
-      <span className={styles.title()}>
-        {state.dragging ? t('fileField.dropzoneActive') : placeholder}
-      </span>
-      {limits && (
-        <span id={limitsId} className={styles.hint()}>
-          {limits}
-        </span>
-      )}
+      {placeholder && <span className={styles.title()}>{placeholder}</span>}
+      {limitsParts}
     </>
   );
 

@@ -125,7 +125,7 @@ test('form.AppField: Field finds its field without a prop, in value and checked 
           {(field) => (
             <field.Field>
               <Field.Label>Count</Field.Label>
-              <Stepper onValueChange={(next) => seen.push(next)} />
+              <Stepper aria-label="진행 단계" onValueChange={(next) => seen.push(next)} />
             </field.Field>
           )}
         </api.AppField>

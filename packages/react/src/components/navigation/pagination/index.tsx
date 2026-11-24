@@ -12,6 +12,7 @@ import { type PaginationEntry } from './range';
 import { PaginationRoot } from './root';
 import { paginationStyle } from './style';
 
+import type { AccessibleName } from '../../../internal/accessible-name';
 import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
@@ -22,19 +23,20 @@ export function Pagination(props: Pagination.Props) {
 export namespace Pagination {
   export type Entry = PaginationEntry;
 
-  export type Props = Omit<ComponentProps<'nav'>, 'children'> & {
-    page?: number;
-    defaultPage?: number;
-    onPageChange?: (page: number) => void;
-    pageCount: number;
-    siblingCount?: number;
-    boundaryCount?: number;
-    size?: IdsSize;
-    variant?: SurfaceVariant;
-    disabled?: boolean;
-    getHref?: (page: number) => string;
-    children?: ReactNode;
-  };
+  export type Props = Omit<ComponentProps<'nav'>, 'children'> &
+    AccessibleName & {
+      page?: number;
+      defaultPage?: number;
+      onPageChange?: (page: number) => void;
+      pageCount: number;
+      siblingCount?: number;
+      boundaryCount?: number;
+      size?: IdsSize;
+      variant?: SurfaceVariant;
+      disabled?: boolean;
+      getHref?: (page: number) => string;
+      children?: ReactNode;
+    };
 
   export type ListProps = PaginationListProps;
   export type ItemProps = PaginationItemProps;
