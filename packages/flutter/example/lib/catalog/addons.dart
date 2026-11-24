@@ -105,8 +105,7 @@ class IdsLocaleAddon extends WidgetbookAddon<AppLocale> {
   @override
   Widget buildUseCase(BuildContext context, Widget child, AppLocale setting) =>
       IdsProviderScope(
-        locale: setting.flutterLocale,
-        translation: setting.translations.ids,
+        locale: setting.ids,
         child: ExampleStrings(locale: setting, child: child),
       );
 }

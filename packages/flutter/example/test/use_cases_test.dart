@@ -35,7 +35,7 @@ void main() {
               tester.element(find.byType(ExampleStrings)),
             );
             expect(ids.resolvedMode, mode);
-            expect(ids.locale.languageCode, locale.languageCode);
+            expect(ids.locale, locale.ids);
           },
         );
       }

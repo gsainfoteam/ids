@@ -20,12 +20,9 @@ class _ProviderIntegrationState extends State<ProviderIntegration> {
 
   @override
   Widget build(BuildContext context) {
-    final translations = Translations.of(context);
-
     return IdsProvider(
       theme: IdsTheme(primary: purpleBrand ? purple : blue, radius: radius),
-      translation: translations.ids,
-      locale: Locale(LocaleSettings.currentLocale.languageCode),
+      locale: TranslationProvider.of(context).locale.ids,
       child: Material(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -71,10 +68,12 @@ class _ProviderIntegrationState extends State<ProviderIntegration> {
                         cornerShape: IdsCornerShape.squircle,
                       )
                     : null,
-                translation: childOverride
-                    ? AppLocale.en.buildSync().ids
+                locale: childOverride
+                    ? IdsLocale(
+                        locale: const Locale('en', 'GB'),
+                        messages: IdsLocale.en.messages,
+                      )
                     : null,
-                locale: childOverride ? const Locale('fr') : null,
                 child: const ScopeReadout(name: 'Child'),
               ),
               IdsProviderScope(
@@ -125,11 +124,11 @@ class _ScopeReadoutState extends State<ScopeReadout> {
                 child: Text('${widget.name} ${context.strings.demo.specimen}'),
               ),
               Text(
-                '${widget.name}: count $count, radius ${ids.radius.standard}, locale ${ids.locale}, corner ${ids.cornerShape.name}',
+                '${widget.name}: count $count, radius ${ids.radius.standard}, locale ${ids.locale.locale.toLanguageTag()}, corner ${ids.cornerShape.name}',
                 style: text,
               ),
               Text(
-                '${ids.translation?.commonLoading ?? IdsMessages.ko.commonLoading} / ${ids.translation?.commonClose ?? IdsMessages.ko.commonClose}',
+                '${ids.messages.commonLoading} / ${ids.messages.commonClose}',
                 style: text,
               ),
               TextButton(

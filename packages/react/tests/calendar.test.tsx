@@ -5,6 +5,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Calendar, IdsProvider } from '../src';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -12,7 +13,7 @@ const ssr = (props: Partial<Calendar.Props>, locale?: string) =>
   parse(
     renderToString(
       locale ? (
-        <IdsProvider theme={testTheme} locale={locale}>
+        <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
           <Calendar {...({ 'aria-label': '달력', ...props } as Calendar.Props)} />
         </IdsProvider>
       ) : (
@@ -112,7 +113,7 @@ test('diagnostics for mismatched values, limits and parts outside the calendar',
 
 test('keyboard: month ends clamp, Home and End follow the week start, Shift jumps', async () => {
   await render(
-    <IdsProvider theme={testTheme} locale="ko-KR-u-fw-mon">
+    <IdsProvider theme={testTheme} locale={koreanTextIn('ko-KR-u-fw-mon')}>
       <Calendar aria-label="달력" defaultValue={d(2024, 1, 31)} today={d(2024, 1, 1)} autoFocus />
     </IdsProvider>,
   );

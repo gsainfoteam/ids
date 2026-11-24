@@ -1,8 +1,0 @@
-{
-  "ids(singleInterface=IdsMessages)": {
-    "commonClose": "Close",
-    "commonLoading": "Loading",
-    "commonRemoveItem": "Remove {label}",
-    "textAreaRemaining": "Characters left: {remaining}"
-  }
-}
