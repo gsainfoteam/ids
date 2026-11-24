@@ -7,14 +7,21 @@ import { SelectEmpty } from './empty';
 import { isType } from './is-type';
 import { SelectSearchField } from './search-field';
 import { slotChildren } from './select-options';
+import { type PopupPresentation } from '../../../internal/field-popup';
 import { flattenFragments, mergeProps, part } from '../../../utils';
 import { ScrollArea } from '../../layout/scroll-area';
 
 import type { BoxProps } from './box-props';
 
-export type SelectContentProps = BoxProps;
+export type SelectContentProps = BoxProps & { mobileVariant?: PopupPresentation };
 
-export function SelectContent({ asChild, children, className, ...props }: SelectContentProps) {
+export function SelectContent({
+  asChild,
+  children,
+  className,
+  mobileVariant: _readByTheRoot,
+  ...props
+}: SelectContentProps) {
   const c = useSelectContext('Select.Content');
   const { state: s, ids } = c.select;
 

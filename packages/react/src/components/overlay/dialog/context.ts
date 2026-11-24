@@ -12,7 +12,6 @@ type DialogContextValue = {
   dialog: ReturnType<typeof useDialog>;
   role: Dialog.Role;
   dismissible: boolean;
-  hideClose: boolean;
   overlay: Dialog.Overlay.Props | undefined;
   titled: boolean;
   setTitled: (titled: boolean) => void;

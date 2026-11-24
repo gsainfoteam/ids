@@ -562,13 +562,8 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
   const screen = await render(
     <div>
       <button onClick={pressedUnderneath}>Before</button>
-      <Select
-        aria-label="Fruit"
-        mobileVariant="drawer"
-        defaultValue="cherry"
-        onValueChange={onValueChange}
-      >
-        {items}
+      <Select aria-label="Fruit" defaultValue="cherry" onValueChange={onValueChange}>
+        <Select.Content mobileVariant="drawer">{items}</Select.Content>
       </Select>
     </div>,
   );

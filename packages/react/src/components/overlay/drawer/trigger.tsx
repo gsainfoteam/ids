@@ -3,7 +3,7 @@
 import { type ComponentProps } from 'react';
 
 import { useDrawerContext } from './context';
-import { mergeProps, part } from '../../../utils';
+import { buttonTypeFor, mergeProps, part } from '../../../utils';
 
 export type DrawerTriggerProps = ComponentProps<'button'> & { asChild?: boolean };
 
@@ -16,7 +16,7 @@ export function DrawerTrigger({ asChild, children, ...props }: DrawerTriggerProp
     children,
     mergeProps(props, {
       ref: drawer.setTrigger,
-      type: asChild ? undefined : 'button',
+      type: buttonTypeFor(asChild, children),
       'aria-haspopup': 'dialog',
       'aria-expanded': drawer.open,
       'aria-controls': drawer.open ? drawer.ids.content : undefined,

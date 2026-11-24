@@ -57,6 +57,18 @@ export const Playground: Story = {
   ],
 };
 
+export const Usage: Story = {
+  render: () => (
+    <div className="w-60">
+      <Image
+        src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'><rect width='4' height='3' fill='%2390c2f0'/><path d='M0 3 L1.2 1.4 L2.2 2.4 L3 1.6 L4 3 Z' fill='%23426b55'/></svg>"
+        alt="호수 너머의 산"
+        ratio={4 / 3}
+      />
+    </div>
+  ),
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -115,7 +127,8 @@ export const Gallery: Story = {
   ),
 };
 
-export const Status: Story = {
+export const ReactToTheLoadingStatus: Story = {
+  tags: ['custom-design'],
   render: function Render() {
     const [src, setSrc] = useState(PHOTO);
     const [log, setLog] = useState<string[]>([]);
@@ -149,7 +162,7 @@ export const Status: Story = {
     docs: {
       description: {
         story:
-          '상태는 `loading` / `loaded` / `error` 입니다. 루트의 `data-status`, `onStatusChange`, 상태를 받는 `className` 으로 씁니다. 깨진 `<img>` 는 DOM 에서 빠지고 Image.Fallback 이 `alt` 를 이름으로 가진 그림이 됩니다.',
+          '상태는 `loading` / `loaded` / `error` 입니다. 앱은 `onStatusChange` 로 상태를 받고, IDS 위에 새로 그린 디자인(`custom-design`)은 상태를 받는 `className` 으로 꾸밉니다. 깨진 `<img>` 는 DOM 에서 빠지고 Image.Fallback 이 `alt` 를 이름으로 가진 그림이 됩니다.',
       },
     },
   },
@@ -172,7 +185,7 @@ export const Status: Story = {
   },
 };
 
-export const Fallback: Story = {
+export const ReplaceABrokenImage: Story = {
   render: () => (
     <div className="flex max-w-md gap-3">
       <div className="w-40">
@@ -202,7 +215,7 @@ export const Fallback: Story = {
   },
 };
 
-export const Viewer: Story = {
+export const BrowseAGroupInTheViewer: Story = {
   render: () => (
     <div className="max-w-md">
       <ImageGroup layout="grid" columns={3} aria-label="풍경 사진">
@@ -252,7 +265,7 @@ export const Viewer: Story = {
   },
 };
 
-export const ComposedViewer: Story = {
+export const PickTheViewerParts: Story = {
   render: () => (
     <div className="max-w-md">
       <ImageGroup layout="grid" columns={3} loop aria-label="풍경 사진">
@@ -304,7 +317,7 @@ export const ComposedViewer: Story = {
   },
 };
 
-export const Standalone: Story = {
+export const OpenTheViewerFromAButton: Story = {
   render: function Render() {
     const [open, setOpen] = useState(false);
 
@@ -335,7 +348,7 @@ export const Standalone: Story = {
   },
 };
 
-export const OpenFromAnywhere: Story = {
+export const OpenTheViewerWithOverlayOpen: Story = {
   name: 'overlay.open',
   render: () => (
     <Button
@@ -362,7 +375,7 @@ export const OpenFromAnywhere: Story = {
   },
 };
 
-export const OnePhoto: Story = {
+export const EnlargeASinglePhoto: Story = {
   render: () => (
     <div className="w-60">
       <Image src={PHOTO} alt="호수 위로 뜬 해" caption="아침의 호수" ratio={4 / 3} preview />
@@ -385,7 +398,7 @@ export const OnePhoto: Story = {
   },
 };
 
-export const Decorative: Story = {
+export const HideADecorativeImage: Story = {
   render: () => (
     <div className="flex max-w-xs items-center gap-3">
       <div className="w-16 shrink-0">

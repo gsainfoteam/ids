@@ -20,7 +20,6 @@ export namespace Message {
   export type Props = Omit<ComponentProps<'article'>, 'children'> & {
     align?: MessageAlign;
     name?: string;
-    avatar?: string | ReactNode;
     time?: Date;
     status?: MessageStatus;
     unread?: number | boolean;
