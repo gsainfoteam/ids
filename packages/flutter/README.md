@@ -286,6 +286,29 @@ IdsButton(
 
 부모가 가로 너비를 정하는 곳에서 `SizedBox(width: double.infinity, child: IdsButton(...))`으로 버튼을 가로로 채울 수 있다.
 
+## ButtonGroup
+
+`IdsButtonGroup`은 Button과 IconButton을 가로 또는 세로로 묶는다. 그룹의
+`size`와 `variant`는 값을 직접 지정하지 않은 버튼이 상속한다. 기본값은
+가로로 붙은 그룹이며, `attached: false`를 주면 버튼 사이를 띄운다.
+
+```dart
+IdsButtonGroup(
+  semanticLabel: '저장',
+  size: IdsSize.tiny,
+  variant: IdsVariant.outline,
+  children: [
+    IdsButton(onPressed: save, child: const Text('저장')),
+    IdsButtonGroup.separator(),
+    IdsIconButton(
+      onPressed: showSaveOptions,
+      icon: const Icon(Icons.keyboard_arrow_down),
+      semanticLabel: '저장 옵션',
+    ),
+  ],
+)
+```
+
 ## IconButton
 
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며

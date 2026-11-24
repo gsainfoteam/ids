@@ -5,6 +5,7 @@ import '../../tokens/ids_enums.dart';
 import '../../tokens/ids_motion.dart';
 import '../../tokens/ids_sizes.dart';
 import '../../tokens/ids_typography.dart';
+import '../components/group/ids_group.dart';
 import 'control_surface.dart';
 import 'ids_interactive.dart';
 
@@ -13,12 +14,14 @@ class ButtonControl extends StatelessWidget {
     super.key,
     this.child,
     this.builder,
+    this.style,
     this.leading,
     this.trailing,
     required this.variant,
     required this.size,
     required this.colorScheme,
     required this.disabled,
+    this.invalid = false,
     required this.busy,
     required this.focusableWhenDisabled,
     this.focusNode,
@@ -27,11 +30,25 @@ class ButtonControl extends StatelessWidget {
     this.onInteractionChange,
     this.onPressed,
     this.square = false,
+    this.dimensions,
+    this.radius,
+    this.pressScale = 1,
+    this.pressed,
+    this.radio = false,
+    this.skipTraversal = false,
   });
 
   final bool square;
+  final ({double height, double padding, double iconPadding, double iconSize})?
+  dimensions;
+  final double? radius;
+  final double pressScale;
+  final bool? pressed;
+  final bool radio;
+  final bool skipTraversal;
   final Widget? child;
   final Widget Function(BuildContext, IdsInteractiveState)? builder;
+  final ShapeDecoration Function(IdsInteractiveState, ShapeDecoration)? style;
   final VoidCallback? onPressed;
   final Widget? leading;
   final Widget? trailing;
@@ -39,6 +56,7 @@ class ButtonControl extends StatelessWidget {
   final IdsSize size;
   final IdsColorScheme colorScheme;
   final bool disabled;
+  final bool invalid;
   final bool busy;
   final bool focusableWhenDisabled;
   final FocusNode? focusNode;
@@ -49,14 +67,20 @@ class ButtonControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = IdsProvider.of(context).resolved;
+    final groupItem = IdsGroupItem.of(context);
+    final direction = Directionality.of(context);
     final tiny = size == IdsSize.tiny;
     final height = theme.dimension(
-      tiny ? IdsSizes.controlTiny : IdsSizes.controlStandard,
+      dimensions?.height ??
+          (tiny ? IdsSizes.controlTiny : IdsSizes.controlStandard),
     );
-    final padding = theme.dimension(tiny ? 12 : 16);
-    final iconPadding = theme.dimension(tiny ? 10 : 12);
+    final padding = theme.dimension(dimensions?.padding ?? (tiny ? 12 : 16));
+    final iconPadding = theme.dimension(
+      dimensions?.iconPadding ?? (tiny ? 10 : 12),
+    );
     final iconSize = theme.dimension(
-      tiny ? IdsSizes.iconTiny : IdsSizes.iconStandard,
+      dimensions?.iconSize ??
+          (tiny ? IdsSizes.iconTiny : IdsSizes.iconStandard),
     );
     final gap = theme.dimension(tiny ? 6 : 8);
     final textStyle =
@@ -72,7 +96,10 @@ class ButtonControl extends StatelessWidget {
     return MergeSemantics(
       child: Semantics(
         container: true,
-        button: true,
+        button: !radio,
+        checked: radio ? pressed : null,
+        inMutuallyExclusiveGroup: radio ? true : null,
+        toggled: radio ? null : pressed,
         enabled: !isDisabled,
         label: semanticLabel,
         liveRegion: busy,
@@ -84,6 +111,8 @@ class ButtonControl extends StatelessWidget {
               : SystemMouseCursors.click,
           child: IdsInteractive(
             onPressed: onPressed,
+            pressed: pressed ?? false,
+            skipTraversal: skipTraversal,
             disabled: isDisabled,
             focusableWhenDisabled: focusableWhenDisabled,
             focusNode: focusNode,
@@ -95,6 +124,13 @@ class ButtonControl extends StatelessWidget {
                 variant,
                 colorScheme,
                 state,
+                corners: groupItem?.corners(theme.radius.standard),
+                radius: radius == null ? null : theme.dimension(radius!),
+                toggle: pressed != null,
+                invalid: invalid,
+              );
+              final decoration = ControlShapeDecoration(
+                style?.call(state, surface.decoration) ?? surface.decoration,
               );
               return ExcludeSemantics(
                 excluding: semanticLabel != null,
@@ -108,63 +144,72 @@ class ButtonControl extends StatelessWidget {
                       : state.hovered
                       ? .7
                       : 1,
-                  child: TweenAnimationBuilder<Color?>(
-                    tween: ColorTween(end: surface.focusColor),
+                  child: AnimatedScale(
+                    scale: !reducedMotion && state.active ? pressScale : 1,
                     duration: duration,
                     curve: curve,
-                    builder: (context, color, child) => CustomPaint(
-                      foregroundPainter: ControlFocusRing(theme, color!),
-                      child: child,
-                    ),
-                    child: AnimatedContainer(
+                    child: TweenAnimationBuilder<Color?>(
+                      tween: ColorTween(end: surface.focusColor),
                       duration: duration,
                       curve: curve,
-                      constraints: square
-                          ? BoxConstraints.tightFor(
-                              width: height,
-                              height: height,
-                            )
-                          : BoxConstraints(minHeight: height),
-                      decoration: surface.decoration,
-                      padding: square
-                          ? EdgeInsets.zero
-                          : EdgeInsetsDirectional.only(
-                              start: leading == null ? padding : iconPadding,
-                              end: trailing == null ? padding : iconPadding,
-                            ),
-                      child: AnimatedDefaultTextStyle(
+                      builder: (context, color, child) => CustomPaint(
+                        foregroundPainter: ControlFocusRing(
+                          decoration.shape,
+                          color!,
+                          direction: direction,
+                        ),
+                        child: child,
+                      ),
+                      child: AnimatedContainer(
                         duration: duration,
                         curve: curve,
-                        style: theme.textStyle(
-                          textStyle,
-                          color: surface.foreground,
-                        ),
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                        child: Builder(
-                          builder: (context) => IconTheme(
-                            data: IconThemeData(
-                              size: iconSize,
-                              color: DefaultTextStyle.of(context).style.color,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              spacing: gap,
-                              children: [
-                                if (leading case final icon?)
-                                  ExcludeSemantics(child: icon),
-                                Flexible(
-                                  child:
-                                      child ??
-                                      Builder(
-                                        builder: (context) =>
-                                            builder!(context, state),
-                                      ),
-                                ),
-                                if (trailing case final icon?)
-                                  ExcludeSemantics(child: icon),
-                              ],
+                        constraints: square
+                            ? BoxConstraints.tightFor(
+                                width: height,
+                                height: height,
+                              )
+                            : BoxConstraints(minHeight: height),
+                        decoration: decoration,
+                        padding: square
+                            ? EdgeInsets.zero
+                            : EdgeInsetsDirectional.only(
+                                start: leading == null ? padding : iconPadding,
+                                end: trailing == null ? padding : iconPadding,
+                              ),
+                        child: AnimatedDefaultTextStyle(
+                          duration: duration,
+                          curve: curve,
+                          style: theme.textStyle(
+                            textStyle,
+                            color: surface.foreground,
+                          ),
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                          child: Builder(
+                            builder: (context) => IconTheme(
+                              data: IconThemeData(
+                                size: iconSize,
+                                color: DefaultTextStyle.of(context).style.color,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                spacing: gap,
+                                children: [
+                                  if (leading case final icon?)
+                                    ExcludeSemantics(child: icon),
+                                  Flexible(
+                                    child:
+                                        child ??
+                                        Builder(
+                                          builder: (context) =>
+                                              builder!(context, state),
+                                        ),
+                                  ),
+                                  if (trailing case final icon?)
+                                    ExcludeSemantics(child: icon),
+                                ],
+                              ),
                             ),
                           ),
                         ),

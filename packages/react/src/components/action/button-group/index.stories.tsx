@@ -310,6 +310,31 @@ export const BuildAToolbar: Story = {
   },
 };
 
+export const LabelledSeparator: Story = {
+  argTypes: { separator: { control: 'radio', options: ['semantic', 'decorative'] } },
+  args: { separator: 'semantic' },
+  render: ({ separator }) => (
+    <ButtonGroup
+      orientation="vertical"
+      variant="outline"
+      separator={separator}
+      aria-label="파일 동작"
+    >
+      <Button>저장</Button>
+      <ButtonGroup.Separator>또는</ButtonGroup.Separator>
+      <Button>삭제</Button>
+    </ButtonGroup>
+  ),
+  play: async ({ args, canvas }) => {
+    await expect(canvas.getByText('또는')).toBeVisible();
+    if (args.separator === 'decorative') {
+      await expect(canvas.queryByRole('separator')).toBeNull();
+    } else {
+      await expect(canvas.getByRole('separator')).toHaveAttribute('aria-orientation', 'horizontal');
+    }
+  },
+};
+
 export const RightToLeft: Story = {
   tags: ['verification'],
   render: () => (

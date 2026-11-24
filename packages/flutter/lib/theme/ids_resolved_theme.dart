@@ -233,8 +233,13 @@ class IdsResolvedTheme {
         package: mono ? null : IdsTypography.sansFontPackage,
       );
 
-  ShapeBorder shape({double? radius, BorderSide side = BorderSide.none}) {
-    final borderRadius = BorderRadius.circular(radius ?? this.radius.standard);
+  ShapeBorder shape({
+    double? radius,
+    BorderSide side = BorderSide.none,
+    BorderRadiusGeometry? corners,
+  }) {
+    final borderRadius =
+        corners ?? BorderRadius.circular(radius ?? this.radius.standard);
     return switch (cornerShape) {
       IdsCornerShape.round => RoundedRectangleBorder(
         borderRadius: borderRadius,

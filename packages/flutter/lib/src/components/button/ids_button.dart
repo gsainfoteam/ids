@@ -1,18 +1,20 @@
 import 'package:flutter/widgets.dart';
 
+import '../group/ids_group.dart';
+
 import '../../interaction/button_control.dart';
 import '../../interaction/ids_interactive.dart';
 import '../../../tokens/ids_enums.dart';
 
-class IdsButton extends StatelessWidget {
+class IdsButton extends StatelessWidget implements IdsGroupedControl {
   const IdsButton({
     super.key,
     required Widget this.child,
     this.onPressed,
     this.leading,
     this.trailing,
-    this.variant = IdsVariant.solid,
-    this.size = IdsSize.standard,
+    this.variant,
+    this.size,
     this.colorScheme = IdsColorScheme.primary,
     this.disabled = false,
     this.busy = false,
@@ -29,8 +31,8 @@ class IdsButton extends StatelessWidget {
     this.onPressed,
     this.leading,
     this.trailing,
-    this.variant = IdsVariant.solid,
-    this.size = IdsSize.standard,
+    this.variant,
+    this.size,
     this.colorScheme = IdsColorScheme.primary,
     this.disabled = false,
     this.busy = false,
@@ -46,8 +48,8 @@ class IdsButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Widget? leading;
   final Widget? trailing;
-  final IdsVariant variant;
-  final IdsSize size;
+  final IdsVariant? variant;
+  final IdsSize? size;
   final IdsColorScheme colorScheme;
   final bool disabled;
   final bool busy;
@@ -63,8 +65,8 @@ class IdsButton extends StatelessWidget {
     onPressed: onPressed,
     leading: leading,
     trailing: trailing,
-    variant: variant,
-    size: size,
+    variant: variant ?? IdsGroup.variantOf(context) ?? IdsVariant.solid,
+    size: size ?? IdsGroup.sizeOf(context) ?? IdsSize.standard,
     colorScheme: colorScheme,
     disabled: disabled,
     busy: busy,

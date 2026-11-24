@@ -21,7 +21,7 @@ export namespace Group {
 
   export type SeparatorProps = Omit<
     ComponentProps<'div'>,
-    'children' | 'role' | 'aria-orientation' | 'aria-hidden' | 'tabIndex'
+    'role' | 'aria-orientation' | 'aria-hidden' | 'tabIndex'
   >;
 
   export const Separator = GroupSeparator;
