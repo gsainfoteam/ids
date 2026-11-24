@@ -3,7 +3,7 @@ import { useActionState, type ReactElement } from 'react';
 import { CalendarDate } from '@internationalized/date';
 import { useFormStatus } from 'react-dom';
 import { describe, expect, test, vi } from 'vitest';
-import { page, server, userEvent, type Locator } from 'vitest/browser';
+import { page, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import {
@@ -346,26 +346,24 @@ test('useFormStatus reads pending while the action runs, then the form resets', 
   await expect.element(labelled('textbox')).toHaveValue('hello');
 });
 
-const CHROMIUM_BLURS_A_BUTTON_IT_DISABLES = server.browser === 'chromium';
+test('useFormStatus stays pending after the browser blurs the Button it natively disables', async () => {
+  const held = deferred();
+  await render(
+    <form aria-label={FORM_LABEL} action={() => held.promise}>
+      <SendDisabledNatively />
+    </form>,
+  );
+  const button = page.getByRole('button');
 
-(CHROMIUM_BLURS_A_BUTTON_IT_DISABLES ? test.fails : test)(
-  'useFormStatus stays pending under a natively disabled Button (fails in Chromium: disabling it blurs it, its onBlur setState makes React drop pending)',
-  async () => {
-    const held = deferred();
-    await render(
-      <form aria-label={FORM_LABEL} action={() => held.promise}>
-        <SendDisabledNatively />
-      </form>,
-    );
+  await userEvent.click(button);
 
-    await userEvent.click(page.getByRole('button', { name: 'Send' }));
+  await expect.element(button).not.toHaveFocus();
+  await expect.element(button).toHaveAccessibleName('Sending');
+  await expect.element(button).toBeDisabled();
 
-    try {
-      await expect
-        .element(page.getByRole('button', { name: 'Sending' }), { timeout: 2000 })
-        .toBeDisabled();
-    } finally {
-      held.resolve();
-    }
-  },
-);
+  held.resolve();
+
+  await expect.element(button).toHaveAccessibleName('Send');
+  await expect.element(button).toBeEnabled();
+  await expect.element(button).not.toHaveAttribute('data-focused');
+});
