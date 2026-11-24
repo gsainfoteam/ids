@@ -16,3 +16,9 @@ export const isPlainEnter = (event: KeyboardEvent) =>
   !event.altKey &&
   !event.ctrlKey &&
   !event.metaKey;
+
+export const onPlainEnter = (action: () => void) => (event: KeyboardEvent) => {
+  if (!isPlainEnter(event)) return;
+  event.preventDefault();
+  action();
+};

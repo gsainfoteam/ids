@@ -1,23 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-
 import { LinkIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useInternalEditorContext } from '../context';
-import {
-  EditorToolTip,
-  useInternalEditorToolProps,
-  useInternalToolState,
-  type EditorToolProps,
-} from './tool';
+import { EditorToolTip, type EditorToolProps } from './tool';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { Button } from '../../../action/button';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Popover } from '../../../overlay/popover';
 import { TextField } from '../../text-field';
-import { isPlainEnter, withProtocol } from '../lib/popover-form';
+import { useInternalEditorLink } from '../hooks/use-editor-link';
+import { useInternalEditorToolProps } from '../hooks/use-editor-tool-props';
+import { useInternalEditorToolState } from '../hooks/use-editor-tool-state';
+import { onPlainEnter } from '../lib/popover-form';
 import { editorMessages } from '../messages-catalog';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
@@ -32,52 +28,15 @@ const LINK = {
 export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorLinkProps) {
   const t = useInternalTranslate(editorMessages);
   const { editor, editable, styles } = useInternalEditorContext('Editor.Link');
-  const state = useInternalToolState(LINK);
+  const state = useInternalEditorToolState(LINK);
   const tool = useInternalEditorToolProps('Link');
-  const [open, setOpen] = useState(false);
-  const [href, setHref] = useState('');
+  const { open, onOpenChange, href, setHref, applyLink, removeLink } =
+    useInternalEditorLink(editor);
   const label = ariaLabel ?? t('editor.link');
   const disabled = !editable || !state.enabled;
 
-  const removeLink = () => {
-    editor?.chain().focus().extendMarkRange('link').unsetLink().run();
-    setOpen(false);
-  };
-
-  const applyLink = () => {
-    if (!editor) return;
-    const typed = href.trim();
-    if (typed === '') {
-      removeLink();
-      return;
-    }
-    const url = withProtocol(typed);
-    const theLinkExtensionAllowsTheAddress = editor.can().setLink({ href: url });
-    if (!theLinkExtensionAllowsTheAddress) {
-      setOpen(false);
-      return;
-    }
-    const insertsTheAddressAsText = editor.state.selection.empty && !editor.isActive('link');
-    const chain = editor.chain().focus().extendMarkRange('link');
-    const linked = insertsTheAddressAsText
-      ? chain.insertContent({
-          type: 'text',
-          text: typed,
-          marks: [{ type: 'link', attrs: { href: url } }],
-        })
-      : chain.setLink({ href: url });
-    linked.run();
-    setOpen(false);
-  };
-
   return (
-    <Popover
-      open={open}
-      onOpenChange={(next) => {
-        if (next) setHref((editor?.getAttributes('link').href as string | undefined) ?? '');
-        setOpen(next);
-      }}
-    >
+    <Popover open={open} onOpenChange={onOpenChange}>
       <EditorToolTip label={label} disabled={disabled}>
         <Popover.Trigger asChild>
           <IconToggle
@@ -109,11 +68,7 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
             placeholder="https://"
             value={href}
             onValueChange={setHref}
-            onKeyDown={(event) => {
-              if (!isPlainEnter(event)) return;
-              event.preventDefault();
-              applyLink();
-            }}
+            onKeyDown={onPlainEnter(applyLink)}
             data-1p-ignore=""
             data-lpignore="true"
           />

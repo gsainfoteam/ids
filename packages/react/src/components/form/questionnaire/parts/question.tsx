@@ -1,28 +1,14 @@
 'use client';
 
-import {
-  isValidElement,
-  useId,
-  useRef,
-  type ComponentProps,
-  type CSSProperties,
-  type KeyboardEvent,
-  type MouseEvent,
-  type ReactNode,
-} from 'react';
+import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { uniq } from 'es-toolkit';
-
-import { QuestionContext, useInternalQuestionnaireContext } from '../context';
-import { QuestionnaireDescription } from './description';
-import { QuestionnaireOption } from './option';
-import { QuestionnaireOther } from './other';
-import { keyHandler } from '../../../../internal/lib/keys';
-import { elementTypeOf, flattenFragments } from '../../../../utils/children';
 import { ToggleGroup } from '../../../action/toggle-group';
 import { CheckboxGroup } from '../../checkbox-group';
 import { RadioGroup } from '../../radio-group';
-import { EMPTY_DRAFT, type QuestionnaireSelectionMode } from '../lib/answers';
+import { QuestionContext } from '../context';
+import { useInternalQuestionnaireQuestion } from '../hooks/use-questionnaire-question';
+import { type QuestionnaireSelectionMode } from '../lib/answers';
+import { splitQuestion } from '../lib/question-parts';
 import {
   questionnaireStyle,
   type QuestionnaireVariant,
@@ -43,35 +29,6 @@ export type QuestionnaireQuestionProps = Omit<
   children: ReactNode;
 };
 
-const ANSWER_PARTS = new Set<unknown>([
-  QuestionnaireOption,
-  QuestionnaireOther,
-  QuestionnaireDescription,
-]);
-
-const isPart = (node: ReactNode, parts: ReadonlySet<unknown>) =>
-  isValidElement(node) && parts.has(elementTypeOf(node));
-
-const DESCRIPTION = new Set<unknown>([QuestionnaireDescription]);
-const OPTION = new Set<unknown>([QuestionnaireOption]);
-
-function splitQuestion(children: ReactNode) {
-  const nodes = flattenFragments(children);
-  const firstPart = nodes.findIndex((node) => isPart(node, ANSWER_PARTS));
-  const answerNodes = firstPart < 0 ? [] : nodes.slice(firstPart);
-
-  return {
-    text: firstPart < 0 ? nodes : nodes.slice(0, firstPart),
-    descriptions: answerNodes.filter((node) => isPart(node, DESCRIPTION)),
-    answers: answerNodes.filter((node) => !isPart(node, DESCRIPTION)),
-    options: answerNodes.filter((node) => isPart(node, OPTION)),
-    rest: answerNodes.filter((node) => !isPart(node, DESCRIPTION) && !isPart(node, OPTION)),
-  };
-}
-
-const isChoiceInput = (target: EventTarget): target is HTMLInputElement =>
-  target instanceof HTMLInputElement && (target.type === 'radio' || target.type === 'checkbox');
-
 export function QuestionnaireQuestion({
   name,
   selectionMode = 'single',
@@ -88,99 +45,27 @@ export function QuestionnaireQuestion({
   onClick,
   ...rest
 }: QuestionnaireQuestionProps) {
-  const questionnaire = useInternalQuestionnaireContext('Questionnaire.Question');
-  const legendId = useId();
-  const descriptionId = useId();
-  const choosingWithArrows = useRef(false);
-
-  const draft = questionnaire.drafts[name] ?? EMPTY_DRAFT;
-  const active = questionnaire.activeName === name;
+  const {
+    size,
+    legendId,
+    descriptionId,
+    draft,
+    active,
+    choose,
+    setChoices,
+    setOther,
+    toggleSingle,
+    handlers,
+  } = useInternalQuestionnaireQuestion({
+    name,
+    selectionMode,
+    onKeyDown,
+    onKeyDownCapture,
+    onKeyUp,
+    onClick,
+  });
   const { text, descriptions, answers, options, rest: others } = splitQuestion(children);
-  const styles = questionnaireStyle({ orientation, size: questionnaire.size });
-
-  const choose = (value: string, checked: boolean) => {
-    const current = questionnaire.draftOf(name);
-
-    if (selectionMode === 'single') {
-      questionnaire.setDraft(name, checked ? { choices: [value], other: '' } : current);
-      return;
-    }
-
-    questionnaire.setDraft(name, {
-      choices: checked
-        ? uniq([...current.choices, value])
-        : current.choices.filter((choice) => choice !== value),
-      other: current.other,
-    });
-  };
-
-  const setOther = (other: string) => {
-    const current = questionnaire.draftOf(name);
-    const clearsTheChoice = selectionMode === 'single' && other.trim() !== '';
-    questionnaire.setDraft(name, { choices: clearsTheChoice ? [] : current.choices, other });
-  };
-
-  const markArrowChoice = () => {
-    choosingWithArrows.current = true;
-    return false;
-  };
-
-  const handleKeyDownCapture = (event: KeyboardEvent<HTMLFieldSetElement>) => {
-    onKeyDownCapture?.(event);
-
-    keyHandler<HTMLFieldSetElement>(
-      {
-        ArrowUp: markArrowChoice,
-        ArrowDown: markArrowChoice,
-        ArrowLeft: markArrowChoice,
-        ArrowRight: markArrowChoice,
-        Home: markArrowChoice,
-        End: markArrowChoice,
-      },
-      { evenIfPrevented: true },
-    )(event);
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLFieldSetElement>) => {
-    onKeyDown?.(event);
-
-    keyHandler<HTMLFieldSetElement>({
-      Enter: () => {
-        if (!isChoiceInput(event.target)) return false;
-        questionnaire.advance();
-      },
-    })(event);
-  };
-
-  const toggleSingle = (value: string | null) => {
-    const current = questionnaire.draftOf(name);
-    const pressedTheChosenAgain = value === null && questionnaire.advanceOnSelect;
-    const chosen = pressedTheChosenAgain ? (current.choices[0] ?? null) : value;
-
-    questionnaire.setDraft(
-      name,
-      chosen === null ? { choices: [], other: current.other } : { choices: [chosen], other: '' },
-    );
-
-    if (chosen !== null && questionnaire.advanceOnSelect && !choosingWithArrows.current)
-      questionnaire.advance();
-  };
-
-  const handleClick = (event: MouseEvent<HTMLFieldSetElement>) => {
-    onClick?.(event);
-
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement) || target.type !== 'radio') return;
-
-    if (choosingWithArrows.current) {
-      choosingWithArrows.current = false;
-      return;
-    }
-
-    if (event.defaultPrevented || !questionnaire.advanceOnSelect || target.disabled) return;
-    choose(target.value, true);
-    questionnaire.advance();
-  };
+  const styles = questionnaireStyle({ orientation, size });
 
   const questionProps = {
     ...rest,
@@ -191,16 +76,10 @@ export function QuestionnaireQuestion({
     'data-active': active ? '' : undefined,
     className: styles.question({ className }),
     style,
-    onKeyDownCapture: handleKeyDownCapture,
-    onKeyDown: handleKeyDown,
-    onKeyUp: (event: KeyboardEvent<HTMLFieldSetElement>) => {
-      onKeyUp?.(event);
-      choosingWithArrows.current = false;
-    },
-    onClick: handleClick,
+    ...handlers,
   };
 
-  const groupProps = { ...questionProps, name, size: questionnaire.size, orientation };
+  const groupProps = { ...questionProps, name, size, orientation };
 
   const content = (
     <>
@@ -221,7 +100,7 @@ export function QuestionnaireQuestion({
         variant,
         draft,
         descriptionId,
-        size: questionnaire.size,
+        size,
         setOther,
       }}
     >
@@ -235,7 +114,7 @@ export function QuestionnaireQuestion({
             {selectionMode === 'single' ? (
               <ToggleGroup<string>
                 name={name}
-                size={questionnaire.size}
+                size={size}
                 orientation={orientation}
                 aria-labelledby={legendId}
                 value={draft.choices[0] ?? null}
@@ -247,16 +126,11 @@ export function QuestionnaireQuestion({
               <ToggleGroup<string>
                 selectionMode="multiple"
                 name={name}
-                size={questionnaire.size}
+                size={size}
                 orientation={orientation}
                 aria-labelledby={legendId}
                 value={draft.choices}
-                onValueChange={(choices) =>
-                  questionnaire.setDraft(name, {
-                    choices,
-                    other: questionnaire.draftOf(name).other,
-                  })
-                }
+                onValueChange={setChoices}
               >
                 <div className={styles.toggles()}>{options}</div>
               </ToggleGroup>
@@ -273,13 +147,7 @@ export function QuestionnaireQuestion({
           {content}
         </RadioGroup>
       ) : (
-        <CheckboxGroup<string>
-          {...groupProps}
-          value={draft.choices}
-          onValueChange={(choices) =>
-            questionnaire.setDraft(name, { choices, other: questionnaire.draftOf(name).other })
-          }
-        >
+        <CheckboxGroup<string> {...groupProps} value={draft.choices} onValueChange={setChoices}>
           {content}
         </CheckboxGroup>
       )}

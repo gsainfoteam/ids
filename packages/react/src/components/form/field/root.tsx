@@ -1,20 +1,14 @@
 'use client';
 
 import {
-  Children,
-  Fragment,
   cloneElement,
-  isValidElement,
   use,
-  useEffect,
   useId,
   type ComponentProps,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
 } from 'react';
-
-import { isString, uniq } from 'es-toolkit';
 
 import {
   FieldContext,
@@ -27,15 +21,21 @@ import {
   type FieldState,
 } from './context';
 import { useInternalField } from './hooks/use-field';
+import { useInternalFieldWarnings } from './hooks/use-field-warnings';
 import { errorShown } from './lib/error-shown';
+import {
+  controlsIn,
+  duplicatedParts,
+  flatten,
+  idsOfPart,
+  isFieldPart,
+  joinIds,
+  partIdsIn,
+  type ControlProps,
+  type PartName,
+} from './lib/field-children';
 import { resolve, stateAttributes, type StateValue } from './lib/state-value';
-import { FieldDescription } from './parts/description';
-import { FieldError } from './parts/error';
-import { FieldHint } from './parts/hint';
-import { FieldLabel } from './parts/label';
 import { fieldStyle } from './style';
-import { elementTypeOf } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { FieldValidity, FieldValidityKey } from './lib/control-state';
 import type { IdsSize } from '../../../tokens/types';
@@ -58,21 +58,6 @@ export type FieldErrorState = FieldState & {
   message: ReactNode;
   validity: FieldValidity['flags'] | null;
 };
-
-type ControlProps = Record<string, unknown>;
-type PartName = 'label' | 'description' | 'hint' | 'error';
-
-function flatten(children: ReactNode): ReactElement<ControlProps>[] {
-  return Children.toArray(children).flatMap((child) => {
-    if (!isValidElement<ControlProps>(child)) return [];
-    return child.type === Fragment ? flatten(child.props.children as ReactNode) : [child];
-  });
-}
-
-function joinIds(...values: unknown[]) {
-  const ids = values.filter(isString).flatMap((value) => value.split(/\s+/));
-  return uniq(ids.filter(Boolean)).join(' ') || undefined;
-}
 
 type FormLibraryBridge = {
   bindControl?: (props: ControlProps, control: ReactElement<ControlProps>) => ControlProps;
@@ -104,11 +89,7 @@ export function FieldRoot({
   const generatedId = useId();
   const field = useInternalField({ dirty, touched });
   const nodes = flatten(children);
-  const controls = nodes.filter(
-    (node) =>
-      !parts.has(elementTypeOf(node)) &&
-      (typeof node.type !== 'string' || ['input', 'select', 'textarea'].includes(node.type)),
-  );
+  const controls = controlsIn(nodes);
   const control = controls[0];
   const original = control?.props ?? {};
   const bound = control && bindControl ? bindControl(original, control) : original;
@@ -120,24 +101,7 @@ export function FieldRoot({
   const required = requiredProp ?? Boolean(original.required);
   const state: FieldState = { orientation, size, invalid, disabled, required, ...field.state };
 
-  const partIds = new Map<ReactElement, string>();
-  const counts: Record<PartName, number> = { label: 0, description: 0, hint: 0, error: 0 };
-  for (const node of nodes) {
-    const part = parts.get(elementTypeOf(node));
-    if (!part) continue;
-    const index = counts[part]++;
-    const childId = isValidElement<ControlProps>(node.props.children)
-      ? node.props.children.props.id
-      : undefined;
-    partIds.set(
-      node,
-      String(
-        node.props.id ??
-          (node.props.asChild ? childId : undefined) ??
-          `${controlId}-${part}${index ? `-${index + 1}` : ''}`,
-      ),
-    );
-  }
+  const { partIds, counts } = partIdsIn(nodes, controlId);
 
   const context: FieldContextValue = {
     controlId,
@@ -150,32 +114,19 @@ export function FieldRoot({
       described: counts.description > 0,
     }),
   };
-  const idsOf = (
-    part: PartName,
-    shown: (node: ReactElement<ControlProps>) => boolean = () => true,
-  ) =>
-    nodes
-      .filter((node) => parts.get(elementTypeOf(node)) === part && shown(node))
-      .map((node) => partIds.get(node));
+  const idsOf = (part: PartName, shown?: (node: ReactElement<ControlProps>) => boolean) =>
+    idsOfPart(nodes, partIds, part, shown);
   const labelIds = idsOf('label');
   const statusIds = invalid
     ? idsOf('error', (node) =>
         errorShown(node.props as { match?: FieldValidityKey; children?: unknown }, context),
       )
     : idsOf('hint');
-  const duplicated = (['label', 'description', 'hint'] as const)
-    .filter((part) => counts[part] > 1)
-    .join(', ');
+  const duplicated = duplicatedParts(counts);
   const accessibleName =
     labelIds.length > 0 ||
     Boolean(original['aria-label'] || original['aria-labelledby'] || ariaLabel || ariaLabelledby);
-  useEffect(() => {
-    if (!isDevelopment) return;
-    if (controls.length !== 1)
-      console.warn('[IDS] Field: exactly one direct child control is required.');
-    if (!accessibleName) console.warn('[IDS] Field: Field.Label or aria-label is required.');
-    if (duplicated) console.warn(`[IDS] Field: only one ${duplicated} part is supported.`);
-  }, [controls.length, accessibleName, duplicated]);
+  useInternalFieldWarnings({ controls: controls.length, accessibleName, duplicated });
 
   const controlProps = {
     ...bound,
@@ -208,7 +159,7 @@ export function FieldRoot({
             style={resolve(style, state)}
           >
             {nodes.map((node, index) =>
-              parts.has(elementTypeOf(node)) ? (
+              isFieldPart(node) ? (
                 cloneElement(node, { key: node.key ?? index, id: partIds.get(node) })
               ) : node === control ? (
                 <div
@@ -232,10 +183,3 @@ export function FieldRoot({
     </FieldContext>
   );
 }
-
-const parts = new Map<unknown, PartName>([
-  [FieldLabel, 'label'],
-  [FieldDescription, 'description'],
-  [FieldHint, 'hint'],
-  [FieldError, 'error'],
-]);

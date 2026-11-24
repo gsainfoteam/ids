@@ -1,47 +1,32 @@
 'use client';
 
 import {
-  isValidElement,
-  useEffect,
   useRef,
   type ComponentProps,
   type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
-  type ReactElement,
   type ReactNode,
 } from 'react';
 
 import { SelectContext } from './context';
 import { useInternalSelect, type SelectValue as SelectSelection } from './hooks/use-select';
-import { isType } from './lib/is-type';
-import { collectOptions, slotChildren } from './lib/select-options';
-import { SelectClear } from './parts/clear';
-import { SelectContent, type SelectContentProps } from './parts/content';
-import { SelectEmpty } from './parts/empty';
-import { OPTION_KINDS, SelectGroup } from './parts/group';
-import { SelectIcon } from './parts/icon';
-import { SelectItem } from './parts/item';
-import { SelectItemIndicator } from './parts/item-indicator';
-import { SelectSearchField } from './parts/search-field';
-import { SelectSeparator } from './parts/separator';
+import { useInternalSelectItemsWarning } from './hooks/use-select-items-warning';
+import {
+  holdsASearchField,
+  isForeignComponent,
+  selectOptionsIn,
+  splitSelectChildren,
+} from './lib/select-children';
+import { SelectContent } from './parts/content';
 import { SelectTrigger } from './parts/trigger';
-import { SelectValue } from './parts/value';
 import { selectStyle } from './style';
 import { FieldPopup, useInternalDrawerPresentation } from '../../../internal/field-popup';
 import { resolveState } from '../../../internal/lib/state-props';
 import { FormValue } from '../../../internal/parts/form-value';
 import { type FieldTriggerVariant } from '../../../internal/surfaces/lib/field-surface';
 import { useInternalTranslate } from '../../../internal/translate';
-import {
-  elementTypeOf,
-  flattenFragments,
-  invariant,
-  isNodeFromAnyWindow,
-  mergeProps,
-  mergeRefs,
-} from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
+import { invariant, isNodeFromAnyWindow, mergeProps, mergeRefs } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -102,28 +87,6 @@ export type SelectProps = BaseProps &
       }
   );
 
-const PARTS = new Set<unknown>([
-  SelectTrigger,
-  SelectValue,
-  SelectIcon,
-  SelectClear,
-  SelectContent,
-  SelectSearchField,
-  SelectItem,
-  SelectItemIndicator,
-  SelectGroup,
-  SelectSeparator,
-  SelectEmpty,
-]);
-
-const isForeignComponent = (node: ReactNode): boolean =>
-  isValidElement<SelectContentProps>(node) &&
-  (elementTypeOf(node) === SelectContent
-    ? flattenFragments(slotChildren(node.props.children, node.props.asChild)).some(
-        isForeignComponent,
-      )
-    : typeof elementTypeOf(node) === 'function' && !PARTS.has(elementTypeOf(node)));
-
 export function SelectRoot(props: SelectProps) {
   const t = useInternalTranslate();
 
@@ -153,50 +116,13 @@ export function SelectRoot(props: SelectProps) {
   } = props;
   const multiple = selectionMode === 'multiple';
 
-  const nodes = flattenFragments(children);
-  const triggers = nodes.filter(isType(SelectTrigger));
-  const clears = nodes.filter(isType(SelectClear));
-  const contents = nodes.filter(isType(SelectContent));
-  invariant(
-    triggers.length <= 1 && clears.length <= 1 && contents.length <= 1,
-    'Select accepts at most one Trigger, Clear and Content.',
-  );
-  const rest = nodes.filter(
-    (node) => !triggers.includes(node) && !clears.includes(node) && !contents.includes(node),
-  );
-  invariant(
-    !contents.length || !rest.some((node) => isValidElement(node)),
-    'Select takes its options either inside Select.Content or directly, not both.',
-  );
-
-  const options = collectOptions(children, OPTION_KINDS);
-  invariant(
-    options.every((option) => typeof option.value === 'string'),
-    'Select.Item: value is required.',
-  );
-  invariant(
-    new Set(options.map((option) => option.value)).size === options.length,
-    'Select: duplicate Item value.',
-  );
+  const { triggers, clears, contents, rest, mobileVariant } = splitSelectChildren(children);
+  const options = selectOptionsIn(children);
 
   const popupNodes = contents.length ? contents : rest;
-  const hidesItems = !options.length && popupNodes.some(isForeignComponent);
-  useEffect(() => {
-    if (isDevelopment && hidesItems)
-      console.warn(
-        '[IDS] Select found no Select.Item. Items are read from the children of Select, Select.Content and Select.Group, and from Fragments, but not from inside other components.',
-      );
-  }, [hidesItems]);
-  const searchable = popupNodes.some((node) =>
-    isValidElement<SelectContentProps>(node) && elementTypeOf(node) === SelectContent
-      ? flattenFragments(slotChildren(node.props.children, node.props.asChild)).some(
-          isType(SelectSearchField),
-        )
-      : isType(SelectSearchField)(node),
-  );
+  useInternalSelectItemsWarning(!options.length && popupNodes.some(isForeignComponent));
+  const searchable = holdsASearchField(popupNodes);
 
-  const mobileVariant = (contents[0] as ReactElement<SelectContentProps> | undefined)?.props
-    .mobileVariant;
   const drawer = useInternalDrawerPresentation(mobileVariant);
   const select = useInternalSelect({
     multiple,

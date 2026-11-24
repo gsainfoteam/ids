@@ -2,17 +2,17 @@
 
 import { useCallback, useId, type DragEvent, type MouseEvent } from 'react';
 
-import { FileRejectionContext } from '../context';
-import { fileKey, isFile, isValidAccept } from '../lib/file-rules';
+import { isFile, isValidAccept } from '../lib/file-rules';
 import { isType } from '../lib/is-type';
 import { FileLimits, type FileFieldLimits } from '../parts/limits';
 import { FileRejection } from '../parts/rejection';
 import { filePartsStyle } from '../style';
 import { useInternalFileField, type FileFieldValue } from './use-file-field';
-import { FormValue } from '../../../../internal/parts/form-value';
 import { flattenFragments, invariant, mergeRefs } from '../../../../utils';
 import { useFieldSize } from '../../field/context';
 
+import type { FileMessagesProps } from '../parts/messages';
+import type { FilePickerProps } from '../parts/picker';
 import type { FileFieldProps, FileFieldState } from '../root';
 
 export type FileFieldLook = 'field' | 'dropzone' | 'embedded';
@@ -185,43 +185,26 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     onPaste: handlers.onPaste,
   };
 
-  const picker = (
-    <input
-      {...native}
-      ref={pickerRef}
-      type="file"
-      multiple={multiple}
-      disabled={disabled}
-      form={form}
-      hidden
-      tabIndex={-1}
-      aria-hidden="true"
-      onChange={handlers.onInputChange}
-    />
-  );
+  const picker: FilePickerProps = {
+    native,
+    ref: pickerRef,
+    multiple,
+    disabled,
+    form,
+    onChange: handlers.onInputChange,
+  };
 
-  const messages = (
-    <>
-      {listsRejections && (
-        <div id={errorId} role="alert">
-          <ul className={styles.rejections()}>
-            {s.rejections.map((rejection) => (
-              <FileRejectionContext key={fileKey(rejection.file)} value={rejection}>
-                {rejectionPart}
-              </FileRejectionContext>
-            ))}
-          </ul>
-        </div>
-      )}
-      <FormValue
-        form={form}
-        value={s.files.map((file) => file.name)}
-        required={required && !readOnly}
-        disabled={disabled}
-        anchor={triggerRef}
-      />
-    </>
-  );
+  const messages: FileMessagesProps = {
+    errorId,
+    rejections: listsRejections ? s.rejections : [],
+    rejectionPart,
+    rejectionsClassName: styles.rejections(),
+    form,
+    fileNames: s.files.map((file) => file.name),
+    required: required && !readOnly,
+    disabled,
+    anchor: triggerRef,
+  };
 
   return {
     context: {

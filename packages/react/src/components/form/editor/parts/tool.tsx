@@ -1,14 +1,15 @@
 'use client';
 
-import { use, type MouseEvent, type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import { useInternalTranslate } from '../../../../internal/translate';
-import { warnOnce } from '../../../../utils/dev';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Tooltip } from '../../../overlay/tooltip';
 import { Kbd } from '../../../typography/kbd';
-import { EditorBarContext, useInternalEditorContext } from '../context';
-import { useInternalEditorSelector } from '../hooks/use-editor-selector';
+import { useInternalEditorContext } from '../context';
+import { useInternalEditorToolProps } from '../hooks/use-editor-tool-props';
+import { useInternalEditorToolState } from '../hooks/use-editor-tool-state';
+import { extensionIsLoaded } from '../lib/extensions';
 import { editorMessages } from '../messages-catalog';
 
 import type { IdsMessageKey } from '../../../../internal/messages';
@@ -31,38 +32,6 @@ export type EditorToggleSpec = {
   extension?: string;
   shortcut?: Hotkey;
 };
-
-export const hasExtension = (editor: TiptapEditor, name: string) =>
-  editor.extensionManager.extensions.some((extension) => extension.name === name);
-
-function warnTheExtensionIsMissing(part: string) {
-  warnOnce(
-    `\`<Editor.${part}>\` found no extension to drive. Place it directly in \`<Editor>\` or \`<Editor.BubbleMenu>\`, not inside a component of your own, so Editor sees it and loads the extension.`,
-  );
-}
-
-export function extensionIsLoaded(editor: TiptapEditor | null, part: string, name?: string) {
-  const loaded = name === undefined || editor === null || hasExtension(editor, name);
-  if (!loaded) warnTheExtensionIsMissing(part);
-  return loaded;
-}
-
-const keepFocusWhereItWas = (event: MouseEvent) => event.preventDefault();
-
-export function useInternalEditorToolProps(name: string, { keepFocus = true } = {}) {
-  const bar = use(EditorBarContext);
-
-  return {
-    onMouseDown: keepFocus ? keepFocusWhereItWas : undefined,
-    ...(bar && {
-      'data-editor-tool': bar.id,
-      'data-value': name,
-      tabIndex: bar.tabStop === undefined ? undefined : bar.tabStop === name ? 0 : -1,
-      onFocus: () => bar.onItemFocus(name),
-      onKeyDown: bar.onItemKeyDown,
-    }),
-  };
-}
 
 export type EditorToolTipProps = {
   label: string;
@@ -87,22 +56,6 @@ export function EditorToolTip({
   );
 }
 
-const IDLE = { active: false, enabled: true };
-
-export function useInternalToolState(
-  spec: Pick<EditorToggleSpec, 'isActive' | 'can' | 'extension'>,
-) {
-  const { editor } = useInternalEditorContext('Editor');
-  return useInternalEditorSelector(
-    editor,
-    (current) =>
-      spec.extension === undefined || hasExtension(current, spec.extension)
-        ? { active: spec.isActive(current), enabled: spec.can(current) }
-        : { active: false, enabled: false },
-    IDLE,
-  );
-}
-
 export function EditorToggleTool({
   spec,
   icon,
@@ -111,7 +64,7 @@ export function EditorToggleTool({
 }: EditorToolProps & { spec: EditorToggleSpec }) {
   const t = useInternalTranslate(editorMessages);
   const { editor, editable } = useInternalEditorContext(`Editor.${spec.name}`);
-  const state = useInternalToolState(spec);
+  const state = useInternalEditorToolState(spec);
   const tool = useInternalEditorToolProps(spec.name);
   const loaded = extensionIsLoaded(editor, spec.name, spec.extension);
   const label = ariaLabel ?? t(spec.label);

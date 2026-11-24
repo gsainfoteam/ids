@@ -1,68 +1,30 @@
 'use client';
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ComponentProps,
-  type CSSProperties,
-  type RefCallback,
-  type RefObject,
-} from 'react';
+import { type ComponentProps, type RefCallback, type RefObject } from 'react';
 
-import { DndContext, DragOverlay, useDraggable, type DragMoveEvent } from '@dnd-kit/core';
-import { getEventCoordinates } from '@dnd-kit/utilities';
+import { DndContext, DragOverlay, useDraggable } from '@dnd-kit/core';
 import {
   ArrowPathIcon,
   DocumentDuplicateIcon,
   PlusIcon,
   TrashIcon,
 } from '@heroicons/react/16/solid';
-import { minBy } from 'es-toolkit';
 import { GripVertical } from 'lucide-react';
 
-import {
-  deleteBlock,
-  duplicateBlock,
-  insertBlockBelow,
-  keepTheCaretInTheTable,
-  moveBlock,
-  selectBlock,
-  turnBlockInto,
-} from './commands';
-import { markTheDraggedBlock, topLevelBlocks } from './extension';
-import { useInternalResizeObserver } from '../../../../hooks/use-resize-observer';
-import { useInternalDragSensors } from '../../../../internal/hooks/use-drag-sensors';
-import { swallowTheClickThatEndsADrag } from '../../../../internal/lib/drag-surface';
+import { deleteBlock, duplicateBlock, insertBlockBelow, turnBlockInto } from './commands';
+import { isATable } from './geometry';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { cn, mergeRefs } from '../../../../utils';
 import { Menu } from '../../../overlay/menu';
-import { blocksAvailableIn, turnsIntoOtherBlocks } from '../blocks/catalog';
 import { useInternalEditorContext } from '../context';
+import { useInternalEditorBlockHandle } from '../hooks/use-editor-block-handle';
 import { editorMessages } from '../messages-catalog';
 import { EditorGlyphButton } from '../parts/glyph-button';
 import { EditorTableMenuItems } from '../table/edit-menu';
 
-import type { BlockHoverStore, HoveredBlock } from './store';
-import type { Editor as TiptapEditor } from '@tiptap/core';
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
-import type { EditorView } from '@tiptap/pm/view';
+import type { BlockHoverStore } from './store';
 
-type BlockAction = (editor: TiptapEditor, pos: number, node: ProseMirrorNode) => void;
-
-type Gap = { pos: number; y: number };
-
-type DropLine = { pos: number; style: CSSProperties };
-
-type Dragged = { block: HoveredBlock; clone: Node; box: CSSProperties };
-
-const isATable = (node: ProseMirrorNode) => node.type.name === 'table';
-
-const FIRST_LINE = 'p,h1,h2,h3,h4,h5,h6,pre,[data-type=detailsSummary]';
 const DRAG_ID = 'ids-editor-block';
-const REACH_BEYOND_THE_BLOCKS = 36;
-const PREVIEW_PADDING = 8;
 const SILENT = {
   announcements: {
     onDragStart: () => undefined,
@@ -72,130 +34,6 @@ const SILENT = {
   },
   screenReaderInstructions: { draggable: '' },
 };
-
-function firstLineOf(block: HTMLElement) {
-  const line = block.matches(FIRST_LINE) ? block : (block.querySelector(FIRST_LINE) ?? block);
-  const style = getComputedStyle(line);
-  const lineHeight = Number.parseFloat(style.lineHeight) || Number.parseFloat(style.fontSize) * 1.2;
-  const top =
-    line.getBoundingClientRect().top +
-    Number.parseFloat(style.paddingTop) +
-    Number.parseFloat(style.borderTopWidth);
-  return { top, height: lineHeight };
-}
-
-const editorRootOf = (element: Element) => element.closest<HTMLElement>('[data-editor]');
-
-function besideTheFirstLine(block: HTMLElement, handle: HTMLElement): CSSProperties {
-  const line = firstLineOf(block);
-  const documentTop = block.closest('[data-editor-document]')?.getBoundingClientRect().top ?? 0;
-  return { top: line.top - documentTop + (line.height - handle.offsetHeight) / 2 };
-}
-
-function useInternalBesideTheFirstLine(block: HoveredBlock | null) {
-  const handleRef = useRef<HTMLButtonElement>(null);
-  const [place, setPlace] = useState<CSSProperties>({});
-
-  useInternalResizeObserver(block?.dom ?? null, (dom) => {
-    const handle = handleRef.current;
-    if (handle) setPlace(besideTheFirstLine(dom, handle));
-  });
-
-  return [handleRef, place] as const;
-}
-
-function useInternalForgetTheBlockWhenThePointerLeaves(
-  store: BlockHoverStore,
-  handleRef: RefObject<HTMLButtonElement | null>,
-) {
-  useEffect(() => {
-    const handle = handleRef.current;
-    const area = handle && editorRootOf(handle);
-    if (!handle || !area) return;
-    const forget = (event: PointerEvent) => {
-      const next = event.relatedTarget;
-      if (next instanceof Node && (area.contains(next) || handle.contains(next))) return;
-      store.set(null);
-    };
-    area.addEventListener('pointerleave', forget);
-    handle.addEventListener('pointerleave', forget);
-    return () => {
-      area.removeEventListener('pointerleave', forget);
-      handle.removeEventListener('pointerleave', forget);
-    };
-  }, [store, handleRef]);
-}
-
-const handBackFocusTo = (editor: TiptapEditor, handle: HTMLElement | null) =>
-  queueMicrotask(() => {
-    const focused = handle?.ownerDocument.activeElement;
-    if (!editor.isDestroyed && (focused === handle || focused === handle?.ownerDocument.body))
-      editor.commands.focus();
-  });
-
-function gapsBetweenTheBlocks(view: EditorView): Gap[] {
-  const blocks = topLevelBlocks(view);
-  const rects = blocks.map((block) => block.dom.getBoundingClientRect());
-  const last = rects.at(-1);
-  if (!last) return [];
-  return [
-    ...blocks.map((block, index) => ({
-      pos: block.pos,
-      y: index === 0 ? rects[0]!.top : (rects[index - 1]!.bottom + rects[index]!.top) / 2,
-    })),
-    { pos: view.state.doc.content.size, y: last.bottom },
-  ];
-}
-
-function isNearTheBlocks(view: EditorView, { x, y }: { x: number; y: number }) {
-  const box = view.dom.getBoundingClientRect();
-  return (
-    x >= box.left - REACH_BEYOND_THE_BLOCKS &&
-    x <= box.right + REACH_BEYOND_THE_BLOCKS &&
-    y >= box.top - REACH_BEYOND_THE_BLOCKS &&
-    y <= box.bottom + REACH_BEYOND_THE_BLOCKS
-  );
-}
-
-function lineAt(view: EditorView, gap: Gap, origin: Element): CSSProperties {
-  const content = view.dom.getBoundingClientRect();
-  const style = getComputedStyle(view.dom);
-  const start = Number.parseFloat(style.paddingInlineStart);
-  const end = Number.parseFloat(style.paddingInlineEnd);
-  const box = origin.getBoundingClientRect();
-  return {
-    top: gap.y - box.top,
-    left: content.left + start - box.left,
-    width: content.width - start - end,
-  };
-}
-
-function dropLineFor(
-  view: EditorView,
-  block: HoveredBlock,
-  pointer: { x: number; y: number },
-  origin: Element,
-): DropLine | null {
-  const node = view.state.doc.nodeAt(block.pos);
-  if (!node || !isNearTheBlocks(view, pointer)) return null;
-  const gap = minBy(gapsBetweenTheBlocks(view), (candidate) => Math.abs(candidate.y - pointer.y));
-  if (!gap || gap.pos === block.pos || gap.pos === block.pos + node.nodeSize) return null;
-  return { pos: gap.pos, style: lineAt(view, gap, origin) };
-}
-
-function draggedFrom(block: HoveredBlock, handle: HTMLElement): Dragged {
-  const from = block.dom.getBoundingClientRect();
-  const grip = handle.getBoundingClientRect();
-  return {
-    block,
-    clone: block.dom.cloneNode(true),
-    box: {
-      width: from.width + PREVIEW_PADDING * 2,
-      marginLeft: from.left - grip.left - PREVIEW_PADDING,
-      marginTop: from.top - grip.top - PREVIEW_PADDING,
-    },
-  };
-}
 
 const showTheClone =
   (clone: Node): RefCallback<HTMLDivElement> =>
@@ -231,84 +69,35 @@ function DraggableGrip({
 export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
   const t = useInternalTranslate(editorMessages);
   const { editor, editable, styles } = useInternalEditorContext('Editor');
-  const hovered = useSyncExternalStore(store.subscribe, store.getSnapshot, () => null);
-  const [menuBlock, setMenuBlock] = useState<HoveredBlock | null>(null);
-  const [dragged, setDragged] = useState<Dragged | null>(null);
-  const [line, setLine] = useState<DropLine | null>(null);
-  const grabbedRef = useRef<HoveredBlock | null>(null);
-  const draggedRef = useRef<Dragged | null>(null);
-  const lineRef = useRef<DropLine | null>(null);
-  const block = menuBlock ?? dragged?.block ?? hovered;
-  const [handleRef, place] = useInternalBesideTheFirstLine(block);
-  const node = block && editor?.state.doc.nodeAt(block.pos);
-  const sensors = useInternalDragSensors({ touch: false });
-
-  useInternalForgetTheBlockWhenThePointerLeaves(store, handleRef);
-
-  const shown = editable && editor !== null && node != null && block !== null;
-  const turnInto = shown && turnsIntoOtherBlocks(node) ? blocksAvailableIn(editor) : [];
-
-  const run = (action: BlockAction) => () => {
-    if (!editor || !block || !node) return;
-    editor.view.focus();
-    action(editor, block.pos, node);
-  };
-
-  const showLine = (next: DropLine | null) => {
-    lineRef.current = next;
-    setLine(next);
-  };
-
-  const followThePointer = ({ activatorEvent, delta }: DragMoveEvent) => {
-    const start = getEventCoordinates(activatorEvent);
-    const origin = editor?.view.dom.closest('[data-editor-document]');
-    const from = draggedRef.current?.block;
-    if (!editor || !from || !start || !origin) return showLine(null);
-    const pointer = { x: start.x + delta.x, y: start.y + delta.y };
-    showLine(dropLineFor(editor.view, from, pointer, origin));
-  };
-
-  const endTheDrag = () => {
-    if (editor && !editor.isDestroyed) markTheDraggedBlock(editor.view, null);
-    draggedRef.current = null;
-    setDragged(null);
-    showLine(null);
-  };
+  const {
+    sensors,
+    handleRef,
+    place,
+    node,
+    shown,
+    turnInto,
+    menuOpen,
+    dragged,
+    line,
+    run,
+    followThePointer,
+    startTheDrag,
+    dropTheBlock,
+    endTheDrag,
+    onMenuOpenChange,
+    grab,
+  } = useInternalEditorBlockHandle(store, editor, editable);
 
   return (
     <DndContext
       sensors={sensors}
       accessibility={SILENT}
-      onDragStart={() => {
-        const handle = handleRef.current;
-        const grabbed = grabbedRef.current;
-        if (!editor || !grabbed || !handle) return;
-        const next = draggedFrom(grabbed, handle);
-        draggedRef.current = next;
-        setDragged(next);
-        markTheDraggedBlock(editor.view, grabbed.pos);
-      }}
+      onDragStart={startTheDrag}
       onDragMove={followThePointer}
-      onDragEnd={() => {
-        const from = draggedRef.current?.block.pos;
-        const to = lineRef.current?.pos;
-        endTheDrag();
-        swallowTheClickThatEndsADrag();
-        if (editor && from !== undefined && to !== undefined) moveBlock(editor, from, to);
-      }}
+      onDragEnd={dropTheBlock}
       onDragCancel={endTheDrag}
     >
-      <Menu
-        open={menuBlock !== null}
-        onOpenChange={(open) => {
-          if (open && editor && block && node) {
-            if (isATable(node)) keepTheCaretInTheTable(editor, block.pos, node);
-            else selectBlock(editor, block.pos);
-          }
-          setMenuBlock(open ? block : null);
-          if (!open && editor) handBackFocusTo(editor, handleRef.current);
-        }}
-      >
+      <Menu open={menuOpen} onOpenChange={onMenuOpenChange}>
         <Menu.Trigger asChild>
           <DraggableGrip
             shown={shown}
@@ -319,9 +108,7 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
             data-editor-block-handle=""
             className={styles.blockHandle()}
             style={place}
-            onMouseDown={() => {
-              grabbedRef.current = block;
-            }}
+            onMouseDown={grab}
           >
             <GripVertical aria-hidden="true" />
           </DraggableGrip>
