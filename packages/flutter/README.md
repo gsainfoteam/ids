@@ -286,6 +286,11 @@ IdsButton(
 
 부모가 가로 너비를 정하는 곳에서 `SizedBox(width: double.infinity, child: IdsButton(...))`으로 버튼을 가로로 채울 수 있다.
 
+## IconButton
+
+`IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며
+`IdsButton`과 같은 variant, 색상, 크기를 사용합니다. 기본 variant는 `ghost`입니다.
+
 ## 개발과 Widgetbook
 
 ```bash

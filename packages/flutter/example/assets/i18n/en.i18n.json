@@ -39,6 +39,14 @@
     },
     "themedSample": {
       "linkDestination": "Link destination"
+    },
+    "iconButtonSample": {
+      "add": "Add",
+      "close": "Close",
+      "saving": "Saving",
+      "openLink": "Open link",
+      "like": "Like",
+      "more": "More"
     }
   },
   "examples": {
