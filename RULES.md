@@ -36,11 +36,13 @@ every emitter, then the message generation). Edits will be overwritten.
 - `packages/react/src/internal/messages-catalog.ts` and
   `packages/react/src/components/form/editor/messages-catalog.ts` (the `editor` group, kept out of the
   shared catalog every component loads)
-- `packages/react/messages/en.json`
+- `packages/react/src/internal/message-arguments.ts` (each message's argument types) and
+  `packages/react/src/locales/*.ts` (the `ko` and `en` locale objects)
 - `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
   `packages/core/config/color-roles.json`)
-- `packages/flutter/lib/messages/ids_messages.dart`
-- `packages/flutter/messages/ko.i18n.json`
+- `packages/flutter/lib/messages/ids_messages.dart` (`IdsMessagesBase`, one `IdsMessages<Language>`
+  class per `packages/core/messages/<language>.json`, and `IdsLocale`) and
+  `packages/flutter/test/generated/ids_message_readers.dart`
 - `packages/flutter/fonts/*` (copied from the `pretendard-gov` and `geist` npm packages as
   `packages/core/config/fonts.json` lists them, so the Flutter fonts move with the versions in
   `packages/core/package.json`)
@@ -410,7 +412,7 @@ story file adds nothing for it.
 
   `live-module.ts` turns the code into `export default function Example()`: a JSX tree becomes its
   return value, and a `render` with no parameters becomes its body. It imports each free name
-  from `@gsainfoteam/ids-react` (and its `chart`, `editor` and `rich-text` entries), `react`, the
+  from `@gsainfoteam/ids-react` (and its `chart`, `editor`, `rich-text`, `locales/ko` and `locales/en` entries), `react`, the
   four `@heroicons/react` sets, `recharts` and `@internationalized/date`, in that order; the
   last two give only PascalCase names, so a story constant named `today` is not taken for the
   function of that name. A name found in none of them (module-level data, a demo component,
@@ -959,10 +961,11 @@ flag ban, shape over role, presence over `show`/`hide` and `XGroup` apply unchan
 
 **Strings.** User-facing strings go through `useTranslate()` with a stable dotted key
 (`t('dialog.close')`, `t('textArea.remaining', { remaining })`), never a Korean literal and never
-a module-level read of `messages`, so the nearest `IdsProvider translate` decides the language on
-the server and the client alike. The Korean defaults live in `packages/core/messages/ko.json`, sorted
-by group and key, as ICU strings with plain `{name}` arguments; a new key also goes into
-`packages/core/messages/en.json` at the same place. Run `pnpm codegen` to refresh the catalogs. `IdsMessageKey` is the union of their dotted leaf paths.
+a module-level read of `messages`, so the nearest `IdsProvider locale` decides the language on
+the server and the client alike. Each language is `packages/core/messages/<language>.json`,
+`{ language, tag, messages }`, with the messages sorted by group and key. A message takes `{name}`
+for a string argument and `{name, number}` for a number, and every language has the keys and
+arguments of `ko.json`, or codegen fails. Run `pnpm codegen` to refresh the catalogs and locales. `IdsMessageKey` is the union of their dotted leaf paths.
 Developer warnings stay English and out of the catalog. A default that has to be a function
 (`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
@@ -1107,8 +1110,8 @@ projects:
   `tests/hydration-<category>.test.tsx` (`checkEveryStoryHydrates` in `tests/hydration-checks.tsx`)
   renders every story with `renderToString`, hydrates that HTML with `hydrateRoot` and fails on a
   recoverable error or any `console.error`. `tests/translate-<category>.test.tsx`
-  (`checkEveryStoryInEnglish` in `tests/translation-checks.tsx`) renders every story under an
-  English `translate` and fails on a Korean default that the story did not write itself. Both are
+  (`checkEveryStoryInEnglish` in `tests/translation-checks.tsx`) renders every story under
+  `locale={en}` and fails on a Korean default that the story did not write itself. Both are
   split by category like the story checks: WebKit's page crashed out of memory inside the files that
   rendered every story in one frame. WebKit keeps every finished file's frame alive until its shard
   ends (about 20 MB for an empty file, 55 MB for one that imports IDS, and a forced GC frees none of
@@ -1367,6 +1370,13 @@ ids_flutter follows ids-react's theme. The design is decided in React; Flutter p
 - IDS styles stay inside IDS components; Material and Cupertino themes are not touched.
 - Widget parameters follow **Props in Flutter** under Component API.
 
-Flutter strings use the generated `IdsMessages` mixin. Consumers supply a slang object through `translation`; component code falls back per member with `t?.spinnerLabel ?? IdsMessages.ko.spinnerLabel`. Edit `packages/core/messages/ko.json` and `en.json`, then run `pnpm codegen`. Do not hand-edit generated Dart messages or catalogs.
+Flutter strings come from the generated `IdsLocale` (`IdsLocale.ko`, `IdsLocale.en`), which pairs a
+`Locale` with an `IdsMessagesBase`. Consumers pass one as `IdsProvider(locale:)`; without it the
+outermost provider takes the shipped messages in the language of `Localizations.maybeLocaleOf`, or
+`IdsLocale.ko`. Component code reads `IdsProvider.of(context).messages.spinnerLabel`. An app changes
+a few strings by extending a shipped class (`extends IdsMessagesEn`) and adds a language by
+extending `IdsMessagesBase`. Edit `packages/core/messages/<language>.json`, then run
+`pnpm codegen`. Do not hand-edit generated Dart messages.
 
-Before Flutter tests or analysis, run `dart run slang` in both `packages/flutter` and `packages/flutter/example` to generate the service fixtures.
+Before the example's tests or analysis, run `dart run slang` in `packages/flutter/example`, which
+uses slang for its own demo strings.

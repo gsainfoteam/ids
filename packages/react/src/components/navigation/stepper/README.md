@@ -262,4 +262,4 @@ const [step, setStep] = useState(0);
 - 버튼의 이름은 `Title` 과 상태 문구("완료", "오류")이고, `Description` 은 `aria-describedby` 로 이어집니다. Title 이 없으면 버튼의 글자가 이름이 됩니다. `Body` 는 버튼 밖이라 이름과 설명에 들어가지 않습니다.
 - 번호와 아이콘 표시는 `aria-hidden` 입니다. 순서는 `ol` 이 알립니다.
 - 목록 이름은 필수입니다. `aria-label` 을 주거나, 보이는 제목이 있으면 `aria-labelledby` 로 그 `id` 를 가리킵니다. 둘 다 없으면 개발 모드에서 경고합니다.
-- 상태 문구는 `IdsProvider translate` 의 `stepper.completed`, `stepper.error` 입니다.
+- 상태 문구는 `IdsProvider locale` 의 `stepper.completed`, `stepper.error` 입니다.
