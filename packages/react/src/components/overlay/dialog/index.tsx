@@ -25,7 +25,6 @@ export namespace Dialog {
     onOpenChangeComplete?: (open: boolean) => void;
     dismissible?: boolean;
     role?: Role;
-    hideClose?: boolean;
     children?: ReactNode;
   };
 

@@ -20,7 +20,9 @@ import { Slot } from '@gsainfoteam/ids-react';
 
 ## asChild 만들기
 
-```tsx
+- IDS 위에 새 컴포넌트를 만드는 예라 그 컴포넌트의 클래스를 `className` 으로 합칩니다.
+
+```tsx custom-design
 function Tag({ asChild = false, className, ...props }: Tag.Props) {
   const Root = asChild ? Slot : 'span';
   return <Root {...props} className={cn('rounded-full px-2.5', className)} />;

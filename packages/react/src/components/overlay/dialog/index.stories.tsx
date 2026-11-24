@@ -20,12 +20,10 @@ const meta = {
   argTypes: {
     role: { control: 'radio', options: ['dialog', 'alertdialog'] },
     dismissible: { control: 'boolean' },
-    hideClose: { control: 'boolean' },
   },
   args: {
     role: 'dialog',
     dismissible: true,
-    hideClose: false,
     onOpenChange: fn(),
     onOpenChangeComplete: fn(),
   },
@@ -88,6 +86,7 @@ type DialogPlaygroundArgs = Dialog.Props & {
   titleText?: string;
   descriptionText?: string;
   body?: ReactNode;
+  closeButton?: boolean;
   footer?: ReactNode;
 };
 
@@ -100,12 +99,12 @@ export const Playground: StoryObj<DialogPlaygroundArgs> = {
     titleText: '프로필 수정',
     descriptionText: '바꾼 내용은 저장을 눌러야 반영됩니다.',
     body: 'form',
+    closeButton: false,
     footer: 'cancelAndSave',
   },
   argTypes: {
     role: { table: { category: 'Dialog' } },
     dismissible: { table: { category: 'Dialog' } },
-    hideClose: { table: { category: 'Dialog' } },
     defaultOpen: {
       control: 'boolean',
       description: '처음부터 열어 둡니다. 바꾼 뒤 툴바의 Remount 로 다시 그려야 반영됩니다.',
@@ -147,6 +146,12 @@ export const Playground: StoryObj<DialogPlaygroundArgs> = {
       description: '비우면 Dialog.Description 을 두지 않습니다.',
       table: { category: 'Dialog.Description' },
     },
+    closeButton: {
+      control: 'boolean',
+      description:
+        '<Dialog.Close /> 를 Content 에 직접 써서 모서리에 X 를 둡니다. Content 에 Dialog.Close 가 하나도 없으면 켜지 않아도 X 를 그립니다.',
+      table: { category: 'Dialog.Close' },
+    },
     footer: {
       control: 'select',
       options: Object.keys(footers),
@@ -167,6 +172,7 @@ export const Playground: StoryObj<DialogPlaygroundArgs> = {
     titleText,
     descriptionText,
     body,
+    closeButton,
     footer,
     ...args
   }) => (
@@ -184,6 +190,7 @@ export const Playground: StoryObj<DialogPlaygroundArgs> = {
             {descriptionText && <Dialog.Description>{descriptionText}</Dialog.Description>}
           </Dialog.Header>
         )}
+        {closeButton && <Dialog.Close />}
         {body}
         {footer}
       </Dialog.Content>
@@ -225,9 +232,9 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Anatomy"
-        description="Header 에 Title 과 Description, 아래에 Footer 를 둡니다. Footer 는 위쪽 선과 옅은 배경을 깐 띠로 바닥에 붙습니다. 모서리의 닫기 버튼은 hideClose 로 뺍니다."
+        description="Header 에 Title 과 Description, 아래에 Footer 를 둡니다. Footer 는 위쪽 선과 옅은 배경을 깐 띠로 바닥에 붙습니다. Content 안에 Dialog.Close 가 없을 때만 모서리에 닫기 버튼(X)을 그립니다."
       >
-        <Showcase.Row label="기본">
+        <Showcase.Row label="X">
           <Dialog>
             <Dialog.Trigger asChild>
               <Button variant="outline">기본</Button>
@@ -237,14 +244,31 @@ export const Gallery: Story = {
                 <Dialog.Title>알림 설정</Dialog.Title>
                 <Dialog.Description>새 댓글이 달리면 알려 드립니다.</Dialog.Description>
               </Dialog.Header>
+            </Dialog.Content>
+          </Dialog>
+        </Showcase.Row>
+        <Showcase.Row label="X, Footer">
+          <Dialog>
+            <Dialog.Trigger asChild>
+              <Button variant="outline">X 와 Footer</Button>
+            </Dialog.Trigger>
+            <Dialog.Content>
+              <Dialog.Close />
+              <Dialog.Header>
+                <Dialog.Title>알림 설정</Dialog.Title>
+                <Dialog.Description>새 댓글이 달리면 알려 드립니다.</Dialog.Description>
+              </Dialog.Header>
               <Dialog.Footer>
-                <Dialog.Close>닫기</Dialog.Close>
+                <Dialog.Close>취소</Dialog.Close>
+                <Dialog.Close asChild>
+                  <Button>저장</Button>
+                </Dialog.Close>
               </Dialog.Footer>
             </Dialog.Content>
           </Dialog>
         </Showcase.Row>
-        <Showcase.Row label="hideClose">
-          <Dialog hideClose>
+        <Showcase.Row label="Footer">
+          <Dialog>
             <Dialog.Trigger asChild>
               <Button variant="outline">닫기 버튼 없이</Button>
             </Dialog.Trigger>
@@ -267,7 +291,7 @@ export const Gallery: Story = {
         description="되돌릴 수 없는 결정은 alertdialog 로 묻고, dismissible={false} 로 버튼으로만 닫게 합니다."
       >
         <Showcase.Row label="alertdialog">
-          <Dialog role="alertdialog" dismissible={false} hideClose>
+          <Dialog role="alertdialog" dismissible={false}>
             <Dialog.Trigger asChild>
               <Button variant="outline" colorScheme="danger">
                 계정 삭제
@@ -428,6 +452,46 @@ export const Nested: Story = {
       expect(canvas.queryByRole('dialog', { name: '비밀번호 변경' })).not.toBeInTheDocument(),
     );
     expect(canvas.getByRole('dialog', { name: '설정' })).toBeInTheDocument();
+  },
+};
+
+export const KeepTheCornerCloseBesideFooterButtons: Story = {
+  render: () => (
+    <Dialog>
+      <Dialog.Trigger asChild>
+        <Button variant="outline">공지 쓰기</Button>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Close />
+        <Dialog.Header>
+          <Dialog.Title>공지 쓰기</Dialog.Title>
+          <Dialog.Description>저장하면 모든 구성원에게 알림이 갑니다.</Dialog.Description>
+        </Dialog.Header>
+        <TextField aria-label="제목" data-1p-ignore data-lpignore="true" />
+        <Dialog.Footer>
+          <Dialog.Close>취소</Dialog.Close>
+          <Dialog.Close asChild>
+            <Button>저장</Button>
+          </Dialog.Close>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Dialog.Content 는 그 안에 Dialog.Close 가 하나도 없을 때만 모서리에 닫기 버튼(X)을 그립니다. Footer 에 취소나 확인을 Dialog.Close 로 두면 X 는 빠집니다. 둘 다 두려면 자식 없는 <Dialog.Close /> 를 Content 에 직접 씁니다. 그 버튼이 모서리의 X 가 됩니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '공지 쓰기' }));
+    const dialog = await canvas.findByRole('dialog', { name: '공지 쓰기' });
+    await expect(canvas.getByRole('button', { name: '닫기' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: '취소' })).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: '닫기' }));
+    await waitFor(() => expect(dialog).not.toBeInTheDocument());
   },
 };
 

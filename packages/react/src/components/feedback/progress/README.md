@@ -27,7 +27,7 @@ import { Progress } from '@gsainfoteam/ids-react';
 <Progress value={40} indeterminate />         // value가 있어도 진행률 없이
 ```
 
-- 값이 `max` 에 닿으면 `data-complete` 가 붙습니다. 색은 저절로 바뀌지 않으니 `colorScheme` 을 직접 넘깁니다.
+- 값이 `max` 에 닿으면 `complete` 상태가 됩니다. 색은 저절로 바뀌지 않으니 `colorScheme` 을 직접 넘깁니다.
 - `max` 가 0 이하이거나 값이 숫자가 아니면 진행률 없이 그립니다.
 
 ## 값 문장
@@ -57,15 +57,19 @@ import { Progress } from '@gsainfoteam/ids-react';
   <Progress.Value />                            {/* Track 뒤: 막대 아래 */}
 </Progress>
 
+```
+
+- Track과 Indicator는 생략하면 기본 모양이 들어갑니다. Track이 없으면 다른 자식은 모두 막대 위에 놓입니다.
+- `Progress.Label`, `Progress.Value`, `Progress.Indicator` 는 `asChild` 로 다른 요소를 그릴 수 있습니다.
+- 막대의 두께와 채움 색을 바꾸는 것은 IDS 밖의 새 디자인입니다. 그때만 Track 과 Indicator 에 `className` 을 줍니다.
+
+```tsx custom-design
 <Progress value={72} aria-label="진행률">
   <Progress.Track className="h-3">
     <Progress.Indicator className="bg-linear-to-r from-info to-success" />
   </Progress.Track>
 </Progress>
 ```
-
-- Track과 Indicator는 생략하면 기본 모양이 들어갑니다. Track이 없으면 다른 자식은 모두 막대 위에 놓입니다.
-- `Progress.Label`, `Progress.Value`, `Progress.Indicator` 는 `asChild` 로 다른 요소를 그릴 수 있습니다.
 
 ## 크기와 색
 
@@ -75,6 +79,11 @@ import { Progress } from '@gsainfoteam/ids-react';
 ```
 
 ## 상태
+
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 값은 앱이 넘긴 `value`, `max` 입니다. `size`, `colorScheme` 도 넘긴 값입니다.
+- `Progress.Value` 의 `children` 은 아래 `Progress.State` 를 받는 함수가 될 수 있습니다.
 
 | 상태                             | 뜻                                         |
 | -------------------------------- | ------------------------------------------ |
@@ -86,12 +95,11 @@ import { Progress } from '@gsainfoteam/ids-react';
 | `complete`                       | 값이 `max` 에 닿았다                       |
 | `size` / `colorScheme`           | 넘긴 값                                    |
 
-```tsx
+- 새 디자인(`custom-design`)에서만 루트와 파트의 `className` 에 `Progress.State` 를 받는 함수를 줍니다. 루트는 `style` 도 같습니다.
+
+```tsx custom-design
 <Progress value={value} className={(state) => (state.complete ? 'opacity-60' : undefined)} />
 ```
-
-- 루트에 `data-progress`, `data-size`, `data-indeterminate`, `data-complete` 가 붙습니다.
-- 파트에는 `data-progress-label`, `data-progress-value`, `data-progress-track`, `data-progress-indicator` 가 붙습니다.
 
 ## 속성
 
@@ -105,7 +113,7 @@ import { Progress } from '@gsainfoteam/ids-react';
 | `getValueLabel`                              | `(value, max) => string`. 값 문장                                       |
 | `aria-label` / `aria-labelledby`             | progressbar의 이름. `Progress.Label` 보다 우선                          |
 | `id` / `aria-describedby` / `aria-valuetext` | progressbar로 간다                                                      |
-| `className` / `style`                        | 루트로 간다. 상태를 받는 함수도 된다                                    |
+| `className` / `style`                        | 루트로 간다. 새 디자인에서만 쓴다                                       |
 
 ## 알아둘 것
 
