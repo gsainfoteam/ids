@@ -6,7 +6,7 @@
 - **강도는 variant, 의미는 colorScheme.** `danger` 같은 색은 `variant` 와 따로 고르고, `solid` `soft` `outline` `ghost` `glossy` `transparent` 가 모두 그 색을 따릅니다. 포커스 링도 같은 색입니다.
 - **로딩은 합성.** `disabled` 와 `<Spinner />` 를 넣으면 스피너가 아이콘 자리에 아이콘 크기로 들어가고, `focusableWhenDisabled` 를 켜면 누른 버튼이 로딩 중에도 포커스를 지킵니다.
 - **asChild.** 링크나 라우터 `Link` 를 버튼 모양으로 그립니다. 링크는 링크로 남고, 비활성이면 이동하지 않습니다.
-- **상태 기반 스타일.** hover, active, focus-visible 이 `data-*` 로 붙고, `className` `style` `children` 은 상태를 받는 함수도 됩니다.
+- **상태는 콜백으로.** hover, active, focus-visible 을 `onInteractionChange` 로 알립니다.
 - **그룹.** `ButtonGroup` 안에서는 그룹의 `size` 를 따르고, 버튼에 직접 준 `size` 가 이깁니다.
 
 ```tsx
@@ -77,7 +77,7 @@ import { Button } from '@gsainfoteam/ids-react';
 - `focusableWhenDisabled` 를 켜면 `disabled` 속성 대신 `aria-disabled` 가 붙습니다. 포커스와 탭 순서는 그대로 두고 클릭, Enter, Space, 폼 제출만 막습니다.
 - `aria-busy` 가 참이면 커서가 금지 표시 대신 진행 중 표시가 됩니다.
 - 문구가 이미 "저장 중" 이라고 말하므로 Spinner 는 `aria-hidden` 으로 둡니다.
-- 문구가 바뀌면서 너비가 흔들리면 `className="min-w-24"` 처럼 최소 너비를 줍니다.
+- 문구가 바뀌면서 너비가 흔들리면 감싸는 요소에 최소 너비를 줍니다: `<div className="inline-grid min-w-24"><Button>…</Button></div>`.
 
 ## asChild
 
@@ -110,26 +110,26 @@ import { Button } from '@gsainfoteam/ids-react';
 
 ## 상태
 
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
 ```tsx
-<Button
-  variant={(state) => (state.hovered ? 'solid' : 'outline')}
-  className={(state) => (state.focusVisible ? 'ring-2' : undefined)}
->
-  {(state) => (state.active ? '누르는 중' : '저장')}
-</Button>
+const [state, setState] = useState<Button.State>();
+
+<Button onInteractionChange={setState}>{state?.active ? '누르는 중' : '저장'}</Button>;
 ```
 
-| 상태           | data 속성            | 뜻                                 |
-| -------------- | -------------------- | ---------------------------------- |
-| `hovered`      | `data-hovered`       | 마우스가 올라가 있다               |
-| `active`       | `data-active`        | 누르고 있다 (포인터, Enter, Space) |
-| `focused`      | `data-focused`       | 포커스가 있다                      |
-| `focusVisible` | `data-focus-visible` | 키보드로 포커스했다                |
-| `disabled`     | `data-disabled`      | 비활성                             |
+| 상태           | 뜻                                 |
+| -------------- | ---------------------------------- |
+| `hovered`      | 마우스가 올라가 있다               |
+| `active`       | 누르고 있다 (포인터, Enter, Space) |
+| `focused`      | 포커스가 있다                      |
+| `focusVisible` | 키보드로 포커스했다                |
+| `pressed`      | Button 에서는 늘 `false`           |
+| `disabled`     | 비활성                             |
 
-- `data-hovered` 와 `data-active` 는 한 번에 하나만 붙고 `active` 가 앞섭니다. 같은 배경을 두고 다투지 않게 하기 위해서입니다.
-- 루트에는 `data-variant` 와 `data-size` 도 붙습니다.
 - `onInteractionChange(state)` 는 상태를 부모에 알려 줄 뿐 제어 prop 이 아닙니다.
+- 새 디자인(`custom-design`)에서만 `className`, `style` 에 `Button.State` 를 받는 함수를 줍니다.
+- `variant`, `colorScheme`, `size` 는 앱이 넘긴 값입니다.
 
 ## 폼
 
@@ -156,7 +156,7 @@ import { Button } from '@gsainfoteam/ids-react';
 | `disabled`                     | native `disabled`                                                       |
 | `focusableWhenDisabled`        | `false`. 켜면 비활성이어도 포커스와 탭 순서를 지킨다                    |
 | `asChild`                      | `false`. 자식 요소 하나를 버튼으로 그린다                               |
-| `className` `style` `children` | 값, 또는 상태를 받는 함수                                               |
+| `className` `style`            | 새 디자인에서만 쓴다                                                    |
 | `onInteractionChange`          | 상호작용 상태가 바뀔 때                                                 |
 | `ref`                          | 실제 `button`. `asChild` 면 자식 요소                                   |
 | 그 외 native 속성              | `button` 으로 간다                                                      |
@@ -165,4 +165,4 @@ import { Button } from '@gsainfoteam/ids-react';
 
 - 버튼 안에 버튼을 넣으면 개발 모드에서 콘솔에 경고합니다. 버튼은 버튼을 품을 수 없어서 브라우저가 바깥 버튼을 쪼갭니다. 여러 버튼은 `ButtonGroup` 으로 묶습니다.
 - 아이콘만 든 Button 도 개발 모드에서 `IconButton` 을 권합니다.
-- hover 는 마우스에서만 붙습니다. 스타일을 덮어쓸 때 `:hover` 대신 `data-hovered` 를 쓰면 터치한 뒤 hover 가 남지 않습니다.
+- hover 는 마우스에서만 켜집니다. 터치한 뒤에는 `hovered` 가 남지 않습니다.
