@@ -47,6 +47,40 @@ Future<FocusNode> pump(
 const outside = Offset(1, 1);
 
 void main() {
+  testWidgets('disabled focusable controls can leave Space to the parent', (
+    tester,
+  ) async {
+    var spaceDowns = 0;
+    var activations = 0;
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Focus(
+          onKeyEvent: (_, event) {
+            if (event is! KeyDownEvent ||
+                event.logicalKey != LogicalKeyboardKey.space) {
+              return KeyEventResult.ignored;
+            }
+            spaceDowns++;
+            return KeyEventResult.handled;
+          },
+          child: IdsInteractive(
+            autofocus: true,
+            disabled: true,
+            focusableWhenDisabled: true,
+            activateOnSpace: false,
+            onPressed: () => activations++,
+            builder: (_, _) => const SizedBox(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    expect(spaceDowns, 1);
+    expect(activations, 0);
+  });
+
   group('focusVisible', () {
     testWidgets('Tab', (tester) async {
       await pump(tester);
@@ -73,6 +107,28 @@ void main() {
       await tester.pump();
       expect(state.focused, isTrue);
       expect(state.focusVisible, isFalse);
+    });
+
+    testWidgets('unhandled key reveals focus after a mouse click', (
+      tester,
+    ) async {
+      await pump(tester);
+      await tester.tap(
+        find.byType(IdsInteractive),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pump();
+      expect(state.focusVisible, isFalse);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
+      expect(state.focusVisible, isFalse);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(state.focused, isTrue);
+      expect(state.focusVisible, isTrue);
+      expect(presses, 1);
     });
 
     testWidgets('requestFocus after keyboard', (tester) async {

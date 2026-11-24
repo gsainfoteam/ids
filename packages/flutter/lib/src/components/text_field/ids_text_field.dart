@@ -7,11 +7,13 @@ import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
 import '../../interaction/control_surface.dart';
+import '../../interaction/control_tokens.dart';
 import '../../interaction/ids_interactive.dart';
 import '../field/ids_field.dart';
+import '../group/ids_group.dart';
 import '../icon_button/ids_icon_button.dart';
 
-class IdsTextField extends StatefulWidget {
+class IdsTextField extends StatefulWidget implements IdsGroupedControl {
   const IdsTextField({
     super.key,
     this.controller,
@@ -147,7 +149,11 @@ class _IdsTextFieldState extends State<IdsTextField> {
     final theme = scope.resolved;
     final colors = theme.colors;
     final field = IdsField.maybeOf(context);
-    final tiny = (widget.size ?? field?.size) == IdsSize.tiny;
+    final groupItem = IdsGroupItem.of(context);
+    final direction = Directionality.of(context);
+    final tiny =
+        (widget.size ?? field?.size ?? IdsGroup.sizeOf(context)) ==
+        IdsSize.tiny;
     final disabled = widget.disabled || (field?.disabled ?? false);
     final required = widget.required || (field?.required ?? false);
     final initialValue = _externalInitialValue ?? widget.defaultValue ?? '';
@@ -192,10 +198,7 @@ class _IdsTextFieldState extends State<IdsTextField> {
         final ring = invalid ? colors.borderDanger : colors.borderPrimary;
         final variant = widget.variant;
         final background = switch (variant) {
-          IdsVariant.outline =>
-            theme.isDark
-                ? colors.bgNeutralSoft.withValues(alpha: .3)
-                : colors.bgSurface,
+          IdsVariant.outline => outlineControlBackground(theme),
           IdsVariant.soft => colors.bgNeutralSoft,
           _ => const Color(0x00000000),
         };
@@ -209,6 +212,98 @@ class _IdsTextFieldState extends State<IdsTextField> {
           disabled,
           invalid,
         );
+        final control = IdsInteractive(
+          disabled: disabled,
+          focusOnTap: false,
+          builder: (context, _) => ListenableBuilder(
+            listenable: _focus,
+            builder: (context, _) {
+              final focused = _focus.hasPrimaryFocus && !disabled;
+              final border = focused || invalid
+                  ? ring
+                  : variant == IdsVariant.outline
+                  ? colors.borderNeutral
+                  : const Color(0x00000000);
+              final shape = theme.shape(
+                side: BorderSide(color: border),
+                corners: groupItem?.corners(theme.radius.standard),
+              );
+              return CustomPaint(
+                foregroundPainter: ControlFocusRing(
+                  shape,
+                  ring.withValues(alpha: focused ? .4 : 0),
+                  direction: direction,
+                ),
+                child: AnimatedContainer(
+                  duration: reducedMotion ? Duration.zero : IdsMotion.fast,
+                  constraints: BoxConstraints(minHeight: height),
+                  decoration: ShapeDecoration(
+                    color: background,
+                    shape: shape,
+                    shadows: variant == IdsVariant.outline
+                        ? controlShadowXs
+                        : const [],
+                  ),
+                  child: IdsGroup.reset(
+                    child: TextFieldTapRegion(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        excludeFromSemantics: true,
+                        onTap: disabled ? null : _focus.requestFocus,
+                        child: IconTheme(
+                          data: iconTheme,
+                          child: ValueListenableBuilder(
+                            valueListenable: _controller,
+                            child: input,
+                            builder: (context, value, input) {
+                              final showClear =
+                                  widget.clearable &&
+                                  !disabled &&
+                                  !widget.readOnly &&
+                                  value.text.isNotEmpty;
+                              return Padding(
+                                padding: EdgeInsetsDirectional.only(
+                                  start: padding,
+                                  end: showClear ? theme.dimension(4) : padding,
+                                ),
+                                child: Row(
+                                  spacing: theme.dimension(tiny ? 6 : 8),
+                                  children: [
+                                    ?widget.leading,
+                                    Expanded(child: input!),
+                                    ?widget.trailing,
+                                    if (showClear)
+                                      ExcludeFocus(
+                                        child: SizedBox.square(
+                                          dimension: actionSize,
+                                          child: IdsIconButton(
+                                            variant: IdsVariant.ghost,
+                                            size: tiny
+                                                ? IdsSize.tiny
+                                                : IdsSize.standard,
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: colors.textNeutral,
+                                            ),
+                                            semanticLabel: clearLabel,
+                                            onPressed: () => _clear(form),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
         return Opacity(
           opacity: widget.disabled && !(field?.disabled ?? false) ? .5 : 1,
           child: Column(
@@ -216,94 +311,7 @@ class _IdsTextFieldState extends State<IdsTextField> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: theme.dimension(field == null ? 4 : 8),
             children: [
-              IdsInteractive(
-                disabled: disabled,
-                focusOnTap: false,
-                builder: (context, _) => ListenableBuilder(
-                  listenable: _focus,
-                  builder: (context, _) {
-                    final focused = _focus.hasPrimaryFocus && !disabled;
-                    final border = focused || invalid
-                        ? ring
-                        : variant == IdsVariant.outline
-                        ? colors.borderNeutral
-                        : const Color(0x00000000);
-                    return CustomPaint(
-                      foregroundPainter: ControlFocusRing(
-                        theme,
-                        ring.withValues(alpha: focused ? .4 : 0),
-                      ),
-                      child: AnimatedContainer(
-                        duration: reducedMotion
-                            ? Duration.zero
-                            : IdsMotion.fast,
-                        constraints: BoxConstraints(minHeight: height),
-                        decoration: ShapeDecoration(
-                          color: background,
-                          shape: theme.shape(side: BorderSide(color: border)),
-                          shadows: variant == IdsVariant.outline
-                              ? _outlineShadow
-                              : const [],
-                        ),
-                        child: TextFieldTapRegion(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            excludeFromSemantics: true,
-                            onTap: disabled ? null : _focus.requestFocus,
-                            child: IconTheme(
-                              data: iconTheme,
-                              child: ValueListenableBuilder(
-                                valueListenable: _controller,
-                                child: input,
-                                builder: (context, value, input) {
-                                  final showClear =
-                                      widget.clearable &&
-                                      !disabled &&
-                                      !widget.readOnly &&
-                                      value.text.isNotEmpty;
-                                  return Padding(
-                                    padding: EdgeInsetsDirectional.only(
-                                      start: padding,
-                                      end: showClear
-                                          ? theme.dimension(4)
-                                          : padding,
-                                    ),
-                                    child: Row(
-                                      spacing: theme.dimension(tiny ? 6 : 8),
-                                      children: [
-                                        ?widget.leading,
-                                        Expanded(child: input!),
-                                        ?widget.trailing,
-                                        if (showClear)
-                                          ExcludeFocus(
-                                            child: SizedBox.square(
-                                              dimension: actionSize,
-                                              child: IdsIconButton(
-                                                size: tiny
-                                                    ? IdsSize.tiny
-                                                    : IdsSize.standard,
-                                                icon: Icon(
-                                                  Icons.close,
-                                                  color: colors.textNeutral,
-                                                ),
-                                                semanticLabel: clearLabel,
-                                                onPressed: () => _clear(form),
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+              control,
               if (form.errorText case final error?)
                 Semantics(
                   liveRegion: true,
@@ -325,10 +333,6 @@ class _IdsTextFieldState extends State<IdsTextField> {
       },
     );
   }
-
-  static const _outlineShadow = [
-    BoxShadow(color: Color(0x0d000000), offset: Offset(0, 1), blurRadius: 2),
-  ];
 
   Widget _input(
     FormFieldState<String> form,

@@ -125,8 +125,8 @@ void main() {
     ShapeDecoration decoration() =>
         tester.widget<AnimatedContainer>(surface).decoration!
             as ShapeDecoration;
-    Color background() =>
-        (decoration().gradient! as LinearGradient).colors.last;
+    Color? background() =>
+        decoration().color ?? decoration().gradient?.colors.last;
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await mouse.addPointer(location: Offset.zero);
     addTearDown(mouse.removePointer);
@@ -164,7 +164,10 @@ void main() {
     );
     await tester.pumpAndSettle();
     final darkColors = IdsProvider.of(tester.element(surface)).colors;
-    expect(background(), darkColors.bgNeutralSoft.withValues(alpha: .30));
+    expect(
+      background(),
+      IdsProvider.of(tester.element(surface)).componentColors.bgControlOutline,
+    );
     expect(
       (decoration().shape as RoundedRectangleBorder).side.color,
       darkColors.borderNeutral,

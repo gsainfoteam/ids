@@ -10,52 +10,102 @@ class IdsGroupData {
     required this.orientation,
     required this.attached,
     this.size,
+    this.decorativeSeparator = false,
   });
 
   final Axis orientation;
   final bool attached;
   final IdsSize? size;
+  final bool decorativeSeparator;
 
   @override
   bool operator ==(Object other) =>
       other is IdsGroupData &&
       other.orientation == orientation &&
       other.attached == attached &&
-      other.size == size;
+      other.size == size &&
+      other.decorativeSeparator == decorativeSeparator;
 
   @override
-  int get hashCode => Object.hash(orientation, attached, size);
+  int get hashCode =>
+      Object.hash(orientation, attached, size, decorativeSeparator);
 }
+
+abstract interface class IdsGroupedControl {}
 
 class IdsGroup extends StatelessWidget {
   const IdsGroup({
     super.key,
     this.orientation = Axis.horizontal,
     this.attached = true,
-    this.size,
     this.semanticLabel,
+    this.size,
+    this.variant,
+    this.decorativeSeparator = false,
     required this.children,
   });
 
   final Axis orientation;
   final bool attached;
-  final IdsSize? size;
   final String? semanticLabel;
+  final IdsSize? size;
+  final IdsVariant? variant;
+  final bool decorativeSeparator;
   final List<Widget> children;
 
   static const _gap = 8.0;
 
+  static Widget reset({required Widget child}) => _IdsGroupScope(
+    group: null,
+    size: null,
+    variant: null,
+    child: IdsGroupItem(
+      orientation: Axis.horizontal,
+      attached: false,
+      roundStart: true,
+      roundEnd: true,
+      child: child,
+    ),
+  );
+
   static IdsGroupData? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_IdsGroupScope>()?.data;
+      context.dependOnInheritedWidgetOfExactType<_IdsGroupScope>()?.group;
+
+  static IdsSize? sizeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_IdsGroupScope>()?.size;
+
+  static IdsVariant? variantOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_IdsGroupScope>()?.variant;
 
   @override
   Widget build(BuildContext context) {
+    final nested = children.any((child) => child is IdsGroup);
+    final joined = attached && !nested;
+    final inheritedVariant = variant ?? variantOf(context);
+    final theme = IdsProvider.of(context);
     final flex = Flex(
       direction: orientation,
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: attached ? 0 : IdsProvider.of(context).dimension(_gap),
-      children: children,
+      spacing: joined ? 0 : theme.dimension(_gap),
+      children: [
+        for (final (index, child) in children.indexed)
+          IdsGroupItem(
+            key: child.key == null ? null : ValueKey(child.key),
+            orientation: orientation,
+            attached: joined,
+            roundStart: !joined || index == 0,
+            roundEnd: !joined || index == children.length - 1,
+            child: orientation == Axis.horizontal && child is IdsGroupedControl
+                ? Align(
+                    alignment: AlignmentDirectional.topStart,
+                    widthFactor: 1,
+                    heightFactor: 1,
+                    child: child,
+                  )
+                : child,
+          ),
+      ],
     );
 
     return Semantics(
@@ -63,11 +113,14 @@ class IdsGroup extends StatelessWidget {
       explicitChildNodes: true,
       label: semanticLabel,
       child: _IdsGroupScope(
-        data: IdsGroupData(
+        group: IdsGroupData(
           orientation: orientation,
           attached: attached,
-          size: size ?? maybeOf(context)?.size,
+          size: size ?? sizeOf(context),
+          decorativeSeparator: decorativeSeparator,
         ),
+        size: size ?? sizeOf(context),
+        variant: inheritedVariant,
         child: orientation == Axis.horizontal
             ? IntrinsicHeight(child: flex)
             : IntrinsicWidth(child: flex),
@@ -77,10 +130,9 @@ class IdsGroup extends StatelessWidget {
 }
 
 class IdsGroupSeparator extends StatelessWidget {
-  const IdsGroupSeparator({super.key});
+  const IdsGroupSeparator({super.key, this.child});
 
-  static const _spacedLength = 20.0;
-  static const _spacedTinyLength = 16.0;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -89,30 +141,89 @@ class IdsGroupSeparator extends StatelessWidget {
       group != null,
       'IdsGroupSeparator must be rendered inside an IdsGroup.',
     );
-    final horizontalGroup = group!.orientation == Axis.horizontal;
+    final vertical = group!.orientation == Axis.horizontal;
     final divider = IdsDivider(
-      orientation: horizontalGroup ? Axis.vertical : Axis.horizontal,
+      orientation: vertical ? Axis.vertical : Axis.horizontal,
+      decorative: group.decorativeSeparator,
+      child: child,
     );
-    if (group.attached) return divider;
-
-    final length = IdsProvider.of(
+    if (group.attached || child != null) return divider;
+    final extent = IdsProvider.of(
       context,
-    ).dimension(group.size == IdsSize.tiny ? _spacedTinyLength : _spacedLength);
+    ).dimension(IdsGroup.sizeOf(context) == IdsSize.tiny ? 16 : 20);
     return Center(
       child: SizedBox(
-        width: horizontalGroup ? null : length,
-        height: horizontalGroup ? length : null,
+        height: vertical ? extent : null,
+        width: vertical ? null : extent,
         child: divider,
       ),
     );
   }
 }
 
-class _IdsGroupScope extends InheritedWidget {
-  const _IdsGroupScope({required this.data, required super.child});
+class IdsGroupItem extends InheritedWidget {
+  const IdsGroupItem({
+    super.key,
+    required this.orientation,
+    required this.attached,
+    required this.roundStart,
+    required this.roundEnd,
+    required super.child,
+  });
 
-  final IdsGroupData data;
+  final Axis orientation;
+  final bool attached;
+  final bool roundStart;
+  final bool roundEnd;
+
+  static IdsGroupItem? of(BuildContext context) {
+    final item = context.dependOnInheritedWidgetOfExactType<IdsGroupItem>();
+    return item?.attached == true ? item : null;
+  }
+
+  BorderRadiusGeometry corners(double radius) {
+    final start = Radius.circular(roundStart ? radius : 0);
+    final end = Radius.circular(roundEnd ? radius : 0);
+    return orientation == Axis.horizontal
+        ? BorderRadiusDirectional.only(
+            topStart: start,
+            bottomStart: start,
+            topEnd: end,
+            bottomEnd: end,
+          )
+        : BorderRadius.only(
+            topLeft: start,
+            topRight: start,
+            bottomLeft: end,
+            bottomRight: end,
+          );
+  }
 
   @override
-  bool updateShouldNotify(_IdsGroupScope old) => old.data != data;
+  bool updateShouldNotify(IdsGroupItem old) =>
+      orientation != old.orientation ||
+      attached != old.attached ||
+      roundStart != old.roundStart ||
+      roundEnd != old.roundEnd;
+}
+
+class _IdsGroupScope extends InheritedWidget {
+  const _IdsGroupScope({
+    required this.group,
+    required this.size,
+    required this.variant,
+    required super.child,
+  });
+
+  final IdsGroupData? group;
+  final IdsSize? size;
+  final IdsVariant? variant;
+
+  @override
+  bool updateShouldNotify(_IdsGroupScope old) =>
+      old.group?.orientation != group?.orientation ||
+      old.group?.attached != group?.attached ||
+      old.group?.decorativeSeparator != group?.decorativeSeparator ||
+      old.size != size ||
+      old.variant != variant;
 }

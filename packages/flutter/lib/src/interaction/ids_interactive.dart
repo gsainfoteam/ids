@@ -57,6 +57,10 @@ class IdsInteractive extends StatefulWidget {
     this.onInteractionChange,
     this.focusNode,
     this.autofocus = false,
+    this.activateOnEnter = true,
+    this.activateOnSpace = true,
+    this.excludePointerSemantics = false,
+    this.skipTraversal = false,
   });
 
   final Widget Function(BuildContext context, IdsInteractiveState state)
@@ -73,6 +77,10 @@ class IdsInteractive extends StatefulWidget {
 
   final FocusNode? focusNode;
   final bool autofocus;
+  final bool activateOnEnter;
+  final bool activateOnSpace;
+  final bool excludePointerSemantics;
+  final bool skipTraversal;
 
   @override
   State<IdsInteractive> createState() => _IdsInteractiveState();
@@ -147,6 +155,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   }
 
   void _handleFocusChange(bool focused) {
+    if (focused == _focused) return;
     _set(() {
       _focused = focused;
       _focusVisible =
@@ -160,11 +169,23 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   }
 
   KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
+    if (!node.hasPrimaryFocus) return KeyEventResult.ignored;
+    final keyboard = HardwareKeyboard.instance;
+    if (event is KeyDownEvent &&
+        !_focusVisible &&
+        !widget.disabled &&
+        !keyboard.isControlPressed &&
+        !keyboard.isAltPressed &&
+        !keyboard.isMetaPressed &&
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional) {
+      _set(() => _focusVisible = true);
+    }
     final key = event.logicalKey;
     final enter =
         key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.numpadEnter;
-    if (!node.hasPrimaryFocus || !(enter || key == LogicalKeyboardKey.space)) {
+    if (!((key == LogicalKeyboardKey.space && widget.activateOnSpace) ||
+        (enter && widget.activateOnEnter))) {
       return KeyEventResult.ignored;
     }
     if (widget.disabled) return KeyEventResult.handled;
@@ -186,6 +207,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
     return Focus(
       focusNode: _node,
       autofocus: widget.autofocus,
+      skipTraversal: widget.skipTraversal,
       canRequestFocus:
           widget.focusOnTap && (enabled || widget.focusableWhenDisabled),
       onFocusChange: _handleFocusChange,
@@ -206,6 +228,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
         },
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
+          excludeFromSemantics: widget.excludePointerSemantics,
           onTapDown: enabled
               ? (_) {
                   if (widget.focusOnTap) {

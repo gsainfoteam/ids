@@ -6,26 +6,14 @@ import '../../tokens/ids_color_roles.dart';
 import '../color/oklch.dart';
 import '../../tokens/ids_enums.dart';
 import 'ids_interactive.dart';
+import 'control_tokens.dart';
 
 import 'control_color_states.dart';
 
 const _black = Color(0xff000000);
 const _white = Color(0xffffffff);
 const _transparent = Color(0x00000000);
-const _shadowXs = [
-  BoxShadow(color: Color(0x0d000000), offset: Offset(0, 1), blurRadius: 2),
-];
-const _shadowSm = [
-  BoxShadow(color: Color(0x1a000000), offset: Offset(0, 1), blurRadius: 3),
-  BoxShadow(
-    color: Color(0x1a000000),
-    offset: Offset(0, 1),
-    blurRadius: 2,
-    spreadRadius: -1,
-  ),
-];
-
-typedef _ControlColors = ({
+typedef ControlColors = ({
   Color fill,
   Color fillHover,
   Color fillActive,
@@ -38,7 +26,7 @@ typedef _ControlColors = ({
   Color ring,
 });
 
-_ControlColors _controlColors(IdsColors colors, IdsColorScheme scheme) {
+ControlColors controlColors(IdsColors colors, IdsColorScheme scheme) {
   return switch (scheme) {
     IdsColorScheme.primary => (
       fill: colors.bgPrimarySolid,
@@ -154,10 +142,14 @@ controlSurface(
   IdsResolvedTheme theme,
   IdsVariant variant,
   IdsColorScheme scheme,
-  IdsInteractiveState state,
-) {
+  IdsInteractiveState state, {
+  BorderRadiusGeometry? corners,
+  double? radius,
+  bool toggle = false,
+  bool invalid = false,
+}) {
   final colors = theme.colors;
-  final roles = _controlColors(colors, scheme);
+  final roles = controlColors(colors, scheme);
   final status = switch (scheme) {
     IdsColorScheme.danger ||
     IdsColorScheme.success ||
@@ -165,20 +157,28 @@ controlSurface(
     IdsColorScheme.info => true,
     _ => false,
   };
-  final active = state.active || state.pressed;
+  final active = state.active;
   final hovered = state.hovered && !active;
   final quietBackground = switch ((active, hovered)) {
     (true, _) => status ? roles.softHover : colors.bgNeutralSoftHover,
     (_, true) => status ? roles.soft : colors.bgNeutralSoft,
     _ when variant == IdsVariant.outline =>
-      theme.isDark
-          ? colors.bgNeutralSoft.withValues(alpha: .30)
-          : colors.bgSurface,
+      toggle ? colors.bgSurface : outlineControlBackground(theme),
     _ => _transparent,
   };
 
-  final (background, foreground) = switch (variant) {
-    IdsVariant.solid => (
+  final (background, foreground) = switch ((toggle, state.pressed, variant)) {
+    (true, false, _) => (quietBackground, roles.quiet),
+    (true, true, IdsVariant.ghost || IdsVariant.outline) => (
+      status ? roles.softHover : colors.bgNeutralSoftHover,
+      status ? roles.onSoft : colors.textOnSurface,
+    ),
+    (true, true, IdsVariant.soft) => (roles.soft, roles.onSoft),
+    (true, true, IdsVariant.solid || IdsVariant.glossy) => (
+      roles.fill,
+      roles.onFill,
+    ),
+    (_, _, IdsVariant.solid) => (
       active
           ? roles.fillActive
           : hovered
@@ -186,7 +186,7 @@ controlSurface(
           : roles.fill,
       roles.onFill,
     ),
-    IdsVariant.soft => (
+    (_, _, IdsVariant.soft) => (
       active
           ? roles.softActive
           : hovered
@@ -194,65 +194,89 @@ controlSurface(
           : roles.soft,
       roles.onSoft,
     ),
-    IdsVariant.outline || IdsVariant.ghost => (quietBackground, roles.quiet),
-    IdsVariant.transparent => (_transparent, roles.quiet),
-    IdsVariant.glossy => (roles.fill, roles.onFill),
+    (_, _, IdsVariant.outline || IdsVariant.ghost) => (
+      quietBackground,
+      roles.quiet,
+    ),
+    (_, _, IdsVariant.glossy) => (roles.fill, roles.onFill),
+    (_, _, IdsVariant.transparent) => (_transparent, roles.quiet),
   };
-  final border = switch (variant) {
-    IdsVariant.outline => colors.borderNeutral,
-    IdsVariant.glossy => mixOklab(roles.fill, _black, .20),
-    _ => null,
-  };
-  final shadows = switch (variant) {
-    IdsVariant.solid || IdsVariant.outline => _shadowXs,
-    IdsVariant.glossy when !active => _shadowSm,
+  final glossy = variant == IdsVariant.glossy && (!toggle || state.pressed);
+  final ring = invalid ? colors.borderDanger : roles.ring;
+  final border = invalid
+      ? ring
+      : switch (variant) {
+          IdsVariant.outline => colors.borderNeutral,
+          IdsVariant.glossy when glossy => glossyControlBorder(roles.fill),
+          _ => null,
+        };
+  final buttonShadows = switch (variant) {
+    IdsVariant.outline => controlShadowXs,
+    IdsVariant.solid when !toggle || state.pressed => controlShadowXs,
+    IdsVariant.glossy when glossy && (!active || toggle) => controlShadowSm,
     _ => const <BoxShadow>[],
   };
 
   return (
     foreground: foreground,
     decoration: ShapeDecoration(
-      gradient: variant == IdsVariant.glossy
-          ? _glossy(roles.fill, active, hovered)
-          : LinearGradient(colors: [background, background]),
+      color: glossy ? null : background,
+      gradient: glossy
+          ? glossyControlGradient(
+              roles.fill,
+              !toggle && active,
+              !toggle && hovered,
+            )
+          : null,
       shape: theme.shape(
+        corners: corners,
+        radius: radius,
         side: border == null
             ? BorderSide.none
-            : BorderSide(color: state.focusVisible ? roles.ring : border),
+            : BorderSide(color: state.focusVisible ? ring : border),
       ),
-      shadows: shadows,
+      shadows: buttonShadows,
     ),
-    focusColor: roles.ring.withValues(alpha: state.focusVisible ? .40 : 0),
+    focusColor: ring.withValues(alpha: state.focusVisible ? .40 : 0),
   );
 }
 
 class ControlFocusRing extends CustomPainter {
-  const ControlFocusRing(this.theme, this.color);
+  const ControlFocusRing(this.shape, this.color, {this.direction});
 
-  final IdsResolvedTheme theme;
+  final ShapeBorder shape;
   final Color color;
+  final TextDirection? direction;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (color.a == 0 || size.isEmpty) return;
     final rect = Offset.zero & size;
-    final inner = theme.shape().getOuterPath(rect);
-    final outer = theme
-        .shape(radius: theme.radius.standard + 3)
-        .getOuterPath(rect.inflate(3));
-    final ring = Path()
+    final edge = shape.getOuterPath(rect, textDirection: direction);
+    final outside = Path()
       ..fillType = PathFillType.evenOdd
-      ..addPath(outer, Offset.zero)
-      ..addPath(inner, Offset.zero);
-    canvas.drawPath(ring, Paint()..color = color);
+      ..addRect(rect.inflate(4))
+      ..addPath(edge, Offset.zero);
+    canvas.save();
+    canvas.clipPath(outside);
+    canvas.drawPath(
+      edge,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6,
+    );
+    canvas.restore();
   }
 
   @override
   bool shouldRepaint(ControlFocusRing old) =>
-      old.theme != theme || old.color != color;
+      old.shape != shape || old.color != color || old.direction != direction;
 }
 
-LinearGradient _glossy(Color fill, bool active, bool hovered) {
+Color glossyControlBorder(Color fill) => mixOklab(fill, _black, .20);
+
+LinearGradient glossyControlGradient(Color fill, bool active, bool hovered) {
   final tint = _white.withValues(alpha: hovered ? .30 : .20);
   final top = Color.alphaBlend(tint, fill);
   return LinearGradient(
@@ -262,5 +286,56 @@ LinearGradient _glossy(Color fill, bool active, bool hovered) {
         ? [Color.alphaBlend(const Color(0x33000000), fill), fill, fill]
         : [Color.alphaBlend(const Color(0x59ffffff), top), top, fill],
     stops: active ? const [0, .07, 1] : const [0, .03, 1],
+  );
+}
+
+class ControlShapeDecoration extends ShapeDecoration {
+  ControlShapeDecoration(ShapeDecoration source)
+    : super(
+        color: source.color,
+        gradient: source.gradient,
+        image: source.image,
+        shadows: source.shadows,
+        shape: source.shape,
+      );
+
+  @override
+  EdgeInsetsGeometry get padding => EdgeInsets.zero;
+
+  @override
+  ShapeDecoration? lerpFrom(Decoration? a, double t) {
+    final decoration = a is ShapeDecoration
+        ? _lerp(a, this, t)
+        : super.lerpFrom(a, t);
+    return decoration == null ? null : ControlShapeDecoration(decoration);
+  }
+
+  @override
+  ShapeDecoration? lerpTo(Decoration? b, double t) {
+    final decoration = b is ShapeDecoration
+        ? _lerp(this, b, t)
+        : super.lerpTo(b, t);
+    return decoration == null ? null : ControlShapeDecoration(decoration);
+  }
+
+  static ShapeDecoration? _lerp(
+    ShapeDecoration a,
+    ShapeDecoration b,
+    double t,
+  ) {
+    if (t == 0) return a;
+    if (t == 1) return b;
+    return ShapeDecoration.lerp(
+      a.color != null && b.gradient != null ? _asGradient(a) : a,
+      b.color != null && a.gradient != null ? _asGradient(b) : b,
+      t,
+    );
+  }
+
+  static ShapeDecoration _asGradient(ShapeDecoration source) => ShapeDecoration(
+    gradient: LinearGradient(colors: [source.color!, source.color!]),
+    image: source.image,
+    shadows: source.shadows,
+    shape: source.shape,
   );
 }
