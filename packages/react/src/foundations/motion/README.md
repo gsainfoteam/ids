@@ -16,4 +16,4 @@
 | `normal` | 250ms | Accordion, Progress, Dialog, 필드 팝업    |
 | `slow`   | 400ms | Drawer, Toast 처럼 멀리 움직이는 전환     |
 
-- 퇴장 애니메이션은 타이머 없이 `usePresence` 의 `data-ending-style` 로 끝을 기다립니다.
+- 퇴장 애니메이션은 타이머 없이 `useInternalPresence` 의 `data-ending-style` 로 끝을 기다립니다.

@@ -4,13 +4,13 @@
 
 | 파일                                 | 내용                                                                             |
 | ------------------------------------ | -------------------------------------------------------------------------------- |
-| [`engine.ts`](#enginets)             | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션 |
-| [`use-zoom-pan.ts`](#use-zoom-pants) | React hook `useZoomPan`. 두 요소에 엔진을 붙이고 배율을 state 로 제어한다        |
-| [`math.ts`](#mathts)                 | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성              |
+| [`lib/engine.ts`](#libenginets)             | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션 |
+| [`hooks/use-zoom-pan.ts`](#hooksuse-zoom-pants) | React hook `useInternalZoomPan`. 두 요소에 엔진을 붙이고 배율을 state 로 제어한다        |
+| [`lib/math.ts`](#libmathts)                 | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성              |
 
 ## 쓰는 곳
 
-- Image 의 뷰어(`components/data/image/viewer-layer.tsx`)가 `useZoomPan` 으로 지금 보는 장의 영역과 상자에 붙입니다. 장을 넘기면 앞 장에서 떼고(그 장의 배율은 1 로 돌아간다) 새 장에 붙습니다.
+- Image 의 뷰어(`components/data/image/parts/viewer-layer.tsx`)가 `useInternalZoomPan` 으로 지금 보는 장의 영역과 상자에 붙입니다. 장을 넘기면 앞 장에서 떼고(그 장의 배율은 1 로 돌아간다) 새 장에 붙습니다.
 - 뷰어는 배율을 ImageGroup 의 `zoom` 으로 제어하고, 확대 중에는 슬라이드 트랙이 끌리지 않게 `watchDrag` 에서 `isZoomed()` 를 묻습니다. 쓸어 닫기의 `presence` 는 대화상자와 배경막의 `--image-viewer-presence` 로 칠합니다.
 
 ## 쓰는 법
@@ -19,7 +19,7 @@
 const [area, setArea] = useState<HTMLElement | null>(null);
 const [box, setBox] = useState<HTMLElement | null>(null);
 
-const zoomPan = useZoomPan({
+const zoomPan = useInternalZoomPan({
   element: area, // 제스처를 받는 영역
   content: box, // 확대되는 상자. 둘 다 있어야 붙는다
   scale: zoom, // 제어하는 배율. 없으면 defaultScale(1)에서 시작
@@ -43,7 +43,7 @@ zoomPan.zoomIn(); // 가운데를 기준으로 2배
 zoomPan.zoomOut(); // 절반
 zoomPan.reset(); // 1배
 zoomPan.zoomTo(3, { x: event.clientX, y: event.clientY }); // 화면 좌표를 기준으로
-useSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르는 순간 엔진에 묻는다
+useInternalSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르는 순간 엔진에 묻는다
 ```
 
 ## 입력
@@ -59,7 +59,7 @@ useSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르는 순�
 | `+` `=`, `-`, `0`    | 가운데를 기준으로 2배, 절반, 1배                                                                   |
 | 방향키 (확대 중)     | 50px 씩 옮긴다. 배율 1 이면 처리하지 않고(`false`) 뷰어의 이전, 다음에 넘긴다                      |
 
-## engine.ts
+## lib/engine.ts
 
 | 이름                                          | 하는 일                                                                          |
 | --------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -78,17 +78,17 @@ useSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르는 순�
 - 버튼과 키의 한 단계는 재생 중인 값이 아니라 목표에서 셉니다. `+` 를 빠르게 두 번 누르면 4배입니다.
 - `prefers-reduced-motion` 이면 모든 이동이 애니메이션 없이 바로 가고, 관성으로 미끄러지지 않습니다.
 - `+` `=` `-` `0` 은 RULES.md 의 Keys 대로 `event.key` 로 읽습니다. TanStack 은 AZERTY 의 `à`(Digit0 자리)를 `0` 으로 맞추기 때문입니다. 방향키는 `keyHandler` 입니다. 조합 중인 키, 이미 처리된 키, Control, Alt, Meta 가 눌린 키(브라우저 확대)는 건너뜁니다.
-- 쓸어 닫기는 Drawer 의 [`drawer-gesture.ts`](../../components/overlay/drawer/drawer-gesture.ts) 를 그대로 씁니다. `latchAxis`(10px 뒤 방향 결정), `resistedOffset`(위로는 고무줄), `releaseTarget`(0.4px/ms 넘게 튕기거나 영역 높이의 25% 넘게 끌면 닫기), `presenceAt`(배경막이 옅어지는 정도), `velocityOf`(마지막 100ms 의 속도). `onSwipeClose` 가 없으면 위아래 끌기도 트랙에 맡깁니다.
+- 쓸어 닫기는 Drawer 의 [`drawer-gesture.ts`](../../components/overlay/drawer/lib/drawer-gesture.ts) 를 그대로 씁니다. `latchAxis`(10px 뒤 방향 결정), `resistedOffset`(위로는 고무줄), `releaseTarget`(0.4px/ms 넘게 튕기거나 영역 높이의 25% 넘게 끌면 닫기), `presenceAt`(배경막이 옅어지는 정도), `velocityOf`(마지막 100ms 의 속도). `onSwipeClose` 가 없으면 위아래 끌기도 트랙에 맡깁니다.
 - 영역에 `touch-action: none` 과 `user-select: none` 을 줍니다. 브라우저가 손가락으로 페이지를 움직이거나 확대하지 않고, 끄는 동안 글자가 선택되지 않습니다. iOS Safari 가 두 손가락으로 페이지를 확대하지 않도록 `gesturestart` 도 막습니다. 그림을 끌어 내보내는 native drag(`dragstart`)도 막습니다.
 - 휠은 `passive: false` 로 들어 늘 `preventDefault()` 합니다. 영역 위의 휠과 트랙패드 핀치는 페이지를 스크롤하거나 확대하지 않습니다.
 - 영역이나 그림의 크기가 바뀌면(`ResizeObserver`) 이동을 새 한계 안으로 옮깁니다.
-- React 를 모르는 엔진입니다. React 에서는 아래 `useZoomPan` 이 붙입니다.
+- React 를 모르는 엔진입니다. React 에서는 아래 `useInternalZoomPan` 이 붙입니다.
 
-## use-zoom-pan.ts
+## hooks/use-zoom-pan.ts
 
 | 이름                                            | 하는 일                                                                              |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `useZoomPan(options)`                           | `element` 와 `content` 가 있고 `disabled` 가 아니면 layout effect 에서 엔진을 붙인다 |
+| `useInternalZoomPan(options)`                           | `element` 와 `content` 가 있고 `disabled` 가 아니면 layout effect 에서 엔진을 붙인다 |
 | `scale`, `zoomed`                               | 제어하는(또는 스스로 가진) 배율과 그것이 1 보다 큰가                                 |
 | `canZoomIn`, `canZoomOut`                       | 배율이 최대보다 작은가, 1 보다 큰가                                                  |
 | `isZoomed()`                                    | 엔진이 지금 그린 배율. 핀치 중이면 `true`. 엔진이 없으면 `false`                     |
@@ -99,7 +99,7 @@ useSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르는 순�
 - 엔진을 만들 때의 배율은 그 렌더의 배율입니다. 뷰어는 장을 넘길 때 `value` 와 `zoom`(1)을 한 번에 바꾸므로 새 장은 1 에서 시작합니다.
 - `disabled` 나 요소가 바뀌면 엔진을 떼면서 transform 을 지웁니다. 뷰어는 닫히는 동안 떼지 않습니다. 떼면 확대한 사진이 닫히는 애니메이션의 첫 장면보다 먼저 1 로 돌아갑니다.
 
-## math.ts
+## lib/math.ts
 
 - 한 점을 기준으로 한 확대는 그 점 아래의 그림이 제자리에 남는 식입니다: `x' = p - (p - x) * s' / s`. PhotoSwipe 의 `Slide.zoomTo` 와 YARL Zoom 의 `changeZoom` 이 같은 식을 씁니다.
 - 이동 한계는 확대한 그림이 영역을 덮는 만큼입니다: `|x| <= (s * w - W) / 2`. 영역보다 좁은 축은 가운데에 둡니다(PhotoSwipe 의 `PanBounds`, YARL 의 `changeOffsets`).
