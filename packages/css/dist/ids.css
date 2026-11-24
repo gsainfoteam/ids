@@ -299,7 +299,7 @@
 
 @custom-variant focus-ring-visible {
   &:focus-visible,
-  &[data-focus-visible],
+  &[data-focus-visible]:not(:disabled),
   &:has([data-field-input]:focus-visible):not(
       :has([popover] [data-field-input]:focus-visible)
     ),

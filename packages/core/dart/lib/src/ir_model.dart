@@ -1619,15 +1619,23 @@ final class IrCssFocusRingTriggersItemPseudo
 
 final class IrCssFocusRingTriggersItemAttribute
     extends IrCssFocusRingTriggersItem {
-  const IrCssFocusRingTriggersItemAttribute({required this.attribute});
+  const IrCssFocusRingTriggersItemAttribute({
+    required this.attribute,
+    this.unlessPseudo,
+  });
 
   factory IrCssFocusRingTriggersItemAttribute.fromJson(
     Map<String, Object?> json,
   ) => IrCssFocusRingTriggersItemAttribute(
     attribute: (json['attribute'] as String),
+    unlessPseudo: json['unlessPseudo'] == null
+        ? null
+        : (json['unlessPseudo'] as String),
   );
 
   final String attribute;
+
+  final String? unlessPseudo;
 }
 
 final class IrCssFocusRingTriggersItemFocusedInside
