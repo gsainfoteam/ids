@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  useInternalLabelling,
-  useInternalSurface,
-  type UseSurfaceOptions,
-} from '../../../../internal/lib/surface';
+import { useInternalLabelling, useInternalSurface, type UseSurfaceOptions } from '../../../../internal/lib/surface';
 
 export function useInternalItem<E extends HTMLElement>({
   selected,

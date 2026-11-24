@@ -70,12 +70,7 @@ export type UseIdsProviderOptions = {
   onModeChange?: (mode: ThemeMode) => void;
 };
 
-export function useInternalIdsProvider({
-  theme,
-  mode,
-  defaultMode,
-  onModeChange,
-}: UseIdsProviderOptions) {
+export function useInternalIdsProvider({ theme, mode, defaultMode, onModeChange }: UseIdsProviderOptions) {
   const parent = use(ThemeContext);
   const root = parent === DEFAULT_THEME;
   const ownsMode = root || mode !== undefined || defaultMode !== undefined;

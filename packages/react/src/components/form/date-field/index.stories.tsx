@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { Field as FormField } from '../../../react-hook-form';
 import { Button } from '../../action/button';
 import { Calendar } from '../../data/calendar';
@@ -167,12 +168,12 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="en-US · de-DE">
-          <IdsProvider.Scope locale="en-US">
+          <IdsProvider.Scope locale={en}>
             <div className="w-72">
               <DateField defaultValue={new CalendarDate(2026, 9, 15)} aria-label="English" />
             </div>
           </IdsProvider.Scope>
-          <IdsProvider.Scope locale="de-DE">
+          <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
             <div className="w-72">
               <DateField
                 format={{ dateStyle: 'long' }}
@@ -201,6 +202,7 @@ export const PickAndClearADate: Story = {
     <div className="w-72">
       <DateField
         aria-label="날짜"
+        placeholder="날짜 선택"
         min={new CalendarDate(2026, 9, 1)}
         max={new CalendarDate(2026, 9, 30)}
         onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
@@ -227,7 +229,7 @@ export const PickAndClearADate: Story = {
     await expect(trigger).toHaveTextContent('2026. 09. 16.');
     await expect(trigger).toHaveFocus();
     await expect(document.querySelector('[role=dialog]')).toBeNull();
-    await userEvent.click(canvas.getByRole('button', { name: '날짜 지우기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(null);
     await expect(trigger).toHaveTextContent('날짜 선택');
   },
@@ -299,7 +301,7 @@ export const PickABirthday: Story = {
   play: async ({ canvas, args, userEvent }) => {
     await userEvent.click(canvas.getByRole('combobox', { name: '생년월일' }));
     const dialog = await canvas.findByRole('dialog');
-    await userEvent.selectOptions(dialog.querySelector('select[aria-label="연도"]')!, '1995');
+    await userEvent.selectOptions(dialog.querySelector('select[aria-label="년"]')!, '1995');
     await userEvent.selectOptions(dialog.querySelector('select[aria-label="월"]')!, '4');
     await userEvent.click(day('1995-05-20'));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 5, 20));
@@ -360,7 +362,7 @@ export const TypeADate: Story = {
 
 export const ShowAnotherLanguage: Story = {
   render: () => (
-    <IdsProvider.Scope locale="en-US">
+    <IdsProvider.Scope locale={en}>
       <div className="w-72">
         <Field>
           <Field.Label>Check-in</Field.Label>
@@ -375,7 +377,7 @@ export const ShowAnotherLanguage: Story = {
     docs: {
       description: {
         story:
-          '날짜의 언어와 순서, 주의 첫날은 가장 가까운 IdsProvider의 locale을 따릅니다. 한 필드만 다른 언어로 보이려면 그 필드를 <IdsProvider.Scope locale="en-US">로 감쌉니다. 주의 첫날을 바꾸려면 "en-US-u-fw-mon"처럼 locale에 적습니다.',
+          '날짜의 언어와 순서, 주의 첫날은 가장 가까운 IdsProvider의 locale을 따릅니다. 한 필드만 다른 언어로 보이려면 그 필드를 IdsProvider.Scope 로 감싸고 locale 을 줍니다. 주의 첫날을 바꾸려면 locale 의 tag 를 "en-US-u-fw-mon"처럼 적습니다.',
       },
     },
   },
@@ -423,7 +425,7 @@ export const SubmitWithANativeForm: Story = {
       >
         <Field>
           <Field.Label>체크인</Field.Label>
-          <DateField name="checkin" required>
+          <DateField name="checkin" placeholder="날짜 선택" required>
             <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
           </DateField>
           <Field.Hint>비워 두면 제출되지 않습니다.</Field.Hint>

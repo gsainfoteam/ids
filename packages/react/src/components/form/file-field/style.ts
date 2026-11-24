@@ -27,6 +27,7 @@ export const filePartsStyle = tv({
     itemSize: 'text-caption-c1-regular',
     itemRemove: fieldAction.base,
     rejections: 'grid gap-0.5 wrap-anywhere text-danger',
+    hint: 'text-caption-c1-regular text-neutral break-keep text-balance',
   },
   variants: {
     size: {

@@ -295,13 +295,13 @@ export const RequireAtLeastOneInANativeForm: Story = {
     docs: {
       description: {
         story:
-          '`required` 는 하나 이상입니다. 비워 두면 브라우저가 제출을 막고 "하나 이상 선택하세요." 를 그룹에 띄웁니다. 고른 값은 같은 `name` 으로 하나씩 제출됩니다.',
+          '`required` 는 하나 이상입니다. 비워 두면 브라우저가 제출을 막고 브라우저의 필수 입력 문구를 그룹에 띄웁니다. 고른 값은 같은 `name` 으로 하나씩 제출됩니다.',
       },
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const validator = canvasElement.querySelector<HTMLInputElement>('[data-form-value-validator]')!;
-    await expect(validator.validationMessage).toBe('하나 이상 선택하세요.');
+    await expect(validator.validity.valueMissing).toBe(true);
     await userEvent.click(canvas.getByRole('checkbox', { name: 'Python' }));
     await userEvent.click(canvas.getByRole('checkbox', { name: 'Rust' }));
     await expect(validator.validity.valid).toBe(true);

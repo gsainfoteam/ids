@@ -6,11 +6,7 @@ import { ChevronDownIcon } from '@heroicons/react/16/solid';
 
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
 import { Slot } from '../../../utility/slot';
-import {
-  IndicatorPlacementContext,
-  useInternalItemContext,
-  useInternalRootContext,
-} from '../context';
+import { IndicatorPlacementContext, useInternalItemContext, useInternalRootContext } from '../context';
 import { openState } from '../lib/open-state';
 
 import type { AccordionItemState } from './item';

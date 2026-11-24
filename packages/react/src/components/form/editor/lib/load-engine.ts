@@ -13,14 +13,10 @@ const FEATURE_LOADERS = {
     import('../../../typography/rich-text/schema/color').then((module) => module.DocumentTextColor),
   ),
   subscript: once(() =>
-    import('../../../typography/rich-text/schema/script').then(
-      (module) => module.DocumentSubscript,
-    ),
+    import('../../../typography/rich-text/schema/script').then((module) => module.DocumentSubscript),
   ),
   superscript: once(() =>
-    import('../../../typography/rich-text/schema/script').then(
-      (module) => module.DocumentSuperscript,
-    ),
+    import('../../../typography/rich-text/schema/script').then((module) => module.DocumentSuperscript),
   ),
   taskList: once(() => import('../task-list/node').then((module) => module.taskListExtensions)),
   textAlign: once(() => import('@tiptap/extension-text-align').then((module) => module.TextAlign)),

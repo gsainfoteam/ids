@@ -6,20 +6,20 @@
 - **Enter 로 보냅니다.** Enter 는 보내고 Shift+Enter 는 줄을 바꿉니다. 한글처럼 조합 중인 글자를 확정하는 Enter 는 보내지 않습니다. 모바일 키보드의 Enter 키에는 `보내기` 가 보입니다(`enterkeyhint="send"`).
 - **보내는 중.** `status` 가 `idle` 이 아니면 보내지 않고, 보내기 버튼이 멈추기 버튼으로 바뀝니다. 그동안에도 다음 메시지를 적어 둘 수 있습니다.
 - **`<form>` 입니다.** 보내기는 `submit` 이라 `onSubmit` 이 먼저 불리고, `onSend` 가 없으면 브라우저나 React 의 form `action` 이 그대로 제출합니다.
-- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-96"><PromptInput /></div>`.
+- **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-96"><PromptInput aria-label="메시지" /></div>`.
 
 ```tsx
 import { PromptInput } from '@gsainfoteam/ids-react';
 
-<PromptInput status={status} onSend={({ text, files }) => send(text, files)} onStop={stop} />;
+<PromptInput aria-label="메시지" status={status} onSend={({ text, files }) => send(text, files)} onStop={stop} />;
 ```
 
 ## 보내기
 
 ```tsx
-<PromptInput onSend={({ text, files, tools }) => {}} /> // 보내면 입력과 첨부를 비운다. 도구는 그대로
-<PromptInput onSubmit={(event) => {}} />                // native submit 이벤트. preventDefault() 하면 보내지 않는다
-<PromptInput action={ask}>                              // onSend 가 없으면 form 이 제출한다
+<PromptInput aria-label="메시지" onSend={({ text, files, tools }) => {}} /> // 보내면 입력과 첨부를 비운다. 도구는 그대로
+<PromptInput aria-label="메시지" onSubmit={(event) => {}} />  // native submit 이벤트. preventDefault() 하면 보내지 않는다
+<PromptInput aria-label="메시지" action={ask}>                // onSend 가 없으면 form 이 제출한다
   <PromptInput.Input name="prompt" />
 </PromptInput>
 ```
@@ -32,9 +32,9 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ## 상태
 
 ```tsx
-<PromptInput status="idle" />                         // 기본. 보낼 수 있다
-<PromptInput status="submitting" onStop={stop} />     // 보냈고 답을 기다린다
-<PromptInput status="streaming" onStop={stop} />      // 답이 오는 중
+<PromptInput aria-label="메시지" status="idle" />                      // 기본. 보낼 수 있다
+<PromptInput aria-label="메시지" status="submitting" onStop={stop} />  // 보냈고 답을 기다린다
+<PromptInput aria-label="메시지" status="streaming" onStop={stop} />   // 답이 오는 중
 ```
 
 | `status`                    | `onStop` 있음                        | `onStop` 없음                                  |
@@ -49,11 +49,11 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ## 값
 
 ```tsx
-<PromptInput defaultValue="안녕" />                           // 비제어
-<PromptInput value={draft} onValueChange={setDraft} />        // 제어. 보내면 onValueChange('') 로 비운다
+<PromptInput aria-label="메시지" defaultValue="안녕" />                     // 비제어
+<PromptInput aria-label="메시지" value={draft} onValueChange={setDraft} />  // 제어. 보내면 onValueChange('') 로 비운다
 
-<PromptInput defaultFiles={[draft]} />                        // 첨부도 비제어
-<PromptInput files={files} onFilesChange={setFiles} />        // 제어. 보내면 onFilesChange([])
+<PromptInput aria-label="메시지" defaultFiles={[draft]} />                  // 첨부도 비제어
+<PromptInput aria-label="메시지" files={files} onFilesChange={setFiles} />  // 제어. 보내면 onFilesChange([])
 ```
 
 - `<button type="reset">` 이나 `form.reset()` 은 `defaultValue` 와 `defaultFiles` 로 되돌리고 콜백을 부르지 않습니다.
@@ -61,7 +61,7 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ## 첨부
 
 ```tsx
-<PromptInput accept="image/*,.pdf" maxSize={10 * 1024 * 1024} maxCount={5} onReject={(rejections) => {}}>
+<PromptInput aria-label="메시지" accept="image/*,.pdf" maxSize={10 * 1024 * 1024} maxCount={5} onReject={(rejections) => {}}>
   <PromptInput.Input />
   <PromptInput.Attach />
 </PromptInput>
@@ -76,7 +76,7 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ## 도구
 
 ```tsx
-<PromptInput onSend={({ text, tools }) => ask(text, { search: tools.includes('search') })}>
+<PromptInput aria-label="메시지" onSend={({ text, tools }) => ask(text, { search: tools.includes('search') })}>
   <PromptInput.Input />
   <PromptInput.ActionMenu>                          {/* + 버튼과 메뉴. 생략하면 AddAttachments 하나 */}
     <PromptInput.AddAttachments />                  {/* 파일 고르기를 연다 */}
@@ -85,8 +85,8 @@ import { PromptInput } from '@gsainfoteam/ids-react';
   <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>웹 검색</PromptInput.Tool>
 </PromptInput>
 
-<PromptInput defaultTools={['search']} />                   // 처음부터 켠 도구
-<PromptInput tools={tools} onToolsChange={setTools} />       // 제어
+<PromptInput aria-label="메시지" defaultTools={['search']} />               // 처음부터 켠 도구
+<PromptInput aria-label="메시지" tools={tools} onToolsChange={setTools} />  // 제어
 ```
 
 - `PromptInput.Tool` 은 outline `Toggle` 입니다. 켜면 테두리 대신 브랜드 옅은 채움(`secondary`)이 깔리고 `aria-pressed="true"` 가 됩니다. `icon` 이 없으면 켰을 때 체크 아이콘을 붙입니다.
@@ -97,7 +97,7 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ## 구성
 
 ```tsx
-<PromptInput accept="image/*" onSend={send}>
+<PromptInput aria-label="메시지" accept="image/*" onSend={send}>
   <PromptInput.Attachments />          {/* Input 앞 = 위 바. 생략하면 위 바 맨 앞 */}
   <PromptInput.Input placeholder="무엇이든 물어보세요" maxRows={8} />
   <PromptInput.Attach />               {/* Input 뒤 = 아래 바. 앞에서부터 */}
@@ -123,7 +123,8 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 - 모든 파트는 `PromptInput` 의 바로 아래 자식으로 둡니다. 다른 요소로 감싸면 찾지 못해 기본 파트가 하나 더 생깁니다.
 - 모델 고르기처럼 켜고 끄는 것이 아닌 도구는 앱이 `Select` 같은 IDS 컴포넌트로 넣습니다. 아래 바의 버튼은 TextArea 바 안쪽 크기로 줄어듭니다.
 - `Select` 는 부모 너비를 채우므로 `<div>` 로 감싸면 내용 너비가 됩니다.
-- 입력의 이름은 기본 `aria-label="메시지"` 이고, placeholder 는 기본 `메시지를 입력하세요` 입니다. `aria-label` 이나 `aria-labelledby` 를 주면 그 값을 씁니다.
+- 입력의 이름은 필수입니다. 루트의 `aria-label` 이나 `aria-labelledby` 가 입력 칸(textarea)의 이름이 되고, `PromptInput.Input` 에 준 이름이 그보다 앞섭니다. 이름이 없으면 개발 모드에서 경고합니다.
+- placeholder 는 기본값이 없습니다. 필요하면 `PromptInput.Input` 에 `placeholder` 를 줍니다.
 - 다른 `<form>` 안에 두지 않습니다. form 은 중첩할 수 없습니다.
 
 ## Props

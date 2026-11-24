@@ -16,21 +16,9 @@ import { flushSync } from 'react-dom';
 
 import { invariant, mergeProps } from '../../../utils';
 import { keyHandler, type KeyMap } from '../../lib/keys';
-import { useInternalTranslate } from '../../translate';
-import {
-  axisKeyMap,
-  readingDirection,
-  useInternalAxesDrag,
-  useInternalCornerShape,
-} from '../hooks/use-resize-axes';
-import {
-  GRIP_HALO,
-  GRIP_STROKE,
-  GRIP_TARGET,
-  gripArc,
-  type GripArc,
-  type ResizeBand,
-} from '../lib/arc';
+import { useInternalIntlWords, useInternalTranslate } from '../../translate';
+import { axisKeyMap, readingDirection, useInternalAxesDrag, useInternalCornerShape } from '../hooks/use-resize-axes';
+import { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from '../lib/arc';
 import { axisSeparatorProps, type ResizeAxis, type ResizeDimension } from '../lib/axis';
 import { resizeGripStyle } from '../style';
 
@@ -104,6 +92,7 @@ export function ResizeGrip({
   ...props
 }: ResizeGripProps) {
   const t = useInternalTranslate();
+  const words = useInternalIntlWords();
   const custom = asChild || children != null;
   const shape = useInternalCornerShape(corner);
   const arc = shape === null || custom ? null : gripArc(shape.radius, band, shape.exponent);
@@ -142,7 +131,7 @@ export function ResizeGrip({
           separators.current.delete(axis.dimension);
         };
       }}
-      {...axisSeparatorProps(axis, t, disabled)}
+      {...axisSeparatorProps(axis, t, words, disabled)}
       tabIndex={disabled ? undefined : axis.dimension === focusedAxis ? 0 : -1}
       className={styles.separator()}
       onFocus={() => setFocusedAxis(axis.dimension)}
@@ -155,7 +144,7 @@ export function ResizeGrip({
   const group = mergeProps(props, {
     ...drag.dragProps,
     role: 'group',
-    'aria-label': props['aria-label'] ?? t('resizable.handle'),
+    'aria-label': props['aria-label'] ?? t('common.resize'),
     'aria-disabled': disabled || undefined,
     'data-resize-grip': '',
     'data-disabled': disabled ? '' : undefined,

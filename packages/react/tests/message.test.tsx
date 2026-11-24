@@ -402,7 +402,7 @@ test('Message.Actions without children copies the content text', async () => {
     ),
   );
   await expect.element(screen.getByRole('group', { name: '메시지 동작' })).toBeVisible();
-  await screen.getByRole('button', { name: '메시지 복사' }).click();
+  await screen.getByRole('button', { name: '복사' }).click();
   await expect.poll(() => copied).toEqual(['웹 검색 3건\n\n셔틀은 12시 20분에 와요.']);
   await expect.element(screen.getByRole('button', { name: '복사했습니다' })).toBeVisible();
 });
@@ -419,7 +419,7 @@ test('Message.Copy text copies that text instead', async () => {
       </Message>,
     ),
   );
-  await screen.getByRole('button', { name: '메시지 복사' }).click();
+  await screen.getByRole('button', { name: '복사' }).click();
   await expect.poll(() => copied).toEqual(['**굵게** 원문']);
 });
 
@@ -463,9 +463,9 @@ test('Tab reaches the actions and the retry button in order, never the article',
       </>,
     ),
   );
-  await expect.element(screen.getByRole('button', { name: '메시지 복사' })).toBeVisible();
+  await expect.element(screen.getByRole('button', { name: '복사' })).toBeVisible();
   await userEvent.keyboard('{Tab}');
-  await expect.element(screen.getByRole('button', { name: '메시지 복사' })).toHaveFocus();
+  await expect.element(screen.getByRole('button', { name: '복사' })).toHaveFocus();
   await userEvent.keyboard('{Tab}');
   await expect.element(screen.getByRole('button', { name: '다시 답하기' })).toHaveFocus();
   await userEvent.keyboard('{Tab}');
@@ -501,7 +501,7 @@ test('axe finds nothing in a chat of groups, answers and failures', async () => 
       </div>,
     ),
   );
-  await expect.element(screen.getByRole('button', { name: '메시지 복사' })).toBeVisible();
+  await expect.element(screen.getByRole('button', { name: '복사' })).toBeVisible();
   const { violations } = await axe.run(screen.container, {
     rules: { 'color-contrast': { enabled: false } },
   });

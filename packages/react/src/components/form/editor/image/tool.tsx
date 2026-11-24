@@ -17,12 +17,7 @@ import { isWebAddress } from '../../../typography/rich-text/schema/url-rules';
 import { TextField } from '../../text-field';
 import { isPlainEnter, withProtocol } from '../lib/popover-form';
 import { editorMessages } from '../messages-catalog';
-import {
-  EditorToolTip,
-  useInternalEditorToolProps,
-  useInternalToolState,
-  type EditorToolProps,
-} from '../parts/tool';
+import { EditorToolTip, useInternalEditorToolProps, useInternalToolState, type EditorToolProps } from '../parts/tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
@@ -133,7 +128,6 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
               <TextField
                 size="tiny"
                 aria-label={t('editor.imageAlt')}
-                placeholder={t('editor.imageAltPlaceholder')}
                 value={alt}
                 onValueChange={setAlt}
                 onKeyDown={onEnter(applyAlt)}

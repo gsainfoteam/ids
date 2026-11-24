@@ -1,478 +1,277 @@
 {
-  "alert": {
-    "close": "Close"
-  },
-  "avatarGroup": {
-    "overflow": "{count} more"
-  },
-  "breadcrumb": {
-    "label": "Breadcrumb",
-    "more": "Show hidden path"
-  },
-  "bubble": {
-    "reactions": "Reactions"
-  },
-  "calendar": {
-    "label": "Calendar",
-    "month": "Month",
-    "nextMonth": "Next month",
-    "previousMonth": "Previous month",
-    "selected": "Selected",
-    "today": "Today",
-    "weekNumber": "Week {week}",
-    "weekNumberHeader": "Week",
-    "year": "Year"
-  },
-  "carousel": {
-    "indicator": "Go to slide {index}",
-    "next": "Next slide",
-    "pause": "Pause autoplay",
-    "previous": "Previous slide",
-    "roleDescription": "carousel"
-  },
-  "chart": {
-    "label": "Chart"
-  },
-  "checkboxGroup": {
-    "required": "Select at least one option."
-  },
-  "chip": {
-    "remove": "Remove"
-  },
-  "chipField": {
-    "create": "Add “{text}”",
-    "empty": "No results found.",
-    "invalid": "This value cannot be added.",
-    "limit": "{count, plural, one {You can pick up to # item.} other {You can pick up to # items.}}",
-    "listbox": "Options",
-    "placeholder": "Add an item…",
-    "remove": "Remove {label}",
-    "search": "Search items"
-  },
-  "codeBlock": {
-    "collapse": "Show less",
-    "copied": "Copied",
-    "copy": "Copy code",
-    "expand": "{count, plural, one {Show # more line} other {Show # more lines}}"
-  },
-  "colorField": {
-    "clear": "Clear color",
-    "close": "Close",
-    "dialog": "Pick a color",
-    "placeholder": "Pick a color"
-  },
-  "colorPicker": {
-    "alpha": "Opacity",
-    "area": "Saturation and brightness",
-    "areaValue": "Saturation {saturation}%, brightness {brightness}%",
-    "brightness": "Brightness",
-    "copied": "Copied",
-    "copy": "Copy color value",
-    "eyeDropper": "Pick a color from the screen",
-    "hue": "Hue",
-    "hueValue": "{degrees} degrees",
-    "input": "Color value",
-    "label": "Color picker",
-    "percent": "{value}%",
-    "saturation": "Saturation",
-    "swatches": "Swatches",
-    "twoD": "2D slider"
-  },
-  "dataTable": {
-    "empty": "No data.",
-    "page": "Page {page} of {count}",
-    "resize": "{column} column width",
-    "selectAll": "Select all rows",
-    "selectRow": "Select {label}",
-    "selectRowNumber": "Select row {number}",
-    "selected": "{count, plural, one {# row selected} other {# rows selected}}"
-  },
-  "dateField": {
-    "clear": "Clear date",
-    "close": "Close",
-    "open": "Open calendar",
-    "placeholder": "Pick a date",
-    "rangePlaceholder": "Pick a date range",
-    "rangeTitle": "Pick a date range",
-    "title": "Pick a date"
-  },
-  "dateTimeField": {
-    "clear": "Clear date and time",
-    "close": "Close",
-    "pickDateFirst": "Pick an available date first.",
-    "placeholder": "Pick a date and time",
-    "title": "Pick a date and time"
-  },
-  "dialog": {
-    "close": "Close"
-  },
-  "drawer": {
-    "close": "Close",
-    "handle": "Drag to resize"
-  },
-  "editor": {
-    "alignCenter": "Align center",
-    "alignJustify": "Justify",
-    "alignLeft": "Align left",
-    "alignRight": "Align right",
-    "blockDelete": "Delete",
-    "blockDuplicate": "Duplicate",
-    "blockHandle": "Block menu",
-    "blockInsertBelow": "Add a block below",
-    "blockTurnInto": "Turn into",
-    "blockType": "Text style",
-    "blockquote": "Quote",
-    "bold": "Bold",
-    "bubbleMenu": "Selection formatting",
-    "bulletList": "Bulleted list",
-    "callout": "Callout",
-    "calloutKind": "Callout type",
-    "calloutRemove": "Remove callout",
-    "code": "Code",
-    "codeBlock": "Code block",
-    "codeLanguage": "Code language",
-    "codeLanguageSearch": "Search languages",
-    "codePlainText": "Plain text",
-    "color": "Color",
-    "colorDanger": "Danger",
-    "colorDefault": "Default",
-    "colorInfo": "Info",
-    "colorNone": "None",
-    "colorPrimary": "Accent 1",
-    "colorSecondary": "Accent 2",
-    "colorSuccess": "Success",
-    "colorTertiary": "Accent 3",
-    "colorWarning": "Warning",
-    "content": "Content",
-    "details": "Toggle",
-    "detailsSummary": "Summary",
-    "detailsToggle": "Show content",
-    "heading": "Heading {level}",
-    "highlight": "Highlight",
-    "highlightColor": "Highlight color",
-    "horizontalRule": "Divider",
-    "image": "Image",
-    "imageAlt": "Alt text",
-    "imageAltPlaceholder": "Describe the image",
-    "imageInsert": "Insert",
-    "imagePickFiles": "Choose files",
-    "imageUploadFailed": "The image could not be uploaded",
-    "imageUploading": "Uploading the image",
-    "imageUrl": "Image address",
-    "imageUrlInvalid": "Enter an address that starts with http or https",
-    "italic": "Italic",
-    "link": "Link",
-    "linkApply": "Apply",
-    "linkRemove": "Remove link",
-    "linkUrl": "Link URL",
-    "mentionEmpty": "No matches",
-    "mentionMenu": "Mentions",
-    "mentionSearching": "Searching…",
-    "orderedList": "Numbered list",
-    "paragraph": "Paragraph",
-    "slashMenu": "Insert block",
-    "slashMenuEmpty": "No matching blocks",
-    "strike": "Strikethrough",
-    "subscript": "Subscript",
-    "superscript": "Superscript",
-    "table": "Table",
-    "tableAddColumnAfter": "Add column after",
-    "tableAddColumnBefore": "Add column before",
-    "tableAddRowAfter": "Add row below",
-    "tableAddRowBefore": "Add row above",
-    "tableDelete": "Delete table",
-    "tableDeleteColumn": "Delete column",
-    "tableDeleteRow": "Delete row",
-    "tableHeaderRow": "Header row",
-    "tableInsert": "Insert table",
-    "tableMergeCells": "Merge cells",
-    "tableSize": "{rows} by {cols}",
-    "tableSplitCell": "Split cell",
-    "taskItem": "Task: {text}",
-    "taskItemEmpty": "Empty task",
-    "taskList": "Task list",
-    "textAlign": "Alignment",
-    "textColor": "Text color",
-    "toolbar": "Formatting",
-    "underline": "Underline"
-  },
-  "fileField": {
-    "clear": "Remove all files",
-    "count": "{count, plural, one {# file} other {# files}}",
-    "dropzone": "Drag files here or click to choose",
-    "dropzoneActive": "Drop here",
-    "kinds": {
-      "audio": "Audio",
-      "image": "Images",
-      "text": "Text",
-      "video": "Videos"
+  "language": "en",
+  "tag": "en-US",
+  "messages": {
+    "avatarGroup": {
+      "overflow": "{count, number} more"
     },
-    "limitCount": "{count, plural, one {Up to # file} other {Up to # files}}",
-    "limitSize": "Up to {max} per file",
-    "list": "Chosen files",
-    "placeholder": "Choose or drop files",
-    "rejectCount": "{max, plural, one {You can pick up to # file.} other {You can pick up to # files.}}",
-    "rejectSize": "Larger than {max}.",
-    "rejectType": "This file type is not allowed.",
-    "remove": "Remove {name}",
-    "required": "Required"
-  },
-  "image": {
-    "close": "Close",
-    "download": "Download",
-    "failed": "The image could not be loaded",
-    "next": "Next image",
-    "photos": "Images",
-    "preview": "View larger: {alt}",
-    "previewUntitled": "View image larger",
-    "previous": "Previous image",
-    "share": "Share",
-    "thumbnails": "Image list",
-    "viewer": "Image viewer",
-    "zoomIn": "Zoom in",
-    "zoomLevel": "{percent}%",
-    "zoomOut": "Zoom out",
-    "zoomReset": "{percent}%, fit to screen"
-  },
-  "input": {
-    "clearSearch": "Clear search"
-  },
-  "kbd": {
-    "alt": "Alt",
-    "backspace": "Backspace",
-    "capsLock": "Caps Lock",
-    "command": "Command",
-    "control": "Control",
-    "delete": "Delete",
-    "down": "Down Arrow",
-    "end": "End",
-    "enter": "Enter",
-    "escape": "Escape",
-    "fn": "Function",
-    "forwardDelete": "Forward Delete",
-    "home": "Home",
-    "left": "Left Arrow",
-    "macDelete": "Delete",
-    "option": "Option",
-    "pageDown": "Page Down",
-    "pageUp": "Page Up",
-    "return": "Return",
-    "right": "Right Arrow",
-    "shift": "Shift",
-    "space": "Space",
-    "super": "Super",
-    "tab": "Tab",
-    "up": "Up Arrow",
-    "windows": "Windows"
-  },
-  "link": {
-    "newTab": "(opens in a new tab)"
-  },
-  "marquee": {
-    "pause": "Pause"
-  },
-  "menu": {
-    "command": "Commands",
-    "empty": "No results found.",
-    "search": "Search commands",
-    "searchPlaceholder": "Search commands…",
-    "submenu": "{label} submenu"
-  },
-  "message": {
-    "actions": "Message actions",
-    "copied": "Copied",
-    "copy": "Copy message",
-    "error": "Not sent",
-    "pending": "Sending",
-    "retry": "Resend",
-    "unread": "Unread",
-    "unreadBy": "Unread by {count}"
-  },
-  "messageScroller": {
-    "jump": "Scroll to bottom",
-    "jumpUnseen": "{count, plural, one {Scroll to bottom, # new message} other {Scroll to bottom, # new messages}}",
-    "label": "Messages",
-    "loading": "Loading earlier messages",
-    "unseen": "{count, plural, one {# new message} other {# new messages}}"
-  },
-  "numberField": {
-    "decrement": "Decrease",
-    "increment": "Increase",
-    "rangeOverflow": "The value must be {max} or less.",
-    "rangeUnderflow": "The value must be {min} or more."
-  },
-  "otpField": {
-    "label": "Verification code"
-  },
-  "pagination": {
-    "first": "First page",
-    "label": "Pagination",
-    "last": "Last page",
-    "next": "Next page",
-    "page": "Page {page}",
-    "previous": "Previous page"
-  },
-  "passwordField": {
-    "capsLock": "Caps Lock is on.",
-    "show": "Show password"
-  },
-  "popover": {
-    "close": "Close"
-  },
-  "promptInput": {
-    "actions": "Add",
-    "attach": "Attach files",
-    "attachments": "Attached files",
-    "label": "Message",
-    "placeholder": "Type a message",
-    "send": "Send",
-    "sending": "Sending",
-    "stop": "Stop"
-  },
-  "qrCode": {
-    "label": "QR code"
-  },
-  "questionnaire": {
-    "navigation": "Question navigation",
-    "next": "Next",
-    "other": "Other",
-    "otherPlaceholder": "Type another answer",
-    "previous": "Previous",
-    "progress": "Questionnaire progress",
-    "skip": "Skip",
-    "step": "Question {current} of {total}",
-    "submit": "Submit"
-  },
-  "rating": {
-    "label": "Rating",
-    "required": "Select a rating.",
-    "valueLabel": "{value} out of {max}"
-  },
-  "resizable": {
-    "handle": "Resize",
-    "height": "Height",
-    "value": "{value}px",
-    "width": "Width"
-  },
-  "richText": {
-    "calloutDanger": "Danger",
-    "calloutInfo": "Note",
-    "calloutSuccess": "Tip",
-    "calloutWarning": "Warning"
-  },
-  "scheduler": {
-    "addDay": "Add a day",
-    "allDay": "All day",
-    "day": "Day",
-    "dayCount": "Number of days",
-    "days": "{count, plural, one {# day} other {# days}}",
-    "drag": {
-      "at": "Starts {time}",
-      "cancel": "Returned {event} to its place.",
-      "end": "Moved {event}.",
-      "hint": "Press Space on an event to pick it up, the arrow keys to move it by 15 minutes or a day, and Enter to drop it. Shift with the up and down arrows moves an hour. Escape cancels.",
-      "monthHint": "Press Space on an event to pick it up, the left and right arrows to move it a day, the up and down arrows to move it a week, and Enter to drop it. Escape cancels.",
-      "start": "Picked up {event}."
+    "breadcrumb": {
+      "more": "Show hidden path"
     },
-    "goToDate": "Go to date",
-    "label": "Schedule",
-    "month": "Month",
-    "more": "+{count} more",
-    "moreLabel": "{count, plural, one {Show # more event} other {Show # more events}} on {date}",
-    "navigation": "Navigate dates",
-    "nextDay": "Next day",
-    "nextDays": "{count, plural, one {Next day} other {Next # days}}",
-    "nextMonth": "Next month",
-    "nextWeek": "Next week",
-    "previousDay": "Previous day",
-    "previousDays": "{count, plural, one {Previous day} other {Previous # days}}",
-    "previousMonth": "Previous month",
-    "previousWeek": "Previous week",
-    "removeDay": "Remove a day",
-    "resize": "End of {event}",
-    "today": "Today",
-    "view": "View",
-    "week": "Week"
-  },
-  "select": {
-    "clear": "Clear selection",
-    "empty": "No results found.",
-    "listbox": "Options",
-    "more": "+{count}",
-    "placeholder": "Select an option",
-    "search": "Search options",
-    "searchPlaceholder": "Search…"
-  },
-  "sidebar": {
-    "collapse": "Collapse sidebar",
-    "drag": {
-      "after": "After {target}",
-      "before": "Before {target}",
-      "cancel": "Returned {item} to its place.",
-      "end": "Moved {item}.",
-      "hint": "Press Space to pick up, the up and down arrows to choose a place, and Enter to drop. Escape cancels.",
-      "inside": "Inside {target}",
-      "origin": "Original place",
-      "start": "Picked up {item}."
+    "bubble": {
+      "reactions": "Reactions"
     },
-    "expand": "Expand sidebar",
-    "label": "Sidebar",
-    "open": "Open menu"
-  },
-  "slider": {
-    "end": "End",
-    "start": "Start"
-  },
-  "slides": {
-    "counter": "{index} / {count}",
-    "roleDescription": "slide",
-    "slide": "{index} of {count}"
-  },
-  "spinner": {
-    "label": "Loading"
-  },
-  "splitter": {
-    "collapse": "Collapse panel",
-    "collapsed": "Collapsed",
-    "expand": "Expand panel",
-    "handle": "Resize panels",
-    "value": "{value}%"
-  },
-  "stepper": {
-    "completed": "Completed",
-    "error": "Error",
-    "label": "Progress"
-  },
-  "telField": {
-    "country": "Country",
-    "countrySearch": "Search countries or calling codes",
-    "invalid": "Enter a valid phone number."
-  },
-  "textArea": {
-    "count": "{count}",
-    "countOfMax": "{count} / {maxLength}",
-    "limitReached": "Character limit reached.",
-    "remaining": "{remaining, plural, one {# character left.} other {# characters left.}}"
-  },
-  "textField": {
-    "clear": "Clear"
-  },
-  "timeField": {
-    "clear": "Clear time",
-    "close": "Close",
-    "placeholder": "Pick a time",
-    "title": "Pick a time"
-  },
-  "timePicker": {
-    "hour": "Hour",
-    "label": "Time",
-    "minute": "Minute",
-    "period": "AM/PM",
-    "second": "Second"
-  },
-  "toast": {
-    "close": "Close notification",
-    "loading": "Working on it",
-    "region": "Notifications"
+    "carousel": {
+      "indicator": "Go to slide {index, number}",
+      "roleDescription": "carousel"
+    },
+    "colorPicker": {
+      "alpha": "Opacity",
+      "area": "Saturation and brightness",
+      "areaValue": "Saturation {saturation}, brightness {brightness}",
+      "brightness": "Brightness",
+      "eyeDropper": "Pick a color from the screen",
+      "hue": "Hue",
+      "input": "Color value",
+      "label": "Color picker",
+      "saturation": "Saturation",
+      "swatches": "Swatches",
+      "twoD": "2D slider"
+    },
+    "common": {
+      "clear": "Clear",
+      "close": "Close",
+      "collapse": "Collapse",
+      "copied": "Copied",
+      "copy": "Copy",
+      "drag": {
+        "cancel": "Returned to its place: {item}",
+        "end": "Moved: {item}",
+        "start": "Picked up: {item}"
+      },
+      "expand": "Expand",
+      "invalid": "Enter a valid value.",
+      "loading": "Loading",
+      "next": "Next",
+      "options": "Options",
+      "pause": "Pause",
+      "previous": "Previous",
+      "remove": "Remove",
+      "removeItem": "Remove {label}",
+      "resize": "Resize",
+      "search": "Search",
+      "sending": "Sending",
+      "status": {
+        "danger": "Danger",
+        "info": "Info",
+        "success": "Success",
+        "warning": "Warning"
+      }
+    },
+    "dataTable": {
+      "resize": "{column} column width",
+      "selectAll": "Select all rows",
+      "selectRow": "Select {label}",
+      "selectRowNumber": "Select row {number, number}",
+      "selected": "{count, number} selected"
+    },
+    "dateField": {
+      "open": "Open calendar"
+    },
+    "editor": {
+      "alignCenter": "Align center",
+      "alignJustify": "Justify",
+      "alignLeft": "Align left",
+      "alignRight": "Align right",
+      "blockDuplicate": "Duplicate",
+      "blockHandle": "Block menu",
+      "blockInsertBelow": "Add a block below",
+      "blockTurnInto": "Turn into",
+      "blockType": "Text style",
+      "blockquote": "Quote",
+      "bold": "Bold",
+      "bubbleMenu": "Selection formatting",
+      "bulletList": "Bulleted list",
+      "callout": "Callout",
+      "calloutKind": "Callout type",
+      "calloutRemove": "Remove callout",
+      "code": "Code",
+      "codeBlock": "Code block",
+      "codeLanguage": "Code language",
+      "codeLanguageSearch": "Search languages",
+      "codePlainText": "Plain text",
+      "color": "Color",
+      "colorDefault": "Default",
+      "colorNone": "None",
+      "colorPrimary": "Accent 1",
+      "colorSecondary": "Accent 2",
+      "colorTertiary": "Accent 3",
+      "content": "Content",
+      "details": "Toggle",
+      "detailsSummary": "Summary",
+      "detailsToggle": "Show content",
+      "heading": "Heading {level, number}",
+      "highlight": "Highlight",
+      "highlightColor": "Highlight color",
+      "horizontalRule": "Divider",
+      "image": "Image",
+      "imageAlt": "Alt text",
+      "imageInsert": "Insert",
+      "imagePickFiles": "Choose files",
+      "imageUploadFailed": "The image could not be uploaded",
+      "imageUploading": "Uploading the image",
+      "imageUrl": "Image address",
+      "imageUrlInvalid": "Enter an address that starts with http or https",
+      "italic": "Italic",
+      "link": "Link",
+      "linkApply": "Apply",
+      "linkRemove": "Remove link",
+      "linkUrl": "Link URL",
+      "mentionEmpty": "No matches",
+      "mentionMenu": "Mentions",
+      "mentionSearching": "Searching…",
+      "orderedList": "Numbered list",
+      "paragraph": "Paragraph",
+      "slashMenu": "Insert block",
+      "slashMenuEmpty": "No matching blocks",
+      "strike": "Strikethrough",
+      "subscript": "Subscript",
+      "superscript": "Superscript",
+      "table": "Table",
+      "tableAddColumnAfter": "Add column after",
+      "tableAddColumnBefore": "Add column before",
+      "tableAddRowAfter": "Add row below",
+      "tableAddRowBefore": "Add row above",
+      "tableDelete": "Delete table",
+      "tableDeleteColumn": "Delete column",
+      "tableDeleteRow": "Delete row",
+      "tableHeaderRow": "Header row",
+      "tableInsert": "Insert table",
+      "tableMergeCells": "Merge cells",
+      "tableSize": "{rows, number} by {cols, number}",
+      "tableSplitCell": "Split cell",
+      "taskItem": "Task: {text}",
+      "taskItemEmpty": "Empty task",
+      "taskList": "Task list",
+      "textAlign": "Alignment",
+      "textColor": "Text color",
+      "toolbar": "Formatting",
+      "underline": "Underline"
+    },
+    "fileField": {
+      "count": "Files: {count, number}",
+      "list": "Chosen files"
+    },
+    "image": {
+      "download": "Download",
+      "photos": "Images",
+      "preview": "View larger: {alt}",
+      "previewUntitled": "View image larger",
+      "share": "Share",
+      "thumbnails": "Image list",
+      "viewer": "Image viewer",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "zoomReset": "{percent}, fit to screen"
+    },
+    "kbd": {
+      "command": "Command",
+      "control": "Control",
+      "down": "Down Arrow",
+      "forwardDelete": "Forward Delete",
+      "left": "Left Arrow",
+      "macDelete": "Delete",
+      "option": "Option",
+      "return": "Return",
+      "right": "Right Arrow",
+      "shift": "Shift",
+      "up": "Up Arrow"
+    },
+    "link": {
+      "newTab": "(opens in a new tab)"
+    },
+    "menu": {
+      "command": "Commands"
+    },
+    "message": {
+      "actions": "Message actions",
+      "error": "Not sent",
+      "retry": "Resend",
+      "unread": "Unread",
+      "unreadBy": "Unread by {count, number}"
+    },
+    "messageScroller": {
+      "jump": "Scroll to bottom",
+      "jumpUnseen": "Scroll to bottom, new messages: {count, number}",
+      "unseen": "New messages: {count, number}"
+    },
+    "numberField": {
+      "decrement": "Decrease",
+      "increment": "Increase"
+    },
+    "pagination": {
+      "first": "First page",
+      "last": "Last page",
+      "page": "Page {page, number}"
+    },
+    "passwordField": {
+      "show": "Show password"
+    },
+    "promptInput": {
+      "actions": "Add",
+      "attach": "Attach files",
+      "attachments": "Attached files",
+      "send": "Send",
+      "stop": "Stop"
+    },
+    "questionnaire": {
+      "navigation": "Question navigation",
+      "progress": "Questionnaire progress",
+      "step": "Question {current, number} of {total, number}"
+    },
+    "rating": {
+      "valueLabel": "{value, number} out of {max, number}"
+    },
+    "scheduler": {
+      "addDay": "Add a day",
+      "allDay": "All day",
+      "dayCount": "Number of days",
+      "drag": {
+        "at": "Starts {time}",
+        "hint": "Press Space on an event to pick it up, the arrow keys to move it by 15 minutes or a day, and Enter to drop it. Shift with the up and down arrows moves an hour. Escape cancels.",
+        "monthHint": "Press Space on an event to pick it up, the left and right arrows to move it a day, the up and down arrows to move it a week, and Enter to drop it. Escape cancels."
+      },
+      "goToDate": "Go to date",
+      "moreLabel": "More events on {date}: {count, number}",
+      "navigation": "Navigate dates",
+      "removeDay": "Remove a day",
+      "resize": "End of {event}",
+      "view": "View"
+    },
+    "sidebar": {
+      "drag": {
+        "after": "After {target}",
+        "before": "Before {target}",
+        "hint": "Press Space to pick up, the up and down arrows to choose a place, and Enter to drop. Escape cancels.",
+        "inside": "Inside {target}",
+        "origin": "Original place"
+      },
+      "open": "Open menu"
+    },
+    "slider": {
+      "end": "End",
+      "start": "Start"
+    },
+    "slides": {
+      "roleDescription": "slide",
+      "slide": "{index, number} of {count, number}"
+    },
+    "stepper": {
+      "completed": "Completed",
+      "error": "Error"
+    },
+    "telField": {
+      "country": "Country"
+    },
+    "textArea": {
+      "limitReached": "Character limit reached.",
+      "remaining": "Characters left: {remaining, number}"
+    },
+    "timePicker": {
+      "label": "Time"
+    },
+    "toast": {
+      "region": "Notifications"
+    }
   }
 }

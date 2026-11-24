@@ -11,7 +11,6 @@ import {
 import { CheckboxGroupContext } from './context';
 import { useInternalCheckboxGroup } from './hooks/use-checkbox-group';
 import { FormValue } from '../../../internal/parts/form-value';
-import { useInternalTranslate } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { Checkbox } from '../checkbox';
 import { checkboxGroupStyle } from './style';
@@ -115,8 +114,6 @@ export function CheckboxGroupRoot<T extends string>({
   'aria-required': _unsupportedByRoleGroup,
   ...rest
 }: CheckboxGroupProps<T>) {
-  const t = useInternalTranslate();
-
   const {
     value,
     toggle,
@@ -184,7 +181,6 @@ export function CheckboxGroupRoot<T extends string>({
           required={required && !readOnly}
           disabled={disabled}
           anchor={anchorRef}
-          message={t('checkboxGroup.required')}
         />
       </fieldset>
     </CheckboxGroupContext.Provider>

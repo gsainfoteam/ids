@@ -31,6 +31,7 @@ const meta = {
     defaultValue: { control: { type: 'number', min: 0, max: 3 } },
   },
   args: {
+    'aria-label': '진행 단계',
     defaultValue: 1,
     orientation: 'horizontal',
     size: 'standard',
@@ -64,7 +65,7 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Stepper defaultValue={1}>
+    <Stepper aria-label="진행 단계" defaultValue={1}>
       <Stepper.Item>
         <Stepper.Title>계정</Stepper.Title>
         <Stepper.Description>이메일과 비밀번호</Stepper.Description>
@@ -89,7 +90,12 @@ export const Gallery: Story = {
           columns={orientations}
           render={(size, orientation) => (
             <div className={orientation === 'horizontal' ? 'w-[28rem]' : 'w-56'}>
-              <Stepper orientation={orientation} size={size} defaultValue={1}>
+              <Stepper
+                aria-label="진행 단계"
+                orientation={orientation}
+                size={size}
+                defaultValue={1}
+              >
                 <Stepper.Item>
                   <Stepper.Title>계정</Stepper.Title>
                   <Stepper.Description>이메일 인증</Stepper.Description>
@@ -113,7 +119,7 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="progress">
           <div className="w-[36rem]">
-            <Stepper defaultValue={2}>
+            <Stepper aria-label="진행 단계" defaultValue={2}>
               <Stepper.Item>
                 <Stepper.Title>completed</Stepper.Title>
               </Stepper.Item>
@@ -131,7 +137,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="error">
           <div className="w-[36rem]">
-            <Stepper defaultValue={2}>
+            <Stepper aria-label="진행 단계" defaultValue={2}>
               <Stepper.Item>
                 <Stepper.Title>계정</Stepper.Title>
               </Stepper.Item>
@@ -147,7 +153,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="disabled">
           <div className="w-[36rem]">
-            <Stepper defaultValue={0} linear={false}>
+            <Stepper aria-label="진행 단계" defaultValue={0} linear={false}>
               <Stepper.Item>
                 <Stepper.Title>기본 정보</Stepper.Title>
               </Stepper.Item>
@@ -163,7 +169,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="all done">
           <div className="w-[36rem]">
-            <Stepper value={3}>
+            <Stepper aria-label="진행 단계" value={3}>
               <Stepper.Item>
                 <Stepper.Title>계정</Stepper.Title>
               </Stepper.Item>
@@ -184,7 +190,7 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="icons">
           <div className="w-[36rem]">
-            <Stepper value={1}>
+            <Stepper aria-label="진행 단계" value={1}>
               <Stepper.Item>
                 <Stepper.Indicator>
                   <UserIcon />
@@ -272,7 +278,7 @@ export const Gallery: Story = {
           render={(size, mode) =>
             mode === 'progress' ? (
               <div className="w-64">
-                <Stepper orientation="vertical" size={size} defaultValue={1}>
+                <Stepper aria-label="진행 단계" orientation="vertical" size={size} defaultValue={1}>
                   <Stepper.Item>
                     <Stepper.Title>계정</Stepper.Title>
                     <Stepper.Description>이메일 인증</Stepper.Description>
@@ -366,7 +372,7 @@ export const ShowEachStepsPanel: Story = {
 
     return (
       <div className="flex w-full max-w-md flex-col gap-4">
-        <Stepper orientation="vertical" value={step} onValueChange={setStep}>
+        <Stepper aria-label="진행 단계" orientation="vertical" value={step} onValueChange={setStep}>
           <Stepper.Item>
             <Stepper.Title>계정</Stepper.Title>
             <Stepper.Description>이메일 인증</Stepper.Description>
@@ -456,7 +462,7 @@ export const ShowProgressWithoutButtons: Story = {
 export const MarkAFailedStep: Story = {
   render: (args) => (
     <div className="w-full max-w-2xl">
-      <Stepper defaultValue={1} onValueChange={args.onValueChange}>
+      <Stepper aria-label="진행 단계" defaultValue={1} onValueChange={args.onValueChange}>
         <Stepper.Item>
           <Stepper.Title>계정</Stepper.Title>
         </Stepper.Item>

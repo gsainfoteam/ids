@@ -34,13 +34,7 @@ function RootMenu({
   triggerType,
   children,
 }: RootMenuProps) {
-  const root = useInternalMenuLevel({
-    open,
-    defaultOpen,
-    onOpenChange,
-    parentOpen: null,
-    triggerType,
-  });
+  const root = useInternalMenuLevel({ open, defaultOpen, onOpenChange, parentOpen: null, triggerType });
 
   return (
     <MenuContext value={{ level: root, root, triggerType }}>

@@ -12,14 +12,7 @@ export {
   type ResizeRange,
   type SeparatorOptions,
 } from './lib/axis';
-export {
-  GRIP_HALO,
-  GRIP_STROKE,
-  GRIP_TARGET,
-  gripArc,
-  type GripArc,
-  type ResizeBand,
-} from './lib/arc';
+export { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from './lib/arc';
 export { ResizeEdge, type ResizeEdgeProps } from './parts/edge';
 export { ResizeGrip, type ResizeGripProps } from './parts/grip';
 export {

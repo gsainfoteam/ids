@@ -975,7 +975,7 @@ test('TextAlign is a group of toggles that align the block and unset back to lef
   await expect.element(group.getByRole('button', { name: '양쪽 정렬' })).toBeVisible();
 });
 
-test('a picked file that is not an image is turned away with the FileField message', async () => {
+test('a picked file that is not an image is turned away with an error toast of its name', async () => {
   const upload = vi.fn(async (file: File) => `https://cdn.gistory.me/${file.name}`);
   render(
     <IdsProvider theme={testTheme}>
@@ -992,7 +992,6 @@ test('a picked file that is not an image is turned away with the FileField messa
   );
 
   await expect.element(page.getByText('notes.pdf')).toBeVisible();
-  await expect.element(page.getByText('허용되지 않는 파일 형식입니다.')).toBeVisible();
   expect(upload).not.toHaveBeenCalled();
   toast.dismissAll();
 });
@@ -1172,7 +1171,7 @@ test('a GitHub alert in markdown is a callout whose kind menu rewrites the marke
   await expect
     .poll(() => content.element().querySelector('[data-callout]')?.getAttribute('data-kind'))
     .toBe('info');
-  await expect.element(content).toMatchTextContent('참고');
+  await expect.element(content).toMatchTextContent('정보');
 
   await userEvent.click(page.getByRole('button', { name: '콜아웃 종류' }));
   await userEvent.click(page.getByRole('menuitemradio', { name: '경고' }));
@@ -1668,7 +1667,7 @@ test('an image width also changes from the keyboard on its Width separator', asy
     />,
   );
   await editable('본문');
-  const separator = page.getByRole('separator', { name: '너비' });
+  const separator = page.getByRole('separator', { name: '크기 조절' });
   await expect.element(separator).toBeInTheDocument();
   separator.element().focus();
   await userEvent.keyboard('{ArrowRight}');

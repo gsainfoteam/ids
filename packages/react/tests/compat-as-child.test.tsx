@@ -276,7 +276,7 @@ const LINK_TARGETS: LinkTarget[] = [
     idsClass: 'focus-ring',
     forwardsRef: true,
     render: (child, ids) => (
-      <Breadcrumb>
+      <Breadcrumb aria-label="이동 경로">
         <Breadcrumb.Item>
           <Breadcrumb.Link asChild ref={ids.ref as Ref<HTMLAnchorElement>} onClick={ids.onClick}>
             {child}
@@ -294,7 +294,7 @@ const LINK_TARGETS: LinkTarget[] = [
     idsClass: 'state-layer',
     forwardsRef: true,
     render: (child, ids) => (
-      <Pagination pageCount={5} defaultPage={1}>
+      <Pagination aria-label="페이지 탐색" pageCount={5} defaultPage={1}>
         <Pagination.Link
           page={2}
           asChild
@@ -330,7 +330,7 @@ const LINK_TARGETS: LinkTarget[] = [
     forwardsRef: false,
     viewport: DESKTOP,
     render: (child, ids) => (
-      <Sidebar value="/here">
+      <Sidebar aria-label="사이드바" value="/here">
         <Sidebar.Item value="/here" asChild onClick={ids.onClick}>
           {child}
         </Sidebar.Item>

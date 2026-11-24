@@ -10,12 +10,7 @@ import { useInternalEditorContext } from '../context';
 import { useInternalEditorSelector } from '../hooks/use-editor-selector';
 import { editorMessages } from '../messages-catalog';
 import { insertTable, NEW_TABLE_SIZE } from './insert';
-import {
-  extensionIsLoaded,
-  hasExtension,
-  useInternalEditorToolProps,
-  type EditorToolProps,
-} from '../parts/tool';
+import { extensionIsLoaded, hasExtension, useInternalEditorToolProps, type EditorToolProps } from '../parts/tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 

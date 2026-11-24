@@ -18,7 +18,7 @@ export function SelectClear({ asChild, children, className, ...props }: SelectCl
   if (!c.select.state.selected.length || c.state.readOnly) return null;
 
   const own = mergeProps(props as Record<string, unknown>, {
-    'aria-label': props['aria-label'] ?? t('select.clear'),
+    'aria-label': props['aria-label'] ?? t('common.clear'),
     disabled: c.state.disabled,
     'data-select-clear': '',
     onClick: c.select.actions.clear,

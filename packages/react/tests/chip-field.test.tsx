@@ -101,6 +101,7 @@ test('search, groups, keyboard selection with a check, chip removal and maxCount
   const screen = await render(
     <ChipField aria-label="Skills" maxCount={1} onValueChange={onValueChange}>
       {items}
+      <ChipField.Limit>최대 1개까지 고를 수 있습니다.</ChipField.Limit>
     </ChipField>,
   );
   const input = screen.getByRole('combobox', { name: 'Skills' });
@@ -302,7 +303,7 @@ test('onCreate: trims, dedupes, ignores IME, validates, and commits on comma or 
   await userEvent.fill(screen.getByRole('combobox', { name: 'Skills' }), 'anything');
   await expect
     .element(page.elementLocator(createRow()!))
-    .toHaveTextContent('추가할 수 없는 값입니다.');
+    .toHaveTextContent('올바른 값이 아닙니다.');
 });
 
 test('required is enforced natively; reset, prevented reset, read-only and disabled', async () => {
@@ -391,7 +392,7 @@ test('drawer: the sheet has its own search field, and closing returns to the fie
   );
   const input = screen.getByRole('combobox', { name: 'Skills' });
   await userEvent.click(input);
-  const search = screen.getByRole('combobox', { name: '항목 검색' });
+  const search = screen.getByRole('combobox', { name: '검색' });
   await expect.element(search).toHaveAttribute('data-chip-field-search');
   expect(search.element().closest('[data-text-field]')).not.toBeNull();
   await expect.element(search).toHaveFocus();
@@ -422,7 +423,7 @@ test('onBlur waits until focus leaves the field and its drawer', async () => {
       </div>,
     );
     await userEvent.click(screen.getByRole('combobox', { name: 'Skills' }));
-    await expect.element(screen.getByRole('combobox', { name: '항목 검색' })).toHaveFocus();
+    await expect.element(screen.getByRole('combobox', { name: '검색' })).toHaveFocus();
     await userEvent.keyboard('{Escape}');
     await expect.element(screen.getByRole('combobox', { name: 'Skills' })).toHaveFocus();
     expect(onBlur, 'focus only moved between the field and its sheet').not.toHaveBeenCalled();

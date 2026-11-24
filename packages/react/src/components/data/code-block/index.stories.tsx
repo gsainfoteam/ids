@@ -275,7 +275,7 @@ export const CopyTheCode: Story = {
       configurable: true,
       value: { writeText: async (text: string) => void copied.push(text) },
     });
-    await userEvent.click(await canvas.findByRole('button', { name: '코드 복사' }));
+    await userEvent.click(await canvas.findByRole('button', { name: '복사' }));
     await waitFor(() => expect(copied).toEqual([INSTALL]));
     await expect(canvas.getByRole('status')).toHaveTextContent('복사했습니다');
     await expect(canvas.getByRole('button', { name: '복사했습니다' })).toHaveAttribute(
@@ -397,8 +397,7 @@ export const CollapseALongFile: Story = {
   },
   play: async ({ canvasElement, canvas, userEvent }) => {
     const pre = () => canvasElement.querySelector('pre')!;
-    const hidden = FORM.split('\n').length - 8;
-    const expand = canvas.getByRole('button', { name: `${hidden}줄 더 보기` });
+    const expand = canvas.getByRole('button', { name: '펼치기' });
     await expect(expand).toHaveAttribute('aria-expanded', 'false');
     await expect(expand).toHaveAttribute('aria-controls', pre().id);
     await expect(pre().scrollHeight).toBeGreaterThan(pre().clientHeight);
@@ -409,7 +408,7 @@ export const CollapseALongFile: Story = {
     await expect(pre().scrollHeight).toBe(pre().clientHeight);
 
     await userEvent.click(collapse);
-    await expect(canvas.getByRole('button', { name: `${hidden}줄 더 보기` })).toHaveFocus();
+    await expect(canvas.getByRole('button', { name: '펼치기' })).toHaveFocus();
   },
 };
 

@@ -1,11 +1,7 @@
 import { type ComponentProps } from 'react';
 
 import { StepperBody, type StepperBodyProps, type StepperBodyState } from './parts/body';
-import {
-  StepperContent,
-  type StepperContentProps,
-  type StepperContentState,
-} from './parts/content';
+import { StepperContent, type StepperContentProps, type StepperContentState } from './parts/content';
 import {
   StepperDescription,
   type StepperDescriptionProps,
@@ -23,16 +19,13 @@ import {
   type StepperSeparatorState,
 } from './parts/separator';
 import { StepperTitle, type StepperTitleProps, type StepperTitleState } from './parts/title';
-import {
-  StepperTrigger,
-  type StepperTriggerProps,
-  type StepperTriggerState,
-} from './parts/trigger';
+import { StepperTrigger, type StepperTriggerProps, type StepperTriggerState } from './parts/trigger';
 import { StepperRoot, type StepperOrientation } from './root';
 import { stepperStyle } from './style';
 import { type StateRenderProps } from '../../../internal/lib/state-props';
 
 import type { StepperStatus } from './lib/step-state';
+import type { AccessibleName } from '../../../internal/lib/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Stepper(props: Stepper.Props) {
@@ -54,6 +47,7 @@ export namespace Stepper {
     ComponentProps<'div'>,
     'children' | 'className' | 'style' | 'defaultValue' | 'onChange'
   > &
+    AccessibleName &
     StateRenderProps<State> & {
       value?: number;
       defaultValue?: number;

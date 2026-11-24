@@ -7,6 +7,7 @@ import { useInternalMessageScroller } from './hooks/use-message-scroller';
 import { MessageScrollerJump } from './parts/jump';
 import { MessageScrollerList } from './parts/list';
 import { messageScrollerStyle } from './style';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { Card } from '../../data/card';
@@ -51,6 +52,8 @@ export function MessageScrollerRoot({
   ...props
 }: MessageScroller.Props) {
   const t = useInternalTranslate();
+  useInternalRequiredName('MessageScroller', { 'aria-label': label, 'aria-labelledby': labelledBy });
+
   const loading = ariaBusy === true || ariaBusy === 'true';
   const { scroll, viewportProps, atEnd, unseen } = useInternalMessageScroller({
     onReachStart,
@@ -76,7 +79,7 @@ export function MessageScrollerRoot({
             <ScrollArea.Viewport
               {...viewportProps}
               role="log"
-              aria-label={labelledBy ? label : (label ?? t('messageScroller.label'))}
+              aria-label={label}
               aria-labelledby={labelledBy}
               aria-busy={loading || undefined}
               className={styles.viewport()}
@@ -87,7 +90,7 @@ export function MessageScrollerRoot({
           {loading ? (
             <div data-message-scroller-loader="" className={styles.loader()}>
               <Card variant="outline" size="tiny" className={styles.loaderSurface()}>
-                <Spinner size="tiny" aria-label={t('messageScroller.loading')} />
+                <Spinner size="tiny" aria-label={t('common.loading')} />
               </Card>
             </div>
           ) : null}

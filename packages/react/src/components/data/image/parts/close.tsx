@@ -15,7 +15,7 @@ export function ImageViewerClose(props: ImageViewerCloseProps) {
   return (
     <ViewerButton
       {...props}
-      label={t('image.close')}
+      label={t('common.close')}
       glyph={<XMarkIcon aria-hidden="true" />}
       act={viewer.close}
     />

@@ -468,11 +468,7 @@ test('a modal layer: backdrop under the content, the page hidden and locked, Tab
   const onBackdropClick = vi.fn();
   function Modal({ open }: { open: boolean }) {
     const [element, setElement] = useState<HTMLElement | null>(null);
-    const layer = useInternalLayer(open, {
-      kind: 'modal',
-      element: () => element,
-      onDismiss: () => {},
-    });
+    const layer = useInternalLayer(open, { kind: 'modal', element: () => element, onDismiss: () => {} });
     return (
       <ModalLayer
         open={open}

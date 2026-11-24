@@ -40,6 +40,7 @@ import { FormValue } from '../parts/form-value';
 import { type FieldSurfaceVariant } from '../surfaces/lib/field-surface';
 
 import type { IdsSize } from '../../tokens/types';
+import type { AccessibleName } from '../lib/accessible-name';
 
 export type { TemporalFieldState, TemporalChange } from './hooks/use-temporal-field';
 export { temporalFieldStyle } from './style';
@@ -68,8 +69,6 @@ export type TemporalFieldProps<V> = Omit<
 };
 
 export type TemporalMessages = {
-  placeholder: string;
-  title: string;
   clear: string;
   close: string;
   open?: string;
@@ -80,6 +79,7 @@ export type TemporalPickerApi<V> = {
   change: TemporalChange<V>;
   close: (restoreFocus: boolean) => void;
   size: IdsSize;
+  name: AccessibleName;
 };
 
 export type TemporalPicker<V> = (api: TemporalPickerApi<V>) => ReactNode;
@@ -129,6 +129,7 @@ type ContextValue = {
   picker: TemporalPickerApi<unknown>;
   popup: {
     id: string;
+    name: AccessibleName;
     anchor: RefObject<HTMLDivElement | null>;
     preferredWidth: number | undefined;
     initialFocusSelector: string;
@@ -256,13 +257,12 @@ export function TemporalContent({ asChild, children, mobileVariant, ...props }: 
       initialFocusSelector={c.popup.initialFocusSelector}
       role="dialog"
       id={c.popup.id}
-      label={c.messages.title}
+      {...c.popup.name}
       data-temporal-owner={c.popup.id}
       className="concentric-p-3"
       onBlur={c.onBlur as (event: FocusEvent<HTMLDivElement>) => void}
     >
       <FieldPopupHeader
-        title={c.messages.title}
         closeLabel={c.messages.close}
         autoFocus
         onClose={() => c.picker.close(true)}
@@ -334,7 +334,16 @@ export function TemporalField<V>({
     onBlur,
   });
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const picker: TemporalPickerApi<V> = { value: state.value, change, close, size: resolvedSize };
+  const fieldName = native['aria-labelledby']
+    ? { 'aria-labelledby': native['aria-labelledby'] }
+    : { 'aria-label': native['aria-label'] ?? '' };
+  const picker: TemporalPickerApi<V> = {
+    value: state.value,
+    change,
+    close,
+    size: resolvedSize,
+    name: fieldName,
+  };
   const styles = temporalFieldStyle({ variant, size: resolvedSize, disabled });
 
   const parts = flattenFragments(children).filter(
@@ -440,15 +449,14 @@ export function TemporalField<V>({
         clear,
         onBlur: handleBlur,
         trigger,
-        text: state.empty
-          ? (placeholder ?? config.messages.placeholder)
-          : config.display(state.value),
+        text: state.empty ? (placeholder ?? '') : config.display(state.value),
         icon: config.icon,
         messages: config.messages,
         content: () => config.picker(picker),
         picker: picker as TemporalPickerApi<unknown>,
         popup: {
           id: popupId,
+          name: fieldName,
           anchor: rootRef,
           preferredWidth: config.preferredWidth,
           initialFocusSelector: config.initialFocusSelector,
