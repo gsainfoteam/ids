@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:ids_flutter/ids.dart';
 
 import '../i18n/translations.g.dart';
 
@@ -21,4 +22,11 @@ class ExampleStrings extends InheritedWidget {
 
 extension ExampleStringsOf on BuildContext {
   Translations get strings => ExampleStrings.of(this);
+}
+
+extension IdsLocaleOfTheApp on AppLocale {
+  IdsLocale get ids => switch (this) {
+    AppLocale.ko => IdsLocale.ko,
+    AppLocale.en => IdsLocale.en,
+  };
 }
