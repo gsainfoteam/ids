@@ -291,6 +291,10 @@ IdsButton(
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며
 `IdsButton`과 같은 variant, 색상, 크기를 사용합니다. 기본 variant는 `ghost`입니다.
 
+## Kbd
+
+`IdsKbd(keys: 'Mod+Shift+K')`는 플랫폼에 맞게 키를 배열한다. `IdsKbd(child: '⌘K')`처럼 한 키캡에 직접 표시할 수도 있다. `size`를 생략하면 `IdsField`의 크기를 따르고, 스크린 리더가 읽는 키 이름은 Provider의 번역과 `labels`로 지정한다.
+
 ## 개발과 Widgetbook
 
 ```bash

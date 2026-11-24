@@ -168,17 +168,32 @@ export const en = defineIdsLocale({
       "zoomReset": "{percent}, fit to screen"
     },
     "kbd": {
+      "alt": "Alt",
+      "backspace": "Backspace",
+      "capsLock": "Caps Lock",
       "command": "Command",
       "control": "Control",
+      "delete": "Delete",
       "down": "Down Arrow",
+      "end": "End",
+      "enter": "Enter",
+      "escape": "Escape",
+      "fn": "Function",
       "forwardDelete": "Forward Delete",
+      "home": "Home",
       "left": "Left Arrow",
       "macDelete": "Delete",
       "option": "Option",
+      "pageDown": "Page Down",
+      "pageUp": "Page Up",
       "return": "Return",
       "right": "Right Arrow",
       "shift": "Shift",
-      "up": "Up Arrow"
+      "space": "Space",
+      "super": "Super",
+      "tab": "Tab",
+      "up": "Up Arrow",
+      "windows": "Windows"
     },
     "link": {
       "newTab": "(opens in a new tab)"

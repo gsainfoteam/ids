@@ -5,6 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'catalog/addons.dart';
 import 'components/button_usecase.dart';
 import 'components/icon_button_usecase.dart';
+import 'components/kbd_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -29,7 +30,13 @@ final directories = <WidgetbookNode>[
       WidgetbookFolder(name: 'Form', children: [field]),
       WidgetbookFolder(name: 'Feedback', children: [spinner]),
       WidgetbookFolder(name: 'Layout', children: [divider]),
-      WidgetbookFolder(name: 'Typography', children: [label]),
+      WidgetbookFolder(
+        name: 'Typography',
+        children: [
+          label,
+          WidgetbookComponent(name: 'IdsKbd', useCases: kbdUseCases),
+        ],
+      ),
       WidgetbookFolder(name: 'Utility', children: [provider]),
     ],
   ),
