@@ -133,7 +133,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |
 | `disabled` / `readOnly`  | 입력과 국가 선택에 함께 적용                                  |
-| `name` / `form`          | hidden input이 E.164 값 하나를 제출한다                        |
+| `name` / `form`          | hidden input이 E.164 값 하나를 제출한다. 빈 값은 제출하지 않는다 |
 | 그 외 native 속성, ref    | 실제 input으로 간다. `autoComplete="tel"`, `inputMode="tel"` 기본 |
 
 ## 알아둘 것

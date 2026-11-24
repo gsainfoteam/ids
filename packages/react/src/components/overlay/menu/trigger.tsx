@@ -15,7 +15,7 @@ import { CommandTrigger } from './command';
 import { CommandContext, MenuContext, useContentContext, useMenuContext } from './context';
 import { menuStyle } from './style';
 import { useMenuItem } from './use-menu-item';
-import { mergeProps, mergeRefs, part } from '../../../utils';
+import { buttonTypeFor, mergeProps, mergeRefs, part } from '../../../utils';
 
 import type { Menu } from '.';
 
@@ -72,7 +72,7 @@ function RootMenuTrigger({
       ...root.getReferenceProps(),
       ...state,
       id: props.id ?? root.ids.trigger,
-      type: asChild ? undefined : 'button',
+      type: buttonTypeFor(asChild, children),
       'aria-haspopup': 'menu',
       'aria-expanded': root.open,
       'aria-controls': root.open ? root.ids.content : undefined,

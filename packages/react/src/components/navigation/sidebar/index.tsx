@@ -34,7 +34,7 @@ export namespace Sidebar {
     AccessibleName & {
       value?: string;
       variant?: Variant;
-      collapsible?: boolean | CollapsibleMode;
+      collapsible?: CollapsibleMode;
       collapsed?: boolean;
       defaultCollapsed?: boolean;
       onCollapsedChange?: (collapsed: boolean) => void;
