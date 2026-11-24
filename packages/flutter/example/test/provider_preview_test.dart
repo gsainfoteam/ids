@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:ids_flutter_example/components/utility/provider_preview.dart';
-import 'package:ids_flutter_example/i18n/translations.g.dart';
 import 'package:ids_flutter_example/catalog/palettes.dart';
 
 void main() {
   testWidgets(
-    'runtime preview changes colors and translations without scaling overflow',
+    'runtime preview changes colors and messages without scaling overflow',
     (tester) async {
       for (final mode in [IdsMode.light, IdsMode.dark]) {
         for (final primary in [blue, purple]) {
@@ -21,7 +20,7 @@ void main() {
               home: ProviderPreview(
                 theme: theme,
                 mode: mode,
-                translation: AppLocale.en.buildSync().ids,
+                locale: IdsLocale.en,
                 textScale: 3,
               ),
             ),
@@ -32,7 +31,7 @@ void main() {
             mode: mode,
           ).colors.bgPrimarySolid;
           expect(find.text('Loading'), findsOneWidget);
-          expect(find.text('닫기'), findsOneWidget);
+          expect(find.text('Close'), findsOneWidget);
           expect(find.text('primary ${hexOf(bgPrimarySolid)}'), findsOneWidget);
           expect(tester.takeException(), isNull);
         }

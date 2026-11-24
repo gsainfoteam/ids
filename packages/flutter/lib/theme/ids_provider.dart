@@ -15,7 +15,6 @@ class IdsProvider extends StatefulWidget {
     this.defaultMode,
     this.onModeChange,
     this.locale,
-    this.translation,
     required this.child,
   }) : assert(
          mode == null || defaultMode == null,
@@ -29,7 +28,6 @@ class IdsProvider extends StatefulWidget {
     this.defaultMode,
     this.onModeChange,
     this.locale,
-    this.translation,
     required this.child,
   }) : assert(
          mode == null || defaultMode == null,
@@ -40,8 +38,7 @@ class IdsProvider extends StatefulWidget {
   final IdsMode? mode;
   final IdsMode? defaultMode;
   final ValueChanged<IdsMode>? onModeChange;
-  final Locale? locale;
-  final IdsMessages? translation;
+  final IdsLocale? locale;
   final Widget child;
 
   static IdsScope of(BuildContext context) => IdsScope.of(context);
@@ -59,12 +56,9 @@ class IdsProviderScope extends IdsProvider {
     super.defaultMode,
     super.onModeChange,
     super.locale,
-    super.translation,
     required super.child,
   }) : super._scope();
 }
-
-const _defaultLocale = Locale('ko', 'KR');
 
 class _IdsProviderState extends State<IdsProvider> with WidgetsBindingObserver {
   IdsScope? _parent;
@@ -127,6 +121,17 @@ class _IdsProviderState extends State<IdsProvider> with WidgetsBindingObserver {
     }
   }
 
+  IdsLocale _localeOfTheApp(BuildContext context) {
+    final appLocale = Localizations.maybeLocaleOf(context);
+    if (appLocale == null) return IdsLocale.ko;
+    for (final shipped in IdsLocale.values) {
+      if (shipped.locale.languageCode == appLocale.languageCode) {
+        return IdsLocale(locale: appLocale, messages: shipped.messages);
+      }
+    }
+    return IdsLocale.ko;
+  }
+
   @override
   Widget build(BuildContext context) {
     _parent = IdsScope.maybeOf(context);
@@ -153,8 +158,7 @@ class _IdsProviderState extends State<IdsProvider> with WidgetsBindingObserver {
     return IdsScope(
       resolved: _resolved!,
       mode: mode,
-      locale: widget.locale ?? _parent?.locale ?? _defaultLocale,
-      translation: widget.translation ?? _parent?.translation,
+      locale: widget.locale ?? _parent?.locale ?? _localeOfTheApp(context),
       setMode: _setMode,
       toggleMode: _toggleMode,
       child: widget.child,
