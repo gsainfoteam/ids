@@ -9,7 +9,11 @@ import { mergeRefs } from '../../../utils';
 
 import type { Avatar } from '.';
 
-export type AvatarImageProps = Omit<ComponentProps<'img'>, 'className' | 'style' | 'alt'> & {
+export type AvatarImageProps = Omit<
+  ComponentProps<'img'>,
+  'src' | 'className' | 'style' | 'alt'
+> & {
+  src?: string;
   className?: StateValue<string | undefined, Avatar.State>;
   style?: StateValue<CSSProperties | undefined, Avatar.State>;
 };

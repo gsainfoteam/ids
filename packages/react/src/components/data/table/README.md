@@ -33,14 +33,13 @@ import { Table } from '@gsainfoteam/ids-react';
 ## 속성이 가는 곳
 
 ```tsx
-<Table
-  className="max-h-80"   // 바깥 상자(ScrollArea root). 크기와 자리를 정한다
-  style={{ maxWidth: 640 }}
-  aria-label="멤버"       // 나머지는 <table> 로 간다(id, aria-*, ref)
-/>
+<div className="flex max-h-80 max-w-160 flex-col">  {/* 크기와 자리는 감싸는 요소가 정한다 */}
+  <Table aria-label="멤버" />                      {/* 속성은 <table> 로 간다(id, aria-*, ref) */}
+</div>
 ```
 
-- `className` 과 `style` 은 표를 감싼 스크롤 상자에, 나머지 속성은 `<table>` 에 붙습니다. TextArea 가 상자와 textarea 를 나누는 것과 같습니다.
+- **크기 계약: fill.** 표를 감싼 스크롤 상자는 부모 폭을 채우고, `flex-col` 부모 안에서는 남은 높이까지 줄어듭니다.
+- 속성은 `<table>` 에 붙습니다. 새 디자인에서만 쓰는 `className` 과 `style` 은 스크롤 상자에 붙습니다. TextArea 가 상자와 textarea 를 나누는 것과 같습니다.
 - 파트(`Table.Row`, `Table.Cell` 등)는 받은 속성을 모두 자기 요소에 붙입니다.
 
 ## variant와 크기
@@ -53,7 +52,7 @@ import { Table } from '@gsainfoteam/ids-react';
 ```
 
 - 상자 모서리는 `--table-radius`(기본 `rounded-container`, 16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
-- 스크롤 영역은 테두리 1px 를 뺀 `--table-radius - 1px` 로 깎습니다. 같은 값이면 채운 머리글 모서리와 테두리 사이로 바탕색이 비칩니다. 모서리를 바꾸려면 `rounded-*` 가 아니라 `[--table-radius:...]` 를 줍니다.
+- 스크롤 영역은 테두리 1px 를 뺀 `--table-radius - 1px` 로 깎습니다. 같은 값이면 채운 머리글 모서리와 테두리 사이로 바탕색이 비칩니다. 새 디자인에서 모서리를 바꾸려면 `className` 에 `rounded-*` 가 아니라 `[--table-radius:...]` 를 줍니다.
 - 선은 모두 `--ids-color-border-neutral` 입니다. 마지막 행은 아래 선이 없고, `Table.Footer` 는 위 선으로 몸통과 나뉩니다.
 - `outline` 의 머리글 행은 `bg-block` 으로 채우고 글자는 `text-neutral` 입니다. `ghost` 의 머리글은 채우지 않지만, 붙는 머리글(`stickyHeader`)이 아래 행을 가리도록 배경은 밑에 깔린 면의 색(`--ids-bg-current`)입니다.
 
@@ -76,7 +75,7 @@ import { Table } from '@gsainfoteam/ids-react';
 - 선택된 행은 `scheme-primary` 와 `state-scheme` 를 얹어, 올렸을 때 층이 primary 채움색으로 짙어집니다.
 - 올렸을 때 층은 `highlightOnHover` 나 `onClick` 이 있는 몸통 행에만 붙습니다. 머리글과 바닥글 행은 바뀌지 않습니다.
 - 선택은 줄무늬보다 앞섭니다. 짝수 행을 골라도 `bg-primary-soft` 입니다.
-- `selected` 는 모양과 `data-selected` 만 바꿉니다. `aria-selected` 는 `grid` 역할에서만 뜻이 있어 붙이지 않습니다. 선택은 행 안의 체크박스나 `aria-pressed` 버튼이 알립니다.
+- `selected` 는 모양만 바꿉니다. `aria-selected` 는 `grid` 역할에서만 뜻이 있어 붙이지 않습니다. 선택은 행 안의 체크박스나 `aria-pressed` 버튼이 알립니다.
 
 ## 누를 수 있는 행
 
@@ -123,11 +122,16 @@ import { Table } from '@gsainfoteam/ids-react';
 ## 스크롤과 붙는 머리글
 
 ```tsx
-<Table className="max-h-80" stickyHeader>...</Table>   // 세로로 스크롤하고 머리글 행이 위에 붙는다
-<Table className="max-w-sm">...</Table>                // 넓은 표는 가로로 스크롤한다
+<div className="flex max-h-80 flex-col">   {/* 세로로 스크롤하고 머리글 행이 위에 붙는다 */}
+  <Table stickyHeader>...</Table>
+</div>
+
+<div className="max-w-sm">                 {/* 넓은 표는 가로로 스크롤한다 */}
+  <Table>...</Table>
+</div>
 ```
 
-- 높이는 바깥 상자(`className`)에 줍니다. 상자는 `flex flex-col` 이고 스크롤 영역이 남은 높이를 받습니다.
+- 높이는 감싸는 `flex-col` 요소에 줍니다. 표의 상자는 그 안에서 줄어들 수 있고(`min-h-0`), 스크롤 영역이 남은 높이를 받습니다.
 - `stickyHeader` 는 `<thead>` 를 `sticky top-0` 으로 붙입니다. 머리글 배경이 밑으로 지나가는 행을 가립니다.
 - 넘치는데 안에 포커스 받을 요소가 없으면 스크롤 영역이 Tab 에 멈춰, 방향키로 표를 넘겨 볼 수 있습니다.
 - 막대는 ScrollArea 의 `hover` 방식입니다. 크기는 표의 `size` 를 따릅니다.
@@ -153,16 +157,13 @@ import { Table } from '@gsainfoteam/ids-react';
 - 행이 없을 때의 안내는 앱이 그립니다. 한 칸짜리 행(`<Table.Cell colSpan={열 수}>`)에 넣거나, 표 대신 Empty 컴포넌트를 둡니다.
 - `DataTable` 은 이 행을 스스로 그립니다(`DataTable.Empty`).
 
-## data 속성
+## 상태
 
-| 속성                                                           | 붙는 곳         | 뜻                   |
-| -------------------------------------------------------------- | --------------- | -------------------- |
-| `data-table`, `data-variant`, `data-size`, `data-layout`       | 바깥 상자       | 넘긴 값              |
-| `data-striped`, `data-sticky-header`                           | 바깥 상자       | 켜진 옵션            |
-| `data-table-header`, `-body`, `-footer`, `-caption`            | 각 부분         | 파트                 |
-| `data-table-row`, `data-selected`, `data-hoverable`            | `<tr>`          | 행, 선택, 올림 색    |
-| `data-table-head`, `data-table-cell`, `data-align`             | `<th>`, `<td>`  | 셀과 정렬            |
-| `data-overflow-x`, `data-overflow-y`                           | 바깥 상자       | 그 방향으로 넘친다   |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 표는 스스로 정하는 상태가 없습니다. `variant`, `size`, `layout`, `striped`, `highlightOnHover`, `stickyHeader`, 행의 `selected`, 셀의 `align` 은 모두 앱이 넘긴 값입니다.
+- 정렬, 선택, 페이지를 표가 갖게 하려면 `DataTable` 을 씁니다.
+- 런타임으로 읽을 수 없는 상태: 표가 가로나 세로로 넘치는지.
 
 ## 속성
 
@@ -174,7 +175,7 @@ import { Table } from '@gsainfoteam/ids-react';
 | `striped`          | 짝수 몸통 행에 `bg-neutral-soft`                                |
 | `highlightOnHover` | 몸통 행에 올리면 `state-hover` 층                     |
 | `stickyHeader`     | 스크롤해도 머리글 행이 위에 붙는다                    |
-| `className`, `style` | 바깥 스크롤 상자                                    |
+| `className`, `style` | 바깥 스크롤 상자. 새 디자인에서만 쓴다              |
 | 그 외 속성         | `<table>`                                             |
 
 | 파트            | 요소        | 속성                                   |

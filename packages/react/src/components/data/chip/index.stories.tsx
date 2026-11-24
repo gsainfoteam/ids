@@ -39,6 +39,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+export const Usage: Story = {
+  render: () => <Chip colorScheme="primary">신규</Chip>,
+};
+
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -117,7 +121,7 @@ export const Gallery: Story = {
   ),
 };
 
-export const Selectable: Story = {
+export const ToggleAFilter: Story = {
   args: { colorScheme: 'primary', onSelectedChange: fn(), children: '팔로우' },
   parameters: {
     docs: {
@@ -140,7 +144,7 @@ export const Selectable: Story = {
   },
 };
 
-export const Removable: Story = {
+export const RemoveATag: Story = {
   render: function Render() {
     const [tags, setTags] = useState(['frontend', 'react', 'design']);
 
@@ -182,7 +186,7 @@ export const Removable: Story = {
   },
 };
 
-export const SelectableAndRemovable: Story = {
+export const ToggleAndRemoveAFilter: Story = {
   render: function Render() {
     const [filters, setFilters] = useState([
       { id: 'open', label: '열림', on: true },
@@ -231,7 +235,7 @@ export const SelectableAndRemovable: Story = {
   },
 };
 
-export const Clickable: Story = {
+export const RunAnActionOnPress: Story = {
   args: { onClick: fn(), children: '필터 열기' },
   parameters: {
     docs: {
@@ -250,6 +254,7 @@ export const Clickable: Story = {
 };
 
 export const Disabled: Story = {
+  tags: ['verification'],
   args: { disabled: true, onRemove: fn(), children: 'readonly' },
   play: async ({ canvas, userEvent, args }) => {
     const close = canvas.getByRole('button', { name: 'readonly 삭제' });

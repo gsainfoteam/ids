@@ -11,9 +11,18 @@
 import { Bubble, Message, MessageGroup } from '@gsainfoteam/ids-react';
 
 <MessageGroup align="start" aria-label="김지수의 메시지">
-  <Message name="김지수" avatar={src} time={t1}><Bubble>학식 메뉴 알려 줘</Bubble></Message>  {/* 아바타, 이름 */}
-  <Message name="김지수" avatar={src} time={t2}><Bubble>오늘 거</Bubble></Message>           {/* 아바타 자리만, 이름은 스크린 리더에만 */}
-  <Message name="김지수" avatar={src} time={t3}><Bubble>2학생회관 기준으로</Bubble></Message>  {/* 말풍선 옆에 시간 */}
+  <Message name="김지수" time={t1}>                 {/* 아바타, 이름 */}
+    <Message.Avatar src={src} />
+    <Bubble>학식 메뉴 알려 줘</Bubble>
+  </Message>
+  <Message name="김지수" time={t2}>                 {/* 아바타 자리만, 이름은 스크린 리더에만 */}
+    <Message.Avatar src={src} />
+    <Bubble>오늘 거</Bubble>
+  </Message>
+  <Message name="김지수" time={t3}>                 {/* 말풍선 옆에 시간 */}
+    <Message.Avatar src={src} />
+    <Bubble>2학생회관 기준으로</Bubble>
+  </Message>
 </MessageGroup>
 
 <MessageGroup align="end" aria-label="내 메시지">
@@ -30,7 +39,7 @@ import { Bubble, Message, MessageGroup } from '@gsainfoteam/ids-react';
 
 ## 처음과 끝
 
-- 안의 Message 에도 `name` 과 `avatar` 를 모두 줍니다. 첫 메시지가 아닌 메시지는 아바타를 `invisible` 로 그려 자리를 맞추고, 머리를 `sr-only` 로 숨겨 이름을 남깁니다.
+- 안의 Message 에도 `name` 과 `Message.Avatar` 를 모두 둡니다. 첫 메시지가 아닌 메시지는 아바타를 `invisible` 로 그려 자리를 맞추고, 머리를 `sr-only` 로 숨겨 이름을 남깁니다.
 - 시간은 마지막 메시지만 그립니다. 말풍선이 없는 메시지라면 마지막 메시지에 시간을 그리는 아래 줄을 저절로 둡니다.
 - 첫 메시지가 아닌 말풍선은 꼬리 쪽 위 모서리를 `indicator`(4px)로 줄입니다. 꼬리 쪽 아래 모서리는 원래 4px 이라 이어지는 말풍선이 한 덩어리로 보입니다.
 - Message 에는 묶음 안이면 `data-first`, `data-last` 가 붙습니다.
