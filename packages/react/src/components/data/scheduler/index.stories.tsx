@@ -275,13 +275,9 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Scheduler
-      aria-label="일정표"
-      events={EVENTS}
-      defaultDate={TODAY}
-      now={NOW}
-      className="h-120"
-    />
+    <div className="[--scheduler-height:--spacing(120)]">
+      <Scheduler aria-label="일정표" events={EVENTS} defaultDate={TODAY} now={NOW} />
+    </div>
   ),
 };
 
@@ -293,44 +289,43 @@ export const Gallery: Story = {
         description="month는 그달이 든 주들, week는 locale의 첫 요일부터 7일, days는 고른 날부터 dayCount일, day는 하루입니다. 오늘은 날짜 숫자를 칠하고, 지금 시각에 선을 긋습니다."
       >
         <Showcase.Row label="month">
-          <Scheduler
-            events={EVENTS}
-            defaultView="month"
-            defaultDate={TODAY}
-            now={NOW}
-            aria-label="월 보기"
-            className="h-160"
-          />
+          <div className="[--scheduler-height:--spacing(160)]">
+            <Scheduler
+              events={EVENTS}
+              defaultView="month"
+              defaultDate={TODAY}
+              now={NOW}
+              aria-label="월 보기"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="week">
-          <Scheduler
-            events={EVENTS}
-            defaultDate={TODAY}
-            now={NOW}
-            aria-label="주 보기"
-            className="h-120"
-          />
+          <div className="[--scheduler-height:--spacing(120)]">
+            <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="주 보기" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="days">
-          <Scheduler
-            events={EVENTS}
-            defaultView="days"
-            defaultDayCount={3}
-            defaultDate={TODAY}
-            now={NOW}
-            aria-label="3일 보기"
-            className="h-120"
-          />
+          <div className="[--scheduler-height:--spacing(120)]">
+            <Scheduler
+              events={EVENTS}
+              defaultView="days"
+              defaultDayCount={3}
+              defaultDate={TODAY}
+              now={NOW}
+              aria-label="3일 보기"
+            />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="day">
-          <Scheduler
-            events={EVENTS}
-            defaultView="day"
-            defaultDate={TODAY}
-            now={NOW}
-            aria-label="일 보기"
-            className="h-120"
-          />
+          <div className="[--scheduler-height:--spacing(120)]">
+            <Scheduler
+              events={EVENTS}
+              defaultView="day"
+              defaultDate={TODAY}
+              now={NOW}
+              aria-label="일 보기"
+            />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -339,14 +334,15 @@ export const Gallery: Story = {
         description="일정마다 colorScheme을 줍니다. 기본은 primary입니다."
       >
         <Showcase.Row label="colorScheme">
-          <Scheduler
-            events={SCHEME_EVENTS}
-            defaultView="day"
-            defaultDate={TODAY}
-            now={NOW}
-            aria-label="색"
-            className="h-120"
-          />
+          <div className="[--scheduler-height:--spacing(120)]">
+            <Scheduler
+              events={SCHEME_EVENTS}
+              defaultView="day"
+              defaultDate={TODAY}
+              now={NOW}
+              aria-label="색"
+            />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -355,47 +351,31 @@ export const Gallery: Story = {
         description="요일, 날짜, 시각과 첫 요일을 locale에서 읽습니다."
       >
         <Showcase.Row label="en-US">
-          <IdsProvider.Scope locale={en}>
-            <Scheduler
-              events={EVENTS}
-              defaultDate={TODAY}
-              now={NOW}
-              aria-label="en-US"
-              className="h-96"
-            />
-          </IdsProvider.Scope>
+          <div className="[--scheduler-height:--spacing(96)]">
+            <IdsProvider.Scope locale={en}>
+              <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="en-US" />
+            </IdsProvider.Scope>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="de-DE">
-          <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
-            <Scheduler
-              events={EVENTS}
-              defaultDate={TODAY}
-              now={NOW}
-              aria-label="de-DE"
-              className="h-96"
-            />
-          </IdsProvider.Scope>
+          <div className="[--scheduler-height:--spacing(96)]">
+            <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
+              <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="de-DE" />
+            </IdsProvider.Scope>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <Scheduler
-            events={[]}
-            defaultDate={TODAY}
-            now={NOW}
-            aria-label="빈 주"
-            className="h-80"
-          />
+          <div className="[--scheduler-height:--spacing(80)]">
+            <Scheduler events={[]} defaultDate={TODAY} now={NOW} aria-label="빈 주" />
+          </div>
         </Showcase.Row>
         <Showcase.Row label="another week">
-          <Scheduler
-            events={EVENTS}
-            defaultDate={on(25)}
-            now={NOW}
-            aria-label="다른 주"
-            className="h-80"
-          />
+          <div className="[--scheduler-height:--spacing(80)]">
+            <Scheduler events={EVENTS} defaultDate={on(25)} now={NOW} aria-label="다른 주" />
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>

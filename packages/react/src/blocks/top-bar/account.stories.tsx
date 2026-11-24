@@ -50,16 +50,17 @@ export const PC: Story = {
     <div className="flex min-h-dvh flex-col break-keep">
       <header className="flex h-14 items-center gap-3 px-4 sm:gap-8 sm:px-6">
         <Drawer side="left">
-          <Drawer.Trigger asChild>
-            <IconButton
-              variant="outline"
-              size="tiny"
-              aria-label="메뉴 열기"
-              icon={<Bars3Icon />}
-              className="sm:hidden"
-            />
-          </Drawer.Trigger>
-          <Drawer.Content aria-label="주 메뉴" className="w-64">
+          <div className="sm:hidden">
+            <Drawer.Trigger asChild>
+              <IconButton
+                variant="outline"
+                size="tiny"
+                aria-label="메뉴 열기"
+                icon={<Bars3Icon />}
+              />
+            </Drawer.Trigger>
+          </div>
+          <Drawer.Content aria-label="주 메뉴">
             <nav aria-label="주 메뉴" className="pt-8">
               <ul className="flex flex-col gap-1">
                 {MENU.map((item) => (
@@ -84,18 +85,15 @@ export const PC: Story = {
           </Drawer.Content>
         </Drawer>
 
-        <Link
-          href="#home"
-          colorScheme="neutral"
-          underline="none"
-          className="text-body-b2-semibold flex items-center gap-2"
-        >
-          <Avatar name="인포팀" size="tiny" aria-hidden>
-            <Avatar.Fallback>
-              <CubeTransparentIcon />
-            </Avatar.Fallback>
-          </Avatar>
-          <span className="max-sm:sr-only">GIST 인포팀</span>
+        <Link href="#home" colorScheme="neutral" underline="none">
+          <span className="text-body-b2-semibold flex items-center gap-2">
+            <Avatar name="인포팀" size="tiny" aria-hidden>
+              <Avatar.Fallback>
+                <CubeTransparentIcon />
+              </Avatar.Fallback>
+            </Avatar>
+            <span className="max-sm:sr-only">GIST 인포팀</span>
+          </span>
         </Link>
 
         <nav aria-label="주 메뉴" className="max-sm:hidden">
@@ -160,21 +158,27 @@ export const PC: Story = {
             시간표가 겹치지 않는지 미리 살펴 두세요.
           </p>
         </Skeleton>
-        <Skeleton loading asChild>
-          <Card className="h-24">
-            <Card.Title>수강 신청</Card.Title>
-          </Card>
-        </Skeleton>
-        <Skeleton loading asChild>
-          <Card className="h-24">
-            <Card.Title>장학금 안내</Card.Title>
-          </Card>
-        </Skeleton>
-        <Skeleton loading asChild>
-          <Card className="h-24">
-            <Card.Title>동아리 모집</Card.Title>
-          </Card>
-        </Skeleton>
+        <div className="grid h-24">
+          <Skeleton loading asChild>
+            <Card>
+              <Card.Title>수강 신청</Card.Title>
+            </Card>
+          </Skeleton>
+        </div>
+        <div className="grid h-24">
+          <Skeleton loading asChild>
+            <Card>
+              <Card.Title>장학금 안내</Card.Title>
+            </Card>
+          </Skeleton>
+        </div>
+        <div className="grid h-24">
+          <Skeleton loading asChild>
+            <Card>
+              <Card.Title>동아리 모집</Card.Title>
+            </Card>
+          </Skeleton>
+        </div>
       </main>
     </div>
   ),

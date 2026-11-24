@@ -171,23 +171,18 @@ export const PC: Story = {
                 </Card.Action>
               </Card.Header>
               <Card.Content>
-                <ToggleGroup
-                  variant="outline"
-                  aria-label="참석 여부"
-                  value={answer}
-                  onValueChange={setAnswer}
-                  className="w-full"
-                >
-                  <Toggle value="going" className="flex-1">
-                    갈게요
-                  </Toggle>
-                  <Toggle value="maybe" className="flex-1">
-                    아마도
-                  </Toggle>
-                  <Toggle value="no" className="flex-1">
-                    못 가요
-                  </Toggle>
-                </ToggleGroup>
+                <div className="grid">
+                  <ToggleGroup
+                    variant="outline"
+                    aria-label="참석 여부"
+                    value={answer}
+                    onValueChange={setAnswer}
+                  >
+                    <Toggle value="going">갈게요</Toggle>
+                    <Toggle value="maybe">아마도</Toggle>
+                    <Toggle value="no">못 가요</Toggle>
+                  </ToggleGroup>
+                </div>
               </Card.Content>
               <Card.Footer>
                 <AvatarGroup max={4} size="tiny" aria-label="참석하는 사람">
