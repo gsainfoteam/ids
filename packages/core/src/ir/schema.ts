@@ -205,7 +205,11 @@ export const PaletteModelSchema = v.object({
 
 const FocusRingTriggerSchema = v.variant('kind', [
   v.object({ kind: v.literal('pseudo'), pseudo: identifier }),
-  v.object({ kind: v.literal('attribute'), attribute: identifier }),
+  v.object({
+    kind: v.literal('attribute'),
+    attribute: identifier,
+    unlessPseudo: v.optional(identifier),
+  }),
   v.object({ kind: v.literal('focusedInside'), attribute: identifier, exceptIn: identifier }),
 ]);
 
