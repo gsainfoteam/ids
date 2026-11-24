@@ -278,13 +278,31 @@ abstract class IdsMessagesBase {
 
   String imageZoomReset({required String percent});
 
+  String get kbdAlt;
+
+  String get kbdBackspace;
+
+  String get kbdCapsLock;
+
   String get kbdCommand;
 
   String get kbdControl;
 
+  String get kbdDelete;
+
   String get kbdDown;
 
+  String get kbdEnd;
+
+  String get kbdEnter;
+
+  String get kbdEscape;
+
+  String get kbdFn;
+
   String get kbdForwardDelete;
+
+  String get kbdHome;
 
   String get kbdLeft;
 
@@ -292,13 +310,25 @@ abstract class IdsMessagesBase {
 
   String get kbdOption;
 
+  String get kbdPageDown;
+
+  String get kbdPageUp;
+
   String get kbdReturn;
 
   String get kbdRight;
 
   String get kbdShift;
 
+  String get kbdSpace;
+
+  String get kbdSuper;
+
+  String get kbdTab;
+
   String get kbdUp;
+
+  String get kbdWindows;
 
   String get linkNewTab;
 
@@ -828,16 +858,43 @@ class IdsMessagesEn extends IdsMessagesBase {
   String imageZoomReset({required String percent}) => '$percent, fit to screen';
 
   @override
+  String get kbdAlt => 'Alt';
+
+  @override
+  String get kbdBackspace => 'Backspace';
+
+  @override
+  String get kbdCapsLock => 'Caps Lock';
+
+  @override
   String get kbdCommand => 'Command';
 
   @override
   String get kbdControl => 'Control';
 
   @override
+  String get kbdDelete => 'Delete';
+
+  @override
   String get kbdDown => 'Down Arrow';
 
   @override
+  String get kbdEnd => 'End';
+
+  @override
+  String get kbdEnter => 'Enter';
+
+  @override
+  String get kbdEscape => 'Escape';
+
+  @override
+  String get kbdFn => 'Function';
+
+  @override
   String get kbdForwardDelete => 'Forward Delete';
+
+  @override
+  String get kbdHome => 'Home';
 
   @override
   String get kbdLeft => 'Left Arrow';
@@ -849,6 +906,12 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get kbdOption => 'Option';
 
   @override
+  String get kbdPageDown => 'Page Down';
+
+  @override
+  String get kbdPageUp => 'Page Up';
+
+  @override
   String get kbdReturn => 'Return';
 
   @override
@@ -858,7 +921,19 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get kbdShift => 'Shift';
 
   @override
+  String get kbdSpace => 'Space';
+
+  @override
+  String get kbdSuper => 'Super';
+
+  @override
+  String get kbdTab => 'Tab';
+
+  @override
   String get kbdUp => 'Up Arrow';
+
+  @override
+  String get kbdWindows => 'Windows';
 
   @override
   String get linkNewTab => '(opens in a new tab)';
@@ -1442,16 +1517,43 @@ class IdsMessagesKo extends IdsMessagesBase {
   String imageZoomReset({required String percent}) => '$percent, 화면에 맞추기';
 
   @override
+  String get kbdAlt => '알트';
+
+  @override
+  String get kbdBackspace => '백스페이스';
+
+  @override
+  String get kbdCapsLock => '캡스 락';
+
+  @override
   String get kbdCommand => '커맨드';
 
   @override
   String get kbdControl => '컨트롤';
 
   @override
+  String get kbdDelete => '딜리트';
+
+  @override
   String get kbdDown => '아래쪽 화살표';
 
   @override
+  String get kbdEnd => '엔드';
+
+  @override
+  String get kbdEnter => '엔터';
+
+  @override
+  String get kbdEscape => '이스케이프';
+
+  @override
+  String get kbdFn => '펑션';
+
+  @override
   String get kbdForwardDelete => '포워드 딜리트';
+
+  @override
+  String get kbdHome => '홈';
 
   @override
   String get kbdLeft => '왼쪽 화살표';
@@ -1463,6 +1565,12 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get kbdOption => '옵션';
 
   @override
+  String get kbdPageDown => '페이지 다운';
+
+  @override
+  String get kbdPageUp => '페이지 업';
+
+  @override
   String get kbdReturn => '리턴';
 
   @override
@@ -1472,7 +1580,19 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get kbdShift => '시프트';
 
   @override
+  String get kbdSpace => '스페이스';
+
+  @override
+  String get kbdSuper => '슈퍼';
+
+  @override
+  String get kbdTab => '탭';
+
+  @override
   String get kbdUp => '위쪽 화살표';
+
+  @override
+  String get kbdWindows => '윈도우';
 
   @override
   String get linkNewTab => '(새 탭에서 열림)';

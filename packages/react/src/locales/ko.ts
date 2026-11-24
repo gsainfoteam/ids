@@ -168,17 +168,32 @@ export const ko = defineIdsLocale({
       "zoomReset": "{percent}, 화면에 맞추기"
     },
     "kbd": {
+      "alt": "알트",
+      "backspace": "백스페이스",
+      "capsLock": "캡스 락",
       "command": "커맨드",
       "control": "컨트롤",
+      "delete": "딜리트",
       "down": "아래쪽 화살표",
+      "end": "엔드",
+      "enter": "엔터",
+      "escape": "이스케이프",
+      "fn": "펑션",
       "forwardDelete": "포워드 딜리트",
+      "home": "홈",
       "left": "왼쪽 화살표",
       "macDelete": "딜리트",
       "option": "옵션",
+      "pageDown": "페이지 다운",
+      "pageUp": "페이지 업",
       "return": "리턴",
       "right": "오른쪽 화살표",
       "shift": "시프트",
-      "up": "위쪽 화살표"
+      "space": "스페이스",
+      "super": "슈퍼",
+      "tab": "탭",
+      "up": "위쪽 화살표",
+      "windows": "윈도우"
     },
     "link": {
       "newTab": "(새 탭에서 열림)"

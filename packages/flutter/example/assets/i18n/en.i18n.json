@@ -47,6 +47,13 @@
       "openLink": "Open link",
       "like": "Like",
       "more": "More"
+    },
+    "kbdSample": {
+      "toOpenSearch": "To open search",
+      "pressThisKey": "Press this key.",
+      "save": "Save",
+      "search": "Search",
+      "send": "Send"
     }
   },
   "examples": {

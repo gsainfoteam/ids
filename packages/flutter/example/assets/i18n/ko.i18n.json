@@ -47,6 +47,13 @@
       "openLink": "링크 열기",
       "like": "좋아요",
       "more": "더보기"
+    },
+    "kbdSample": {
+      "toOpenSearch": "검색을 열려면",
+      "pressThisKey": "를 누르세요.",
+      "save": "저장",
+      "search": "검색",
+      "send": "보내기"
     }
   },
   "examples": {

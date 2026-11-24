@@ -31,6 +31,7 @@ const sortedDeep = (catalog: Catalog): Catalog =>
 
 const PACKAGE = fileURLToPath(new URL('../', import.meta.url));
 const SRC = `${PACKAGE}src/`;
+const FLUTTER_SRC = fileURLToPath(new URL('../../flutter/lib/src/', import.meta.url));
 const GENERATED = ['internal/messages.ts', 'messages-catalog.ts', 'message-arguments.ts'];
 const isComponentCode = (file: string) =>
   /\.tsx?$/.test(file) &&
@@ -102,9 +103,15 @@ test('every key is used by the code', () => {
     .map((file) => readFileSync(SRC + file, 'utf8'))
     .join('\n');
 
+  const flutterSource = readdirSync(FLUTTER_SRC, { recursive: true, encoding: 'utf8' })
+    .filter((file) => file.endsWith('.dart'))
+    .map((file) => readFileSync(FLUTTER_SRC + file, 'utf8'))
+    .join('\n');
+
   const unused = keys.filter((key) => {
     const group = key.slice(0, key.lastIndexOf('.'));
-    return !source.includes(`'${key}'`) && !source.includes(`\`${group}.\${`);
+    const dartMember = key.replace(/\.([a-z])/g, (_, letter: string) => letter.toUpperCase());
+    return !new RegExp(`\\.${dartMember}\\b`).test(flutterSource) && !source.includes(`'${key}'`) && !source.includes(`\`${group}.\${`);
   });
 
   expect(unused).toEqual([]);
