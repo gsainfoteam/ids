@@ -1,13 +1,14 @@
 'use client';
 
-import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 import { ThemeContext, useInternalIdsProvider, type ThemeMode } from './hooks/use-ids-provider';
-import { warnWhenTagLeavesLanguage } from '../../../internal/date-locale';
+import { useInternalIdsProviderElement } from './hooks/use-ids-provider-element';
+import { useInternalIdsProviderLanguage } from './hooks/use-ids-provider-language';
+import { useInternalIdsProviderWarnings } from './hooks/use-ids-provider-warnings';
 import { OverlayHost, PortalRootContext } from '../../../internal/overlay/parts/host';
 import { LanguageContext } from '../../../internal/translate';
-import { cn, mergeRefs } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
+import { cn } from '../../../utils';
 import { DefaultToaster } from '../../feedback/toast';
 import { TooltipDelayGroup } from '../../overlay/tooltip/parts/delay-group';
 import { Slot } from '../slot';
@@ -47,39 +48,10 @@ export function IdsProviderRoot<const Language extends string = string>({
       defaultMode,
       onModeChange,
     });
-  const inherited = use(LanguageContext);
-  const language = useMemo(() => (locale ? { locale } : inherited), [locale, inherited]);
-  const elementRef = useRef<HTMLElement>(null);
-  const [element, setElement] = useState<HTMLElement | null>(null);
-  const mergedRef = useCallback(
-    (node: HTMLElement | null) => mergeRefs(elementRef, setElement, ref)(node),
-    [ref],
-  );
+  const language = useInternalIdsProviderLanguage(locale);
+  const { elementRef, element, mergedRef } = useInternalIdsProviderElement(ref);
 
-  const hasPrimary = context.theme.primary !== undefined;
-
-  useEffect(() => {
-    if (!isDevelopment) return;
-    if (!hasPrimary)
-      console.error(
-        "[IDS] IdsProvider: the outermost IdsProvider needs a theme with a primary color, such as <IdsProvider theme={defineIdsTheme({ primary: '#0d9488' })}>. IdsProvider.Scope only changes the theme it inherits.",
-      );
-    for (const issue of issues)
-      console.warn(`[IDS] IdsProvider theme.${issue.path}: ${issue.message}`);
-  }, [hasPrimary, issues]);
-
-  useEffect(() => {
-    if (locale) warnWhenTagLeavesLanguage(locale);
-  }, [locale]);
-
-  useEffect(() => {
-    if (!isDevelopment || !hasPrimary || !elementRef.current) return;
-    const surface = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-bg-base');
-    if (surface.trim() === '')
-      console.warn(
-        '[IDS] IdsProvider: no IDS color tokens on this element. Import @gsainfoteam/ids-css after tailwindcss.',
-      );
-  }, [hasPrimary, context.resolvedMode]);
+  useInternalIdsProviderWarnings(context, issues, elementRef);
 
   const Root = asChild ? Slot : 'div';
   const host = outermost && (

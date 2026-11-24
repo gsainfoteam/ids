@@ -1,12 +1,21 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState, type KeyboardEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  type KeyboardEvent,
+  type Ref,
+  type RefCallback,
+} from 'react';
 
 import { tabbable } from 'tabbable';
 
 import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { keyHandler, withModifiers } from '../../../../internal/lib/keys';
 import { useInternalPresence } from '../../../../internal/overlay/hooks/use-presence';
+import { mergeRefs } from '../../../../utils';
 
 function neighbour(root: HTMLElement) {
   const candidates = tabbable(root.ownerDocument.body).filter(
@@ -39,6 +48,7 @@ export type UseAlertOptions = {
   defaultOpen: boolean;
   onOpenChange?: (open: boolean) => void;
   dismissible: boolean;
+  ref: Ref<HTMLDivElement> | undefined;
 };
 
 export function useInternalAlert({
@@ -46,6 +56,7 @@ export function useInternalAlert({
   defaultOpen,
   onOpenChange,
   dismissible,
+  ref,
 }: UseAlertOptions) {
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   const [isOpen, setOpen] = useControllableState({
@@ -79,8 +90,13 @@ export function useInternalAlert({
     )(event);
   };
 
+  const mergedRef: RefCallback<HTMLDivElement> = useCallback(
+    (element: HTMLDivElement | null) => mergeRefs(setNode, ref)(element),
+    [setNode, ref],
+  );
+
   return {
-    setNode,
+    ref: mergedRef,
     open: isOpen,
     mounted,
     ending,
