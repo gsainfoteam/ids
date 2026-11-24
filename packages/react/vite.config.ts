@@ -4,10 +4,8 @@ import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import preserveDirectives from 'rollup-preserve-directives';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
-
-import { everyMessage } from './src/internal/every-message';
 
 const manifest = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   dependencies?: Record<string, string>;
@@ -19,27 +17,12 @@ const external = [
   ...Object.keys(manifest.peerDependencies ?? {}),
 ].map((name) => new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}($|/)`));
 
-const messageCatalogs = (): Plugin => ({
-  name: 'ids:message-catalogs',
-  apply: 'build',
-  generateBundle() {
-    const english = readFileSync(new URL('./messages/en.json', import.meta.url), 'utf8');
-    this.emitFile({
-      type: 'asset',
-      fileName: 'messages/ko.json',
-      source: `${JSON.stringify(everyMessage, null, 2)}\n`,
-    });
-    this.emitFile({ type: 'asset', fileName: 'messages/en.json', source: english });
-  },
-});
-
 export default defineConfig({
   plugins: [
     tsconfigPaths({ projects: ['./tsconfig.json'] }),
     tailwindcss(),
     react(),
     preserveDirectives(),
-    messageCatalogs(),
   ],
   resolve: {
     alias: {
@@ -55,6 +38,8 @@ export default defineConfig({
         'rich-text': fileURLToPath(new URL('./src/rich-text.ts', import.meta.url)),
         'react-hook-form': fileURLToPath(new URL('./src/react-hook-form.tsx', import.meta.url)),
         'tanstack-form': fileURLToPath(new URL('./src/tanstack-form.tsx', import.meta.url)),
+        'locales/ko': fileURLToPath(new URL('./src/locales/ko.ts', import.meta.url)),
+        'locales/en': fileURLToPath(new URL('./src/locales/en.ts', import.meta.url)),
       },
       formats: ['es'],
       fileName: (_format, entry) => `${entry}.js`,

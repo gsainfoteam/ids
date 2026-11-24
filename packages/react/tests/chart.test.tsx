@@ -19,6 +19,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { AspectRatio, Button, IdsProvider } from '../src';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Chart } from '../src/chart';
 import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
@@ -32,7 +33,7 @@ const ROWS = [
 const CONFIG = { web: { label: '웹' }, app: { label: '앱' } } satisfies Chart.Config;
 
 const visits = (inside: ReactNode = <Chart.Tooltip />, locale?: string) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     <div style={{ width: 400 }}>
       <Chart config={CONFIG}>
         <Chart.Title>방문</Chart.Title>

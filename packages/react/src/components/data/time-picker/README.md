@@ -59,11 +59,11 @@ const [time, setTime] = useState<Time | null>(null);
 ```tsx
 <TimePicker />                             // ko-KR: 오전/오후 컬럼이 앞에 오는 12시간제
 <TimePicker hourCycle="24h" />             // 24시간제, 오전/오후 컬럼 없음
-<IdsProvider.Scope locale="en-US">
+<IdsProvider.Scope locale={en}>
   <TimePicker />                           // 12시간제, AM/PM 이 뒤에
 </IdsProvider.Scope>
-<IdsProvider.Scope locale="de-DE"><TimePicker /></IdsProvider.Scope>                 // 24시간제
-<IdsProvider.Scope locale="ja-JP"><TimePicker hourCycle="12h" /></IdsProvider.Scope> // 午前/午後 가 앞에
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}><TimePicker /></IdsProvider.Scope>                 // 24시간제
+<IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}><TimePicker hourCycle="12h" /></IdsProvider.Scope> // 午前/午後 가 앞에
 ```
 
 - locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 시계 하나만 다른 언어로 그리려면 그 둘레에 `IdsProvider.Scope` 를 둡니다.

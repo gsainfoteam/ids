@@ -36,8 +36,8 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 
 ```tsx
 <DateField />                                         // 2026. 09. 15. (locale 의 두 자리 숫자 날짜)
-<IdsProvider.Scope locale="en-US"><DateField /></IdsProvider.Scope>  // 09/15/2026
-<IdsProvider.Scope locale="de-DE"><DateField /></IdsProvider.Scope>  // 15.09.2026
+<IdsProvider.Scope locale={en}><DateField /></IdsProvider.Scope>  // 09/15/2026
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}><DateField /></IdsProvider.Scope>  // 15.09.2026
 <DateField format={{ dateStyle: 'long' }} />          // 2026년 9월 15일
 <DateField format={{ month: 'long', day: 'numeric', weekday: 'long' }} />  // 9월 15일 화요일
 <DateField format={(date, locale) => `${date.month}/${date.day}`} />  // 9/15. 함수는 CalendarDate 를 받는다

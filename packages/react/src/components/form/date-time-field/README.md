@@ -60,8 +60,8 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 ```tsx
 <DateTimeField />                                    // ko-KR: 2026. 09. 15. 오후 2:30
 <DateTimeField hourCycle="24h" />                    // 2026. 09. 15. 14:30
-<IdsProvider.Scope locale="en-US"><DateTimeField /></IdsProvider.Scope>  // 09/15/2026, 2:30 PM
-<IdsProvider.Scope locale="de-DE"><DateTimeField /></IdsProvider.Scope>  // 15.09.2026, 14:30
+<IdsProvider.Scope locale={en}><DateTimeField /></IdsProvider.Scope>  // 09/15/2026, 2:30 PM
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}><DateTimeField /></IdsProvider.Scope>  // 15.09.2026, 14:30
 <DateTimeField format={{ dateStyle: 'long', timeStyle: 'short' }} hourCycle="24h" />  // 2026년 9월 15일 14:30
 <DateTimeField format={(value, locale) => `${value.month}/${value.day} ${value.hour}시`} />  // 함수
 ```

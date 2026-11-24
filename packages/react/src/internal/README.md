@@ -29,8 +29,9 @@
 | [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar, Image                                                                                                                                                                                                         |
 | [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
 | [`intl-words.ts`](#intl-wordsts)                 | 문구 대신 Intl 이 만드는 낱말: 상대 날짜, 날짜 칸 이름, 백분율, 단위, `a / b`          | Calendar, Scheduler, TimePicker, ColorPicker, Image, DataTable, Splitter, `resize-handle/`, `slides/`, TextArea, Select |
+| [`locale.ts`](#localets)                         | `IdsLocale`, `IdsMessages` 타입과 `defineIdsLocale`                                    | `IdsProvider`, `translate.ts`, `messages.ts`, `src/locales/*`, `src/index.ts` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
-| [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
+| [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale, 문구 채우기 | [translate.ts](#translatets), `date-locale.ts`, `locale.ts` |
 | [`motion.ts`](#motionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | Image, `zoom-pan/` |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, Image, `field-popup/` |
 | [`paragraph.ts`](#paragraphts)                   | `<p>` 로 그리는 Description 파트의 ref, 안에 든 블록 요소 경고                       | Card, Item, Empty, Alert, Field |
@@ -47,7 +48,7 @@
 | [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                                                | DateField, TimeField, DateTimeField                                                                                                                                                                                   |
 | [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                                              | TextField, PasswordField, NumberField, TelField, TextArea                                                                                                                                                             |
 | [`surfaces/toggle-surface.ts`](#surfacestoggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
-| [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useTranslate`, `useProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
+| [`translate.ts`](#translatets)                   | `IdsProvider` 의 `locale` context 와 `useTranslate`, `useProviderLocale`, `useIntlWords` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
 | [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
 | [`use-copy-feedback.ts`](#use-copy-feedbackts)   | 클립보드에 쓰고 1.5초 동안 복사했다고 알리는 hook                                    | CodeBlock.Copy, Message.Copy |
 | [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image |
@@ -296,6 +297,7 @@ BCP 47 locale 태그를 풀이하고, 날짜와 시각의 locale 데이터를 �
 ### 쓰는 곳
 
 - `resolveLocale`: Calendar, TimePicker, DateField, TimeField, DateTimeField
+- `warnWhenTagLeavesLanguage`: `IdsProvider`. locale 의 `tag` 가 `language` 가 아닌 언어면 개발 중에 태그마다 한 번 경고합니다. `resolveLocale` 로 태그를 검사한 뒤 `Intl.Locale` 의 `language` 와 비교합니다.
 - `dateFormatter`: [temporal-field](./temporal-field/README.md#formatts) 의 `format.ts`, Calendar 의 `day-picker-locale.ts`
 - `formatPart`, `numberFormatter`: Calendar 의 `day-picker-locale.ts`
 - `hourCycleOf`: TimePicker 의 `time.ts` (`resolveHourCycle`)
@@ -317,7 +319,7 @@ weekStartsOn={weekStartOf(locale)}
 formatDay: (date) => formatPart(date, 'day', locale, { day: 'numeric' }),
 
 // components/data/scheduler/toolbar.tsx
-<LanguageContext value={{ ...language, locale: withWeekStart(locale, weekStartsOn) }}>
+<LanguageContext value={{ ...language, tag: withWeekStart(locale, weekStartsOn) }}>
 
 // components/form/date-field/parse.ts
 const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE);
@@ -851,6 +853,35 @@ words.ratio(1200, 2000);           // '1,200 / 2,000'
 - 영어 `DisplayNames` 는 소문자를 돌려줍니다(`hour`). 화면에 보이는 칸 이름은 컴포넌트가 첫 글자만 locale 대문자로 바꿉니다.
 - `px` 은 Intl 의 단위가 아니라서 `pixels` 는 숫자 뒤에 `px` 을 붙입니다.
 
+## locale.ts
+
+앱이 `IdsProvider` 에 주는 locale 객체의 타입과 `defineIdsLocale` 입니다. 타입과 항등 함수뿐이라 서버에서도 읽습니다.
+
+### 쓰는 곳
+
+- `IdsProvider`, `IdsProvider.Scope` 의 `locale` prop, `LanguageContext`
+- `messages.ts` 의 `formatLocaleMessage`, `date-locale.ts` 의 `warnWhenTagLeavesLanguage`
+- `src/locales/ko.ts`, `src/locales/en.ts` (codegen), `src/index.ts`
+
+### 쓰는 법
+
+```ts
+const fr = defineIdsLocale({ language: 'fr', tag: 'fr-FR', messages: frMessages satisfies IdsMessages });
+const ca = defineIdsLocale({ language: 'fr', tag: 'fr-CA', messages: { common: { close: 'Fermer' } }, base: fr });
+```
+
+### 왜 이렇게
+
+- `IdsMessages` 는 `messages-catalog.ts` 의 모양을 따라 만든 타입입니다. 인자가 없는 문구는 `string`, 인자가 있는 문구는 `string` 이나 `(values) => string` 이고, 인자 타입은 `message-arguments.ts` 에서 읽습니다.
+- 전체 문구는 `FullLocale`, 일부 문구는 `base` 가 필수인 `PartialLocale` 입니다. 일부만 준 locale 이 한국어로 몰래 돌아가지 않게, 나머지를 읽을 곳을 타입이 요구합니다.
+- `tag` 는 `language` 이거나 `language-` 로 시작합니다. `NoInfer` 라서 `language` 만 타입 인자를 정하고, 다른 언어의 태그는 컴파일 오류입니다.
+- `defineIdsLocale` 은 받은 객체를 그대로 돌려줍니다. 타입을 확인하고 `language` 를 리터럴로 좁히는 일만 합니다.
+
+### 알아둘 것
+
+- 문구가 늘면 `IdsMessages` 가 넓어져서 앱의 전체 locale 이 타입 오류가 납니다. 의도한 동작입니다.
+- `FullLocale`, `PartialLocale` 은 `src/locales/*.d.ts` 가 가리켜야 해서 이 모듈에서 내보냅니다. `src/index.ts` 는 `IdsLocale` 만 내보냅니다.
+
 ## list-styles.ts
 
 팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 선택 체크, 스크롤 목록과 그 ScrollArea, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
@@ -902,10 +933,10 @@ slots: {
 
 ### 쓰는 곳
 
-- [translate.ts](#translatets): 앱의 `translate` 가 답하지 않을 때 `formatDefaultMessage` 로 기본값을 채웁니다.
+- [translate.ts](#translatets): provider 에 locale 이 있으면 `formatLocaleMessage`, 없으면 `formatDefaultMessage` 로 문구를 채웁니다.
 - [date-locale.ts](#date-localets): `DEFAULT_LOCALE`(`'ko-KR'`).
-- `vite.config.ts`: 빌드 때 `every-message.ts` 의 `everyMessage`(공용 카탈로그와 Editor 카탈로그를 합친 것)를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 core에서 생성한 영어 카탈로그이고 같은 곳으로 복사됩니다.
 - `src/index.ts`: 앱이 쓰는 `IdsMessageKey`, `IdsMessageValues` 타입.
+- `messages-catalog.ts`, Editor 의 `messages-catalog.ts`, `message-arguments.ts`, `src/locales/*.ts` 는 `packages/core/messages/<lang>.json` 에서 `pnpm codegen` 이 씁니다.
 
 ### 쓰는 법
 
@@ -922,19 +953,22 @@ formatDefaultMessage('common.removeItem', { label: '사과' }); // '사과 삭�
 
 ### 왜 이렇게
 
-- 기본값은 컴포넌트 이름 아래에 중첩한 객체입니다. 키는 점으로 이은 경로(`'calendar.previousMonth'`)이고, `IdsMessageKey` 는 그 잎 경로들의 union 타입입니다. next-intl, i18next 가 중첩 카탈로그를 같은 점 경로로 읽어서, 앱은 `ko.json`, `en.json` 을 `ids` 아래에 그대로 붙일 수 있습니다.
-- 그룹과 키는 알파벳 순서입니다. 두 카탈로그도 같은 순서라 diff 가 읽기 쉽습니다(`tests/messages.test.ts` 가 확인).
-- 값은 `{name}` 자리만 쓰는 문자열입니다. 영어도 복수형 없이 읽히게 썼습니다(`'{count} selected'`). 한국어 조사가 붙는 자리는 문장을 바꿔 조사가 필요 없게 썼습니다(`'옮겼습니다: {item}'`).
+- 기본값은 컴포넌트 이름 아래에 중첩한 객체입니다. 키는 점으로 이은 경로(`'calendar.previousMonth'`)이고, `IdsMessageKey` 는 그 잎 경로들의 union 타입입니다. 앱의 locale 객체 `messages` 도 같은 모양이라, 앱이 i18n 라이브러리의 `ids` 묶음을 그대로 넘길 수 있습니다.
+- 그룹과 키는 알파벳 순서입니다. 모든 locale 도 같은 순서라 diff 가 읽기 쉽습니다(`tests/messages.test.ts` 가 확인).
+- core 의 원본은 숫자 인자를 `{count, number}` 로 적습니다. codegen 은 런타임 문자열에서 `, number` 를 지우고 인자 타입을 `message-arguments.ts` 로 씁니다. `IdsMessages` 는 그 표로 인자 타입을 정합니다.
+- 숫자 인자는 채울 때 locale 의 태그로 씁니다(`numbersIn(tag)`). 인자가 숫자인지는 값의 타입으로 압니다.
+- 문구 값이 함수면 인자를 그대로 넘기고 그 결과를 씁니다. 숫자는 앱이 씁니다.
+- 런타임 값은 `{name}` 자리만 쓰는 문자열입니다. 영어도 복수형 없이 읽히게 썼습니다(`'{count} selected'`). 한국어 조사가 붙는 자리는 문장을 바꿔 조사가 필요 없게 썼습니다(`'옮겼습니다: {item}'`).
 - 여러 컴포넌트가 같은 말을 쓰면 `common.*` 하나를 씁니다(`common.close`, `common.clear`, `common.drag.start`). 컴포넌트 이름이 붙은 그룹은 그 컴포넌트만 쓰는 말입니다.
 - 화면에 보이는 글(placeholder, 빈 결과, 검증 문구, 버튼 글)은 카탈로그에 없습니다. 앱이 part 의 children 이나 `placeholder` 로 씁니다. 카탈로그에는 IDS 가 스스로 그리는 컨트롤의 이름과 스크린 리더 안내만 있습니다.
 - Intl 이 만드는 낱말(오늘, 다음 달, 시, 분, `42%`)은 카탈로그에 없고 [intl-words.ts](#intl-wordsts) 가 만듭니다.
 - Editor 의 문구(`editor.*`)는 공용 `messages-catalog.ts` 에 없고 `components/form/editor/messages-catalog.ts` 의 `editorMessages` 에 있습니다. 공용 카탈로그는 문구를 쓰는 모든 컴포넌트가 싣기 때문에, Editor 만 쓰는 문구 3 kB 가 Button, Dialog 의 import 에도 실리지 않게 나눴습니다. Editor 의 컴포넌트는 `useTranslate(editorMessages)` 로 읽습니다. `IdsMessageKey` 는 두 카탈로그의 키를 모두 담습니다.
-- 한국어 기본값은 복수형이 필요 없어서 `{name}` 자리만 씁니다. 그래서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). 이 약속은 `tests/messages.test.ts` 가 ICU 파서로 확인합니다.
+- 복수형과 select 를 쓰지 않아서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). codegen 이 원본의 인자를 `{name}` 과 `{name, number}` 로만 받고, `tests/messages.test.ts` 가 모든 locale 의 인자가 타입과 같은지 확인합니다.
 
 ### 알아둘 것
 
-- 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`와 `messages/en.json`을 생성합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
-- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 쓰고, `every-message.ts` 가 다시 합칩니다. 카탈로그를 넘기지 않은 `useTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
+- 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`, `message-arguments.ts`, `src/locales/<language>.ts`를 생성합니다. 언어 사이에 키나 인자가 다르면 codegen 이 실패합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
+- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 씁니다. `IdsMessageCatalog` 타입과 `src/locales/<language>.ts` 는 두 카탈로그를 모두 담습니다. 카탈로그를 넘기지 않은 `useTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 
@@ -1412,11 +1446,12 @@ export const toggleStyle = tv({
 
 ## translate.ts
 
-`IdsProvider` 의 `translate`, `locale` 을 내려보내는 context 와, 컴포넌트가 문구를 읽는 hook 입니다.
+`IdsProvider` 의 `locale` 을 내려보내는 context 와, 컴포넌트가 문구, 태그, Intl 낱말을 읽는 hook 입니다.
 
 ### 쓰는 곳
 
-- `IdsProvider`: `LanguageContext` 를 제공합니다. `translate`, `locale` 을 주지 않은 provider 는 바깥 것을 물려받습니다.
+- `IdsProvider`: `LanguageContext` 를 제공합니다. `locale` 을 주지 않은 provider 는 바깥 것을 물려받고, 주면 객체 전체를 바꿉니다.
+- Scheduler 의 toolbar 와 일 수 칸: 태그만 바꿉니다(`{ ...language, tag }`). Calendar 와 NumberField 에 주 시작이 든 태그를 넘기는 prop 이 없어서입니다.
 - 문구를 그리는 모든 컴포넌트와 hook: `useTranslate()`. Editor 는 자기 카탈로그를 넘깁니다(`useTranslate(editorMessages)`).
 - 날짜, 시간, 숫자, 전화번호 컴포넌트: `useProviderLocale()`.
 
@@ -1425,7 +1460,7 @@ export const toggleStyle = tv({
 ```tsx
 const t = useTranslate();
 <button aria-label={t('dialog.close')} />;
-t('chipField.remove', { label }); // 값을 끼우는 문구
+t('common.removeItem', { label }); // 값을 끼우는 문구
 
 // 기본값이 함수인 prop 은 본문에서 만든다
 const getValueLabel = getValueLabelProp ?? ((value: number, max: number) => t('rating.valueLabel', { value, max }));
@@ -1433,14 +1468,16 @@ const getValueLabel = getValueLabelProp ?? ((value: number, max: number) => t('r
 
 ### 왜 이렇게
 
-- `t(key, values)` 는 앱의 `translate(key, values)` 를 먼저 부르고, `undefined` 이거나 키 그대로가 오면 한국어 기본값을 씁니다. 기본값은 넘긴 카탈로그에서 먼저 찾고, 없으면 공용 카탈로그에서 찾습니다. i18n 라이브러리 대부분이 빠진 키에 키를 돌려주기 때문입니다.
+- `t(key, values)` 는 provider 의 locale 에서 찾고, 없으면 그 `base`, 다시 그 `base` 순서로 찾습니다. locale 이 없으면 한국어 기본값을 씁니다. 기본값은 넘긴 카탈로그에서 먼저 찾고, 없으면 공용 카탈로그에서 찾습니다.
+- locale 과 `base` 어디에도 없는 문구는 개발 중에 키마다 한 번 `console.error` 를 내고 한국어 기본값을 씁니다. 타입이 막으므로 JavaScript 앱이나 새 버전의 문구에서만 생깁니다.
+- `useProviderLocale()` 은 바꾼 태그, locale 의 태그, `DEFAULT_LOCALE` 순서로 돌려줍니다. 컴포넌트는 그 값을 그대로 씁니다.
 - 문구는 렌더 중에 hook 으로 읽습니다. 모듈 최상위에서 읽으면 앱의 언어를 알 수 없고, 서버에서 요청마다 언어가 다를 때 섞입니다. 그래서 `messages` 를 직접 읽는 곳은 이 모듈뿐입니다.
 - 컴포넌트 밖에서 만들어지는 문구(toast 의 기본 loading 문구)는 저장해 두지 않고, 그 toast 를 그리는 `ToastView` 가 렌더할 때 `t` 로 채웁니다.
-- 순수 함수(`describeLimits`, `dayPickerLabels`)는 `Translate` 를 인자로 받습니다.
+- 순수 함수(`dayPickerLabels`)는 `Translate` 나 `IntlWords` 를 인자로 받습니다.
 
 ### 알아둘 것
 
-- `overlay.open` 항목과 toast 는 가장 바깥 `IdsProvider` 에서 그려지므로 그 provider 의 `translate` 를 씁니다.
+- `overlay.open` 항목과 toast 는 가장 바깥 `IdsProvider` 에서 그려지므로 그 provider 의 `locale` 을 씁니다.
 - prop 기본값에 `t(...)` 를 쓸 수 없습니다(`t` 는 본문에서 생김). `placeholder: placeholderProp` 으로 받고 본문에서 `placeholderProp ?? t(...)` 로 씁니다.
 
 ## use-checked-writes.ts

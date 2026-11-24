@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { Field as FormField } from '../../../react-hook-form';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
@@ -278,7 +279,7 @@ export const FormatForAnotherLocale: Story = {
 
     return (
       <div className="grid w-72 gap-4">
-        <IdsProvider.Scope locale="de-DE">
+        <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
           <Field>
             <Field.Label>금액</Field.Label>
             <NumberField
@@ -306,7 +307,7 @@ export const FormatForAnotherLocale: Story = {
     docs: {
       description: {
         story:
-          '숫자는 가장 가까운 `IdsProvider` 의 `locale` 로 쓰고 읽습니다. 앱 전체는 바깥 `IdsProvider` 의 `locale` 로 정하고, 한 필드만 다른 형식으로 보이려면 그 필드를 `<IdsProvider.Scope locale="de-DE">` 로 감쌉니다. `formatOptions` 로 통화와 퍼센트를 고르고, 입력하는 동안에는 쓴 글자를 그대로 두었다가 입력을 마치면 그 형식으로 다시 씁니다.',
+          '숫자는 가장 가까운 `IdsProvider` 의 `locale` 로 쓰고 읽습니다. 앱 전체는 바깥 `IdsProvider` 의 `locale` 로 정하고, 한 필드만 다른 형식으로 보이려면 그 필드를 `IdsProvider.Scope` 로 감싸고 그 `locale` 의 `tag` 를 `de-DE` 로 줍니다. `formatOptions` 로 통화와 퍼센트를 고르고, 입력하는 동안에는 쓴 글자를 그대로 두었다가 입력을 마치면 그 형식으로 다시 씁니다.',
       },
     },
   },

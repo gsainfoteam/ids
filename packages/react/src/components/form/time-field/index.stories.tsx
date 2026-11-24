@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
 import { Field } from '../field';
@@ -102,7 +103,7 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="Intl options · en-US">
-          <IdsProvider.Scope locale="en-US">
+          <IdsProvider.Scope locale={en}>
             <div className="w-44">
               <TimeField
                 format={{ hour: '2-digit', minute: '2-digit' }}
