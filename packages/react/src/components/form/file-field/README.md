@@ -124,7 +124,8 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 ```
 
 - 앱은 값을 `value` / `onValueChange` 로, 거부된 파일을 `onReject` 로 읽습니다. 비어 있는지는 `null` 이나 빈 배열로 압니다.
-- `disabled`, `readOnly`, `invalid`, `required` 는 앱이 준 값 그대로입니다.
+- `disabled`, `readOnly`, `required` 는 앱이 준 값 그대로입니다.
+- `invalid` 는 앱이 준 값이거나, `onReject` 로 받은 거부 파일이 남아 있는 동안 켜집니다.
 - 새 디자인을 그릴 때만, 루트와 `Trigger` 의 `className` 은 `FileField.State`(`dragging` 포함)를 받는 함수도 됩니다.
 
 ## 폼
