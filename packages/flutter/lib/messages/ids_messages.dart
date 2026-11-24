@@ -1,421 +1,1040 @@
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
-mixin IdsMessages {
-  static const ko = IdsKoreanMessages._();
+abstract class IdsMessagesBase {
+  const IdsMessagesBase();
 
-  String? avatarGroupOverflow({required Object count}) => null;
+  String get language;
 
-  String? get breadcrumbMore => null;
+  String avatarGroupOverflow({required num count});
 
-  String? get bubbleReactions => null;
+  String get breadcrumbMore;
 
-  String? carouselIndicator({required Object index}) => null;
+  String get bubbleReactions;
 
-  String? get carouselRoleDescription => null;
+  String carouselIndicator({required num index});
 
-  String? get colorPickerAlpha => null;
+  String get carouselRoleDescription;
 
-  String? get colorPickerArea => null;
+  String get colorPickerAlpha;
 
-  String? colorPickerAreaValue({required Object saturation, required Object brightness}) => null;
+  String get colorPickerArea;
 
-  String? get colorPickerBrightness => null;
+  String colorPickerAreaValue({required String saturation, required String brightness});
 
-  String? get colorPickerEyeDropper => null;
+  String get colorPickerBrightness;
 
-  String? get colorPickerHue => null;
+  String get colorPickerEyeDropper;
 
-  String? get colorPickerInput => null;
+  String get colorPickerHue;
 
-  String? get colorPickerLabel => null;
+  String get colorPickerInput;
 
-  String? get colorPickerSaturation => null;
+  String get colorPickerLabel;
 
-  String? get colorPickerSwatches => null;
+  String get colorPickerSaturation;
 
-  String? get colorPickerTwoD => null;
+  String get colorPickerSwatches;
 
-  String? get commonClear => null;
+  String get colorPickerTwoD;
 
-  String? get commonClose => null;
+  String get commonClear;
 
-  String? get commonCollapse => null;
+  String get commonClose;
 
-  String? get commonCopied => null;
+  String get commonCollapse;
 
-  String? get commonCopy => null;
+  String get commonCopied;
 
-  String? commonDragCancel({required Object item}) => null;
+  String get commonCopy;
 
-  String? commonDragEnd({required Object item}) => null;
+  String commonDragCancel({required String item});
 
-  String? commonDragStart({required Object item}) => null;
+  String commonDragEnd({required String item});
 
-  String? get commonExpand => null;
+  String commonDragStart({required String item});
 
-  String? get commonInvalid => null;
+  String get commonExpand;
 
-  String? get commonLoading => null;
+  String get commonInvalid;
 
-  String? get commonNext => null;
+  String get commonLoading;
 
-  String? get commonOptions => null;
+  String get commonNext;
 
-  String? get commonPause => null;
+  String get commonOptions;
 
-  String? get commonPrevious => null;
+  String get commonPause;
 
-  String? get commonRemove => null;
+  String get commonPrevious;
 
-  String? commonRemoveItem({required Object label}) => null;
+  String get commonRemove;
 
-  String? get commonResize => null;
+  String commonRemoveItem({required String label});
 
-  String? get commonSearch => null;
+  String get commonResize;
 
-  String? get commonSending => null;
+  String get commonSearch;
 
-  String? get commonStatusDanger => null;
+  String get commonSending;
 
-  String? get commonStatusInfo => null;
+  String get commonStatusDanger;
 
-  String? get commonStatusSuccess => null;
+  String get commonStatusInfo;
 
-  String? get commonStatusWarning => null;
+  String get commonStatusSuccess;
 
-  String? dataTableResize({required Object column}) => null;
+  String get commonStatusWarning;
 
-  String? get dataTableSelectAll => null;
+  String dataTableResize({required String column});
 
-  String? dataTableSelectRow({required Object label}) => null;
+  String get dataTableSelectAll;
 
-  String? dataTableSelectRowNumber({required Object number}) => null;
+  String dataTableSelectRow({required String label});
 
-  String? dataTableSelected({required Object count}) => null;
+  String dataTableSelectRowNumber({required num number});
 
-  String? get dateFieldOpen => null;
+  String dataTableSelected({required num count});
 
-  String? get editorAlignCenter => null;
+  String get dateFieldOpen;
 
-  String? get editorAlignJustify => null;
+  String get editorAlignCenter;
 
-  String? get editorAlignLeft => null;
+  String get editorAlignJustify;
 
-  String? get editorAlignRight => null;
+  String get editorAlignLeft;
 
-  String? get editorBlockDuplicate => null;
+  String get editorAlignRight;
 
-  String? get editorBlockHandle => null;
+  String get editorBlockDuplicate;
 
-  String? get editorBlockInsertBelow => null;
+  String get editorBlockHandle;
 
-  String? get editorBlockTurnInto => null;
+  String get editorBlockInsertBelow;
 
-  String? get editorBlockType => null;
+  String get editorBlockTurnInto;
 
-  String? get editorBlockquote => null;
+  String get editorBlockType;
 
-  String? get editorBold => null;
+  String get editorBlockquote;
 
-  String? get editorBubbleMenu => null;
+  String get editorBold;
 
-  String? get editorBulletList => null;
+  String get editorBubbleMenu;
 
-  String? get editorCallout => null;
+  String get editorBulletList;
 
-  String? get editorCalloutKind => null;
+  String get editorCallout;
 
-  String? get editorCalloutRemove => null;
+  String get editorCalloutKind;
 
-  String? get editorCode => null;
+  String get editorCalloutRemove;
 
-  String? get editorCodeBlock => null;
+  String get editorCode;
 
-  String? get editorCodeLanguage => null;
+  String get editorCodeBlock;
 
-  String? get editorCodeLanguageSearch => null;
+  String get editorCodeLanguage;
 
-  String? get editorCodePlainText => null;
+  String get editorCodeLanguageSearch;
 
-  String? get editorColor => null;
+  String get editorCodePlainText;
 
-  String? get editorColorDefault => null;
+  String get editorColor;
 
-  String? get editorColorNone => null;
+  String get editorColorDefault;
 
-  String? get editorColorPrimary => null;
+  String get editorColorNone;
 
-  String? get editorColorSecondary => null;
+  String get editorColorPrimary;
 
-  String? get editorColorTertiary => null;
+  String get editorColorSecondary;
 
-  String? get editorContent => null;
+  String get editorColorTertiary;
 
-  String? get editorDetails => null;
+  String get editorContent;
 
-  String? get editorDetailsSummary => null;
+  String get editorDetails;
 
-  String? get editorDetailsToggle => null;
+  String get editorDetailsSummary;
 
-  String? editorHeading({required Object level}) => null;
+  String get editorDetailsToggle;
 
-  String? get editorHighlight => null;
+  String editorHeading({required num level});
 
-  String? get editorHighlightColor => null;
+  String get editorHighlight;
 
-  String? get editorHorizontalRule => null;
+  String get editorHighlightColor;
 
-  String? get editorImage => null;
+  String get editorHorizontalRule;
 
-  String? get editorImageAlt => null;
+  String get editorImage;
 
-  String? get editorImageInsert => null;
+  String get editorImageAlt;
 
-  String? get editorImagePickFiles => null;
+  String get editorImageInsert;
 
-  String? get editorImageUploadFailed => null;
+  String get editorImagePickFiles;
 
-  String? get editorImageUploading => null;
+  String get editorImageUploadFailed;
 
-  String? get editorImageUrl => null;
+  String get editorImageUploading;
 
-  String? get editorImageUrlInvalid => null;
+  String get editorImageUrl;
 
-  String? get editorItalic => null;
+  String get editorImageUrlInvalid;
 
-  String? get editorLink => null;
+  String get editorItalic;
 
-  String? get editorLinkApply => null;
+  String get editorLink;
 
-  String? get editorLinkRemove => null;
+  String get editorLinkApply;
 
-  String? get editorLinkUrl => null;
+  String get editorLinkRemove;
 
-  String? get editorMentionEmpty => null;
+  String get editorLinkUrl;
 
-  String? get editorMentionMenu => null;
+  String get editorMentionEmpty;
 
-  String? get editorMentionSearching => null;
+  String get editorMentionMenu;
 
-  String? get editorOrderedList => null;
+  String get editorMentionSearching;
 
-  String? get editorParagraph => null;
+  String get editorOrderedList;
 
-  String? get editorSlashMenu => null;
+  String get editorParagraph;
 
-  String? get editorSlashMenuEmpty => null;
+  String get editorSlashMenu;
 
-  String? get editorStrike => null;
+  String get editorSlashMenuEmpty;
 
-  String? get editorSubscript => null;
+  String get editorStrike;
 
-  String? get editorSuperscript => null;
+  String get editorSubscript;
 
-  String? get editorTable => null;
+  String get editorSuperscript;
 
-  String? get editorTableAddColumnAfter => null;
+  String get editorTable;
 
-  String? get editorTableAddColumnBefore => null;
+  String get editorTableAddColumnAfter;
 
-  String? get editorTableAddRowAfter => null;
+  String get editorTableAddColumnBefore;
 
-  String? get editorTableAddRowBefore => null;
+  String get editorTableAddRowAfter;
 
-  String? get editorTableDelete => null;
+  String get editorTableAddRowBefore;
 
-  String? get editorTableDeleteColumn => null;
+  String get editorTableDelete;
 
-  String? get editorTableDeleteRow => null;
+  String get editorTableDeleteColumn;
 
-  String? get editorTableHeaderRow => null;
+  String get editorTableDeleteRow;
 
-  String? get editorTableInsert => null;
+  String get editorTableHeaderRow;
 
-  String? get editorTableMergeCells => null;
+  String get editorTableInsert;
 
-  String? editorTableSize({required Object rows, required Object cols}) => null;
+  String get editorTableMergeCells;
 
-  String? get editorTableSplitCell => null;
+  String editorTableSize({required num rows, required num cols});
 
-  String? editorTaskItem({required Object text}) => null;
+  String get editorTableSplitCell;
 
-  String? get editorTaskItemEmpty => null;
+  String editorTaskItem({required String text});
 
-  String? get editorTaskList => null;
+  String get editorTaskItemEmpty;
 
-  String? get editorTextAlign => null;
+  String get editorTaskList;
 
-  String? get editorTextColor => null;
+  String get editorTextAlign;
 
-  String? get editorToolbar => null;
+  String get editorTextColor;
 
-  String? get editorUnderline => null;
+  String get editorToolbar;
 
-  String? fileFieldCount({required Object count}) => null;
+  String get editorUnderline;
 
-  String? get fileFieldList => null;
+  String fileFieldCount({required num count});
 
-  String? get imageDownload => null;
+  String get fileFieldList;
 
-  String? get imagePhotos => null;
+  String get imageDownload;
 
-  String? imagePreview({required Object alt}) => null;
+  String get imagePhotos;
 
-  String? get imagePreviewUntitled => null;
+  String imagePreview({required String alt});
 
-  String? get imageShare => null;
+  String get imagePreviewUntitled;
 
-  String? get imageThumbnails => null;
+  String get imageShare;
 
-  String? get imageViewer => null;
+  String get imageThumbnails;
 
-  String? get imageZoomIn => null;
+  String get imageViewer;
 
-  String? get imageZoomOut => null;
+  String get imageZoomIn;
 
-  String? imageZoomReset({required Object percent}) => null;
+  String get imageZoomOut;
 
-  String? get kbdCommand => null;
+  String imageZoomReset({required String percent});
 
-  String? get kbdControl => null;
+  String get kbdCommand;
 
-  String? get kbdDown => null;
+  String get kbdControl;
 
-  String? get kbdForwardDelete => null;
+  String get kbdDown;
 
-  String? get kbdLeft => null;
+  String get kbdForwardDelete;
 
-  String? get kbdMacDelete => null;
+  String get kbdLeft;
 
-  String? get kbdOption => null;
+  String get kbdMacDelete;
 
-  String? get kbdReturn => null;
+  String get kbdOption;
 
-  String? get kbdRight => null;
+  String get kbdReturn;
 
-  String? get kbdShift => null;
+  String get kbdRight;
 
-  String? get kbdUp => null;
+  String get kbdShift;
 
-  String? get linkNewTab => null;
+  String get kbdUp;
 
-  String? get menuCommand => null;
+  String get linkNewTab;
 
-  String? get messageActions => null;
+  String get menuCommand;
 
-  String? get messageError => null;
+  String get messageActions;
 
-  String? get messageRetry => null;
+  String get messageError;
 
-  String? get messageUnread => null;
+  String get messageRetry;
 
-  String? messageUnreadBy({required Object count}) => null;
+  String get messageUnread;
 
-  String? get messageScrollerJump => null;
+  String messageUnreadBy({required num count});
 
-  String? messageScrollerJumpUnseen({required Object count}) => null;
+  String get messageScrollerJump;
 
-  String? messageScrollerUnseen({required Object count}) => null;
+  String messageScrollerJumpUnseen({required num count});
 
-  String? get numberFieldDecrement => null;
+  String messageScrollerUnseen({required num count});
 
-  String? get numberFieldIncrement => null;
+  String get numberFieldDecrement;
 
-  String? get paginationFirst => null;
+  String get numberFieldIncrement;
 
-  String? get paginationLast => null;
+  String get paginationFirst;
 
-  String? paginationPage({required Object page}) => null;
+  String get paginationLast;
 
-  String? get passwordFieldShow => null;
+  String paginationPage({required num page});
 
-  String? get promptInputActions => null;
+  String get passwordFieldShow;
 
-  String? get promptInputAttach => null;
+  String get promptInputActions;
 
-  String? get promptInputAttachments => null;
+  String get promptInputAttach;
 
-  String? get promptInputSend => null;
+  String get promptInputAttachments;
 
-  String? get promptInputStop => null;
+  String get promptInputSend;
 
-  String? get questionnaireNavigation => null;
+  String get promptInputStop;
 
-  String? get questionnaireProgress => null;
+  String get questionnaireNavigation;
 
-  String? questionnaireStep({required Object current, required Object total}) => null;
+  String get questionnaireProgress;
 
-  String? ratingValueLabel({required Object max, required Object value}) => null;
+  String questionnaireStep({required num current, required num total});
 
-  String? get schedulerAddDay => null;
+  String ratingValueLabel({required num value, required num max});
 
-  String? get schedulerAllDay => null;
+  String get schedulerAddDay;
 
-  String? get schedulerDayCount => null;
+  String get schedulerAllDay;
 
-  String? schedulerDragAt({required Object time}) => null;
+  String get schedulerDayCount;
 
-  String? get schedulerDragHint => null;
+  String schedulerDragAt({required String time});
 
-  String? get schedulerDragMonthHint => null;
+  String get schedulerDragHint;
 
-  String? get schedulerGoToDate => null;
+  String get schedulerDragMonthHint;
 
-  String? schedulerMoreLabel({required Object date, required Object count}) => null;
+  String get schedulerGoToDate;
 
-  String? get schedulerNavigation => null;
+  String schedulerMoreLabel({required String date, required num count});
 
-  String? get schedulerRemoveDay => null;
+  String get schedulerNavigation;
 
-  String? schedulerResize({required Object event}) => null;
+  String get schedulerRemoveDay;
 
-  String? get schedulerView => null;
+  String schedulerResize({required String event});
 
-  String? sidebarDragAfter({required Object target}) => null;
+  String get schedulerView;
 
-  String? sidebarDragBefore({required Object target}) => null;
+  String sidebarDragAfter({required String target});
 
-  String? get sidebarDragHint => null;
+  String sidebarDragBefore({required String target});
 
-  String? sidebarDragInside({required Object target}) => null;
+  String get sidebarDragHint;
 
-  String? get sidebarDragOrigin => null;
+  String sidebarDragInside({required String target});
 
-  String? get sidebarOpen => null;
+  String get sidebarDragOrigin;
 
-  String? get sliderEnd => null;
+  String get sidebarOpen;
 
-  String? get sliderStart => null;
+  String get sliderEnd;
 
-  String? get slidesRoleDescription => null;
+  String get sliderStart;
 
-  String? slidesSlide({required Object count, required Object index}) => null;
+  String get slidesRoleDescription;
 
-  String? get stepperCompleted => null;
+  String slidesSlide({required num index, required num count});
 
-  String? get stepperError => null;
+  String get stepperCompleted;
 
-  String? get telFieldCountry => null;
+  String get stepperError;
 
-  String? get textAreaLimitReached => null;
+  String get telFieldCountry;
 
-  String? textAreaRemaining({required Object remaining}) => null;
+  String get textAreaLimitReached;
 
-  String? get timePickerLabel => null;
+  String textAreaRemaining({required num remaining});
 
-  String? get toastRegion => null;
+  String get timePickerLabel;
+
+  String get toastRegion;
 }
 
-final class IdsKoreanMessages with IdsMessages {
-  const IdsKoreanMessages._();
+class IdsMessagesEn extends IdsMessagesBase {
+  const IdsMessagesEn();
+
+  static final _numbers = NumberFormat.decimalPattern('en_US');
+
+  static String _number(num value) => _numbers.format(value);
+
+  @override
+  String get language => 'en';
+
+  @override
+  String avatarGroupOverflow({required num count}) => '${_number(count)} more';
+
+  @override
+  String get breadcrumbMore => 'Show hidden path';
+
+  @override
+  String get bubbleReactions => 'Reactions';
+
+  @override
+  String carouselIndicator({required num index}) => 'Go to slide ${_number(index)}';
+
+  @override
+  String get carouselRoleDescription => 'carousel';
+
+  @override
+  String get colorPickerAlpha => 'Opacity';
+
+  @override
+  String get colorPickerArea => 'Saturation and brightness';
+
+  @override
+  String colorPickerAreaValue({required String saturation, required String brightness}) => 'Saturation $saturation, brightness $brightness';
+
+  @override
+  String get colorPickerBrightness => 'Brightness';
+
+  @override
+  String get colorPickerEyeDropper => 'Pick a color from the screen';
+
+  @override
+  String get colorPickerHue => 'Hue';
+
+  @override
+  String get colorPickerInput => 'Color value';
+
+  @override
+  String get colorPickerLabel => 'Color picker';
+
+  @override
+  String get colorPickerSaturation => 'Saturation';
+
+  @override
+  String get colorPickerSwatches => 'Swatches';
+
+  @override
+  String get colorPickerTwoD => '2D slider';
+
+  @override
+  String get commonClear => 'Clear';
+
+  @override
+  String get commonClose => 'Close';
+
+  @override
+  String get commonCollapse => 'Collapse';
+
+  @override
+  String get commonCopied => 'Copied';
+
+  @override
+  String get commonCopy => 'Copy';
+
+  @override
+  String commonDragCancel({required String item}) => 'Returned to its place: $item';
+
+  @override
+  String commonDragEnd({required String item}) => 'Moved: $item';
+
+  @override
+  String commonDragStart({required String item}) => 'Picked up: $item';
+
+  @override
+  String get commonExpand => 'Expand';
+
+  @override
+  String get commonInvalid => 'Enter a valid value.';
+
+  @override
+  String get commonLoading => 'Loading';
+
+  @override
+  String get commonNext => 'Next';
+
+  @override
+  String get commonOptions => 'Options';
+
+  @override
+  String get commonPause => 'Pause';
+
+  @override
+  String get commonPrevious => 'Previous';
+
+  @override
+  String get commonRemove => 'Remove';
+
+  @override
+  String commonRemoveItem({required String label}) => 'Remove $label';
+
+  @override
+  String get commonResize => 'Resize';
+
+  @override
+  String get commonSearch => 'Search';
+
+  @override
+  String get commonSending => 'Sending';
+
+  @override
+  String get commonStatusDanger => 'Danger';
+
+  @override
+  String get commonStatusInfo => 'Info';
+
+  @override
+  String get commonStatusSuccess => 'Success';
+
+  @override
+  String get commonStatusWarning => 'Warning';
+
+  @override
+  String dataTableResize({required String column}) => '$column column width';
+
+  @override
+  String get dataTableSelectAll => 'Select all rows';
+
+  @override
+  String dataTableSelectRow({required String label}) => 'Select $label';
+
+  @override
+  String dataTableSelectRowNumber({required num number}) => 'Select row ${_number(number)}';
+
+  @override
+  String dataTableSelected({required num count}) => '${_number(count)} selected';
+
+  @override
+  String get dateFieldOpen => 'Open calendar';
+
+  @override
+  String get editorAlignCenter => 'Align center';
+
+  @override
+  String get editorAlignJustify => 'Justify';
+
+  @override
+  String get editorAlignLeft => 'Align left';
+
+  @override
+  String get editorAlignRight => 'Align right';
+
+  @override
+  String get editorBlockDuplicate => 'Duplicate';
+
+  @override
+  String get editorBlockHandle => 'Block menu';
+
+  @override
+  String get editorBlockInsertBelow => 'Add a block below';
+
+  @override
+  String get editorBlockTurnInto => 'Turn into';
+
+  @override
+  String get editorBlockType => 'Text style';
+
+  @override
+  String get editorBlockquote => 'Quote';
+
+  @override
+  String get editorBold => 'Bold';
+
+  @override
+  String get editorBubbleMenu => 'Selection formatting';
+
+  @override
+  String get editorBulletList => 'Bulleted list';
+
+  @override
+  String get editorCallout => 'Callout';
+
+  @override
+  String get editorCalloutKind => 'Callout type';
+
+  @override
+  String get editorCalloutRemove => 'Remove callout';
+
+  @override
+  String get editorCode => 'Code';
+
+  @override
+  String get editorCodeBlock => 'Code block';
+
+  @override
+  String get editorCodeLanguage => 'Code language';
+
+  @override
+  String get editorCodeLanguageSearch => 'Search languages';
+
+  @override
+  String get editorCodePlainText => 'Plain text';
+
+  @override
+  String get editorColor => 'Color';
+
+  @override
+  String get editorColorDefault => 'Default';
+
+  @override
+  String get editorColorNone => 'None';
+
+  @override
+  String get editorColorPrimary => 'Accent 1';
+
+  @override
+  String get editorColorSecondary => 'Accent 2';
+
+  @override
+  String get editorColorTertiary => 'Accent 3';
+
+  @override
+  String get editorContent => 'Content';
+
+  @override
+  String get editorDetails => 'Toggle';
+
+  @override
+  String get editorDetailsSummary => 'Summary';
+
+  @override
+  String get editorDetailsToggle => 'Show content';
+
+  @override
+  String editorHeading({required num level}) => 'Heading ${_number(level)}';
+
+  @override
+  String get editorHighlight => 'Highlight';
+
+  @override
+  String get editorHighlightColor => 'Highlight color';
+
+  @override
+  String get editorHorizontalRule => 'Divider';
+
+  @override
+  String get editorImage => 'Image';
+
+  @override
+  String get editorImageAlt => 'Alt text';
+
+  @override
+  String get editorImageInsert => 'Insert';
+
+  @override
+  String get editorImagePickFiles => 'Choose files';
+
+  @override
+  String get editorImageUploadFailed => 'The image could not be uploaded';
+
+  @override
+  String get editorImageUploading => 'Uploading the image';
+
+  @override
+  String get editorImageUrl => 'Image address';
+
+  @override
+  String get editorImageUrlInvalid => 'Enter an address that starts with http or https';
+
+  @override
+  String get editorItalic => 'Italic';
+
+  @override
+  String get editorLink => 'Link';
+
+  @override
+  String get editorLinkApply => 'Apply';
+
+  @override
+  String get editorLinkRemove => 'Remove link';
+
+  @override
+  String get editorLinkUrl => 'Link URL';
+
+  @override
+  String get editorMentionEmpty => 'No matches';
+
+  @override
+  String get editorMentionMenu => 'Mentions';
+
+  @override
+  String get editorMentionSearching => 'Searching…';
+
+  @override
+  String get editorOrderedList => 'Numbered list';
+
+  @override
+  String get editorParagraph => 'Paragraph';
+
+  @override
+  String get editorSlashMenu => 'Insert block';
+
+  @override
+  String get editorSlashMenuEmpty => 'No matching blocks';
+
+  @override
+  String get editorStrike => 'Strikethrough';
+
+  @override
+  String get editorSubscript => 'Subscript';
+
+  @override
+  String get editorSuperscript => 'Superscript';
+
+  @override
+  String get editorTable => 'Table';
+
+  @override
+  String get editorTableAddColumnAfter => 'Add column after';
+
+  @override
+  String get editorTableAddColumnBefore => 'Add column before';
+
+  @override
+  String get editorTableAddRowAfter => 'Add row below';
+
+  @override
+  String get editorTableAddRowBefore => 'Add row above';
+
+  @override
+  String get editorTableDelete => 'Delete table';
+
+  @override
+  String get editorTableDeleteColumn => 'Delete column';
+
+  @override
+  String get editorTableDeleteRow => 'Delete row';
+
+  @override
+  String get editorTableHeaderRow => 'Header row';
+
+  @override
+  String get editorTableInsert => 'Insert table';
+
+  @override
+  String get editorTableMergeCells => 'Merge cells';
+
+  @override
+  String editorTableSize({required num rows, required num cols}) => '${_number(rows)} by ${_number(cols)}';
+
+  @override
+  String get editorTableSplitCell => 'Split cell';
+
+  @override
+  String editorTaskItem({required String text}) => 'Task: $text';
+
+  @override
+  String get editorTaskItemEmpty => 'Empty task';
+
+  @override
+  String get editorTaskList => 'Task list';
+
+  @override
+  String get editorTextAlign => 'Alignment';
+
+  @override
+  String get editorTextColor => 'Text color';
+
+  @override
+  String get editorToolbar => 'Formatting';
+
+  @override
+  String get editorUnderline => 'Underline';
+
+  @override
+  String fileFieldCount({required num count}) => 'Files: ${_number(count)}';
+
+  @override
+  String get fileFieldList => 'Chosen files';
+
+  @override
+  String get imageDownload => 'Download';
+
+  @override
+  String get imagePhotos => 'Images';
+
+  @override
+  String imagePreview({required String alt}) => 'View larger: $alt';
+
+  @override
+  String get imagePreviewUntitled => 'View image larger';
+
+  @override
+  String get imageShare => 'Share';
+
+  @override
+  String get imageThumbnails => 'Image list';
+
+  @override
+  String get imageViewer => 'Image viewer';
+
+  @override
+  String get imageZoomIn => 'Zoom in';
+
+  @override
+  String get imageZoomOut => 'Zoom out';
+
+  @override
+  String imageZoomReset({required String percent}) => '$percent, fit to screen';
+
+  @override
+  String get kbdCommand => 'Command';
+
+  @override
+  String get kbdControl => 'Control';
+
+  @override
+  String get kbdDown => 'Down Arrow';
+
+  @override
+  String get kbdForwardDelete => 'Forward Delete';
+
+  @override
+  String get kbdLeft => 'Left Arrow';
+
+  @override
+  String get kbdMacDelete => 'Delete';
+
+  @override
+  String get kbdOption => 'Option';
+
+  @override
+  String get kbdReturn => 'Return';
+
+  @override
+  String get kbdRight => 'Right Arrow';
+
+  @override
+  String get kbdShift => 'Shift';
+
+  @override
+  String get kbdUp => 'Up Arrow';
+
+  @override
+  String get linkNewTab => '(opens in a new tab)';
+
+  @override
+  String get menuCommand => 'Commands';
+
+  @override
+  String get messageActions => 'Message actions';
+
+  @override
+  String get messageError => 'Not sent';
+
+  @override
+  String get messageRetry => 'Resend';
+
+  @override
+  String get messageUnread => 'Unread';
+
+  @override
+  String messageUnreadBy({required num count}) => 'Unread by ${_number(count)}';
+
+  @override
+  String get messageScrollerJump => 'Scroll to bottom';
+
+  @override
+  String messageScrollerJumpUnseen({required num count}) => 'Scroll to bottom, new messages: ${_number(count)}';
+
+  @override
+  String messageScrollerUnseen({required num count}) => 'New messages: ${_number(count)}';
+
+  @override
+  String get numberFieldDecrement => 'Decrease';
+
+  @override
+  String get numberFieldIncrement => 'Increase';
+
+  @override
+  String get paginationFirst => 'First page';
+
+  @override
+  String get paginationLast => 'Last page';
+
+  @override
+  String paginationPage({required num page}) => 'Page ${_number(page)}';
+
+  @override
+  String get passwordFieldShow => 'Show password';
+
+  @override
+  String get promptInputActions => 'Add';
+
+  @override
+  String get promptInputAttach => 'Attach files';
+
+  @override
+  String get promptInputAttachments => 'Attached files';
+
+  @override
+  String get promptInputSend => 'Send';
+
+  @override
+  String get promptInputStop => 'Stop';
+
+  @override
+  String get questionnaireNavigation => 'Question navigation';
+
+  @override
+  String get questionnaireProgress => 'Questionnaire progress';
+
+  @override
+  String questionnaireStep({required num current, required num total}) => 'Question ${_number(current)} of ${_number(total)}';
+
+  @override
+  String ratingValueLabel({required num value, required num max}) => '${_number(value)} out of ${_number(max)}';
+
+  @override
+  String get schedulerAddDay => 'Add a day';
+
+  @override
+  String get schedulerAllDay => 'All day';
+
+  @override
+  String get schedulerDayCount => 'Number of days';
+
+  @override
+  String schedulerDragAt({required String time}) => 'Starts $time';
+
+  @override
+  String get schedulerDragHint => 'Press Space on an event to pick it up, the arrow keys to move it by 15 minutes or a day, and Enter to drop it. Shift with the up and down arrows moves an hour. Escape cancels.';
+
+  @override
+  String get schedulerDragMonthHint => 'Press Space on an event to pick it up, the left and right arrows to move it a day, the up and down arrows to move it a week, and Enter to drop it. Escape cancels.';
+
+  @override
+  String get schedulerGoToDate => 'Go to date';
+
+  @override
+  String schedulerMoreLabel({required String date, required num count}) => 'More events on $date: ${_number(count)}';
+
+  @override
+  String get schedulerNavigation => 'Navigate dates';
+
+  @override
+  String get schedulerRemoveDay => 'Remove a day';
+
+  @override
+  String schedulerResize({required String event}) => 'End of $event';
+
+  @override
+  String get schedulerView => 'View';
+
+  @override
+  String sidebarDragAfter({required String target}) => 'After $target';
+
+  @override
+  String sidebarDragBefore({required String target}) => 'Before $target';
+
+  @override
+  String get sidebarDragHint => 'Press Space to pick up, the up and down arrows to choose a place, and Enter to drop. Escape cancels.';
+
+  @override
+  String sidebarDragInside({required String target}) => 'Inside $target';
+
+  @override
+  String get sidebarDragOrigin => 'Original place';
+
+  @override
+  String get sidebarOpen => 'Open menu';
+
+  @override
+  String get sliderEnd => 'End';
+
+  @override
+  String get sliderStart => 'Start';
+
+  @override
+  String get slidesRoleDescription => 'slide';
+
+  @override
+  String slidesSlide({required num index, required num count}) => '${_number(index)} of ${_number(count)}';
+
+  @override
+  String get stepperCompleted => 'Completed';
+
+  @override
+  String get stepperError => 'Error';
+
+  @override
+  String get telFieldCountry => 'Country';
+
+  @override
+  String get textAreaLimitReached => 'Character limit reached.';
+
+  @override
+  String textAreaRemaining({required num remaining}) => 'Characters left: ${_number(remaining)}';
+
+  @override
+  String get timePickerLabel => 'Time';
+
+  @override
+  String get toastRegion => 'Notifications';
+}
+
+class IdsMessagesKo extends IdsMessagesBase {
+  const IdsMessagesKo();
 
   static final _numbers = NumberFormat.decimalPattern('ko_KR');
 
-  static String _format(Object value) =>
-      value is num ? _numbers.format(value) : value.toString();
+  static String _number(num value) => _numbers.format(value);
 
   @override
-  String avatarGroupOverflow({required Object count}) => '외 ${_format(count)}명';
+  String get language => 'ko';
+
+  @override
+  String avatarGroupOverflow({required num count}) => '외 ${_number(count)}명';
 
   @override
   String get breadcrumbMore => '숨은 경로 보기';
@@ -424,7 +1043,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get bubbleReactions => '반응';
 
   @override
-  String carouselIndicator({required Object index}) => '${_format(index)}번째 슬라이드로';
+  String carouselIndicator({required num index}) => '${_number(index)}번째 슬라이드로';
 
   @override
   String get carouselRoleDescription => '캐러셀';
@@ -436,7 +1055,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get colorPickerArea => '채도와 밝기';
 
   @override
-  String colorPickerAreaValue({required Object saturation, required Object brightness}) => '채도 ${_format(saturation)}, 밝기 ${_format(brightness)}';
+  String colorPickerAreaValue({required String saturation, required String brightness}) => '채도 $saturation, 밝기 $brightness';
 
   @override
   String get colorPickerBrightness => '밝기';
@@ -478,13 +1097,13 @@ final class IdsKoreanMessages with IdsMessages {
   String get commonCopy => '복사';
 
   @override
-  String commonDragCancel({required Object item}) => '제자리에 두었습니다: ${_format(item)}';
+  String commonDragCancel({required String item}) => '제자리에 두었습니다: $item';
 
   @override
-  String commonDragEnd({required Object item}) => '옮겼습니다: ${_format(item)}';
+  String commonDragEnd({required String item}) => '옮겼습니다: $item';
 
   @override
-  String commonDragStart({required Object item}) => '집었습니다: ${_format(item)}';
+  String commonDragStart({required String item}) => '집었습니다: $item';
 
   @override
   String get commonExpand => '펼치기';
@@ -511,7 +1130,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get commonRemove => '삭제';
 
   @override
-  String commonRemoveItem({required Object label}) => '${_format(label)} 삭제';
+  String commonRemoveItem({required String label}) => '$label 삭제';
 
   @override
   String get commonResize => '크기 조절';
@@ -535,19 +1154,19 @@ final class IdsKoreanMessages with IdsMessages {
   String get commonStatusWarning => '경고';
 
   @override
-  String dataTableResize({required Object column}) => '${_format(column)} 열 너비';
+  String dataTableResize({required String column}) => '$column 열 너비';
 
   @override
   String get dataTableSelectAll => '모든 행 선택';
 
   @override
-  String dataTableSelectRow({required Object label}) => '${_format(label)} 선택';
+  String dataTableSelectRow({required String label}) => '$label 선택';
 
   @override
-  String dataTableSelectRowNumber({required Object number}) => '${_format(number)}번째 행 선택';
+  String dataTableSelectRowNumber({required num number}) => '${_number(number)}번째 행 선택';
 
   @override
-  String dataTableSelected({required Object count}) => '${_format(count)}개 선택됨';
+  String dataTableSelected({required num count}) => '${_number(count)}개 선택됨';
 
   @override
   String get dateFieldOpen => '달력 열기';
@@ -646,7 +1265,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorDetailsToggle => '내용 펼치기';
 
   @override
-  String editorHeading({required Object level}) => '제목 ${_format(level)}';
+  String editorHeading({required num level}) => '제목 ${_number(level)}';
 
   @override
   String get editorHighlight => '형광펜';
@@ -760,13 +1379,13 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorTableMergeCells => '셀 합치기';
 
   @override
-  String editorTableSize({required Object rows, required Object cols}) => '${_format(rows)}행 ${_format(cols)}열';
+  String editorTableSize({required num rows, required num cols}) => '${_number(rows)}행 ${_number(cols)}열';
 
   @override
   String get editorTableSplitCell => '셀 나누기';
 
   @override
-  String editorTaskItem({required Object text}) => '할 일: ${_format(text)}';
+  String editorTaskItem({required String text}) => '할 일: $text';
 
   @override
   String get editorTaskItemEmpty => '빈 할 일';
@@ -787,7 +1406,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorUnderline => '밑줄';
 
   @override
-  String fileFieldCount({required Object count}) => '파일 ${_format(count)}개';
+  String fileFieldCount({required num count}) => '파일 ${_number(count)}개';
 
   @override
   String get fileFieldList => '고른 파일';
@@ -799,7 +1418,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get imagePhotos => '사진';
 
   @override
-  String imagePreview({required Object alt}) => '${_format(alt)} 크게 보기';
+  String imagePreview({required String alt}) => '$alt 크게 보기';
 
   @override
   String get imagePreviewUntitled => '이미지 크게 보기';
@@ -820,7 +1439,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get imageZoomOut => '축소';
 
   @override
-  String imageZoomReset({required Object percent}) => '${_format(percent)}, 화면에 맞추기';
+  String imageZoomReset({required String percent}) => '$percent, 화면에 맞추기';
 
   @override
   String get kbdCommand => '커맨드';
@@ -874,16 +1493,16 @@ final class IdsKoreanMessages with IdsMessages {
   String get messageUnread => '안 읽음';
 
   @override
-  String messageUnreadBy({required Object count}) => '${_format(count)}명 안 읽음';
+  String messageUnreadBy({required num count}) => '${_number(count)}명 안 읽음';
 
   @override
   String get messageScrollerJump => '맨 아래로';
 
   @override
-  String messageScrollerJumpUnseen({required Object count}) => '맨 아래로, 새 메시지 ${_format(count)}개';
+  String messageScrollerJumpUnseen({required num count}) => '맨 아래로, 새 메시지 ${_number(count)}개';
 
   @override
-  String messageScrollerUnseen({required Object count}) => '새 메시지 ${_format(count)}개';
+  String messageScrollerUnseen({required num count}) => '새 메시지 ${_number(count)}개';
 
   @override
   String get numberFieldDecrement => '값 줄이기';
@@ -898,7 +1517,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get paginationLast => '마지막 페이지';
 
   @override
-  String paginationPage({required Object page}) => '${_format(page)}페이지';
+  String paginationPage({required num page}) => '${_number(page)}페이지';
 
   @override
   String get passwordFieldShow => '비밀번호 표시';
@@ -925,10 +1544,10 @@ final class IdsKoreanMessages with IdsMessages {
   String get questionnaireProgress => '질문 진행';
 
   @override
-  String questionnaireStep({required Object current, required Object total}) => '질문 ${_format(current)} / ${_format(total)}';
+  String questionnaireStep({required num current, required num total}) => '질문 ${_number(current)} / ${_number(total)}';
 
   @override
-  String ratingValueLabel({required Object max, required Object value}) => '${_format(max)}점 만점에 ${_format(value)}점';
+  String ratingValueLabel({required num value, required num max}) => '${_number(max)}점 만점에 ${_number(value)}점';
 
   @override
   String get schedulerAddDay => '하루 늘리기';
@@ -940,7 +1559,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get schedulerDayCount => '보여 줄 날 수';
 
   @override
-  String schedulerDragAt({required Object time}) => '${_format(time)} 시작';
+  String schedulerDragAt({required String time}) => '$time 시작';
 
   @override
   String get schedulerDragHint => '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.';
@@ -952,7 +1571,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get schedulerGoToDate => '날짜로 이동';
 
   @override
-  String schedulerMoreLabel({required Object date, required Object count}) => '${_format(date)} 일정 ${_format(count)}개 더 보기';
+  String schedulerMoreLabel({required String date, required num count}) => '$date 일정 ${_number(count)}개 더 보기';
 
   @override
   String get schedulerNavigation => '날짜 이동';
@@ -961,22 +1580,22 @@ final class IdsKoreanMessages with IdsMessages {
   String get schedulerRemoveDay => '하루 줄이기';
 
   @override
-  String schedulerResize({required Object event}) => '${_format(event)} 끝 시각';
+  String schedulerResize({required String event}) => '$event 끝 시각';
 
   @override
   String get schedulerView => '보기';
 
   @override
-  String sidebarDragAfter({required Object target}) => '${_format(target)} 뒤';
+  String sidebarDragAfter({required String target}) => '$target 뒤';
 
   @override
-  String sidebarDragBefore({required Object target}) => '${_format(target)} 앞';
+  String sidebarDragBefore({required String target}) => '$target 앞';
 
   @override
   String get sidebarDragHint => 'Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.';
 
   @override
-  String sidebarDragInside({required Object target}) => '${_format(target)} 안';
+  String sidebarDragInside({required String target}) => '$target 안';
 
   @override
   String get sidebarDragOrigin => '원래 자리';
@@ -994,7 +1613,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get slidesRoleDescription => '슬라이드';
 
   @override
-  String slidesSlide({required Object count, required Object index}) => '${_format(count)}장 중 ${_format(index)}번째';
+  String slidesSlide({required num index, required num count}) => '${_number(count)}장 중 ${_number(index)}번째';
 
   @override
   String get stepperCompleted => '완료';
@@ -1009,11 +1628,42 @@ final class IdsKoreanMessages with IdsMessages {
   String get textAreaLimitReached => '글자 수 제한에 도달했습니다.';
 
   @override
-  String textAreaRemaining({required Object remaining}) => '${_format(remaining)}자 남았습니다.';
+  String textAreaRemaining({required num remaining}) => '${_number(remaining)}자 남았습니다.';
 
   @override
   String get timePickerLabel => '시간';
 
   @override
   String get toastRegion => '알림';
+}
+
+@immutable
+class IdsLocale {
+  IdsLocale({required this.locale, required this.messages})
+    : assert(
+        locale.languageCode == messages.language,
+        'IdsLocale: the locale ${locale.toLanguageTag()} is not in the language of its messages (${messages.language}).',
+      );
+
+  static final en = IdsLocale(
+    locale: Locale.fromSubtags(languageCode: 'en', countryCode: 'US'),
+    messages: const IdsMessagesEn(),
+  );
+
+  static final ko = IdsLocale(
+    locale: Locale.fromSubtags(languageCode: 'ko', countryCode: 'KR'),
+    messages: const IdsMessagesKo(),
+  );
+
+  static final List<IdsLocale> values = [en, ko];
+
+  final Locale locale;
+  final IdsMessagesBase messages;
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsLocale && other.locale == locale && other.messages == messages;
+
+  @override
+  int get hashCode => Object.hash(locale, messages);
 }

@@ -90,8 +90,7 @@ for (final issue in checkIdsTheme(appTheme)) {
 | `mode`                | controlled 모드. 바꾸기 요청은 `onModeChange` 만 부른다        |
 | `defaultMode`         | uncontrolled 초기 모드. 바깥 기본값 `IdsMode.light`            |
 | `onModeChange`        | 모드 변경 요청 알림                                           |
-| `locale`              | 날짜, 숫자용 로케일. 바깥 기본값 `Locale('ko', 'KR')`          |
-| `translation`         | slang 이 만든 `IdsMessages` 객체                              |
+| `locale`              | `IdsLocale`. 문구와 숫자 형식. 없으면 앱 로케일, 그다음 `IdsLocale.ko` |
 
 ```dart
 final ids = IdsProvider.of(context);
@@ -124,7 +123,7 @@ IdsProviderScope(
 
 - 준 필드만 부모 테마에 덮는다. 나머지는 부모를 따른다.
 - `mode` 나 `defaultMode` 를 주지 않은 scope 의 `setMode`, `toggleMode` 는 모드를 가진 조상을 바꾼다.
-- `locale` 과 `translation` 은 따로 상속한다. locale 만 영어로 바꿔도 영어 문구를 고르지 않는다.
+- `locale` 을 주지 않은 scope 는 부모의 `IdsLocale` 을 그대로 쓴다.
 
 ## 색 역할
 
@@ -191,46 +190,73 @@ DecoratedBox(
 - 두 글꼴 파일은 `pnpm codegen` 이 npm 패키지(`pretendard-gov`, Vercel 의 `geist`)에서 `fonts/` 로 복사한다. 버전은 `packages/core/package.json` 이 정한다. 라이선스(SIL OFL 1.1)는 `fonts/*-LICENSE.txt` 에 있다.
 - `textStyle` 은 `inherit: false` 스타일을 돌려준다. 색은 `color` 로 준다.
 
-## IDS 문구와 slang
-
-- IDS 문구의 원본은 `packages/core/messages/ko.json` 과 `en.json` 이다. `pnpm codegen` 이 Dart 기본 객체 `IdsMessages.ko` 와 slang 용 `messages/ko.i18n.json` 을 만든다.
-- `IdsMessages` 는 모든 멤버가 nullable 인 mixin 이다. `dialog.close` 는 `dialogClose`, `chipField.remove` 는 `chipFieldRemove(label: ...)` 가 된다.
-- 빠진 멤버는 컴포넌트가 `t?.dialogClose ?? IdsMessages.ko.dialogClose` 로 한국어를 고른다.
-
-서비스는 slang 4.19.2 이상을 쓰고 `slang.yaml` 에 다음을 합친다.
-
-```yaml
-string_interpolation: braces
-imports:
-  - 'package:ids_flutter/ids.dart'
-interfaces:
-  IdsMessages:
-    generate_mixin: false
-```
-
-```json
-{
-  "ids(singleInterface=IdsMessages)": {
-    "dialogClose": "Close",
-    "spinnerLabel": "Loading",
-    "chipFieldRemove": "Remove {label}"
-  }
-}
-```
+## 문구와 언어
 
 ```dart
-final t = Translations.of(context);
+IdsProvider(theme: appTheme, locale: IdsLocale.en, child: child)
+```
 
-return IdsProvider(
-  theme: appTheme,
-  translation: t.ids,
-  locale: LocaleSettings.currentLocale.flutterLocale,
-  child: child,
+- `IdsLocale` 은 `locale`(Flutter `Locale`) 과 `messages`(`IdsMessagesBase`) 를 묶는다. 패키지는 `IdsLocale.ko`(ko-KR) 와 `IdsLocale.en`(en-US) 을 싣는다.
+- `locale` 을 주지 않으면 가장 바깥 Provider 가 `Localizations.maybeLocaleOf(context)` 를 읽는다. 언어가 같은 실린 문구가 있으면 앱의 `Locale` 과 그 문구를 쓰고, 없으면 `IdsLocale.ko` 를 쓴다.
+- 문구는 접근성 이름과 알림뿐이다. `dialog.close` 는 `dialogClose`, `chipField.remove` 는 `chipFieldRemove(label: ...)` 가 된다.
+- `IdsLocale` 을 만들 때 `locale.languageCode` 와 `messages.language` 가 다르면 debug 빌드에서 assert 가 실패한다.
+
+### 일부만 바꾸기
+
+실린 언어의 클래스를 상속해 바꿀 멤버만 덮는다.
+
+```dart
+class AppMessages extends IdsMessagesEn {
+  const AppMessages();
+
+  @override
+  String get dialogClose => 'Dismiss';
+}
+
+final appLocale = IdsLocale(
+  locale: const Locale('en', 'GB'),
+  messages: const AppMessages(),
 );
 ```
 
-- 기존 interpolation 이 `dart` 이면 `{label}` 을 `$label` 로 쓴다.
-- 번역은 IDS 자체 문구에만 쓴다. Label 의 child 나 명시한 `semanticLabel` 은 바꾸지 않는다.
+### 새 언어
+
+`IdsMessagesBase` 를 상속하면 모든 멤버를 구현해야 한다. 빠진 멤버는 컴파일 오류다.
+
+```dart
+class JapaneseMessages extends IdsMessagesBase {
+  const JapaneseMessages();
+
+  @override
+  String get language => 'ja';
+
+  @override
+  String get dialogClose => '閉じる';
+
+  // ...
+}
+
+final japanese = IdsLocale(
+  locale: const Locale('ja', 'JP'),
+  messages: const JapaneseMessages(),
+);
+```
+
+### 앱 i18n 과 맞추기
+
+앱 언어마다 `IdsLocale` 을 하나 고른다. slang 이면 이렇게 쓴다.
+
+```dart
+final ids = switch (TranslationProvider.of(context).locale) {
+  AppLocale.ko => IdsLocale.ko,
+  AppLocale.en => IdsLocale.en,
+};
+
+return IdsProvider(theme: appTheme, locale: ids, child: child);
+```
+
+- `MaterialApp` 의 `locale` 과 `supportedLocales` 만 쓰는 앱은 `locale` 을 주지 않아도 앱 로케일을 따른다.
+- 원본은 `packages/core/messages/<language>.json` 이다. `pnpm codegen` 이 `lib/messages/ids_messages.dart` 를 만든다.
 
 ## 이전 API 에서 옮기기
 
@@ -247,7 +273,6 @@ return IdsProvider(
 pnpm codegen
 cd packages/flutter
 flutter pub get
-dart run slang
 flutter analyze
 flutter test
 cd example
@@ -256,8 +281,8 @@ flutter test
 ```
 
 - Widgetbook 은 `packages/flutter/example` 에서 `flutter run` 으로 연다.
-- `Runtime theme and slang`: primary, neutral, status, radius, 모서리, 모드, 번역, 글자 배율을 바꾸며 계열마다 solid, soft, 글자, 선 역할을 본다.
+- `Playground`: primary, neutral, status, radius, 모서리, 모드, 언어, 글자 배율을 바꾸며 계열마다 solid, soft, 글자, 선 역할을 본다.
 - `Nested scopes`: 부모, 모드를 물려받는 scope, 색과 모드를 따로 가진 scope 의 범위를 비교한다.
-- `Service integration`: 실제 slang `TranslationProvider` 아래에서 테마와 언어를 바꿔도 자식 상태가 남는지 본다.
-- slang 이 만든 Dart 파일은 커밋하지 않는다. CI 가 위 순서로 만든다.
+- `Follow the app language`: 예제 앱의 slang `TranslationProvider` 아래에서 테마와 언어를 바꿔도 자식 상태가 남는지 본다.
+- 예제 앱의 slang 이 만든 Dart 파일은 커밋하지 않는다. CI 가 위 순서로 만든다.
 - `test/theme_roles_parity_test.dart` 는 ids-react 가 쓴 `packages/core/tests/fixtures/theme-roles.json` 과 모든 역할을 비교한다.
