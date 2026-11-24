@@ -1,28 +1,15 @@
 'use client';
 
-import { useRef, useState, type KeyboardEvent, type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
-import { clamp, range } from 'es-toolkit';
-
-import { keyHandler } from '../../../../internal/lib/keys';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { Popover } from '../../../overlay/popover';
 import { useInternalEditorContext } from '../context';
+import { useInternalEditorTableSizePicker } from '../hooks/use-editor-table-size-picker';
 import { editorMessages } from '../messages-catalog';
 import { NEW_TABLE_SIZE, type TableSize } from './insert';
+import { cellSelector, COLUMNS, ROWS } from './size-grid';
 import { EditorToolTip, type EditorToolTipProps } from '../parts/tool';
-
-const MOST = { rows: 8, cols: 10 } as const satisfies TableSize;
-
-const ROWS = range(1, MOST.rows + 1);
-const COLUMNS = range(1, MOST.cols + 1);
-
-const within = (size: TableSize): TableSize => ({
-  rows: clamp(size.rows, 1, MOST.rows),
-  cols: clamp(size.cols, 1, MOST.cols),
-});
-
-const cellSelector = ({ rows, cols }: TableSize) => `[data-table-size-cell="${rows}x${cols}"]`;
 
 export function EditorTableSizePicker({
   tooltip,
@@ -37,37 +24,11 @@ export function EditorTableSizePicker({
 }) {
   const t = useInternalTranslate(editorMessages);
   const { styles } = useInternalEditorContext('Editor.Table');
-  const [open, setOpen] = useState(false);
-  const [size, setSize] = useState(NEW_TABLE_SIZE);
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  const pick = (picked: TableSize) => {
-    setOpen(false);
-    onPick(picked);
-  };
-
-  const moveTo = (next: TableSize) => {
-    const bounded = within(next);
-    setSize(bounded);
-    gridRef.current?.querySelector<HTMLElement>(cellSelector(bounded))?.focus();
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) =>
-    keyHandler<HTMLButtonElement>({
-      ArrowRight: () => moveTo({ ...size, cols: size.cols + 1 }),
-      ArrowLeft: () => moveTo({ ...size, cols: size.cols - 1 }),
-      ArrowDown: () => moveTo({ ...size, rows: size.rows + 1 }),
-      ArrowUp: () => moveTo({ ...size, rows: size.rows - 1 }),
-    })(event);
+  const { open, onOpenChange, size, setSize, gridRef, pick, onKeyDown } =
+    useInternalEditorTableSizePicker(onPick);
 
   return (
-    <Popover
-      open={open && !disabled}
-      onOpenChange={(next) => {
-        if (next) setSize(NEW_TABLE_SIZE);
-        setOpen(next);
-      }}
-    >
+    <Popover open={open && !disabled} onOpenChange={onOpenChange}>
       <EditorToolTip {...tooltip}>
         <Popover.Trigger asChild>{children}</Popover.Trigger>
       </EditorToolTip>
