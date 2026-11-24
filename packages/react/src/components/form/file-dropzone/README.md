@@ -70,7 +70,7 @@ import { Field, FileDropzone } from '@gsainfoteam/ids-react';
 
 앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-```tsx
+```tsx custom-design
 <FileDropzone className={(state) => (state.dragging ? 'ring-2' : undefined)} />
 ```
 
