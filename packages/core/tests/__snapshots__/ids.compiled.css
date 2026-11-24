@@ -446,7 +446,7 @@
   }
   .focus-ring {
     outline: none;
-    &:focus-visible, &[data-focus-visible], &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
+    &:focus-visible, &[data-focus-visible]:not(:disabled), &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
       --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
       --tw-ring-color: var(--ids-color-border-primary-strong);
@@ -457,7 +457,7 @@
     }
     &[aria-invalid="true"], &[data-invalid] {
       --tw-inset-ring-color: var(--ids-color-border-danger-strong);
-      &:focus-visible, &[data-focus-visible], &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
+      &:focus-visible, &[data-focus-visible]:not(:disabled), &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
         --tw-ring-color: var(--ids-color-border-danger-strong);
         @supports (color: color-mix(in lab, red, red)) {
           --tw-ring-color: color-mix(in oklab, var(--ids-color-border-danger-strong) 40%, transparent);
@@ -468,7 +468,7 @@
   }
   .focus-ring-current {
     outline: none;
-    &:focus-visible, &[data-focus-visible], &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
+    &:focus-visible, &[data-focus-visible]:not(:disabled), &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
       --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
       --tw-ring-color: currentcolor;
@@ -479,7 +479,7 @@
     }
     &[aria-invalid="true"], &[data-invalid] {
       --tw-inset-ring-color: var(--ids-color-border-danger-strong);
-      &:focus-visible, &[data-focus-visible], &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
+      &:focus-visible, &[data-focus-visible]:not(:disabled), &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
         --tw-ring-color: var(--ids-color-border-danger-strong);
         @supports (color: color-mix(in lab, red, red)) {
           --tw-ring-color: color-mix(in oklab, var(--ids-color-border-danger-strong) 40%, transparent);
@@ -490,7 +490,7 @@
   }
   .focus-ring-scheme {
     outline: none;
-    &:focus-visible, &[data-focus-visible], &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
+    &:focus-visible, &[data-focus-visible]:not(:disabled), &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
       --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
       --tw-ring-color: var(--ids-color-border-scheme-strong);
@@ -501,7 +501,7 @@
     }
     &[aria-invalid="true"], &[data-invalid] {
       --tw-inset-ring-color: var(--ids-color-border-danger-strong);
-      &:focus-visible, &[data-focus-visible], &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
+      &:focus-visible, &[data-focus-visible]:not(:disabled), &:has([data-field-input]:focus-visible):not( :has([popover] [data-field-input]:focus-visible) ), &:has([data-text-field-input]:focus-visible):not( :has([popover] [data-text-field-input]:focus-visible) ), &:has([data-text-area-input]:focus-visible):not( :has([popover] [data-text-area-input]:focus-visible) ) {
         --tw-ring-color: var(--ids-color-border-danger-strong);
         @supports (color: color-mix(in lab, red, red)) {
           --tw-ring-color: color-mix(in oklab, var(--ids-color-border-danger-strong) 40%, transparent);
@@ -639,7 +639,7 @@
   .dark\:bg-base:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)) {
     background-color: var(--ids-color-bg-base);
   }
-  .focus-ring-visible\:ring-2:focus-visible, .focus-ring-visible\:ring-2[data-focus-visible], .focus-ring-visible\:ring-2:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible) ), .focus-ring-visible\:ring-2:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible) ), .focus-ring-visible\:ring-2:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible) ) {
+  .focus-ring-visible\:ring-2:focus-visible, .focus-ring-visible\:ring-2[data-focus-visible]:not(:disabled), .focus-ring-visible\:ring-2:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible) ), .focus-ring-visible\:ring-2:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible) ), .focus-ring-visible\:ring-2:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible) ) {
     --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
