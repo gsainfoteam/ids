@@ -26,8 +26,6 @@ import { Kbd, KbdGroup } from '@gsainfoteam/ids-react';
 | `platform`    | 그린 플랫폼. `mac` / `windows` / `linux` |
 | `combination` | 늘 `true`                                |
 
-- 루트에 `data-kbd-group`, `data-size`, `data-platform` 이 붙습니다.
-
 ## 속성
 
 | 속성        | 기본 / 동작                                           |

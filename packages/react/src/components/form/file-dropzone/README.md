@@ -68,12 +68,17 @@ import { Field, FileDropzone } from '@gsainfoteam/ids-react';
 
 ## 상태
 
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
 ```tsx
 <FileDropzone className={(state) => (state.dragging ? 'ring-2' : undefined)} />
 ```
 
-- 앱은 값을 `value` / `onValueChange` 로, 거부된 파일을 `onReject` 로 읽습니다.
-- 새 디자인을 그릴 때만, 루트와 `Trigger` 의 `className` 은 `FileDropzone.State`(`dragging` 포함)를 받는 함수도 됩니다.
+- 값은 `value` / `onValueChange`, 거부된 파일은 `onReject` 로 읽습니다. 비어 있는지는 `null` 이나 빈 배열로 압니다.
+- `disabled`, `readOnly`, `required`, `multiple` 은 앱이 준 값 그대로입니다.
+- `invalid` 는 앱이 준 값이거나, `onReject` 로 받은 거부 파일이 남아 있는 동안 켜집니다.
+- 새 디자인(`custom-design`)에서만 루트와 `Trigger` 의 `className` 에 `FileDropzone.State`(`dragging`, `disabled`, `readOnly`, `invalid`, `required`, `empty`, `multiple`)를 받는 함수를 줍니다.
+- 파일을 끌어 올리고 있는지(`dragging`)는 값이나 콜백으로 나오지 않고 위 함수로만 받습니다.
 
 ## 크기, variant
 

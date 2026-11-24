@@ -74,7 +74,7 @@ import { Chip, Sidebar } from '@gsainfoteam/ids-react';
 <Sidebar.Item href="/beta" disabled>베타</Sidebar.Item>
 ```
 
-- `Sidebar` 의 `value` 와 같은 `value` 의 항목이 지금 페이지입니다. `aria-current="page"` 와 `data-selected` 가 붙고 배경이 칠해집니다.
+- `Sidebar` 의 `value` 와 같은 `value` 의 항목이 지금 페이지입니다. `aria-current="page"` 가 붙고 배경이 칠해집니다.
 - 칸은 자식 순서로 정합니다. 글자보다 앞의 첫 요소가 아이콘, 글자가 라벨, 라벨 뒤의 요소가 끝 칸입니다. 글자가 없으면 아이콘 다음 요소가 라벨입니다.
 - 링크의 이름은 라벨입니다. 끝 칸의 Chip 은 이름에 들어가지 않습니다.
 - `asChild` 의 자식은 ref 와 `onClick` 을 받는 링크 하나여야 합니다.
@@ -282,8 +282,8 @@ export default async function Layout({ children }) {
 
 - `inset` 은 본문을 `Sidebar.Inset` 이 그리므로 `Sidebar.Provider` 가 필요합니다. 없으면 개발 모드에서 경고합니다.
 - Provider 는 자식 JSX 에서 `Sidebar` 를 찾아 `variant` 를 읽으므로, 서버 HTML 부터 본문이 Card 입니다. `Sidebar` 를 앱의 컴포넌트로 감싸 Provider 가 찾지 못하면, 마운트 뒤 Sidebar 가 알려 준 `variant` 로 본문을 Card 로 바꿉니다.
-- 사이드바는 `sticky top-0 h-dvh` 로 화면 높이를 채우고 본문과 함께 스크롤되지 않습니다. 다른 높이는 `className` 으로 줍니다.
-- 폭은 `--sidebar-width`(기본 15rem)입니다: `className="[--sidebar-width:18rem]"`.
+- 사이드바는 `sticky top-0 h-dvh` 로 화면 높이를 채우고 본문과 함께 스크롤되지 않습니다. 다른 높이는 새 디자인에서 `className` 으로 줍니다.
+- 폭은 `--sidebar-width`(기본 15rem)입니다. 사이드바가 이 값을 정하므로, 바꾸는 것은 새 디자인이고 `className` 으로 줍니다(`[--sidebar-width:18rem]`).
 
 ## Provider 와 Inset
 

@@ -21,14 +21,20 @@ import { Image } from '@gsainfoteam/ids-react';
 <Image src={src} alt="..." />                        // 부모 폭을 채우고, 높이는 그림의 비율
 <Image src={src} alt="..." ratio={1} />              // 정사각형. 그림은 칸을 채우고 잘린다
 <Image src={src} alt="..." ratio={16 / 9} />
-<Image src={src} alt="..." className="w-40" />       // 폭은 className 으로
 <Image src={src} alt="..." width={640} height={480} />  // 불러오기 전에도 자리를 잡는다
+
+<div className="w-40">                               {/* 폭은 감싸는 요소가 */}
+  <Image src={src} alt="..." />
+</div>
 ```
 
-- 폭은 부모를 가득 채웁니다(`w-full`). 크기는 부모의 폭과 `ratio` 가 정합니다.
+- **크기 계약: fill.** 폭은 부모를 가득 채웁니다(`w-full`). 크기는 부모의 폭과 `ratio` 가 정합니다.
 - `ratio` 가 없으면 높이는 불러온 그림의 비율입니다. 불러오기 전에는 높이를 모르므로 자리가 0 입니다. 목록처럼 자리가 흔들리면 안 되는 곳에는 `ratio` 나 `width`, `height` 를 줍니다.
-- 모서리는 `rounded-standard`(10px)입니다. `className="rounded-none"` 으로 바꿉니다.
-- 그림 안의 위치는 `object-cover` 가 기본입니다. `className="[&_img]:object-top"` 처럼 바꿉니다.
+- 모서리는 `rounded-standard`(10px), 그림 안의 위치는 `object-cover` 입니다. 둘을 바꾸는 것은 IDS 밖의 새 디자인이고, 그때만 `className` 을 줍니다.
+
+```tsx custom-design
+<Image src={src} alt="..." className="rounded-none [&_img]:object-top" />
+```
 
 ## 불러오기와 실패
 
@@ -48,7 +54,7 @@ import { Image } from '@gsainfoteam/ids-react';
 <Image alt="아직 올리지 않은 사진" />             {/* src 가 없으면 바로 Fallback */}
 ```
 
-| `data-status` | 뜻                                                 |
+| `status`      | 뜻                                                 |
 | ------------- | -------------------------------------------------- |
 | `loading`     | 불러오는 중. `Image.Placeholder` 가 보인다         |
 | `loaded`      | 그림을 그렸다                                      |
@@ -207,40 +213,20 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 - 썸네일 줄은 이름이 "사진 목록" 인 `role="group"` 이고, 지금 장의 썸네일은 `aria-current="true"` 입니다.
 - 깨진 큰 그림의 알림에서 그림 아이콘은 `role="img"` 와 `alt` 를 이름으로 가집니다.
 
-## 상태와 data 속성
+## 상태
 
-| 속성                              | 뜻                                        |
-| --------------------------------- | ----------------------------------------- |
-| `data-image`                      | 사진 상자                                 |
-| `data-status`                     | `loading` / `loaded` / `error`            |
-| `data-preview`                    | 누르면 크게 보는 사진                     |
-| `data-image-group`, `data-layout` | 묶음과 그 배치(`row` / `column` / `grid`) |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-- 함수로 받는 상태는 `{ status, preview }` 입니다. 루트의 `className`, `style` 이 받습니다.
+- 불러오는 상태(`loading` / `loaded` / `error`)는 `onStatusChange` 로 받습니다.
+- 크게 보기는 앱이 넘긴 `preview` 이고, `ImageGroup` 안이면 따로 주지 않아도 켜집니다.
+- 뷰어가 열렸는지, 지금 보는 장, 배율은 `ImageGroup`(뷰어만 쓸 때는 `Image.Viewer`)의 `open` / `onOpenChange`, `value` / `onValueChange`, `zoom` / `onZoomChange` 로 읽습니다. 배율이 1 보다 크면 확대된 상태입니다.
+- 새 디자인(`custom-design`)에서만 `Image` 루트의 `className`, `style` 에 `Image.State`(`status`, `preview`)를 받는 함수를 줍니다.
 
-| 뷰어 속성                      | 붙는 곳                                  | 뜻                                        |
-| ------------------------------ | ---------------------------------------- | ----------------------------------------- |
-| `data-image-viewer`            | 대화상자                                 |                                           |
-| `data-open`                    | 대화상자                                 | 열려 있다                                 |
-| `data-zoomed`                  | 대화상자                                 | 확대되어 있다                             |
-| `data-ending-style`            | 대화상자, 뒤 배경                        | 닫히는 중                                 |
-| `data-swiping`                 | 대화상자, 뒤 배경                        | 아래로 쓸어내리는 중                      |
-| `--image-viewer-presence`      | 대화상자, 뒤 배경                        | 쓸어내리는 동안 1 에서 0 으로 줄어드는 값 |
-| `data-image-viewer-backdrop`   | 뒤 배경                                  |                                           |
-| `data-image-viewer-stage`      | 사진들이 넘어가는 영역                   |                                           |
-| `data-slide`, `data-selected`  | 한 장, 지금 장                           |                                           |
-| `data-image-viewer-box`        | 확대되는 사진 상자                       |                                           |
-| `data-image-viewer-picture`    | 큰 그림 `<img>`                          |                                           |
-| `data-image-viewer-notice`     | 깨진 큰 그림의 알림                      |                                           |
-| `data-image-viewer-toolbar`    | `Image.Viewer.Toolbar`                   |                                           |
-| `data-image-viewer-counter`    | `Image.Viewer.Counter`                   |                                           |
-| `data-image-viewer-zoom-reset` | `Image.Viewer.ZoomReset`                 |                                           |
-| `data-image-viewer-separator`  | `Image.Viewer.Separator`                 |                                           |
-| `data-image-viewer-step`       | `Image.Viewer.Prev`, `Image.Viewer.Next` | `prev` / `next`                           |
-| `data-image-viewer-caption`    | `Image.Viewer.Caption`                   |                                           |
-| `data-image-viewer-thumbnails` | `Image.Viewer.Thumbnails`                |                                           |
-| `data-current`                 | 썸네일                                   | 지금 장. `aria-current="true"`            |
-| `data-image-viewer-download`   | `Image.Viewer.Download`                  |                                           |
+```tsx custom-design
+<Image src={src} alt="..." className={(state) => (state.status === 'error' ? 'opacity-60' : undefined)} />
+```
+
+- 런타임으로 읽을 수 없는 상태: 뷰어가 닫히는 전환 중인지, 아래로 쓸어내리는 중인지와 그 진행.
 
 ## 속성
 
@@ -254,7 +240,7 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | `previewSrc`          | 뷰어에서 보여 줄 그림. 기본 `src`                               |
 | `caption`             | 뷰어에서 보여 줄 설명                                           |
 | `onStatusChange`      | 불러오는 상태가 바뀔 때                                         |
-| `className` / `style` | 사진 상자로 간다. 상태를 받는 함수도 된다                       |
+| `className` / `style` | 사진 상자로 간다. 상태를 받는 함수도 된다. 새 디자인에서만 쓴다 |
 | `ref` / 그 외 속성    | `<img>` 로 간다(`srcSet`, `sizes`, `loading`, `crossOrigin` 등) |
 
 ### Image.Viewer
