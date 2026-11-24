@@ -29,7 +29,7 @@ export function DrawerHandle({ ref, className, onClick, ...props }: DrawerHandle
   return (
     <button
       type="button"
-      aria-label={t('drawer.handle')}
+      aria-label={t('common.resize')}
       aria-controls={drawer.ids.content}
       {...props}
       ref={handleRef}

@@ -42,7 +42,7 @@ export function SidebarTrigger({
           size="tiny"
           {...props}
           variant={variant}
-          aria-label={t('drawer.close')}
+          aria-label={t('common.close')}
           icon={<XMarkIcon />}
           data-sidebar-trigger=""
           className={className}
@@ -57,8 +57,8 @@ export function SidebarTrigger({
   const label = opensDrawer
     ? t('sidebar.open')
     : controls.collapsed
-      ? t('sidebar.expand')
-      : t('sidebar.collapse');
+      ? t('common.expand')
+      : t('common.collapse');
   const defaultIcon = opensDrawer ? (
     <Bars3Icon />
   ) : controls.collapsed ? (

@@ -2,11 +2,11 @@
 
 그림 하나를 확대하고, 끌어서 옮기고, 아래로 쓸어 닫는 제스처 엔진입니다. 휠, 두 손가락, 두 번 탭(클릭), 키보드로 배율을 바꿉니다. 확대한 그림은 가장자리까지만 끌리고, 빠르게 놓으면 관성으로 미끄러집니다. 배율 1 에서 아래로 쓸면 Drawer 와 같은 기준으로 닫습니다.
 
-| 파일                                 | 내용                                                                             |
-| ------------------------------------ | -------------------------------------------------------------------------------- |
-| [`lib/engine.ts`](#libenginets)             | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션 |
-| [`hooks/use-zoom-pan.ts`](#hooksuse-zoom-pants) | React hook `useInternalZoomPan`. 두 요소에 엔진을 붙이고 배율을 state 로 제어한다        |
-| [`lib/math.ts`](#libmathts)                 | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성              |
+| 파일                                            | 내용                                                                              |
+| ----------------------------------------------- | --------------------------------------------------------------------------------- |
+| [`lib/engine.ts`](#libenginets)                 | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션  |
+| [`hooks/use-zoom-pan.ts`](#hooksuse-zoom-pants) | React hook `useInternalZoomPan`. 두 요소에 엔진을 붙이고 배율을 state 로 제어한다 |
+| [`lib/math.ts`](#libmathts)                     | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성               |
 
 ## 쓰는 곳
 
@@ -88,7 +88,7 @@ useInternalSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르
 
 | 이름                                            | 하는 일                                                                              |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `useInternalZoomPan(options)`                           | `element` 와 `content` 가 있고 `disabled` 가 아니면 layout effect 에서 엔진을 붙인다 |
+| `useInternalZoomPan(options)`                   | `element` 와 `content` 가 있고 `disabled` 가 아니면 layout effect 에서 엔진을 붙인다 |
 | `scale`, `zoomed`                               | 제어하는(또는 스스로 가진) 배율과 그것이 1 보다 큰가                                 |
 | `canZoomIn`, `canZoomOut`                       | 배율이 최대보다 작은가, 1 보다 큰가                                                  |
 | `isZoomed()`                                    | 엔진이 지금 그린 배율. 핀치 중이면 `true`. 엔진이 없으면 `false`                     |

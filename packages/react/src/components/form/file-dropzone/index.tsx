@@ -1,15 +1,19 @@
 import {
   FileDropzoneClear,
   FileDropzoneItem,
+  FileDropzoneLimits,
   FileDropzoneList,
   FileDropzonePreview,
+  FileDropzoneRejection,
   FileDropzoneRemove,
   FileDropzoneTrigger,
   FileDropzoneValue,
   type FileDropzoneClearProps,
   type FileDropzoneItemProps,
+  type FileDropzoneLimitsProps,
   type FileDropzoneListProps,
   type FileDropzonePreviewProps,
+  type FileDropzoneRejectionProps,
   type FileDropzoneRemoveProps,
   type FileDropzoneTriggerProps,
   type FileDropzoneValueProps,
@@ -22,7 +26,7 @@ import {
 } from './root';
 import { fileDropzoneStyle } from './style';
 
-import type { FileFieldItemState, FileFieldRejection } from '../file-field';
+import type { FileFieldItemState, FileFieldLimits, FileFieldRejection } from '../file-field';
 
 export function FileDropzone(props: FileDropzoneProps) {
   return <FileDropzoneRoot {...props} />;
@@ -34,6 +38,7 @@ export namespace FileDropzone {
   export type ItemState = FileFieldItemState;
   export type Variant = FileDropzoneVariant;
   export type Rejection = FileFieldRejection;
+  export type Limits = FileFieldLimits;
 
   export type TriggerProps = FileDropzoneTriggerProps;
   export type ValueProps = FileDropzoneValueProps;
@@ -42,6 +47,8 @@ export namespace FileDropzone {
   export type ItemProps = FileDropzoneItemProps;
   export type RemoveProps = FileDropzoneRemoveProps;
   export type PreviewProps = FileDropzonePreviewProps;
+  export type LimitsProps = FileDropzoneLimitsProps;
+  export type RejectionProps = FileDropzoneRejectionProps;
 
   export const Trigger = FileDropzoneTrigger;
   export const Value = FileDropzoneValue;
@@ -50,6 +57,8 @@ export namespace FileDropzone {
   export const Item = FileDropzoneItem;
   export const Remove = FileDropzoneRemove;
   export const Preview = FileDropzonePreview;
+  export const Limits = FileDropzoneLimits;
+  export const Rejection = FileDropzoneRejection;
 
   export const Style = fileDropzoneStyle;
 }

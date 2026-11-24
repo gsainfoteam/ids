@@ -18,7 +18,6 @@ import {
   VIEWPORT_MARGIN,
   type PopupPresentation,
 } from '../overlay';
-import { FieldPopupTitleContext } from './parts/header';
 
 export { FieldPopupHeader } from './parts/header';
 export { useInternalDrawerPresentation, type PopupPresentation } from '../overlay';
@@ -66,7 +65,6 @@ export function FieldPopup({
   const drawer = useInternalDrawerPresentation(mobileVariant);
   const presentation: PopupPresentation = drawer ? 'drawer' : 'popover';
   const initialFocusDone = useRef(false);
-  const [titleId, setTitleId] = useState<string>();
   const [stacked, setStacked] = useState(false);
 
   const layer = useInternalLayer(true, {
@@ -158,8 +156,7 @@ export function FieldPopup({
           popover="manual"
           role={role}
           aria-modal={drawer || undefined}
-          aria-label={props['aria-label'] ?? (role && !named && !titleId ? label : undefined)}
-          aria-labelledby={props['aria-labelledby'] ?? (named ? undefined : titleId)}
+          aria-label={props['aria-label'] ?? (role && !named ? label : undefined)}
           tabIndex={props.tabIndex ?? (drawer ? -1 : undefined)}
           data-field-popup=""
           data-presentation={presentation}
@@ -167,9 +164,7 @@ export function FieldPopup({
           className={styles.popup({ className })}
           style={{ ...style, ...(drawer ? undefined : anchored.floatingStyles), position: 'fixed' }}
         >
-          <ScrollArea.Viewport className={styles.viewport()}>
-            <FieldPopupTitleContext value={setTitleId}>{children}</FieldPopupTitleContext>
-          </ScrollArea.Viewport>
+          <ScrollArea.Viewport className={styles.viewport()}>{children}</ScrollArea.Viewport>
         </div>
       </ScrollArea>
     </ModalLayer>

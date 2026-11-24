@@ -23,7 +23,7 @@
 
 - TextField 는 `textControlStyle` 을 그대로 `TextField.Style` 로 쓰고, PasswordField, NumberField, TelField 는 `tv({ extend: textControlStyle })` 로 넓힙니다.
 - 네 필드의 `Clear` 는 모두 `TextControlClear` 입니다.
-- 상자의 클래스는 [`fieldSurface`](../README.md#surfaceslibfield-surfacets), 상자 안 버튼은 `fieldAction.padded` 입니다.
+- 상자의 클래스는 [`fieldSurface`](../README.md#field-surfacets), 상자 안 버튼은 `fieldAction.padded` 입니다.
 
 ## index.tsx
 

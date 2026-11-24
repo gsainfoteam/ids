@@ -117,7 +117,7 @@ test('SSR: panels grow by their default sizes, the rest share what is left, hand
   expect(first!.getAttribute('aria-valuemin')).toBe('10');
   expect(first!.getAttribute('aria-valuemax')).toBe('60');
   expect(first!.getAttribute('aria-valuetext')).toBe('30%');
-  expect(first!.getAttribute('aria-label')).toBe('패널 크기 조절');
+  expect(first!.getAttribute('aria-label')).toBe('크기 조절');
   expect(first!.tabIndex).toBe(0);
   expect(second!.getAttribute('aria-controls')).toBe(panelsOf(root)[1]!.id);
   expect(doc.querySelectorAll('[dir]'), 'the direction is inherited, never forced').toHaveLength(0);
@@ -152,10 +152,10 @@ test('SSR: a collapsed panel is inert, and its handle offers a button to expand 
   expect(sidebar!.hasAttribute('inert')).toBe(true);
   expect(sidebar!.hasAttribute('data-collapsed')).toBe(true);
   const handle = doc.querySelector('[role=separator]')!;
-  expect(handle.getAttribute('aria-valuetext')).toBe('접힘');
+  expect(handle.getAttribute('aria-valuetext')).toBe('0%');
   expect(handle.getAttribute('aria-valuemin'), 'collapsing is the smallest size').toBe('0');
   const toggle = doc.querySelector('[data-splitter-toggle]')!;
-  expect(toggle.getAttribute('aria-label')).toBe('패널 펼치기');
+  expect(toggle.getAttribute('aria-label')).toBe('펼치기');
   expect(toggle.getAttribute('aria-expanded')).toBe('false');
   expect(toggle.getAttribute('aria-controls')).toBe('sidebar');
 });
@@ -275,7 +275,7 @@ test('collapse: Enter and the handle button fold the panel and restore its size,
   handle.element().focus();
   await userEvent.keyboard('{Enter}');
   await expect.element(handle).toHaveAttribute('aria-valuenow', '0');
-  await expect.element(handle).toHaveAttribute('aria-valuetext', '접힘');
+  await expect.element(handle).toHaveAttribute('aria-valuetext', '0%');
   await expect.element(sidebar()).toHaveAttribute('inert');
   expect(commits).toEqual([[0, 100]]);
   await userEvent.keyboard('{Enter}');
@@ -284,12 +284,12 @@ test('collapse: Enter and the handle button fold the panel and restore its size,
     .toHaveAttribute('aria-valuenow', '30');
   await expect.element(sidebar()).not.toHaveAttribute('inert');
 
-  const toggle = screen.getByRole('button', { name: '패널 접기' });
+  const toggle = screen.getByRole('button', { name: '접기' });
   await expect.element(toggle).toHaveAttribute('aria-controls', 'sidebar');
   await expect.element(toggle).toHaveAttribute('aria-expanded', 'true');
   await userEvent.click(toggle);
   await expect.element(handle).toHaveAttribute('aria-valuenow', '0');
-  const expand = screen.getByRole('button', { name: '패널 펼치기' });
+  const expand = screen.getByRole('button', { name: '펼치기' });
   await expect.element(expand).toHaveAttribute('aria-expanded', 'false');
   expect(commits.at(-1)).toEqual([0, 100]);
   await userEvent.click(expand);
@@ -323,7 +323,7 @@ test('collapse: a collapsible panel after the handle folds toward the end', asyn
     </Sized>,
   );
   const handle = screen.getByRole('separator');
-  await userEvent.click(screen.getByRole('button', { name: '패널 접기' }));
+  await userEvent.click(screen.getByRole('button', { name: '접기' }));
   await expect.element(handle).toHaveAttribute('aria-valuenow', '100');
   handle.element().focus();
   await userEvent.keyboard('{Enter}');

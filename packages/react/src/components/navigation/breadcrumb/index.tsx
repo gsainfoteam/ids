@@ -9,6 +9,7 @@ import { BreadcrumbSeparator, type BreadcrumbSeparatorProps } from './parts/sepa
 import { BreadcrumbRoot } from './root';
 import { breadcrumbStyle } from './style';
 
+import type { AccessibleName } from '../../../internal/lib/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Breadcrumb(props: Breadcrumb.Props) {
@@ -16,10 +17,11 @@ export function Breadcrumb(props: Breadcrumb.Props) {
 }
 
 export namespace Breadcrumb {
-  export type Props = ComponentProps<'nav'> & {
-    size?: IdsSize;
-    maxItems?: number;
-  };
+  export type Props = ComponentProps<'nav'> &
+    AccessibleName & {
+      size?: IdsSize;
+      maxItems?: number;
+    };
 
   export type ListProps = BreadcrumbListProps;
   export type ItemProps = BreadcrumbItemProps;

@@ -112,7 +112,7 @@
 - 실제 input이 없는 곳에 `onChange`를 둔 경우
 - 안쪽 native input에 root의 `onChange`를 넘겨 변경이 두 번 보고되는 경우
 - 입력을 React `onChange`가 아니라 native `input`, `change` listener에서 읽어 `setState`하는 경우. 키 입력을 잃습니다
-- 위젯 키를 `keyHandler`(`internal/lib/keys.ts`) 밖에서 처리한 경우, 단축키를 `Hotkey` 타입이 아닌 문자열로 받은 경우, 키 처리에서 `stopPropagation`을 부른 경우
+- 위젯 키를 `keyHandler`(`internal/keys.ts`) 밖에서 처리한 경우, 단축키를 `Hotkey` 타입이 아닌 문자열로 받은 경우, 키 처리에서 `stopPropagation`을 부른 경우
 - 부품 props 타입이 `X.PartProps` 이름을 따르지 않는 경우, 부품이 생략됐을 때 기본값으로 대체되지 않는 경우
 - group 컨트롤(RadioGroup, CheckboxGroup, Rating, ToggleGroup 같은 것)이 root에 `ref`, `id`, `tabIndex={-1}`를 두지 않거나 `focus()`를 선택된 항목에 넘기지 않는 경우
 - `onClick`을 받는 Card, Item이 root를 `<button>`으로 만들어 안에 버튼이 중첩되는 경우

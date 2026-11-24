@@ -8,6 +8,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, TimeField } from '../src';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
@@ -18,7 +19,7 @@ const option = (unit: string, n: number) =>
   col(unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
 const d = (hour = 9, minute = 30, second = 0) => new Time(hour, minute, second);
 const inLocale = (locale: string | undefined, children: ReactNode) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     {children}
   </IdsProvider>
 );
@@ -63,7 +64,7 @@ test('SSR: display follows format, hourCycle and the locale tag; FormData follow
   expect(form({})).toBe('14:05');
   expect(form({ precision: 'second' })).toBe('14:05:09');
   const empty = html({});
-  expect(empty.querySelector('[role=combobox]')!.textContent).toBe('시간 선택');
+  expect(empty.querySelector('[role=combobox]')!.textContent).toBe('');
   expect(new FormData(empty.querySelector('form')!).get('at')).toBeNull();
   expect(() => text({ locale: 'de_DE' })).toThrow(/BCP 47/);
   // @ts-expect-error A Date is no longer a time value.
@@ -93,9 +94,9 @@ test('StrictMode: ArrowDown focuses the first column, picks stay open, Escape an
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   await expect.element(trigger).toHaveFocus();
   await expect.element(trigger).toHaveTextContent('14:45');
-  await userEvent.click(screen.getByRole('button', { name: '시간 지우기' }));
+  await userEvent.click(screen.getByRole('button', { name: '지우기' }));
   expect(changes.at(-1)).toBeNull();
-  await expect.element(trigger).toHaveTextContent('시간 선택');
+  await expect.element(trigger).toHaveTextContent('');
 });
 
 test('Delete inside the picker clears the field too', async () => {
@@ -123,7 +124,7 @@ test('custom parts, readOnly, and a native onClick that prevents opening', async
   );
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
-  const clear = screen.getByRole('button', { name: '시간 지우기' });
+  const clear = screen.getByRole('button', { name: '지우기' });
   await expect.element(clear).toHaveAttribute('disabled');
   await expect.element(clear).toHaveAttribute('data-variant', 'ghost');
   await expect.element(clear).toHaveAttribute('data-disabled');
@@ -131,14 +132,14 @@ test('custom parts, readOnly, and a native onClick that prevents opening', async
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   await screen.rerender(
-    <TimeField>
+    <TimeField aria-label="알람">
       <TimeField.Content mobileVariant="drawer">Custom time controls</TimeField.Content>
     </TimeField>,
   );
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(screen.getByRole('dialog')).toMatchTextContent('Custom time controls');
   await expect.element(screen.getByRole('button', { name: '닫기' })).toHaveFocus();
-  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('시간 선택');
+  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('알람');
 });
 
 test('required and native reset go through the hidden form value', async () => {

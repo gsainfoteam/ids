@@ -71,14 +71,14 @@ class ProviderPreview extends StatelessWidget {
                       for (final family in IdsColorRoles.families)
                         FamilySwatch(family: family, colors: colors),
                       Text(
-                        ids.translation?.spinnerLabel ??
-                            IdsMessages.ko.spinnerLabel,
+                        ids.translation?.commonLoading ??
+                            IdsMessages.ko.commonLoading,
                       ),
                       const IdsSpinner(),
                       const IdsDivider(),
                       Text(
-                        ids.translation?.dialogClose ??
-                            IdsMessages.ko.dialogClose,
+                        ids.translation?.commonClose ??
+                            IdsMessages.ko.commonClose,
                       ),
                     ],
                   ),

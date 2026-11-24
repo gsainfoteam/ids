@@ -168,7 +168,7 @@ function CommandPopup({
               </div>
             </ScrollArea.Viewport>
           </ScrollArea>
-          {empties.length ? empties : <CommandEmpty />}
+          {empties}
         </OverlayItemContext>
       </div>
     </ModalLayer>
@@ -181,10 +181,10 @@ export function CommandSearch({ placeholder, ...props }: Menu.SearchProps) {
   const palette = useInternalCommandContext('Menu.Search');
 
   const own = mergeProps(props as Record<string, unknown>, {
-    'aria-label': props['aria-label'] ?? t('menu.search'),
+    'aria-label': props['aria-label'] ?? t('common.search'),
     'data-menu-search': '',
     value: palette.query,
-    placeholder: placeholder ?? t('menu.searchPlaceholder'),
+    placeholder,
     onChange: (event: ChangeEvent<HTMLInputElement>) => palette.search(event.currentTarget.value),
     onKeyDown: palette.onSearchKeyDown,
   }) as Omit<FieldPopupSearchProps, 'controls' | 'activeDescendant'>;
@@ -201,14 +201,12 @@ export function CommandSearch({ placeholder, ...props }: Menu.SearchProps) {
 CommandSearch.displayName = 'Menu.Search';
 
 export function CommandEmpty({ asChild, children, className, ...props }: Menu.EmptyProps) {
-  const t = useInternalTranslate();
-
   const palette = useInternalCommandContext('Menu.Empty');
 
   return part(
     'div',
     asChild,
-    palette.empty ? (children ?? t('menu.empty')) : null,
+    palette.empty ? children : null,
     mergeProps(props, {
       role: 'status',
       'data-menu-empty': '',

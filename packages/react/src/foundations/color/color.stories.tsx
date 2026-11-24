@@ -576,7 +576,7 @@ export const Lab: Story = {
                             </Breadcrumb.Item>
                           </Breadcrumb.List>
                         </Breadcrumb>
-                        <Stepper defaultValue={1}>
+                        <Stepper aria-label="진행 단계" defaultValue={1}>
                           <Stepper.Item>
                             <Stepper.Title>계정</Stepper.Title>
                           </Stepper.Item>

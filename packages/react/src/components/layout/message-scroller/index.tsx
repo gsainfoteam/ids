@@ -6,6 +6,8 @@ import { MessageScrollerList, type MessageScrollerListProps } from './parts/list
 import { MessageScrollerRoot } from './root';
 import { messageScrollerStyle } from './style';
 
+import type { AccessibleName } from '../../../internal/lib/accessible-name';
+
 export function MessageScroller(props: MessageScroller.Props) {
   return <MessageScrollerRoot {...props} />;
 }
@@ -13,11 +15,12 @@ export function MessageScroller(props: MessageScroller.Props) {
 export namespace MessageScroller {
   export type ScrollOnAppend = EngineScrollOnAppend;
 
-  export type Props = ComponentProps<'div'> & {
-    onReachStart?: () => void;
-    stickToBottom?: boolean;
-    scrollOnAppend?: ScrollOnAppend;
-  };
+  export type Props = ComponentProps<'div'> &
+    AccessibleName & {
+      onReachStart?: () => void;
+      stickToBottom?: boolean;
+      scrollOnAppend?: ScrollOnAppend;
+    };
   export type ListProps = MessageScrollerListProps;
   export type JumpProps = MessageScrollerJumpProps;
 

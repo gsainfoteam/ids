@@ -16,10 +16,10 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const region = (name = '사진') => page.getByRole('region', { name });
 const slide = (n: number, count = 5) => page.getByRole('group', { name: `${count}장 중 ${n}번째` });
-const previous = () => page.getByRole('button', { name: '이전 슬라이드' });
-const next = () => page.getByRole('button', { name: '다음 슬라이드' });
+const previous = () => page.getByRole('button', { name: '이전' });
+const next = () => page.getByRole('button', { name: '다음' });
 const indicator = (n: number) => page.getByRole('button', { name: `${n}번째 슬라이드로` });
-const pause = () => page.getByRole('button', { name: '자동 넘김 멈춤' });
+const pause = () => page.getByRole('button', { name: '일시 정지' });
 const outside = () => page.getByRole('button', { name: '밖' });
 
 const slideNodes = () => [...document.querySelectorAll<HTMLElement>('[data-carousel-slide]')];

@@ -319,9 +319,9 @@ export function useInternalNumberField({
     current == null
       ? ''
       : min !== undefined && current < min
-        ? t('numberField.rangeUnderflow', { min: format(min) })
+        ? t('common.invalid')
         : max !== undefined && current > max
-          ? t('numberField.rangeOverflow', { max: format(max) })
+          ? t('common.invalid')
           : '';
   const notify = use(FieldNotifyContext);
   useLayoutEffect(() => {

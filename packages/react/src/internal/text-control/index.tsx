@@ -144,7 +144,7 @@ export function TextControlClear({
   const internal = {
     type: 'button' as const,
     tabIndex: -1,
-    'aria-label': props['aria-label'] ?? t('textField.clear'),
+    'aria-label': props['aria-label'] ?? t('common.clear'),
     'aria-controls': context.inputId,
     'data-text-control-clear': '',
     onPointerDown: keepFocusInInput,

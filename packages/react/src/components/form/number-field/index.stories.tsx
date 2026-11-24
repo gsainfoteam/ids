@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { Field as FormField } from '../../../react-hook-form';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
@@ -278,7 +279,7 @@ export const FormatForAnotherLocale: Story = {
 
     return (
       <div className="grid w-72 gap-4">
-        <IdsProvider.Scope locale="de-DE">
+        <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
           <Field>
             <Field.Label>금액</Field.Label>
             <NumberField
@@ -306,7 +307,7 @@ export const FormatForAnotherLocale: Story = {
     docs: {
       description: {
         story:
-          '숫자는 가장 가까운 `IdsProvider` 의 `locale` 로 쓰고 읽습니다. 앱 전체는 바깥 `IdsProvider` 의 `locale` 로 정하고, 한 필드만 다른 형식으로 보이려면 그 필드를 `<IdsProvider.Scope locale="de-DE">` 로 감쌉니다. `formatOptions` 로 통화와 퍼센트를 고르고, 입력하는 동안에는 쓴 글자를 그대로 두었다가 입력을 마치면 그 형식으로 다시 씁니다.',
+          '숫자는 가장 가까운 `IdsProvider` 의 `locale` 로 쓰고 읽습니다. 앱 전체는 바깥 `IdsProvider` 의 `locale` 로 정하고, 한 필드만 다른 형식으로 보이려면 그 필드를 `IdsProvider.Scope` 로 감싸고 그 `locale` 의 `tag` 를 `de-DE` 로 줍니다. `formatOptions` 로 통화와 퍼센트를 고르고, 입력하는 동안에는 쓴 글자를 그대로 두었다가 입력을 마치면 그 형식으로 다시 씁니다.',
       },
     },
   },
@@ -383,7 +384,7 @@ export const BlockValuesOutOfRange: Story = {
         <Field.Label>좌석 수</Field.Label>
         <NumberField name="seats" min={1} max={8} defaultValue={12} />
         <Field.Hint>1에서 8까지</Field.Hint>
-        <Field.Error />
+        <Field.Error match="customError">좌석은 1석에서 8석까지 고를 수 있습니다.</Field.Error>
       </Field>
       <Button type="submit">예약</Button>
     </form>
@@ -392,18 +393,18 @@ export const BlockValuesOutOfRange: Story = {
     docs: {
       description: {
         story:
-          '`min` 과 `max` 를 벗어난 값은 native 검증으로도 알립니다. 폼이 제출을 막고 `Field.Error` 가 이유를 보여 줍니다. 입력을 마치면 범위 안으로 맞춰집니다.',
+          '`min` 과 `max` 를 벗어난 값은 native 검증으로도 알립니다. 폼이 제출을 막고 `Field.Error match="customError"` 에 쓴 이유가 보입니다. 입력을 마치면 범위 안으로 맞춰집니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('spinbutton', { name: '좌석 수' });
     await userEvent.click(canvas.getByRole('button', { name: '예약' }));
-    await expect(await canvas.findByText('값은 8 이하여야 합니다.')).toBeVisible();
+    await expect(await canvas.findByText('좌석은 1석에서 8석까지 고를 수 있습니다.')).toBeVisible();
     await userEvent.click(input);
     await userEvent.keyboard('{ArrowDown}');
     await expect(input).toHaveValue('8');
-    await expect(canvas.queryByText('값은 8 이하여야 합니다.')).toBeNull();
+    await expect(canvas.queryByText('좌석은 1석에서 8석까지 고를 수 있습니다.')).toBeNull();
   },
 };
 

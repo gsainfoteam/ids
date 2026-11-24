@@ -5,7 +5,7 @@
 - **Progress 와 값을 같이 셉니다.** `value`, `max`, `indeterminate`, `getValueLabel` 은 `Progress` 와 같은 내부 hook 으로 계산합니다. 범위를 벗어난 값은 0과 `max` 사이로 맞추고, 백분율은 내림입니다.
 - **이름과 값이 자동으로 연결됩니다.** `CircularProgress.Label` 이 progressbar의 이름이 되고, `aria-valuenow` / `aria-valuemax` / `aria-valuetext` 가 붙습니다.
 - **가운데와 옆.** `CircularProgress.Label` 은 원 옆에, 나머지 자식은 원 가운데에 놓입니다.
-- **Spinner 와 같은 원.** 반지름과 선 굵기를 Spinner 와 같은 치수(`internal/parts/arc`)에서 가져옵니다.
+- **Spinner 와 같은 원.** 반지름과 선 굵기를 Spinner 와 같은 치수(`internal/arc`)에서 가져옵니다.
 - **모션 줄이기.** `prefers-reduced-motion` 이면 호가 늘어나는 전환도, 진행률이 없을 때의 회전도 멈춥니다.
 
 ```tsx

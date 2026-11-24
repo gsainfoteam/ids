@@ -13,7 +13,7 @@
 import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 
 <div className="h-96">
-  <MessageScroller>
+  <MessageScroller aria-label="메시지">
     {messages.map((message) => (
       <Message key={message.id} align={message.mine ? 'end' : 'start'}>
         <Bubble variant={message.mine ? 'solid' : 'soft'}>{message.text}</Bubble>
@@ -26,9 +26,9 @@ import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 ## 새 메시지가 붙을 때
 
 ```tsx
-<MessageScroller />                          // scrollOnAppend="end" (기본). 맨 아래에 붙어 따라간다
-<MessageScroller scrollOnAppend="start" />   // 새로 붙은 첫 자식을 위쪽에 맞춘다. AI 대화
-<MessageScroller stickToBottom={false} />    // 맨 아래에 있어도 따라가지 않는다
+<MessageScroller aria-label="메시지" />                         // scrollOnAppend="end" (기본). 맨 아래에 붙어 따라간다
+<MessageScroller aria-label="메시지" scrollOnAppend="start" />  // 새로 붙은 첫 자식을 위쪽에 맞춘다. AI 대화
+<MessageScroller aria-label="메시지" stickToBottom={false} />   // 맨 아래에 있어도 따라가지 않는다
 ```
 
 - `end` 는 맨 아래에 있을 때만 따라갑니다. 위로 올려 둔 동안 붙은 자식 수는 아래로 가기 버튼에 셉니다.
@@ -40,14 +40,14 @@ import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 
 ## 따라가기를 푸는 것
 
-| 입력                                   | 동작                                 |
-| -------------------------------------- | ------------------------------------ |
-| 위로 스크롤 (막대 끌기, 찾기, 스크립트 포함) | 맨 아래에서 벗어나면 푼다          |
-| 휠을 위로                              | 스크롤이 일어나기 전에 푼다          |
-| `PageUp`, `Home`, `ArrowUp` (수정키 포함) | 브라우저가 스크롤하기 전에 푼다   |
-| 손가락으로 목록을 아래로 끌기           | 푼다                                 |
-| 목록 안의 글자 고르기 (`selectionchange`) | 맨 아래에 있어도 푼다              |
-| 맨 아래로 다시 스크롤, 아래로 가기 버튼  | 다시 따라간다 (`stickToBottom` 일 때) |
+| 입력                                         | 동작                                  |
+| -------------------------------------------- | ------------------------------------- |
+| 위로 스크롤 (막대 끌기, 찾기, 스크립트 포함) | 맨 아래에서 벗어나면 푼다             |
+| 휠을 위로                                    | 스크롤이 일어나기 전에 푼다           |
+| `PageUp`, `Home`, `ArrowUp` (수정키 포함)    | 브라우저가 스크롤하기 전에 푼다       |
+| 손가락으로 목록을 아래로 끌기                | 푼다                                  |
+| 목록 안의 글자 고르기 (`selectionchange`)    | 맨 아래에 있어도 푼다                 |
+| 맨 아래로 다시 스크롤, 아래로 가기 버튼      | 다시 따라간다 (`stickToBottom` 일 때) |
 
 - 맨 아래로 보는 거리는 8px 입니다. 그 안에서 위로 조금 움직인 것은 맨 아래로 봅니다.
 - MessageScroller 가 직접 옮긴 스크롤(따라가기, 자리 지키기, 위쪽 맞추기)은 사용자 입력으로 세지 않습니다.
@@ -56,7 +56,7 @@ import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 ## 앞 기록 불러오기
 
 ```tsx
-<MessageScroller onReachStart={loadOlder} aria-busy={loadingOlder}>
+<MessageScroller aria-label="메시지" onReachStart={loadOlder} aria-busy={loadingOlder}>
   {messages.map(...)}
 </MessageScroller>
 ```
@@ -70,7 +70,7 @@ import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 ## 아래로 가기 버튼
 
 ```tsx
-<MessageScroller>
+<MessageScroller aria-label="메시지">
   {messages.map(...)}
   {/* 없으면 기본 버튼. 바꿀 때만 둔다 */}
   <MessageScroller.Jump variant="soft" colorScheme="primary" />
@@ -91,7 +91,7 @@ import { Bubble, Message, MessageScroller } from '@gsainfoteam/ids-react';
 ## 목록
 
 ```tsx
-<MessageScroller>
+<MessageScroller aria-label="메시지">
   <MessageScroller.List>
     {messages.map(...)}
   </MessageScroller.List>
@@ -130,7 +130,7 @@ export function Chat() {
 
   return (
     <div className="min-h-0 flex-1">
-      <MessageScroller scrollOnAppend="start">
+      <MessageScroller aria-label="메시지" scrollOnAppend="start">
         {turnsOf(messages).map((turn) => (
           <div key={turn[0].id} className="flex flex-col gap-4">
             {turn.map((message) => (
@@ -157,7 +157,7 @@ export function Chat() {
 
 ## 접근성
 
-- 스크롤 영역은 `role="log"` 라 새로 붙은 메시지를 스크린 리더가 읽습니다. 이름은 "메시지"이고 root 의 `aria-label`, `aria-labelledby` 가 그 이름이 됩니다.
+- 스크롤 영역은 `role="log"` 라 새로 붙은 메시지를 스크린 리더가 읽습니다. root 의 `aria-label` 이나 `aria-labelledby` 가 그 이름이 됩니다. 이름은 필수이고 기본값이 없어, 없으면 개발 모드에서 경고합니다.
 - 앞 기록을 불러오는 동안은 `aria-busy` 라 붙은 기록을 한꺼번에 읽지 않습니다.
 - 안에 포커스를 받을 요소가 없으면 스크롤 영역이 Tab 멈춤을 받아 키보드로 읽을 수 있습니다(ScrollArea 규칙).
 
@@ -168,19 +168,20 @@ export function Chat() {
 
 ## 속성
 
-| 속성             | 기본 / 동작                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| `stickToBottom`  | `true`. 맨 아래에 있으면 새 메시지와 자라는 메시지를 따라간다       |
-| `scrollOnAppend` | `'end'`(기본) / `'start'`. 새로 붙은 첫 자식을 위쪽에 맞출지        |
-| `onReachStart`   | 위로 스크롤해 맨 위에 닿으면 부른다                                 |
-| `aria-busy`      | 위쪽에 Spinner. root 가 아니라 스크롤 영역에 붙는다                 |
-| `aria-label`     | 스크롤 영역(`role="log"`)의 이름. 기본 "메시지"                     |
-| 그 외            | root `<div>` 로 간다                                               |
+| 속성              | 기본 / 동작                                                   |
+| ----------------- | ------------------------------------------------------------- |
+| `stickToBottom`   | `true`. 맨 아래에 있으면 새 메시지와 자라는 메시지를 따라간다 |
+| `scrollOnAppend`  | `'end'`(기본) / `'start'`. 새로 붙은 첫 자식을 위쪽에 맞출지  |
+| `onReachStart`    | 위로 스크롤해 맨 위에 닿으면 부른다                           |
+| `aria-busy`       | 위쪽에 Spinner. root 가 아니라 스크롤 영역에 붙는다           |
+| `aria-label`      | 필수. 스크롤 영역(`role="log"`)의 이름. 기본값이 없다         |
+| `aria-labelledby` | `aria-label` 대신, 보이는 제목의 `id`                         |
+| 그 외             | root `<div>` 로 간다                                          |
 
-| 파트             | 기본 / 동작                                                  |
-| ---------------- | ------------------------------------------------------------ |
-| `List`           | `<ol>`. 목록을 직접 적을 때만 둔다                            |
-| `Jump`           | Button. 없으면 기본 버튼이 붙는다                             |
+| 파트   | 기본 / 동작                        |
+| ------ | ---------------------------------- |
+| `List` | `<ol>`. 목록을 직접 적을 때만 둔다 |
+| `Jump` | Button. 없으면 기본 버튼이 붙는다  |
 
 ## 알아둘 것
 
