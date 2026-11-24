@@ -10,6 +10,7 @@ import 'components/text_field_usecase.dart';
 import 'components/button_group_usecase.dart';
 import 'components/checkbox_usecase.dart';
 import 'components/checkbox_group_usecase.dart';
+import 'components/floating_button_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -32,6 +33,10 @@ final directories = <WidgetbookNode>[
           WidgetbookComponent(
             name: 'IdsButtonGroup',
             useCases: buttonGroupUseCases,
+          ),
+          WidgetbookComponent(
+            name: 'IdsFloatingButton',
+            useCases: floatingButtonUseCases,
           ),
         ],
       ),

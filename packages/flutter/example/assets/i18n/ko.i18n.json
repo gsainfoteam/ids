@@ -165,6 +165,14 @@
       "submissionResult": "제출 결과",
       "selectAll": "전체 선택",
       "skillComingSoon": "{skill} (준비 중)"
+    },
+    "floatingButtonSample": {
+      "createAPost": "새 글 작성",
+      "floatingButtonsUseOpaqueBackgrounds": "떠 있는 버튼이라 모든 배경이 불투명합니다.",
+      "contactUs": "문의",
+      "uploading": "업로드 중",
+      "compose": "작성",
+      "upload": "업로드"
     }
   },
   "examples": {
