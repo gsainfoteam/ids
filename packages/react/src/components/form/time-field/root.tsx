@@ -3,7 +3,7 @@
 import { ClockIcon } from '@heroicons/react/24/outline';
 
 import { TimeFieldContext } from './context';
-import { TimeFieldTimePicker } from './time-picker';
+import { TimeFieldTimePicker } from './parts/time-picker';
 import { resolveLocale } from '../../../internal/date-locale';
 import {
   pickerPart,
@@ -14,8 +14,8 @@ import {
   formatter,
   timeOptions,
   type TemporalFormat,
-} from '../../../internal/temporal-field/format';
-import { useProviderLocale, useTranslate } from '../../../internal/translate';
+} from '../../../internal/temporal-field/lib/format';
+import { useInternalProviderLocale, useInternalTranslate } from '../../../internal/translate';
 import {
   onUtcSampleDay,
   resolveHourCycle,
@@ -24,7 +24,7 @@ import {
   validateTime,
   type HourCycle,
   type TimePrecision,
-} from '../../data/time-picker/time';
+} from '../../data/time-picker/lib/time';
 
 import type { Time } from '@internationalized/date';
 
@@ -48,8 +48,8 @@ export function TimeFieldRoot({
   max,
   ...props
 }: TimeFieldProps) {
-  const t = useTranslate();
-  const providerLocale = useProviderLocale();
+  const t = useInternalTranslate();
+  const providerLocale = useInternalProviderLocale();
   validateTime(props.value, 'TimeField');
   validateTime(props.defaultValue, 'TimeField');
   validateTime(min, 'TimeField');

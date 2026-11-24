@@ -1,9 +1,9 @@
 import type { ComponentProps, CSSProperties, ReactNode, Ref } from 'react';
 
+import { type FloatingPlacement } from './hooks/use-floating-button';
 import { FloatingButtonRoot } from './root';
 import { floatingButtonStyle } from './style';
-import { type FloatingPlacement } from './use-floating-button';
-import { type ControlColorScheme } from '../../../internal/surfaces/control-surface';
+import { type ControlColorScheme } from '../../../internal/surfaces/lib/control-surface';
 
 import type { InteractiveState, WithInteractiveValues } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';
@@ -39,4 +39,4 @@ export namespace FloatingButton {
 }
 
 export { type FloatingButtonProps } from './root';
-export type { FloatingPlacement } from './use-floating-button';
+export type { FloatingPlacement } from './hooks/use-floating-button';

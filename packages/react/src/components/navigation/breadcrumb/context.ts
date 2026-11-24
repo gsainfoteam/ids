@@ -15,7 +15,7 @@ export const BreadcrumbContext = createContext<BreadcrumbContextValue | null>(nu
 
 export const CollapsedContext = createContext(false);
 
-export function useBreadcrumbContext(part: string) {
+export function useInternalBreadcrumbContext(part: string) {
   const context = use(BreadcrumbContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Breadcrumb>\`.`);
   return context;

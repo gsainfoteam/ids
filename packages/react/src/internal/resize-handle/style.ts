@@ -1,7 +1,7 @@
 import { cn, tv } from '../../utils';
 
-import type { ResizeBand } from './arc';
-import type { ResizeDimension } from './axis';
+import type { ResizeBand } from './lib/arc';
+import type { ResizeDimension } from './lib/axis';
 
 export const resizeHandle = {
   base: cn('touch-none select-none outline-none after:absolute'),

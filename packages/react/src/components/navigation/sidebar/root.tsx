@@ -10,14 +10,14 @@ import {
   type SidebarContextValue,
   type SidebarControls,
 } from './context';
-import { SidebarFooter } from './footer';
-import { SidebarList } from './group';
-import { SidebarHeader } from './header';
-import { SidebarItem } from './item';
+import { DEFAULT_SHORTCUT, useInternalSidebar } from './hooks/use-sidebar';
+import { SidebarFooter } from './parts/footer';
+import { SidebarList } from './parts/group';
+import { SidebarHeader } from './parts/header';
+import { SidebarItem } from './parts/item';
+import { SidebarTrigger } from './parts/trigger';
 import { sidebarStyle, type SidebarCollapsibleMode, type SidebarPanelState } from './style';
-import { SidebarTrigger } from './trigger';
-import { DEFAULT_SHORTCUT, useSidebar } from './use-sidebar';
-import { useRequiredName } from '../../../internal/accessible-name';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
 import { Card } from '../../data/card';
 import { Divider } from '../../layout/divider';
@@ -82,11 +82,11 @@ export function SidebarRoot({
   ...props
 }: Sidebar.Props) {
   const name = { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy };
-  useRequiredName('Sidebar', name);
+  useInternalRequiredName('Sidebar', name);
 
   const provider = use(SidebarProviderContext);
   const collapsible = collapsibleProp ?? false;
-  const controls = useSidebar({
+  const controls = useInternalSidebar({
     collapsed,
     defaultCollapsed,
     onCollapsedChange,

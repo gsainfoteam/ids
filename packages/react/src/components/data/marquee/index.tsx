@@ -1,7 +1,7 @@
 import { type ComponentProps } from 'react';
 
-import { MarqueeItem, type MarqueeItemProps } from './item';
-import { MarqueePause, type MarqueePauseProps } from './pause';
+import { MarqueeItem, type MarqueeItemProps } from './parts/item';
+import { MarqueePause, type MarqueePauseProps } from './parts/pause';
 import { MarqueeRoot } from './root';
 import { marqueeStyle } from './style';
 

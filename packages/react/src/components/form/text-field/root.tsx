@@ -2,8 +2,8 @@
 
 import { cloneElement, createContext, isValidElement, use } from 'react';
 
-import { useTextField } from './use-text-field';
-import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
+import { useInternalTextField } from './hooks/use-text-field';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/lib/field-surface';
 import {
   Adornments,
   TextControlClear,
@@ -25,7 +25,7 @@ export type TextFieldState = TextControlState;
 export type StateValue<T> = T | ((state: TextFieldState) => T);
 
 type TextFieldContextValue = {
-  inputProps: ReturnType<typeof useTextField>['inputProps'];
+  inputProps: ReturnType<typeof useInternalTextField>['inputProps'];
   styles: ReturnType<typeof textControlStyle>;
 };
 
@@ -53,7 +53,7 @@ export function TextFieldRoot({
     () => <TextFieldInput />,
     'TextField',
   );
-  const field = useTextField({
+  const field = useInternalTextField({
     rootProps,
     input: input.props,
     disabled,

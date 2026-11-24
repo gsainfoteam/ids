@@ -2,7 +2,6 @@
 
 import { type ComponentProps, type ComponentType, type ReactNode } from 'react';
 
-import { TabsContent, type TabsContentProps } from './content';
 import {
   TabsContext,
   type TabsActivationMode,
@@ -10,11 +9,12 @@ import {
   type TabsColorScheme,
   type TabsOrientation,
 } from './context';
-import { TabsList, type TabsListProps } from './list';
+import { useInternalTabs } from './hooks/use-tabs';
+import { TabsContent, type TabsContentProps } from './parts/content';
+import { TabsList, type TabsListProps } from './parts/list';
+import { TabsTrigger, type TabsTriggerProps } from './parts/trigger';
 import { tabsStyle } from './style';
-import { TabsTrigger, type TabsTriggerProps } from './trigger';
-import { useTabs } from './use-tabs';
-import { resolveState, type StateRenderProps } from '../../../internal/state-props';
+import { resolveState, type StateRenderProps } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -67,7 +67,7 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
     ...rest
   } = props;
 
-  const tabs = useTabs({
+  const tabs = useInternalTabs({
     value,
     defaultValue,
     onValueChange: onValueChange as ((value: string) => void) | undefined,

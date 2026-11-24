@@ -6,7 +6,7 @@ import { noop } from 'es-toolkit';
 
 const noSubscription = () => noop;
 
-export function useClipboardSupport() {
+export function useInternalClipboardSupport() {
   return useSyncExternalStore(
     noSubscription,
     () => typeof navigator.clipboard?.writeText === 'function',

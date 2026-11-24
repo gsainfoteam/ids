@@ -8,7 +8,7 @@ import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
 
 import type { Group } from '.';
-import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/lib/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type GroupOrientation = 'horizontal' | 'vertical';
@@ -22,15 +22,15 @@ export type GroupContextValue = {
 
 const GroupContext = createContext<GroupContextValue | null>(null);
 
-export function useGroupContext() {
+export function useInternalGroupContext() {
   return use(GroupContext);
 }
 
-export function useGroupNameWarning(
+export function useInternalGroupNameWarning(
   component: string,
   props: { 'aria-label'?: string; 'aria-labelledby'?: string },
 ) {
-  const nested = useGroupContext() !== null;
+  const nested = useInternalGroupContext() !== null;
   const named =
     (typeof props['aria-label'] === 'string' && props['aria-label'].trim() !== '') ||
     props['aria-labelledby'] != null;
@@ -51,7 +51,7 @@ export function GroupRoot({
   children,
   ...rest
 }: Group.Props) {
-  const parent = useGroupContext();
+  const parent = useInternalGroupContext();
   const context: GroupContextValue = {
     orientation,
     size: size ?? parent?.size,
@@ -75,7 +75,7 @@ export function GroupRoot({
 }
 
 export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
-  const group = useGroupContext();
+  const group = useInternalGroupContext();
   invariant(group, 'Group.Separator must be rendered inside ButtonGroup or ToggleGroup.');
   return (
     <Divider

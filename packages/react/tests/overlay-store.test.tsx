@@ -8,9 +8,9 @@ import { render } from 'vitest-browser-react';
 import { palettes } from '../.storybook/palettes';
 import { IdsProvider } from '../src';
 import { testTheme } from './theme';
-import { OverlayItemContext, useOverlay, useOverlayItem } from '../src/internal/overlay/host';
-import { overlay } from '../src/internal/overlay/store';
-import { usePresence } from '../src/internal/overlay/use-presence';
+import { useInternalPresence } from '../src/internal/overlay/hooks/use-presence';
+import { overlay } from '../src/internal/overlay/lib/store';
+import { OverlayItemContext, useOverlay, useInternalOverlayItem } from '../src/internal/overlay/parts/host';
 
 const nextFrame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
 const finishAnimations = (element: Element) => {
@@ -18,9 +18,9 @@ const finishAnimations = (element: Element) => {
 };
 
 function BoundBox({ label, children }: { label: string; children?: ReactNode }) {
-  const item = useOverlayItem(undefined);
+  const item = useInternalOverlayItem(undefined);
   const ref = useRef<HTMLDivElement>(null);
-  const { mounted, ending } = usePresence(item?.open ?? false, {
+  const { mounted, ending } = useInternalPresence(item?.open ?? false, {
     elements: () => [ref.current],
     onExitComplete: () => item?.exited(),
   });

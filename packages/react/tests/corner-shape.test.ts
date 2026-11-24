@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { insetClipPath } from '../src/internal/corner-shape';
+import { insetClipPath } from '../src/internal/lib/corner-shape';
 
 const box = { width: 200, height: 100 };
 const insets = { top: 10, right: 20, bottom: 10, left: 20 };

@@ -1,5 +1,5 @@
-import { overlayStyles } from '../../../internal/overlay/styles';
-import { slidesLayout } from '../../../internal/slides/layout';
+import { overlayStyles } from '../../../internal/overlay/lib/styles';
+import { slidesLayout } from '../../../internal/slides/lib/layout';
 import { cn, tv } from '../../../utils';
 
 const chrome = cn(

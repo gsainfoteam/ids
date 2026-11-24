@@ -4,8 +4,8 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { TimePickerApi } from './hooks/use-time-picker';
 import type { timePickerStyle } from './style';
-import type { TimePickerApi } from './use-time-picker';
 
 type ContextValue = TimePickerApi & {
   styles: ReturnType<typeof timePickerStyle>;
@@ -14,7 +14,7 @@ type ContextValue = TimePickerApi & {
 
 export const TimePickerContext = createContext<ContextValue | null>(null);
 
-export function useTimePickerContext(part: string) {
+export function useInternalTimePickerContext(part: string) {
   const context = use(TimePickerContext);
   invariant(context, `${part} must be inside TimePicker.`);
   return context;

@@ -1,20 +1,20 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { MenuCheckboxItem } from './checkbox-item';
-import { CommandEmpty, CommandSearch } from './command';
-import { MenuContent } from './content';
-import { MenuGroup } from './group';
-import { MenuItemIndicator, type MenuItemIndicatorProps } from './indicator';
-import { MenuItem } from './item';
-import { MenuLabel } from './label';
-import { MenuRadioGroup } from './radio-group';
-import { MenuRadioItem } from './radio-item';
+import { type MenuTriggerType } from './hooks/use-menu';
+import { MenuCheckboxItem } from './parts/checkbox-item';
+import { CommandEmpty, CommandSearch } from './parts/command';
+import { MenuContent } from './parts/content';
+import { MenuGroup } from './parts/group';
+import { MenuItemIndicator, type MenuItemIndicatorProps } from './parts/indicator';
+import { MenuItem } from './parts/item';
+import { MenuLabel } from './parts/label';
+import { MenuRadioGroup } from './parts/radio-group';
+import { MenuRadioItem } from './parts/radio-item';
+import { MenuSeparator } from './parts/separator';
+import { MenuShortcut } from './parts/shortcut';
+import { MenuTrigger } from './parts/trigger';
 import { MenuRoot } from './root';
-import { MenuSeparator } from './separator';
-import { MenuShortcut } from './shortcut';
 import { menuStyle } from './style';
-import { MenuTrigger } from './trigger';
-import { type MenuTriggerType } from './use-menu';
 import { type AnchoredAlign, type AnchoredSide } from '../../../internal/overlay';
 
 import type { Divider } from '../../layout/divider';

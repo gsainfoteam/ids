@@ -4,17 +4,17 @@ import { cloneElement, type ReactElement } from 'react';
 
 import { CheckIcon, TrashIcon } from '@heroicons/react/16/solid';
 
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { Menu } from '../../../overlay/menu';
-import { CALLOUT_ICON } from '../../../typography/rich-text/callout-icon';
-import { CALLOUT_TITLE } from '../../../typography/rich-text/callout-kinds';
+import { CALLOUT_TITLE } from '../../../typography/rich-text/lib/callout-kinds';
+import { CALLOUT_ICON } from '../../../typography/rich-text/parts/callout-icon';
 import {
   CALLOUT_KINDS,
   calloutKindOf,
   type CalloutKind,
 } from '../../../typography/rich-text/schema/callout';
-import { EditorGlyphButton } from '../glyph-button';
 import { editorMessages } from '../messages-catalog';
+import { EditorGlyphButton } from '../parts/glyph-button';
 import { editorStyle } from '../style';
 
 const kindIcon = (kind: CalloutKind) =>
@@ -33,7 +33,7 @@ export function EditorCalloutKindMenu({
   onKindChange: (kind: CalloutKind) => void;
   onRemove: () => void;
 }) {
-  const t = useTranslate(editorMessages);
+  const t = useInternalTranslate(editorMessages);
 
   return (
     <Menu>

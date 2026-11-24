@@ -1,15 +1,15 @@
 import { describe, expect, test } from 'vitest';
 
 import { palettes } from '../.storybook/palettes';
-import { createIdsPalette } from '../src/components/utility/ids-provider/palette-scales';
+import { createIdsPalette } from '../src/components/utility/ids-provider/lib/palette-scales';
 import {
   resolveColors,
   resolveColorsOnce,
   slotsOf,
-} from '../src/components/utility/ids-provider/theme-roles';
-import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
+} from '../src/components/utility/ids-provider/lib/theme-roles';
+import { checkIdsTheme } from '../src/components/utility/ids-provider/lib/theme-variables';
 
-import type { IdsRamp } from '../src/components/utility/ids-provider/theme';
+import type { IdsRamp } from '../src/components/utility/ids-provider/lib/theme';
 
 describe.each(Object.keys(palettes))('%s', (hue) => {
   const { issues } = resolveColors({ primary: palettes[hue as keyof typeof palettes] });

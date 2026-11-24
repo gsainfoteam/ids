@@ -4,18 +4,18 @@ import { isValidElement, useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import { isEqual, isPlainObject } from 'es-toolkit';
 
-import { DataTableCaption } from './caption';
-import { DataTableContent } from './content';
 import { DataTableContext } from './context';
-import { DataTableEmpty } from './empty';
-import { DataTablePagination } from './pagination';
+import { DataTableCaption } from './parts/caption';
+import { DataTableContent } from './parts/content';
+import { DataTableEmpty } from './parts/empty';
+import { DataTablePagination } from './parts/pagination';
+import { DataTableToolbar } from './parts/toolbar';
 import { dataTableStyle } from './style';
-import { DataTableToolbar } from './toolbar';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { DataTable } from '.';
-import type { DataTableFeatures } from './features';
+import type { DataTableFeatures } from './lib/features';
 import type { ReactTable } from '@tanstack/react-table';
 import type { RowData, RowSelectionState, Updater } from '@tanstack/table-core';
 
@@ -30,7 +30,7 @@ function applied(updater: Updater<RowSelectionState>, previous: RowSelectionStat
   return typeof updater === 'function' ? updater(previous) : updater;
 }
 
-function useSelectionTrio(
+function useInternalSelectionTrio(
   table: ReactTable<DataTableFeatures, RowData>,
   trio: Pick<DataTable.Props<RowData>, 'value' | 'defaultValue' | 'onValueChange'>,
 ) {
@@ -93,7 +93,7 @@ export function DataTableRoot<TData extends RowData>({
   const table = instance as unknown as ReactTable<DataTableFeatures, RowData>;
   const rootRef = useRef<HTMLDivElement>(null);
   const setRtl = table.options.meta?.setRtl;
-  const selection = useSelectionTrio(table, { value, defaultValue, onValueChange });
+  const selection = useInternalSelectionTrio(table, { value, defaultValue, onValueChange });
 
   useLayoutEffect(() => {
     if (rootRef.current) setRtl?.(isRtl(rootRef.current));

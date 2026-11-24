@@ -10,17 +10,17 @@ import {
   type ReactNode,
 } from 'react';
 
-import { DEFAULT_SERIES, seriesColor, seriesVariables, uncoloredKeys } from './config';
 import { ChartContext } from './context';
-import { ChartDescription } from './description';
-import { fadedSeriesOf, paintSeries, RECHARTS_CHARTS, tableOf, type GraphProps } from './graph';
+import { useInternalChartSize } from './hooks/use-chart-size';
+import { useInternalKeysOverARestingPointer } from './hooks/use-keys-over-a-resting-pointer';
+import { DEFAULT_SERIES, seriesColor, seriesVariables, uncoloredKeys } from './lib/config';
+import { fadedSeriesOf, paintSeries, RECHARTS_CHARTS, tableOf, type GraphProps } from './lib/graph';
+import { ChartDescription } from './parts/description';
+import { ChartTable } from './parts/table';
+import { ChartTitle } from './parts/title';
 import { chartStyle } from './style';
-import { ChartTable } from './table';
-import { ChartTitle } from './title';
-import { useChartSize } from './use-chart-size';
-import { useKeysOverARestingPointer } from './use-keys-over-a-resting-pointer';
-import { hasAccessibleName, useUnnamedWarning } from '../../../internal/accessible-name';
-import { useProviderLocale } from '../../../internal/translate';
+import { hasAccessibleName, useInternalUnnamedWarning } from '../../../internal/lib/accessible-name';
+import { useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -94,11 +94,11 @@ function paintedChildren(
 }
 
 export function ChartRoot({ config, className, style, children, ...props }: Chart.Props) {
-  const providerLocale = useProviderLocale();
+  const providerLocale = useInternalProviderLocale();
   const id = useId();
   const frameRef = useRef<HTMLDivElement>(null);
-  const size = useChartSize(frameRef);
-  const keysOverARestingPointer = useKeysOverARestingPointer(frameRef);
+  const size = useInternalChartSize(frameRef);
+  const keysOverARestingPointer = useInternalKeysOverARestingPointer(frameRef);
   const styles = chartStyle();
 
   const elements = flattenFragments(children);
@@ -125,7 +125,7 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
 
   const wrapsAnUnknownChart = graph !== undefined && !recognised && !hasOwnTable;
   const uncoloredSeries = uncoloredKeys(config).length;
-  useUnnamedWarning('Chart', graph !== undefined && !hasAccessibleName(graphName));
+  useInternalUnnamedWarning('Chart', graph !== undefined && !hasAccessibleName(graphName));
 
   useEffect(() => {
     if (isDevelopment && wrapsAnUnknownChart) console.warn(WRAPPED_CHART_WARNING);

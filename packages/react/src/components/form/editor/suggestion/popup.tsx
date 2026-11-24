@@ -11,11 +11,11 @@ import {
   type ReactNode,
 } from 'react';
 
-import { listStyles } from '../../../../internal/list-styles';
+import { listStyles } from '../../../../internal/lib/list-styles';
 import { cn } from '../../../../utils';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { Popover } from '../../../overlay/popover';
-import { useEditorContext } from '../context';
+import { useInternalEditorContext } from '../context';
 
 import type { SuggestionStore } from './store';
 
@@ -29,7 +29,7 @@ export type EditorSuggestionPopupProps<Item> = {
 
 const keepTheCaretInTheEditor = (event: { preventDefault: () => void }) => event.preventDefault();
 
-function useAnchorBox(anchor: (() => DOMRect | null) | null, open: boolean) {
+function useInternalAnchorBox(anchor: (() => DOMRect | null) | null, open: boolean) {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [box, setBox] = useState<CSSProperties>({});
 
@@ -49,7 +49,7 @@ function useAnchorBox(anchor: (() => DOMRect | null) | null, open: boolean) {
   return [anchorRef, box] as const;
 }
 
-function useActiveDescendant(dom: HTMLElement | undefined, listId: string, activeId?: string) {
+function useInternalActiveDescendant(dom: HTMLElement | undefined, listId: string, activeId?: string) {
   useEffect(() => {
     if (!dom || !activeId) return;
     dom.setAttribute('aria-controls', listId);
@@ -68,16 +68,16 @@ export function EditorSuggestionPopup<Item>({
   status,
   children,
 }: EditorSuggestionPopupProps<Item>) {
-  const { editor, styles } = useEditorContext('Editor');
+  const { editor, styles } = useInternalEditorContext('Editor');
   const view = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const listId = useId();
   const optionId = (index: number) => `${listId}-${index}`;
   const activeId = view.open && view.items.length > 0 ? optionId(view.highlighted) : undefined;
-  const [anchorRef, anchorBox] = useAnchorBox(view.anchor, view.open);
+  const [anchorRef, anchorBox] = useInternalAnchorBox(view.anchor, view.open);
   const listRef = useRef<HTMLDivElement>(null);
   const message = view.loading || view.items.length === 0 ? status(view) : '';
 
-  useActiveDescendant(editor?.view.dom, listId, activeId);
+  useInternalActiveDescendant(editor?.view.dom, listId, activeId);
 
   useLayoutEffect(() => {
     if (activeId)

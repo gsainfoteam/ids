@@ -3,12 +3,12 @@
 import { isValidElement, useEffect, type CSSProperties, type ReactNode } from 'react';
 
 import { MarqueeContext } from './context';
-import { MarqueePause } from './pause';
-import { isValidSpeed, loopDuration } from './speed';
+import { useInternalMarquee } from './hooks/use-marquee';
+import { isValidSpeed, loopDuration } from './lib/speed';
+import { MarqueePause } from './parts/pause';
 import { marqueeStyle, type MarqueeOrientation } from './style';
-import { useMarquee } from './use-marquee';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { useReducedMotion } from '../../../hooks/use-reduced-motion';
+import { useInternalReducedMotion } from '../../../hooks/use-reduced-motion';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -36,7 +36,7 @@ export function MarqueeRoot({
   children,
   ...rest
 }: Marquee.Props) {
-  const reduced = useReducedMotion();
+  const reduced = useInternalReducedMotion();
   const orientation = orientationOf(direction);
   const reverse = runsBackward(direction);
   const [chosen, setChosen] = useControllableState<boolean | undefined>({
@@ -46,7 +46,7 @@ export function MarqueeRoot({
   });
   const playing = !reduced && (chosen ?? true);
 
-  const { setTrack, length, viewportProps } = useMarquee({
+  const { setTrack, length, viewportProps } = useInternalMarquee({
     orientation,
     reverse,
     moving: !reduced,

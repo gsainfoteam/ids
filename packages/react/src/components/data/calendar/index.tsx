@@ -1,15 +1,15 @@
-import { CalendarCaption, type CalendarCaptionLayout, type CalendarCaptionProps } from './caption';
+import { type CalendarModifiers, type CalendarState } from './hooks/use-calendar';
 import {
   type CalendarSelectionMode,
   type DateMatcher as CalendarDateMatcher,
   type DateRange,
-} from './date';
-import { CalendarDay, type CalendarDayProps } from './day';
-import { CalendarFooter, type CalendarFooterProps } from './footer';
+} from './lib/date';
+import { CalendarCaption, type CalendarCaptionLayout, type CalendarCaptionProps } from './parts/caption';
+import { CalendarDay, type CalendarDayProps } from './parts/day';
+import { CalendarFooter, type CalendarFooterProps } from './parts/footer';
+import { CalendarWeekNumber, type CalendarWeekNumberProps } from './parts/week-number';
 import { CalendarRoot, type CalendarDayState, type CalendarProps } from './root';
 import { calendarStyle } from './style';
-import { type CalendarModifiers, type CalendarState } from './use-calendar';
-import { CalendarWeekNumber, type CalendarWeekNumberProps } from './week-number';
 
 export function Calendar(props: CalendarProps) {
   return <CalendarRoot {...props} />;
@@ -52,10 +52,10 @@ export namespace Calendar {
   export const Style = calendarStyle;
 }
 
-export { type CalendarCaptionLayout } from './caption';
+export { type CalendarCaptionLayout } from './parts/caption';
 export { type CalendarDayState, type CalendarOptions, type CalendarProps } from './root';
-export { CalendarPickContext } from './use-calendar';
+export { CalendarPickContext } from './hooks/use-calendar';
 
-export type { CalendarState } from './use-calendar';
+export type { CalendarState } from './hooks/use-calendar';
 
-export type { DateRange, CalendarSelectionMode, CalendarValue, DateMatcher } from './date';
+export type { DateRange, CalendarSelectionMode, CalendarValue, DateMatcher } from './lib/date';

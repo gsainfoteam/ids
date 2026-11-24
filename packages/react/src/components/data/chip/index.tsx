@@ -1,13 +1,13 @@
 import { type CSSProperties, type HTMLAttributes, type ReactNode, type Ref } from 'react';
 
-import { ChipClose, type ChipCloseProps } from './close';
-import { ChipIcon, type ChipIconProps } from './icon';
-import { ChipLabel, type ChipLabelProps } from './label';
+import { type ChipRemoveEvent } from './hooks/use-chip';
+import { ChipClose, type ChipCloseProps } from './parts/close';
+import { ChipIcon, type ChipIconProps } from './parts/icon';
+import { ChipLabel, type ChipLabelProps } from './parts/label';
 import { ChipRoot, type ChipVariant, type ChipColorScheme } from './root';
 import { chipStyle } from './style';
-import { type ChipRemoveEvent } from './use-chip';
 import { type InteractiveState } from '../../../hooks/use-interactive';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 

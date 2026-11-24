@@ -4,8 +4,8 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { SchedulerFormat } from './format';
-import type { SchedulerEventData, SchedulerSegment, SchedulerShift } from './layout';
+import type { SchedulerFormat } from './lib/format';
+import type { SchedulerEventData, SchedulerSegment, SchedulerShift } from './lib/layout';
 import type { schedulerStyle } from './style';
 import type { CalendarDate, CalendarDateTime } from '@internationalized/date';
 
@@ -29,7 +29,7 @@ export type SchedulerEventContextValue = {
 
 export const SchedulerEventContext = createContext<SchedulerEventContextValue | null>(null);
 
-export function useSchedulerEventContext(part: string) {
+export function useInternalSchedulerEventContext(part: string) {
   const scheduler = use(SchedulerContext);
   const event = use(SchedulerEventContext);
   invariant(

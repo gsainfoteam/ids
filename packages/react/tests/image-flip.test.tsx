@@ -5,7 +5,7 @@ import { cdp } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { skipWithoutCdp } from './engines';
-import { enterFrom, exitTo } from '../src/components/data/image/flip';
+import { enterFrom, exitTo } from '../src/components/data/image/lib/flip';
 
 const THUMBNAIL: CSSProperties = {
   position: 'fixed',

@@ -17,9 +17,8 @@ import {
 } from '@internationalized/date';
 
 import { SchedulerContext } from './context';
-import { SchedulerEvent } from './event';
-import { schedulerFormat } from './format';
-import { SchedulerGrid } from './grid';
+import { useInternalNow } from './hooks/use-now';
+import { schedulerFormat } from './lib/format';
 import {
   dateOf,
   daysOf,
@@ -29,23 +28,24 @@ import {
   type SchedulerEventData,
   type SchedulerSlot,
   type SchedulerView,
-} from './layout';
+} from './lib/layout';
+import { SchedulerEvent } from './parts/event';
+import { SchedulerGrid } from './parts/grid';
 import {
   SchedulerEventMenu,
   SchedulerSlotMenu,
   type SchedulerEventMenuPartProps,
   type SchedulerSlotMenuPartProps,
-} from './menus';
-import { SchedulerMonth } from './month';
+} from './parts/menus';
+import { SchedulerMonth } from './parts/month';
+import { SchedulerToolbar } from './parts/toolbar';
 import { schedulerStyle } from './style';
-import { SchedulerToolbar } from './toolbar';
-import { useNow } from './use-now';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { useRequiredName, type AccessibleName } from '../../../internal/accessible-name';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
-import { useProviderLocale } from '../../../internal/translate';
+import { useInternalRequiredName, type AccessibleName } from '../../../internal/lib/accessible-name';
+import { useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
-import { validateDate } from '../calendar/date';
+import { validateDate } from '../calendar/lib/date';
 
 export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = Omit<
   ComponentProps<'div'>,
@@ -113,16 +113,16 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   ...props
 }: SchedulerProps<E>) {
   [dateProp, defaultDate].forEach((date) => validateDate(date, 'Scheduler'));
-  useRequiredName('Scheduler', {
+  useInternalRequiredName('Scheduler', {
     'aria-label': ariaLabel,
     'aria-labelledby': props['aria-labelledby'],
   });
 
   const { renderEvent, eventMenu, slotMenu } = splitChildren(children);
-  const providerLocale = useProviderLocale();
+  const providerLocale = useInternalProviderLocale();
   const resolvedLocale = resolveLocale(providerLocale);
   const weekStart = weekStartsOn ?? weekStartOf(resolvedLocale);
-  const now = useNow(nowProp);
+  const now = useInternalNow(nowProp);
   const [firstShownDate] = useState(() => defaultDate ?? todayIn(getLocalTimeZone()));
   const today = now && dateOf(now);
   const generatedHintId = useId();

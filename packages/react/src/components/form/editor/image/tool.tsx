@@ -5,9 +5,9 @@ import { useId, useRef, useState, type KeyboardEvent } from 'react';
 import { PhotoIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
-import { useEditorContext } from '../context';
+import { useInternalEditorContext } from '../context';
 import { IMAGE_ACCEPT } from './types';
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { isDevelopment } from '../../../../utils/dev';
 import { Button } from '../../../action/button';
 import { IconToggle } from '../../../action/icon-toggle';
@@ -15,9 +15,9 @@ import { Spinner } from '../../../feedback/spinner';
 import { Popover } from '../../../overlay/popover';
 import { isWebAddress } from '../../../typography/rich-text/schema/url-rules';
 import { TextField } from '../../text-field';
+import { isPlainEnter, withProtocol } from '../lib/popover-form';
 import { editorMessages } from '../messages-catalog';
-import { isPlainEnter, withProtocol } from '../popover-form';
-import { EditorToolTip, useEditorToolProps, useToolState, type EditorToolProps } from '../tool';
+import { EditorToolTip, useInternalEditorToolProps, useInternalToolState, type EditorToolProps } from '../parts/tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
@@ -41,10 +41,10 @@ function warnThereIsNoUpload() {
 type ImagePopover = 'insert' | 'alt';
 
 export function EditorImage({ icon, 'aria-label': ariaLabel, className }: EditorImageProps) {
-  const t = useTranslate(editorMessages);
-  const { editor, editable, images, styles } = useEditorContext('Editor.Image');
-  const state = useToolState(IMAGE);
-  const tool = useEditorToolProps('Image');
+  const t = useInternalTranslate(editorMessages);
+  const { editor, editable, images, styles } = useInternalEditorContext('Editor.Image');
+  const state = useInternalToolState(IMAGE);
+  const tool = useInternalEditorToolProps('Image');
   const inputRef = useRef<HTMLInputElement>(null);
   const urlErrorId = useId();
   const [open, setOpen] = useState<ImagePopover | null>(null);

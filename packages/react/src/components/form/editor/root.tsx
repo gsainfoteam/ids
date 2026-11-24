@@ -15,33 +15,44 @@ import {
 
 import { isEqual } from 'es-toolkit';
 
-import { EditorBar } from './bar';
-import { EditorBlockType } from './block-type';
-import {
-  EditorBlockquote,
-  EditorBulletList,
-  EditorCodeBlock,
-  EditorOrderedList,
-  EditorTaskList,
-} from './blocks';
-import { EditorBubbleMenu } from './bubble-menu';
 import { EditorCallout } from './callout/tool';
-import { EditorColor } from './color';
-import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorContext, type EditorImages } from './context';
-import { EditorCount } from './count';
 import { EditorDetails } from './details/tool';
-import { EditorHorizontalRule } from './horizontal-rule';
+import { useInternalEditorSelector } from './hooks/use-editor-selector';
 import { EditorImage } from './image/tool';
 import { isImageFile, type ImageUpload } from './image/types';
-import { EditorLink } from './link';
 import {
   EDITOR_FEATURES,
   engineKey,
   loadEngine,
   type EditorFeature,
   type LoadedEngine,
-} from './load-engine';
+} from './lib/load-engine';
+import {
+  formText,
+  isEmptyValue,
+  readValue,
+  writable,
+  writeValue,
+  type EditorFormat,
+  type EditorValue,
+} from './lib/value';
+import { editorMessages } from './messages-catalog';
+import { EditorBar } from './parts/bar';
+import { EditorBlockType } from './parts/block-type';
+import {
+  EditorBlockquote,
+  EditorBulletList,
+  EditorCodeBlock,
+  EditorOrderedList,
+  EditorTaskList,
+} from './parts/blocks';
+import { EditorBubbleMenu } from './parts/bubble-menu';
+import { EditorColor } from './parts/color';
+import { EditorContentPart, type EditorContentProps } from './parts/content';
+import { EditorCount } from './parts/count';
+import { EditorHorizontalRule } from './parts/horizontal-rule';
+import { EditorLink } from './parts/link';
 import {
   EditorBold,
   EditorCode,
@@ -51,29 +62,18 @@ import {
   EditorSubscript,
   EditorSuperscript,
   EditorUnderline,
-} from './marks';
-import { editorMessages } from './messages-catalog';
-import { EditorSeparator } from './separator';
+} from './parts/marks';
+import { EditorSeparator } from './parts/separator';
+import { EditorTextAlign } from './parts/text-align';
 import { editorStyle } from './style';
 import { EditorTable } from './table/tool';
-import { EditorTextAlign } from './text-align';
-import { useEditorSelector } from './use-editor-selector';
-import {
-  formText,
-  isEmptyValue,
-  readValue,
-  writable,
-  writeValue,
-  type EditorFormat,
-  type EditorValue,
-} from './value';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { useFormReset } from '../../../hooks/use-form-reset';
-import { FormValue } from '../../../internal/form-value';
-import { useTranslate, type Translate } from '../../../internal/translate';
+import { useInternalFormReset } from '../../../hooks/use-form-reset';
+import { FormValue } from '../../../internal/parts/form-value';
+import { useInternalTranslate, type Translate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
-import { toast } from '../../feedback/toast/toast-store';
+import { toast } from '../../feedback/toast/lib/toast-store';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
 import type { Editor } from '.';
@@ -228,7 +228,7 @@ function featuresIn(
   );
 }
 
-function useLoadedEngine(format: EditorFormat, features: readonly EditorFeature[]) {
+function useInternalLoadedEngine(format: EditorFormat, features: readonly EditorFeature[]) {
   const key = engineKey(format, features);
   const [loaded, setLoaded] = useState<LoadedEngine | null>(null);
   const requested = useRef({ format, features });
@@ -283,7 +283,7 @@ export function EditorRoot(props: Editor.Props) {
     style,
     children,
   } = props;
-  const t = useTranslate(editorMessages);
+  const t = useInternalTranslate(editorMessages);
   const size = useFieldSize(sizeProp) ?? 'standard';
   const generatedId = useId();
   const contentId = id ?? `ids-editor-${generatedId}`;
@@ -323,7 +323,7 @@ export function EditorRoot(props: Editor.Props) {
     onValueChange: onValueChange as ((next: EditorValue | undefined) => void) | undefined,
   });
   const [focused, setFocused] = useState(false);
-  const loaded = useLoadedEngine(format, features);
+  const loaded = useInternalLoadedEngine(format, features);
   const [uploaded] = useState(() => new Set<string>());
   const [pendingUploads, setPendingUploads] = useState(0);
 
@@ -473,13 +473,13 @@ export function EditorRoot(props: Editor.Props) {
     writeValue(editor, value, format, uploaded);
   }, [editor, value, format, uploaded]);
 
-  useFormReset(rootRef, () => {
+  useInternalFormReset(rootRef, () => {
     if (!editor || value !== undefined) return;
     setCurrent(defaultValue, { silent: true });
     writeValue(editor, defaultValue, format, uploaded);
   });
 
-  const empty = useEditorSelector(editor, (instance) => instance.isEmpty, isEmptyValue(current));
+  const empty = useInternalEditorSelector(editor, (instance) => instance.isEmpty, isEmptyValue(current));
 
   const submitted = formText(current, empty);
   useLayoutEffect(() => {

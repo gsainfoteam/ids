@@ -14,14 +14,14 @@ import {
 } from 'react';
 
 import { ImageContext, ImageGroupContext } from './context';
-import { ImageFallback } from './fallback';
-import { ImagePlaceholder } from './placeholder';
+import { useInternalImageGroup, type ImageItem, type NaturalSize } from './hooks/use-image-group';
+import { ImageFallback } from './parts/fallback';
+import { ImagePlaceholder } from './parts/placeholder';
+import { ImageViewer, preloadImageViewer } from './parts/viewer';
 import { imageStyle } from './style';
-import { useImageGroup, type ImageItem, type NaturalSize } from './use-image-group';
-import { ImageViewer, preloadImageViewer } from './viewer';
-import { useImageSettledBeforeMount, useImageStatus } from '../../../internal/image-status';
-import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalImageSettledBeforeMount, useInternalImageStatus } from '../../../internal/lib/image-status';
+import { resolveState } from '../../../internal/lib/state-props';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { AspectRatio } from '../../layout/aspect-ratio';
@@ -49,7 +49,7 @@ function loadedSizeOf(image: HTMLImageElement | null): NaturalSize | undefined {
 const warmTheViewer = () => void preloadImageViewer();
 
 function OneImageGroup({ children }: { children: ReactNode }) {
-  const group = useImageGroup({});
+  const group = useInternalImageGroup({});
   return (
     <ImageGroupContext value={group}>
       {children}
@@ -97,18 +97,18 @@ function ImageFrame({
   ...rest
 }: Image.Props & { preview: boolean }) {
   const group = use(ImageGroupContext);
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const key = useId();
   const name = alt ?? '';
 
   const current = src || undefined;
-  const { status, report } = useImageStatus(current, onStatusChange);
+  const { status, report } = useInternalImageStatus(current, onStatusChange);
   const imageRef = useRef<HTMLImageElement>(null);
   const mergedRef = useCallback(
     (node: HTMLImageElement | null) => mergeRefs(imageRef, ref)(node),
     [ref],
   );
-  useImageSettledBeforeMount(imageRef, current, report);
+  useInternalImageSettledBeforeMount(imageRef, current, report);
 
   const [frame, setFrame] = useState<HTMLElement | null>(null);
   const [trigger, setTrigger] = useState<HTMLButtonElement | null>(null);

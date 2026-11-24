@@ -1,12 +1,12 @@
 import { type FieldOrientation, type FieldState } from './context';
-import { FieldDescription, type FieldDescriptionProps } from './description';
-import { FieldError, type FieldErrorProps } from './error';
-import { FieldHint, type FieldHintProps } from './hint';
-import { FieldLabel, type FieldLabelProps } from './label';
+import { FieldDescription, type FieldDescriptionProps } from './parts/description';
+import { FieldError, type FieldErrorProps } from './parts/error';
+import { FieldHint, type FieldHintProps } from './parts/hint';
+import { FieldLabel, type FieldLabelProps } from './parts/label';
 import { FieldRoot, type FieldProps, type FieldErrorState } from './root';
 import { fieldStyle } from './style';
 
-import type { FieldValidityKey } from './control-state';
+import type { FieldValidityKey } from './lib/control-state';
 
 export function Field(props: FieldProps) {
   return <FieldRoot {...props} />;
@@ -34,4 +34,4 @@ export namespace Field {
 
 export { FieldRoot, type FieldProps, type FieldErrorState } from './root';
 export type { FieldOrientation, FieldState } from './context';
-export type { FieldValidity, FieldValidityKey } from './control-state';
+export type { FieldValidity, FieldValidityKey } from './lib/control-state';

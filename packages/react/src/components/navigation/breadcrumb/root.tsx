@@ -3,9 +3,9 @@
 import { isValidElement } from 'react';
 
 import { BreadcrumbContext } from './context';
-import { BreadcrumbList } from './list';
+import { BreadcrumbList } from './parts/list';
 import { breadcrumbStyle } from './style';
-import { useRequiredName } from '../../../internal/accessible-name';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Breadcrumb } from '.';
@@ -17,7 +17,7 @@ export function BreadcrumbRoot({
   children,
   ...props
 }: Breadcrumb.Props) {
-  useRequiredName('Breadcrumb', props);
+  useInternalRequiredName('Breadcrumb', props);
 
   const styles = breadcrumbStyle({ size });
 

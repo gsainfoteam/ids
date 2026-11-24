@@ -1,6 +1,6 @@
 import { Alert } from '../../../feedback/alert';
-import { RichTextCalloutIcon } from '../callout-icon';
-import { RichTextCalloutTitle } from '../callout-title';
+import { RichTextCalloutIcon } from '../parts/callout-icon';
+import { RichTextCalloutTitle } from '../parts/callout-title';
 import { calloutKindOf } from '../schema/callout';
 
 import type { DocumentNodeProps } from './types';

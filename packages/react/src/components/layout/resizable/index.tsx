@@ -1,14 +1,14 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { ResizableHandle, type ResizableHandleProps } from './handle';
-import { ResizableRoot } from './root';
-import { resizableStyle } from './style';
 import {
   type ResizableAxisOptions,
   type ResizableInstance,
   type UseResizableOptions,
-} from './use-resizable';
-import { type StateValue } from '../../../internal/state-props';
+} from './hooks/use-resizable';
+import { ResizableHandle, type ResizableHandleProps } from './parts/handle';
+import { ResizableRoot } from './root';
+import { resizableStyle } from './style';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 export function Resizable(props: Resizable.Props) {
   return <ResizableRoot {...props} />;
@@ -53,5 +53,5 @@ export namespace Resizable {
 
 export type ResizableProps = Resizable.Props;
 
-export { useResizable } from './use-resizable';
-export type { ResizableAxisOptions, ResizableInstance, UseResizableOptions } from './use-resizable';
+export { useResizable } from './hooks/use-resizable';
+export type { ResizableAxisOptions, ResizableInstance, UseResizableOptions } from './hooks/use-resizable';

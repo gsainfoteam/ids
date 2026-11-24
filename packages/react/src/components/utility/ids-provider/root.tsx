@@ -2,17 +2,17 @@
 
 import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 
-import { ThemeContext, useIdsProvider, type ThemeMode } from './use-ids-provider';
+import { ThemeContext, useInternalIdsProvider, type ThemeMode } from './hooks/use-ids-provider';
 import { warnWhenTagLeavesLanguage } from '../../../internal/date-locale';
-import { OverlayHost, PortalRootContext } from '../../../internal/overlay/host';
+import { OverlayHost, PortalRootContext } from '../../../internal/overlay/parts/host';
 import { LanguageContext } from '../../../internal/translate';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { DefaultToaster } from '../../feedback/toast';
-import { TooltipDelayGroup } from '../../overlay/tooltip/delay-group';
+import { TooltipDelayGroup } from '../../overlay/tooltip/parts/delay-group';
 import { Slot } from '../slot';
 
-import type { IdsThemeOverrides } from './theme';
+import type { IdsThemeOverrides } from './lib/theme';
 import type { IdsLocale } from '../../../internal/locale';
 
 export type IdsProviderRootProps<Language extends string = string> = Omit<
@@ -40,7 +40,7 @@ export function IdsProviderRoot<const Language extends string = string>({
   children,
   ...rest
 }: IdsProviderRootProps<Language>) {
-  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } = useIdsProvider({
+  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } = useInternalIdsProvider({
     theme,
     mode,
     defaultMode,

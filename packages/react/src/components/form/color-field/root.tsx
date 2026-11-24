@@ -10,17 +10,17 @@ import {
   type ReactNode,
 } from 'react';
 
-import { ColorFieldClear } from './clear';
-import { ColorFieldContent, type ColorFieldContentProps } from './content';
 import { ColorFieldContext } from './context';
-import { isType } from './is-type';
+import { useInternalColorField } from './hooks/use-color-field';
+import { isType } from './lib/is-type';
+import { ColorFieldClear } from './parts/clear';
+import { ColorFieldContent, type ColorFieldContentProps } from './parts/content';
+import { ColorFieldTrigger } from './parts/trigger';
 import { colorFieldStyle } from './style';
-import { ColorFieldTrigger } from './trigger';
-import { useColorField } from './use-color-field';
-import { FieldPopup, FieldPopupHeader, useDrawerPresentation } from '../../../internal/field-popup';
-import { FormValue } from '../../../internal/form-value';
-import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
+import { FieldPopup, FieldPopupHeader, useInternalDrawerPresentation } from '../../../internal/field-popup';
+import { resolveState } from '../../../internal/lib/state-props';
+import { FormValue } from '../../../internal/parts/form-value';
+import { useInternalTranslate } from '../../../internal/translate';
 import {
   containsElementOfType,
   flattenFragments,
@@ -29,12 +29,12 @@ import {
   mergeProps,
   mergeRefs,
 } from '../../../utils';
-import { ColorPickerAlphaSlider } from '../../data/color-picker/alpha-slider';
+import { ColorPickerAlphaSlider } from '../../data/color-picker/parts/alpha-slider';
 import { useFieldSize } from '../field/context';
 
-import type { FieldTriggerVariant } from '../../../internal/surfaces/field-surface';
+import type { FieldTriggerVariant } from '../../../internal/surfaces/lib/field-surface';
 import type { IdsSize } from '../../../tokens/types';
-import type { ColorFormat } from '../../data/color-picker/color';
+import type { ColorFormat } from '../../data/color-picker/lib/color';
 
 export type ColorFieldVariant = FieldTriggerVariant;
 
@@ -101,7 +101,7 @@ export function ColorFieldRoot({
   onBlur,
   ...native
 }: ColorFieldProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   const nodes = flattenFragments(children);
   const triggers = nodes.filter(isType(ColorFieldTrigger));
@@ -115,7 +115,7 @@ export function ColorFieldRoot({
   const alpha = containsElementOfType(content?.props.children, ALPHA_SLIDER);
   const mobileVariant = content?.props.mobileVariant;
 
-  const { rootRef, triggerRef, ...field } = useColorField({
+  const { rootRef, triggerRef, ...field } = useInternalColorField({
     value,
     defaultValue,
     onValueChange,
@@ -128,7 +128,7 @@ export function ColorFieldRoot({
     readOnly,
   });
   const { state: s, actions } = field;
-  const drawer = useDrawerPresentation(mobileVariant);
+  const drawer = useInternalDrawerPresentation(mobileVariant);
   const popupId = `ids-color-${useId()}`;
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = colorFieldStyle({ variant, size: resolvedSize });

@@ -8,7 +8,7 @@ import { render } from 'vitest-browser-react';
 import { Button, IdsProvider, MessageScroller } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
-import { START_ZONE_PX } from '../src/components/layout/message-scroller/message-scroll';
+import { START_ZONE_PX } from '../src/components/layout/message-scroller/lib/message-scroll';
 
 type Point = { x: number; y: number };
 

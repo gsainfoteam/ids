@@ -1,21 +1,21 @@
 'use client';
 
 import { iconButtonStyle } from './style';
-import { useIconLabel } from '../../../internal/icon-label';
+import { useInternalIconLabel } from '../../../internal/lib/icon-label';
 import { invariant } from '../../../utils';
-import { useGroupContext } from '../../utility/group';
-import { useButton } from '../button/use-button';
+import { useInternalGroupContext } from '../../utility/group';
+import { useInternalButton } from '../button/hooks/use-button';
 
 import type { IconButton } from '.';
 
 export function IconButtonRoot(props: IconButton.Props) {
-  const group = useGroupContext();
+  const group = useInternalGroupContext();
   const {
     props: { icon, variant: ownVariant, colorScheme, size, className, style, ...rest },
     element,
     content,
     render,
-  } = useButton(props, 'IconButton');
+  } = useInternalButton(props, 'IconButton');
 
   invariant(
     props.asChild || content == null,
@@ -24,7 +24,7 @@ export function IconButtonRoot(props: IconButton.Props) {
   invariant(icon != null || props.asChild, 'IconButton: the `icon` prop is required.');
 
   const glyph = icon ?? content;
-  const label = useIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
+  const label = useInternalIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
   const variant = ownVariant ?? group?.variant ?? 'ghost';
   const resolvedSize = size ?? group?.size ?? 'standard';
 

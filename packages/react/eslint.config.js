@@ -10,6 +10,14 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import checkFile from 'eslint-plugin-check-file';
 import { defineConfig } from 'eslint/config';
 
+const PUBLIC_EXPORT_OF_AN_INTERNAL_HOOK = [
+  'ExportSpecifier[exported.name=/^useInternal/]',
+  'ExportNamedDeclaration > FunctionDeclaration[id.name=/^useInternal/]',
+  'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name=/^useInternal/]',
+];
+const INTERNAL_HOOK_MESSAGE =
+  'A useInternal* hook is internal: export a public hook named useX instead.';
+
 export default defineConfig(
   {
     ignores: ['dist', 'storybook-static', '.storybook', 'node_modules'],
@@ -83,6 +91,35 @@ export default defineConfig(
       'react-refresh/only-export-components': 'off',
       '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
+    },
+  },
+  {
+    files: ['src/{index,chart,editor,rich-text}.ts', 'src/{react-hook-form,tanstack-form}.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...PUBLIC_EXPORT_OF_AN_INTERNAL_HOOK.map((selector) => ({
+          selector,
+          message: INTERNAL_HOOK_MESSAGE,
+        })),
+        {
+          selector: 'ExportAllDeclaration',
+          message:
+            'Name each export, so the useInternal* check sees every name a public entry exports.',
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/components/*/*/index.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...PUBLIC_EXPORT_OF_AN_INTERNAL_HOOK.map((selector) => ({
+          selector: `TSModuleBlock ${selector}`,
+          message: INTERNAL_HOOK_MESSAGE,
+        })),
+      ],
     },
   },
   {

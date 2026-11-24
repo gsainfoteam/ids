@@ -1,7 +1,7 @@
 import { tv } from '../../../utils';
 
 import type { ScrollArea } from '.';
-import type { Axis, Placement } from './geometry';
+import type { Axis, Placement } from './lib/geometry';
 import type { IdsSize } from '../../../tokens/types';
 
 export const scrollAreaStyle = tv({

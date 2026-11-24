@@ -3,10 +3,10 @@
 import { isValidElement, use } from 'react';
 
 import { ItemContext, ItemGroupContext } from './context';
+import { useInternalItem } from './hooks/use-item';
+import { ItemTitle } from './parts/title';
 import { itemStyle } from './style';
-import { ItemTitle } from './title';
-import { useItem } from './use-item';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { containsElementOfType } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
@@ -54,7 +54,7 @@ export function ItemRoot({
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
   const titleIsTheButton = interactive && !asChild && containsElementOfType(children, ITEM_TITLE);
-  const { interaction, props, dataProps, labelling, trigger, register } = useItem<HTMLDivElement>({
+  const { interaction, props, dataProps, labelling, trigger, register } = useInternalItem<HTMLDivElement>({
     interactive,
     asChild,
     disabled,

@@ -1,22 +1,22 @@
 'use client';
 
 import { iconToggleStyle } from './style';
-import { useIconLabel } from '../../../internal/icon-label';
+import { useInternalIconLabel } from '../../../internal/lib/icon-label';
 import { invariant } from '../../../utils';
-import { useGroupContext } from '../../utility/group';
-import { useToggle } from '../toggle/use-toggle';
+import { useInternalGroupContext } from '../../utility/group';
+import { useInternalToggle } from '../toggle/hooks/use-toggle';
 
 import type { IconToggle } from '.';
 
 export function IconToggleRoot(props: IconToggle.Props) {
-  const layout = useGroupContext();
+  const layout = useInternalGroupContext();
   const {
     props: { icon, variant: ownVariant, colorScheme, size, className, style, ...rest },
     toggleProps,
     element,
     content,
     render,
-  } = useToggle(props, 'IconToggle');
+  } = useInternalToggle(props, 'IconToggle');
 
   invariant(
     props.asChild || content == null,
@@ -25,7 +25,7 @@ export function IconToggleRoot(props: IconToggle.Props) {
   invariant(icon != null || props.asChild, 'IconToggle: the `icon` prop is required.');
 
   const glyph = icon ?? content;
-  const label = useIconLabel('IconToggle', glyph, rest, element?.props as object | undefined);
+  const label = useInternalIconLabel('IconToggle', glyph, rest, element?.props as object | undefined);
   const variant = ownVariant ?? layout?.variant ?? 'outline';
   const resolvedSize = size ?? layout?.size ?? 'standard';
 

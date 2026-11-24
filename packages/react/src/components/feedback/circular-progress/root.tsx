@@ -1,12 +1,12 @@
 'use client';
 
 import { CircularProgressContext } from './context';
-import { CircularProgressIndicator } from './indicator';
-import { CircularProgressLabel } from './label';
+import { CircularProgressIndicator } from './parts/indicator';
+import { CircularProgressLabel } from './parts/label';
+import { CircularProgressTrack } from './parts/track';
 import { circularProgressStyle } from './style';
-import { CircularProgressTrack } from './track';
-import { resolve } from '../progress/part-props';
-import { isPart, useProgressRoot } from '../progress/use-progress';
+import { isPart, useInternalProgressRoot } from '../progress/hooks/use-progress';
+import { resolve } from '../progress/lib/part-props';
 
 import type { CircularProgress } from '.';
 
@@ -27,7 +27,7 @@ export function CircularProgressRoot({
   'aria-valuetext': ariaValueText,
   ...rest
 }: CircularProgress.Props) {
-  const { progress, nodes, labelId, progressbar } = useProgressRoot(
+  const { progress, nodes, labelId, progressbar } = useInternalProgressRoot(
     {
       value,
       max,

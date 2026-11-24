@@ -1,8 +1,10 @@
-import { PromptInputActionMenu, type PromptInputActionMenuProps } from './action-menu';
-import { PromptInputAddAttachments, type PromptInputAddAttachmentsProps } from './add-attachments';
-import { PromptInputAttach, type PromptInputAttachProps } from './attach';
-import { PromptInputAttachments, type PromptInputAttachmentsProps } from './attachments';
-import { PromptInputInput, type PromptInputInputProps } from './input';
+import { PromptInputActionMenu, type PromptInputActionMenuProps } from './parts/action-menu';
+import { PromptInputAddAttachments, type PromptInputAddAttachmentsProps } from './parts/add-attachments';
+import { PromptInputAttach, type PromptInputAttachProps } from './parts/attach';
+import { PromptInputAttachments, type PromptInputAttachmentsProps } from './parts/attachments';
+import { PromptInputInput, type PromptInputInputProps } from './parts/input';
+import { PromptInputSubmit, type PromptInputSubmitProps } from './parts/submit';
+import { PromptInputTool, type PromptInputToolProps } from './parts/tool';
 import {
   PromptInputRoot,
   type PromptInputMessage,
@@ -11,8 +13,6 @@ import {
   type PromptInputVariant,
 } from './root';
 import { promptInputStyle } from './style';
-import { PromptInputSubmit, type PromptInputSubmitProps } from './submit';
-import { PromptInputTool, type PromptInputToolProps } from './tool';
 
 export function PromptInput(props: PromptInput.Props) {
   return <PromptInputRoot {...props} />;

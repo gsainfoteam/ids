@@ -3,14 +3,14 @@
 import { useCallback } from 'react';
 
 import { AccordionContext } from './context';
-import { flag } from './open-state';
+import { ROOT_ATTRIBUTE, useInternalAccordion } from './hooks/use-accordion';
+import { flag } from './lib/open-state';
 import { accordionStyle } from './style';
-import { ROOT_ATTRIBUTE, useAccordion } from './use-accordion';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { mergeRefs } from '../../../utils';
 
 import type { Accordion } from '.';
-import type { AccordionValue } from './accordion-value';
+import type { AccordionValue } from './lib/accordion-value';
 
 export type AccordionVariant = 'outline' | 'soft' | 'ghost';
 
@@ -31,7 +31,7 @@ export function AccordionRoot<T extends string = string>(props: Accordion.Props<
     ...rest
   } = props;
 
-  const { rootRef, state, toggle, reveal, register, onTriggerKeyDown } = useAccordion<T>({
+  const { rootRef, state, toggle, reveal, register, onTriggerKeyDown } = useInternalAccordion<T>({
     type,
     value,
     defaultValue,

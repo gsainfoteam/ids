@@ -2,9 +2,9 @@
 
 import { use, useEffect } from 'react';
 
-import { CommandMenu, CommandNestedMenu } from './command';
-import { CommandContext, ContentContext, MenuContext, useMenuContext } from './context';
-import { useMenuLevel, type MenuLevel, type MenuTriggerType } from './use-menu';
+import { CommandContext, ContentContext, MenuContext, useInternalMenuContext } from './context';
+import { useInternalMenuLevel, type MenuLevel, type MenuTriggerType } from './hooks/use-menu';
+import { CommandMenu, CommandNestedMenu } from './parts/command';
 import { FloatingNode, FloatingTree } from '../../../internal/overlay';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -34,7 +34,7 @@ function RootMenu({
   triggerType,
   children,
 }: RootMenuProps) {
-  const root = useMenuLevel({ open, defaultOpen, onOpenChange, parentOpen: null, triggerType });
+  const root = useInternalMenuLevel({ open, defaultOpen, onOpenChange, parentOpen: null, triggerType });
 
   return (
     <MenuContext value={{ level: root, root, triggerType }}>
@@ -54,8 +54,8 @@ function NestedMenu({
   parent,
   children,
 }: NestedMenuProps) {
-  const { root, triggerType } = useMenuContext('Menu');
-  const level = useMenuLevel({
+  const { root, triggerType } = useInternalMenuContext('Menu');
+  const level = useInternalMenuLevel({
     open,
     defaultOpen,
     onOpenChange,
