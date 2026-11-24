@@ -25,6 +25,20 @@
     },
     "spinner": {
       "loadingList": "목록을 불러오는 중"
+    },
+    "buttonSample": {
+      "newPost": "새 글",
+      "next": "다음",
+      "export": "내보내기",
+      "delete": "삭제",
+      "saving": "저장 중",
+      "link": "링크",
+      "disabledLink": "비활성 링크",
+      "confirm": "확인",
+      "save": "저장"
+    },
+    "themedSample": {
+      "linkDestination": "링크 대상"
     }
   },
   "examples": {

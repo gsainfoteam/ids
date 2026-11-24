@@ -6,6 +6,17 @@ enum IdsMode {
   system,
 }
 
+enum IdsColorScheme {
+  primary,
+  secondary,
+  tertiary,
+  neutral,
+  danger,
+  success,
+  warning,
+  info,
+}
+
 enum IdsSize {
   standard,
   tiny,

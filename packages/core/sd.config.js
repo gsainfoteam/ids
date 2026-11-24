@@ -1164,6 +1164,14 @@ const dartMotionFormatter = ({ dictionary }) =>
       .join("\n"),
   });
 
+const dartSizeFormatter = ({ dictionary }) =>
+  render(T_DART_CLASS, {
+    NAME: "IdsSizes",
+    MEMBERS: byPath(dictionary, "size")
+      .map((t) => `  static const double ${toCamel(slug(t))} = ${parseFloat(val(t))};`)
+      .join("\n"),
+  });
+
 const fontStack = (dictionary, name) =>
   val(byPath(dictionary, "font-family").find((t) => t.path[1] === name));
 
@@ -1221,6 +1229,7 @@ for (const [name, format] of [
   ["ids/dart-motion", dartMotionFormatter],
   ["ids/ts-component-tokens", tsComponentTokensFormatter],
   ["ids/dart-component-tokens", dartComponentTokensFormatter],
+  ["ids/dart-size", dartSizeFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
   StyleDictionary.registerFormat({ name, format });
@@ -1252,6 +1261,7 @@ export default {
           format: "ids/dart-color-roles",
         },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
+        { destination: "../flutter/lib/tokens/ids_sizes.dart", format: "ids/dart-size" },
         {
           destination: "../flutter/lib/tokens/ids_component_tokens.dart",
           format: "ids/dart-component-tokens",
