@@ -169,40 +169,43 @@ const [events, setEvents] = useState(initialEvents);
 - 마우스는 4px 를 움직여야, 터치는 250ms 를 누르고 있어야 고르기가 시작됩니다. 그 전에 떼면 아무것도 넘기지 않고, 터치는 그 전까지 스크롤됩니다. Escape 는 고르기를 취소합니다.
 - 보드 끝으로 끌면 보드가 스크롤되면서 고른 기간이 이어집니다.
 - 일정, 버튼(`+N개`) 위에서 누르면 고르지 않습니다. 오른쪽 버튼과 수정 키(`Ctrl`, `Shift`, `Alt`, `Meta`)를 누른 채로 누를 때도 고르지 않습니다.
-- 키보드로 고르는 방법은 없습니다. 키보드로 일정을 만들려면 앱이 "새 일정" 버튼이나 `slotMenu` 를 함께 둡니다.
+- 키보드로 고르는 방법은 없습니다. 키보드로 일정을 만들려면 앱이 "새 일정" 버튼이나 `Scheduler.SlotMenu` 를 함께 둡니다.
 
 ## 우클릭 메뉴
 
 ```tsx
-<Scheduler
-  aria-label="일정표"
-  events={events}
-  eventMenu={(event) => (
-    <>
-      <Menu.Item onSelect={() => open(event)}>
-        <ArrowTopRightOnSquareIcon />
-        열기
+<Scheduler aria-label="일정표" events={events}>
+  <Scheduler.EventMenu>
+    {(event) => (
+      <>
+        <Menu.Item onSelect={() => open(event)}>
+          <ArrowTopRightOnSquareIcon />
+          열기
+        </Menu.Item>
+        <Menu.Item onSelect={() => remove(event)}>
+          <TrashIcon />
+          삭제
+        </Menu.Item>
+      </>
+    )}
+  </Scheduler.EventMenu>
+  <Scheduler.SlotMenu>
+    {({ start, end }) => (
+      <Menu.Item onSelect={() => create({ start, end })}>
+        <PlusIcon />
+        여기에 일정 만들기
       </Menu.Item>
-      <Menu.Item onSelect={() => remove(event)}>
-        <TrashIcon />
-        삭제
-      </Menu.Item>
-    </>
-  )}
-  slotMenu={({ start, end }) => (
-    <Menu.Item onSelect={() => create({ start, end })}>
-      <PlusIcon />
-      여기에 일정 만들기
-    </Menu.Item>
-  )}
-/>
+    )}
+  </Scheduler.SlotMenu>
+</Scheduler>
 ```
 
-- `eventMenu(event)` 는 일정(종일 일정 포함)을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 메뉴 이름은 일정 제목입니다.
-- `slotMenu({ start, end, allDay })` 는 시간 칸의 빈 곳을 우클릭했을 때 엽니다. 포인터 아래의 30분 칸이 `CalendarDateTime` 으로 넘어오고, 메뉴 이름은 "11월 18일 수요일 오후 2:30" 입니다.
+- `Scheduler.EventMenu` 의 children 함수 `(event)` 는 일정(종일 일정 포함)을 우클릭했을 때 열 `Menu.Item` 들을 돌려줍니다. 메뉴 이름은 일정 제목입니다.
+- `Scheduler.SlotMenu` 의 children 함수 `({ start, end, allDay })` 는 시간 칸의 빈 곳을 우클릭했을 때 엽니다. 포인터 아래의 30분 칸이 `CalendarDateTime` 으로 넘어오고, 메뉴 이름은 "11월 18일 수요일 오후 2:30" 입니다.
 - 월 보기에서는 날 칸의 빈 곳을 우클릭하면 그날 하루(`00:00` 부터 다음 날 `00:00` 까지, `allDay: true`)가 넘어오고, 메뉴 이름은 "2026년 11월 25일 수요일" 입니다.
 - 메뉴는 `Menu triggerType="contextmenu"` 라서 우클릭한 자리에 뜹니다. 고르는 법, 키보드, 닫는 법은 Menu 와 같습니다.
-- 메뉴를 주지 않은 곳(`eventMenu` 없이 일정, `slotMenu` 없이 빈 칸, 종일 줄의 빈 곳)은 브라우저 메뉴가 그대로 뜹니다.
+- 메뉴 part 를 두지 않은 곳(`Scheduler.EventMenu` 없이 일정, `Scheduler.SlotMenu` 없이 빈 칸, 종일 줄의 빈 곳)은 브라우저 메뉴가 그대로 뜹니다.
+- 두 part 는 `Scheduler` 의 자식이나 Fragment 안에 둡니다. 일정을 그리는 함수(`{(event) => <Scheduler.Event />}`)와 함께 둘 수 있습니다.
 - `onEventChange` 와 함께 써도 우클릭은 일정을 집지 않습니다.
 
 ## 보기와 날짜
@@ -255,7 +258,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 ## 스크롤
 
 - 처음 그릴 때 보이는 기간의 가장 이른 일정, 그것이 오전 8시보다 늦으면 오전 8시로 내려 둡니다. 그 시각 글자가 머리줄에 가리지 않도록 15분 위에서 멈춥니다. 날짜를 옮겨도 다시 내리지 않습니다.
-- 높이는 기본 `h-144` 입니다. `className="h-full"` 처럼 바꾸면 격자가 남은 높이를 씁니다.
+- 높이는 기본 `h-144` 입니다. 다른 높이는 새 디자인에서 `className` 으로 줍니다. `h-full` 이면 격자가 남은 높이를 씁니다.
 - 월, 주, N일 보기의 하루 칸은 88px 보다 좁아지지 않습니다. 좁은 화면에서는 격자가 가로로 스크롤되고, 시각 열은 왼쪽에 남습니다. 하루 보기는 가로로 스크롤되지 않습니다.
 
 ## locale
@@ -286,12 +289,15 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |
 | `now`                                   | `CalendarDateTime`                    | 클라이언트 시계      |
 | `onEventChange`                         | `(event, { start, end }) => void`     | 없음(옮기지 않음)    |
-| `eventMenu`                             | `(event) => ReactNode`                | 없음(브라우저 메뉴)  |
-| `slotMenu`                              | `({ start, end, allDay }) => ReactNode` | 없음(브라우저 메뉴) |
 | `onSlotSelect`                          | `({ start, end, allDay }) => void`    | 없음(고르지 않음)    |
-| `children`                              | `(event) => ReactNode`                | `<Scheduler.Event />` |
+| `children`                              | `(event) => ReactNode` 와 아래 part    | `<Scheduler.Event />` |
 
 나머지 `div` props 는 root 에 갑니다.
+
+| Part                  | children                                | 없으면              |
+| --------------------- | --------------------------------------- | ------------------- |
+| `Scheduler.EventMenu` | `(event) => ReactNode`                  | 일정에 브라우저 메뉴 |
+| `Scheduler.SlotMenu`  | `({ start, end, allDay }) => ReactNode` | 빈 칸에 브라우저 메뉴 |
 
 ## 다음 판
 

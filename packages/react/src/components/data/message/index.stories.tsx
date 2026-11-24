@@ -35,7 +35,6 @@ const meta = {
   argTypes: {
     align: { control: 'radio', options: aligns },
     status: { control: 'radio', options: statuses },
-    avatar: { control: false },
     time: { control: false },
   },
   args: {
@@ -61,7 +60,8 @@ export const Playground: Story = {};
 export const Usage: Story = {
   render: () => (
     <div className="w-96 break-keep">
-      <Message name="김지수" avatar={JISU} time={SENT_AT}>
+      <Message name="김지수" time={SENT_AT}>
+        <Message.Avatar src={JISU} />
         <Bubble>오늘 셔틀 몇 시에 와?</Bubble>
       </Message>
     </div>
@@ -151,7 +151,8 @@ export const Gallery: Story = {
       <Showcase.Section title="Avatar">
         <Showcase.Row label="src">
           <div className="w-96">
-            <Message name="김지수" avatar={JISU} time={SENT_AT}>
+            <Message name="김지수" time={SENT_AT}>
+              <Message.Avatar src={JISU} />
               <Bubble>내일 수업 휴강이래</Bubble>
             </Message>
           </div>
@@ -166,16 +167,12 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="node">
           <div className="w-96">
-            <Message
-              name="GIST 도우미"
-              avatar={
-                <Avatar name="GIST 도우미" size="tiny">
-                  <Avatar.Fallback>
-                    <SparklesIcon />
-                  </Avatar.Fallback>
-                </Avatar>
-              }
-            >
+            <Message name="GIST 도우미">
+              <Message.Avatar size="tiny">
+                <Avatar.Fallback>
+                  <SparklesIcon />
+                </Avatar.Fallback>
+              </Message.Avatar>
               <Bubble>무엇을 도와 드릴까요?</Bubble>
             </Message>
           </div>

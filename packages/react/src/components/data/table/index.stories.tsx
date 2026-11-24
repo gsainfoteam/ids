@@ -36,26 +36,28 @@ const meta = {
   },
   args: { variant: 'outline', size: 'standard', 'aria-label': '멤버' },
   render: (args) => (
-    <Table {...args} className="max-w-xl">
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>이름</Table.Head>
-          <Table.Head>이메일</Table.Head>
-          <Table.Head>역할</Table.Head>
-          <Table.Head align="end">잔액</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {MEMBERS.map((member) => (
-          <Table.Row key={member.id}>
-            <Table.Cell>{member.name}</Table.Cell>
-            <Table.Cell>{member.email}</Table.Cell>
-            <Table.Cell>{member.role}</Table.Cell>
-            <Table.Cell align="end">{won(member.balance)}</Table.Cell>
+    <div className="max-w-xl">
+      <Table {...args}>
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>이름</Table.Head>
+            <Table.Head>이메일</Table.Head>
+            <Table.Head>역할</Table.Head>
+            <Table.Head align="end">잔액</Table.Head>
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+        </Table.Header>
+        <Table.Body>
+          {MEMBERS.map((member) => (
+            <Table.Row key={member.id}>
+              <Table.Cell>{member.name}</Table.Cell>
+              <Table.Cell>{member.email}</Table.Cell>
+              <Table.Cell>{member.role}</Table.Cell>
+              <Table.Cell align="end">{won(member.balance)}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   ),
 } satisfies Meta<typeof Table>;
 
@@ -63,6 +65,31 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <div className="max-w-md">
+      <Table aria-label="멤버">
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>이름</Table.Head>
+            <Table.Head>역할</Table.Head>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>김철수</Table.Cell>
+            <Table.Cell>관리자</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>이영희</Table.Cell>
+            <Table.Cell>멤버</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+    </div>
+  ),
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -72,164 +99,178 @@ export const Gallery: Story = {
           rows={sizes}
           columns={variants}
           render={(size, variant) => (
-            <Table variant={variant} size={size} aria-label={`${variant} ${size}`} className="w-80">
-              <Table.Header>
-                <Table.Row>
-                  <Table.Head>이름</Table.Head>
-                  <Table.Head align="end">잔액</Table.Head>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {MEMBERS.slice(0, 3).map((member) => (
-                  <Table.Row key={member.id}>
-                    <Table.Cell>{member.name}</Table.Cell>
-                    <Table.Cell align="end">{won(member.balance)}</Table.Cell>
+            <div className="w-80">
+              <Table variant={variant} size={size} aria-label={`${variant} ${size}`}>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.Head>이름</Table.Head>
+                    <Table.Head align="end">잔액</Table.Head>
                   </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
+                </Table.Header>
+                <Table.Body>
+                  {MEMBERS.slice(0, 3).map((member) => (
+                    <Table.Row key={member.id}>
+                      <Table.Cell>{member.name}</Table.Cell>
+                      <Table.Cell align="end">{won(member.balance)}</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            </div>
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="Rows">
         <Showcase.Row label="striped">
-          <Table striped aria-label="줄무늬" className="w-80">
-            <Table.Header>
-              <Table.Row>
-                <Table.Head>이름</Table.Head>
-                <Table.Head>역할</Table.Head>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {MEMBERS.map((member) => (
-                <Table.Row key={member.id}>
-                  <Table.Cell>{member.name}</Table.Cell>
-                  <Table.Cell>{member.role}</Table.Cell>
+          <div className="w-80">
+            <Table striped aria-label="줄무늬">
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>이름</Table.Head>
+                  <Table.Head>역할</Table.Head>
                 </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
+              </Table.Header>
+              <Table.Body>
+                {MEMBERS.map((member) => (
+                  <Table.Row key={member.id}>
+                    <Table.Cell>{member.name}</Table.Cell>
+                    <Table.Cell>{member.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="selected">
-          <Table highlightOnHover aria-label="선택된 행" className="w-80">
-            <Table.Header>
-              <Table.Row>
-                <Table.Head>이름</Table.Head>
-                <Table.Head>역할</Table.Head>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {MEMBERS.map((member, index) => (
-                <Table.Row key={member.id} selected={index === 1}>
-                  <Table.Cell>{member.name}</Table.Cell>
-                  <Table.Cell>{member.role}</Table.Cell>
+          <div className="w-80">
+            <Table highlightOnHover aria-label="선택된 행">
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>이름</Table.Head>
+                  <Table.Head>역할</Table.Head>
                 </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
+              </Table.Header>
+              <Table.Body>
+                {MEMBERS.map((member, index) => (
+                  <Table.Row key={member.id} selected={index === 1}>
+                    <Table.Cell>{member.name}</Table.Cell>
+                    <Table.Cell>{member.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="striped · selected">
-          <Table striped aria-label="줄무늬와 선택" className="w-80">
-            <Table.Body>
-              {MEMBERS.map((member, index) => (
-                <Table.Row key={member.id} selected={index === 1}>
-                  <Table.Head>{member.name}</Table.Head>
-                  <Table.Cell>{member.role}</Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
+          <div className="w-80">
+            <Table striped aria-label="줄무늬와 선택">
+              <Table.Body>
+                {MEMBERS.map((member, index) => (
+                  <Table.Row key={member.id} selected={index === 1}>
+                    <Table.Head>{member.name}</Table.Head>
+                    <Table.Cell>{member.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Parts">
         <Showcase.Row label="caption · footer">
-          <Table aria-label="잔액" className="w-96">
-            <Table.Caption>2026년 9월 기준</Table.Caption>
-            <Table.Header>
-              <Table.Row>
-                <Table.Head>이름</Table.Head>
-                <Table.Head>역할</Table.Head>
-                <Table.Head align="end">잔액</Table.Head>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {MEMBERS.map((member) => (
-                <Table.Row key={member.id}>
-                  <Table.Cell>{member.name}</Table.Cell>
-                  <Table.Cell>
-                    <Chip variant="soft">{member.role}</Chip>
-                  </Table.Cell>
-                  <Table.Cell align="end">{won(member.balance)}</Table.Cell>
+          <div className="w-96">
+            <Table aria-label="잔액">
+              <Table.Caption>2026년 9월 기준</Table.Caption>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>이름</Table.Head>
+                  <Table.Head>역할</Table.Head>
+                  <Table.Head align="end">잔액</Table.Head>
                 </Table.Row>
-              ))}
-            </Table.Body>
-            <Table.Footer>
-              <Table.Row>
-                <Table.Head colSpan={2}>합계</Table.Head>
-                <Table.Cell align="end">
-                  {won(MEMBERS.reduce((sum, member) => sum + member.balance, 0))}
-                </Table.Cell>
-              </Table.Row>
-            </Table.Footer>
-          </Table>
+              </Table.Header>
+              <Table.Body>
+                {MEMBERS.map((member) => (
+                  <Table.Row key={member.id}>
+                    <Table.Cell>{member.name}</Table.Cell>
+                    <Table.Cell>
+                      <Chip variant="soft">{member.role}</Chip>
+                    </Table.Cell>
+                    <Table.Cell align="end">{won(member.balance)}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+              <Table.Footer>
+                <Table.Row>
+                  <Table.Head colSpan={2}>합계</Table.Head>
+                  <Table.Cell align="end">
+                    {won(MEMBERS.reduce((sum, member) => sum + member.balance, 0))}
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Footer>
+            </Table>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="align">
-          <Table variant="ghost" aria-label="정렬" className="w-96">
-            <Table.Header>
-              <Table.Row>
-                <Table.Head align="start">start</Table.Head>
-                <Table.Head align="center">center</Table.Head>
-                <Table.Head align="end">end</Table.Head>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              <Table.Row>
-                <Table.Cell align="start">가</Table.Cell>
-                <Table.Cell align="center">나</Table.Cell>
-                <Table.Cell align="end">다</Table.Cell>
-              </Table.Row>
-            </Table.Body>
-          </Table>
+          <div className="w-96">
+            <Table variant="ghost" aria-label="정렬">
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head align="start">start</Table.Head>
+                  <Table.Head align="center">center</Table.Head>
+                  <Table.Head align="end">end</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell align="start">가</Table.Cell>
+                  <Table.Cell align="center">나</Table.Cell>
+                  <Table.Cell align="end">다</Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-export const ClickableRows: Story = {
+export const SelectARowOnPress: Story = {
   render: function Render() {
     const [selected, setSelected] = useState<string | null>(null);
     return (
-      <Table aria-label="멤버" className="max-w-md">
-        <Table.Header>
-          <Table.Row>
-            <Table.Head>이름</Table.Head>
-            <Table.Head>이메일</Table.Head>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {MEMBERS.map((member) => (
-            <Table.Row
-              key={member.id}
-              selected={selected === member.id}
-              onClick={() => setSelected(member.id)}
-            >
-              <Table.Head>
-                <button
-                  type="button"
-                  aria-pressed={selected === member.id}
-                  className="rounded-standard focus-ring cursor-pointer outline-none"
-                >
-                  {member.name}
-                </button>
-              </Table.Head>
-              <Table.Cell>{member.email}</Table.Cell>
+      <div className="max-w-md">
+        <Table aria-label="멤버">
+          <Table.Header>
+            <Table.Row>
+              <Table.Head>이름</Table.Head>
+              <Table.Head>이메일</Table.Head>
             </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
+          </Table.Header>
+          <Table.Body>
+            {MEMBERS.map((member) => (
+              <Table.Row
+                key={member.id}
+                selected={selected === member.id}
+                onClick={() => setSelected(member.id)}
+              >
+                <Table.Head>
+                  <button
+                    type="button"
+                    aria-pressed={selected === member.id}
+                    className="rounded-standard focus-ring cursor-pointer outline-none"
+                  >
+                    {member.name}
+                  </button>
+                </Table.Head>
+                <Table.Cell>{member.email}</Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      </div>
     );
   },
   parameters: {
@@ -254,32 +295,34 @@ export const ClickableRows: Story = {
   },
 };
 
-export const StickyHeader: Story = {
+export const PinTheHeaderWhileScrolling: Story = {
   render: () => (
-    <Table stickyHeader striped aria-label="긴 목록" className="max-h-64 max-w-md">
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>번호</Table.Head>
-          <Table.Head>이름</Table.Head>
-          <Table.Head align="end">점수</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {Array.from({ length: 30 }, (_, index) => (
-          <Table.Row key={index}>
-            <Table.Cell>{index + 1}</Table.Cell>
-            <Table.Cell>학생 {index + 1}</Table.Cell>
-            <Table.Cell align="end">{(index * 37) % 100}</Table.Cell>
+    <div className="flex max-h-64 max-w-md flex-col">
+      <Table stickyHeader striped aria-label="긴 목록">
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>번호</Table.Head>
+            <Table.Head>이름</Table.Head>
+            <Table.Head align="end">점수</Table.Head>
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+        </Table.Header>
+        <Table.Body>
+          {Array.from({ length: 30 }, (_, index) => (
+            <Table.Row key={index}>
+              <Table.Cell>{index + 1}</Table.Cell>
+              <Table.Cell>학생 {index + 1}</Table.Cell>
+              <Table.Cell align="end">{(index * 37) % 100}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '높이를 `className` 으로 제한하면 표가 안에서 스크롤하고, `stickyHeader` 는 머리글 행을 위에 붙여 둡니다. 스크롤바는 ScrollArea 가 그립니다.',
+          '감싼 요소가 높이를 제한하면 표가 안에서 스크롤하고, `stickyHeader` 는 머리글 행을 위에 붙여 둡니다. 스크롤바는 ScrollArea 가 그립니다.',
       },
     },
   },
@@ -293,32 +336,34 @@ export const StickyHeader: Story = {
   },
 };
 
-export const WideTable: Story = {
+export const ScrollAWideTable: Story = {
   render: () => (
-    <Table aria-label="월별 매출" className="max-w-sm">
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>항목</Table.Head>
-          {Array.from({ length: 12 }, (_, month) => (
-            <Table.Head key={month} align="end">
-              {month + 1}월
-            </Table.Head>
-          ))}
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {['매출', '비용', '이익'].map((item, row) => (
-          <Table.Row key={item}>
-            <Table.Head>{item}</Table.Head>
+    <div className="max-w-sm">
+      <Table aria-label="월별 매출">
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>항목</Table.Head>
             {Array.from({ length: 12 }, (_, month) => (
-              <Table.Cell key={month} align="end">
-                {won((row + 1) * (month + 3) * 1000)}
-              </Table.Cell>
+              <Table.Head key={month} align="end">
+                {month + 1}월
+              </Table.Head>
             ))}
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+        </Table.Header>
+        <Table.Body>
+          {['매출', '비용', '이익'].map((item, row) => (
+            <Table.Row key={item}>
+              <Table.Head>{item}</Table.Head>
+              {Array.from({ length: 12 }, (_, month) => (
+                <Table.Cell key={month} align="end">
+                  {won((row + 1) * (month + 3) * 1000)}
+                </Table.Cell>
+              ))}
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   ),
   parameters: {
     docs: {

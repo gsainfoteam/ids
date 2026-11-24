@@ -1,10 +1,18 @@
 'use client';
 
-import { isValidElement, useEffect, type ComponentProps, type ReactNode } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  useEffect,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
-import { DialogClose } from './close';
+import { DialogClose, type DialogCloseProps } from './close';
 import { useDialogContext } from './context';
 import { DialogFooter } from './footer';
+import { DialogHeader } from './header';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
@@ -23,11 +31,35 @@ DialogContent.displayName = 'Dialog.Content';
 
 const isFooter = (node: ReactNode) => isValidElement(node) && elementTypeOf(node) === DialogFooter;
 
+const isCornerClose = (node: ReactNode): node is ReactElement<DialogCloseProps> =>
+  isValidElement<DialogCloseProps>(node) &&
+  elementTypeOf(node) === DialogClose &&
+  node.props.children == null &&
+  !node.props.asChild;
+
+const PARTS_THAT_HOLD_A_CLOSE = new Set<unknown>([DialogHeader, DialogFooter]);
+
+function writesAClose(children: ReactNode): boolean {
+  return flattenFragments(children).some((node) => {
+    if (!isValidElement<{ children?: ReactNode }>(node)) return false;
+    const type = elementTypeOf(node);
+    if (type === DialogClose) return true;
+    const searchable = typeof type === 'string' || PARTS_THAT_HOLD_A_CLOSE.has(type);
+    return searchable && writesAClose(node.props.children);
+  });
+}
+
 function splitOffTheFooter(children: ReactNode) {
   const parts = flattenFragments(children);
-  let footerStart = parts.length;
-  while (footerStart > 0 && isFooter(parts[footerStart - 1])) footerStart -= 1;
-  return { body: parts.slice(0, footerStart), footer: parts.slice(footerStart) };
+  const corner = parts.filter(isCornerClose);
+  const rest = parts.filter((node) => !isCornerClose(node));
+  let footerStart = rest.length;
+  while (footerStart > 0 && isFooter(rest[footerStart - 1])) footerStart -= 1;
+  return {
+    body: rest.slice(0, footerStart),
+    footer: rest.slice(footerStart),
+    corner: corner.length ? corner : writesAClose(rest) ? [] : [<DialogClose key="close" />],
+  };
 }
 
 function DialogPopup({ className, style, children, ...props }: DialogContentProps) {
@@ -49,7 +81,7 @@ function DialogPopup({ className, style, children, ...props }: DialogContentProp
       );
   }, [content, props]);
 
-  const { body, footer } = splitOffTheFooter(children);
+  const { body, footer, corner } = splitOffTheFooter(children);
 
   const labelledBy =
     props['aria-labelledby'] ??
@@ -96,7 +128,9 @@ function DialogPopup({ className, style, children, ...props }: DialogContentProp
             </div>
           </ScrollArea>
           {footer}
-          {!c.hideClose && <DialogClose className={styles.close()} />}
+          {corner.map((close) =>
+            cloneElement(close, { className: styles.close({ className: close.props.className }) }),
+          )}
         </OverlayItemContext>
       </div>
     </ModalLayer>

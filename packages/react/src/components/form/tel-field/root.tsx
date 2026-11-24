@@ -94,7 +94,7 @@ export function TelFieldRoot({
             className={styles.adornment()}
           />
         </div>
-        {field.hiddenInputName && (
+        {field.hiddenInputName && field.value !== '' && (
           <input
             type="hidden"
             name={field.hiddenInputName}

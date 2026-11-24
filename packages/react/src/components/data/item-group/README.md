@@ -24,7 +24,7 @@ import { Item, ItemGroup } from '@gsainfoteam/ids-react';
 | `size`    | `'standard' \| 'tiny'`                 | -          |
 | `ordered` | `boolean`                              | `false`    |
 
-`<ul>`(`ordered` 면 `<ol>`) 의 나머지 속성은 루트로 갑니다. 루트에는 `data-item-group` 과 `data-variant` 가 붙습니다.
+`<ul>`(`ordered` 면 `<ol>`) 의 나머지 속성은 루트로 갑니다.
 
 ## 행 감싸기
 

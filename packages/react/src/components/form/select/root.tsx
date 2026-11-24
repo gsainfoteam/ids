@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
@@ -80,7 +81,6 @@ type BaseProps = NativeTriggerProps & {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  mobileVariant?: 'popover' | 'drawer';
   className?: string | ((state: SelectState) => string | undefined);
   style?: CSSProperties;
   children?: ReactNode;
@@ -142,7 +142,6 @@ export function SelectRoot(props: SelectProps) {
     readOnly = false,
     required = false,
     disabled = false,
-    mobileVariant,
     name,
     form,
     className,
@@ -196,6 +195,8 @@ export function SelectRoot(props: SelectProps) {
       : isType(SelectSearchField)(node),
   );
 
+  const mobileVariant = (contents[0] as ReactElement<SelectContentProps> | undefined)?.props
+    .mobileVariant;
   const drawer = useDrawerPresentation(mobileVariant);
   const select = useSelect({
     multiple,

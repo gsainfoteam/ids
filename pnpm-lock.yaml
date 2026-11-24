@@ -65,7 +65,7 @@ importers:
         version: link:../../packages/react
       next:
         specifier: ^16.3.6
-        version: 16.3.6(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 16.3.6(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       react:
         specifier: ^19.2.0
         version: 19.2.6
@@ -384,6 +384,12 @@ importers:
       '@babel/standalone':
         specifier: 7.29.15
         version: 7.29.15
+      '@conform-to/react':
+        specifier: ^1.21.3
+        version: 1.21.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@conform-to/zod':
+        specifier: ^1.21.3
+        version: 1.21.3(zod@4.6.5)
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.0(jiti@2.7.0))
@@ -420,6 +426,9 @@ importers:
       '@tanstack/react-form':
         specifier: ^1.33.5
         version: 1.33.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@tanstack/react-router':
+        specifier: ^1.170.40
+        version: 1.170.40(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@types/babel__standalone':
         specifier: ^7.1.9
         version: 7.1.9
@@ -447,6 +456,9 @@ importers:
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
+      date-fns:
+        specifier: ^4.4.0
+        version: 4.4.0
       eslint:
         specifier: ^10.1.0
         version: 10.4.0(jiti@2.7.0)
@@ -483,6 +495,12 @@ importers:
       jsqr:
         specifier: ^1.4.0
         version: 1.4.0
+      motion:
+        specifier: ^14.14.0
+        version: 14.14.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      next:
+        specifier: ^16.3.6
+        version: 16.3.6(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       playwright:
         specifier: ^1.63.0
         version: 1.63.0
@@ -540,6 +558,9 @@ importers:
       typescript-eslint:
         specifier: ^8.57.1
         version: 8.60.0(@typescript/typescript6@6.0.2)(eslint@10.4.0(jiti@2.7.0))
+      valibot:
+        specifier: ^1.5.0
+        version: 1.5.0(@typescript/typescript6@6.0.2)
       vite:
         specifier: ^7.3.1
         version: 7.3.3(@types/node@22.19.19)(jiti@2.7.0)(lightningcss@1.33.0)(tsx@4.23.15)(yaml@2.9.1)
@@ -905,6 +926,20 @@ packages:
   '@clack/prompts@1.8.1':
     resolution: {integrity: sha512-dlT1m5e/0yUL0kRNcQn7yGLVThkgbB0Ga/1AmfDDC/8ik6AIiSf2QLQO2zPYvefsHP0aFgxO93cVLCCfDp7kzQ==}
     engines: {node: '>= 20.12.0'}
+
+  '@conform-to/dom@1.21.3':
+    resolution: {integrity: sha512-gaFYBWPCLwIJASd+VQWtcLfJnhn3Fo0/U8NS0LAMvUHuWU6UZ354MqYNUgvkaMtEfPfqSai6p4txdDp9JelDww==}
+
+  '@conform-to/react@1.21.3':
+    resolution: {integrity: sha512-HvpdcfIGAzvRzff2dBdJT2utn6jzLKHYzTQ+0jQAdQ2emQkzNw4U1g/50xkaRX/cFuCrh1MokL/8TX7JW7AtAQ==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+
+  '@conform-to/zod@1.21.3':
+    resolution: {integrity: sha512-IbFw4iMywJ7fWfZ1MIDEMlUfFa9ZkZhG8hL2K6zcx1eM6SPhwWAmmsFi478POShOLDj72A0qQ9nLCz+2qAEF5A==}
+    peerDependencies:
+      zod: ^3.21.0 || ^4.0.0
 
   '@csstools/color-helpers@5.1.0':
     resolution: {integrity: sha512-S11EXWJyy0Mz5SYvRmY8nJYTFFd1LCNV+7cXyAgQtOOuzb4EsgfqDufL+9esx72/eLhsRdGZwaldu/h+E4t4BA==}
@@ -4120,6 +4155,20 @@ packages:
     resolution: {integrity: sha512-Wp1zXWPVUPBmfoa3Cqc9ctaKuzKAV6uLstRqlR56kSjplf5uAce+qeyYym7F+PHbGTk+tCEdkCW6RD7DX/gBZw==}
     engines: {node: '>=20'}
 
+  framer-motion@14.14.0:
+    resolution: {integrity: sha512-fidRX0VzkZdA9OovFiBSzJtt9/jLcJpna78Z+KCqQQZIWoIpN3tOhEXAhhAw/FObUUh+o3Y18yx1F4BP0mVJ8Q==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+      remix: ^3.1.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      remix:
+        optional: true
+
   fs-extra@7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
@@ -4686,6 +4735,26 @@ packages:
 
   monaco-editor@0.52.2:
     resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
+
+  motion-dom@14.14.0:
+    resolution: {integrity: sha512-IAxcKhYkuQA2W0Tlx1AvVgImfqEoF3/t3IovbPQJlYkefmGsmrXjn967lMII5VmFmLpQEab4+ZkHo/ijJ4Esig==}
+
+  motion-utils@14.7.0:
+    resolution: {integrity: sha512-woO0/Nb7ys75f94fjvQi/6leiHGvZUYkeHUPEZ3vxsV+9OpEVhkxp01x8MlRwX0zt31EqgXsKDAoBoJLC148Tw==}
+
+  motion@14.14.0:
+    resolution: {integrity: sha512-a306U6sV5VKq1abtzKiinB+UQjiY88jrsvQzWORP3WPv/DFANyoYVlPbdnmJPMEbusyPXB4GyQJVANaq/pSIYQ==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+      remix: ^3.1.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      remix:
+        optional: true
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -6771,6 +6840,19 @@ snapshots:
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
+  '@conform-to/dom@1.21.3': {}
+
+  '@conform-to/react@1.21.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@conform-to/dom': 1.21.3
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
+
+  '@conform-to/zod@1.21.3(zod@4.6.5)':
+    dependencies:
+      '@conform-to/dom': 1.21.3
+      zod: 4.6.5
+
   '@csstools/color-helpers@5.1.0': {}
 
   '@csstools/css-calc@2.1.4(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)':
@@ -7461,7 +7543,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.9
       estree-walker: 2.0.2
-      picomatch: 4.0.7
+      picomatch: 4.0.4
     optionalDependencies:
       rollup: 4.60.4
 
@@ -9812,6 +9894,15 @@ snapshots:
     dependencies:
       tiny-inflate: 1.0.3
 
+  framer-motion@14.14.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+    dependencies:
+      motion-dom: 14.14.0
+      motion-utils: 14.7.0
+      tslib: 2.8.1
+    optionalDependencies:
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
+
   fs-extra@7.0.1:
     dependencies:
       graceful-fs: 4.2.11
@@ -9831,7 +9922,7 @@ snapshots:
 
   geist@1.9.2(next@16.3.6(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)):
     dependencies:
-      next: 16.3.6(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      next: 16.3.6(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
 
   gensync@1.0.0-beta.2: {}
 
@@ -10077,7 +10168,7 @@ snapshots:
       whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.2.0
-      ws: 8.22.0
+      ws: 8.21.0
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -10319,6 +10410,20 @@ snapshots:
 
   monaco-editor@0.52.2: {}
 
+  motion-dom@14.14.0:
+    dependencies:
+      motion-utils: 14.7.0
+
+  motion-utils@14.7.0: {}
+
+  motion@14.14.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+    dependencies:
+      framer-motion: 14.14.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      tslib: 2.8.1
+    optionalDependencies:
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
+
   mri@1.2.0: {}
 
   mrmime@2.0.1: {}
@@ -10341,7 +10446,7 @@ snapshots:
 
   neotraverse@1.0.1: {}
 
-  next@16.3.6(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  next@16.3.6(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       '@next/env': 16.3.6
       '@swc/helpers': 0.5.23
@@ -10350,7 +10455,7 @@ snapshots:
       postcss: 8.5.23
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
-      styled-jsx: 5.1.6(react@19.2.6)
+      styled-jsx: 5.1.6(@babel/core@7.29.7)(react@19.2.6)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.3.6
       '@next/swc-darwin-x64': 16.3.6
@@ -11101,10 +11206,12 @@ snapshots:
 
   strip-indent@4.1.1: {}
 
-  styled-jsx@5.1.6(react@19.2.6):
+  styled-jsx@5.1.6(@babel/core@7.29.7)(react@19.2.6):
     dependencies:
       client-only: 0.0.1
       react: 19.2.6
+    optionalDependencies:
+      '@babel/core': 7.29.7
 
   supports-preserve-symlinks-flag@1.0.0: {}
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import axe from 'axe-core';
@@ -51,7 +51,21 @@ const EVENTS: Scheduler.EventData[] = [
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
-const inProvider = ({ locale, ...props }: Partial<Scheduler.Props> & { locale?: string } = {}) => (
+type Menus = {
+  eventMenu?: Scheduler.EventMenu.Props['children'];
+  slotMenu?: Scheduler.SlotMenu.Props['children'];
+};
+
+const inProvider = ({
+  locale,
+  eventMenu,
+  slotMenu,
+  children,
+  ...props
+}: Partial<Omit<Scheduler.Props, 'children'>> & {
+  locale?: string;
+  children?: (event: Scheduler.EventData) => ReactNode;
+} & Menus = {}) => (
   <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     <Scheduler
       {...({
@@ -61,7 +75,11 @@ const inProvider = ({ locale, ...props }: Partial<Scheduler.Props> & { locale?: 
         now: NOW,
         ...props,
       } as Scheduler.Props)}
-    />
+    >
+      {children}
+      {eventMenu && <Scheduler.EventMenu>{eventMenu}</Scheduler.EventMenu>}
+      {slotMenu && <Scheduler.SlotMenu>{slotMenu}</Scheduler.SlotMenu>}
+    </Scheduler>
   </IdsProvider>
 );
 

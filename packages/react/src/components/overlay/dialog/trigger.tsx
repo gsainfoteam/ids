@@ -3,7 +3,7 @@
 import { type ComponentProps } from 'react';
 
 import { useDialogContext } from './context';
-import { mergeProps, part } from '../../../utils';
+import { buttonTypeFor, mergeProps, part } from '../../../utils';
 
 export type DialogTriggerProps = ComponentProps<'button'> & { asChild?: boolean };
 
@@ -16,7 +16,7 @@ export function DialogTrigger({ asChild, children, ...props }: DialogTriggerProp
     children,
     mergeProps(props, {
       ref: dialog.setTrigger,
-      type: asChild ? undefined : 'button',
+      type: buttonTypeFor(asChild, children),
       'aria-haspopup': 'dialog',
       'aria-expanded': dialog.open,
       'aria-controls': dialog.open ? dialog.ids.content : undefined,

@@ -163,7 +163,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 | `size`                                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |
 | `disabled` / `readOnly`               | 입력과 버튼의 변경을 모두 막는다                              |
-| `name` / `form`                       | hidden input이 숫자 문자열을 제출한다. 빈 값은 `""`           |
+| `name` / `form`                       | hidden input이 숫자 문자열을 제출한다. 빈 값은 제출하지 않는다 |
 | 그 외 native 속성, ref                 | 실제 input으로 간다                                           |
 
 ## 알아둘 것
