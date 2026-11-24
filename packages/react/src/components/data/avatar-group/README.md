@@ -45,7 +45,7 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 <AvatarGroup layout="inline" />          // 겹치지 않고 간격을 두고 늘어놓는다
 ```
 
-- 아래에 깔린 아바타는 겹친 쪽에 `data-cutout="start"` 또는 `"end"` 가 붙고, 그쪽이 2px 틈을 두고 오려집니다.
+- 아래에 깔린 아바타는 겹친 쪽이 2px 틈을 두고 오려집니다.
 - `dir="rtl"` 안에서는 방향이 뒤집힙니다.
 
 ## 크기
@@ -57,15 +57,14 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 </AvatarGroup>
 ```
 
-## 상태와 data 속성
+## 상태
 
-| 요소      | 속성                                                             |
-| --------- | ---------------------------------------------------------------- |
-| 루트      | `data-avatar-group`, `data-layout`, `data-stacking`, `data-size` |
-| 각 아바타 | `data-cutout="start \| end"` (겹쳐서 오려진 쪽)                  |
-| `+N`      | `data-avatar-group-overflow`                                     |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-루트의 `className`, `style` 은 `{ visible, hidden, layout, stacking, size }` 를 받는 함수가 될 수 있고, `Overflow` 의 `className`, `style`, `children` 은 `{ count }` 를 받습니다.
+- `layout`, `stacking`, `size`, `max`, `total` 은 앱이 넘긴 값입니다.
+- `+N` 에 모인 수는 `AvatarGroup.Overflow` 의 `children` 이 받는 `{ count }` 로 읽습니다.
+- 새 디자인(`custom-design`)에서만 루트의 `className`, `style` 에 `AvatarGroup.State`(`visible`, `hidden`, `layout`, `stacking`, `size`)를, `Overflow` 의 `className`, `style` 에 `{ count }` 를 받는 함수를 줍니다.
+- 런타임으로 읽을 수 없는 상태: 아바타마다 겹쳐 오려진 쪽(`start` / `end`).
 
 ## 속성
 
@@ -82,5 +81,5 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 ## 알아둘 것
 
 - 자식 하나가 한 사람입니다. `<a href>` 나 툴팁으로 감싼 아바타도 한 사람으로 세고, 안쪽 아바타가 오려집니다.
-- 겹침 간격은 `size` 에 맞춰져 있습니다. 아바타 크기를 `className` 으로 따로 바꾸면 겹침이 맞지 않습니다.
+- 겹침 간격은 `size` 에 맞춰져 있습니다. 새 디자인에서 아바타 크기를 `className` 으로 따로 바꾸면 겹침이 맞지 않습니다.
 - 루트는 `ul`, 아바타는 하나씩 `li` 에 담깁니다. 겹치게 당기는 것은 `li` 라서, 아바타 옆에 제자리로 렌더된 팝오버와 그 focus guard 는 당겨지지 않습니다.

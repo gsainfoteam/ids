@@ -44,21 +44,51 @@ import { Dialog } from '@gsainfoteam/ids-react';
 | `Dialog.Description` | 대화상자의 설명(`aria-describedby`)                                         |
 | `Dialog.Footer`      | 바닥의 버튼 띠. 좁은 화면에서는 세로로, 주 버튼이 위에 온다                 |
 | `Dialog.Close`       | 닫는 버튼. 글자만 주면 outline 버튼, `asChild` 면 자식 버튼에 닫기를 붙인다 |
-| `Dialog.Overlay`     | 뒤 배경. `className`, `style` 을 바꿀 때만 적는다                           |
+| `Dialog.Overlay`     | 뒤 배경. 새 디자인(`custom-design`)에서 `className`, `style` 을 줄 때만 적는다 |
 
 - 모든 파트는 생략할 수 있습니다. `Dialog.Title` 이 없으면 `Dialog.Content` 에 `aria-label` 을 줍니다. 둘 다 없으면 개발 모드에서 경고합니다.
-- 모서리의 닫기 버튼(X)은 늘 붙습니다. 빼려면 `hideClose` 를 줍니다.
 - 닫기 버튼은 대화상자 오른쪽 위에 고정되어 본문이 스크롤돼도 그 자리에 있고, Tab 순서는 Footer 다음 마지막입니다. `Dialog.Header` 만 버튼 자리(`pe-8`)를 비켜 주므로, 긴 본문은 스크롤할 때 버튼 아래로 지나갑니다.
+
+## 모서리의 닫기 버튼
+
+```tsx
+<Dialog.Content>                         {/* Dialog.Close 가 없다: 모서리에 X 를 그린다 */}
+  <Dialog.Header>...</Dialog.Header>
+</Dialog.Content>
+
+<Dialog.Content>                         {/* Footer 의 Dialog.Close 가 닫는다: X 는 없다 */}
+  <Dialog.Header>...</Dialog.Header>
+  <Dialog.Footer>
+    <Dialog.Close>취소</Dialog.Close>
+  </Dialog.Footer>
+</Dialog.Content>
+
+<Dialog.Content>
+  <Dialog.Close />                       {/* 직접 쓴 X. Footer 와 함께 둔다 */}
+  <Dialog.Header>...</Dialog.Header>
+  <Dialog.Footer>
+    <Dialog.Close>취소</Dialog.Close>
+  </Dialog.Footer>
+</Dialog.Content>
+```
+
+- `Dialog.Content` 는 그 안에 `Dialog.Close` 가 하나도 없을 때만 모서리에 닫기 버튼(X)을 그립니다. 닫는 버튼을 앱이 두면 X 는 따로 그리지 않습니다.
+- `Dialog.Close` 는 `Content` 의 자식, Fragment, HTML 요소, `Dialog.Header`, `Dialog.Footer` 안에서 찾습니다. 다른 컴포넌트와 안에 연 `Dialog` 안은 찾지 않습니다.
+- 자식 없는 `<Dialog.Close />` 를 `Content` 의 자식으로 쓰면 그 버튼이 모서리의 X 가 됩니다.
 
 ## 크기
 
 ```tsx
-<Dialog.Content />                       // 기본: 최대 폭 max-w-sm(384px), 화면 높이 - 2rem 까지
-<Dialog.Content className="max-w-2xl" /> // 폭과 높이는 className 으로
+<Dialog.Content /> // 최대 폭 max-w-sm(384px), 화면 높이 - 2rem 까지
 ```
 
-- 크기 prop 은 없습니다. 본문이 화면보다 길면 대화상자 안에서 스크롤합니다. 막대는 OS 막대가 아니라 [ScrollArea](../../layout/scroll-area/README.md) 의 `hover` 막대라 둥근 모서리 안쪽에 섭니다.
-- 본문(`data-dialog-body`)이 ScrollArea root 이고 padding 과 `gap` 은 안쪽 viewport 가 가집니다. `className` 은 `Dialog.Content` 에 붙으므로, 본문 여백을 바꾸려면 안쪽에 요소를 두고 거기에 줍니다.
+- 크기 prop 은 없습니다. 폭과 높이는 IDS 가 정하고, 대화상자는 top layer 에 뜨므로 감싸는 요소로 바꿀 수 없습니다. 다른 폭은 IDS 위에 짓는 새 디자인(`custom-design`)이고, 그때만 `Dialog.Content` 에 `className` 을 줍니다.
+- 본문이 화면보다 길면 대화상자 안에서 스크롤합니다. 막대는 OS 막대가 아니라 [ScrollArea](../../layout/scroll-area/README.md) 의 `hover` 막대라 둥근 모서리 안쪽에 섭니다.
+- 본문은 ScrollArea 이고 padding 과 `gap` 은 IDS 가 정합니다. 본문 안의 배치는 안쪽에 요소를 두고 거기에 클래스를 줍니다.
+
+```tsx custom-design
+<Dialog.Content className="max-w-2xl" /> // 새 디자인에서만: 폭을 넓힌다
+```
 
 ## 버튼 띠
 
@@ -89,7 +119,7 @@ import { Dialog } from '@gsainfoteam/ids-react';
 ```
 
 - 닫히면 포커스는 연 순간 포커스가 있던 요소로 돌아갑니다. 그 요소가 사라졌으면(닫힌 메뉴의 항목) 그 메뉴의 trigger 로 갑니다.
-- 닫히는 애니메이션이 끝날 때까지 요소가 남습니다(`data-ending-style`).
+- 닫히는 애니메이션이 끝날 때까지 요소가 남습니다.
 
 ## overlay.open
 
@@ -117,17 +147,17 @@ const discard = await overlay.open<boolean>(({ close }) => (
 ## 겹쳐 열기
 
 - 대화상자 안에서 연 대화상자, 안에 든 Select, 메뉴는 위에 쌓입니다. Escape 와 바깥 클릭은 맨 위부터 하나씩 닫습니다.
-- 가장 아래 대화상자만 배경을 어둡고 흐리게 합니다. 위의 대화상자 뒤에서는 아래 대화상자가 조금 작아집니다(`data-nested-open`).
+- 가장 아래 대화상자만 배경을 어둡고 흐리게 합니다. 위의 대화상자 뒤에서는 아래 대화상자가 조금 작아집니다.
 - 대화상자를 세 개 이상 겹치면 개발 모드에서 경고합니다.
 
 ## 상태
 
-| 속성                | 붙는 곳                                        |
-| ------------------- | ---------------------------------------------- |
-| `data-open`         | `Dialog.Content`                               |
-| `data-ending-style` | `Dialog.Content`, 배경. 닫히는 애니메이션 동안 |
-| `data-nested-open`  | 위에 다른 대화상자가 열린 `Dialog.Content`     |
-| `data-popup-open`   | 열려 있는 동안의 `Dialog.Trigger`              |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 열림은 `open` / `defaultOpen` / `onOpenChange` 로 읽고 정합니다.
+- 열고 닫는 애니메이션이 끝난 때는 `onOpenChangeComplete(open)` 가 알립니다.
+- `overlay.open` 으로 연 대화상자는 `close` 에 넘긴 값으로 끝나는 Promise 를 돌려줍니다.
+- Dialog 의 part 는 상태를 받는 `className` 함수가 없습니다.
 
 ## 속성
 
@@ -138,7 +168,6 @@ const discard = await overlay.open<boolean>(({ close }) => (
 | `onOpenChangeComplete` | 열고 닫는 애니메이션이 끝난 뒤                         |
 | `dismissible`          | 기본 `true`. `false` 면 Escape 와 배경 클릭을 무시한다 |
 | `role`                 | `dialog`(기본) / `alertdialog`                         |
-| `hideClose`            | 모서리의 닫기 버튼을 뺀다                              |
 
 ## 알아둘 것
 

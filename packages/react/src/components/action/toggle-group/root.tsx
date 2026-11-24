@@ -23,10 +23,11 @@ export function ToggleGroupRoot<T extends string = string>(props: ToggleGroup.Pr
     ref,
     className,
     children,
+    onFocus,
     ...rest
   } = props;
   useGroupNameWarning('ToggleGroup', props);
-  const { context, rootProps, formValue } = useToggleGroup({
+  const { context, rootProps, formValue, forwardRootFocusToItem } = useToggleGroup({
     selectionMode,
     value,
     defaultValue,
@@ -48,6 +49,10 @@ export function ToggleGroupRoot<T extends string = string>(props: ToggleGroup.Pr
         orientation={orientation}
         separator={rootProps.role === 'radiogroup' ? 'decorative' : 'semantic'}
         className={toggleGroupStyle({ orientation, className })}
+        onFocus={(event) => {
+          forwardRootFocusToItem(event);
+          onFocus?.(event);
+        }}
       >
         {children}
         <FormValue {...formValue} />

@@ -25,7 +25,7 @@ import { CircularProgress } from '@gsainfoteam/ids-react';
 <CircularProgress value={40} indeterminate />      // value가 있어도 진행률 없이
 ```
 
-- 값이 `max` 에 닿으면 `data-complete` 가 붙습니다. 색은 저절로 바뀌지 않으니 `colorScheme` 을 직접 넘깁니다.
+- 값이 `max` 에 닿으면 `complete` 상태가 됩니다. 색은 저절로 바뀌지 않으니 `colorScheme` 을 직접 넘깁니다.
 - `getValueLabel` 이 없으면 백분율(`65%`)입니다. 돌려준 문장은 `aria-valuetext` 와 `CircularProgress.Value` 에 함께 쓰입니다.
 
 ## 구조
@@ -56,14 +56,14 @@ import { CircularProgress } from '@gsainfoteam/ids-react';
 
 ## 상태
 
-`Progress.State` 와 같습니다: `value`, `max`, `percent`, `valueLabel`, `indeterminate`, `complete`, `size`, `colorScheme`.
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-```tsx
+- 값은 앱이 넘긴 `value`, `max` 이고, `size`, `colorScheme` 도 넘긴 값입니다.
+- 새 디자인(`custom-design`)에서만 `className` 에 `CircularProgress.State` 를 받는 함수를 줍니다. `Progress.State` 와 같습니다: `value`, `max`, `percent`, `valueLabel`, `indeterminate`, `complete`, `size`, `colorScheme`.
+
+```tsx custom-design
 <CircularProgress value={value} className={(state) => (state.complete ? 'opacity-60' : undefined)} />
 ```
-
-- 루트에 `data-circular-progress`, `data-size`, `data-indeterminate`, `data-complete` 가 붙습니다.
-- 파트에는 `data-circular-progress-label`, `-value`, `-track`, `-indicator` 가 붙습니다.
 
 ## 속성
 
@@ -77,7 +77,7 @@ import { CircularProgress } from '@gsainfoteam/ids-react';
 | `getValueLabel`                              | `(value, max) => string`. 값 문장                 |
 | `aria-label` / `aria-labelledby`             | progressbar의 이름. `CircularProgress.Label` 보다 우선 |
 | `id` / `aria-describedby` / `aria-valuetext` | progressbar로 간다                                |
-| `className` / `style`                        | 루트로 간다. 상태를 받는 함수도 된다              |
+| `className` / `style`                        | 루트로 간다. 새 디자인에서만 쓴다                 |
 
 ## 알아둘 것
 

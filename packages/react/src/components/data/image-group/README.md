@@ -77,4 +77,3 @@ const [index, setIndex] = useState(0);
 | `zoom` / `onZoomChange`                    | 확대 배율. 기본 `1`                          |
 | 그 외 속성                                 | `<ul>` 로 간다(`aria-label`, `className` 등) |
 
-- 루트에는 `data-image-group` 과 `data-layout` 이 붙습니다.

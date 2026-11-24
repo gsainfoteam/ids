@@ -97,6 +97,10 @@ import { Alert } from '@gsainfoteam/ids-react';
 
 ## 상태
 
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 열림은 `open` / `onOpenChange` 로 읽습니다. 나머지는 앱이 넘긴 값이거나 그 결과입니다.
+
 | 상태          | 뜻                    |
 | ------------- | --------------------- |
 | `colorScheme` | 넘긴 의미             |
@@ -105,13 +109,13 @@ import { Alert } from '@gsainfoteam/ids-react';
 | `dismissible` | `Alert.Close` 가 있다 |
 | `ending`      | 닫히는 전환 중이다    |
 
-- IDS 위에 새 디자인을 얹을 때 `className` 과 `style` 은 이 상태를 받는 함수로도 줄 수 있습니다.
+- 새 디자인(`custom-design`)에서만 `className` 과 `style` 에 이 상태(`Alert.State`)를 받는 함수를 줍니다.
 
-```tsx
+```tsx custom-design
 <Alert className={(state) => (state.dismissible ? 'pe-2' : undefined)} />
 ```
 
-- 열림은 `open` / `onOpenChange` 로 읽습니다.
+- 닫히는 전환 중인지(`ending`)는 값이나 콜백으로 나오지 않고 위 함수로만 받습니다.
 
 ## 속성
 
@@ -122,7 +126,7 @@ import { Alert } from '@gsainfoteam/ids-react';
 | `open` / `defaultOpen` | 열림. 기본 `true`                    |
 | `onOpenChange`         | 닫으려 할 때 `false` 로              |
 | `role` / `aria-live`   | 의미에 따라 자동. 넘기면 그 값       |
-| `className` / `style`  | 루트로 간다. 상태를 받는 함수도 된다 |
+| `className` / `style`  | 루트로 간다. 새 디자인에서만 쓴다    |
 | 그 외 속성             | 루트 div로 간다                      |
 
 ## 알아둘 것

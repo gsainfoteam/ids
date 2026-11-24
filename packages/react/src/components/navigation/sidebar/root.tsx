@@ -16,7 +16,7 @@ import { SidebarHeader } from './header';
 import { SidebarItem } from './item';
 import { sidebarStyle, type SidebarCollapsibleMode, type SidebarPanelState } from './style';
 import { SidebarTrigger } from './trigger';
-import { collapsibleModeOf, DEFAULT_SHORTCUT, useSidebar } from './use-sidebar';
+import { DEFAULT_SHORTCUT, useSidebar } from './use-sidebar';
 import { useTranslate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
 import { Card } from '../../data/card';
@@ -82,7 +82,7 @@ export function SidebarRoot({
 }: Sidebar.Props) {
   const t = useTranslate();
   const provider = use(SidebarProviderContext);
-  const collapsible = collapsibleModeOf(collapsibleProp);
+  const collapsible = collapsibleProp ?? false;
   const controls = useSidebar({
     collapsed,
     defaultCollapsed,
