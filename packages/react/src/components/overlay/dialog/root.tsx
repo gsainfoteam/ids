@@ -22,13 +22,7 @@ export function DialogRoot({
   role = 'dialog',
   children,
 }: Dialog.Props) {
-  const dialog = useInternalDialog({
-    open,
-    defaultOpen,
-    onOpenChange,
-    onOpenChangeComplete,
-    dismissible,
-  });
+  const dialog = useInternalDialog({ open, defaultOpen, onOpenChange, onOpenChangeComplete, dismissible });
 
   const [titled, setTitled] = useState(false);
   const [described, setDescribed] = useState(false);

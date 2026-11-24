@@ -23,7 +23,12 @@ const meta = {
     scrollOnAppend: { control: 'radio', options: ['end', 'start'] },
     'aria-busy': { control: 'boolean' },
   },
-  args: { stickToBottom: true, scrollOnAppend: 'end', 'aria-busy': false },
+  args: {
+    'aria-label': '메시지',
+    stickToBottom: true,
+    scrollOnAppend: 'end',
+    'aria-busy': false,
+  },
 } satisfies Meta<typeof MessageScroller>;
 
 export default meta;
@@ -100,7 +105,7 @@ export const Playground: Story = {
 export const Usage: Story = {
   render: () => (
     <div className="rounded-container border-neutral h-80 w-full max-w-md overflow-hidden border">
-      <MessageScroller>
+      <MessageScroller aria-label="메시지">
         <Message align="start">
           <Bubble variant="soft">내일 동아리 회의 몇 시였지?</Bubble>
         </Message>
@@ -139,7 +144,7 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="end (기본)">
           <div className={frame}>
-            <MessageScroller>
+            <MessageScroller aria-label="메시지">
               {CONVERSATION.map((line) => (
                 <Message key={line.id} align={line.mine ? 'end' : 'start'}>
                   <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
@@ -150,7 +155,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="넘치지 않음">
           <div className={frame}>
-            <MessageScroller>
+            <MessageScroller aria-label="메시지">
               {CONVERSATION.slice(0, 3).map((line) => (
                 <Message key={line.id} align={line.mine ? 'end' : 'start'}>
                   <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
@@ -167,7 +172,7 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="aria-busy">
           <div className={frame}>
-            <MessageScroller aria-busy>
+            <MessageScroller aria-label="메시지" aria-busy>
               {CONVERSATION.map((line) => (
                 <Message key={line.id} align={line.mine ? 'end' : 'start'}>
                   <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
@@ -188,7 +193,7 @@ export const FollowNewMessages: Story = {
     return (
       <div className="flex w-full max-w-md flex-col items-start gap-3">
         <div className={frame}>
-          <MessageScroller>
+          <MessageScroller aria-label="메시지">
             {lines.map((line) => (
               <Message key={line.id} align={line.mine ? 'end' : 'start'}>
                 <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
@@ -254,7 +259,7 @@ export const KeepTheQuestionInViewInAnAiChat: Story = {
     return (
       <div className="flex w-full max-w-md flex-col gap-3">
         <div className={frame}>
-          <MessageScroller scrollOnAppend="start">
+          <MessageScroller aria-label="메시지" scrollOnAppend="start">
             {turns.map((turn) => (
               <div key={turn.id} className="flex flex-col gap-3">
                 <Message align="end">
@@ -340,6 +345,7 @@ export const LoadEarlierMessages: Story = {
     return (
       <div className={frame}>
         <MessageScroller
+          aria-label="메시지"
           aria-busy={loading}
           onReachStart={async () => {
             if (!more) return;
@@ -394,7 +400,7 @@ export const LoadEarlierMessages: Story = {
 export const ReplaceTheJumpButton: Story = {
   render: () => (
     <div className={frame}>
-      <MessageScroller>
+      <MessageScroller aria-label="메시지">
         {CONVERSATION.map((line) => (
           <Message key={line.id} align={line.mine ? 'end' : 'start'}>
             <Bubble variant={line.mine ? 'solid' : 'soft'}>{line.text}</Bubble>
@@ -439,7 +445,7 @@ export const NarrowTheListInAWideChat: Story = {
   tags: ['custom-design'],
   render: () => (
     <div className="border-neutral rounded-container h-80 w-full max-w-2xl overflow-hidden border">
-      <MessageScroller>
+      <MessageScroller aria-label="메시지">
         <MessageScroller.List className="mx-auto w-full max-w-sm gap-6 px-6">
           {CONVERSATION.map((line) => (
             <Message key={line.id} align={line.mine ? 'end' : 'start'}>

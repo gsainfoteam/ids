@@ -15,6 +15,7 @@ import { isCheckedScore, useInternalRating } from './hooks/use-rating';
 import { resolve, type StateProp } from './lib/state-prop';
 import { RatingItem, type RatingItemProps } from './parts/item';
 import { ratingStyle, type RatingOptionPlacement } from './style';
+import { hasAccessibleName, useInternalUnnamedWarning } from '../../../internal/lib/accessible-name';
 import { FormValue } from '../../../internal/parts/form-value';
 import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
@@ -130,7 +131,7 @@ export function RatingRoot({
     max,
     step,
     interactive,
-    missingMessage: required && interactive ? t('rating.required') : null,
+    missingMessage: null,
     ref,
   });
   const {
@@ -159,6 +160,10 @@ export function RatingRoot({
   const scoreId = `${id ?? generatedId}-score`;
   const groupName = name ?? generatedId;
   const formOwner = name === undefined && form === undefined ? NO_FORM_OWNER : form;
+  useInternalUnnamedWarning(
+    'Rating',
+    !readOnly && !hasAccessibleName({ 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby }),
+  );
 
   const option = (score: number, placement: RatingOptionPlacement) => (
     <input
@@ -194,13 +199,7 @@ export function RatingRoot({
       id={id}
       role={readOnly ? 'img' : 'radiogroup'}
       tabIndex={readOnly ? undefined : -1}
-      aria-label={
-        readOnly
-          ? ariaLabel
-            ? `${ariaLabel}: ${scoreLabel}`
-            : scoreLabel
-          : (ariaLabel ?? (ariaLabelledby ? undefined : t('rating.label')))
-      }
+      aria-label={readOnly ? (ariaLabel ? `${ariaLabel}: ${scoreLabel}` : scoreLabel) : ariaLabel}
       aria-labelledby={readOnly && ariaLabelledby ? `${ariaLabelledby} ${scoreId}` : ariaLabelledby}
       aria-required={readOnly ? undefined : (ariaRequired ?? (required || undefined))}
       aria-disabled={disabled || undefined}

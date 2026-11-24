@@ -162,10 +162,10 @@ export const ClearASearch: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('searchbox', { name: '검색' });
-    await userEvent.click(canvas.getByRole('button', { name: '검색어 지우기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     await expect(input).toHaveValue('');
     await expect(input).toHaveFocus();
-    await expect(canvas.queryByRole('button', { name: '검색어 지우기' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: '지우기' })).toBeNull();
     await userEvent.type(input, 'Heroicons');
     await userEvent.keyboard('{Escape}');
     await expect(input).toHaveValue('');

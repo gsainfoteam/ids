@@ -6,8 +6,8 @@ import { useInternalStepperWarnings } from './hooks/use-stepper-warnings';
 import { flag } from './lib/step-state';
 import { isStep, isStray } from './lib/steps';
 import { stepperStyle } from './style';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { resolveState } from '../../../internal/lib/state-props';
-import { useInternalTranslate } from '../../../internal/translate';
 import { flattenFragments } from '../../../utils';
 
 import type { Stepper } from '.';
@@ -32,7 +32,6 @@ export function StepperRoot(props: Stepper.Props) {
     ...rest
   } = props;
 
-  const t = useInternalTranslate();
   const { id, listRef, current, interactive, shownValue, roving, select } = useInternalStepper({
     value,
     defaultValue,
@@ -55,8 +54,12 @@ export function StepperRoot(props: Stepper.Props) {
     strayCount: others.filter(isStray).length,
   });
 
+  useInternalRequiredName('Stepper', {
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+  });
+
   const styles = stepperStyle({ orientation, size, interactive, progress });
-  const defaultLabel = progress ? t('stepper.label') : undefined;
 
   return (
     <StepperContext
@@ -87,7 +90,7 @@ export function StepperRoot(props: Stepper.Props) {
       >
         <ol
           ref={listRef}
-          aria-label={ariaLabelledBy === undefined ? (ariaLabel ?? defaultLabel) : ariaLabel}
+          aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
           className={styles.list()}
         >

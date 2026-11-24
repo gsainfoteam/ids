@@ -15,13 +15,15 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
     어떤 말투로 쓸까요?
     <Questionnaire.Option value="formal">격식</Questionnaire.Option>
     <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-    <Questionnaire.Other />
+    <Questionnaire.Other aria-label="직접 입력" />
   </Questionnaire.Question>
   <Questionnaire.Question name="topics" selectionMode="multiple" optional>
     무엇을 넣을까요?
     <Questionnaire.Option value="summary">요약</Questionnaire.Option>
     <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
   </Questionnaire.Question>
+  <Questionnaire.Skip>건너뛰기</Questionnaire.Skip>
+  <Questionnaire.Submit>보내기</Questionnaire.Submit>
 </Questionnaire>;
 ```
 
@@ -51,7 +53,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 - 보기 카드 전체가 `<label>` 이라 어디를 눌러도 고릅니다.
 - 라디오나 체크박스는 카드 앞쪽, 제목 첫 줄 높이에 놓입니다. 고른 카드는 테두리가 primary 가 되고 바탕이 옅게 깔립니다.
 - 보기 카드와 직접 입력은 높이와 radius(`standard`)가 같습니다. `description` 이 있는 카드만 두 줄만큼 높아집니다.
-- 보기 카드는 컨테이너가 아니라 입력과 같은 컨트롤로 그립니다. 바탕과 테두리는 직접 입력과 같은 `internal/surfaces/lib/field-surface` 의 `outline` 이고, 모서리는 `concentric-p-*` 대신 입력처럼 `rounded-standard` 와 가로 여백입니다. 카드 모서리에 10px 컨트롤이 없어 concentric 이 키운 radius 는 직접 입력과 어긋납니다.
+- 보기 카드는 컨테이너가 아니라 입력과 같은 컨트롤로 그립니다. 바탕과 테두리는 직접 입력과 같은 `internal/surfaces/field-surface` 의 `outline` 이고, 모서리는 `concentric-p-*` 대신 입력처럼 `rounded-standard` 와 가로 여백입니다. 카드 모서리에 10px 컨트롤이 없어 concentric 이 키운 radius 는 직접 입력과 어긋납니다.
 - 고른 카드는 `bg-neutral-soft` 에 primary 테두리입니다. hover 와 누름은 다른 컨트롤처럼 state layer(`state-hover`, `state-press`)를 바탕 위에 얹고, 비활성 카드에는 얹지 않습니다.
 
 ## 모양
@@ -69,7 +71,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 </Questionnaire.Question>
 ```
 
-| `variant`  | 보기                                                              |
+| `variant`     | 보기                                                              |
 | ------------- | ----------------------------------------------------------------- |
 | `card` (기본) | `Item` 카드 안의 `Radio` / `Checkbox`. `description` 을 보인다    |
 | `toggle`      | `ToggleGroup` 안의 `Toggle`. 라디오도 체크박스도 없고 글자 폭만큼 |
@@ -80,10 +82,11 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 ## 직접 입력
 
 ```tsx
-<Questionnaire.Other placeholder="예: 반말로 짧게" />
+<Questionnaire.Other aria-label="직접 입력" placeholder="예: 반말로 짧게" />
 ```
 
-- 보기에 없는 답을 적는 `TextField` 입니다. 이름은 `직접 입력`, placeholder 는 `다른 답을 적어 주세요` 이고 둘 다 바꿀 수 있습니다.
+- 보기에 없는 답을 적는 `TextField` 입니다. 이름은 앱이 `aria-label` 이나 `aria-labelledby` 로 꼭 줍니다. 빠뜨리면 개발 모드에서 경고합니다.
+- `placeholder` 는 기본값이 없습니다.
 - 하나만 고르는 질문에서는 적기 시작하면 고른 보기가 풀리고, 보기를 고르면 적은 글이 지워집니다.
 - 여럿 고르는 질문에서는 고른 보기 뒤에 적은 글이 붙습니다(`['sticker', '엽서']`).
 - 글이 있을 때만 질문의 `name` 으로 FormData 에 들어갑니다.
@@ -104,13 +107,13 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 ## 진행과 이동
 
-| 부분     | 보일 때                                                                    |
-| -------- | -------------------------------------------------------------------------- |
+| 부분     | 보일 때                                                                               |
+| -------- | ------------------------------------------------------------------------------------- |
 | Progress | 질문이 둘 이상. 맨 위에 작은 글자 `질문 1 / 3` 과 짧은 막대. `aria-valuetext` 도 같다 |
-| 이전     | 첫 질문이 아닐 때                                                          |
-| 건너뛰기 | 지금 질문이 `optional`                                                     |
-| 다음     | 마지막 질문이 아닐 때. 답하지 않은 필수 질문에서는 꺼진다(포커스는 받는다) |
-| 보내기   | 마지막 질문. 글자는 `Questionnaire.Submit` 으로 바꾼다                     |
+| 이전     | 첫 질문이 아닐 때. 이름이 `이전` 인 아이콘 버튼                                       |
+| 건너뛰기 | 지금 질문이 `optional` 이고 `Questionnaire.Skip` 에 글자를 줬을 때                    |
+| 다음     | 마지막 질문이 아닐 때. 답하지 않은 필수 질문에서는 꺼진다(포커스는 받는다)            |
+| 보내기   | 마지막 질문일 때. 글자가 없으면 다음과 같은 아이콘 버튼이다                           |
 
 - 다음과 보내기는 같은 submit 버튼입니다. 질문 안에서 form 이 제출되면 마지막이 아닐 때는 다음 질문으로 넘어갑니다.
 - 이동 버튼은 `ButtonGroup` 안의 레이아웃 div 로 띄워 묶이고 `aria-label="질문 이동"` 이 붙습니다.
@@ -121,13 +124,18 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 <Questionnaire onComplete={plan}>
   <Questionnaire.Question name="size">…</Questionnaire.Question>
   <Questionnaire.Question name="goods">…</Questionnaire.Question>
+  <Questionnaire.Skip>건너뛰기</Questionnaire.Skip> {/* optional 질문의 건너뛰기 버튼 글자 */}
   <Questionnaire.Submit>계획 세우기</Questionnaire.Submit> {/* 마지막 질문의 버튼 글자 */}
 </Questionnaire>
+
+<Questionnaire.Submit>{({ last }) => (last ? '계획 세우기' : '계속')}</Questionnaire.Submit>
 ```
 
-- `Questionnaire.Submit` 은 다음과 보내기를 맡는 submit 버튼입니다. 쓰지 않으면 기본 버튼이 그려집니다.
-- 어디에 적어도 이동 버튼 묶음 안, 건너뛰기 뒤에 그려집니다.
-- `children` 은 마지막 질문에서만 보입니다. 기본은 `보내기`, 마지막이 아닐 때는 늘 `다음` 입니다.
+- `Questionnaire.Submit` 은 다음과 보내기를 맡는 submit 버튼입니다.
+- 글자는 앱이 씁니다. `children` 이 글자면 마지막 질문에서만 쓰고, 함수면 `{ last }` 를 받아 모든 질문의 글자를 정합니다.
+- 글자가 없으면 이름이 `다음` 인 아이콘 버튼(`IconButton`)입니다. 마지막 질문에서도 같은 버튼이 보냅니다.
+- `Questionnaire.Skip` 은 건너뛰기 버튼입니다. `children` 이 없으면 그리지 않습니다. 쓰지 않으면 optional 질문에도 건너뛰기 버튼이 없습니다.
+- 둘 다 어디에 적어도 이동 버튼 묶음 안에 그려집니다. 순서는 이전, 건너뛰기, 다음(보내기)입니다.
 - 그 밖의 속성은 `Button` 으로 갑니다(`variant`, `colorScheme`). `type` 은 늘 `submit` 이고, 답하지 않은 필수 질문에서는 꺼집니다.
 
 ## 고르면 바로 넘어가기
@@ -173,23 +181,24 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 ## 속성
 
-| 속성                     | 기본 / 동작                                                             |
-| ------------------------ | ----------------------------------------------------------------------- |
-| `defaultValue`           | `Record<string, string \| string[]>`, 기본 `{}`                         |
-| `onComplete`             | 마지막 질문에서 보낼 때 답을 받는다                                     |
-| `advanceOnSelect`        | `false`. 하나만 고르는 질문을 고르면 바로 넘어간다                      |
-| `size`                   | `standard`(기본) / `tiny`                                               |
-| 그 외 속성               | `<form>` 으로 간다 (`id`, `aria-label`)                 |
-| Question `name`          | 답의 키이자 FormData 이름                                               |
-| Question `selectionMode` | `single`(기본) / `multiple`                                             |
-| Question `optional`      | `false`. 켜면 건너뛰기 버튼                                             |
-| Question `orientation`   | `vertical`(기본) / `horizontal`                                         |
-| Question `variant`    | `card`(기본) / `toggle`                                                 |
-| Option `value`           | 답이 되는 값                                                            |
-| Option `description`     | 보기 둘째 줄                                                            |
-| Option `disabled`        | 그 보기만 끈다                                                          |
-| Other                    | `TextField` 의 속성. `value`, `name`, `size` 는 Questionnaire 가 정한다 |
-| Submit `children`        | 마지막 버튼 글자. 기본 `보내기`. 그 밖의 속성은 `Button` 으로           |
+| 속성                     | 기본 / 동작                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `defaultValue`           | `Record<string, string \| string[]>`, 기본 `{}`                                                                   |
+| `onComplete`             | 마지막 질문에서 보낼 때 답을 받는다                                                                               |
+| `advanceOnSelect`        | `false`. 하나만 고르는 질문을 고르면 바로 넘어간다                                                                |
+| `size`                   | `standard`(기본) / `tiny`                                                                                         |
+| 그 외 속성               | `<form>` 으로 간다 (`id`, `aria-label`)                                                                           |
+| Question `name`          | 답의 키이자 FormData 이름                                                                                         |
+| Question `selectionMode` | `single`(기본) / `multiple`                                                                                       |
+| Question `optional`      | `false`. 켜면 건너뛰기 버튼                                                                                       |
+| Question `orientation`   | `vertical`(기본) / `horizontal`                                                                                   |
+| Question `variant`       | `card`(기본) / `toggle`                                                                                           |
+| Option `value`           | 답이 되는 값                                                                                                      |
+| Option `description`     | 보기 둘째 줄                                                                                                      |
+| Option `disabled`        | 그 보기만 끈다                                                                                                    |
+| Other                    | `TextField` 의 속성. `aria-label` 이나 `aria-labelledby` 필수. `value`, `name`, `size` 는 Questionnaire 가 정한다 |
+| Submit `children`        | 마지막 버튼 글자, 또는 `({ last }) => 글자`. 기본값 없음. 그 밖의 속성은 `Button` 으로                            |
+| Skip `children`          | 건너뛰기 버튼 글자. 기본값 없음. 그 밖의 속성은 `Button` 으로                                                     |
 
 ## 상태
 

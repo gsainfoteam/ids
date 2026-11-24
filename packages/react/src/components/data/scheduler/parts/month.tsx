@@ -202,7 +202,7 @@ export function SchedulerMonth<E extends SchedulerEventData>({
                       })}
                       onClick={() => onShowDay(day)}
                     >
-                      {t('scheduler.more', { count: hidden })}
+                      {format.words.signed(hidden)}
                     </Button>
                   </li>
                 );

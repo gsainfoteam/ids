@@ -4,7 +4,9 @@ import { IdsProviderRoot, type IdsProviderRootProps } from './root';
 import type { ThemeContextValue, ThemeMode } from './hooks/use-ids-provider';
 import type { IdsTheme } from './lib/theme';
 
-export function IdsProvider(props: IdsProvider.Props) {
+export function IdsProvider<const Language extends string = string>(
+  props: IdsProvider.Props<Language>,
+) {
   return <IdsProviderRoot {...props} />;
 }
 
@@ -13,7 +15,10 @@ export namespace IdsProvider {
 
   export type State = ThemeContextValue;
 
-  export type Props = Omit<IdsProviderRootProps, 'theme'> & { theme: IdsTheme };
+  export type Props<Language extends string = string> = Omit<
+    IdsProviderRootProps<Language>,
+    'theme'
+  > & { theme: IdsTheme };
 
   export const Scope = IdsProviderScope;
   export namespace Scope {

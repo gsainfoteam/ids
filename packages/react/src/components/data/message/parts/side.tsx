@@ -25,7 +25,7 @@ export function MessageSide({ onRetry }: { onRetry: (() => void) | undefined }) 
         />
       )}
       <MessageUnread />
-      {status === 'pending' && <span className={styles.hint()}>{t('message.pending')}</span>}
+      {status === 'pending' && <span className={styles.hint()}>{t('common.sending')}</span>}
       {shownTime !== undefined && <MessageTime time={shownTime} />}
     </div>
   );

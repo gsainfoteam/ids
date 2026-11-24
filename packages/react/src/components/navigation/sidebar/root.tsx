@@ -14,7 +14,7 @@ import { SidebarHeader } from './parts/header';
 import { SidebarItem } from './parts/item';
 import { SidebarTrigger } from './parts/trigger';
 import { sidebarStyle } from './style';
-import { useInternalTranslate } from '../../../internal/translate';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { containsElementOfType, flattenFragments } from '../../../utils';
 import { Card } from '../../data/card';
 import { Divider } from '../../layout/divider';
@@ -64,9 +64,12 @@ export function SidebarRoot({
   className,
   children,
   'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
   ...props
 }: Sidebar.Props) {
-  const t = useInternalTranslate();
+  const name = { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy };
+  useInternalRequiredName('Sidebar', name);
+
   const provider = use(SidebarProviderContext);
   const collapsible = collapsibleProp ?? false;
   const controls = useInternalSidebar({
@@ -80,7 +83,6 @@ export function SidebarRoot({
     provider,
   });
 
-  const label = ariaLabel ?? t('sidebar.label');
   const state = panelStateOf(controls, collapsible);
   const standalone = provider === null;
   const styles = sidebarStyle({ variant, state, standalone });
@@ -109,7 +111,7 @@ export function SidebarRoot({
     <>
       {header ?? (addsHeader && <SidebarHeader />)}
       <ScrollArea fade="y" className={styles.scroll()}>
-        <nav aria-label={label} className={styles.nav()}>
+        <nav {...name} className={styles.nav()}>
           {body}
         </nav>
       </ScrollArea>
@@ -125,7 +127,7 @@ export function SidebarRoot({
     <>
       <aside
         {...props}
-        aria-label={label}
+        {...name}
         data-sidebar=""
         data-sidebar-variant={variant}
         data-collapsible={collapsible || undefined}
@@ -153,10 +155,10 @@ export function SidebarRoot({
         {variant === 'sidebar' && <Divider orientation="vertical" className={styles.divider()} />}
       </aside>
       <Drawer side="left" open={controls.mobileOpen} onOpenChange={controls.setMobileOpen}>
-        <Drawer.Content aria-label={label} className={drawer.styles.drawer()}>
+        <Drawer.Content {...name} className={drawer.styles.drawer()}>
           <SidebarContext value={drawer}>
             {header ?? <SidebarHeader />}
-            <nav aria-label={label} className={drawer.styles.drawerNav()}>
+            <nav {...name} className={drawer.styles.drawerNav()}>
               {body}
             </nav>
             {footer}

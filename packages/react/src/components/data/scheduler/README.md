@@ -27,7 +27,7 @@ const events = [
   },
 ];
 
-<Scheduler events={events} />;
+<Scheduler aria-label="일정표" events={events} />;
 ```
 
 ## 구조
@@ -42,7 +42,7 @@ const events = [
 | 일정 하나       | Item (`onClick` 이면 Title 이 버튼) | `<li>`, 시작과 끝은 `<time dateTime>`       |
 | 지금 시각       | Divider                           | `<hr aria-hidden>`                          |
 
-- root 는 `role="group"` 이고 이름은 기본 "일정표"입니다. `aria-label` 로 바꿉니다.
+- root 는 `role="group"` 이고 이름(`aria-label` 이나 `aria-labelledby`)은 필수입니다. 없으면 개발 모드에서 경고합니다.
 - 요일 머리줄과 종일 줄은 위에, 시각 열은 왼쪽에 붙어 있고 격자만 움직입니다.
 - 머리줄의 각 날짜 칸이 그날 `<section>` 의 이름입니다. 화면에 보이는 "화 17" 대신 "2026년 11월 17일 화요일"로 읽힙니다.
 - 오늘 칸은 `aria-current="date"` 입니다.
@@ -74,11 +74,11 @@ type EventData = {
 ## 일정 칸 그리기
 
 ```tsx
-<Scheduler events={events}>
+<Scheduler aria-label="일정표" events={events}>
   {(event) => <Scheduler.Event onClick={() => openEvent(event.id)} />}
 </Scheduler>
 
-<Scheduler events={rooms}>
+<Scheduler aria-label="일정표" events={rooms}>
   {(room) => (
     <Scheduler.Event colorScheme="tertiary">
       <Item.Content>
@@ -104,6 +104,7 @@ type EventData = {
 const [events, setEvents] = useState(initialEvents);
 
 <Scheduler
+  aria-label="일정표"
   events={events}
   onEventChange={(event, { start, end }) =>
     setEvents((all) => all.map((item) => (item.id === event.id ? { ...item, start, end } : item)))
@@ -132,7 +133,7 @@ const [events, setEvents] = useState(initialEvents);
 | 아래 끝 separator `↑` `↓` | 끝 시각 15분. `Shift` 와 함께 1시간                |
 
 - 아래 끝은 Resizable(`direction="vertical"`, `step` 은 15분 높이)이라 separator "알고리즘 끝 시각"으로 읽히고, 값은 px 대신 끝 시각("오전 10:30")입니다.
-- 집고, 옮기고, 놓을 때마다 "알고리즘을(를) 집었습니다.", "11월 18일 수요일 오전 9:30 시작", "알고리즘을(를) 옮겼습니다."를 알립니다. 사용법은 root 의 `aria-describedby` 로 읽힙니다.
+- 집고, 옮기고, 놓을 때마다 "집었습니다: 알고리즘", "11월 18일 수요일 오전 9:30 시작", "옮겼습니다: 알고리즘"를 알립니다. 사용법은 root 의 `aria-describedby` 로 읽힙니다.
 - 놓은 일정이 다른 날 칸으로 가면 포커스가 그 일정을 따라갑니다.
 
 ## 월 보기에서 옮기기
@@ -156,6 +157,7 @@ const [events, setEvents] = useState(initialEvents);
 
 ```tsx
 <Scheduler
+  aria-label="일정표"
   events={events}
   onSlotSelect={({ start, end, allDay }) => openCreateDialog({ start, end, allDay })}
 />
@@ -172,7 +174,7 @@ const [events, setEvents] = useState(initialEvents);
 ## 우클릭 메뉴
 
 ```tsx
-<Scheduler events={events}>
+<Scheduler aria-label="일정표" events={events}>
   <Scheduler.EventMenu>
     {(event) => (
       <>
@@ -209,12 +211,12 @@ const [events, setEvents] = useState(initialEvents);
 ## 보기와 날짜
 
 ```tsx
-<Scheduler events={events} defaultView="day" defaultDate={new CalendarDate(2026, 11, 17)} />
-<Scheduler events={events} defaultView="days" defaultDayCount={4} />
+<Scheduler aria-label="일정표" events={events} defaultView="day" defaultDate={new CalendarDate(2026, 11, 17)} />
+<Scheduler aria-label="일정표" events={events} defaultView="days" defaultDayCount={4} />
 
 const [view, setView] = useState<Scheduler.View>('week');
 const [date, setDate] = useState(today(getLocalTimeZone()));
-<Scheduler events={events} view={view} onViewChange={setView} date={date} onDateChange={setDate} />
+<Scheduler aria-label="일정표" events={events} view={view} onViewChange={setView} date={date} onDateChange={setDate} />
 ```
 
 - `date` 는 보이는 기간 안의 아무 날입니다. 월 보기는 그날이 든 달, 주 보기는 그날이 든 주, `days` 는 그날부터 `dayCount` 일을 그립니다.
@@ -229,7 +231,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 ## 월 보기
 
 ```tsx
-<Scheduler events={events} defaultView="month" />
+<Scheduler aria-label="일정표" events={events} defaultView="month" />
 ```
 
 - 그달 1일이 든 주부터 마지막 날이 든 주까지 그립니다. 앞뒤 달의 날은 `bg-block` 으로 가라앉힙니다.
@@ -244,8 +246,8 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 ## 지금 시각
 
 ```tsx
-<Scheduler events={events} />                                          // 클라이언트 시계, 1분마다
-<Scheduler events={events} now={new CalendarDateTime(2026, 11, 17, 10, 30)} />  // 고정
+<Scheduler aria-label="일정표" events={events} />                                          // 클라이언트 시계, 1분마다
+<Scheduler aria-label="일정표" events={events} now={new CalendarDateTime(2026, 11, 17, 10, 30)} />  // 고정
 ```
 
 - 오늘 칸에 지금 시각의 선을 긋습니다. 장식이라 화면 읽기는 읽지 않습니다.
@@ -262,13 +264,19 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 ## locale
 
 ```tsx
-<Scheduler locale="en-US" />    // Sun 15, "November 15 – 21, 2026", 9:00 AM
-<Scheduler locale="de-DE" />    // 월요일 시작, "16.–22. November 2026", 9:00
-<Scheduler weekStartsOn={1} />  // 첫 요일을 정한다(0 일요일 ~ 6 토요일)
+<IdsProvider.Scope locale={en}>
+  <Scheduler aria-label="Schedule" />                // Sun 15, "November 15 – 21, 2026", 9:00 AM
+</IdsProvider.Scope>
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
+  <Scheduler aria-label="Kalender" />                // 월요일 시작, "16.–22. November 2026", 9:00
+</IdsProvider.Scope>
+<Scheduler aria-label="일정표" weekStartsOn={1} />   // 첫 요일을 정한다(0 일요일 ~ 6 토요일)
 ```
 
-- `locale` 이 없으면 IdsProvider 의 locale, 그다음 `ko-KR` 입니다.
-- 버튼 이름 같은 문구는 locale 이 아니라 IdsProvider `translate` 를 따릅니다(`scheduler.*` 키).
+- 가장 가까운 IdsProvider 의 locale 을 따르고, 없으면 `ko-KR` 입니다.
+- 이전, 오늘, 다음 버튼과 보기 전환의 이름은 Intl 이 locale 로 그립니다(`지난주`, `오늘`, `다음 주`, `월`, `주`, `3일`, `일`). 영어는 첫 글자를 대문자로 씁니다(`Today`, `Month`).
+- `days`, `day` 보기의 이전, 다음은 `3일 전`, `3일 후`, `1일 전`, `1일 후` 입니다. 월 보기의 넘친 일정은 `+2` 입니다.
+- 그 밖의 문구(보기, 날짜로 이동, 끌기 안내)는 IdsProvider `locale` 의 `scheduler.*` 문구를 따릅니다.
 
 ## Props
 
@@ -278,7 +286,6 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | `view` / `defaultView` / `onViewChange` | `'month' \| 'week' \| 'days' \| 'day'` | `'week'`             |
 | `dayCount` / `defaultDayCount` / `onDayCountChange` | `number` (`days` 보기의 날 수, 2 ~ 14) | `3`  |
 | `date` / `defaultDate` / `onDateChange` | `CalendarDate`                        | 오늘                 |
-| `locale`                                | `string` (BCP 47)                     | Provider locale      |
 | `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |
 | `now`                                   | `CalendarDateTime`                    | 클라이언트 시계      |
 | `onEventChange`                         | `(event, { start, end }) => void`     | 없음(옮기지 않음)    |

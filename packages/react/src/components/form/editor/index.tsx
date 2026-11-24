@@ -4,11 +4,7 @@ import { EditorCallout, type EditorCalloutProps } from './callout/tool';
 import { EditorDetails, type EditorDetailsProps } from './details/tool';
 import { EditorImage, type EditorImageProps } from './image/tool';
 import { type EditorFormat } from './lib/value';
-import {
-  EditorBlockType,
-  type EditorBlockTypeProps,
-  type EditorHeadingLevel,
-} from './parts/block-type';
+import { EditorBlockType, type EditorBlockTypeProps, type EditorHeadingLevel } from './parts/block-type';
 import {
   EditorBlockquote,
   EditorBulletList,
@@ -34,11 +30,7 @@ import {
   type EditorMarkProps,
 } from './parts/marks';
 import { EditorSeparator, type EditorSeparatorProps } from './parts/separator';
-import {
-  EditorTextAlign,
-  type EditorTextAlignment,
-  type EditorTextAlignProps,
-} from './parts/text-align';
+import { EditorTextAlign, type EditorTextAlignment, type EditorTextAlignProps } from './parts/text-align';
 import { EditorRoot, type EditorState, type EditorType, type EditorVariant } from './root';
 import { editorStyle } from './style';
 import { EditorTable, type EditorTableProps } from './table/tool';

@@ -7,7 +7,12 @@ import { QuestionnaireDescription, type QuestionnaireDescriptionProps } from './
 import { QuestionnaireOption, type QuestionnaireOptionProps } from './parts/option';
 import { QuestionnaireOther, type QuestionnaireOtherProps } from './parts/other';
 import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './parts/question';
-import { QuestionnaireSubmit, type QuestionnaireSubmitProps } from './parts/submit';
+import { QuestionnaireSkip, type QuestionnaireSkipProps } from './parts/skip';
+import {
+  QuestionnaireSubmit,
+  type QuestionnaireSubmitProps,
+  type QuestionnaireSubmitState,
+} from './parts/submit';
 import { QuestionnaireRoot, type QuestionnaireProps } from './root';
 import {
   questionnaireStyle,
@@ -32,6 +37,8 @@ export namespace Questionnaire {
   export type OtherProps = QuestionnaireOtherProps;
   export type DescriptionProps = QuestionnaireDescriptionProps;
   export type SubmitProps = QuestionnaireSubmitProps;
+  export type SubmitState = QuestionnaireSubmitState;
+  export type SkipProps = QuestionnaireSkipProps;
 
   export const Question = QuestionnaireQuestion;
   export namespace Question {
@@ -56,6 +63,12 @@ export namespace Questionnaire {
   export const Submit = QuestionnaireSubmit;
   export namespace Submit {
     export type Props = SubmitProps;
+    export type State = SubmitState;
+  }
+
+  export const Skip = QuestionnaireSkip;
+  export namespace Skip {
+    export type Props = SkipProps;
   }
 
   export const Style = questionnaireStyle;

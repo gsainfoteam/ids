@@ -263,11 +263,11 @@ export function useInternalSidebarSortable<T extends SidebarTreeItem<T>>({
   };
 
   const announcements: Announcements = {
-    onDragStart: ({ active }) => t('sidebar.drag.start', { item: labelOf(active.id) }),
+    onDragStart: ({ active }) => t('common.drag.start', { item: labelOf(active.id) }),
     onDragOver: () => undefined,
     onDragEnd: ({ active, over }) =>
-      t(over ? 'sidebar.drag.end' : 'sidebar.drag.cancel', { item: labelOf(active.id) }),
-    onDragCancel: ({ active }) => t('sidebar.drag.cancel', { item: labelOf(active.id) }),
+      t(over ? 'common.drag.end' : 'common.drag.cancel', { item: labelOf(active.id) }),
+    onDragCancel: ({ active }) => t('common.drag.cancel', { item: labelOf(active.id) }),
   };
 
   const value: SidebarSortableValue = {
@@ -285,7 +285,7 @@ export function useInternalSidebarSortable<T extends SidebarTreeItem<T>>({
       const stops = keyboardStops(tree, key, isVisible, isAllowed);
       pending.current = null;
       setGrab({ key, stops, at: stops.findIndex((stop) => stop.move === null) });
-      setAnnouncement(t('sidebar.drag.start', { item: labelOf(key) }));
+      setAnnouncement(t('common.drag.start', { item: labelOf(key) }));
     },
     step: (direction) => {
       if (!grab) return;
@@ -299,11 +299,11 @@ export function useInternalSidebarSortable<T extends SidebarTreeItem<T>>({
     release: () => {
       const move = grab?.stops[grab.at]?.move;
       const label = labelOf(grab?.key ?? '');
-      endGrab(t(move ? 'sidebar.drag.end' : 'sidebar.drag.cancel', { item: label }));
+      endGrab(t(move ? 'common.drag.end' : 'common.drag.cancel', { item: label }));
       if (move) commit(move, true);
     },
     cancel: () => {
-      if (grab) endGrab(t('sidebar.drag.cancel', { item: labelOf(grab.key) }));
+      if (grab) endGrab(t('common.drag.cancel', { item: labelOf(grab.key) }));
     },
   };
 

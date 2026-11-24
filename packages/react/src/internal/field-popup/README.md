@@ -9,7 +9,7 @@
 | -------------------------- | ------------------------------------------------------------------------------------------------- |
 | [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `useInternalDrawerPresentation` 의 다시 내보내기 |
 | [`lib/styles.ts`](#libstylests)   | `popupStyle`                                                                                      |
-| [`parts/header.tsx`](#partsheadertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                                                |
+| [`parts/header.tsx`](#partsheadertsx) | drawer 머리의 닫기 버튼(`FieldPopupHeader`)                                                       |
 | [`parts/search.tsx`](#partssearchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                                                           |
 
 - 닫기 규칙, top layer, 위치 계산, modal 은 [`internal/overlay`](../overlay/README.md) 의 코어입니다. `FieldPopup` 은 그 코어를 필드가 쓰는 props 로 묶은 어댑터입니다.
@@ -24,7 +24,7 @@
 | [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`                                               |
 | Menu                                          | `FieldPopupSearch`(명령 팔레트의 `Menu.Search`)                                |
 
-- `parts/search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/parts/search` 에서 직접 가져옵니다.
+- `parts/search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/search` 에서 직접 가져옵니다.
 
 ## index.tsx
 
@@ -128,7 +128,7 @@ const styles = popupStyle({ presentation });   // 'popover' | 'drawer'
 
 // internal/field-popup/parts/header.tsx
 const styles = popupStyle();
-<div className={styles.header()}><h2 id={titleId} className={styles.title()}>{title}</h2></div>
+<div className={styles.header()}><IconButton aria-label={closeLabel} … /></div>
 ```
 
 ### 왜 이렇게
@@ -148,7 +148,6 @@ const styles = popupStyle();
 ```tsx
 // internal/temporal-field/index.tsx
 <FieldPopupHeader
-  title={config.messages.title}
   closeLabel={config.messages.close}
   autoFocus                              // 닫기 버튼이 초기 포커스 후보가 된다
   onClose={() => close(true)}
@@ -157,9 +156,9 @@ const styles = popupStyle();
 
 ### 왜 이렇게
 
-- drawer 는 자기를 연 필드를 덮으므로 스스로 이름을 밝히고 나갈 길을 줍니다. popover 는 필드가 보이므로 머리를 그리지 않습니다.
+- drawer 는 자기를 연 필드를 덮으므로 나갈 길(닫기 버튼)을 줍니다. popover 는 필드가 보이므로 머리를 그리지 않습니다.
 - temporal-field 는 늘 렌더하고 `header` 슬롯의 CSS 로 숨기고, ColorField 는 `drawer` 일 때만 렌더합니다.
-- 제목은 `h2` 입니다. `FieldPopup` 이 `FieldPopupTitleContext` 로 넘긴 함수에 자기 id 를 등록하고, 팝업은 호출한 쪽이 `aria-label` 도 `aria-labelledby` 도 주지 않았으면 `aria-labelledby` 로 그 제목을 이름으로 삼습니다. temporal-field 는 그래서 `aria-label` 대신 `label`(머리가 없을 때의 대비)만 넘깁니다. popover 에서 CSS 로 숨긴 제목도 이름은 됩니다.
+- 머리에는 제목이 없습니다. 팝업의 이름은 호출한 쪽이 필드의 `aria-labelledby` 나 `aria-label` 을 그대로 넘겨 줍니다(temporal-field, ColorField). IDS 가 쓴 제목 문구를 두지 않기 위해서입니다.
 - `autoFocus` 면 닫기 버튼에 `data-popup-autofocus` 를 붙입니다. `initialFocusSelector` 에 맞는 요소가 먼저입니다.
 
 ## parts/search.tsx

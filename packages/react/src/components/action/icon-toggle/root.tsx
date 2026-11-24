@@ -25,12 +25,7 @@ export function IconToggleRoot(props: IconToggle.Props) {
   invariant(icon != null || props.asChild, 'IconToggle: the `icon` prop is required.');
 
   const glyph = icon ?? content;
-  const label = useInternalIconLabel(
-    'IconToggle',
-    glyph,
-    rest,
-    element?.props as object | undefined,
-  );
+  const label = useInternalIconLabel('IconToggle', glyph, rest, element?.props as object | undefined);
   const variant = ownVariant ?? layout?.variant ?? 'outline';
   const resolvedSize = size ?? layout?.size ?? 'standard';
 

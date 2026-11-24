@@ -47,7 +47,8 @@ const config = {
 | 범례       | `Chart.Legend`                                     | `<ul>`                                |
 | 표         | `Chart.Table` (Table)                              | `<table>`                             |
 
-- 모든 파트는 선택입니다. 제목이 없으면 그래프 이름은 `chart.label` 문구("차트")입니다.
+- 모든 파트는 선택입니다. 그래프의 이름은 `Chart.Title` 입니다. 제목이 없으면 Recharts 차트에 `aria-label` 을 줍니다(`<BarChart aria-label="방문">`).
+- 제목도 `aria-label` 도 없으면 개발 모드에서 경고합니다.
 
 ## 계열 색
 
@@ -73,7 +74,7 @@ const shares = rows.map((row) => ({ ...row, fill: `var(--chart-${row.service})` 
 
 <AspectRatio ratio={1}>
   <Chart config={servicesConfig}>
-    <PieChart>
+    <PieChart aria-label="방문">
       <Pie data={shares} dataKey="visits" nameKey="service" />
       <Chart.Tooltip />
     </PieChart>
@@ -102,7 +103,7 @@ const config = {
 
 ```tsx
 <Chart config={config}>
-  <BarChart data={rows}>
+  <BarChart aria-label="방문" data={rows}>
     <Bar dataKey="web" />
     <Chart.Tooltip />                                {/* 두면 툴팁 */}
     <Chart.Legend />                                 {/* 두면 범례 */}
@@ -110,7 +111,7 @@ const config = {
 </Chart>
 
 <Chart config={config}>
-  <BarChart data={rows}>
+  <BarChart aria-label="방문" data={rows}>
     <Bar dataKey="web" />
     <Chart.Tooltip indicator="line" formatter={(value) => `${value}회`} />
     <Chart.Legend content={<VisitLegend />} />      {/* 통째로 바꾸기 */}
@@ -132,7 +133,7 @@ const config = {
 
 ```tsx
 <Chart config={config}>
-  <LineChart data={rows}>
+  <LineChart aria-label="방문" data={rows}>
     <XAxis dataKey="day" name="요일" />
     <Line dataKey="web" />
   </LineChart>

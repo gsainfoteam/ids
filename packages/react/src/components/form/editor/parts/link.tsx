@@ -6,12 +6,7 @@ import { LinkIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useInternalEditorContext } from '../context';
-import {
-  EditorToolTip,
-  useInternalEditorToolProps,
-  useInternalToolState,
-  type EditorToolProps,
-} from './tool';
+import { EditorToolTip, useInternalEditorToolProps, useInternalToolState, type EditorToolProps } from './tool';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { Button } from '../../../action/button';
 import { IconToggle } from '../../../action/icon-toggle';

@@ -29,7 +29,7 @@ export function ColorFieldClear({
 
   const button = {
     ...props,
-    'aria-label': props['aria-label'] ?? t('colorField.clear'),
+    'aria-label': props['aria-label'] ?? t('common.clear'),
     disabled: c.state.disabled,
     'data-color-field-clear': '',
     variant: 'ghost' as const,

@@ -1,9 +1,6 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import {
-  type NumberFieldFormatOptions,
-  type NumberFieldInputProps,
-} from './hooks/use-number-field';
+import { type NumberFieldFormatOptions, type NumberFieldInputProps } from './hooks/use-number-field';
 import { NumberFieldDecrement } from './parts/decrement';
 import { NumberFieldIncrement } from './parts/increment';
 import { NumberFieldInput } from './parts/input';

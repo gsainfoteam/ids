@@ -24,12 +24,7 @@ export function IconButtonRoot(props: IconButton.Props) {
   invariant(icon != null || props.asChild, 'IconButton: the `icon` prop is required.');
 
   const glyph = icon ?? content;
-  const label = useInternalIconLabel(
-    'IconButton',
-    glyph,
-    rest,
-    element?.props as object | undefined,
-  );
+  const label = useInternalIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
   const variant = ownVariant ?? group?.variant ?? 'ghost';
   const resolvedSize = size ?? group?.size ?? 'standard';
 

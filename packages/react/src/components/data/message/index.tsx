@@ -21,7 +21,6 @@ export namespace Message {
     align?: MessageAlign;
     name?: string;
     time?: Date;
-    locale?: string;
     status?: MessageStatus;
     unread?: number | boolean;
     onRetry?: () => void;

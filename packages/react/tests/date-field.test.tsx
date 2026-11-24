@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 
 import { Calendar, DateField, DateTimeField, Field, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
@@ -28,7 +29,7 @@ const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone:
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 const inLocale = (locale: string | undefined, children: ReactNode) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     {children}
   </IdsProvider>
 );
@@ -91,7 +92,7 @@ test('SSR: Intl options, format functions, Field labelling and ISO local-date Fo
     expect(doc.querySelector('button button')).toBeNull();
   }
   const empty = parse(renderToString(<DateField name="date" />));
-  expect(empty.querySelector('[role=combobox]')!.textContent).toBe('날짜 선택');
+  expect(empty.querySelector('[role=combobox]')!.textContent).toBe('');
   expect(empty.querySelector('[data-date-field]')!.hasAttribute('data-empty')).toBe(true);
   expect(empty.querySelector('[data-placeholder]')).not.toBeNull();
   expect(() =>
@@ -140,7 +141,7 @@ test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear 
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   await expect.element(trigger).toHaveFocus();
   await expect.element(trigger).toMatchTextContent('2026. 09. 18.');
-  await userEvent.click(screen.getByRole('button', { name: '날짜 지우기' }));
+  await userEvent.click(screen.getByRole('button', { name: '지우기' }));
   expect(changes.slice(1)).toEqual([null]);
   await expect.element(trigger).toHaveFocus();
   expect(clear()).toBeNull();
@@ -163,7 +164,7 @@ test('picking the day that is already chosen closes without reporting a change',
 test('StrictMode opens on the active day; custom content keeps the close button to focus', async () => {
   const screen = await render(
     <StrictMode>
-      <DateField>
+      <DateField aria-label="마감일">
         <DateField.Calendar today={d(15)} />
       </DateField>
     </StrictMode>,
@@ -176,7 +177,7 @@ test('StrictMode opens on the active day; custom content keeps the close button 
   await expect.element(trigger).toHaveFocus();
   await screen.rerender(
     <StrictMode>
-      <DateField>
+      <DateField aria-label="마감일">
         <DateField.Content mobileVariant="drawer">Custom content</DateField.Content>
       </DateField>
     </StrictMode>,
@@ -184,7 +185,7 @@ test('StrictMode opens on the active day; custom content keeps the close button 
   await userEvent.click(trigger);
   await expect.element(screen.getByRole('dialog')).toMatchTextContent('Custom content');
   await expect.element(screen.getByRole('button', { name: '닫기' })).toHaveFocus();
-  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('날짜 선택');
+  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('마감일');
 });
 
 test('range stays open, a half-picked range is missing from FormData and fails required', async () => {
@@ -194,6 +195,8 @@ test('range stays open, a half-picked range is missing from FormData and fails r
       <DateField
         selectionMode="range"
         name="trip"
+        aria-label="여행 기간"
+        placeholder="기간 선택"
         required
         onValueChange={(next) => (value = next)}
       >
@@ -204,7 +207,7 @@ test('range stays open, a half-picked range is missing from FormData and fails r
   const trigger = screen.getByRole('combobox');
   await expect.element(trigger).toMatchTextContent('기간 선택');
   await userEvent.click(trigger);
-  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('기간 선택');
+  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('여행 기간');
   await userEvent.click(day('2026-09-18'));
   expect(value?.end).toBeNull();
   await expect.element(trigger).toMatchTextContent('2026. 09. 18. – …');
@@ -239,7 +242,7 @@ test('DateField.Calendar takes the calendar options: months shown, the first mon
   );
   await userEvent.click(screen.getByRole('combobox'));
   await expect.poll(shownMonths).toEqual(['2000년 1월']);
-  await expect.element(screen.getByRole('combobox', { name: '연도' })).toHaveValue('2000');
+  await expect.element(screen.getByRole('combobox', { name: '년' })).toHaveValue('2000');
 });
 
 test('DateField.Content mobileVariant="drawer" opens a drawer on a narrow screen and a popover on a wide one', async () => {
@@ -482,7 +485,7 @@ test('react-hook-form value mode: required error focus, Date value, reset and di
   expect(keyOf(submitted.mock.lastCall?.[0].date)).toBe('2026-09-18');
   expect(formData().get('date')).toBe('2026-09-18');
   methods.reset();
-  await expect.element(trigger).toMatchTextContent('날짜 선택');
+  await expect.element(trigger).toHaveTextContent('');
   methods.setValue('date', d(20));
   await expect.element(trigger).toMatchTextContent('2026. 09. 20.');
   await screen.rerender(<App disabled />);
@@ -572,7 +575,7 @@ test('Clear is a ghost IconButton in the field size that keeps its tab stop and 
   );
   await expect.element(clear()).toHaveAttribute('id', 'own');
   await expect.element(clear()).toHaveTextContent('Wipe');
-  await expect.element(clear()).toHaveAttribute('aria-label', '날짜 지우기');
+  await expect.element(clear()).toHaveAttribute('aria-label', '지우기');
   await expect.element(clear()).toHaveAttribute('data-variant', 'ghost');
   await expect.element(clear()).toHaveClass('size-7');
   await userEvent.click(clear()!);
@@ -829,7 +832,7 @@ test('typed entry and the calendar share one value; ArrowDown opens on the typed
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   await expect.element(button).toHaveAttribute('aria-expanded', 'false');
   await expect.element(button).not.toHaveAttribute('aria-controls');
-  await userEvent.click(screen.getByRole('button', { name: '날짜 지우기' }));
+  await userEvent.click(screen.getByRole('button', { name: '지우기' }));
   await expect.element(textBox()).toHaveValue('');
   expect(changes.at(-1)).toBeNull();
 });

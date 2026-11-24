@@ -38,6 +38,7 @@ const meta = {
     disabled: { control: 'boolean' },
   },
   args: {
+    'aria-label': '메시지',
     variant: 'outline',
     size: 'standard',
     status: 'idle',
@@ -76,7 +77,7 @@ export const Usage: Story = {
 
     return (
       <div className="grid w-96 gap-3">
-        <PromptInput onSend={(message) => setSent(message.text)} />
+        <PromptInput aria-label="메시지" onSend={(message) => setSent(message.text)} />
         <output aria-label="보낸 메시지">{sent}</output>
       </div>
     );
@@ -92,8 +93,8 @@ export const Gallery: Story = {
           columns={variants}
           render={(size, variant) => (
             <div className="w-72">
-              <PromptInput size={size} variant={variant}>
-                <PromptInput.Input aria-label={`${variant} ${size}`} />
+              <PromptInput aria-label={`${variant} ${size}`} size={size} variant={variant}>
+                <PromptInput.Input />
                 <PromptInput.Attach />
               </PromptInput>
             </div>
@@ -107,22 +108,22 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="idle">
           <div className="w-72">
-            <PromptInput defaultValue="오늘 학식 뭐야?">
-              <PromptInput.Input aria-label="idle" />
+            <PromptInput aria-label="idle" defaultValue="오늘 학식 뭐야?">
+              <PromptInput.Input />
             </PromptInput>
           </div>
         </Showcase.Row>
         <Showcase.Row label="submitting">
           <div className="w-72">
-            <PromptInput status="submitting">
-              <PromptInput.Input aria-label="submitting" />
+            <PromptInput aria-label="submitting" status="submitting">
+              <PromptInput.Input />
             </PromptInput>
           </div>
         </Showcase.Row>
         <Showcase.Row label="streaming">
           <div className="w-72">
-            <PromptInput status="streaming" onStop={() => {}}>
-              <PromptInput.Input aria-label="streaming" />
+            <PromptInput aria-label="streaming" status="streaming" onStop={() => {}}>
+              <PromptInput.Input />
             </PromptInput>
           </div>
         </Showcase.Row>
@@ -131,16 +132,16 @@ export const Gallery: Story = {
       <Showcase.Section title="States">
         <Showcase.Row label="attachments">
           <div className="w-72">
-            <PromptInput defaultFiles={[REPORT, NOTES]}>
-              <PromptInput.Input aria-label="첨부" />
+            <PromptInput aria-label="첨부" defaultFiles={[REPORT, NOTES]}>
+              <PromptInput.Input />
               <PromptInput.Attach />
             </PromptInput>
           </div>
         </Showcase.Row>
         <Showcase.Row label="tools">
           <div className="w-72">
-            <PromptInput defaultTools={['search']}>
-              <PromptInput.Input aria-label="도구" />
+            <PromptInput aria-label="도구" defaultTools={['search']}>
+              <PromptInput.Input />
               <PromptInput.ActionMenu />
               <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
                 웹 검색
@@ -150,8 +151,8 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="disabled">
           <div className="w-72">
-            <PromptInput disabled defaultValue="보낼 수 없음">
-              <PromptInput.Input aria-label="비활성" />
+            <PromptInput aria-label="비활성" disabled defaultValue="보낼 수 없음">
+              <PromptInput.Input />
               <PromptInput.Attach />
             </PromptInput>
           </div>
@@ -236,6 +237,7 @@ export const StopAStreamingReply: Story = {
     return (
       <div className="w-96">
         <PromptInput
+          aria-label="메시지"
           status={status}
           onSend={async (message) => {
             setStatus('streaming');
@@ -338,7 +340,12 @@ export const FillTheInputFromSuggestions: Story = {
             </Chip>
           ))}
         </div>
-        <PromptInput value={draft} onValueChange={setDraft} onSend={args.onSend} />
+        <PromptInput
+          aria-label="메시지"
+          value={draft}
+          onValueChange={setDraft}
+          onSend={args.onSend}
+        />
       </div>
     );
   },

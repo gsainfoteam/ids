@@ -4,11 +4,7 @@ import {
   type DateMatcher as CalendarDateMatcher,
   type DateRange,
 } from './lib/date';
-import {
-  CalendarCaption,
-  type CalendarCaptionLayout,
-  type CalendarCaptionProps,
-} from './parts/caption';
+import { CalendarCaption, type CalendarCaptionLayout, type CalendarCaptionProps } from './parts/caption';
 import { CalendarDay, type CalendarDayProps } from './parts/day';
 import { CalendarFooter, type CalendarFooterProps } from './parts/footer';
 import { CalendarWeekNumber, type CalendarWeekNumberProps } from './parts/week-number';

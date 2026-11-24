@@ -17,11 +17,7 @@ import { noop } from 'es-toolkit';
 import { useInternalOverlayItem } from '../../../../internal/overlay';
 import { isDevelopment } from '../../../../utils/dev';
 import { ImageGroupContext } from '../context';
-import {
-  useInternalImageGroup,
-  type ImageGroupState,
-  type ViewerItem,
-} from '../hooks/use-image-group';
+import { useInternalImageGroup, type ImageGroupState, type ViewerItem } from '../hooks/use-image-group';
 
 export type ImageViewerItem = {
   src: string;

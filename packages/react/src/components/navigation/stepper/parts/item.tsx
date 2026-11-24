@@ -3,12 +3,7 @@
 import { use, type ComponentProps } from 'react';
 
 import { StepperBody } from './body';
-import {
-  StepperIndexContext,
-  StepperItemContext,
-  stepIds,
-  useInternalRootContext,
-} from '../context';
+import { StepperIndexContext, StepperItemContext, stepIds, useInternalRootContext } from '../context';
 import { StepperDescription } from './description';
 import { StepperSeparator } from './separator';
 import { StepperTitle } from './title';

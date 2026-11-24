@@ -26,6 +26,7 @@ const meta = {
     disabled: { control: 'boolean' },
   },
   args: {
+    'aria-label': '페이지 탐색',
     pageCount: 20,
     defaultPage: 7,
     siblingCount: 1,
@@ -43,7 +44,7 @@ type Story = StoryObj<typeof meta>;
 export const Playground: Story = {};
 
 export const Usage: Story = {
-  render: () => <Pagination defaultPage={3} pageCount={10} />,
+  render: () => <Pagination aria-label="페이지 탐색" defaultPage={3} pageCount={10} />,
 };
 
 export const Gallery: Story = {
@@ -57,7 +58,13 @@ export const Gallery: Story = {
           rows={variants}
           columns={sizes}
           render={(variant, size) => (
-            <Pagination defaultPage={3} pageCount={5} variant={variant} size={size} />
+            <Pagination
+              aria-label="페이지 탐색"
+              defaultPage={3}
+              pageCount={5}
+              variant={variant}
+              size={size}
+            />
           )}
         />
       </Showcase.Section>
@@ -67,46 +74,51 @@ export const Gallery: Story = {
         description="페이지가 칸보다 많으면 먼 쪽을 생략합니다. 칸 수는 boundaryCount × 2 + siblingCount × 2 + 3 으로 늘 같아서 페이지를 옮겨도 폭이 흔들리지 않습니다."
       >
         <Showcase.Row label="all fit">
-          <Pagination defaultPage={4} pageCount={7} />
+          <Pagination aria-label="페이지 탐색" defaultPage={4} pageCount={7} />
         </Showcase.Row>
         <Showcase.Row label="start">
-          <Pagination defaultPage={2} pageCount={20} />
+          <Pagination aria-label="페이지 탐색" defaultPage={2} pageCount={20} />
         </Showcase.Row>
         <Showcase.Row label="middle">
-          <Pagination defaultPage={10} pageCount={20} />
+          <Pagination aria-label="페이지 탐색" defaultPage={10} pageCount={20} />
         </Showcase.Row>
         <Showcase.Row label="end">
-          <Pagination defaultPage={19} pageCount={20} />
+          <Pagination aria-label="페이지 탐색" defaultPage={19} pageCount={20} />
         </Showcase.Row>
         <Showcase.Row label="siblingCount 2">
-          <Pagination defaultPage={10} pageCount={20} siblingCount={2} />
+          <Pagination aria-label="페이지 탐색" defaultPage={10} pageCount={20} siblingCount={2} />
         </Showcase.Row>
         <Showcase.Row label="boundaryCount 2">
-          <Pagination defaultPage={10} pageCount={20} boundaryCount={2} />
+          <Pagination aria-label="페이지 탐색" defaultPage={10} pageCount={20} boundaryCount={2} />
         </Showcase.Row>
         <Showcase.Row label="boundaryCount 0">
-          <Pagination defaultPage={10} pageCount={20} boundaryCount={0} />
+          <Pagination aria-label="페이지 탐색" defaultPage={10} pageCount={20} boundaryCount={0} />
         </Showcase.Row>
         <Showcase.Row label="large pages">
-          <Pagination defaultPage={1204} pageCount={1250} />
+          <Pagination aria-label="페이지 탐색" defaultPage={1204} pageCount={1250} />
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
         <Showcase.Row label="first page">
-          <Pagination defaultPage={1} pageCount={5} />
+          <Pagination aria-label="페이지 탐색" defaultPage={1} pageCount={5} />
         </Showcase.Row>
         <Showcase.Row label="last page">
-          <Pagination defaultPage={5} pageCount={5} />
+          <Pagination aria-label="페이지 탐색" defaultPage={5} pageCount={5} />
         </Showcase.Row>
         <Showcase.Row label="one page">
-          <Pagination defaultPage={1} pageCount={1} />
+          <Pagination aria-label="페이지 탐색" defaultPage={1} pageCount={1} />
         </Showcase.Row>
         <Showcase.Row label="disabled">
-          <Pagination defaultPage={3} pageCount={5} disabled />
+          <Pagination aria-label="페이지 탐색" defaultPage={3} pageCount={5} disabled />
         </Showcase.Row>
         <Showcase.Row label="links">
-          <Pagination defaultPage={3} pageCount={5} getHref={(page) => `#page-${page}`} />
+          <Pagination
+            aria-label="페이지 탐색"
+            defaultPage={3}
+            pageCount={5}
+            getHref={(page) => `#page-${page}`}
+          />
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -118,7 +130,7 @@ export const FollowThePageInYourState: Story = {
     const [page, setPage] = useState(1);
     return (
       <div className="flex flex-col items-start gap-3">
-        <Pagination page={page} pageCount={12} onPageChange={setPage} />
+        <Pagination aria-label="페이지 탐색" page={page} pageCount={12} onPageChange={setPage} />
         <p className="text-body-b3-regular text-neutral">12페이지 중 {page}페이지</p>
       </div>
     );
@@ -132,16 +144,23 @@ export const FollowThePageInYourState: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '다음 페이지' }));
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
     await expect(canvas.getByText('12페이지 중 2페이지')).toBeInTheDocument();
     await userEvent.click(canvas.getByRole('button', { name: '12페이지' }));
     await expect(canvas.getByText('12페이지 중 12페이지')).toBeInTheDocument();
-    await expect(canvas.getByRole('button', { name: '다음 페이지' })).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: '다음' })).toBeDisabled();
   },
 };
 
 export const GiveEveryPageAnAddress: Story = {
-  render: () => <Pagination defaultPage={3} pageCount={10} getHref={(page) => `#page-${page}`} />,
+  render: () => (
+    <Pagination
+      aria-label="페이지 탐색"
+      defaultPage={3}
+      pageCount={10}
+      getHref={(page) => `#page-${page}`}
+    />
+  ),
   parameters: {
     docs: {
       description: {
@@ -156,10 +175,7 @@ export const GiveEveryPageAnAddress: Story = {
       'page',
     );
     await expect(canvas.getByRole('link', { name: '4페이지' })).toHaveAttribute('href', '#page-4');
-    await expect(canvas.getByRole('link', { name: '다음 페이지' })).toHaveAttribute(
-      'href',
-      '#page-4',
-    );
+    await expect(canvas.getByRole('link', { name: '다음' })).toHaveAttribute('href', '#page-4');
   },
 };
 
@@ -167,7 +183,7 @@ export const LinkWithYourRouter: Story = {
   render: function Render() {
     const [page, setPage] = useState(4);
     return (
-      <Pagination page={page} pageCount={10} onPageChange={setPage}>
+      <Pagination aria-label="페이지 탐색" page={page} pageCount={10} onPageChange={setPage}>
         <Pagination.List>
           {(entry) => {
             if (entry.type === 'ellipsis') return <Pagination.Ellipsis />;
@@ -197,7 +213,7 @@ export const LinkWithYourRouter: Story = {
     const four = canvas.getByRole('link', { name: '4페이지' });
     await expect(four).toHaveTextContent('4');
     await expect(four).toHaveAttribute('href', '#posts?page=4');
-    await userEvent.click(canvas.getByRole('link', { name: '다음 페이지' }));
+    await userEvent.click(canvas.getByRole('link', { name: '다음' }));
     await expect(canvas.getByRole('link', { name: '5페이지' })).toHaveAttribute(
       'aria-current',
       'page',
@@ -207,7 +223,7 @@ export const LinkWithYourRouter: Story = {
 
 export const PlaceThePartsYourself: Story = {
   render: () => (
-    <Pagination defaultPage={2} pageCount={3} variant="outline">
+    <Pagination aria-label="페이지 탐색" defaultPage={2} pageCount={3} variant="outline">
       <Pagination.List>
         <Pagination.Item>
           <Pagination.Previous icon={<ArrowLongLeftIcon aria-hidden="true" />} />
@@ -236,12 +252,12 @@ export const PlaceThePartsYourself: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '다음 페이지' }));
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
     await expect(canvas.getByRole('button', { name: '3페이지' })).toHaveAttribute(
       'aria-current',
       'page',
     );
-    await expect(canvas.getByRole('button', { name: '다음 페이지' })).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: '다음' })).toBeDisabled();
   },
 };
 
@@ -250,7 +266,7 @@ export const ShowPageOfTotal: Story = {
     const [page, setPage] = useState(7);
 
     return (
-      <Pagination page={page} pageCount={20} onPageChange={setPage}>
+      <Pagination aria-label="페이지 탐색" page={page} pageCount={20} onPageChange={setPage}>
         <Pagination.List>
           <Pagination.Item>
             <Pagination.First focusableWhenDisabled />

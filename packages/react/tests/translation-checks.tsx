@@ -1,15 +1,14 @@
 import { type ReactNode } from 'react';
 
 import { composeStories, setProjectAnnotations } from '@storybook/react-vite';
-import { IntlMessageFormat } from 'intl-messageformat';
 import { beforeAll, describe, expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 
 import * as preview from '../.storybook/preview';
-import englishCatalog from '../messages/en.json';
-import { IdsProvider, type IdsTranslate } from '../src';
+import { IdsProvider } from '../src';
 import { testTheme } from './theme';
-import { everyMessage } from '../src/internal/every-message';
+import { en } from '../src/locales/en';
+import { ko } from '../src/locales/ko';
 
 import type { StoryFiles } from './story-checks';
 
@@ -17,28 +16,20 @@ type Catalog = { [name: string]: string | Catalog };
 
 export type StorySources = Record<string, string>;
 
-const lookup = (catalog: Catalog, key: string) =>
-  key
-    .split('.')
-    .reduce<string | Catalog>((node, name) => (node as Catalog)[name], catalog) as string;
-
 const leafValues = (catalog: Catalog): string[] =>
   Object.values(catalog).flatMap((value) =>
     typeof value === 'string' ? [value] : leafValues(value),
   );
 
-export const english: IdsTranslate = (key, values) =>
-  new IntlMessageFormat(lookup(englishCatalog, key), 'en-US').format(values) as string;
-
 export const inEnglish = (children: ReactNode) => (
-  <IdsProvider theme={testTheme} translate={english} locale="en-US">
+  <IdsProvider theme={testTheme} locale={en}>
     {children}
   </IdsProvider>
 );
 
 const HANGUL = /[ᄀ-ᇿ㄰-㆏가-힯]/;
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const koreanDefaults = leafValues(everyMessage)
+const koreanDefaults = leafValues(ko.messages as Catalog)
   .filter((pattern) => HANGUL.test(pattern))
   .map((pattern) => new RegExp(`^${escape(pattern).replace(/\\\{\w+\\\}/g, '.+')}$`));
 const NAMING_ATTRIBUTES = [

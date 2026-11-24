@@ -3,12 +3,7 @@
 import { use } from 'react';
 
 import { CommandCheckboxItem } from './command';
-import {
-  CommandContext,
-  ItemContext,
-  useInternalContentContext,
-  useInternalMenuContext,
-} from '../context';
+import { CommandContext, ItemContext, useInternalContentContext, useInternalMenuContext } from '../context';
 import { withIndicator } from './indicator';
 import { mergeProps, part } from '../../../../utils';
 import { selectItem, useInternalMenuItem } from '../hooks/use-menu-item';

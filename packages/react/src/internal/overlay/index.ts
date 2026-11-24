@@ -54,9 +54,4 @@ export {
   type UseAnchoredOptions,
 } from './hooks/use-anchored';
 export { useInternalPresence, type PresenceOptions } from './hooks/use-presence';
-export {
-  overlay,
-  type OverlayControls,
-  type OverlayOptions,
-  type OverlayRender,
-} from './lib/store';
+export { overlay, type OverlayControls, type OverlayOptions, type OverlayRender } from './lib/store';

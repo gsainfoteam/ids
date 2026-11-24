@@ -26,8 +26,6 @@ export function useInternalStepperWarnings({
   const ignoredInARecord = progress
     ? ''
     : PROGRESS_ONLY_PROPS.filter((name) => props[name] !== undefined).join(', ');
-  const unnamedRecord =
-    !progress && props['aria-label'] === undefined && props['aria-labelledby'] === undefined;
 
   useEffect(() => {
     if (!isDevelopment || !progress) return;
@@ -50,11 +48,4 @@ export function useInternalStepperWarnings({
       `[IDS] Stepper: progress={false} lists events with no current step and ignores ${ignoredInARecord}. Mark an event with Stepper.Item completed or error instead.`,
     );
   }, [ignoredInARecord]);
-
-  useEffect(() => {
-    if (isDevelopment && unnamedRecord)
-      console.warn(
-        '[IDS] Stepper: progress={false} has no default list name, since "Progress" does not describe a record of events. Pass aria-label or aria-labelledby, such as aria-label="Recent activity".',
-      );
-  }, [unnamedRecord]);
 }

@@ -8,12 +8,7 @@ import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { useInternalFormReset } from '../../../../hooks/use-form-reset';
 import { revealPopupOption } from '../../../../internal/field-popup';
 import { isComposingKey, keyHandler, withModifiers } from '../../../../internal/lib/keys';
-import {
-  matchesQuery,
-  orderByOptions,
-  typeaheadIndex,
-  type SelectOption,
-} from '../lib/select-options';
+import { matchesQuery, orderByOptions, typeaheadIndex, type SelectOption } from '../lib/select-options';
 
 export type SelectValue = string | null | string[];
 

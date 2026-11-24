@@ -41,12 +41,7 @@ export type UseAlertOptions = {
   dismissible: boolean;
 };
 
-export function useInternalAlert({
-  open,
-  defaultOpen,
-  onOpenChange,
-  dismissible,
-}: UseAlertOptions) {
+export function useInternalAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAlertOptions) {
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   const [isOpen, setOpen] = useControllableState({
     value: open,

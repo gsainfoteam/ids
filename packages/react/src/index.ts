@@ -191,7 +191,13 @@ export type { SidebarCollapsibleMode, SidebarVariant } from './components/naviga
 
 export type { IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
-export type { IdsTranslate } from './internal/translate';
+export { defineIdsLocale } from './internal/locale';
+export type {
+  IdsLocale,
+  IdsMessageArguments,
+  IdsMessages,
+  IdsPartialMessages,
+} from './internal/locale';
 
 export { Field } from './components/form/field';
 export { FieldGroup } from './components/form/field-group';

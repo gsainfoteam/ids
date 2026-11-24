@@ -9,7 +9,10 @@ import { IconToggle } from '../../../action/icon-toggle';
 import { useInternalCarouselContext } from '../context';
 
 import type { InteractiveState, InteractiveValue } from '../../../../hooks/use-interactive';
-import type { ControlColorScheme, SurfaceVariant } from '../../../../internal/surfaces/lib/control-surface';
+import type {
+  ControlColorScheme,
+  SurfaceVariant,
+} from '../../../../internal/surfaces/lib/control-surface';
 import type { IdsSize } from '../../../../tokens/types';
 
 export type CarouselPauseProps = Omit<ComponentProps<'button'>, 'children' | 'color' | 'value'> & {
@@ -36,7 +39,7 @@ export function CarouselPause({
   return (
     <IconToggle
       {...rest}
-      aria-label={rest['aria-label'] ?? t('carousel.pause')}
+      aria-label={rest['aria-label'] ?? t('common.pause')}
       icon={icon}
       variant={variant}
       size={size ?? carousel.size}

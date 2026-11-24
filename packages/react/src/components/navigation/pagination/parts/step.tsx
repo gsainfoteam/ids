@@ -8,6 +8,8 @@ import { useInternalPaginationContext } from '../context';
 import { useInternalPaginationControl } from '../hooks/use-pagination-control';
 import { stepTarget, type StepDirection } from '../lib/step-target';
 
+import type { IdsMessageKey } from '../../../../internal/messages';
+
 export type PaginationStepProps = Omit<
   ComponentProps<'button'>,
   'children' | 'onClick' | 'color'
@@ -18,6 +20,13 @@ export type PaginationStepProps = Omit<
   focusableWhenDisabled?: boolean;
   onClick?: (event: MouseEvent<HTMLElement>) => void;
 };
+
+const STEP_NAME_KEY = {
+  first: 'pagination.first',
+  previous: 'common.previous',
+  next: 'common.next',
+  last: 'pagination.last',
+} as const satisfies Record<StepDirection, IdsMessageKey>;
 
 type StepOptions = {
   part: string;
@@ -57,7 +66,7 @@ export function PaginationStep({
   const shared = {
     ...props,
     ...control,
-    'aria-label': props['aria-label'] ?? t(`pagination.${direction}`),
+    'aria-label': props['aria-label'] ?? t(STEP_NAME_KEY[direction]),
     [`data-pagination-${direction}`]: '',
     variant: 'ghost' as const,
     className: context.styles.arrow({ className }),

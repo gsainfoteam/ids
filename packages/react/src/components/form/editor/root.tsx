@@ -329,8 +329,7 @@ export function EditorRoot(props: Editor.Props) {
     const uploadImage = loaded?.features.imageUpload?.uploadImage;
     if (!upload || !uploadImage) return;
     const accepted = files.filter(isImageFile);
-    for (const file of files.filter((candidate) => !isImageFile(candidate)))
-      toast.error(file.name, { description: t('fileField.rejectType') });
+    for (const file of files.filter((candidate) => !isImageFile(candidate))) toast.error(file.name);
     setPendingUploads((count) => count + accepted.length);
     for (const file of accepted)
       void uploadImage(instance, file, at, { upload, uploaded })
@@ -477,11 +476,7 @@ export function EditorRoot(props: Editor.Props) {
     writeValue(editor, defaultValue, format, uploaded);
   });
 
-  const empty = useInternalEditorSelector(
-    editor,
-    (instance) => instance.isEmpty,
-    isEmptyValue(current),
-  );
+  const empty = useInternalEditorSelector(editor, (instance) => instance.isEmpty, isEmptyValue(current));
 
   const submitted = formText(current, empty);
   useLayoutEffect(() => {

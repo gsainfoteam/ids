@@ -18,7 +18,7 @@ export function ImageViewerPrev({ className, ...props }: ImageViewerPrevProps) {
       {...props}
       data-image-viewer-step="prev"
       className={viewer.styles.prev({ className })}
-      label={t('image.previous')}
+      label={t('common.previous')}
       glyph={<ChevronLeftIcon aria-hidden="true" />}
       act={viewer.prev}
       unavailable={!viewer.canPrev}

@@ -274,7 +274,7 @@ test('CountrySelect emits international values, searches country, disables and r
   await userEvent.fill(input, '01012345678');
   expect(last).toBe('+821012345678');
   await userEvent.click(country);
-  const search = screen.getByRole('combobox', { name: '옵션 검색' });
+  const search = screen.getByRole('combobox', { name: '검색', exact: true });
   await userEvent.fill(search, 'US');
   await expect.element(search).toHaveValue('US');
   await userEvent.click(screen.getByRole('option').first());
@@ -301,7 +301,7 @@ test('the country search draws its own focus ring, not the phone field around it
   await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
   await expect.poll(ringed, { message: 'the country trigger is part of the field' }).toBe(true);
   await userEvent.keyboard('{Enter}');
-  await expect.element(screen.getByRole('combobox', { name: '옵션 검색' })).toHaveFocus();
+  await expect.element(screen.getByRole('combobox', { name: '검색', exact: true })).toHaveFocus();
   await expect.poll(ringed).toBe(false);
 });
 
@@ -443,7 +443,7 @@ test('an incomplete number fails native validation and Field.Error says so', asy
   await userEvent.fill(input, '010123');
   expect(node(input).validity.customError).toBe(true);
   await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-  await expect.poll(() => error()?.textContent).toBe('올바른 전화번호를 입력하세요.');
+  await expect.poll(() => error()?.textContent).toBe('올바른 값이 아닙니다.');
   await userEvent.fill(input, '01012345678');
   expect(node(input).validity.valid).toBe(true);
   await expect.poll(error).toBeNull();
@@ -470,8 +470,8 @@ test('country names come from Intl in the provider locale, ko-KR by default, and
   const country = screen.getByRole('combobox', { name: COUNTRY });
   await expect.element(country).toHaveAttribute('aria-label', COUNTRY);
   await userEvent.click(country);
-  const search = screen.getByRole('combobox', { name: '옵션 검색' });
-  await expect.element(search).toHaveAttribute('placeholder', '국가 또는 국가 번호 검색');
+  const search = screen.getByRole('combobox', { name: '검색', exact: true });
+  await expect.element(search).toHaveAttribute('placeholder', '검색');
   await userEvent.fill(search, '미국');
   await expect.element(search).toHaveValue('미국');
   const options = screen

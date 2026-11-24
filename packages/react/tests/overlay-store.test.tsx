@@ -10,11 +10,7 @@ import { IdsProvider } from '../src';
 import { testTheme } from './theme';
 import { useInternalPresence } from '../src/internal/overlay/hooks/use-presence';
 import { overlay } from '../src/internal/overlay/lib/store';
-import {
-  OverlayItemContext,
-  useOverlay,
-  useInternalOverlayItem,
-} from '../src/internal/overlay/parts/host';
+import { OverlayItemContext, useOverlay, useInternalOverlayItem } from '../src/internal/overlay/parts/host';
 
 const nextFrame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
 const finishAnimations = (element: Element) => {
