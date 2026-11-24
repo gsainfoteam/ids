@@ -4,7 +4,7 @@ import { createContext, use, type KeyboardEvent } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { StepperItemState } from './item';
+import type { StepperItemState } from './parts/item';
 import type { StepperOrientation } from './root';
 import type { stepperStyle } from './style';
 
@@ -36,13 +36,13 @@ export const StepperContext = createContext<RootContext | null>(null);
 export const StepperIndexContext = createContext<number | null>(null);
 export const StepperItemContext = createContext<ItemContext | null>(null);
 
-export function useRootContext(part: string) {
+export function useInternalRootContext(part: string) {
   const context = use(StepperContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Stepper>\`.`);
   return context;
 }
 
-export function useItemContext(part: string) {
+export function useInternalItemContext(part: string) {
   const context = use(StepperItemContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Stepper.Item>\`.`);
   return context;

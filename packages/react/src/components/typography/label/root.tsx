@@ -2,8 +2,8 @@
 
 import { cloneElement, isValidElement, type ReactNode } from 'react';
 
+import { useInternalLabel } from './hooks/use-label';
 import { labelStyle } from './style';
-import { useLabel } from './use-label';
 import { invariant, mergeEventHandlers, mergeProps } from '../../../utils';
 
 import type { Label } from '.';
@@ -39,7 +39,7 @@ export function LabelRoot({
     labelRef,
     state: mirrored,
     onLabelClick,
-  } = useLabel({
+  } = useInternalLabel({
     id: id ?? child?.props.id,
     htmlFor: htmlFor ?? child?.props.htmlFor,
     disabled,

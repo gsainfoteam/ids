@@ -1,11 +1,11 @@
 'use client';
 
 import { TelFieldContext } from './context';
-import { TelFieldCountrySelect } from './country-select';
-import { TelFieldInput } from './input';
+import { useInternalTelField } from './hooks/use-tel-field';
+import { TelFieldCountrySelect } from './parts/country-select';
+import { TelFieldInput } from './parts/input';
 import { telFieldStyle } from './style';
-import { useTelField } from './use-tel-field';
-import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/lib/field-surface';
 import {
   Adornments,
   TextControlClear,
@@ -15,7 +15,7 @@ import {
   stateAttributes,
   type TextControlState,
 } from '../../../internal/text-control';
-import { useProviderLocale } from '../../../internal/translate';
+import { useInternalProviderLocale } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -45,7 +45,7 @@ export function TelFieldRoot({
   children,
   ...rootProps
 }: TelField.Props) {
-  const locale = useProviderLocale();
+  const locale = useInternalProviderLocale();
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const { items, leading, input, trailing } = splitAroundInput<TelField.InputProps>(
     children,
@@ -56,7 +56,7 @@ export function TelFieldRoot({
   const selects = countOf(items, TelFieldCountrySelect);
   invariant(selects <= 1, '`<TelField>` accepts at most one `<TelField.CountrySelect />`.');
 
-  const field = useTelField({
+  const field = useInternalTelField({
     rootProps,
     input: input.props,
     value,

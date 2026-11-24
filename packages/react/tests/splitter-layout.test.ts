@@ -7,7 +7,7 @@ import {
   keyTarget,
   moveHandle,
   type PanelConstraints,
-} from '../src/components/layout/splitter/layout';
+} from '../src/components/layout/splitter/lib/layout';
 
 const free: PanelConstraints = { minSize: 0, maxSize: 100, collapsible: false, collapsedSize: 0 };
 const atLeast = (minSize: number): PanelConstraints => ({ ...free, minSize });

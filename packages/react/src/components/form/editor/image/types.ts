@@ -1,4 +1,4 @@
-import { acceptsFile, parseAccept } from '../../file-field/file-rules';
+import { acceptsFile, parseAccept } from '../../file-field/lib/file-rules';
 
 export const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/avif'];
 

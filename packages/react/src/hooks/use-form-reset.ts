@@ -13,7 +13,7 @@ function ownerForm(element: Element | null) {
   return 'form' in element ? (element as FormAssociated).form : element.closest('form');
 }
 
-export function useFormReset(ref: RefObject<Element | null>, onReset: () => void) {
+export function useInternalFormReset(ref: RefObject<Element | null>, onReset: () => void) {
   const latest = useRef(onReset);
   useEffect(() => {
     latest.current = onReset;

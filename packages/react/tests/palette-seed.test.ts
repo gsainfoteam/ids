@@ -8,11 +8,11 @@ import palette from '../../core/tokens/palette.tokens.json';
 import {
   SCALE_RULES,
   createIdsPalette,
-} from '../src/components/utility/ids-provider/palette-scales';
-import { createIdsRamp, shadeOf } from '../src/components/utility/ids-provider/palette-seed';
-import { RAMP_STEPS, type IdsRamp } from '../src/components/utility/ids-provider/theme';
-import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
-import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
+} from '../src/components/utility/ids-provider/lib/palette-scales';
+import { createIdsRamp, shadeOf } from '../src/components/utility/ids-provider/lib/palette-seed';
+import { RAMP_STEPS, type IdsRamp } from '../src/components/utility/ids-provider/lib/theme';
+import { resolveColors } from '../src/components/utility/ids-provider/lib/theme-roles';
+import { checkIdsTheme } from '../src/components/utility/ids-provider/lib/theme-variables';
 import { IDS_NEUTRAL_SCALES } from '../src/tokens/color-roles';
 import { IDS_STATUS_PALETTES } from '../src/tokens/palette-model';
 
@@ -197,7 +197,7 @@ test(
         '--input-type=module',
         '-e',
         `
-    const { createIdsRamp } = await import('./dist/components/utility/ids-provider/palette-seed.js');
+    const { createIdsRamp } = await import('./dist/components/utility/ids-provider/lib/palette-seed.js');
     process.stdout.write(createIdsRamp('#0d9488')?.[600] ?? 'undefined');
   `,
       ],

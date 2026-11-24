@@ -3,12 +3,12 @@
 import { isValidElement, type ReactNode } from 'react';
 
 import { MessageScrollerContext, MessageScrollerViewContext } from './context';
-import { MessageScrollerJump } from './jump';
-import { MessageScrollerList } from './list';
+import { useInternalMessageScroller } from './hooks/use-message-scroller';
+import { MessageScrollerJump } from './parts/jump';
+import { MessageScrollerList } from './parts/list';
 import { messageScrollerStyle } from './style';
-import { useMessageScroller } from './use-message-scroller';
-import { useRequiredName } from '../../../internal/accessible-name';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { Card } from '../../data/card';
 import { Spinner } from '../../feedback/spinner';
@@ -51,11 +51,14 @@ export function MessageScrollerRoot({
   'aria-busy': ariaBusy,
   ...props
 }: MessageScroller.Props) {
-  const t = useTranslate();
-  useRequiredName('MessageScroller', { 'aria-label': label, 'aria-labelledby': labelledBy });
+  const t = useInternalTranslate();
+  useInternalRequiredName('MessageScroller', {
+    'aria-label': label,
+    'aria-labelledby': labelledBy,
+  });
 
   const loading = ariaBusy === true || ariaBusy === 'true';
-  const { scroll, viewportProps, atEnd, unseen } = useMessageScroller({
+  const { scroll, viewportProps, atEnd, unseen } = useInternalMessageScroller({
     onReachStart,
     loading,
     stickToBottom,

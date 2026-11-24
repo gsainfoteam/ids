@@ -1,6 +1,6 @@
 import { createIdsRamp } from '../src';
 
-import type { IdsRamp } from '../src/components/utility/ids-provider/theme';
+import type { IdsRamp } from '../src/components/utility/ids-provider/lib/theme';
 
 export const paletteSeeds = {
   red: '#fb2c36',

@@ -4,7 +4,7 @@ import { createContext, use, useContext, type ReactNode } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { FieldValidity } from './control-state';
+import type { FieldValidity } from './lib/control-state';
 import type { fieldStyle } from './style';
 import type { IdsSize } from '../../../tokens/types';
 
@@ -44,7 +44,7 @@ export type FieldContextValue = {
 
 export const FieldContext = createContext<FieldContextValue | null>(null);
 
-export function useFieldContext(name: string) {
+export function useInternalFieldContext(name: string) {
   const context = use(FieldContext);
   invariant(context, `Field.${name} must be inside Field.`);
   return context;

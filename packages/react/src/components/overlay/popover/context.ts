@@ -4,11 +4,11 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { useInternalPopover } from './hooks/use-popover';
 import type { popoverStyle } from './style';
-import type { usePopover } from './use-popover';
 
 type PopoverContextValue = {
-  popover: ReturnType<typeof usePopover>;
+  popover: ReturnType<typeof useInternalPopover>;
   titled: boolean;
   setTitled: (titled: boolean) => void;
   described: boolean;
@@ -18,7 +18,7 @@ type PopoverContextValue = {
 
 export const PopoverContext = createContext<PopoverContextValue | null>(null);
 
-export function usePopoverContext(part: string) {
+export function useInternalPopoverContext(part: string) {
   const context = use(PopoverContext);
   invariant(context, `${part} must be rendered inside Popover.`);
   return context;

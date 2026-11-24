@@ -5,8 +5,8 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { Image } from '.';
+import type { ImageGroupState, ViewerItem } from './hooks/use-image-group';
 import type { imageStyle } from './style';
-import type { ImageGroupState, ViewerItem } from './use-image-group';
 
 type Context = {
   state: Image.State;
@@ -41,13 +41,13 @@ export type ImageViewerContextValue = {
 
 export const ImageViewerContext = createContext<ImageViewerContextValue | null>(null);
 
-export function useImageContext(part: string) {
+export function useInternalImageContext(part: string) {
   const context = use(ImageContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Image>\`.`);
   return context;
 }
 
-export function useImageViewerContext(part: string) {
+export function useInternalImageViewerContext(part: string) {
   const context = use(ImageViewerContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Image.Viewer>\`.`);
   return context;

@@ -4,31 +4,31 @@ import { isValidElement, type CSSProperties, type ReactElement, type ReactNode }
 
 import { DayPicker, type DayPickerProps } from 'react-day-picker';
 
-import { CalendarCaption, type CalendarCaptionProps } from './caption';
-import { Chevron } from './chevron';
 import { CalendarContext, type NativeProps } from './context';
+import { useInternalCalendar, type CalendarState } from './hooks/use-calendar';
 import {
   type CalendarValue,
   type DateMatcher as CalendarDateMatcher,
   type DateSelection,
-} from './date';
-import { CalendarDay, type CalendarDayProps } from './day';
-import { CalendarDayButton } from './day-button';
-import { dayPickerFormatters, dayPickerLabels } from './day-picker-locale';
-import { Dropdown } from './dropdown';
-import { CalendarFooter } from './footer';
-import { MonthButton } from './month-button';
-import { MonthGrid } from './month-grid';
-import { Root } from './picker-root';
+} from './lib/date';
+import { dayPickerFormatters, dayPickerLabels } from './lib/day-picker-locale';
+import { CalendarCaption, type CalendarCaptionProps } from './parts/caption';
+import { Chevron } from './parts/chevron';
+import { CalendarDay, type CalendarDayProps } from './parts/day';
+import { CalendarDayButton } from './parts/day-button';
+import { Dropdown } from './parts/dropdown';
+import { CalendarFooter } from './parts/footer';
+import { MonthButton } from './parts/month-button';
+import { MonthGrid } from './parts/month-grid';
+import { Root } from './parts/picker-root';
+import { CalendarWeekNumber, type CalendarWeekNumberProps } from './parts/week-number';
 import { calendarStyle } from './style';
-import { useCalendar, type CalendarState } from './use-calendar';
-import { CalendarWeekNumber, type CalendarWeekNumberProps } from './week-number';
 import { resolveLocale, weekStartOf } from '../../../internal/date-locale';
-import { useIntlWords, useProviderLocale } from '../../../internal/translate';
+import { useInternalIntlWords, useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant, mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
-import type { AccessibleName } from '../../../internal/accessible-name';
+import type { AccessibleName } from '../../../internal/lib/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
 import type { CalendarDate } from '@internationalized/date';
 
@@ -105,8 +105,8 @@ function calendarParts(children: ReactNode) {
 }
 
 export function CalendarRoot(props: CalendarProps) {
-  const providerLocale = useProviderLocale();
-  const words = useIntlWords(providerLocale);
+  const providerLocale = useInternalProviderLocale();
+  const words = useInternalIntlWords(providerLocale);
   const {
     selectionMode = 'single',
     value,
@@ -133,7 +133,7 @@ export function CalendarRoot(props: CalendarProps) {
 
   const { day, caption, weekNumber, footer } = calendarParts(children);
   const captionLayout = caption?.layout ?? 'label';
-  const api = useCalendar({
+  const api = useInternalCalendar({
     selectionMode,
     value,
     defaultValue,

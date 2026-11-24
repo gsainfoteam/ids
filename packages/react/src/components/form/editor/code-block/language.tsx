@@ -1,11 +1,11 @@
 'use client';
 
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalTranslate } from '../../../../internal/translate';
 import {
   CODE_LANGUAGES,
   isPlainText,
   listedLanguageName,
-} from '../../../data/code-block/highlight';
+} from '../../../data/code-block/lib/highlight';
 import { Select } from '../../select';
 import { editorMessages } from '../messages-catalog';
 import { editorStyle } from '../style';
@@ -30,7 +30,7 @@ export function EditorCodeLanguage({
   disabled: boolean;
   onLanguageChange: (language: string | null) => void;
 }) {
-  const t = useTranslate(editorMessages);
+  const t = useInternalTranslate(editorMessages);
 
   return (
     <Select

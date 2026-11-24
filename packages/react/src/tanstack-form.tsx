@@ -15,7 +15,7 @@ import {
   valueReports,
   withoutDefaults,
   type ControlMode,
-} from './internal/form-bridge';
+} from './internal/lib/form-bridge';
 import { isDevelopment } from './utils/dev';
 
 const { fieldContext: appFieldContext } = createFormHookContexts();

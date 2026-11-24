@@ -1,7 +1,12 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { PasswordFieldCapsLock, type PasswordFieldCapsLockProps } from './caps-lock';
-import { PasswordFieldInput } from './input';
+import { type PasswordFieldInputProps } from './hooks/use-password-field';
+import { PasswordFieldCapsLock, type PasswordFieldCapsLockProps } from './parts/caps-lock';
+import { PasswordFieldInput } from './parts/input';
+import {
+  PasswordFieldVisibilityToggle,
+  type PasswordFieldVisibilityToggleProps,
+} from './parts/visibility-toggle';
 import {
   PasswordFieldRoot,
   type StateValue,
@@ -9,11 +14,6 @@ import {
   type PasswordFieldState,
 } from './root';
 import { passwordFieldStyle } from './style';
-import { type PasswordFieldInputProps } from './use-password-field';
-import {
-  PasswordFieldVisibilityToggle,
-  type PasswordFieldVisibilityToggleProps,
-} from './visibility-toggle';
 import { TextControlClear, type TextControlClearProps } from '../../../internal/text-control';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -57,6 +57,6 @@ export namespace PasswordField {
 }
 
 export type { PasswordFieldVariant, PasswordFieldState } from './root';
-export type { PasswordFieldInputProps } from './use-password-field';
+export type { PasswordFieldInputProps } from './hooks/use-password-field';
 
 export type PasswordFieldProps = PasswordField.Props;

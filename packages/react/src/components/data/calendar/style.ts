@@ -1,4 +1,4 @@
-import { fieldSurface } from '../../../internal/surfaces/field-surface';
+import { fieldSurface } from '../../../internal/surfaces/lib/field-surface';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';

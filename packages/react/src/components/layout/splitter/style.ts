@@ -1,7 +1,7 @@
 import { resizeHandle } from '../../../internal/resize-handle';
 import { tv } from '../../../utils';
 
-import type { SplitterOrientation } from './use-splitter';
+import type { SplitterOrientation } from './hooks/use-splitter';
 
 export type SplitterToggleSide = 'center' | 'before' | 'after';
 

@@ -4,8 +4,8 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { DateTimeLimits } from './date-time';
-import type { HourCycle } from '../../data/time-picker/time';
+import type { DateTimeLimits } from './lib/date-time';
+import type { HourCycle } from '../../data/time-picker/lib/time';
 import type { CalendarDate } from '@internationalized/date';
 
 type ContextValue = {
@@ -16,7 +16,7 @@ type ContextValue = {
 
 export const DateTimeFieldContext = createContext<ContextValue | null>(null);
 
-export function useDateTimeFieldContext(part: string) {
+export function useInternalDateTimeFieldContext(part: string) {
   const context = use(DateTimeFieldContext);
   invariant(context, `${part} must be inside DateTimeField.`);
   return context;

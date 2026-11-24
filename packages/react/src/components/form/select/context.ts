@@ -5,13 +5,13 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { SelectItemState, SelectState } from '.';
-import type { SelectOption } from './select-options';
+import type { useInternalSelect } from './hooks/use-select';
+import type { SelectOption } from './lib/select-options';
 import type { selectStyle } from './style';
-import type { useSelect } from './use-select';
 import type { IdsSize } from '../../../tokens/types';
 
 type SelectContextValue = {
-  select: ReturnType<typeof useSelect>;
+  select: ReturnType<typeof useInternalSelect>;
   options: SelectOption[];
   state: SelectState;
   placeholder?: string;
@@ -24,7 +24,7 @@ type SelectContextValue = {
 export const SelectContext = createContext<SelectContextValue | null>(null);
 export const ItemContext = createContext<SelectItemState | null>(null);
 
-export function useSelectContext(part: string) {
+export function useInternalSelectContext(part: string) {
   const context = use(SelectContext);
   invariant(context, `${part} must be rendered inside Select.`);
 

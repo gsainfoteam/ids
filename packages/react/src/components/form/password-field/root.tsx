@@ -1,12 +1,12 @@
 'use client';
 
-import { PasswordFieldCapsLock } from './caps-lock';
 import { PasswordFieldContext } from './context';
-import { PasswordFieldInput } from './input';
+import { useInternalPasswordField } from './hooks/use-password-field';
+import { PasswordFieldCapsLock } from './parts/caps-lock';
+import { PasswordFieldInput } from './parts/input';
+import { PasswordFieldVisibilityToggle } from './parts/visibility-toggle';
 import { passwordFieldStyle } from './style';
-import { usePasswordField } from './use-password-field';
-import { PasswordFieldVisibilityToggle } from './visibility-toggle';
-import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/lib/field-surface';
 import {
   Adornments,
   TextControlClear,
@@ -63,7 +63,7 @@ export function PasswordFieldRoot({
   const own = [PasswordFieldVisibilityToggle, PasswordFieldCapsLock, TextControlClear];
   const drawsDefaultParts = writesNoneOf(items, [PasswordFieldInput, ...own]);
 
-  const field = usePasswordField({
+  const field = useInternalPasswordField({
     rootProps,
     input: input.props,
     disabled,

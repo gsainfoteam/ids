@@ -2,17 +2,17 @@
 
 import { isValidElement, useEffect, useId, useRef, type ReactElement } from 'react';
 
-import { StepperContent } from './content';
 import { StepperContext, StepperIndexContext } from './context';
-import { StepperItem } from './item';
-import { flag } from './step-state';
+import { flag } from './lib/step-state';
+import { StepperContent } from './parts/content';
+import { StepperItem } from './parts/item';
 import { stepperStyle } from './style';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { useRequiredName } from '../../../internal/accessible-name';
-import { resolveState } from '../../../internal/state-props';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
+import { resolveState } from '../../../internal/lib/state-props';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
-import { useRovingFocus } from '../../utility/group/use-roving-focus';
+import { useInternalRovingFocus } from '../../utility/group/hooks/use-roving-focus';
 
 import type { Stepper } from '.';
 
@@ -65,7 +65,7 @@ export function StepperRoot(props: Stepper.Props) {
     ? ''
     : PROGRESS_ONLY_PROPS.filter((name) => props[name] !== undefined).join(', ');
 
-  const roving = useRovingFocus({
+  const roving = useInternalRovingFocus({
     rootRef: listRef,
     ownItemSelector: `[data-stepper-trigger="${id}"]`,
     orientation,
@@ -96,7 +96,10 @@ export function StepperRoot(props: Stepper.Props) {
     );
   }, [ignoredInARecord]);
 
-  useRequiredName('Stepper', { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy });
+  useInternalRequiredName('Stepper', {
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+  });
 
   const styles = stepperStyle({ orientation, size, interactive, progress });
 

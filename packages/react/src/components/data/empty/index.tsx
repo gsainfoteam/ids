@@ -1,12 +1,12 @@
 import { type ComponentProps } from 'react';
 
-import { EmptyActions, type EmptyActionsProps } from './actions';
-import { EmptyDescription, type EmptyDescriptionProps } from './description';
-import { EmptyMedia, type EmptyMediaProps } from './media';
-import { type EmptyPartProps } from './part';
+import { EmptyActions, type EmptyActionsProps } from './parts/actions';
+import { EmptyDescription, type EmptyDescriptionProps } from './parts/description';
+import { EmptyMedia, type EmptyMediaProps } from './parts/media';
+import { type EmptyPartProps } from './parts/part';
+import { EmptyTitle, type EmptyTitleProps } from './parts/title';
 import { EmptyRoot } from './root';
 import { emptyStyle } from './style';
-import { EmptyTitle, type EmptyTitleProps } from './title';
 
 import type { IdsSize } from '../../../tokens/types';
 

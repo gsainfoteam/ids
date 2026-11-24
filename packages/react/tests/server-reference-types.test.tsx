@@ -4,7 +4,7 @@ import { render } from 'vitest-browser-react';
 
 import { Dialog, Field, IdsProvider, Image, ImageGroup, Select, TextField } from '../src';
 import { testTheme } from './theme';
-import { ImageViewer } from '../src/components/data/image/viewer';
+import { ImageViewer } from '../src/components/data/image/parts/viewer';
 
 const asServerComponentHandsItOver = <T,>(component: T): T =>
   ({

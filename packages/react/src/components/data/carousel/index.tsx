@@ -1,15 +1,15 @@
-import { CarouselContent, type CarouselContentProps } from './content';
+import { CarouselContent, type CarouselContentProps } from './parts/content';
 import {
   CarouselIndicator,
   type CarouselIndicatorProps,
   type CarouselIndicatorState,
-} from './indicator';
-import { CarouselIndicators, type CarouselIndicatorsProps } from './indicators';
-import { CarouselNext, type CarouselNextProps } from './next';
-import { CarouselPause, type CarouselPauseProps } from './pause';
-import { CarouselPrev, type CarouselPrevProps } from './prev';
+} from './parts/indicator';
+import { CarouselIndicators, type CarouselIndicatorsProps } from './parts/indicators';
+import { CarouselNext, type CarouselNextProps } from './parts/next';
+import { CarouselPause, type CarouselPauseProps } from './parts/pause';
+import { CarouselPrev, type CarouselPrevProps } from './parts/prev';
+import { CarouselSlide, type CarouselSlideProps, type CarouselSlideState } from './parts/slide';
 import { CarouselRoot, type CarouselProps, type CarouselState } from './root';
-import { CarouselSlide, type CarouselSlideProps, type CarouselSlideState } from './slide';
 import { carouselStyle } from './style';
 
 import type {
@@ -20,12 +20,12 @@ import type {
   CarouselOptions,
   CarouselPlaying,
   CarouselSlides,
-} from './use-carousel';
+} from './hooks/use-carousel';
 import type {
   SlidesAlign,
   SlidesOrientation,
   SlidesPerScroll,
-} from '../../../internal/slides/layout';
+} from '../../../internal/slides/lib/layout';
 
 export function Carousel(props: Carousel.Props) {
   return <CarouselRoot {...props} />;
@@ -93,6 +93,6 @@ export namespace Carousel {
   export const Style = carouselStyle;
 }
 
-export { useCarousel } from './use-carousel';
+export { useCarousel } from './hooks/use-carousel';
 export type { CarouselProps, CarouselState } from './root';
-export type { CarouselInstance, CarouselOptions } from './use-carousel';
+export type { CarouselInstance, CarouselOptions } from './hooks/use-carousel';

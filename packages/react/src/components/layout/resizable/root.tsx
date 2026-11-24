@@ -12,11 +12,11 @@ import {
 } from 'react';
 
 import { ResizableContext } from './context';
-import { ResizableHandle } from './handle';
+import { useResizable } from './hooks/use-resizable';
+import { useInternalResizableElement } from './hooks/use-resizable-element';
+import { ResizableHandle } from './parts/handle';
 import { resizableStyle } from './style';
-import { useResizable } from './use-resizable';
-import { useResizableElement } from './use-resizable-element';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { containsElementOfType, invariant, mergeProps, mergeRefs } from '../../../utils';
 
 import type { Resizable } from '.';
@@ -50,7 +50,7 @@ export function ResizableRoot({
   const content = child ? child.props.children : children;
   const [dragging, setDragging] = useState(false);
   const own = useResizable();
-  const resizable = useResizableElement(given ?? own, rootId);
+  const resizable = useInternalResizableElement(given ?? own, rootId);
 
   const state: Resizable.State = {
     direction,

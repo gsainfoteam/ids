@@ -4,13 +4,13 @@ import { paletteHues, palettes } from '../.storybook/palettes';
 import {
   DISTINCT_FAMILIES,
   distanceBetween,
-} from '../src/components/utility/ids-provider/color-distance';
+} from '../src/components/utility/ids-provider/lib/color-distance';
 import {
   DERIVED_CHROMA_RATIO,
   TERTIARY_HUE_TURN,
   derivedTertiary,
-} from '../src/components/utility/ids-provider/derived-brands';
-import { IDS_NEUTRAL_PALETTE } from '../src/components/utility/ids-provider/palette-scales';
+} from '../src/components/utility/ids-provider/lib/derived-brands';
+import { IDS_NEUTRAL_PALETTE } from '../src/components/utility/ids-provider/lib/palette-scales';
 import {
   chromaOf,
   chromaRatioOf,
@@ -20,7 +20,7 @@ import {
   rampFromSteps,
   shadeOf,
   signedHueDelta,
-} from '../src/components/utility/ids-provider/palette-seed';
+} from '../src/components/utility/ids-provider/lib/palette-seed';
 import {
   HARMONIZE_LIMIT,
   STATUS_HUES,
@@ -28,17 +28,17 @@ import {
   fixedStatusPalette,
   harmonizedStatusPalettes,
   readsAs,
-} from '../src/components/utility/ids-provider/status';
+} from '../src/components/utility/ids-provider/lib/status';
 import {
   TINTED_NEUTRAL_CHROMA,
   neutralPalette,
   resolveColors,
-} from '../src/components/utility/ids-provider/theme-roles';
-import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
+} from '../src/components/utility/ids-provider/lib/theme-roles';
+import { checkIdsTheme } from '../src/components/utility/ids-provider/lib/theme-variables';
 import { IDS_STATUS_FAMILIES } from '../src/tokens/color-roles';
 import { IDS_STATUS_PALETTES } from '../src/tokens/palette-model';
 
-import type { IdsStatusFamily } from '../src/components/utility/ids-provider/theme';
+import type { IdsStatusFamily } from '../src/components/utility/ids-provider/lib/theme';
 
 const statusReference = (family: IdsStatusFamily) =>
   rampFromSteps(IDS_STATUS_PALETTES[STATUS_PALETTE_NAMES[family]]);

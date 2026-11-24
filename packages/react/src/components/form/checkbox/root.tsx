@@ -8,13 +8,13 @@ import {
   type ReactNode,
 } from 'react';
 
-import { dataState, resolve, type StateProp } from './checkbox-state';
 import { CheckboxContext } from './context';
-import { CheckboxIndicator } from './indicator';
+import { useInternalCheckbox, type CheckedState } from './hooks/use-checkbox';
+import { dataState, resolve, type StateProp } from './lib/checkbox-state';
+import { CheckboxIndicator } from './parts/indicator';
 import { checkboxStyle } from './style';
-import { useCheckbox, type CheckedState } from './use-checkbox';
 import { invariant } from '../../../utils';
-import { useCheckboxGroupContext } from '../checkbox-group/context';
+import { useInternalCheckboxGroupContext } from '../checkbox-group/context';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -81,7 +81,7 @@ export function CheckboxRoot({
   onPointerCancel,
   ...inputProps
 }: CheckboxProps) {
-  const enclosingGroup = useCheckboxGroupContext();
+  const enclosingGroup = useInternalCheckboxGroupContext();
   const group = value === undefined ? null : enclosingGroup;
   const option = String(value);
   invariant(
@@ -103,7 +103,7 @@ export function CheckboxRoot({
   const resolvedSize = useFieldSize(size ?? group?.size) ?? 'standard';
   const resolvedVariant = variant ?? group?.variant ?? 'outline';
   const isReadOnly = readOnly || Boolean(group?.readOnly);
-  const { checked, interaction, inputRef, handlers } = useCheckbox({
+  const { checked, interaction, inputRef, handlers } = useInternalCheckbox({
     checked: group ? group.value.includes(option) : checkedProp,
     defaultChecked,
     onCheckedChange: (next) => {

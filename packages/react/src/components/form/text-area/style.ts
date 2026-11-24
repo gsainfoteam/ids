@@ -1,9 +1,9 @@
-import { fieldSurface } from '../../../internal/surfaces/field-surface';
+import { fieldSurface } from '../../../internal/surfaces/lib/field-surface';
 import { insetButtons } from '../../../internal/text-control/style';
 import { tv } from '../../../utils';
 
 import type { TextAreaVariant } from '.';
-import type { TextAreaHandle } from './use-text-area';
+import type { TextAreaHandle } from './hooks/use-text-area';
 import type { IdsSize } from '../../../tokens/types';
 
 export const textAreaStyle = tv({

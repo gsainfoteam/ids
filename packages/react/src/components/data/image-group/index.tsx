@@ -4,9 +4,9 @@ import { ImageGroupRoot } from './root';
 import { imageGroupStyle } from './style';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { Image } from '../image';
-import { ImageViewer } from '../image/viewer';
+import { ImageViewer } from '../image/parts/viewer';
 
-import type { UseImageGroupOptions } from '../image/use-image-group';
+import type { UseImageGroupOptions } from '../image/hooks/use-image-group';
 
 export type ImageGroupLayout = 'row' | 'column' | 'grid';
 

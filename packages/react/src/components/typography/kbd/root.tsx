@@ -3,12 +3,12 @@
 import { cloneElement, Fragment, isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { KbdStyleContext } from './context';
-import { GLYPH_ICONS } from './glyph-icons';
-import { orderedKeys, splitGlyphs, type KbdLabel, type ResolvedKey } from './keys';
-import { KbdSeparator, type KbdSeparatorProps } from './separator';
+import { useInternalKbd } from './hooks/use-kbd';
+import { orderedKeys, splitGlyphs, type KbdLabel, type ResolvedKey } from './lib/keys';
+import { GLYPH_ICONS } from './parts/glyph-icons';
+import { KbdSeparator, type KbdSeparatorProps } from './parts/separator';
 import { kbdStyle } from './style';
-import { useKbd } from './use-kbd';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { kbdGroupStyle } from '../kbd-group/style';
 
@@ -60,8 +60,8 @@ function Face({ keyInfo, name, iconClassName }: FaceProps) {
 }
 
 export function KbdRoot({ keys, size, platform, labels, className, children, ...rest }: Kbd.Props) {
-  const t = useTranslate();
-  const kbd = useKbd({ size, platform, labels });
+  const t = useInternalTranslate();
+  const kbd = useInternalKbd({ size, platform, labels });
   const name = (label: KbdLabel) => kbd.labels[label] ?? t(`kbd.${label}`);
   const ordered = keys ? orderedKeys(keys, kbd.platform) : [];
   const state: Kbd.State = {

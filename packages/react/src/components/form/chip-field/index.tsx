@@ -1,13 +1,13 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { ChipContent, type ChipContentProps } from './content';
-import { ChipCreate, type ChipCreateProps } from './create';
-import { ChipEmpty, type ChipEmptyProps } from './empty';
-import { ChipGroup, type ChipGroupProps } from './group';
-import { ChipInput, type ChipInputProps } from './input';
-import { ChipItem, type ChipItemProps } from './item';
-import { ChipItemIndicator, type ChipItemIndicatorProps } from './item-indicator';
-import { ChipLimit, type ChipLimitProps } from './limit';
+import { ChipContent, type ChipContentProps } from './parts/content';
+import { ChipCreate, type ChipCreateProps } from './parts/create';
+import { ChipEmpty, type ChipEmptyProps } from './parts/empty';
+import { ChipGroup, type ChipGroupProps } from './parts/group';
+import { ChipInput, type ChipInputProps } from './parts/input';
+import { ChipItem, type ChipItemProps } from './parts/item';
+import { ChipItemIndicator, type ChipItemIndicatorProps } from './parts/item-indicator';
+import { ChipLimit, type ChipLimitProps } from './parts/limit';
 import {
   ChipFieldRoot,
   type ChipFieldVariant,
@@ -17,7 +17,7 @@ import {
 } from './root';
 import { chipFieldStyle } from './style';
 
-import type { ChipValidateResult } from './chip-values';
+import type { ChipValidateResult } from './lib/chip-values';
 import type { IdsSize } from '../../../tokens/types';
 
 export function ChipField(props: ChipField.Props) {

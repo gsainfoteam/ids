@@ -2,7 +2,7 @@
 
 import { createContext, use, useCallback, useMemo } from 'react';
 
-import { intlWords, type IntlWords } from './intl-words';
+import { intlWords, type IntlWords } from './lib/intl-words';
 import {
   DEFAULT_LOCALE,
   formatDefaultMessage,
@@ -32,7 +32,7 @@ function reportMissing(locale: IdsLocale, key: IdsMessageKey) {
   );
 }
 
-export function useTranslate(ownCatalog?: MessageTree): Translate {
+export function useInternalTranslate(ownCatalog?: MessageTree): Translate {
   const { locale, tag } = use(LanguageContext);
 
   return useCallback(
@@ -47,13 +47,13 @@ export function useTranslate(ownCatalog?: MessageTree): Translate {
   );
 }
 
-export function useProviderLocale(): string {
+export function useInternalProviderLocale(): string {
   const { locale, tag } = use(LanguageContext);
   return tag ?? locale?.tag ?? DEFAULT_LOCALE;
 }
 
-export function useIntlWords(locale?: string): IntlWords {
-  const providerLocale = useProviderLocale();
+export function useInternalIntlWords(locale?: string): IntlWords {
+  const providerLocale = useInternalProviderLocale();
   const tag = locale ?? providerLocale;
 
   return useMemo(() => intlWords(tag), [tag]);

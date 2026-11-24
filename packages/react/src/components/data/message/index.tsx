@@ -1,11 +1,11 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { MessageActions, type MessageActionsProps } from './actions';
-import { MessageAvatar, type MessageAvatarProps } from './avatar';
-import { MessageContent, type MessageContentProps } from './content';
-import { MessageCopy, type MessageCopyProps } from './copy';
-import { MessageFooter, type MessageFooterProps } from './footer';
-import { MessageHeader, type MessageHeaderProps } from './header';
+import { MessageActions, type MessageActionsProps } from './parts/actions';
+import { MessageAvatar, type MessageAvatarProps } from './parts/avatar';
+import { MessageContent, type MessageContentProps } from './parts/content';
+import { MessageCopy, type MessageCopyProps } from './parts/copy';
+import { MessageFooter, type MessageFooterProps } from './parts/footer';
+import { MessageHeader, type MessageHeaderProps } from './parts/header';
 import { MessageRoot, type MessageAlign, type MessageStatus } from './root';
 import { messageStyle } from './style';
 

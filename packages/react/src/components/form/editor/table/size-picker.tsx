@@ -4,13 +4,13 @@ import { useRef, useState, type KeyboardEvent, type ReactElement } from 'react';
 
 import { clamp, range } from 'es-toolkit';
 
-import { keyHandler } from '../../../../internal/keys';
-import { useTranslate } from '../../../../internal/translate';
+import { keyHandler } from '../../../../internal/lib/keys';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { Popover } from '../../../overlay/popover';
-import { useEditorContext } from '../context';
+import { useInternalEditorContext } from '../context';
 import { editorMessages } from '../messages-catalog';
-import { EditorToolTip, type EditorToolTipProps } from '../tool';
 import { NEW_TABLE_SIZE, type TableSize } from './insert';
+import { EditorToolTip, type EditorToolTipProps } from '../parts/tool';
 
 const MOST = { rows: 8, cols: 10 } as const satisfies TableSize;
 
@@ -35,8 +35,8 @@ export function EditorTableSizePicker({
   onPick: (size: TableSize) => void;
   children: ReactElement;
 }) {
-  const t = useTranslate(editorMessages);
-  const { styles } = useEditorContext('Editor.Table');
+  const t = useInternalTranslate(editorMessages);
+  const { styles } = useInternalEditorContext('Editor.Table');
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState(NEW_TABLE_SIZE);
   const gridRef = useRef<HTMLDivElement>(null);

@@ -17,7 +17,7 @@ type ResizableContextValue = {
 
 export const ResizableContext = createContext<ResizableContextValue | null>(null);
 
-export function useResizableContext(part: string) {
+export function useInternalResizableContext(part: string) {
   const context = use(ResizableContext);
   invariant(context, `${part} must be rendered inside Resizable.`);
   return context;
