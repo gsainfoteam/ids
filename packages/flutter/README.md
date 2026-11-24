@@ -376,6 +376,16 @@ IdsCheckboxGroup<String>.withParts(
 `onClick`에서 `event.preventDefault()`를 호출하면 이번 활성화의 상태 변경과
 `onPressedChange` 호출을 막을 수 있다.
 
+## ToggleGroup
+
+`IdsToggleGroup`은 하나를 선택하고 `IdsToggleGroup.multiple`은 여러 값을 선택한다.
+각 `IdsToggle`에 `value`를 지정하면 그룹에서 눌림 상태를 관리한다. 방향키는 단일
+선택에서 포커스와 선택을 함께 옮기고, 다중 선택에서는 포커스만 옮긴다.
+`loop: false`를 주면 끝에서 멈추고, 단일 선택에서 `required: true`를 주면
+이미 선택한 항목을 다시 눌러도 선택을 유지한다.
+`IdsToggleGroup<T>`와 `IdsToggleGroup<T>.multiple`은 문자열이나 enum 같은 값을
+선택 콜백과 폼 저장까지 같은 타입으로 전달한다.
+
 ## IconButton
 
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며
