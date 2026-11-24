@@ -137,7 +137,7 @@ export const Gallery: Story = {
             {({ All, Item }) => (
               <>
                 <Label>
-                  <All />
+                  <All>{() => <Checkbox.Indicator />}</All>
                   전체 선택
                 </Label>
                 <div className="flex flex-col gap-3 ps-6">
@@ -420,5 +420,23 @@ export const Keyboard: Story = {
     await userEvent.tab();
     await userEvent.keyboard(' ');
     await expect(args.onValueChange).toHaveBeenLastCalledWith(['ts', 'js', 'py']);
+  },
+};
+
+export const StateStyle: Story = {
+  args: {
+    style: ({ value }) => ({
+      width: 'fit-content',
+      padding: 12,
+      backgroundColor: value.length > 1 ? 'var(--ids-color-bg-primary-soft)' : undefined,
+    }),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const group = canvas.getByRole('group', { name: '관심 기술' });
+    const initialBackground = getComputedStyle(group).backgroundColor;
+    await userEvent.click(canvas.getByRole('checkbox', { name: 'Rust' }));
+    await expect(getComputedStyle(group).backgroundColor).not.toBe(initialBackground);
+    await userEvent.click(canvas.getByRole('checkbox', { name: 'Rust' }));
+    await expect(getComputedStyle(group).backgroundColor).toBe(initialBackground);
   },
 };

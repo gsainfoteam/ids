@@ -18,6 +18,8 @@ abstract class IdsMessagesBase {
 
   String get checkboxRequired;
 
+  String get checkboxGroupRequired;
+
   String get colorPickerAlpha;
 
   String get colorPickerArea;
@@ -470,6 +472,9 @@ class IdsMessagesEn extends IdsMessagesBase {
 
   @override
   String get checkboxRequired => 'Select this item.';
+
+  @override
+  String get checkboxGroupRequired => 'Select at least one option.';
 
   @override
   String get colorPickerAlpha => 'Opacity';
@@ -1135,6 +1140,9 @@ class IdsMessagesKo extends IdsMessagesBase {
 
   @override
   String get checkboxRequired => '이 항목을 선택하세요.';
+
+  @override
+  String get checkboxGroupRequired => '하나 이상 선택하세요.';
 
   @override
   String get colorPickerAlpha => '투명도';

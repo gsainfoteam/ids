@@ -21,6 +21,9 @@ export const en = defineIdsLocale({
     "checkbox": {
       "required": "Select this item."
     },
+    "checkboxGroup": {
+      "required": "Select at least one option."
+    },
     "colorPicker": {
       "alpha": "Opacity",
       "area": "Saturation and brightness",

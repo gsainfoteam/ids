@@ -333,6 +333,29 @@ IdsCheckbox(
 )
 ```
 
+## CheckboxGroup
+
+`IdsCheckboxGroup<T>`은 `value` 또는 `defaultValue`에 `List<T>`를 받고
+`onValueChange`로 다음 선택을 전달한다. `IdsCheckboxGroupItem`에 항목의 값을
+지정하고, `IdsCheckboxGroupAll`을 사용해 활성 항목만 한꺼번에 선택하거나 해제한다.
+전체 선택은 일부 항목만 체크되어 있을 때 혼합 상태를 그린다.
+`IdsCheckboxGroupAll`의 `builder`와 `style`로 전체 선택 상태에 맞춰 표시를 바꿀 수 있다.
+`withParts` 빌더의 `parts.item`은 그룹과 같은 값 타입을 사용한다.
+그룹의 `style`에는 현재 상태와 기본 레이아웃 위젯이 전달된다. 선택 상태에 따라
+그룹에 배경이나 여백을 적용할 수 있다.
+
+```dart
+IdsCheckboxGroup<String>.withParts(
+  defaultValue: const ['email'],
+  semanticLabel: '알림 방식',
+  builder: (context, parts) => [
+    parts.all(semanticLabel: '전체 선택'),
+    parts.item(value: 'email', semanticLabel: '이메일'),
+    parts.item(value: 'push', semanticLabel: '푸시'),
+  ],
+)
+```
+
 ## IconButton
 
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며
