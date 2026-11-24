@@ -201,6 +201,7 @@ export const PickAndClearADate: Story = {
     <div className="w-72">
       <DateField
         aria-label="날짜"
+        placeholder="날짜 선택"
         min={new CalendarDate(2026, 9, 1)}
         max={new CalendarDate(2026, 9, 30)}
         onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
@@ -227,7 +228,7 @@ export const PickAndClearADate: Story = {
     await expect(trigger).toHaveTextContent('2026. 09. 16.');
     await expect(trigger).toHaveFocus();
     await expect(document.querySelector('[role=dialog]')).toBeNull();
-    await userEvent.click(canvas.getByRole('button', { name: '날짜 지우기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(null);
     await expect(trigger).toHaveTextContent('날짜 선택');
   },
@@ -299,7 +300,7 @@ export const PickABirthday: Story = {
   play: async ({ canvas, args, userEvent }) => {
     await userEvent.click(canvas.getByRole('combobox', { name: '생년월일' }));
     const dialog = await canvas.findByRole('dialog');
-    await userEvent.selectOptions(dialog.querySelector('select[aria-label="연도"]')!, '1995');
+    await userEvent.selectOptions(dialog.querySelector('select[aria-label="년"]')!, '1995');
     await userEvent.selectOptions(dialog.querySelector('select[aria-label="월"]')!, '4');
     await userEvent.click(day('1995-05-20'));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 5, 20));
@@ -423,7 +424,7 @@ export const SubmitWithANativeForm: Story = {
       >
         <Field>
           <Field.Label>체크인</Field.Label>
-          <DateField name="checkin" required>
+          <DateField name="checkin" placeholder="날짜 선택" required>
             <DateField.Calendar today={new CalendarDate(2026, 9, 15)} />
           </DateField>
           <Field.Hint>비워 두면 제출되지 않습니다.</Field.Hint>

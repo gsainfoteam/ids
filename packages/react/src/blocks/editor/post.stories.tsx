@@ -152,7 +152,12 @@ export const PC: Story = {
                 <Card.Description>목록과 공유 미리 보기에 보여요.</Card.Description>
               </Card.Header>
               <Card.Content>
-                <FileDropzone aria-label="표지 그림" accept="image/*" maxSize={10 * 1024 * 1024} />
+                <FileDropzone
+                  aria-label="표지 그림"
+                  accept="image/*"
+                  maxSize={10 * 1024 * 1024}
+                  placeholder="그림을 끌어다 놓거나 눌러서 고르세요"
+                />
               </Card.Content>
             </Card>
 

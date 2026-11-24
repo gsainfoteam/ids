@@ -17,6 +17,7 @@ import { SidebarTrigger, type SidebarTriggerProps } from './trigger';
 import { findElementOfType } from '../../../utils';
 
 import type { SidebarMove, SidebarPlace, SidebarTreeItem } from './tree';
+import type { AccessibleName } from '../../../internal/accessible-name';
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
 export function Sidebar(props: Sidebar.Props) {
@@ -29,17 +30,18 @@ export namespace Sidebar {
   export type Variant = SidebarVariant;
   export type CollapsibleMode = SidebarCollapsibleMode;
 
-  export type Props = Omit<ComponentProps<'aside'>, 'children'> & {
-    value?: string;
-    variant?: Variant;
-    collapsible?: CollapsibleMode;
-    collapsed?: boolean;
-    defaultCollapsed?: boolean;
-    onCollapsedChange?: (collapsed: boolean) => void;
-    shortcut?: Hotkey | false;
-    persist?: string;
-    children?: ReactNode;
-  };
+  export type Props = Omit<ComponentProps<'aside'>, 'children'> &
+    AccessibleName & {
+      value?: string;
+      variant?: Variant;
+      collapsible?: CollapsibleMode;
+      collapsed?: boolean;
+      defaultCollapsed?: boolean;
+      onCollapsedChange?: (collapsed: boolean) => void;
+      shortcut?: Hotkey | false;
+      persist?: string;
+      children?: ReactNode;
+    };
 
   export const Header = SidebarHeader;
   export namespace Header {

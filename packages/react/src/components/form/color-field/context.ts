@@ -14,7 +14,7 @@ import type { PickerDefaults } from '../../data/color-picker/context';
 type ColorFieldContextValue = {
   field: Omit<ReturnType<typeof useColorField>, 'rootRef' | 'triggerRef'>;
   state: ColorFieldState;
-  placeholder: string;
+  placeholder?: string;
   triggerProps: Record<string, unknown>;
   valueId: string;
   picker: ComponentProps<typeof ColorPicker> & PickerDefaults;

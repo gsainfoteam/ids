@@ -5,6 +5,8 @@ import { createContext, use, type ReactNode } from 'react';
 import { invariant } from '../../../utils';
 
 import type { FileFieldState } from '.';
+import type { FileFieldRejection } from './file-rules';
+import type { FileFieldLimits } from './limits';
 import type { filePartsStyle } from './style';
 import type { useFileField } from './use-file-field';
 import type { IdsSize } from '../../../tokens/types';
@@ -15,7 +17,7 @@ type FileFieldContextValue = {
   state: FileFieldState;
   size: IdsSize;
   placeholder: ReactNode;
-  limits: string;
+  limits: FileFieldLimits;
   limitsId: string;
   triggerProps: Record<string, unknown>;
   styles: ReturnType<typeof filePartsStyle>;
@@ -24,6 +26,7 @@ type FileFieldContextValue = {
 
 export const FileContext = createContext<FileFieldContextValue | null>(null);
 export const FileRowContext = createContext(false);
+export const FileRejectionContext = createContext<FileFieldRejection | null>(null);
 
 export function useFile(part: string) {
   const context = use(FileContext);

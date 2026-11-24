@@ -77,10 +77,8 @@ export function TimeFieldRoot({
           display: (value) => display(value!),
           serialize: (value) => timeKey(value!, precision),
           messages: {
-            placeholder: t('timeField.placeholder'),
-            title: t('timeField.title'),
-            clear: t('timeField.clear'),
-            close: t('timeField.close'),
+            clear: t('common.clear'),
+            close: t('common.close'),
           },
           icon: ClockIcon,
           initialFocusSelector: '[data-time-column]',

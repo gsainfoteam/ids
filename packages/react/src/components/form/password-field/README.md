@@ -3,7 +3,7 @@
 비밀번호를 입력받는 필드입니다. 보기 버튼과 Caps Lock 표시가 기본으로 붙습니다.
 
 - **보기 전환.** 같은 input의 `type` 만 바꿔서 값, 선택 범위, 자동 완성이 그대로 남습니다. 버튼 이름은 그대로 두고 `aria-pressed` 로 상태를 알립니다.
-- **Caps Lock 표시.** 입력 중에 Caps Lock이 켜져 있으면 ⇪ 표시가 나타나고, 스크린 리더에 "Caps Lock이 켜져 있습니다."라고 알립니다.
+- **Caps Lock 표시.** 입력 중에 Caps Lock이 켜져 있으면 ⇪ 표시가 나타납니다. `PasswordField.CapsLock` 에 `label` 을 주면 스크린 리더가 그 문구를 읽습니다.
 - **비밀번호 관리자와 맞춤.** `name` 으로 `current-password` / `new-password` 를 고르고, 폼을 제출할 때는 보이던 비밀번호를 다시 가려서 관리자가 저장을 제안할 수 있게 합니다.
 - **조립.** TextField와 같은 테두리를 씁니다. `PasswordField.Input` 앞뒤에 아이콘이나 버튼을 두고, 파트를 직접 두면 그 자리에 놓입니다.
 - **react-hook-form, TanStack Form.** 실제 `<input>` 하나라 `register()` 가 그대로 되고, `onValueChange` 로 값을 바로 받습니다.
@@ -64,14 +64,15 @@ import { Field, PasswordField } from '@gsainfoteam/ids-react';
 </PasswordField>
 
 <PasswordField name="password">
-  <PasswordField.CapsLock label="Caps Lock is on" />    {/* 자리와 문구를 정한다 */}
+  <PasswordField.CapsLock label="Caps Lock이 켜져 있습니다." /> {/* 자리와 문구를 정한다 */}
   <PasswordField.Input />
   <PasswordField.VisibilityToggle />
 </PasswordField>
 ```
 
 - 키를 누르거나 입력을 누를 때마다 `getModifierState('CapsLock')` 으로 다시 읽습니다. 포커스가 떠나면 사라집니다.
-- ⇪ 표시는 `aria-hidden` 이고 `title` 로 문구를 보여 줍니다. 알림은 항상 마운트된 `role="status"` 가 맡습니다.
+- ⇪ 표시는 `aria-hidden` 이고 `label` 을 `title` 로 보여 줍니다. 알림은 항상 마운트된 `role="status"` 가 맡습니다.
+- `label` 에는 기본 문구가 없습니다. 주지 않으면 표시만 그리고 알리지 않습니다.
 
 ## 자동 완성
 

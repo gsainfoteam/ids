@@ -239,14 +239,18 @@ export const WarnWhenCapsLockIsOn: Story = {
         placeholder="Caps Lock을 켜 보세요"
         data-1p-ignore=""
         data-lpignore="true"
-      />
+      >
+        <PasswordField.Input />
+        <PasswordField.CapsLock label="Caps Lock이 켜져 있습니다." />
+        <PasswordField.VisibilityToggle />
+      </PasswordField>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '입력에 포커스가 있는 동안 Caps Lock이 켜지면 ⇪ 표시가 나타나고, 스크린 리더에는 "Caps Lock이 켜져 있습니다."라고 알립니다. 부품을 쓰지 않은 PasswordField 는 이 표시를 기본으로 그립니다.',
+          '입력에 포커스가 있는 동안 Caps Lock이 켜지면 ⇪ 표시가 나타납니다. PasswordField.CapsLock 의 label 은 표시의 title 이 되고 스크린 리더가 읽습니다. 부품을 쓰지 않은 PasswordField 는 문구 없이 표시만 그립니다.',
       },
     },
   },

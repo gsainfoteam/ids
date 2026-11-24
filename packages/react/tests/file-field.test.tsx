@@ -24,7 +24,18 @@ const fieldRoot = (container: HTMLElement) =>
 const removeButton = (name: string) =>
   page.getByRole('button', { name: `${name} 삭제`, exact: true });
 
-const clearButton = () => page.getByRole('button', { name: '파일 모두 지우기', exact: true });
+const clearButton = () => page.getByRole('button', { name: '지우기', exact: true });
+
+const reasonText = {
+  type: '형식이 맞지 않습니다.',
+  size: '너무 큽니다.',
+  count: '개수를 넘었습니다.',
+};
+const rejection = (
+  <FileField.Rejection>
+    {({ file, reason }) => `${file.name}: ${reasonText[reason]}`}
+  </FileField.Rejection>
+);
 
 const settle = () => new Promise((resolve) => setTimeout(resolve));
 
@@ -78,8 +89,7 @@ test('SSR: labels, native picker attributes, button semantics, validator and dia
   const button = doc.querySelector<HTMLButtonElement>('[data-file-field] button')!;
   expect(doc.querySelector('label')!.htmlFor).toBe(button.id);
   expect(button.hasAttribute('aria-required'), 'a button takes no aria-required').toBe(false);
-  const described = button.getAttribute('aria-describedby')!.split(' ');
-  expect(described.map((id) => doc.getElementById(id)?.textContent)).toContain('필수 항목');
+  expect(button.hasAttribute('aria-describedby'), 'required needs no hidden text').toBe(false);
   expect(button.hasAttribute('data-field-input')).toBe(true);
   const native = doc.querySelector<HTMLInputElement>('[type=file]')!;
   expect(native.getAttribute('capture')).toBe('environment');
@@ -102,7 +112,9 @@ test('single: replacement, rejections keep the model, a repeat pick, and clear',
       maxSize={10}
       onValueChange={onValueChange}
       onReject={onReject}
-    />,
+    >
+      {rejection}
+    </FileField>,
   );
   const trigger = screen.getByRole('button', { name: 'Files', exact: true });
   const input = picker(screen.container);
@@ -116,9 +128,9 @@ test('single: replacement, rejections keep the model, a repeat pick, and clear',
   await expect.element(trigger).toHaveAttribute('aria-invalid', 'true');
   await expect
     .element(screen.getByRole('alert'))
-    .toHaveTextContent('bad.txt: 허용되지 않는 파일 형식입니다.');
+    .toHaveTextContent('bad.txt: 형식이 맞지 않습니다.');
   await userEvent.upload(input, [file('big.pdf', '12345678901')]);
-  await expect.element(screen.getByRole('alert')).toHaveTextContent('big.pdf: 10 B보다 큽니다.');
+  await expect.element(screen.getByRole('alert')).toHaveTextContent('big.pdf: 너무 큽니다.');
   await userEvent.upload(input, [file('new.pdf')]);
   expect(onValueChange).toHaveBeenLastCalledWith(named('new.pdf'));
   await expect.element(screen.getByRole('alert')).not.toBeInTheDocument();
@@ -149,7 +161,9 @@ test('multiple: appends, dedupes, limits, and removal keeps focus in the list', 
         maxCount={3}
         onValueChange={onValueChange}
         onReject={onReject}
-      />
+      >
+        {rejection}
+      </FileField>
     </form>,
   );
   const trigger = screen.getByRole('button', { name: 'Files', exact: true });
@@ -166,9 +180,7 @@ test('multiple: appends, dedupes, limits, and removal keeps focus in the list', 
   );
   expect(onValueChange).toHaveBeenLastCalledWith([named('a.pdf'), named('b.pdf'), named('c.pdf')]);
   expect(onReject).toHaveBeenLastCalledWith([{ file: named('d.pdf'), reason: 'count' }]);
-  await expect
-    .element(screen.getByRole('alert'))
-    .toHaveTextContent('d.pdf: 최대 3개까지 고를 수 있습니다.');
+  await expect.element(screen.getByRole('alert')).toHaveTextContent('d.pdf: 개수를 넘었습니다.');
   await expect.element(trigger).toMatchTextContent('파일 3개');
   await userEvent.click(removeButton('a.pdf'));
   expect(onValueChange).toHaveBeenLastCalledWith([named('b.pdf'), named('c.pdf')]);
@@ -409,7 +421,6 @@ test('required is enforced natively; reset, prevented reset, read-only and disab
   const sentName = () => (new FormData(form()).get('resume') as File | null)?.name;
   const trigger = screen.getByRole('button', { name: 'Resume', exact: true });
   const reset = screen.getByRole('button', { name: 'Reset' });
-  await expect.element(trigger).toHaveAccessibleDescription(/필수 항목/);
   expect(form().checkValidity()).toBe(false);
   await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
   await expect.element(trigger).toHaveFocus();

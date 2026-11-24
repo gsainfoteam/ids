@@ -46,7 +46,7 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 - `format` 은 [`Intl.DateTimeFormatOptions`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options) 나 `(date, locale) => string` 입니다. date-fns 패턴 문자열은 받지 않습니다.
 - 기본값은 `{ year: 'numeric', month: '2-digit', day: '2-digit' }` 입니다.
 - 날짜와 시간은 [DateTimeField](../date-time-field/README.md) 를 씁니다.
-- 비어 있으면 `placeholder`(기본 `날짜 선택`, 기간은 `기간 선택`)를 흐린 색으로 보입니다.
+- 비어 있으면 `placeholder` 를 흐린 색으로 보입니다. 기본값은 없어서, 주지 않으면 빈 칸입니다.
 
 ## 달력 옵션
 
@@ -88,7 +88,7 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 
 - 달력 안의 키보드는 [Calendar](../../data/calendar/README.md#키보드) 와 같습니다.
 - `onBlur` 는 포커스가 필드와 팝업을 모두 벗어날 때만 부릅니다.
-- 판(drawer)에서는 제목과 닫기 버튼이 위에 붙습니다.
+- 판(drawer)에서는 닫기 버튼이 위에 붙습니다. 제목은 없고, 판의 이름은 필드의 이름(`Field.Label`, `aria-label`)입니다.
 - 팝업이 남은 화면보다 길면 안에서 스크롤하고, 위나 아래에 내용이 더 남은 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)).
 
 ## 글자로 입력
@@ -231,7 +231,7 @@ const schema = z.object({
 | `value` / `defaultValue` / `onValueChange`                            | 모드별 타입. 기본 `null`, `multiple` 은 `[]`             |
 | `open` / `defaultOpen` / `onOpenChange`                               | 팝업 열림                                                |
 | `format`                                                              | locale 숫자 날짜. Intl 옵션이나 `(date, locale) => string` |
-| `placeholder`                                                         | `날짜 선택`, 기간은 `기간 선택`                          |
+| `placeholder`                                                         | 기본 없음. 비어 있을 때 보일 글                          |
 | `min` / `max` / `disabled`                                            | 달력으로 간다. `disabled={true}` 는 필드 전체            |
 | `name` / `form` / `required`                                          | 숨은 값 입력과 브라우저 검증                             |
 | `readOnly`                                                            | 열리지 않고 Clear 도 막힌다                              |

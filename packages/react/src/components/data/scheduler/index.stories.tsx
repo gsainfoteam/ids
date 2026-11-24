@@ -248,6 +248,7 @@ const meta = {
     weekStartsOn: { control: { type: 'number', min: 0, max: 6 } },
   },
   args: {
+    'aria-label': '일정표',
     events: EVENTS,
     defaultDate: TODAY,
     now: NOW,
@@ -274,7 +275,7 @@ export const Playground: Story = {};
 export const Usage: Story = {
   render: () => (
     <div className="[--scheduler-height:--spacing(120)]">
-      <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} />
+      <Scheduler aria-label="일정표" events={EVENTS} defaultDate={TODAY} now={NOW} />
     </div>
   ),
 };
@@ -421,7 +422,7 @@ export const MoveBetweenPeriods: Story = {
     await expect(args.onViewChange).toHaveBeenLastCalledWith('day');
     await expect(shownDays(canvasElement)).toEqual(['2026-11-17']);
 
-    await userEvent.click(canvas.getByRole('button', { name: '이전 날' }));
+    await userEvent.click(canvas.getByRole('button', { name: '1일 전' }));
     await expect(args.onDateChange).toHaveBeenLastCalledWith(on(16));
     await expect(shownDays(canvasElement)).toEqual(['2026-11-16']);
   },
@@ -450,7 +451,7 @@ export const ShowAWholeMonth: Story = {
     await expect(range(canvasElement)).toHaveTextContent('2026년 12월');
     await expect(monthDays()[0]).toHaveAttribute('data-scheduler-month-day', '2026-11-29');
 
-    await userEvent.click(canvas.getByRole('button', { name: '이전 달' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지난달' }));
     await userEvent.click(
       canvas.getByRole('button', { name: '2026년 11월 17일 화요일 일정 5개 더 보기' }),
     );
@@ -473,7 +474,7 @@ export const ShowAChosenNumberOfDays: Story = {
     await expect(canvas.getByRole('radio', { name: '3일' })).toBeChecked();
     await expect(shownDays(canvasElement)).toEqual(['2026-11-17', '2026-11-18', '2026-11-19']);
 
-    await userEvent.click(canvas.getByRole('button', { name: '다음 3일' }));
+    await userEvent.click(canvas.getByRole('button', { name: '3일 후' }));
     await expect(args.onDateChange).toHaveBeenLastCalledWith(on(20));
     await expect(shownDays(canvasElement)).toEqual(['2026-11-20', '2026-11-21', '2026-11-22']);
 
@@ -497,7 +498,7 @@ export const ShowAChosenNumberOfDays: Story = {
 
     await userEvent.type(count, '{ArrowUp}');
     await expect(args.onDayCountChange).toHaveBeenLastCalledWith(6);
-    await expect(canvas.getByRole('button', { name: '다음 6일' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: '6일 후' })).toBeVisible();
   },
 };
 
@@ -536,7 +537,7 @@ export const OpenAnEventOnClick: Story = {
 
     return (
       <div className="flex w-full flex-col gap-3">
-        <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW}>
+        <Scheduler aria-label="일정표" events={EVENTS} defaultDate={TODAY} now={NOW}>
           {(event) => <Scheduler.Event onClick={() => setOpened(event.title)} />}
         </Scheduler>
         <p className="text-body-b3-regular" data-testid="opened">
@@ -581,6 +582,7 @@ export const DragAnEventToANewTime: Story = {
     return (
       <div className="flex w-full flex-col gap-3">
         <Scheduler
+          aria-label="일정표"
           events={events}
           defaultDate={TODAY}
           now={NOW}
@@ -636,7 +638,7 @@ export const DragAnEventToANewTime: Story = {
     canvas.getAllByRole('button', { name: '점심' })[0]!.focus();
     await userEvent.keyboard('[Space]{ArrowDown}{Escape}');
     await expect(changed).not.toHaveTextContent('점심');
-    await expect(canvas.getByText('점심을(를) 제자리에 두었습니다.')).toBeInTheDocument();
+    await expect(canvas.getByText('제자리에 두었습니다: 점심')).toBeInTheDocument();
   },
 };
 
@@ -656,6 +658,7 @@ export const AddRightClickMenus: Story = {
     return (
       <div className="flex w-full flex-col gap-3">
         <Scheduler
+          aria-label="일정표"
           events={events}
           defaultDate={TODAY}
           now={NOW}
@@ -764,6 +767,7 @@ export const CreateAnEventBySelectingTime: Story = {
     return (
       <div className="flex w-full flex-col gap-3">
         <Scheduler
+          aria-label="일정표"
           events={events}
           defaultDate={TODAY}
           now={NOW}
@@ -833,6 +837,7 @@ export const MoveEventsInTheMonthView: Story = {
     return (
       <div className="flex w-full flex-col gap-3">
         <Scheduler
+          aria-label="일정표"
           events={events}
           defaultView="month"
           defaultDate={TODAY}
@@ -902,7 +907,7 @@ export const DrawYourOwnEventContent: Story = {
     },
   },
   render: () => (
-    <Scheduler events={ROOMS} defaultDate={TODAY} now={NOW}>
+    <Scheduler aria-label="일정표" events={ROOMS} defaultDate={TODAY} now={NOW}>
       {(event) => (
         <Scheduler.Event colorScheme="tertiary">
           <Item.Content>
@@ -934,6 +939,7 @@ export const ControlTheDateAndView: Story = {
     return (
       <div className="flex w-full flex-col gap-3">
         <Scheduler
+          aria-label="일정표"
           events={EVENTS}
           view={view}
           onViewChange={setView}
@@ -948,7 +954,7 @@ export const ControlTheDateAndView: Story = {
     );
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '다음 날' }));
+    await userEvent.click(canvas.getByRole('button', { name: '1일 후' }));
     await expect(canvas.getByTestId('state')).toHaveTextContent('day · 2026-11-19');
     await userEvent.click(canvas.getByRole('radio', { name: '주' }));
     await expect(canvas.getByTestId('state')).toHaveTextContent('week · 2026-11-19');
@@ -984,7 +990,7 @@ export const Keyboard: Story = {
     },
   },
   play: async ({ canvas, args, userEvent }) => {
-    const stops = ['이전 주', '오늘', '다음 주'];
+    const stops = ['지난주', '오늘', '다음 주'];
     for (const name of stops) {
       await userEvent.tab();
       await expect(canvas.getByRole('button', { name })).toHaveFocus();
@@ -999,7 +1005,7 @@ export const Keyboard: Story = {
     await userEvent.keyboard('{ArrowRight}');
     await expect(canvas.getByRole('radio', { name: '일' })).toHaveFocus();
     await expect(args.onViewChange).toHaveBeenLastCalledWith('day');
-    await expect(canvas.getByRole('button', { name: '이전 날' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: '1일 전' })).toBeVisible();
     await userEvent.keyboard('{Home}');
     await expect(canvas.getByRole('radio', { name: '월' })).toHaveFocus();
     await expect(args.onViewChange).toHaveBeenLastCalledWith('month');

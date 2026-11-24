@@ -625,7 +625,7 @@ export const GroupItemsInASubmenu: Story = {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveFocus());
     await waitFor(() =>
-      expect(canvas.queryByRole('menu', { name: '공유 하위 메뉴' })).not.toBeInTheDocument(),
+      expect(canvas.queryByRole('menu', { name: '공유' })).not.toBeInTheDocument(),
     );
     expect(canvas.getByRole('menu', { name: '파일' })).toBeInTheDocument();
   },
@@ -875,7 +875,7 @@ export const SearchCommandsWithAHotkey: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: /^명령 찾기/ }));
-    const search = await canvas.findByRole('combobox', { name: '명령 검색' });
+    const search = await canvas.findByRole('combobox', { name: '검색' });
     await waitFor(() => expect(search).toHaveFocus());
 
     await userEvent.type(search, 'zzz');
@@ -1066,10 +1066,10 @@ export const NestedSubmenus: Story = {
 
     await userEvent.keyboard('{ArrowLeft}');
     await focused('저화질');
-    expect(canvas.queryByRole('menu', { name: '저화질 하위 메뉴' })).not.toBeInTheDocument();
+    expect(canvas.queryByRole('menu', { name: '저화질' })).not.toBeInTheDocument();
     await userEvent.keyboard('{Escape}');
     await focused('JPEG');
-    expect(canvas.queryByRole('menu', { name: 'JPEG 하위 메뉴' })).not.toBeInTheDocument();
+    expect(canvas.queryByRole('menu', { name: 'JPEG' })).not.toBeInTheDocument();
     await userEvent.keyboard('{ArrowLeft}');
     await focused('이미지');
     await userEvent.keyboard('{Escape}');

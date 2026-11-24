@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
@@ -36,7 +38,13 @@ function steps(names = ['Account', 'Profile', 'Review'], marks: Stepper.Item.Pro
 }
 
 test('SSR: an ordered list of step buttons, the current one marked with aria-current', () => {
-  const doc = parse(renderToString(<Stepper defaultValue={1}>{steps()}</Stepper>));
+  const doc = parse(
+    renderToString(
+      <Stepper aria-label="진행 단계" defaultValue={1}>
+        {steps()}
+      </Stepper>,
+    ),
+  );
   const list = doc.querySelector('ol')!;
   const items = Array.from(list.children);
 
@@ -64,7 +72,13 @@ test('SSR: an ordered list of step buttons, the current one marked with aria-cur
 });
 
 test('SSR: a value without onValueChange only shows progress, with no buttons', () => {
-  const doc = parse(renderToString(<Stepper value={2}>{steps()}</Stepper>));
+  const doc = parse(
+    renderToString(
+      <Stepper aria-label="진행 단계" value={2}>
+        {steps()}
+      </Stepper>,
+    ),
+  );
 
   expect(doc.querySelectorAll('button')).toHaveLength(0);
   expect(doc.querySelector('li[aria-current="step"]')!.textContent).toContain('Review');
@@ -73,7 +87,11 @@ test('SSR: a value without onValueChange only shows progress, with no buttons', 
 
 test('linear: only the steps behind and the next one can be pressed', async () => {
   const onValueChange = vi.fn();
-  await render(<Stepper onValueChange={onValueChange}>{steps()}</Stepper>);
+  await render(
+    <Stepper aria-label="진행 단계" onValueChange={onValueChange}>
+      {steps()}
+    </Stepper>,
+  );
 
   await expect.element(step('Review')).toBeDisabled();
   await userEvent.click(step('Profile'));
@@ -86,7 +104,9 @@ test('linear: only the steps behind and the next one can be pressed', async () =
 });
 
 test('linear: a step marked completed can be reached even when it lies ahead', async () => {
-  await render(<Stepper>{steps(undefined, [{}, {}, { completed: true }])}</Stepper>);
+  await render(
+    <Stepper aria-label="진행 단계">{steps(undefined, [{}, {}, { completed: true }])}</Stepper>,
+  );
 
   await expect.element(step('Review')).toBeEnabled();
   await expect.element(step('Review')).toHaveAccessibleName('Review 완료');
@@ -96,7 +116,7 @@ test('linear: a step marked completed can be reached even when it lies ahead', a
 test('non-linear: any step can be pressed, disabled ones cannot', async () => {
   const onValueChange = vi.fn();
   await render(
-    <Stepper linear={false} onValueChange={onValueChange}>
+    <Stepper aria-label="진행 단계" linear={false} onValueChange={onValueChange}>
       {steps(['A', 'B', 'C', 'D'], [{}, { disabled: true }])}
     </Stepper>,
   );
@@ -110,7 +130,7 @@ test('non-linear: any step can be pressed, disabled ones cannot', async () => {
 
 test('a disabled root disables every step', async () => {
   await render(
-    <Stepper disabled linear={false}>
+    <Stepper aria-label="진행 단계" disabled linear={false}>
       {steps()}
     </Stepper>,
   );
@@ -123,7 +143,7 @@ test('keyboard: one Tab stop on the current step, arrows, Home and End move betw
   await render(
     <>
       <button type="button">before</button>
-      <Stepper linear={false} defaultValue={1}>
+      <Stepper aria-label="진행 단계" linear={false} defaultValue={1}>
         {steps(['A', 'B', 'C', 'D'], [{}, {}, { disabled: true }])}
       </Stepper>
       <button type="button">after</button>
@@ -158,7 +178,9 @@ test('keyboard: one Tab stop on the current step, arrows, Home and End move betw
 test('right-to-left swaps the left and right arrows', async () => {
   await render(
     <div dir="rtl">
-      <Stepper linear={false}>{steps()}</Stepper>
+      <Stepper aria-label="진행 단계" linear={false}>
+        {steps()}
+      </Stepper>
     </div>,
   );
 
@@ -168,7 +190,11 @@ test('right-to-left swaps the left and right arrows', async () => {
 });
 
 test('an error step keeps aria-current and reads its state after the title', async () => {
-  await render(<Stepper defaultValue={1}>{steps(undefined, [{}, { error: true }])}</Stepper>);
+  await render(
+    <Stepper aria-label="진행 단계" defaultValue={1}>
+      {steps(undefined, [{}, { error: true }])}
+    </Stepper>,
+  );
 
   const profile = step('Profile');
   await expect.element(profile).toHaveAccessibleName('Profile 오류');
@@ -180,7 +206,7 @@ test('an error step keeps aria-current and reads its state after the title', asy
 
 test('Content shows only the panel of the current step and keeps the others mounted', async () => {
   await render(
-    <Stepper defaultValue={0}>
+    <Stepper aria-label="진행 단계" defaultValue={0}>
       {steps()}
       <Stepper.Content value={0}>
         <input aria-label="Email" />
@@ -199,7 +225,7 @@ test('Content shows only the panel of the current step and keeps the others moun
 
 test('explicit parts replace the defaults, and part children take the step state', async () => {
   await render(
-    <Stepper defaultValue={1}>
+    <Stepper aria-label="진행 단계" defaultValue={1}>
       <Stepper.Item>
         <Stepper.Trigger>
           <Stepper.Title>First</Stepper.Title>
@@ -228,7 +254,7 @@ test('development warnings: a value past the steps and a child that is not a par
   onTestFinished(() => warn.mockRestore());
 
   await render(
-    <Stepper value={5}>
+    <Stepper aria-label="진행 단계" value={5}>
       {steps()}
       <div>stray</div>
     </Stepper>,
@@ -244,7 +270,7 @@ test('a vertical title keeps its first line level with the indicator, also when 
   for (const size of ['standard', 'tiny'] as const) {
     const screen = await render(
       <div className="w-48">
-        <Stepper orientation="vertical" size={size} value={0}>
+        <Stepper aria-label="진행 단계" orientation="vertical" size={size} value={0}>
           <Stepper.Item>
             <Stepper.Title>A title long enough to wrap onto another line</Stepper.Title>
             <Stepper.Description>Details</Stepper.Description>
@@ -372,12 +398,13 @@ test('progress={false} ignores value, onValueChange and linear, with a developme
   expect(onValueChange).not.toHaveBeenCalled();
 });
 
-test('progress={false} has no default list name and warns in development until it gets one', async () => {
+test('a Stepper has no default list name and warns in development until it gets one', async () => {
   const warn = silenceWarnings();
-  const unnamed = await render(<Stepper progress={false}>{steps()}</Stepper>);
+  const Unnamed = Stepper as (props: Omit<Stepper.Props, 'aria-label'>) => ReactNode;
+  const unnamed = await render(<Unnamed progress={false}>{steps()}</Unnamed>);
 
   expect(document.querySelector('ol')!.hasAttribute('aria-label')).toBe(false);
-  expect(warn).toHaveBeenCalledWith(expect.stringContaining('no default list name'));
+  expect(warn).toHaveBeenCalledWith(expect.stringContaining('Stepper: it has no accessible name'));
 
   await unnamed.unmount();
   warn.mockClear();
@@ -433,7 +460,12 @@ test('Body renders outside the step button: its button is its own Tab stop and p
   await render(
     <>
       <button type="button">before</button>
-      <Stepper orientation="vertical" defaultValue={0} onValueChange={onValueChange}>
+      <Stepper
+        aria-label="진행 단계"
+        orientation="vertical"
+        defaultValue={0}
+        onValueChange={onValueChange}
+      >
         <Stepper.Item>
           <Stepper.Title>Account</Stepper.Title>
           <Stepper.Body>
@@ -545,7 +577,7 @@ test('the vertical connector line runs beside the Body, at the title column, to 
 test('Body is hidden in a horizontal Stepper and placed inside Trigger, each with a development warning', async () => {
   const warn = silenceWarnings();
   await render(
-    <Stepper defaultValue={0}>
+    <Stepper aria-label="진행 단계" defaultValue={0}>
       <Stepper.Item>
         <Stepper.Title>Account</Stepper.Title>
         <Stepper.Body>Account body</Stepper.Body>

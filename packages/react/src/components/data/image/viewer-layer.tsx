@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  isValidElement,
   useCallback,
   useLayoutEffect,
   useRef,
@@ -8,6 +9,8 @@ import {
   type KeyboardEvent,
   type MouseEvent,
   type PointerEvent,
+  type ReactElement,
+  type ReactNode,
 } from 'react';
 
 import { ImageViewerCaption } from './caption';
@@ -15,6 +18,7 @@ import { ImageViewerContext, type ImageViewerContextValue } from './context';
 import { enterFrom, exitTo } from './flip';
 import { imageStyle } from './style';
 import { ImageViewerToolbar } from './toolbar';
+import { ImageViewerFallback } from './viewer-fallback';
 import { ImageViewerSlide } from './viewer-slide';
 import { keyHandler } from '../../../internal/keys';
 import {
@@ -28,6 +32,7 @@ import {
 import { SlidesAnnouncer, useSlides } from '../../../internal/slides';
 import { useTranslate } from '../../../internal/translate';
 import { useZoomPan } from '../../../internal/zoom-pan';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { ImageViewerLook, ImageViewerSource } from './viewer';
 
@@ -53,6 +58,9 @@ const DEFAULT_PARTS = (
   </>
 );
 
+const isFallback = (node: ReactNode): node is ReactElement =>
+  isValidElement(node) && elementTypeOf(node) === ImageViewerFallback;
+
 function isEmptyGround(target: Element, viewer: Element) {
   if (target === viewer) return true;
   return target.closest(THE_STAGE) !== null && target.closest(WHAT_IS_NOT_EMPTY) === null;
@@ -73,6 +81,9 @@ function ViewerSession({
   const { open, items } = source;
   const count = items.length;
   const styles = imageStyle();
+  const parts = flattenFragments(look.children ?? DEFAULT_PARTS);
+  const fallback = parts.find(isFallback);
+  const chrome = parts.filter((node) => !isFallback(node));
 
   const [content, setContent] = useState<HTMLElement | null>(null);
   const [backdrop, setBackdrop] = useState<HTMLElement | null>(null);
@@ -280,12 +291,13 @@ function ViewerSession({
                 attachArea={setArea}
                 attachBox={attachBox}
                 styles={styles}
+                fallback={fallback}
               />
             ))}
           </div>
         </section>
         <OverlayItemContext value={null}>
-          <ImageViewerContext value={context}>{look.children ?? DEFAULT_PARTS}</ImageViewerContext>
+          <ImageViewerContext value={context}>{chrome}</ImageViewerContext>
         </OverlayItemContext>
         <SlidesAnnouncer slides={slides} className={styles.announcer()} />
       </div>

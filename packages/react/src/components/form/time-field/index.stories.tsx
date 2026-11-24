@@ -155,6 +155,7 @@ export const PickAndClearATime: Story = {
     <div className="w-60">
       <TimeField
         aria-label="시간"
+        placeholder="시간 선택"
         defaultValue={new Time(9, 30)}
         hourCycle="24h"
         step={15}
@@ -180,7 +181,7 @@ export const PickAndClearATime: Story = {
     await userEvent.keyboard('{Escape}');
     await expect(trigger).toHaveTextContent('01:45');
     await expect(trigger).toHaveFocus();
-    await userEvent.click(canvas.getByRole('button', { name: '시간 지우기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     await expect(trigger).toHaveTextContent('시간 선택');
   },
 };
@@ -305,7 +306,7 @@ export const SubmitWithANativeForm: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '저장' }));
     await expect(canvas.getByLabelText('저장 결과')).toHaveTextContent('{"alarm":"07:00"}');
-    await userEvent.click(canvas.getByRole('button', { name: '시간 지우기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     const form = canvas.getByRole('button', { name: '저장' }).closest('form')!;
     await expect(form.checkValidity()).toBe(false);
     await userEvent.click(canvas.getByRole('button', { name: '초기화' }));

@@ -14,7 +14,7 @@ import { Stepper } from '@gsainfoteam/ids-react';
 
 const [step, setStep] = useState(0);
 
-<Stepper value={step} onValueChange={setStep}>
+<Stepper aria-label="진행 단계" value={step} onValueChange={setStep}>
   <Stepper.Item>
     <Stepper.Title>계정</Stepper.Title>
     <Stepper.Description>이메일과 비밀번호</Stepper.Description>
@@ -33,10 +33,10 @@ const [step, setStep] = useState(0);
 값은 현재 단계의 번호입니다. 0 부터 셉니다.
 
 ```tsx
-<Stepper defaultValue={1} />                          // 비제어. 단계를 누르면 옮긴다
-<Stepper value={step} onValueChange={setStep} />      // 제어
-<Stepper value={2} />                                 // 표시 전용. 버튼이 없다
-<Stepper value={3} />                                 // 단계가 3개면 모두 completed
+<Stepper aria-label="진행 단계" defaultValue={1} />                      // 비제어. 단계를 누르면 옮긴다
+<Stepper aria-label="진행 단계" value={step} onValueChange={setStep} />  // 제어
+<Stepper aria-label="진행 단계" value={2} />                             // 표시 전용. 버튼이 없다
+<Stepper aria-label="진행 단계" value={3} />                             // 단계가 3개면 모두 completed
 ```
 
 - `value` 를 주고 `onValueChange` 를 주지 않으면 누를 수 없는 표시 전용이 됩니다. 이때는 단계가 버튼이 아니고, 현재 단계의 `li` 에 `aria-current="step"` 이 붙습니다.
@@ -46,8 +46,8 @@ const [step, setStep] = useState(0);
 ## linear
 
 ```tsx
-<Stepper />                  // 기본 linear. 지난 단계와 바로 다음 단계만 누를 수 있다
-<Stepper linear={false} />   // 어느 단계든 누를 수 있다
+<Stepper aria-label="진행 단계" />                 // 기본 linear. 지난 단계와 바로 다음 단계만 누를 수 있다
+<Stepper aria-label="진행 단계" linear={false} />  // 어느 단계든 누를 수 있다
 ```
 
 - linear 에서 그보다 뒤의 단계는 `disabled` 버튼이라 Tab 과 방향키가 건너뜁니다. 흐리게 그리지는 않습니다.
@@ -56,12 +56,12 @@ const [step, setStep] = useState(0);
 ## 단계 상태
 
 ```tsx
-<Stepper.Item />             // 순서로 정해진다: completed / current / upcoming
-<Stepper.Item completed />   // 순서와 상관없이 completed
-<Stepper.Item completed={false} />  // 지난 단계인데 아직 끝나지 않음
-<Stepper.Item error />       // 오류. 현재 단계여도 오류로 그린다
-<Stepper.Item disabled />    // 누를 수 없고 흐리게
-<Stepper disabled />         // 모든 단계
+<Stepper.Item />                             // 순서로 정해진다: completed / current / upcoming
+<Stepper.Item completed />                   // 순서와 상관없이 completed
+<Stepper.Item completed={false} />           // 지난 단계인데 아직 끝나지 않음
+<Stepper.Item error />                       // 오류. 현재 단계여도 오류로 그린다
+<Stepper.Item disabled />                    // 누를 수 없고 흐리게
+<Stepper aria-label="진행 단계" disabled />  // 모든 단계
 ```
 
 - 오류인 현재 단계도 `aria-current="step"` 은 그대로입니다.
@@ -102,7 +102,7 @@ const [step, setStep] = useState(0);
 - `completed`, `error` 를 준 항목은 진행에서처럼 체크와 X 로 그리고 "완료", "오류" 를 읽습니다. 배포 성공과 실패에 씁니다.
 - 연결선은 completed 뒤에도 중립색이고, 표시 칸의 아래 끝에서 다음 표시 칸의 위 끝까지 틈 없이 이어집니다.
 - 늘 표시 전용이라 버튼이 없습니다. `value`, `defaultValue`, `onValueChange`, `linear` 는 쓰지 않고, 주면 개발 모드에서 경고합니다.
-- 목록 이름의 기본값이 없습니다. "진행 단계" 는 기록의 이름이 아니므로 `aria-label` 이나 `aria-labelledby` 를 줍니다. 없으면 개발 모드에서 경고합니다.
+- 기록도 진행처럼 `aria-label` 이나 `aria-labelledby` 로 목록 이름을 줍니다(`최근 활동`, `댓글`).
 - 진행 중인 일(도는 빌드)은 `<Stepper.Indicator><Spinner aria-hidden /></Stepper.Indicator>` 와 제목의 글로 알립니다. 한 단계씩 나아가는 파이프라인이면 기록 대신 `value` 만 준 표시 전용 진행을 씁니다. 도는 단계에 `aria-current="step"` 이 붙습니다.
 
 ## Body
@@ -134,7 +134,7 @@ const [step, setStep] = useState(0);
 ## Content
 
 ```tsx
-<Stepper value={step} onValueChange={setStep}>
+<Stepper aria-label="진행 단계" value={step} onValueChange={setStep}>
   <Stepper.Item>...</Stepper.Item>
   <Stepper.Item>...</Stepper.Item>
 
@@ -190,12 +190,12 @@ const [step, setStep] = useState(0);
 
 ## 키보드
 
-| 키                | 동작                                        |
-| ----------------- | ------------------------------------------- |
-| `Tab`             | 현재 단계로 들어오고, 다음 Tab 은 목록 밖   |
-| `→` `↓` / `←` `↑` | 다음, 이전 단계. 끝에서 멈춘다              |
-| `Home` / `End`    | 처음, 마지막 단계                           |
-| `Enter` / `Space` | 그 단계로 옮긴다                            |
+| 키                | 동작                                      |
+| ----------------- | ----------------------------------------- |
+| `Tab`             | 현재 단계로 들어오고, 다음 Tab 은 목록 밖 |
+| `→` `↓` / `←` `↑` | 다음, 이전 단계. 끝에서 멈춘다            |
+| `Home` / `End`    | 처음, 마지막 단계                         |
+| `Enter` / `Space` | 그 단계로 옮긴다                          |
 
 - 누를 수 없는 단계(disabled, linear 에서 먼 단계)는 건너뜁니다.
 - `dir="rtl"` 에서는 `←` `→` 가 뒤집힙니다.
@@ -204,8 +204,8 @@ const [step, setStep] = useState(0);
 ## 방향
 
 ```tsx
-<Stepper orientation="horizontal" />  // 기본. 단계 사이를 가로선이 잇는다
-<Stepper orientation="vertical" />    // 세로. 표시 아래로 선이 내려간다
+<Stepper aria-label="진행 단계" orientation="horizontal" />  // 기본. 단계 사이를 가로선이 잇는다
+<Stepper aria-label="진행 단계" orientation="vertical" />    // 세로. 표시 아래로 선이 내려간다
 ```
 
 - 세로에서 제목의 첫 줄은 표시의 가운데에 맞춥니다. 제목이 여러 줄이어도 첫 줄이 표시 옆에 옵니다.
@@ -213,10 +213,10 @@ const [step, setStep] = useState(0);
 ## 크기
 
 ```tsx
-<Stepper size="tiny" />               // standard(기본) / tiny
+<Stepper aria-label="진행 단계" size="tiny" />               // standard(기본) / tiny
 
 <div className="w-80">
-  <Stepper>...</Stepper>              {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
+  <Stepper aria-label="진행 단계">...</Stepper>              {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
 </div>
 ```
 
@@ -230,35 +230,36 @@ const [step, setStep] = useState(0);
 - 단계의 `completed`, `error`, `disabled` 는 앱이 `Stepper.Item` 에 줍니다. 나머지는 순서로 정해집니다.
 - 새 디자인을 그릴 때만 상태를 받는 함수를 씁니다. `className`, `style`, `children` 이 함수를 받습니다.
 
-| 받는 곳                                                                         | 필드                                                                                    |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| 루트                                                                            | `value`(기록은 `-1`), `orientation`, `disabled`, `progress`                             |
+| 받는 곳                                                                         | 필드                                                                                                 |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 루트                                                                            | `value`(기록은 `-1`), `orientation`, `disabled`, `progress`                                          |
 | `Item`, `Indicator`, `Title`, `Description`, `Body`, `Separator`(children 없음) | `index`, `status`(`completed` `current` `upcoming` `error` `neutral`), `current`, `disabled`, `last` |
-| `Trigger`                                                                       | 위에 더해 `hovered`, `active`, `focused`, `focusVisible`                                |
-| `Content`                                                                       | `value`, `current`                                                                      |
+| `Trigger`                                                                       | 위에 더해 `hovered`, `active`, `focused`, `focusVisible`                                             |
+| `Content`                                                                       | `value`, `current`                                                                                   |
 
 ## 속성
 
-| 속성                     | 기본 / 동작                                                        |
-| ------------------------ | ------------------------------------------------------------------ |
-| `value` / `defaultValue` | 현재 단계 번호. 기본 `0`                                           |
-| `onValueChange`          | 단계를 눌러 옮길 때 `(value: number)`                              |
-| `linear`                 | 기본 `true`. 지난 단계와 바로 다음 단계만 누를 수 있다             |
-| `progress`               | 기본 `true`. `false` 면 현재 단계가 없는 기록                      |
-| `orientation`            | `horizontal`(기본) / `vertical`                                    |
-| `size`                   | `standard`(기본) / `tiny`                                          |
-| `disabled`               | 모든 단계 비활성                                                   |
-| `aria-label`             | 단계 목록(`ol`)의 이름. 진행의 기본은 "진행 단계", 기록은 기본 없음 |
-| `aria-labelledby`        | 단계 목록의 이름을 다른 요소에서                                   |
-| `Item.completed`         | 순서와 상관없이 완료 여부를 정한다. 기록에서는 성공한 일           |
-| `Item.error`             | 오류 단계. 기록에서는 실패한 일                                    |
-| `Item.disabled`          | 그 단계만 비활성                                                   |
-| `Body.asChild`           | 감싸는 `div` 없이 자식 요소에 속성을 합친다                        |
-| `Content.value`          | 필수. 보일 단계 번호                                               |
+| 속성                     | 기본 / 동작                                                                |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `value` / `defaultValue` | 현재 단계 번호. 기본 `0`                                                   |
+| `onValueChange`          | 단계를 눌러 옮길 때 `(value: number)`                                      |
+| `linear`                 | 기본 `true`. 지난 단계와 바로 다음 단계만 누를 수 있다                     |
+| `progress`               | 기본 `true`. `false` 면 현재 단계가 없는 기록                              |
+| `orientation`            | `horizontal`(기본) / `vertical`                                            |
+| `size`                   | `standard`(기본) / `tiny`                                                  |
+| `disabled`               | 모든 단계 비활성                                                           |
+| `aria-label`             | 필수. 단계 목록(`ol`)의 이름. 기본값이 없다                                |
+| `aria-labelledby`        | `aria-label` 대신, 보이는 제목의 `id`                                      |
+| `Item.completed`         | 순서와 상관없이 완료 여부를 정한다. 기록에서는 성공한 일                   |
+| `Item.error`             | 오류 단계. 기록에서는 실패한 일                                            |
+| `Item.disabled`          | 그 단계만 비활성                                                           |
+| `Body.asChild`           | 감싸는 `div` 없이 자식 요소에 속성을 합친다                                |
+| `Content.value`          | 필수. 보일 단계 번호                                                       |
 | 그 외                    | 각 파트의 native 속성. `Trigger` 는 `button` 으로, `Body` 는 `div` 로 간다 |
 
 ## 알아둘 것
 
 - 버튼의 이름은 `Title` 과 상태 문구("완료", "오류")이고, `Description` 은 `aria-describedby` 로 이어집니다. Title 이 없으면 버튼의 글자가 이름이 됩니다. `Body` 는 버튼 밖이라 이름과 설명에 들어가지 않습니다.
 - 번호와 아이콘 표시는 `aria-hidden` 입니다. 순서는 `ol` 이 알립니다.
-- 상태 문구는 `IdsProvider translate` 의 `stepper.completed`, `stepper.error`, 목록 이름은 `stepper.label` 입니다. 기록은 `stepper.label` 을 쓰지 않습니다.
+- 목록 이름은 필수입니다. `aria-label` 을 주거나, 보이는 제목이 있으면 `aria-labelledby` 로 그 `id` 를 가리킵니다. 둘 다 없으면 개발 모드에서 경고합니다.
+- 상태 문구는 `IdsProvider translate` 의 `stepper.completed`, `stepper.error` 입니다.

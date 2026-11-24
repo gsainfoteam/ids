@@ -13,7 +13,7 @@ class _EmptyMessages with IdsMessages {
   const _EmptyMessages();
 
   @override
-  String get spinnerLabel => '';
+  String get commonLoading => '';
 }
 
 Widget host(Widget child) =>

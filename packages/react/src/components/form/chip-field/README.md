@@ -85,11 +85,14 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 ## 개수 제한
 
 ```tsx
-<ChipField maxCount={3}>{items}</ChipField>
+<ChipField maxCount={3}>
+  {items}
+  <ChipField.Limit>최대 3개까지 고를 수 있습니다.</ChipField.Limit>
+</ChipField>
 ```
 
 - 제한에 닿으면 고르지 않은 옵션이 비활성이 되고, 새 값도 만들 수 없습니다.
-- 목록 위의 안내 문구는 live region 이라 스크린 리더가 읽습니다. `ChipField.Limit` 으로 바꿀 수 있습니다.
+- 안내 문구는 앱이 `ChipField.Limit` 의 자식으로 씁니다. 제한에 닿았을 때만 보이고, live region 이라 스크린 리더가 읽습니다. 쓰지 않으면 아무것도 그리지 않습니다.
 - 바깥에서 준 `value` 는 자르지 않습니다.
 
 ## 구성
@@ -123,6 +126,8 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 - `Input` 과 옵션 part 는 `asChild` 를 받습니다.
 - 칩이 줄을 넘으면 칩과 입력이 든 줄만 아래로 늘어나고, 꾸밈과 화살표는 오른쪽 열에서 세로 가운데에 남습니다. 줄 간격은 4px 입니다.
 - 칩은 `Chip` 이고 지우기 버튼은 `Chip.Close` 입니다.
+- `Empty` 와 `Limit` 은 자식만 그립니다. 쓰지 않으면 결과가 없을 때 목록이 그냥 비어 있습니다.
+- `Create` 의 기본 내용은 친 글자를 다듬은 값 그대로입니다. 문구를 붙이려면 자식에 함수를 줍니다.
 - 지우기 버튼에 포커스가 있으면 필드 테두리에 링이 그려지고 칩은 테마 색으로 칠해집니다. 버튼 자체에는 링을 그리지 않습니다.
 
 ## 옵션 직접 그리기
@@ -178,6 +183,7 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 - 입력을 클릭하거나 글자를 치면 열리고, 옵션을 골라도 열린 채로 남습니다.
 - 목록은 위나 아래에 옵션이 더 남으면 그 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)). 방향키로 옮긴 옵션은 흐린 띠 밖에 멈춥니다.
 - 640px 보다 좁은 화면에서 목록은 모달 하단 시트로 열립니다(`ChipField.Content` 의 `mobileVariant="drawer"`, 기본). `mobileVariant="popover"` 면 좁은 화면에서도 팝오버입니다. 필드의 입력이 시트 뒤로 가려지므로 시트 위에 같은 검색어를 쓰는 검색창이 있고, 닫으면 필드의 입력으로 포커스가 돌아옵니다.
+
 ```tsx
 <ChipField>
   <ChipField.Content mobileVariant="popover">{items}</ChipField.Content>
@@ -242,22 +248,22 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
 ## 속성
 
-| 속성                                    | 기본 / 동작                                                |
-| --------------------------------------- | ---------------------------------------------------------- |
-| `value` / `defaultValue`                | 중복 없는 `string[]` / `[]`                                |
-| `onValueChange`                         | 칩이 바뀔 때                                               |
-| `open` / `defaultOpen` / `onOpenChange` | 목록의 열림 상태                                           |
-| `validate`                              | 만들 값을 검사한다                                         |
-| `onCreate`                              | 주면 목록에 없는 값을 만든다. 값을 만들 때마다 불린다      |
-| `maxCount`                              | 0 이상 정수. 새로 고르기와 만들기를 막는다                 |
-| `removeLabel`                           | 칩 지우기 버튼 이름. 기본 `${label} 삭제`                  |
-| `variant`                               | `outline`(기본) / `soft` / `ghost`                         |
-| `size`                                  | `standard` / `tiny`. 생략하면 `Field` 크기                 |
-| `invalid`                               | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선 |
-| `disabled` / `readOnly`                 | 고르기, 만들기, 지우기를 막는다                            |
-| `name` / `form`                         | 칩마다 hidden input                                        |
-| `required`                              | 브라우저 검증                                              |
-| `ref`, 그 외 native 속성                | 검색 input. 기본 `placeholder="항목 추가…"`(칩이 없을 때만)            |
+| 속성                                    | 기본 / 동작                                                      |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `value` / `defaultValue`                | 중복 없는 `string[]` / `[]`                                      |
+| `onValueChange`                         | 칩이 바뀔 때                                                     |
+| `open` / `defaultOpen` / `onOpenChange` | 목록의 열림 상태                                                 |
+| `validate`                              | 만들 값을 검사한다                                               |
+| `onCreate`                              | 주면 목록에 없는 값을 만든다. 값을 만들 때마다 불린다            |
+| `maxCount`                              | 0 이상 정수. 새로 고르기와 만들기를 막는다                       |
+| `removeLabel`                           | 칩 지우기 버튼 이름. 기본 `${label} 삭제`                        |
+| `variant`                               | `outline`(기본) / `soft` / `ghost`                               |
+| `size`                                  | `standard` / `tiny`. 생략하면 `Field` 크기                       |
+| `invalid`                               | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선       |
+| `disabled` / `readOnly`                 | 고르기, 만들기, 지우기를 막는다                                  |
+| `name` / `form`                         | 칩마다 hidden input                                              |
+| `required`                              | 브라우저 검증                                                    |
+| `ref`, 그 외 native 속성                | 검색 input. `placeholder` 는 기본값이 없고 칩이 없을 때만 보인다 |
 
 ## 알아둘 것
 

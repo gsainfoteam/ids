@@ -443,7 +443,7 @@ test('copy writes the shown value and announces it', async (context) => {
         <input aria-label="Paste target" />
       </>,
     );
-    const button = page.getByRole('button', { name: '색상 값 복사' });
+    const button = page.getByRole('button', { name: '복사' });
     await expect.element(button).toHaveAttribute('data-variant', 'outline');
     await expect.element(button).toHaveAttribute('data-size', 'tiny');
     await userEvent.click(button);

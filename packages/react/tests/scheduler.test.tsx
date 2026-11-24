@@ -64,7 +64,15 @@ const inProvider = ({
   children?: (event: Scheduler.EventData) => ReactNode;
 } & Menus) => (
   <IdsProvider theme={testTheme}>
-    <Scheduler events={EVENTS} defaultDate={on(17)} now={NOW} {...props}>
+    <Scheduler
+      {...({
+        'aria-label': '일정표',
+        events: EVENTS,
+        defaultDate: on(17),
+        now: NOW,
+        ...props,
+      } as Scheduler.Props)}
+    >
       {children}
       {eventMenu && <Scheduler.EventMenu>{eventMenu}</Scheduler.EventMenu>}
       {slotMenu && <Scheduler.SlotMenu>{slotMenu}</Scheduler.SlotMenu>}
@@ -228,7 +236,7 @@ test('keyboard: Tab walks the toolbar and the event buttons in day and time orde
 
   const gridStop = FIREFOX_STOPS_ON_EVERY_SCROLLER ? [GRID_VIEWPORT] : [];
   const expected = [
-    '이전 주',
+    '지난주',
     '오늘',
     '다음 주',
     weekRange(on(15), on(21)),
@@ -644,6 +652,7 @@ test('pointer: a dropped event takes focus, the same as a keyboard drop', async 
     return (
       <IdsProvider theme={testTheme}>
         <Scheduler
+          aria-label="일정표"
           events={events}
           defaultDate={on(17)}
           defaultView="month"
@@ -859,9 +868,7 @@ test('keyboard: an event without onClick takes focus, Space picks it up and Esca
   await userEvent.keyboard('[Space]{ArrowUp}');
   await expect.element(screen.getByText(/오전 8:45 시작$/)).toBeInTheDocument();
   await userEvent.keyboard('{Escape}');
-  await expect
-    .element(screen.getByText('Algorithms을(를) 제자리에 두었습니다.'))
-    .toBeInTheDocument();
+  await expect.element(screen.getByText('제자리에 두었습니다: Algorithms')).toBeInTheDocument();
   expect(onEventChange).not.toHaveBeenCalled();
   expect(algo!.closest<HTMLElement>('[data-scheduler-movable]')!.style.translate).toBe('');
 });
@@ -995,7 +1002,7 @@ test('no event box covers another, so every end handle can be grabbed', async ()
 test('the date popup opens under a locale whose only -u- keyword is the week start', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme} locale="ko-KR-u-fw-mon">
-      <Scheduler events={EVENTS} defaultDate={on(17)} now={NOW} />
+      <Scheduler aria-label="일정표" events={EVENTS} defaultDate={on(17)} now={NOW} />
     </IdsProvider>,
   );
   await userEvent.click(screen.container.querySelector<HTMLElement>('[data-scheduler-range]')!);

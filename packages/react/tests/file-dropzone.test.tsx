@@ -17,11 +17,17 @@ test('limits are described up front, and a single file is listed with its previe
       accept="image/*,.pdf,application/x-zip"
       maxSize={5 * 1024 * 1024}
       defaultValue={file('cover.png', 'x', 'image/png')}
-    />,
+    >
+      <FileDropzone.Limits>
+        {({ accept, maxSize, maxCount }) =>
+          `${accept.join(', ')} · ${maxSize} · ${maxCount ?? '제한 없음'}`
+        }
+      </FileDropzone.Limits>
+    </FileDropzone>,
   );
   await expect
     .element(screen.getByRole('button', { name: 'Files', exact: true }))
-    .toHaveAccessibleDescription('이미지, PDF, ZIP · 파일당 최대 5 MB');
+    .toHaveAccessibleDescription('image/*, .pdf, application/x-zip · 5242880 · 제한 없음');
   expect(dropzoneRoot(screen.container)).not.toBeNull();
   expect(screen.container.querySelector('[data-file-field]')).toBeNull();
   const rows = screen.getByRole('listitem').elements();
@@ -35,12 +41,14 @@ test('limits are described up front, and a single file is listed with its previe
 });
 
 test('the trigger is the drop area and does not take the field focus marker', async () => {
-  const screen = await render(<FileDropzone aria-label="Files" variant="soft" />);
+  const screen = await render(
+    <FileDropzone aria-label="Files" variant="soft" placeholder="파일을 끌어다 놓으세요" />,
+  );
   const trigger = screen.getByRole('button', { name: 'Files', exact: true }).element();
   expect(trigger.hasAttribute('data-field-input')).toBe(false);
   expect(trigger.classList.contains('border-dashed')).toBe(true);
   expect(trigger.classList.contains('bg-neutral-soft')).toBe(true);
-  expect(trigger).toHaveTextContent('파일을 끌어다 놓거나 눌러서 고르세요');
+  expect(trigger).toHaveTextContent('파일을 끌어다 놓으세요');
 });
 
 test('its parts are the FileField parts under FileDropzone names', async () => {
@@ -56,9 +64,7 @@ test('its parts are the FileField parts under FileDropzone names', async () => {
     </FileDropzone>,
   );
   await expect.element(screen.getByRole('listitem').nth(1)).toMatchTextContent('b.pdf');
-  await expect
-    .element(screen.getByRole('button', { name: '파일 모두 지우기', exact: true }))
-    .toBeVisible();
+  await expect.element(screen.getByRole('button', { name: '지우기', exact: true })).toBeVisible();
 });
 
 test('a FileField part also works inside FileDropzone', async () => {

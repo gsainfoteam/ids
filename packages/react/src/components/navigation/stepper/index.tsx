@@ -25,6 +25,7 @@ import { StepperTrigger, type StepperTriggerProps, type StepperTriggerState } fr
 import { type StateRenderProps } from '../../../internal/state-props';
 
 import type { StepperStatus } from './step-state';
+import type { AccessibleName } from '../../../internal/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Stepper(props: Stepper.Props) {
@@ -46,6 +47,7 @@ export namespace Stepper {
     ComponentProps<'div'>,
     'children' | 'className' | 'style' | 'defaultValue' | 'onChange'
   > &
+    AccessibleName &
     StateRenderProps<State> & {
       value?: number;
       defaultValue?: number;

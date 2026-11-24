@@ -383,7 +383,7 @@ export const BlockValuesOutOfRange: Story = {
         <Field.Label>좌석 수</Field.Label>
         <NumberField name="seats" min={1} max={8} defaultValue={12} />
         <Field.Hint>1에서 8까지</Field.Hint>
-        <Field.Error />
+        <Field.Error match="customError">좌석은 1석에서 8석까지 고를 수 있습니다.</Field.Error>
       </Field>
       <Button type="submit">예약</Button>
     </form>
@@ -392,18 +392,18 @@ export const BlockValuesOutOfRange: Story = {
     docs: {
       description: {
         story:
-          '`min` 과 `max` 를 벗어난 값은 native 검증으로도 알립니다. 폼이 제출을 막고 `Field.Error` 가 이유를 보여 줍니다. 입력을 마치면 범위 안으로 맞춰집니다.',
+          '`min` 과 `max` 를 벗어난 값은 native 검증으로도 알립니다. 폼이 제출을 막고 `Field.Error match="customError"` 에 쓴 이유가 보입니다. 입력을 마치면 범위 안으로 맞춰집니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('spinbutton', { name: '좌석 수' });
     await userEvent.click(canvas.getByRole('button', { name: '예약' }));
-    await expect(await canvas.findByText('값은 8 이하여야 합니다.')).toBeVisible();
+    await expect(await canvas.findByText('좌석은 1석에서 8석까지 고를 수 있습니다.')).toBeVisible();
     await userEvent.click(input);
     await userEvent.keyboard('{ArrowDown}');
     await expect(input).toHaveValue('8');
-    await expect(canvas.queryByText('값은 8 이하여야 합니다.')).toBeNull();
+    await expect(canvas.queryByText('좌석은 1석에서 8석까지 고를 수 있습니다.')).toBeNull();
   },
 };
 

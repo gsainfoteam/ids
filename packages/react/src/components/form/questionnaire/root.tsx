@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ChevronLeftIcon } from '@heroicons/react/16/solid';
 import { flushSync } from 'react-dom';
 import { focusable } from 'tabbable';
 
@@ -27,14 +28,15 @@ import { QuestionnaireContext } from './context';
 import { QuestionnaireOption, type QuestionnaireOptionProps } from './option';
 import { QuestionnaireOther } from './other';
 import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './question';
+import { QuestionnaireSkip } from './skip';
 import { questionnaireStyle } from './style';
 import { QuestionnaireSubmit } from './submit';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils/children';
-import { Button } from '../../action/button';
 import { ButtonGroup } from '../../action/button-group';
+import { IconButton } from '../../action/icon-button';
 import { Progress } from '../../feedback/progress';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -62,6 +64,7 @@ const QUESTION = new Set<unknown>([QuestionnaireQuestion]);
 const OPTION = new Set<unknown>([QuestionnaireOption]);
 const OTHER = new Set<unknown>([QuestionnaireOther]);
 const SUBMIT = new Set<unknown>([QuestionnaireSubmit]);
+const SKIP = new Set<unknown>([QuestionnaireSkip]);
 
 function optionValuesIn(children: ReactNode): string[] {
   return flattenFragments(children).flatMap((node) => {
@@ -185,7 +188,9 @@ export function QuestionnaireRoot({
   const showsForward = current !== undefined && !opensTheNextStepOnSelect;
   const parts = flattenFragments(children);
   const isSubmit = (node: ReactNode) => isValidElement(node) && SUBMIT.has(elementTypeOf(node));
+  const isSkip = (node: ReactNode) => isValidElement(node) && SKIP.has(elementTypeOf(node));
   const submit = parts.find(isSubmit) ?? <QuestionnaireSubmit />;
+  const skipButton = parts.find(isSkip);
 
   return (
     <QuestionnaireContext.Provider
@@ -197,6 +202,7 @@ export function QuestionnaireRoot({
         draftOf,
         setDraft,
         advance,
+        skip,
         last,
         canLeaveCurrent: current !== undefined && canLeave(current, drafts),
       }}
@@ -222,7 +228,7 @@ export function QuestionnaireRoot({
             <Progress.Track className={styles.progressTrack()} />
           </Progress>
         )}
-        {parts.filter((node) => !isSubmit(node))}
+        {parts.filter((node) => !isSubmit(node) && !isSkip(node))}
         {(showsPrevious || showsSkip || showsForward) && (
           <ButtonGroup
             size="tiny"
@@ -231,20 +237,16 @@ export function QuestionnaireRoot({
           >
             <div className={styles.navigationItems()}>
               {showsPrevious && (
-                <Button
+                <IconButton
                   type="button"
                   variant="outline"
+                  aria-label={t('common.previous')}
+                  icon={<ChevronLeftIcon aria-hidden="true" />}
                   className={styles.previous()}
                   onClick={() => goTo(index - 1)}
-                >
-                  {t('questionnaire.previous')}
-                </Button>
+                />
               )}
-              {showsSkip && (
-                <Button type="button" variant="outline" onClick={skip}>
-                  {t('questionnaire.skip')}
-                </Button>
-              )}
+              {showsSkip && skipButton}
               {showsForward && submit}
             </div>
           </ButtonGroup>

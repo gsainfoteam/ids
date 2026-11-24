@@ -206,13 +206,13 @@ export const SubmitTheScoreWithAForm: Story = {
     docs: {
       description: {
         story:
-          '점수마다 `name` 을 가진 라디오라 고른 점수가 그대로 제출됩니다. 0점은 아무 라디오도 고르지 않은 것이라 항목이 없고, `required` 면 브라우저가 "점수를 선택하세요." 로 제출을 막습니다. 초기화도 브라우저가 합니다.',
+          '점수마다 `name` 을 가진 라디오라 고른 점수가 그대로 제출됩니다. 0점은 아무 라디오도 고르지 않은 것이라 항목이 없고, `required` 면 브라우저가 자기 필수 입력 문구로 제출을 막습니다. 초기화도 브라우저가 합니다.',
       },
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const radio = canvas.getByRole('radio', { name: '5점 만점에 1점' }) as HTMLInputElement;
-    await expect(radio.validationMessage).toBe('점수를 선택하세요.');
+    await expect(radio.validity.valueMissing).toBe(true);
     await userEvent.click(canvas.getByRole('radio', { name: '5점 만점에 4점' }));
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toHaveTextContent('[["score","4"]]');
