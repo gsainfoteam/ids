@@ -95,7 +95,13 @@ export function useInternalTextArea({
   const value = native.value != null ? String(native.value) : observed.value;
   const control = useInternalTextControl({ inputRef, disabled, readOnly });
 
-  const ref = useInternalMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertTextarea);
+  const ref = useInternalMergedRef(
+    inputRef,
+    childProps?.ref,
+    rootProps.ref,
+    own.ref,
+    assertTextarea,
+  );
 
   const inputProps = {
     ...native,

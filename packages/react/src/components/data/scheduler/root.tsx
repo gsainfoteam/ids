@@ -42,7 +42,10 @@ import { SchedulerToolbar } from './parts/toolbar';
 import { schedulerStyle } from './style';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
-import { useInternalRequiredName, type AccessibleName } from '../../../internal/lib/accessible-name';
+import {
+  useInternalRequiredName,
+  type AccessibleName,
+} from '../../../internal/lib/accessible-name';
 import { useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { validateDate } from '../calendar/lib/date';

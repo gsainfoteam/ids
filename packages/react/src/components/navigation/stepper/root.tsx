@@ -96,7 +96,10 @@ export function StepperRoot(props: Stepper.Props) {
     );
   }, [ignoredInARecord]);
 
-  useInternalRequiredName('Stepper', { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy });
+  useInternalRequiredName('Stepper', {
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+  });
 
   const styles = stepperStyle({ orientation, size, interactive, progress });
 

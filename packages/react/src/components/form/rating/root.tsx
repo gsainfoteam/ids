@@ -15,7 +15,10 @@ import { isCheckedScore, useInternalRating } from './hooks/use-rating';
 import { resolve, type StateProp } from './lib/state-prop';
 import { RatingItem, type RatingItemProps } from './parts/item';
 import { ratingStyle, type RatingOptionPlacement } from './style';
-import { hasAccessibleName, useInternalUnnamedWarning } from '../../../internal/lib/accessible-name';
+import {
+  hasAccessibleName,
+  useInternalUnnamedWarning,
+} from '../../../internal/lib/accessible-name';
 import { FormValue } from '../../../internal/parts/form-value';
 import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';

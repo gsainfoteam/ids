@@ -2,7 +2,10 @@
 
 import { type ChangeEvent, type ComponentProps, type KeyboardEvent } from 'react';
 
-import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../../internal/field-popup/parts/search';
+import {
+  FieldPopupSearch,
+  type FieldPopupSearchProps,
+} from '../../../../internal/field-popup/parts/search';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { mergeProps } from '../../../../utils';
 import { useInternalSelectContext } from '../context';

@@ -54,4 +54,8 @@ export namespace Resizable {
 export type ResizableProps = Resizable.Props;
 
 export { useResizable } from './hooks/use-resizable';
-export type { ResizableAxisOptions, ResizableInstance, UseResizableOptions } from './hooks/use-resizable';
+export type {
+  ResizableAxisOptions,
+  ResizableInstance,
+  UseResizableOptions,
+} from './hooks/use-resizable';

@@ -19,7 +19,9 @@ export function ColumnView({
   children,
   ...props
 }: Omit<TimePickerColumnProps, 'unit'> & { unit: TimeUnit }) {
-  const c = useInternalTimePickerContext(unit === 'period' ? 'TimePicker.Period' : 'TimePicker.Column');
+  const c = useInternalTimePickerContext(
+    unit === 'period' ? 'TimePicker.Period' : 'TimePicker.Column',
+  );
   const words = useInternalIntlWords(c.locale);
   const id = useId();
   const column = useInternalTimeColumn(c, unit);

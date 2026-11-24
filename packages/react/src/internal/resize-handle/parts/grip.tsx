@@ -17,8 +17,20 @@ import { flushSync } from 'react-dom';
 import { invariant, mergeProps } from '../../../utils';
 import { keyHandler, type KeyMap } from '../../lib/keys';
 import { useInternalIntlWords, useInternalTranslate } from '../../translate';
-import { axisKeyMap, readingDirection, useInternalAxesDrag, useInternalCornerShape } from '../hooks/use-resize-axes';
-import { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from '../lib/arc';
+import {
+  axisKeyMap,
+  readingDirection,
+  useInternalAxesDrag,
+  useInternalCornerShape,
+} from '../hooks/use-resize-axes';
+import {
+  GRIP_HALO,
+  GRIP_STROKE,
+  GRIP_TARGET,
+  gripArc,
+  type GripArc,
+  type ResizeBand,
+} from '../lib/arc';
 import { axisSeparatorProps, type ResizeAxis, type ResizeDimension } from '../lib/axis';
 import { resizeGripStyle } from '../style';
 

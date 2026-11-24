@@ -10,12 +10,26 @@ import {
 
 import { useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
 
-import { CommandContext, ItemContext, useInternalCommandContext, useInternalRadioContext } from '../context';
+import {
+  CommandContext,
+  ItemContext,
+  useInternalCommandContext,
+  useInternalRadioContext,
+} from '../context';
 import { withIndicator } from './indicator';
-import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../../internal/field-popup/parts/search';
+import {
+  FieldPopupSearch,
+  type FieldPopupSearchProps,
+} from '../../../../internal/field-popup/parts/search';
 import { ModalLayer, OverlayItemContext } from '../../../../internal/overlay';
 import { useInternalTranslate } from '../../../../internal/translate';
-import { buttonTypeFor, elementTypeOf, flattenFragments, mergeProps, part } from '../../../../utils';
+import {
+  buttonTypeFor,
+  elementTypeOf,
+  flattenFragments,
+  mergeProps,
+  part,
+} from '../../../../utils';
 import { isDevelopment } from '../../../../utils/dev';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { useInternalCommandOption, useInternalCommandPalette } from '../hooks/use-command';

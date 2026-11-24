@@ -1,4 +1,8 @@
-import { cornerExponent, cornerRadiusScale, insetClipPath } from '../../../../internal/lib/corner-shape';
+import {
+  cornerExponent,
+  cornerRadiusScale,
+  insetClipPath,
+} from '../../../../internal/lib/corner-shape';
 
 const PAGE_INSET = 26;
 const PAGE_DROP = 'calc(env(safe-area-inset-top) + 14px)';

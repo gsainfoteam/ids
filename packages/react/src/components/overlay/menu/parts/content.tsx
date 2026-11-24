@@ -25,7 +25,10 @@ import { menuStyle } from '../style';
 
 import type { Menu } from '..';
 
-function useInternalPlacement(level: MenuLevel, { side, align, sideOffset, alignOffset }: MenuPlacement) {
+function useInternalPlacement(
+  level: MenuLevel,
+  { side, align, sideOffset, alignOffset }: MenuPlacement,
+) {
   const { setPlacement } = level;
 
   useLayoutEffect(() => {
@@ -160,7 +163,12 @@ function NestedMenuContent({
   const { level } = useInternalMenuContext('Menu.Content');
   const parent = useInternalContentContext('Menu.Content');
 
-  useInternalPlacement(level, { side: side ?? awayFromParent(parent), align, sideOffset, alignOffset });
+  useInternalPlacement(level, {
+    side: side ?? awayFromParent(parent),
+    align,
+    sideOffset,
+    alignOffset,
+  });
 
   if (!level.mounted) return null;
 

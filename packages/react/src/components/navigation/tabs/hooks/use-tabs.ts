@@ -59,7 +59,11 @@ function useInternalKeptMounted() {
 
 type Counts = RefObject<Map<string, number>>;
 
-function useInternalMismatchWarnings(selected: string | undefined, triggers: Counts, contents: Counts) {
+function useInternalMismatchWarnings(
+  selected: string | undefined,
+  triggers: Counts,
+  contents: Counts,
+) {
   const warned = useRef(new Set<string>());
 
   useEffect(() => {

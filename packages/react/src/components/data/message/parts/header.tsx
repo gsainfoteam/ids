@@ -8,7 +8,8 @@ import { MessageTime } from './time';
 export type MessageHeaderProps = ComponentProps<'header'>;
 
 export function MessageHeader({ className, children, ...props }: MessageHeaderProps) {
-  const { styles, name, time, timeIn, status, labelId } = useInternalMessageContext('Message.Header');
+  const { styles, name, time, timeIn, status, labelId } =
+    useInternalMessageContext('Message.Header');
   const custom = children != null;
 
   return (

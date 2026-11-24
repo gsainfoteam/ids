@@ -19,7 +19,8 @@ export function SliderThumb({
   children,
   ...props
 }: SliderThumbProps) {
-  const { state, styles, min, max, dragging, thumbProps } = useInternalSliderContext('Slider.Thumb');
+  const { state, styles, min, max, dragging, thumbProps } =
+    useInternalSliderContext('Slider.Thumb');
   invariant(
     index >= 0 && index < state.values.length,
     `Slider.Thumb: index ${index} has no value; a range slider has thumbs 0 and 1.`,

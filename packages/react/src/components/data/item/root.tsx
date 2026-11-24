@@ -54,27 +54,28 @@ export function ItemRoot({
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
   const titleIsTheButton = interactive && !asChild && containsElementOfType(children, ITEM_TITLE);
-  const { interaction, props, dataProps, labelling, trigger, register } = useInternalItem<HTMLDivElement>({
-    interactive,
-    asChild,
-    disabled,
-    titleIsTheButton,
-    selected,
-    current: isCurrent(rest['aria-current']),
-    handlers: {
-      onClick,
-      onKeyDown,
-      onKeyUp,
-      onFocus,
-      onBlur,
-      onPointerEnter,
-      onPointerLeave,
-      onPointerDown,
-      onPointerUp,
-      onPointerCancel,
-      onInteractionChange,
-    },
-  });
+  const { interaction, props, dataProps, labelling, trigger, register } =
+    useInternalItem<HTMLDivElement>({
+      interactive,
+      asChild,
+      disabled,
+      titleIsTheButton,
+      selected,
+      current: isCurrent(rest['aria-current']),
+      handlers: {
+        onClick,
+        onKeyDown,
+        onKeyUp,
+        onFocus,
+        onBlur,
+        onPointerEnter,
+        onPointerLeave,
+        onPointerDown,
+        onPointerUp,
+        onPointerCancel,
+        onInteractionChange,
+      },
+    });
   const state: Item.State = { ...interaction, interactive, selected: selected === true };
   const styles = itemStyle({ variant, size: resolvedSize, interactive });
   const Root = asChild ? Slot : 'div';

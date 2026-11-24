@@ -24,7 +24,8 @@ export function QuestionnaireOption({
   className,
   children,
 }: QuestionnaireOptionProps) {
-  const { selectionMode, orientation, variant, size } = useInternalQuestionContext('Questionnaire.Option');
+  const { selectionMode, orientation, variant, size } =
+    useInternalQuestionContext('Questionnaire.Option');
   const styles = questionnaireStyle({ orientation, size });
   const Control = selectionMode === 'single' ? Radio : Checkbox;
 

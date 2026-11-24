@@ -476,7 +476,11 @@ export function EditorRoot(props: Editor.Props) {
     writeValue(editor, defaultValue, format, uploaded);
   });
 
-  const empty = useInternalEditorSelector(editor, (instance) => instance.isEmpty, isEmptyValue(current));
+  const empty = useInternalEditorSelector(
+    editor,
+    (instance) => instance.isEmpty,
+    isEmptyValue(current),
+  );
 
   const submitted = formText(current, empty);
   useLayoutEffect(() => {

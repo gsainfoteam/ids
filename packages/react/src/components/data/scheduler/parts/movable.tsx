@@ -11,7 +11,12 @@ import { useInternalTranslate } from '../../../../internal/translate';
 import { invariant, mergeRefs } from '../../../../utils';
 import { Resizable, useResizable } from '../../../layout/resizable';
 import { SchedulerContext, SchedulerDragContext } from '../context';
-import { HOURS_IN_DAY, SHORTEST_SHOWN_HOURS, SNAP_MINUTES, type SchedulerSegment } from '../lib/layout';
+import {
+  HOURS_IN_DAY,
+  SHORTEST_SHOWN_HOURS,
+  SNAP_MINUTES,
+  type SchedulerSegment,
+} from '../lib/layout';
 
 import type { CalendarDate } from '@internationalized/date';
 
