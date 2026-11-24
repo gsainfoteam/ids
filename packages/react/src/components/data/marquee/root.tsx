@@ -1,16 +1,15 @@
 'use client';
 
-import { isValidElement, useEffect, type CSSProperties, type ReactNode } from 'react';
+import { isValidElement, type CSSProperties, type ReactNode } from 'react';
 
 import { MarqueeContext } from './context';
 import { useInternalMarquee } from './hooks/use-marquee';
-import { isValidSpeed, loopDuration } from './lib/speed';
+import { useInternalMarqueePlaying } from './hooks/use-marquee-playing';
+import { useInternalMarqueeWarnings } from './hooks/use-marquee-warnings';
+import { loopDuration } from './lib/speed';
 import { MarqueePause } from './parts/pause';
 import { marqueeStyle, type MarqueeOrientation } from './style';
-import { useControllableState } from '../../../hooks/use-controllable-state';
-import { useInternalReducedMotion } from '../../../hooks/use-reduced-motion';
 import { elementTypeOf, flattenFragments } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { Marquee, MarqueeDirection } from '.';
 
@@ -36,15 +35,13 @@ export function MarqueeRoot({
   children,
   ...rest
 }: Marquee.Props) {
-  const reduced = useInternalReducedMotion();
+  const { reduced, playing, setPlaying } = useInternalMarqueePlaying({
+    playing: playingProp,
+    defaultPlaying,
+    onPlayingChange,
+  });
   const orientation = orientationOf(direction);
   const reverse = runsBackward(direction);
-  const [chosen, setChosen] = useControllableState<boolean | undefined>({
-    value: playingProp,
-    defaultValue: defaultPlaying,
-    onValueChange: onPlayingChange as ((playing: boolean | undefined) => void) | undefined,
-  });
-  const playing = !reduced && (chosen ?? true);
 
   const { setTrack, length, viewportProps } = useInternalMarquee({
     orientation,
@@ -57,15 +54,7 @@ export function MarqueeRoot({
   const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
   const named = hasText(rest['aria-label']) || rest['aria-labelledby'] != null;
 
-  useEffect(() => {
-    if (!isDevelopment) return;
-    if (!named)
-      console.warn(
-        '[IDS] Marquee: give it an aria-label that says what flows by, such as "Partners".',
-      );
-    if (!isValidSpeed(speed))
-      console.warn('[IDS] Marquee: speed must be a positive number of pixels per second.');
-  }, [named, speed]);
+  useInternalMarqueeWarnings(named, speed);
 
   const styles = marqueeStyle({
     orientation,
@@ -81,7 +70,7 @@ export function MarqueeRoot({
   const duration = { '--marquee-duration': loopDuration(length, speed) } as CSSProperties;
 
   return (
-    <MarqueeContext value={{ styles, size, playing, setPlaying: setChosen }}>
+    <MarqueeContext value={{ styles, size, playing, setPlaying }}>
       <div
         {...rest}
         role="group"

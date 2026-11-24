@@ -1,11 +1,10 @@
 'use client';
 
-import { useCallback, useRef, type ComponentProps, type CSSProperties } from 'react';
+import type { ComponentProps, CSSProperties } from 'react';
 
-import { useInternalImageSettledBeforeMount } from '../../../../internal/hooks/use-image-settled-before-mount';
 import { resolveState, type StateValue } from '../../../../internal/lib/state-props';
-import { mergeRefs } from '../../../../utils';
 import { useInternalAvatarContext } from '../context';
+import { useInternalAvatarPicture } from '../hooks/use-avatar-picture';
 
 import type { Avatar } from '..';
 
@@ -29,12 +28,7 @@ export function AvatarImage({
 }: AvatarImageProps) {
   const { state, imageSrc, report, styles } = useInternalAvatarContext('Avatar.Image');
   const current = src || imageSrc;
-  const imageRef = useRef<HTMLImageElement>(null);
-  const mergedRef = useCallback(
-    (node: HTMLImageElement | null) => mergeRefs(imageRef, ref)(node),
-    [ref],
-  );
-  useInternalImageSettledBeforeMount(imageRef, current, report);
+  const mergedRef = useInternalAvatarPicture(current, report, ref);
 
   if (!current || state.status === 'error') return null;
   return (

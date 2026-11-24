@@ -1,15 +1,15 @@
 'use client';
 
-import { isValidElement, use, useEffect, type ReactElement } from 'react';
+import { isValidElement, use, type ReactElement } from 'react';
 
 import { AvatarContext, AvatarCutoutContext, AvatarGroupContext } from './context';
+import { useInternalAvatarNameWarning } from './hooks/use-avatar-name-warning';
 import { AvatarFallback } from './parts/fallback';
 import { AvatarImage, type AvatarImageProps } from './parts/image';
 import { avatarStyle } from './style';
 import { useInternalImageStatus } from '../../../internal/hooks/use-image-status';
 import { resolveState } from '../../../internal/lib/state-props';
 import { elementTypeOf, flattenFragments } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { Avatar } from '.';
 
@@ -45,12 +45,7 @@ export function AvatarRoot({
 
   const decorative = alt === '' || ariaHidden === true || ariaHidden === 'true';
   const label = [ariaLabel, alt, name].find((candidate) => candidate?.trim());
-  useEffect(() => {
-    if (isDevelopment && !decorative && label === undefined)
-      console.warn(
-        '[IDS] Avatar: pass name, alt or aria-label so it has an accessible name, or alt="" when it is decorative.',
-      );
-  }, [decorative, label]);
+  useInternalAvatarNameWarning(decorative, label);
 
   const state: Avatar.State = { status, size: resolvedSize };
   const styles = avatarStyle({ size: resolvedSize, cutout: cutout ?? 'none' });

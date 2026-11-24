@@ -3,7 +3,6 @@
 import {
   cloneElement,
   isValidElement,
-  useEffect,
   type ComponentProps,
   type ReactElement,
   type ReactNode,
@@ -15,8 +14,8 @@ import { DialogFooter } from './footer';
 import { DialogHeader } from './header';
 import { ModalLayer, OverlayItemContext } from '../../../../internal/overlay';
 import { elementTypeOf, flattenFragments } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
 import { ScrollArea } from '../../../layout/scroll-area';
+import { useInternalDialogNameWarning } from '../hooks/use-dialog-name-warning';
 
 export type DialogContentProps = ComponentProps<'div'>;
 
@@ -67,19 +66,7 @@ function DialogPopup({ className, style, children, ...props }: DialogContentProp
   const { dialog, styles, overlay } = c;
   const { ids, position, ending, open, content } = dialog;
 
-  useEffect(() => {
-    if (!isDevelopment || !content) return;
-
-    const named =
-      content.hasAttribute('aria-label') ||
-      !!props['aria-labelledby'] ||
-      !!content.querySelector('[data-dialog-title]');
-
-    if (!named)
-      console.warn(
-        '[IDS] Dialog: add Dialog.Title, or aria-label on Dialog.Content, so screen readers can name the dialog.',
-      );
-  }, [content, props]);
+  useInternalDialogNameWarning(content, props);
 
   const { body, footer, corner } = splitOffTheFooter(children);
 

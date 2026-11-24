@@ -1,9 +1,10 @@
 'use client';
 
-import { Children, useCallback, type ComponentProps } from 'react';
+import { Children, type ComponentProps } from 'react';
 
 import { mergeRefs } from '../../../../utils';
 import { useInternalAreaContext } from '../context';
+import { useInternalScrollAreaCornerRegister } from '../hooks/use-scroll-area-corner-register';
 import { scrollAreaStyle } from '../style';
 
 export type ScrollAreaCornerProps = ComponentProps<'div'>;
@@ -12,16 +13,12 @@ export function ScrollAreaCorner({ className, children, ref, ...props }: ScrollA
   const c = useInternalAreaContext('ScrollArea.Corner');
   const occupied = Children.count(children) > 0;
 
-  const registerCorner = c?.area.registerCorner;
-  const vertical = c?.placements.y;
-  const horizontal = c?.placements.x;
-  const register = useCallback(
-    (node: HTMLDivElement | null) =>
-      node && occupied && registerCorner && vertical && horizontal
-        ? registerCorner(node, { x: horizontal, y: vertical })
-        : undefined,
-    [occupied, registerCorner, vertical, horizontal],
-  );
+  const register = useInternalScrollAreaCornerRegister({
+    occupied,
+    registerCorner: c?.area.registerCorner,
+    vertical: c?.placements.y,
+    horizontal: c?.placements.x,
+  });
 
   if (!c) return null;
 

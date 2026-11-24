@@ -1,30 +1,20 @@
 'use client';
 
-import {
-  isValidElement,
-  use,
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { isValidElement, use, type ReactElement, type ReactNode } from 'react';
 
 import { ImageContext, ImageGroupContext } from './context';
-import { useInternalImageGroup, type ImageItem, type NaturalSize } from './hooks/use-image-group';
+import { useInternalImageAltWarning } from './hooks/use-image-alt-warning';
+import { useInternalImageGroup } from './hooks/use-image-group';
+import { useInternalImagePicture } from './hooks/use-image-picture';
+import { useInternalImagePreview } from './hooks/use-image-preview';
+import { aspectOf } from './lib/image-size';
 import { ImageFallback } from './parts/fallback';
 import { ImagePlaceholder } from './parts/placeholder';
 import { ImageViewer, preloadImageViewer } from './parts/viewer';
 import { imageStyle } from './style';
-import { useInternalImageSettledBeforeMount } from '../../../internal/hooks/use-image-settled-before-mount';
-import { useInternalImageStatus } from '../../../internal/hooks/use-image-status';
 import { resolveState } from '../../../internal/lib/state-props';
 import { useInternalTranslate } from '../../../internal/translate';
-import { elementTypeOf, flattenFragments, mergeRefs } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { AspectRatio } from '../../layout/aspect-ratio';
 
 import type { Image } from '.';
@@ -35,17 +25,6 @@ const isPart =
   (part: unknown) =>
   (node: ReactNode): node is ReactElement =>
     isValidElement(node) && elementTypeOf(node) === part;
-
-function aspectOf(width: number | string | undefined, height: number | string | undefined) {
-  const across = Number(width);
-  const down = Number(height);
-  return across > 0 && down > 0 ? across / down : undefined;
-}
-
-function loadedSizeOf(image: HTMLImageElement | null): NaturalSize | undefined {
-  if (!image?.complete || image.naturalWidth === 0) return undefined;
-  return { width: image.naturalWidth, height: image.naturalHeight };
-}
 
 const warmTheViewer = () => void preloadImageViewer();
 
@@ -97,63 +76,30 @@ function ImageFrame({
   children,
   ...rest
 }: Image.Props & { preview: boolean }) {
-  const group = use(ImageGroupContext);
   const t = useInternalTranslate();
-  const key = useId();
   const name = alt ?? '';
 
   const current = src || undefined;
-  const { status, report } = useInternalImageStatus(current, onStatusChange);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const mergedRef = useCallback(
-    (node: HTMLImageElement | null) => mergeRefs(imageRef, ref)(node),
-    [ref],
+  const { status, report, imageRef, mergedRef } = useInternalImagePicture(
+    current,
+    onStatusChange,
+    ref,
   );
-  useInternalImageSettledBeforeMount(imageRef, current, report);
-
-  const [frame, setFrame] = useState<HTMLElement | null>(null);
-  const [trigger, setTrigger] = useState<HTMLButtonElement | null>(null);
-  const shown = previewSrc || current;
-  const previewable = preview && group !== null && shown !== undefined;
-  const register = group?.register;
-
-  const itemNow = (): ImageItem => ({
-    src: shown ?? '',
-    srcSet: previewSrc ? undefined : srcSet,
-    sizes: undefined,
-    thumbnail: current,
-    thumbnailSize: loadedSizeOf(imageRef.current),
+  const { previewable, expanded, setFrame, setTrigger, openViewer } = useInternalImagePreview({
+    preview,
+    current,
+    previewSrc,
+    srcSet,
     alt: name,
     caption,
     crossOrigin,
     referrerPolicy,
+    imageRef,
   });
-  const latestItem = useRef(itemNow);
-  useLayoutEffect(() => {
-    latestItem.current = itemNow;
-  });
-
-  useLayoutEffect(() => {
-    if (!previewable || !register || !frame) return;
-    return register({ key, element: frame, trigger, item: () => latestItem.current() });
-  }, [previewable, register, key, frame, trigger]);
-
-  useEffect(() => {
-    if (!isDevelopment) return;
-    if (alt === undefined)
-      console.warn(
-        '[IDS] Image: pass alt. Say what the picture shows, or pass alt="" when it only decorates the page.',
-      );
-    else if (previewable && alt.trim() === '')
-      console.warn(
-        '[IDS] Image: an image that opens the viewer needs an alt that says what it shows.',
-      );
-  }, [alt, previewable]);
+  useInternalImageAltWarning(alt, previewable);
 
   const state: Image.State = { status, preview: previewable };
   const styles = imageStyle();
-  const index = group?.entries.findIndex((entry) => entry.key === key) ?? -1;
-  const expanded = previewable && group !== null && group.open && index === group.value;
 
   const nodes = flattenFragments(children);
   const placeholder = nodes.find(isPart(ImagePlaceholder)) ?? <ImagePlaceholder />;
@@ -207,7 +153,7 @@ function ImageFrame({
       className={styles.trigger()}
       onPointerEnter={warmTheViewer}
       onFocus={warmTheViewer}
-      onClick={() => group?.openAt(key)}
+      onClick={openViewer}
     >
       {picture}
     </button>

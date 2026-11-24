@@ -17,6 +17,16 @@ export const sameSize = (a: number, b: number) => compare(a, b) === 0;
 
 const sum = (sizes: readonly number[]) => sizes.reduce((total, size) => total + size, 0);
 
+export function defaultTotalOf(
+  defaultValue: readonly number[] | undefined,
+  panels: ReadonlyArray<{ defaultSize?: number }>,
+) {
+  const given = (defaultValue ?? panels.map((panel) => panel.defaultSize)).filter(
+    (size): size is number => size !== undefined,
+  );
+  return sum(given);
+}
+
 const smallestOf = (panel: PanelConstraints) =>
   panel.collapsible ? Math.min(panel.collapsedSize, panel.minSize) : panel.minSize;
 

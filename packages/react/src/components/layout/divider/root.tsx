@@ -3,14 +3,11 @@
 import { isValidElement, useId } from 'react';
 
 import { dividerStyle } from './style';
+import { resolveState } from '../../../internal/lib/state-props';
 import { invariant, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Divider } from '.';
-
-function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
 
 export function DividerRoot({
   orientation = 'horizontal',
@@ -51,8 +48,8 @@ export function DividerRoot({
     'data-orientation': orientation,
     'data-labelled': labelled ? '' : undefined,
     'data-align': labelled ? align : undefined,
-    className: root({ className: resolve(className, state) }),
-    style: resolve(style, state),
+    className: root({ className: resolveState(className, state) }),
+    style: resolveState(style, state),
   };
 
   if (asChild)

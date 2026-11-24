@@ -1,19 +1,17 @@
 'use client';
 
-import { useLayoutEffect, type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 import { Slot } from '../../../utility/slot';
 import { useInternalPopoverContext } from '../context';
+import { useInternalPopoverPartPresence } from '../hooks/use-popover-part-presence';
 
 export type PopoverDescriptionProps = ComponentProps<'p'> & { asChild?: boolean };
 
 export function PopoverDescription({ asChild, className, ...props }: PopoverDescriptionProps) {
   const { styles, popover, setDescribed } = useInternalPopoverContext('Popover.Description');
 
-  useLayoutEffect(() => {
-    setDescribed(true);
-    return () => setDescribed(false);
-  }, [setDescribed]);
+  useInternalPopoverPartPresence(setDescribed);
 
   const Root = asChild ? Slot : 'p';
 

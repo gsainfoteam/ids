@@ -1,8 +1,9 @@
 'use client';
 
-import { use, useCallback, type ComponentProps, type ReactNode } from 'react';
+import { use, type ComponentProps, type ReactNode } from 'react';
 
 import { PlacementContext, ScrollbarContext, useInternalAreaContext } from '../context';
+import { useInternalScrollAreaBarRegister } from '../hooks/use-scroll-area-bar-register';
 import { axisOf } from '../lib/orientation';
 import { scrollAreaStyle } from '../style';
 import { ScrollAreaThumb } from './thumb';
@@ -25,13 +26,8 @@ export function ScrollAreaScrollbar({
   const c = useInternalAreaContext('ScrollArea.Scrollbar');
   const placement = use(PlacementContext);
   const axis = axisOf(orientation);
-  const registerBar = c?.area.registerBar;
 
-  const register = useCallback(
-    (node: HTMLDivElement | null) =>
-      node && registerBar ? registerBar(axis, node, placement) : undefined,
-    [registerBar, axis, placement],
-  );
+  const register = useInternalScrollAreaBarRegister(c?.area.registerBar, axis, placement);
 
   if (!c) return null;
 
