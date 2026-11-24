@@ -1,18 +1,18 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { DataTableCaption, type DataTableCaptionProps } from './caption';
-import { DataTableContent, type DataTableContentProps } from './content';
-import { DataTableEmpty, type DataTableEmptyProps } from './empty';
 import {
   createDataTableColumnHelper,
   type DataTableColumnDef,
   type DataTableColumnMeta,
   type DataTableFeatures,
-} from './features';
-import { DataTablePagination, type DataTablePaginationProps } from './pagination';
+} from './lib/features';
+import { DataTableCaption, type DataTableCaptionProps } from './parts/caption';
+import { DataTableContent, type DataTableContentProps } from './parts/content';
+import { DataTableEmpty, type DataTableEmptyProps } from './parts/empty';
+import { DataTablePagination, type DataTablePaginationProps } from './parts/pagination';
+import { DataTableToolbar, type DataTableToolbarProps } from './parts/toolbar';
 import { DataTableRoot } from './root';
 import { dataTableStyle, type DataTableVariant } from './style';
-import { DataTableToolbar, type DataTableToolbarProps } from './toolbar';
 
 import type {
   DataTableColumnSizingOptions,
@@ -21,7 +21,7 @@ import type {
   DataTableSelectionOptions,
   DataTableSortingOptions,
   UseDataTableOptions,
-} from './use-data-table';
+} from './hooks/use-data-table';
 import type { IdsSize } from '../../../tokens/types';
 import type {
   CellData,
@@ -108,7 +108,7 @@ export namespace DataTable {
   export const Style = dataTableStyle;
 }
 
-export { useDataTable } from './use-data-table';
+export { useDataTable } from './hooks/use-data-table';
 export type DataTableProps<TData extends RowData> = DataTable.Props<TData>;
 export type {
   DataTableColumnSizingOptions,
@@ -117,6 +117,6 @@ export type {
   DataTableSelectionOptions,
   DataTableSortingOptions,
   UseDataTableOptions,
-} from './use-data-table';
+} from './hooks/use-data-table';
 export type { DataTableVariant } from './style';
-export type { DataTableColumnDef, DataTableColumnMeta, DataTableFeatures } from './features';
+export type { DataTableColumnDef, DataTableColumnMeta, DataTableFeatures } from './lib/features';

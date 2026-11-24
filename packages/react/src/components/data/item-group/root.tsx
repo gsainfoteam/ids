@@ -5,7 +5,7 @@ import { Children, isValidElement } from 'react';
 import { itemGroupStyle } from './style';
 import { elementTypeOf, mergeRefs } from '../../../utils';
 import { ItemGroupContext } from '../item/context';
-import { ItemSeparator } from '../item/separator';
+import { ItemSeparator } from '../item/parts/separator';
 
 import type { ItemGroup } from '.';
 

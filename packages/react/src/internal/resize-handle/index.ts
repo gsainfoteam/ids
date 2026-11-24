@@ -11,33 +11,40 @@ export {
   type ResizeOrientation,
   type ResizeRange,
   type SeparatorOptions,
-} from './axis';
-export { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from './arc';
-export { ResizeEdge, type ResizeEdgeProps } from './edge';
-export { ResizeGrip, type ResizeGripProps } from './grip';
+} from './lib/axis';
+export {
+  GRIP_HALO,
+  GRIP_STROKE,
+  GRIP_TARGET,
+  gripArc,
+  type GripArc,
+  type ResizeBand,
+} from './lib/arc';
+export { ResizeEdge, type ResizeEdgeProps } from './parts/edge';
+export { ResizeGrip, type ResizeGripProps } from './parts/grip';
 export {
   endEndCornerExponent,
   innerEndEndRadius,
   isRightToLeft,
   measureAxis,
   type MeasuredAxis,
-} from './measure';
+} from './lib/measure';
 export { resizeEdgeStyle, resizeGripStyle, resizeHandle } from './style';
 export {
   axisKeyMap,
   currentRange,
   readingDirection,
-  useAxesDrag,
-  useAxisSeparator,
-  useCornerShape,
+  useInternalAxesDrag,
+  useInternalAxisSeparator,
+  useInternalCornerShape,
   type CornerShape,
-  useMeasuredAxes,
+  useInternalMeasuredAxes,
   type AxesDragOptions,
   type MeasuredAxes,
-} from './use-resize-axes';
+} from './hooks/use-resize-axes';
 export {
-  useResizeDrag,
+  useInternalResizeDrag,
   type ResizeDelta,
   type ResizeDragAxes,
   type UseResizeDragOptions,
-} from './use-resize-drag';
+} from './hooks/use-resize-drag';

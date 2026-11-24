@@ -8,7 +8,7 @@ import { paletteHues, palettes } from '../.storybook/palettes';
 import { Button, ButtonGroup, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
-import { TEXT_LC, lightnessContrast } from '../src/components/utility/ids-provider/contrast';
+import { TEXT_LC, lightnessContrast } from '../src/components/utility/ids-provider/lib/contrast';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 

@@ -1,12 +1,12 @@
 'use client';
 
 import { ProgressContext } from './context';
-import { ProgressIndicator } from './indicator';
-import { ProgressLabel } from './label';
-import { resolve } from './part-props';
+import { isPart, useInternalProgressRoot } from './hooks/use-progress';
+import { resolve } from './lib/part-props';
+import { ProgressIndicator } from './parts/indicator';
+import { ProgressLabel } from './parts/label';
+import { ProgressTrack } from './parts/track';
 import { progressStyle } from './style';
-import { ProgressTrack } from './track';
-import { isPart, useProgressRoot } from './use-progress';
 
 import type { Progress } from '.';
 
@@ -27,7 +27,7 @@ export function ProgressRoot({
   'aria-valuetext': ariaValueText,
   ...rest
 }: Progress.Props) {
-  const { progress, nodes, labelId, progressbar } = useProgressRoot(
+  const { progress, nodes, labelId, progressbar } = useInternalProgressRoot(
     {
       value,
       max,

@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react';
 
-import { useTranslate } from '../../../../internal/translate';
-import { EditorGlyphButton } from '../glyph-button';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { editorMessages } from '../messages-catalog';
+import { EditorGlyphButton } from '../parts/glyph-button';
 import { editorStyle } from '../style';
 
 import type { EditorDetailsOptions } from './node';
@@ -18,7 +18,7 @@ export function EditorDetailsView({
   extension,
   updateAttributes,
 }: ReactNodeViewProps) {
-  const t = useTranslate(editorMessages);
+  const t = useInternalTranslate(editorMessages);
   const styles = editorStyle({ size: (extension.options as EditorDetailsOptions).size });
   const [openWhileReading, setOpenWhileReading] = useState<boolean | null>(null);
   const open = (editor.isEditable ? null : openWhileReading) ?? Boolean(node.attrs.open);

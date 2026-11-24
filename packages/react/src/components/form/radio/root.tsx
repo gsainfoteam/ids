@@ -2,12 +2,12 @@
 
 import { createContext, use, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
+import { useInternalRadio } from './hooks/use-radio';
 import { radioStyle } from './style';
-import { useRadio } from './use-radio';
 import { invariant } from '../../../utils';
 import { Slot } from '../../utility/slot';
 import { useFieldSize } from '../field/context';
-import { useRadioGroupContext } from '../radio-group/context';
+import { useInternalRadioGroupContext } from '../radio-group/context';
 
 import type { Radio } from '.';
 import type { IdsSize } from '../../../tokens/types';
@@ -87,7 +87,7 @@ export function RadioRoot({
   onPointerCancel,
   ...inputProps
 }: RadioProps) {
-  const group = useRadioGroupContext();
+  const group = useInternalRadioGroupContext();
   invariant(group === null || value !== undefined, 'A Radio inside RadioGroup needs a `value`.');
   invariant(
     group === null || (checkedProp === undefined && defaultChecked === undefined),
@@ -103,7 +103,7 @@ export function RadioRoot({
   const isDisabled = Boolean(disabled) || Boolean(group?.disabled);
   const isReadOnly = readOnly || Boolean(group?.readOnly);
 
-  const { checked, controlled, interaction, inputRef, handlers } = useRadio({
+  const { checked, controlled, interaction, inputRef, handlers } = useInternalRadio({
     checked: group ? group.value === value : checkedProp,
     defaultChecked,
     onCheckedChange: (next) => {

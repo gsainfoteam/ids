@@ -1,14 +1,14 @@
 import { type ReactNode } from 'react';
 
-import { PopoverArrow, type PopoverArrowProps } from './arrow';
-import { PopoverClose, type PopoverCloseProps } from './close';
-import { PopoverContent, type PopoverContentProps } from './content';
-import { PopoverDescription, type PopoverDescriptionProps } from './description';
+import { type PopoverAnchor, type PopoverTriggerType } from './hooks/use-popover';
+import { PopoverArrow, type PopoverArrowProps } from './parts/arrow';
+import { PopoverClose, type PopoverCloseProps } from './parts/close';
+import { PopoverContent, type PopoverContentProps } from './parts/content';
+import { PopoverDescription, type PopoverDescriptionProps } from './parts/description';
+import { PopoverTitle, type PopoverTitleProps } from './parts/title';
+import { PopoverTrigger, type PopoverTriggerProps } from './parts/trigger';
 import { PopoverRoot } from './root';
 import { popoverStyle } from './style';
-import { PopoverTitle, type PopoverTitleProps } from './title';
-import { PopoverTrigger, type PopoverTriggerProps } from './trigger';
-import { type PopoverAnchor, type PopoverTriggerType } from './use-popover';
 
 import type { AnchoredAlign, AnchoredSide } from '../../../internal/overlay';
 

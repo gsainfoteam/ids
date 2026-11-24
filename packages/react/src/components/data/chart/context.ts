@@ -4,8 +4,8 @@ import { createContext, use, type RefObject } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { ChartConfig } from './config';
-import type { ChartTableModel } from './graph';
+import type { ChartConfig } from './lib/config';
+import type { ChartTableModel } from './lib/graph';
 import type { chartStyle } from './style';
 
 type Context = {
@@ -20,7 +20,7 @@ type Context = {
 
 export const ChartContext = createContext<Context | null>(null);
 
-export function useChartContext(part: string) {
+export function useInternalChartContext(part: string) {
   const context = use(ChartContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Chart>\`.`);
   return context;

@@ -1,4 +1,4 @@
-import { RatingItem, type RatingItemProps } from './item';
+import { RatingItem, type RatingItemProps } from './parts/item';
 import { RatingRoot, type RatingState, type RatingItemState, type RatingProps } from './root';
 import { ratingStyle } from './style';
 

@@ -5,11 +5,11 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { Dialog } from '.';
+import type { useInternalDialog } from './hooks/use-dialog';
 import type { dialogStyle } from './style';
-import type { useDialog } from './use-dialog';
 
 type DialogContextValue = {
-  dialog: ReturnType<typeof useDialog>;
+  dialog: ReturnType<typeof useInternalDialog>;
   role: Dialog.Role;
   dismissible: boolean;
   overlay: Dialog.Overlay.Props | undefined;
@@ -22,7 +22,7 @@ type DialogContextValue = {
 
 export const DialogContext = createContext<DialogContextValue | null>(null);
 
-export function useDialogContext(part: string) {
+export function useInternalDialogContext(part: string) {
   const context = use(DialogContext);
   invariant(context, `${part} must be rendered inside Dialog.`);
   return context;

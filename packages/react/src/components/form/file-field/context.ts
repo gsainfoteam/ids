@@ -5,15 +5,15 @@ import { createContext, use, type ReactNode } from 'react';
 import { invariant } from '../../../utils';
 
 import type { FileFieldState } from '.';
-import type { FileFieldRejection } from './file-rules';
-import type { FileFieldLimits } from './limits';
+import type { useInternalFileField } from './hooks/use-file-field';
+import type { FileFieldRejection } from './lib/file-rules';
+import type { FileFieldLimits } from './parts/limits';
 import type { filePartsStyle } from './style';
-import type { useFileField } from './use-file-field';
 import type { IdsSize } from '../../../tokens/types';
 
 type FileFieldContextValue = {
   owner: 'FileField' | 'FileDropzone';
-  field: Omit<ReturnType<typeof useFileField>, 'rootRef' | 'pickerRef' | 'triggerRef'>;
+  field: Omit<ReturnType<typeof useInternalFileField>, 'rootRef' | 'pickerRef' | 'triggerRef'>;
   state: FileFieldState;
   size: IdsSize;
   placeholder: ReactNode;
@@ -28,7 +28,7 @@ export const FileContext = createContext<FileFieldContextValue | null>(null);
 export const FileRowContext = createContext(false);
 export const FileRejectionContext = createContext<FileFieldRejection | null>(null);
 
-export function useFile(part: string) {
+export function useInternalFile(part: string) {
   const context = use(FileContext);
   invariant(context, `${part} must be rendered inside FileField or FileDropzone.`);
 

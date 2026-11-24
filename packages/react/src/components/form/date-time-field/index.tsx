@@ -1,8 +1,8 @@
 import { type CalendarDateTime } from '@internationalized/date';
 
-import { DateTimeFieldCalendar, type DateTimeFieldCalendarProps } from './calendar';
+import { DateTimeFieldCalendar, type DateTimeFieldCalendarProps } from './parts/calendar';
+import { DateTimeFieldTimePicker, type DateTimeFieldTimePickerProps } from './parts/time-picker';
 import { DateTimeFieldRoot, type DateTimeFieldProps } from './root';
-import { DateTimeFieldTimePicker, type DateTimeFieldTimePickerProps } from './time-picker';
 import {
   TemporalClear,
   TemporalContent,
@@ -45,5 +45,5 @@ export namespace DateTimeField {
 }
 
 export type { DateTimeFieldProps } from './root';
-export type { DateTimeFieldCalendarProps } from './calendar';
-export type { DateTimeFieldTimePickerProps } from './time-picker';
+export type { DateTimeFieldCalendarProps } from './parts/calendar';
+export type { DateTimeFieldTimePickerProps } from './parts/time-picker';

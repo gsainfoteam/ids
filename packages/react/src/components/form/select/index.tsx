@@ -1,10 +1,14 @@
-import { SelectClear, type SelectClearProps } from './clear';
-import { SelectContent, type SelectContentProps } from './content';
-import { SelectEmpty, type SelectEmptyProps } from './empty';
-import { SelectGroup, type SelectGroupProps } from './group';
-import { SelectIcon, type SelectIconProps } from './icon';
-import { SelectItem, type SelectItemProps } from './item';
-import { SelectItemIndicator, type SelectItemIndicatorProps } from './item-indicator';
+import { SelectClear, type SelectClearProps } from './parts/clear';
+import { SelectContent, type SelectContentProps } from './parts/content';
+import { SelectEmpty, type SelectEmptyProps } from './parts/empty';
+import { SelectGroup, type SelectGroupProps } from './parts/group';
+import { SelectIcon, type SelectIconProps } from './parts/icon';
+import { SelectItem, type SelectItemProps } from './parts/item';
+import { SelectItemIndicator, type SelectItemIndicatorProps } from './parts/item-indicator';
+import { SelectSearchField, type SelectSearchFieldProps } from './parts/search-field';
+import { SelectSeparator, type SelectSeparatorProps } from './parts/separator';
+import { SelectTrigger, type SelectTriggerProps } from './parts/trigger';
+import { SelectValue, type SelectValueProps } from './parts/value';
 import {
   SelectRoot,
   type SelectVariant,
@@ -13,11 +17,7 @@ import {
   type SelectValueState,
   type SelectProps,
 } from './root';
-import { SelectSearchField, type SelectSearchFieldProps } from './search-field';
-import { SelectSeparator, type SelectSeparatorProps } from './separator';
 import { selectStyle } from './style';
-import { SelectTrigger, type SelectTriggerProps } from './trigger';
-import { SelectValue, type SelectValueProps } from './value';
 
 export function Select(props: SelectProps) {
   return <SelectRoot {...props} />;

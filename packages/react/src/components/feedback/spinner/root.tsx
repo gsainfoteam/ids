@@ -2,10 +2,10 @@
 
 import { useCallback, useRef } from 'react';
 
+import { useInternalSpinner } from './hooks/use-spinner';
 import { spinnerStyle } from './style';
-import { useSpinner } from './use-spinner';
-import { Arc } from '../../../internal/arc';
-import { useTranslate } from '../../../internal/translate';
+import { Arc } from '../../../internal/parts/arc';
+import { useInternalTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
@@ -26,7 +26,7 @@ export function SpinnerRoot({
   ref,
   ...rest
 }: Spinner.Props) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   const resolvedSize = useFieldSize(size);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -34,7 +34,7 @@ export function SpinnerRoot({
     (node: SVGSVGElement | null) => mergeRefs(svgRef, ref)(node),
     [ref],
   );
-  const { announcement } = useSpinner(svgRef, hiddenFromScreenReaders(ariaHidden));
+  const { announcement } = useInternalSpinner(svgRef, hiddenFromScreenReaders(ariaHidden));
 
   const state: Spinner.State = { size: resolvedSize, announced: announcement === 'announced' };
   const resolvedClassName = typeof className === 'function' ? className(state) : className;

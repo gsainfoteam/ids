@@ -4,10 +4,10 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
 
 | 파일                                             | 내용                                                                                                                                                  |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`index.tsx`](#indextsx)                         | `TemporalField`, 파트(`TemporalTrigger`, `TemporalInput`, `TemporalValue`, `TemporalClear`, `TemporalContent`), `useTemporalPicker`, `pickerPart`, `temporalFieldStyle` 의 다시 내보내기 |
+| [`index.tsx`](#indextsx)                         | `TemporalField`, 파트(`TemporalTrigger`, `TemporalInput`, `TemporalValue`, `TemporalClear`, `TemporalContent`), `useInternalTemporalPicker`, `pickerPart`, `temporalFieldStyle` 의 다시 내보내기 |
 | [`style.ts`](#stylets)                           | `temporalFieldStyle`                                                                                                                                  |
-| [`use-temporal-field.ts`](#use-temporal-fieldts) | 값, 열림, 입력 중인 글자, blur, 폼 reset 을 다루는 hook                                                                                               |
-| [`format.ts`](#formatts)                         | 표시 형식(`TemporalFormat`, `formatter`, `dateOptions`, `timeOptions`)                                                                                |
+| [`hooks/use-temporal-field.ts`](#hooksuse-temporal-fieldts) | 값, 열림, 입력 중인 글자, blur, 폼 reset 을 다루는 hook                                                                                               |
+| [`lib/format.ts`](#libformatts)                         | 표시 형식(`TemporalFormat`, `formatter`, `dateOptions`, `timeOptions`)                                                                                |
 
 ## 쓰는 곳
 
@@ -18,7 +18,7 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
 | DateTimeField | TimeField 와 같은 것, 팝업 내용을 그리는 `temporalFieldStyle` 의 `panel`, `panelTime`, `panelHint` 슬롯 |
 
 - 각 필드는 파트를 그대로 내보냅니다(`DateField.Trigger = TemporalTrigger`). `Style` 도 `temporalFieldStyle` 입니다.
-- 팝업은 [field-popup](../field-popup/README.md) 의 `FieldPopup`, 폼 값은 [`FormValue`](../README.md#form-valuetsx) 입니다.
+- 팝업은 [field-popup](../field-popup/README.md) 의 `FieldPopup`, 폼 값은 [`FormValue`](../README.md#partsform-valuetsx) 입니다.
 
 ## index.tsx
 
@@ -100,7 +100,7 @@ export namespace DateField {
 - 팝업의 `aria-labelledby` 로 컨트롤을 가리키지 않습니다. combobox 를 가리키면 이름 대신 그 값이 읽힙니다(accname 의 embedded control).
 - 머리(`FieldPopupHeader`)는 닫기 버튼 하나이고, 늘 렌더하고 drawer 에서만 보입니다.
 - `placeholder` 에 기본값은 없습니다. 비어 있는 Trigger 는 아무 글자도 그리지 않습니다.
-- `DateField.Calendar`, `TimeField.TimePicker` 같은 picker 파트는 `useTemporalPicker(part)` 로 `{ value, change, close, size, name }` 를 읽어 값을 잇습니다. 루트의 자식으로 적으면 필드 루트가 `pickerPart(children, type)` 로 찾아 `picker` 에서 그리고, `Content` 의 children 안에 적어도 같은 context 를 읽어 그 자리에 그려집니다. `pickerPart` 는 루트의 자식과 `Content` 의 children 을 함께 찾습니다. 팝업 폭(`monthsToShow`)이나 오늘(`today`)처럼 열기 전에 루트가 알아야 하는 속성이 있기 때문이고, 둘 중 한 곳만 찾으면 다른 곳에 적은 속성이 조용히 무시됩니다.
+- `DateField.Calendar`, `TimeField.TimePicker` 같은 picker 파트는 `useInternalTemporalPicker(part)` 로 `{ value, change, close, size, name }` 를 읽어 값을 잇습니다. 루트의 자식으로 적으면 필드 루트가 `pickerPart(children, type)` 로 찾아 `picker` 에서 그리고, `Content` 의 children 안에 적어도 같은 context 를 읽어 그 자리에 그려집니다. `pickerPart` 는 루트의 자식과 `Content` 의 children 을 함께 찾습니다. 팝업 폭(`monthsToShow`)이나 오늘(`today`)처럼 열기 전에 루트가 알아야 하는 속성이 있기 때문이고, 둘 중 한 곳만 찾으면 다른 곳에 적은 속성이 조용히 무시됩니다.
 - `name` 은 필드의 이름입니다. Field 가 준 `aria-labelledby`(Field.Label 의 id), 없으면 `aria-label` 입니다. 팝업 안의 Calendar 는 이름이 필수라서 `{...picker.name}` 으로 필드 이름을 받습니다. 빼면 Calendar 가 개발 모드에서 이름이 없다고 경고합니다.
 - `panel`, `panelTime`, `panelHint` 는 DateTimeField 의 팝업입니다. 달력 옆에 시계를 두고, 휴대폰에서는 위아래로 쌓습니다(`sm:flex-row`).
 
@@ -120,14 +120,14 @@ export namespace DateField {
 
 - 여기에 hook 이나 컴포넌트를 두지 않습니다. 클라이언트 모듈에 두면 서버 컴포넌트의 `DateField.Style` 이 client reference 가 되어 부를 수 없습니다.
 
-## use-temporal-field.ts
+## hooks/use-temporal-field.ts
 
 ### 쓰는 법
 
 ```ts
 // internal/temporal-field/index.tsx
 const { state, input, blocked, popupId, controlRef, rootRef, change, clear, close, toggle, show, onBlur: handleBlur } =
-  useTemporalField<V>({
+  useInternalTemporalField<V>({
     value,
     defaultValue: defaultValue ?? config.empty,
     onValueChange,
@@ -165,9 +165,9 @@ const { state, input, blocked, popupId, controlRef, rootRef, change, clear, clos
 
 - `change(value, { close: true })` 는 값을 넣고 닫으며 포커스를 되돌립니다. `picker` 가 받는 API 입니다.
 - `change` 와 `clear` 는 blocked 면 아무것도 하지 않습니다.
-- reset 의 시점 문제는 [`useFormReset`](../../hooks/README.md#use-form-resetts) 을 봅니다.
+- reset 의 시점 문제는 [`useInternalFormReset`](../../hooks/README.md#use-form-resetts) 을 봅니다.
 
-## format.ts
+## lib/format.ts
 
 ### 쓰는 법
 

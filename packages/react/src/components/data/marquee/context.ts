@@ -16,7 +16,7 @@ type Context = {
 
 export const MarqueeContext = createContext<Context | null>(null);
 
-export function useMarqueeContext(part: string) {
+export function useInternalMarqueeContext(part: string) {
   const context = use(MarqueeContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Marquee>\`.`);
   return context;

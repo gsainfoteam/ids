@@ -1,6 +1,6 @@
 import { tv } from '../../../utils';
 
-import type { AvatarGroupLayout } from './arrange';
+import type { AvatarGroupLayout } from './lib/arrange';
 import type { IdsSize } from '../../../tokens/types';
 
 export const avatarGroupStyle = tv({

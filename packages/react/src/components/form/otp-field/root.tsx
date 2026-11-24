@@ -3,12 +3,12 @@
 import { type ChangeEvent, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { OTPContext } from './context';
-import { OTPFieldGroup } from './group';
-import { lengthOnlyPattern, type OTPFieldPattern } from './otp-code';
-import { OTPFieldSlot } from './slot';
+import { useInternalOTPField } from './hooks/use-otp-field';
+import { lengthOnlyPattern, type OTPFieldPattern } from './lib/otp-code';
+import { OTPFieldGroup } from './parts/group';
+import { OTPFieldSlot } from './parts/slot';
 import { otpFieldStyle } from './style';
-import { useOTPField } from './use-otp-field';
-import { useUnnamedWarning } from '../../../internal/accessible-name';
+import { useInternalUnnamedWarning } from '../../../internal/lib/accessible-name';
 import { invariant, mergeProps } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -80,7 +80,7 @@ export function OTPFieldRoot({
   );
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = otpFieldStyle({ size: resolvedSize, variant });
-  const { state, handlers, rootRef, inputRef } = useOTPField({
+  const { state, handlers, rootRef, inputRef } = useInternalOTPField({
     length,
     value,
     defaultValue,
@@ -98,7 +98,7 @@ export function OTPFieldRoot({
     inputProps['aria-label'] !== undefined ||
     inputProps['aria-labelledby'] !== undefined ||
     inputProps.id !== undefined;
-  useUnnamedWarning('OTPField', !labelled);
+  useInternalUnnamedWarning('OTPField', !labelled);
 
   const cleanBeforeOnChange = (event: ChangeEvent<HTMLInputElement>) => {
     handlers.onChange(event);

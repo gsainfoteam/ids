@@ -21,6 +21,6 @@ const prefersReducedMotion = () => canMatchMedia() && window.matchMedia(REDUCED_
 
 const noPreferenceOnTheServer = () => false;
 
-export function useReducedMotion() {
+export function useInternalReducedMotion() {
   return useSyncExternalStore(subscribe, prefersReducedMotion, noPreferenceOnTheServer);
 }

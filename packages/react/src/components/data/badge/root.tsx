@@ -2,10 +2,10 @@
 
 import { useRef } from 'react';
 
+import { useInternalBadge } from './hooks/use-badge';
+import { useInternalBadgeInset } from './hooks/use-badge-inset';
 import { badgeStyle } from './style';
-import { useBadge } from './use-badge';
-import { useBadgeInset } from './use-badge-inset';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { mergeRefs } from '../../../utils';
 
 import type { Badge } from '.';
@@ -36,7 +36,7 @@ export function BadgeRoot({
   ...rest
 }: Badge.Props) {
   const rootRef = useRef<HTMLSpanElement>(null);
-  const { indicatorId, dot, display, hidden, anchor } = useBadge({
+  const { indicatorId, dot, display, hidden, anchor } = useInternalBadge({
     content,
     max,
     showZero,
@@ -44,7 +44,7 @@ export function BadgeRoot({
     label,
     children,
   });
-  useBadgeInset(rootRef, placement);
+  useInternalBadgeInset(rootRef, placement);
 
   const styles = badgeStyle({ variant, colorScheme, size, dot, placement });
   const state: Badge.State = {

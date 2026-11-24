@@ -3,7 +3,7 @@
 import { cloneElement, isValidElement, type ReactNode } from 'react';
 
 import { markerStyle } from './style';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { invariant, mergeRefs } from '../../../utils';
 import { Divider } from '../../layout/divider';
 import { Slot } from '../../utility/slot';

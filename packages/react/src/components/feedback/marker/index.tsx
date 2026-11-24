@@ -3,7 +3,7 @@ import { type CSSProperties, type HTMLAttributes, type ReactNode, type Ref } fro
 import { MarkerRoot } from './root';
 import { markerStyle } from './style';
 
-import type { StateValue } from '../../../internal/state-props';
+import type { StateValue } from '../../../internal/lib/state-props';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Marker(props: Marker.Props) {

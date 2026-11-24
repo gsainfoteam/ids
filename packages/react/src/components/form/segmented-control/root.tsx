@@ -10,12 +10,12 @@ import {
 } from 'react';
 
 import { SegmentedControlContext, type SegmentedControlOrientation } from './context';
-import { SegmentedControlItem, type SegmentedControlItemProps } from './item';
+import { SegmentedControlItem, type SegmentedControlItemProps } from './parts/item';
 import { segmentedControlStyle } from './style';
 import { elementTypeOf, flattenFragments } from '../../../utils/children';
 import { isDevelopment } from '../../../utils/dev';
 import { useFieldSize } from '../field/context';
-import { useRadioGroup } from '../radio-group/use-radio-group';
+import { useInternalRadioGroup } from '../radio-group/hooks/use-radio-group';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -51,7 +51,7 @@ const holdsOnlyItems = (children: ReactNode) =>
     (child) => child === null || typeof child === 'boolean' || isItem(child),
   );
 
-function useWarnAboutOtherChildren(onlyItems: boolean) {
+function useInternalWarnAboutOtherChildren(onlyItems: boolean) {
   useEffect(() => {
     if (isDevelopment && !onlyItems)
       console.warn(
@@ -81,7 +81,7 @@ export function SegmentedControlRoot<T extends string>({
 }: SegmentedControlProps<T>) {
   const generatedName = useId();
   const groupName = name ?? generatedName;
-  const { value, select, rootRef, forwardRootFocusToRadio, moveToEnd } = useRadioGroup<T>({
+  const { value, select, rootRef, forwardRootFocusToRadio, moveToEnd } = useInternalRadioGroup<T>({
     value: valueProp,
     defaultValue,
     onValueChange,
@@ -97,7 +97,7 @@ export function SegmentedControlRoot<T extends string>({
     typeof children === 'function'
       ? children(render as unknown as SegmentedControlRenderProps<T>)
       : children;
-  useWarnAboutOtherChildren(holdsOnlyItems(items));
+  useInternalWarnAboutOtherChildren(holdsOnlyItems(items));
 
   return (
     <SegmentedControlContext.Provider

@@ -19,6 +19,6 @@ export type RadioGroupContextValue = {
 
 export const RadioGroupContext = createContext<RadioGroupContextValue | null>(null);
 
-export function useRadioGroupContext() {
+export function useInternalRadioGroupContext() {
   return useContext(RadioGroupContext);
 }

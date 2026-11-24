@@ -1,14 +1,14 @@
 import { type ComponentProps, type CSSProperties } from 'react';
 
-import { TableBody, type TableBodyProps } from './body';
-import { TableCaption, type TableCaptionProps } from './caption';
-import { TableCell, type TableCellProps } from './cell';
 import { type TableAlign, type TableLayout, type TableSection, type TableVariant } from './context';
-import { TableFooter, type TableFooterProps } from './footer';
-import { TableHead, type TableHeadProps } from './head';
-import { TableHeader, type TableHeaderProps } from './header';
+import { TableBody, type TableBodyProps } from './parts/body';
+import { TableCaption, type TableCaptionProps } from './parts/caption';
+import { TableCell, type TableCellProps } from './parts/cell';
+import { TableFooter, type TableFooterProps } from './parts/footer';
+import { TableHead, type TableHeadProps } from './parts/head';
+import { TableHeader, type TableHeaderProps } from './parts/header';
+import { TableRow, type TableRowProps } from './parts/row';
 import { TableRoot } from './root';
-import { TableRow, type TableRowProps } from './row';
 import { tableStyle } from './style';
 
 import type { IdsSize } from '../../../tokens/types';

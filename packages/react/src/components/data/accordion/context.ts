@@ -4,7 +4,7 @@ import { createContext, use, type KeyboardEvent } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { AccordionItemState } from './item';
+import type { AccordionItemState } from './parts/item';
 import type { accordionStyle } from './style';
 
 type RootContext = {
@@ -30,13 +30,13 @@ export const AccordionItemContext = createContext<ItemContext | null>(null);
 export const HeaderContext = createContext(false);
 export const IndicatorPlacementContext = createContext<'end' | 'inline'>('end');
 
-export function useRootContext(part: string) {
+export function useInternalRootContext(part: string) {
   const context = use(AccordionContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Accordion>\`.`);
   return context;
 }
 
-export function useItemContext(part: string) {
+export function useInternalItemContext(part: string) {
   const context = use(AccordionItemContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Accordion.Item>\`.`);
   return context;

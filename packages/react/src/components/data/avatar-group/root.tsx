@@ -2,10 +2,10 @@
 
 import { createContext, isValidElement, use } from 'react';
 
-import { arrangeAvatarGroup } from './arrange';
+import { arrangeAvatarGroup } from './lib/arrange';
 import { avatarGroupStyle } from './style';
-import { resolveState } from '../../../internal/state-props';
-import { useTranslate } from '../../../internal/translate';
+import { resolveState } from '../../../internal/lib/state-props';
+import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, invariant } from '../../../utils';
 import { Avatar } from '../avatar';
 import { AvatarCutoutContext, AvatarGroupContext } from '../avatar/context';
@@ -36,7 +36,7 @@ export function AvatarGroupRoot({
   children,
   ...rest
 }: AvatarGroup.Props) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const overflowLabel =
     overflowLabelProp ?? ((count: number) => t('avatarGroup.overflow', { count }));
 

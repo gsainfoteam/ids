@@ -25,7 +25,7 @@ import {
   clearOfCurve,
   MIN_THUMB_LENGTH,
   PAGE_FRACTION,
-} from '../src/components/layout/scroll-area/geometry';
+} from '../src/components/layout/scroll-area/lib/geometry';
 
 type Point = { x: number; y: number };
 

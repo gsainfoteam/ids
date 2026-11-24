@@ -1,7 +1,7 @@
-import { CheckboxIndicator, type CheckboxIndicatorProps } from './indicator';
+import { type CheckedState } from './hooks/use-checkbox';
+import { CheckboxIndicator, type CheckboxIndicatorProps } from './parts/indicator';
 import { CheckboxRoot, type CheckboxVariant, type CheckboxState, type CheckboxProps } from './root';
 import { checkboxStyle } from './style';
-import { type CheckedState } from './use-checkbox';
 
 export function Checkbox(props: CheckboxProps) {
   return <CheckboxRoot {...props} />;
@@ -24,4 +24,4 @@ export namespace Checkbox {
 }
 
 export type { CheckboxVariant, CheckboxState, CheckboxProps } from './root';
-export type { CheckedState } from './use-checkbox';
+export type { CheckedState } from './hooks/use-checkbox';

@@ -1,10 +1,10 @@
 'use client';
 
 import { ToggleGroupContext } from './context';
+import { useInternalToggleGroup } from './hooks/use-toggle-group';
 import { toggleGroupStyle } from './style';
-import { useToggleGroup } from './use-toggle-group';
-import { FormValue } from '../../../internal/form-value';
-import { Group, useGroupNameWarning } from '../../utility/group';
+import { FormValue } from '../../../internal/parts/form-value';
+import { Group, useInternalGroupNameWarning } from '../../utility/group';
 
 import type { ToggleGroup } from '.';
 
@@ -26,8 +26,8 @@ export function ToggleGroupRoot<T extends string = string>(props: ToggleGroup.Pr
     onFocus,
     ...rest
   } = props;
-  useGroupNameWarning('ToggleGroup', props);
-  const { context, rootProps, formValue, forwardRootFocusToItem } = useToggleGroup({
+  useInternalGroupNameWarning('ToggleGroup', props);
+  const { context, rootProps, formValue, forwardRootFocusToItem } = useInternalToggleGroup({
     selectionMode,
     value,
     defaultValue,
