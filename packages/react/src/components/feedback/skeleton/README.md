@@ -38,13 +38,13 @@ import { Skeleton } from '@gsainfoteam/ids-react';
 - 불러오는 동안 자식은 보이지 않고(`invisible`) `inert` 입니다. Tab, 스크린 리더, 포인터가 들어가지 않습니다.
 - 끝나면(`loading={false}`) 속성과 클래스만 빠집니다. 구조가 그대로라서 화면이 밀리지 않고 자식이 다시 마운트되지 않습니다.
 - 기본 감싸기는 `div` 두 개입니다.
-  - 칠하는 바깥 `div`: `aria-busy="true"`, 모서리 `standard`. `className` 과 `style` 이 여기로 갑니다.
+  - 칠하는 바깥 `div`: `aria-busy="true"`, 모서리 `standard`. 새 디자인에서 쓰는 `className` 과 `style` 이 여기로 갑니다.
   - 자식을 담는 안쪽 `div`: `display: contents` 라서 상자를 만들지 않고, `inert` 가 여기에 붙습니다.
 - `asChild` 는 자식 요소에 속성과 모양을 합칩니다(Slot).
   - 자식의 모서리가 그대로입니다. Avatar 는 원, Card 는 concentric 모서리입니다.
   - 자식의 테두리, 그림자, 글자, `::before` 와 `::after` 는 숨깁니다.
   - 자식 요소가 곧 불러오는 내용이라서 `aria-busy` 와 `inert` 가 그 요소에 함께 붙습니다.
-- 인라인 요소(Avatar, Chip, Button)는 `asChild` 로 칠합니다. 기본 `div` 는 블록이라서 줄 너비를 채웁니다. 글자 한 줄을 그 글 너비만큼 칠하려면 `className="w-fit"` 을 줍니다.
+- 인라인 요소(Avatar, Chip, Button)는 `asChild` 로 칠합니다. 기본 `div` 는 블록이라서 줄 너비를 채웁니다. 글자 한 줄을 그 글 너비만큼 칠하려면 감싸는 요소에 `w-fit` 을 줍니다: `<div className="w-fit"><Skeleton>…</Skeleton></div>`.
 
 ## 합성
 
@@ -57,14 +57,18 @@ const placeholderPost = { author: '김지스트', team: '인포팀', title: '202
       <Skeleton loading={isLoading} asChild>
         <Avatar name={(post ?? placeholderPost).author} />
       </Skeleton>
-      <Skeleton loading={isLoading} className="flex-1">
-        <p className="text-body-b3-medium">{(post ?? placeholderPost).author}</p>
-        <p className="text-body-b3-regular">{(post ?? placeholderPost).team}</p>
+      <div className="flex-1">                       {/* 남은 폭은 감싸는 요소가 */}
+        <Skeleton loading={isLoading}>
+          <p className="text-body-b3-medium">{(post ?? placeholderPost).author}</p>
+          <p className="text-body-b3-regular">{(post ?? placeholderPost).team}</p>
+        </Skeleton>
+      </div>
+    </div>
+    <div className="w-fit">                          {/* 글 너비만큼만 칠한다 */}
+      <Skeleton loading={isLoading}>
+        <Card.Title>{(post ?? placeholderPost).title}</Card.Title>
       </Skeleton>
     </div>
-    <Skeleton loading={isLoading} className="w-fit">
-      <Card.Title>{(post ?? placeholderPost).title}</Card.Title>
-    </Skeleton>
   </Card>
 </section>
 
@@ -83,12 +87,16 @@ const placeholderMembers = Array.from({ length: 5 }, (_, index) => ({
         </Skeleton>
       </Item.Media>
       <Item.Content>
-        <Skeleton loading={isLoading} asChild className="w-fit">
-          <Item.Title>{member.name}</Item.Title>
-        </Skeleton>
-        <Skeleton loading={isLoading} asChild className="w-fit">
-          <Item.Description>{member.team}</Item.Description>
-        </Skeleton>
+        <div className="w-fit">
+          <Skeleton loading={isLoading} asChild>
+            <Item.Title>{member.name}</Item.Title>
+          </Skeleton>
+        </div>
+        <div className="w-fit">
+          <Skeleton loading={isLoading} asChild>
+            <Item.Description>{member.team}</Item.Description>
+          </Skeleton>
+        </div>
       </Item.Content>
     </Item>
   ))}
@@ -113,14 +121,11 @@ const placeholderMembers = Array.from({ length: 5 }, (_, index) => ({
 - 움직임은 CSS 패키지의 `animate-skeleton-pulse`, `animate-skeleton-wave` 이고 한 번에 2초입니다.
 - `prefers-reduced-motion` 이면 움직이지 않고 `bg-neutral-soft` 바탕만 남습니다.
 
-## data 속성
+## 상태
 
-| 속성                    | 뜻                                                   |
-| ----------------------- | ---------------------------------------------------- |
-| `data-skeleton`         | 바깥 `div`. `asChild` 면 자식 요소                   |
-| `data-animation`        | `pulse` / `wave` / `none`                            |
-| `data-loading`          | 불러오는 동안                                        |
-| `data-skeleton-content` | 기본 감싸기에서 자식을 담는 `display: contents` 요소 |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 불러오는 중인지와 움직임은 앱이 넘긴 `loading`, `animation` 입니다. Skeleton 이 스스로 바꾸는 상태는 없습니다.
 
 ## 속성
 
@@ -130,7 +135,7 @@ const placeholderMembers = Array.from({ length: 5 }, (_, index) => ({
 | `loading`            | 불러오는 중인지. 기본 `true`                                  |
 | `animation`          | `pulse`(기본) / `wave` / `none`                               |
 | `asChild`            | `div` 로 감싸지 않고 자식 요소를 칠한다                       |
-| `className`, `style` | 배치와 크기. 바깥 `div` 나 자식 요소로 간다                   |
+| `className`, `style` | 새 디자인에서만. 바깥 `div` 나 자식 요소로 간다               |
 | `ref` / 그 외 속성   | 바깥 `div` 로, `asChild` 면 자식 요소로 간다                  |
 
 ## 알아둘 것
@@ -138,4 +143,4 @@ const placeholderMembers = Array.from({ length: 5 }, (_, index) => ({
 - 기본 감싸기는 `div` 라서 `p`, 제목, 버튼 안에는 `asChild` 로 그 안의 요소를 칠합니다.
 - `loading` 은 Skeleton 이 그리는 상태입니다. `aria-busy` 와 `inert` 는 이 값에서 나오므로 직접 주지 않습니다.
 - `asChild` 의 자식 컴포넌트는 받은 `className`, `inert`, `aria-busy`, `ref` 를 DOM 요소까지 전달해야 합니다(Slot 규칙).
-- 감싼 자식의 크기가 내용으로 정해지면(빈 글자, 주소가 없는 이미지) 불러오는 동안 크기가 없습니다. placeholder 데이터를 주거나 className 으로 크기를 줍니다.
+- 감싼 자식의 크기가 내용으로 정해지면(빈 글자, 주소가 없는 이미지) 불러오는 동안 크기가 없습니다. placeholder 데이터를 주거나 감싸는 grid 요소로 크기를 줍니다: `<div className="grid h-5 w-24"><Skeleton>…</Skeleton></div>`.
