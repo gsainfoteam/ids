@@ -135,7 +135,10 @@ export function useInteractive<E extends Element = Element>({
       onKeyDown?.(e);
     },
     onKeyUp(e: KeyboardEvent<E>) {
-      if (e.key === 'Enter' || e.key === ' ') setState((s) => ({ ...s, active: false }));
+      if (e.key === 'Enter' || e.key === ' ')
+        deferPastFormActionWhenDisabled(e.currentTarget, () =>
+          setState((s) => ({ ...s, active: false })),
+        );
       onKeyUp?.(e);
     },
   };

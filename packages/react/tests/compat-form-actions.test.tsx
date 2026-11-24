@@ -367,3 +367,37 @@ test('useFormStatus stays pending after the browser blurs the Button it natively
   await expect.element(button).toBeEnabled();
   await expect.element(button).not.toHaveAttribute('data-focused');
 });
+
+test('a Button submitted from the keyboard stays pending and its focus ring leaves with the focus', async () => {
+  const held = deferred();
+  await render(
+    <>
+      <form aria-label={FORM_LABEL} action={() => held.promise}>
+        <SendDisabledNatively />
+      </form>
+      <Button disabled>Idle</Button>
+      <p>Elsewhere</p>
+    </>,
+  );
+  const button = page.getByRole('button', { name: /^Send/ });
+  const shadowOf = (name: string) =>
+    getComputedStyle(page.getByRole('button', { name }).element()).boxShadow;
+
+  await userEvent.keyboard('{Tab}');
+  await expect.element(button).toHaveFocus();
+  await userEvent.keyboard('{Enter}');
+
+  await expect.element(button).toHaveAccessibleName('Sending');
+  await expect.element(button).toBeDisabled();
+
+  await userEvent.click(page.getByText('Elsewhere'));
+
+  await expect.element(button).not.toHaveFocus();
+  await expect.element(button).toHaveAccessibleName('Sending');
+  expect(shadowOf('Sending')).toBe(shadowOf('Idle'));
+
+  held.resolve();
+
+  await expect.element(button).toHaveAccessibleName('Send');
+  await expect.element(button).not.toHaveAttribute('data-focus-visible');
+});
