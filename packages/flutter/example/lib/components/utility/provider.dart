@@ -62,16 +62,10 @@ final provider = WidgetbookComponent(
           options: IdsMode.values,
           labelBuilder: (value) => value.name,
         );
-        final translation = context.knobs.objectOrNull.segmented(
-          label: 'translation',
-          description: context.strings.notes.provider.translation,
-          options: AppLocale.values,
-          labelBuilder: (value) => value.languageCode,
-        );
         final locale = context.knobs.object.segmented(
           label: 'locale',
-          options: AppLocale.values,
-          labelBuilder: (value) => value.languageCode,
+          options: IdsLocale.values,
+          labelBuilder: (value) => value.locale.toLanguageTag(),
         );
         final textScale = context.knobs.doubleOrNull.slider(
           label: 'MediaQuery textScaler',
@@ -92,8 +86,7 @@ final provider = WidgetbookComponent(
             scale: scale,
           ),
           mode: mode,
-          translation: translation?.translations.ids,
-          locale: locale.flutterLocale,
+          locale: locale,
           textScale: textScale,
         );
       },
@@ -164,9 +157,9 @@ final provider = WidgetbookComponent(
       ),
     ),
     WidgetbookUseCase(
-      name: 'Connect slang translations',
+      name: 'Follow the app language',
       builder: (context) => Example(
-        description: context.strings.examples.provider.connectSlang,
+        description: context.strings.examples.provider.followTheAppLanguage,
         child: TranslationProvider(child: const ProviderIntegration()),
       ),
     ),

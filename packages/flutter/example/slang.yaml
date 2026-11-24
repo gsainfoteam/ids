@@ -10,8 +10,3 @@ statistics: false
 autodoc:
   enabled: false
 string_interpolation: braces
-imports:
-  - 'package:ids_flutter/ids.dart'
-interfaces:
-  IdsMessages:
-    generate_mixin: false

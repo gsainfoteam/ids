@@ -157,8 +157,12 @@ pnpm --filter @gsainfoteam/ids-react exec vitest run --project node tests/flutte
 
 ## 문구 카탈로그
 
-`messages/ko.json`과 `messages/en.json`이 IDS 자체 문구의 원본이다. 서비스의 문구는 포함하지 않는다. 파일은 `{ language, tag, messages }`이고, 인자는 `{name}`(문자열)과 `{name, number}`(숫자)만 쓴다. `pnpm codegen`이 React의 `src/internal/messages-catalog.ts`, `src/internal/message-arguments.ts`, `src/locales/<language>.ts`를 생성한다.
+`messages/<language>.json`(`ko`, `en`)이 IDS 자체 문구의 원본이다. 서비스의 문구는 포함하지 않는다. 파일은 `{ language, tag, messages }`이고, 인자는 `{name}`(문자열)과 `{name, number}`(숫자)만 쓴다. 모든 언어는 ko와 같은 키와 인자를 가져야 한다.
 
-같은 명령은 Flutter의 `lib/messages/ids_messages.dart`와 `messages/ko.i18n.json`도 생성한다. Dart에는 nullable `IdsMessages` mixin과 모든 문구를 가진 `IdsMessages.ko`가 들어간다. `dialog.close`는 `dialogClose`로, `{label}`은 필수 named parameter `Object label`로 바뀐다. 중첩 경로가 같은 Dart 이름이 되거나 한국어에 지원하지 않는 ICU 구문이 있으면 생성이 실패한다.
+`pnpm codegen`(`messages.build.mjs`)이 다음을 생성한다.
+
+- React: `src/internal/messages-catalog.ts`, Editor의 `messages-catalog.ts`, `src/internal/message-arguments.ts`, `src/locales/<language>.ts`
+- Flutter: `lib/messages/ids_messages.dart`(`IdsMessagesBase`, 언어마다 `IdsMessages<Language>`, `IdsLocale`)와 `test/generated/ids_message_readers.dart`
+- `dialog.close`는 `dialogClose`로, `{label}`은 `required String label`, `{count, number}`는 `required num count`로 바뀐다. 중첩 경로가 같은 Dart 이름이 되면 생성이 실패한다.
 
 생성기 테스트: `node --test packages/core/dart-messages.test.mjs`.
