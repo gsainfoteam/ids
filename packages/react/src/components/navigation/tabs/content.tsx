@@ -49,6 +49,7 @@ export function TabsContent<T extends string = string>({
   className,
   style,
   children,
+  tabIndex = 0,
   ref,
   ...rest
 }: TabsContentProps<T>) {
@@ -71,7 +72,7 @@ export function TabsContent<T extends string = string>({
 
   return (
     <div
-      tabIndex={0}
+      tabIndex={hidden ? -1 : tabIndex}
       {...rest}
       ref={mergedRef}
       id={contentIdOf(tabs.id, value)}

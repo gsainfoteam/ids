@@ -225,6 +225,7 @@ test('forceMount keeps a hidden panel with its state, and aria-controls points a
   await userEvent.click(tab('b'));
   const kept = document.getElementById(tab('a').element().getAttribute('aria-controls')!)!;
   expect(kept.getAttribute('hidden')).toBe('until-found');
+  expect(getComputedStyle(kept).position).toBe('absolute');
   expect(kept.getAttribute('aria-labelledby')).toBe(tab('a').element().id);
   await userEvent.click(tab('a'));
   await expect.element(page.getByRole('textbox', { name: 'Note' })).toHaveValue('kept');

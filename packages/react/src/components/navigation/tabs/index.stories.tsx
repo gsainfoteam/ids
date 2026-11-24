@@ -25,6 +25,7 @@ const meta = {
     orientation: { control: 'radio', options: ['horizontal', 'vertical'] },
     activationMode: { control: 'radio', options: ['automatic', 'manual'] },
     size: { control: 'radio', options: sizes },
+    colorScheme: { control: 'radio', options: ['primary', 'secondary', 'tertiary'] },
     loop: { control: 'boolean' },
   },
   args: {
@@ -196,10 +197,14 @@ export const SelectOnlyOnEnter: Story = {
         <Tabs.Trigger value="inbox">받은 편지</Tabs.Trigger>
         <Tabs.Trigger value="sent">보낸 편지</Tabs.Trigger>
         <Tabs.Trigger value="spam">스팸</Tabs.Trigger>
+        <Tabs.Trigger value="archive" onClick={(event) => event.preventDefault()}>
+          보관함
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="inbox">새 메일 3통</Tabs.Content>
       <Tabs.Content value="sent">보낸 메일 12통</Tabs.Content>
       <Tabs.Content value="spam">스팸 없음</Tabs.Content>
+      <Tabs.Content value="archive">보관된 메일</Tabs.Content>
     </Tabs>
   ),
   parameters: {
@@ -227,6 +232,12 @@ export const SelectOnlyOnEnter: Story = {
     await expect(canvas.getByRole('tabpanel')).toHaveTextContent('보낸 메일 12통');
     await userEvent.keyboard('{ArrowRight} ');
     await expect(args.onValueChange).toHaveBeenLastCalledWith('spam');
+    await userEvent.keyboard('{ArrowRight}{Enter} ');
+    await expect(canvas.getByRole('tab', { name: '보관함' })).toHaveFocus();
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('스팸 없음');
+    await userEvent.click(canvas.getByRole('tab', { name: '보관함' }));
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('스팸 없음');
+    await expect(args.onValueChange).toHaveBeenCalledTimes(2);
   },
 };
 
@@ -321,7 +332,7 @@ export const KeepHiddenPanelsMounted: Story = {
           />
         </div>
       </Tabs.Content>
-      <Tabs.Content value="preview" forceMount>
+      <Tabs.Content value="preview" forceMount tabIndex={-1}>
         미리보기에 들어갈 글은 페이지 안 찾기로도 찾을 수 있습니다.
       </Tabs.Content>
     </Tabs>
@@ -337,7 +348,11 @@ export const KeepHiddenPanelsMounted: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.type(canvas.getByRole('textbox', { name: '댓글' }), '좋아요');
     await userEvent.click(canvas.getByRole('tab', { name: '미리보기' }));
-    await expect(canvas.getByRole('textbox', { name: '댓글', hidden: true })).not.toBeVisible();
+    const hiddenInput = canvas.getByRole('textbox', { name: '댓글', hidden: true });
+    await expect(hiddenInput).not.toBeVisible();
+    await userEvent.tab();
+    await expect(canvas.getByRole('tabpanel', { name: '미리보기' })).not.toHaveFocus();
+    await expect(hiddenInput.closest('[role="tabpanel"]')).not.toHaveFocus();
     await userEvent.click(canvas.getByRole('tab', { name: '쓰기' }));
     await expect(canvas.getByRole('textbox', { name: '댓글' })).toHaveValue('좋아요');
   },
