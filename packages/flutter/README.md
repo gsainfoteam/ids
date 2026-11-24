@@ -356,6 +356,17 @@ IdsCheckboxGroup<String>.withParts(
 )
 ```
 
+## FloatingButton
+
+`IdsFloatingButton`을 화면이나 패널의 `Stack`에 넣으면 기본으로 오른쪽 아래에
+배치된다. 시작·끝 방향과 화면 안전 영역을 적용하며 `placement: null`을 주면
+일반 레이아웃 안에 배치된다. 아이콘만 있으면 원형으로 그린다. 사용자 지정 아이콘이나
+빌더를 사용할 때는 `iconOnly`와 `semanticLabel`을 직접 지정할 수 있다.
+`href`를 주면 링크로 읽히며 클릭과 Enter로 주소를 연다.
+`onPressed`를 함께 주면 앱이 이동을 직접 처리할 수 있고, `onClick`에서
+`event.preventDefault()`를 호출하면 활성화를 취소한다.
+비활성 링크는 목적지를 노출하지 않으며 기본 탭 순서에서 제외된다.
+
 ## IconButton
 
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며

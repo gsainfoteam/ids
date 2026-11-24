@@ -165,6 +165,14 @@
       "submissionResult": "Submission result",
       "selectAll": "Select all",
       "skillComingSoon": "{skill} (coming soon)"
+    },
+    "floatingButtonSample": {
+      "createAPost": "Create a post",
+      "floatingButtonsUseOpaqueBackgrounds": "Floating buttons use opaque backgrounds.",
+      "contactUs": "Contact us",
+      "uploading": "Uploading",
+      "compose": "Compose",
+      "upload": "Upload"
     }
   },
   "examples": {

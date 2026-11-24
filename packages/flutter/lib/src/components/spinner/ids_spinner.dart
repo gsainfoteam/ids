@@ -84,8 +84,9 @@ class _IdsSpinnerState extends State<IdsSpinner>
         scope?.colors.textNeutralStrong ??
         icon.color!;
     final size = _sizes[widget.size] ?? icon.size!;
+    final inheritedSize = widget.size == null ? inheritedIcon?.data.size : null;
     final arc = CustomPaint(
-      size: Size.square(scope?.dimension(size) ?? size),
+      size: Size.square(inheritedSize ?? scope?.dimension(size) ?? size),
       painter: _ArcPainter(
         color.withValues(alpha: color.a * (icon.opacity ?? 1)),
       ),

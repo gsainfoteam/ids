@@ -108,7 +108,7 @@ export const Usage: Story = {
 };
 
 export const Gallery: Story = {
-  render: () => (
+  render: ({ size }) => (
     <Showcase>
       <Showcase.Section
         title="Variant × Color scheme"
@@ -119,7 +119,7 @@ export const Gallery: Story = {
           columns={variants}
           render={(colorScheme, variant) => (
             <Spot>
-              <FloatingButton colorScheme={colorScheme} variant={variant} aria-label={colorScheme}>
+              <FloatingButton colorScheme={colorScheme} variant={variant} size={size} aria-label={colorScheme}>
                 <PlusIcon />
               </FloatingButton>
             </Spot>
@@ -345,8 +345,9 @@ export const ShowProgressWhileUploading: Story = {
 
 export const RenderALink: Story = {
   decorators: inContainingBlock,
-  render: () => (
-    <FloatingButton asChild disabled>
+  args: { disabled: true },
+  render: ({ disabled }) => (
+    <FloatingButton asChild disabled={disabled}>
       <a href="#compose">
         <PlusIcon />새 글 작성
       </a>
@@ -360,8 +361,12 @@ export const RenderALink: Story = {
       },
     },
   },
-  play: async ({ canvas }) => {
+  play: async ({ args, canvas }) => {
     const action = canvas.getByRole('link', { name: '새 글 작성' });
+    if (!args.disabled) {
+      await expect(action).toHaveAttribute('href', '#compose');
+      return;
+    }
     await expect(action).not.toHaveAttribute('href');
     await expect(action).toHaveAttribute('aria-disabled', 'true');
     await expect(action).toHaveAttribute('tabindex', '-1');
