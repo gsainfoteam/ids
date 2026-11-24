@@ -2,11 +2,13 @@
 
 import { useCallback, useId, type DragEvent, type MouseEvent } from 'react';
 
-import { describeLimits, isFile, isValidAccept } from '../lib/file-rules';
+import { isFile, isValidAccept } from '../lib/file-rules';
+import { isType } from '../lib/is-type';
+import { FileLimits, type FileFieldLimits } from '../parts/limits';
+import { FileRejection } from '../parts/rejection';
 import { filePartsStyle } from '../style';
 import { useInternalFileField, type FileFieldValue } from './use-file-field';
-import { useInternalTranslate } from '../../../../internal/translate';
-import { invariant, mergeRefs } from '../../../../utils';
+import { flattenFragments, invariant, mergeRefs } from '../../../../utils';
 import { useFieldSize } from '../../field/context';
 
 import type { FileMessagesProps } from '../parts/messages';
@@ -22,8 +24,6 @@ const joinIds = (...ids: Array<string | undefined | false>) =>
   ids.filter(Boolean).join(' ') || undefined;
 
 export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldLook) {
-  const t = useInternalTranslate();
-
   const {
     multiple = false,
     value,
@@ -36,7 +36,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     maxCount,
     onReject,
     placeholder,
-    children: _children,
+    children,
     className: _className,
     style: _style,
     ref: forwardedRef,
@@ -58,7 +58,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': ariaDescribedby,
     'aria-invalid': ariaInvalid,
-    'aria-required': ariaRequired,
+    'aria-required': _ariaRequired,
     ...native
   } = props;
   const owner = componentNameOf(look);
@@ -101,21 +101,21 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     [rootRef],
   );
 
+  const nodes = flattenFragments(children);
+  const limitsParts = nodes.filter(isType(FileLimits));
+  const rejectionPart = nodes.find(isType(FileRejection));
+  const structure = nodes.filter((node) => !limitsParts.includes(node) && node !== rejectionPart);
+
   const uid = useId();
   const id = providedId ?? `ids-file-${uid}`;
   const errorId = `${id}-rejections`;
   const limitsId = `${id}-limits`;
-  const requiredId = `${id}-required`;
-  const announcesRequired =
-    ariaRequired === undefined ? required : ariaRequired === true || ariaRequired === 'true';
-  const limits = describeLimits(
-    {
-      tokens: s.tokens,
-      maxSize,
-      maxCount: multiple ? maxCount : undefined,
-    },
-    t,
-  );
+  const limits: FileFieldLimits = {
+    accept: s.tokens,
+    maxSize,
+    maxCount: multiple ? maxCount : undefined,
+  };
+  const listsRejections = !!rejectionPart && s.rejections.length > 0;
   const showsInvalid =
     s.rejections.length > 0 ? true : (ariaInvalid ?? invalid) === true || ariaInvalid === 'true';
   const state: FileFieldState = {
@@ -142,9 +142,8 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': joinIds(
       ariaDescribedby,
-      look === 'dropzone' && !!limits && limitsId,
-      s.rejections.length > 0 && errorId,
-      announcesRequired && requiredId,
+      limitsParts.length > 0 && limitsId,
+      listsRejections && errorId,
     ),
     'aria-invalid': s.rejections.length ? true : (ariaInvalid ?? (invalid || undefined)),
     'aria-disabled': readOnly || undefined,
@@ -196,13 +195,10 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
   };
 
   const messages: FileMessagesProps = {
-    announcesRequired,
-    requiredId,
     errorId,
-    rejections: s.rejections,
+    rejections: listsRejections ? s.rejections : [],
+    rejectionPart,
     rejectionsClassName: styles.rejections(),
-    maxSize,
-    maxFiles: multiple ? (maxCount ?? 0) : 1,
     form,
     fileNames: s.files.map((file) => file.name),
     required: required && !readOnly,
@@ -216,8 +212,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
       field,
       state,
       size: resolvedSize,
-      placeholder:
-        placeholder ?? (look === 'dropzone' ? t('fileField.dropzone') : t('fileField.placeholder')),
+      placeholder,
       limits,
       limitsId,
       triggerProps,
@@ -226,5 +221,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     rootProps,
     picker,
     messages,
+    structure,
+    limitsParts,
   };
 }

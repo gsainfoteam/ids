@@ -113,6 +113,7 @@ describe.each(BROWSER_ZONES)('an app in %s that holds Date objects', (zone) => {
     await render(
       inIds(
         <Calendar
+          aria-label="달력"
           value={toCalendarDate(fromDate(startOfDay(base), getLocalTimeZone()))}
           onValueChange={(next) => (picked = next)}
         />,
@@ -224,6 +225,7 @@ describe.each(BROWSER_ZONES)('an app in %s that holds Date objects', (zone) => {
       inIds(
         <div className="flex h-[600px] flex-col">
           <Scheduler
+            aria-label="일정표"
             defaultView="day"
             defaultDate={toCalendarDate(fromDate(start, tz))}
             events={[
@@ -396,7 +398,7 @@ const UNCONVERTED = [
   {
     field: 'Calendar',
     given: 'a Date',
-    ui: <Calendar value={aDate as never} />,
+    ui: <Calendar aria-label="달력" value={aDate as never} />,
     error: /expected a CalendarDate/,
   },
   {

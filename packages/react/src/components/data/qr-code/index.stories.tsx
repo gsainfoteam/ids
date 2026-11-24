@@ -42,7 +42,14 @@ const meta = {
     errorCorrection: { control: 'radio', options: [undefined, ...levels] },
     quietZone: { control: { type: 'number', min: 0, max: 8 } },
   },
-  args: { value: PROFILE, variant: 'theme', size: 'standard', shape: 'square', quietZone: 4 },
+  args: {
+    'aria-label': 'Alice의 프로필',
+    value: PROFILE,
+    variant: 'theme',
+    size: 'standard',
+    shape: 'square',
+    quietZone: 4,
+  },
 } satisfies Meta<typeof QRCode>;
 
 export default meta;
@@ -65,16 +72,16 @@ export const Gallery: Story = {
           rows={shapes}
           columns={finderShapes}
           render={(shape, finderShape) => (
-            <QRCode value={PROFILE} shape={shape} finderShape={finderShape} />
+            <QRCode aria-label="QR 코드" value={PROFILE} shape={shape} finderShape={finderShape} />
           )}
         />
       </Showcase.Section>
 
       <Showcase.Section title="Size" description="standard 128px, tiny 96px, 숫자는 px 입니다.">
         <Showcase.Row label="size">
-          <QRCode value={PROFILE} size="tiny" />
-          <QRCode value={PROFILE} size="standard" />
-          <QRCode value={PROFILE} size={192} />
+          <QRCode aria-label="QR 코드" value={PROFILE} size="tiny" />
+          <QRCode aria-label="QR 코드" value={PROFILE} size="standard" />
+          <QRCode aria-label="QR 코드" value={PROFILE} size={192} />
         </Showcase.Row>
       </Showcase.Section>
 
@@ -84,7 +91,7 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="level">
           {levels.map((level) => (
-            <QRCode key={level} value={PROFILE} errorCorrection={level} />
+            <QRCode aria-label="QR 코드" key={level} value={PROFILE} errorCorrection={level} />
           ))}
         </Showcase.Row>
       </Showcase.Section>
@@ -96,7 +103,9 @@ export const Gallery: Story = {
         <Showcase.Matrix
           rows={shapes}
           columns={variants}
-          render={(shape, variant) => <QRCode value={PROFILE} shape={shape} variant={variant} />}
+          render={(shape, variant) => (
+            <QRCode aria-label="QR 코드" value={PROFILE} shape={shape} variant={variant} />
+          )}
         />
       </Showcase.Section>
 
@@ -105,19 +114,19 @@ export const Gallery: Story = {
         description="로고가 있으면 가운데 모듈을 비우고 오류 정정 수준을 H 로 올립니다."
       >
         <Showcase.Row label="image">
-          <QRCode value={PROFILE} shape="rounded">
+          <QRCode aria-label="QR 코드" value={PROFILE} shape="rounded">
             <QRCode.Logo>
               <img src={BRAND_MARK} alt="" />
             </QRCode.Logo>
           </QRCode>
-          <QRCode value={PROFILE} shape="dots" size={192}>
+          <QRCode aria-label="QR 코드" value={PROFILE} shape="dots" size={192}>
             <QRCode.Logo>
               <img src={BRAND_MARK} alt="" />
             </QRCode.Logo>
           </QRCode>
         </Showcase.Row>
         <Showcase.Row label="icon">
-          <QRCode value={PROFILE}>
+          <QRCode aria-label="QR 코드" value={PROFILE}>
             <QRCode.Logo>
               <AcademicCapIcon />
             </QRCode.Logo>
@@ -130,9 +139,9 @@ export const Gallery: Story = {
         description="둘레의 빈 칸 수입니다. 표준은 4칸이고, 0 이면 모서리도 둥글게 깎지 않습니다."
       >
         <Showcase.Row label="quietZone">
-          <QRCode value={PROFILE} quietZone={4} />
-          <QRCode value={PROFILE} quietZone={2} />
-          <QRCode value={PROFILE} quietZone={0} />
+          <QRCode aria-label="QR 코드" value={PROFILE} quietZone={4} />
+          <QRCode aria-label="QR 코드" value={PROFILE} quietZone={2} />
+          <QRCode aria-label="QR 코드" value={PROFILE} quietZone={0} />
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -203,7 +212,7 @@ export const SayWhereTheCodeLeads: Story = {
     docs: {
       description: {
         story:
-          '스크린 리더는 `role="img"` 의 이름만 읽습니다. 기본 이름은 "QR 코드" 이고 긴 URL 을 읽지 않습니다. `aria-label` 이나 `aria-labelledby` 로 무엇으로 가는 코드인지 적고, 스캔할 수 없는 사람을 위해 주소를 글자로도 보여 줍니다.',
+          '스크린 리더는 `role="img"` 의 이름만 읽습니다. 이름은 필수이고 긴 URL 을 읽지 않습니다. `aria-label` 이나 `aria-labelledby` 로 무엇으로 가는 코드인지 적고, 스캔할 수 없는 사람을 위해 주소를 글자로도 보여 줍니다.',
       },
     },
   },

@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  isValidElement,
-  type ComponentProps,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
 import { PromptInputContext } from './context';
 import { useInternalPromptInput } from './hooks/use-prompt-input';
@@ -14,7 +9,10 @@ import { PromptInputAttachments } from './parts/attachments';
 import { PromptInputInput, type PromptInputInputProps } from './parts/input';
 import { PromptInputSubmit } from './parts/submit';
 import { promptInputStyle } from './style';
-import { useInternalTranslate } from '../../../internal/translate';
+import {
+  useInternalRequiredName,
+  type AccessibleName,
+} from '../../../internal/lib/accessible-name';
 import {
   elementTypeOf,
   flattenFragments,
@@ -40,28 +38,29 @@ export type PromptInputMessage = { text: string; files: File[]; tools: string[] 
 export type PromptInputProps = Omit<
   ComponentProps<'form'>,
   'children' | 'defaultValue' | 'onChange'
-> & {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  files?: File[];
-  defaultFiles?: File[];
-  onFilesChange?: (files: File[]) => void;
-  tools?: string[];
-  defaultTools?: string[];
-  onToolsChange?: (tools: string[]) => void;
-  onSend?: (message: PromptInputMessage) => void;
-  onStop?: () => void;
-  status?: PromptInputStatus;
-  accept?: string;
-  maxSize?: number;
-  maxCount?: number;
-  onReject?: (rejections: FileFieldRejection[]) => void;
-  disabled?: boolean;
-  variant?: PromptInputVariant;
-  size?: IdsSize;
-  children?: ReactNode;
-};
+> &
+  AccessibleName & {
+    value?: string;
+    defaultValue?: string;
+    onValueChange?: (value: string) => void;
+    files?: File[];
+    defaultFiles?: File[];
+    onFilesChange?: (files: File[]) => void;
+    tools?: string[];
+    defaultTools?: string[];
+    onToolsChange?: (tools: string[]) => void;
+    onSend?: (message: PromptInputMessage) => void;
+    onStop?: () => void;
+    status?: PromptInputStatus;
+    accept?: string;
+    maxSize?: number;
+    maxCount?: number;
+    onReject?: (rejections: FileFieldRejection[]) => void;
+    disabled?: boolean;
+    variant?: PromptInputVariant;
+    size?: IdsSize;
+    children?: ReactNode;
+  };
 
 const ROOM_FOR_TWO_LINES = 2;
 const LINES_BEFORE_SCROLLING = 6;
@@ -112,9 +111,10 @@ export function PromptInputRoot({
   children,
   onSubmit,
   ref,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
   ...formProps
 }: PromptInputProps) {
-  const t = useInternalTranslate();
   const size = useFieldSize(sizeProp) ?? 'standard';
   const {
     formRef,
@@ -158,6 +158,10 @@ export function PromptInputRoot({
     onKeyDown,
     ...inputProps
   } = input;
+  useInternalRequiredName('PromptInput', {
+    'aria-label': inputProps['aria-label'] ?? ariaLabel,
+    'aria-labelledby': inputProps['aria-labelledby'] ?? ariaLabelledBy,
+  });
 
   return (
     <PromptInputContext
@@ -199,10 +203,8 @@ export function PromptInputRoot({
             {top}
             <TextAreaInput
               key="input"
-              aria-label={
-                inputProps['aria-labelledby'] === undefined ? t('promptInput.label') : undefined
-              }
-              placeholder={t('promptInput.placeholder')}
+              aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledBy}
               enterKeyHint="send"
               {...inputProps}
             />

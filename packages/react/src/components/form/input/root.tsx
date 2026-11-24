@@ -54,7 +54,7 @@ export function InputRoot(props: InputProps) {
           <>
             <MagnifyingGlassIcon />
             <TextField.Input />
-            <TextField.Clear aria-label={t('input.clearSearch')} />
+            <TextField.Clear aria-label={t('common.clear')} />
           </>
         )}
       </TextField>

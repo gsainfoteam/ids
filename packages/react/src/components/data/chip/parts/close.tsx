@@ -50,7 +50,7 @@ export function ChipClose({
       variant="ghost"
       colorScheme={context.colorScheme}
       size={context.size}
-      aria-label={ariaLabel ?? t('chip.remove')}
+      aria-label={ariaLabel ?? t('common.remove')}
       aria-labelledby={chipLabelThenOwnLabel}
       disabled={context.disabled}
       data-chip-close=""

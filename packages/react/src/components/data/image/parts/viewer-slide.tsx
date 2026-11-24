@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, type CSSProperties, type RefCallback } from 'react';
+import { useState, type CSSProperties, type ReactNode, type RefCallback } from 'react';
 
 import { PhotoIcon } from '@heroicons/react/24/outline';
 
-import { useInternalTranslate } from '../../../../internal/translate';
 import { Spinner } from '../../../feedback/spinner';
 import { useInternalNaturalSize, type Probed } from '../hooks/use-natural-size';
 
@@ -20,6 +19,7 @@ export type ImageViewerSlideProps = {
   attachArea: RefCallback<HTMLElement>;
   attachBox: RefCallback<HTMLElement>;
   styles: ReturnType<typeof imageStyle>;
+  fallback: ReactNode;
 };
 
 const sizeFrom = (probed: Probed | undefined) =>
@@ -43,8 +43,8 @@ export function ImageViewerSlide({
   attachArea,
   attachBox,
   styles,
+  fallback,
 }: ImageViewerSlideProps) {
-  const t = useInternalTranslate();
   const probedFull = useInternalNaturalSize(item.src, near, item.crossOrigin);
   const probedThumbnail = useInternalNaturalSize(
     item.thumbnailSize ? undefined : item.thumbnail,
@@ -102,7 +102,7 @@ export function ImageViewerSlide({
             <span {...standInFor(item.alt)}>
               <PhotoIcon aria-hidden="true" />
             </span>
-            {t('image.failed')}
+            {fallback}
           </p>
         ) : near ? (
           <Spinner />

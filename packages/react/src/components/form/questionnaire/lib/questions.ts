@@ -6,6 +6,7 @@ import { containsElementOfType, elementTypeOf, flattenFragments } from '../../..
 import { QuestionnaireOption, type QuestionnaireOptionProps } from '../parts/option';
 import { QuestionnaireOther } from '../parts/other';
 import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from '../parts/question';
+import { QuestionnaireSkip } from '../parts/skip';
 import { QuestionnaireSubmit } from '../parts/submit';
 
 import type { QuestionnaireQuestionShape } from './answers';
@@ -14,6 +15,7 @@ const QUESTION = new Set<unknown>([QuestionnaireQuestion]);
 const OPTION = new Set<unknown>([QuestionnaireOption]);
 const OTHER = new Set<unknown>([QuestionnaireOther]);
 const SUBMIT = new Set<unknown>([QuestionnaireSubmit]);
+const SKIP = new Set<unknown>([QuestionnaireSkip]);
 
 function optionValuesIn(children: ReactNode): string[] {
   return flattenFragments(children).flatMap((node) => {
@@ -44,6 +46,8 @@ export function readQuestions(children: ReactNode): QuestionnaireQuestionShape[]
 
 export const isSubmit = (node: ReactNode) =>
   isValidElement(node) && SUBMIT.has(elementTypeOf(node));
+
+export const isSkip = (node: ReactNode) => isValidElement(node) && SKIP.has(elementTypeOf(node));
 
 const forwardsItsOwnFocus = (element: HTMLElement) => element.hasAttribute('tabindex');
 

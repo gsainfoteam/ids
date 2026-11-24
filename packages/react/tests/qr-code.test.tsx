@@ -81,7 +81,7 @@ function ChangingValue() {
   const [value, setValue] = useState('first');
   return (
     <>
-      <QRCode value={value} />
+      <QRCode aria-label="QR 코드" value={value} />
       <button type="button" onClick={() => setValue('second value')}>
         change
       </button>
@@ -92,8 +92,8 @@ function ChangingValue() {
 const contrast = (a: number, b: number) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 
 describe('accessible name', () => {
-  test('is an image named "QR 코드" without reading the value', async () => {
-    const screen = await renderInTheme(<QRCode value={PROFILE} />);
+  test('is an image named by the app without reading the value', async () => {
+    const screen = await renderInTheme(<QRCode value={PROFILE} aria-label="QR 코드" />);
 
     await expect.element(screen.getByRole('img', { name: 'QR 코드' })).toBeInTheDocument();
     expect(codeIn(screen.container).querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
@@ -115,17 +115,16 @@ describe('accessible name', () => {
     expect(labelled.element()).not.toHaveAttribute('aria-label');
   });
 
-  test('speaks the translation for the default name', async () => {
-    const screen = await render(
-      <IdsProvider
-        theme={testTheme}
-        translate={(key) => (key === 'qrCode.label' ? 'QR code' : undefined)}
-      >
-        <QRCode value={PROFILE} />
-      </IdsProvider>,
-    );
+  test('has no default name and warns in development without one', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const Unnamed = QRCode as unknown as (props: { value: string }) => ReactNode;
+    const screen = await renderInTheme(<Unnamed value={PROFILE} />);
 
-    await expect.element(screen.getByRole('img', { name: 'QR code' })).toBeInTheDocument();
+    expect(codeIn(screen.container)).not.toHaveAttribute('aria-label');
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('[IDS] QRCode: it has no accessible name'),
+    );
+    warn.mockRestore();
   });
 });
 
@@ -137,14 +136,22 @@ describe('round trip through a scanner', () => {
     ['dots', 'square'],
   ] as const)('%s modules with %s finders decode to the value', async (shape, finderShape) => {
     const screen = await renderInTheme(
-      <QRCode value={PROFILE} shape={shape} finderShape={finderShape} size={240} />,
+      <QRCode
+        aria-label="QR 코드"
+        value={PROFILE}
+        shape={shape}
+        finderShape={finderShape}
+        size={240}
+      />,
     );
 
     expect(decode(await rasterize(codeIn(screen.container)))).toBe(PROFILE);
   });
 
   test.each(['L', 'M', 'Q', 'H'] as const)('decodes at error correction %s', async (level) => {
-    const screen = await renderInTheme(<QRCode value={PROFILE} errorCorrection={level} />);
+    const screen = await renderInTheme(
+      <QRCode aria-label="QR 코드" value={PROFILE} errorCorrection={level} />,
+    );
 
     expect(codeIn(screen.container)).toHaveAttribute('data-error-correction', level);
     expect(decode(await rasterize(codeIn(screen.container)))).toBe(PROFILE);
@@ -154,8 +161,8 @@ describe('round trip through a scanner', () => {
     const long = `${PROFILE}?from=${'campus-event-'.repeat(12)}`;
     const screen = await renderInTheme(
       <>
-        <QRCode value="지스트 인포팀" />
-        <QRCode value={long} shape="rounded" size={320} />
+        <QRCode aria-label="QR 코드" value="지스트 인포팀" />
+        <QRCode aria-label="QR 코드" value={long} shape="rounded" size={320} />
       </>,
     );
     const [korean, url] = screen.container.querySelectorAll<HTMLElement>('[data-qr-code]');
@@ -178,7 +185,7 @@ describe('round trip through a scanner', () => {
 describe('logo', () => {
   test('raises error correction to H and still decodes under an opaque logo', async () => {
     const screen = await renderInTheme(
-      <QRCode value={PROFILE} shape="rounded" size={240}>
+      <QRCode aria-label="QR 코드" value={PROFILE} shape="rounded" size={240}>
         <QRCode.Logo>
           <AcademicCapIcon />
         </QRCode.Logo>
@@ -195,7 +202,7 @@ describe('logo', () => {
 
   test('sits in the middle, about a fifth of the modules wide', async () => {
     const screen = await renderInTheme(
-      <QRCode value={PROFILE} size={200}>
+      <QRCode aria-label="QR 코드" value={PROFILE} size={200}>
         <QRCode.Logo data-testid="logo">
           <img alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />
         </QRCode.Logo>
@@ -213,7 +220,7 @@ describe('logo', () => {
   test('warns when an explicit level is too low to carry a logo', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     await renderInTheme(
-      <QRCode value={PROFILE} errorCorrection="M">
+      <QRCode aria-label="QR 코드" value={PROFILE} errorCorrection="M">
         <QRCode.Logo>
           <AcademicCapIcon />
         </QRCode.Logo>
@@ -226,7 +233,7 @@ describe('logo', () => {
 
   test('renders an element of its own with asChild', async () => {
     const screen = await renderInTheme(
-      <QRCode value={PROFILE}>
+      <QRCode aria-label="QR 코드" value={PROFILE}>
         <QRCode.Logo asChild>
           <span data-testid="mark">IDS</span>
         </QRCode.Logo>
@@ -239,14 +246,14 @@ describe('logo', () => {
 
 describe('colors', () => {
   test('variant theme follows the mode: dark modules on light in light mode, inverted in dark mode', async () => {
-    const light = await renderInTheme(<QRCode value={PROFILE} />);
+    const light = await renderInTheme(<QRCode aria-label="QR 코드" value={PROFILE} />);
     expect(codeIn(light.container)).toHaveAttribute('data-variant', 'theme');
     const lightPlate = plate(codeIn(light.container));
     expect(lightPlate.background).toBeGreaterThan(lightPlate.foreground);
     expect(decode(await rasterize(codeIn(light.container)))).toBe(PROFILE);
     await light.unmount();
 
-    const dark = await renderInTheme(<QRCode value={PROFILE} />, 'dark');
+    const dark = await renderInTheme(<QRCode aria-label="QR 코드" value={PROFILE} />, 'dark');
     const darkPlate = plate(codeIn(dark.container));
     expect(darkPlate.foreground).toBeGreaterThan(darkPlate.background);
     expect(contrast(darkPlate.foreground, darkPlate.background)).toBeGreaterThan(15);
@@ -256,7 +263,10 @@ describe('colors', () => {
   });
 
   test('variant light keeps dark modules on a light plate in dark mode', async () => {
-    const screen = await renderInTheme(<QRCode value={PROFILE} variant="light" />, 'dark');
+    const screen = await renderInTheme(
+      <QRCode aria-label="QR 코드" value={PROFILE} variant="light" />,
+      'dark',
+    );
     const colors = plate(codeIn(screen.container));
 
     expect(colors.background).toBeGreaterThan(colors.foreground);
@@ -266,7 +276,10 @@ describe('colors', () => {
 
   test('variant dark draws light modules on a dark plate in either mode', async () => {
     for (const mode of ['light', 'dark'] as const) {
-      const screen = await renderInTheme(<QRCode value={PROFILE} variant="dark" />, mode);
+      const screen = await renderInTheme(
+        <QRCode aria-label="QR 코드" value={PROFILE} variant="dark" />,
+        mode,
+      );
       expect(codeIn(screen.container)).toHaveAttribute('data-variant', 'dark');
       const colors = plate(codeIn(screen.container));
 
@@ -279,7 +292,7 @@ describe('colors', () => {
   test('takes other colors through the two custom properties set on a parent', async () => {
     const screen = await renderInTheme(
       <div className="[--qr-code-background:rgb(255,255,255)] [--qr-code-foreground:rgb(0,0,128)]">
-        <QRCode value={PROFILE} />
+        <QRCode aria-label="QR 코드" value={PROFILE} />
       </div>,
     );
     const code = codeIn(screen.container);
@@ -295,7 +308,7 @@ describe('size and quiet zone', () => {
     ['standard', 128],
     [200, 200],
   ] as const)('size %s is %ipx square', async (size, pixels) => {
-    const screen = await renderInTheme(<QRCode value={PROFILE} size={size} />);
+    const screen = await renderInTheme(<QRCode aria-label="QR 코드" value={PROFILE} size={size} />);
     const box = codeIn(screen.container).getBoundingClientRect();
 
     expect(box.width).toBe(pixels);
@@ -305,7 +318,7 @@ describe('size and quiet zone', () => {
   test('a parent narrower than the size shrinks the code and keeps it square', async () => {
     const screen = await renderInTheme(
       <div style={{ width: 100 }}>
-        <QRCode value={PROFILE} size={200} />
+        <QRCode aria-label="QR 코드" value={PROFILE} size={200} />
       </div>,
     );
     const code = codeIn(screen.container);
@@ -319,8 +332,8 @@ describe('size and quiet zone', () => {
   test('quietZone adds that many modules around the code and 0 drops the rounded corner', async () => {
     const screen = await renderInTheme(
       <>
-        <QRCode value={PROFILE} quietZone={4} />
-        <QRCode value={PROFILE} quietZone={0} />
+        <QRCode aria-label="QR 코드" value={PROFILE} quietZone={4} />
+        <QRCode aria-label="QR 코드" value={PROFILE} quietZone={0} />
       </>,
     );
     const [standard, flush] = screen.container.querySelectorAll<HTMLElement>('[data-qr-code]');
@@ -339,7 +352,7 @@ describe('size and quiet zone', () => {
 describe('development warnings', () => {
   test('warns on an empty value', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    await renderInTheme(<QRCode value="" />);
+    await renderInTheme(<QRCode aria-label="QR 코드" value="" />);
 
     expect(warn).toHaveBeenCalledWith('[IDS] QRCode: value is empty.');
     warn.mockRestore();
@@ -347,7 +360,9 @@ describe('development warnings', () => {
 
   test('draws an empty plate and warns when the value is too long', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const screen = await renderInTheme(<QRCode value={'x'.repeat(4000)} errorCorrection="H" />);
+    const screen = await renderInTheme(
+      <QRCode aria-label="QR 코드" value={'x'.repeat(4000)} errorCorrection="H" />,
+    );
     const code = codeIn(screen.container);
 
     expect(code).toHaveAttribute('data-overflow', '');

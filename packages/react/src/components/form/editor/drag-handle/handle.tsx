@@ -154,7 +154,7 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
           <Menu.Separator />
           <Menu.Item onSelect={run(deleteBlock)} className={styles.destructiveItem()}>
             <TrashIcon aria-hidden="true" />
-            {t('editor.blockDelete')}
+            {t('common.remove')}
           </Menu.Item>
         </Menu.Content>
       </Menu>

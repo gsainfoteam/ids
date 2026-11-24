@@ -1,19 +1,16 @@
 'use client';
 
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 
 import { FormValue } from '../../../../internal/parts/form-value';
-import { useInternalTranslate } from '../../../../internal/translate';
-import { fileKey, formatBytes, type FileFieldRejection } from '../lib/file-rules';
+import { FileRejectionContext } from '../context';
+import { fileKey, type FileFieldRejection } from '../lib/file-rules';
 
 export type FileMessagesProps = {
-  announcesRequired: boolean;
-  requiredId: string;
   errorId: string;
   rejections: FileFieldRejection[];
+  rejectionPart: ReactNode;
   rejectionsClassName: string;
-  maxSize: number | undefined;
-  maxFiles: number;
   form: string | undefined;
   fileNames: string[];
   required: boolean;
@@ -22,40 +19,25 @@ export type FileMessagesProps = {
 };
 
 export function FileMessages({
-  announcesRequired,
-  requiredId,
   errorId,
   rejections,
+  rejectionPart,
   rejectionsClassName,
-  maxSize,
-  maxFiles,
   form,
   fileNames,
   required,
   disabled,
   anchor,
 }: FileMessagesProps) {
-  const t = useInternalTranslate();
-
   return (
     <>
-      {announcesRequired && (
-        <span id={requiredId} hidden>
-          {t('fileField.required')}
-        </span>
-      )}
       {rejections.length > 0 && (
         <div id={errorId} role="alert">
           <ul className={rejectionsClassName}>
-            {rejections.map(({ file, reason }) => (
-              <li key={fileKey(file)}>
-                {file.name}:{' '}
-                {reason === 'type'
-                  ? t('fileField.rejectType')
-                  : reason === 'size'
-                    ? t('fileField.rejectSize', { max: formatBytes(maxSize ?? 0) })
-                    : t('fileField.rejectCount', { max: maxFiles })}
-              </li>
+            {rejections.map((rejection) => (
+              <FileRejectionContext key={fileKey(rejection.file)} value={rejection}>
+                {rejectionPart}
+              </FileRejectionContext>
             ))}
           </ul>
         </div>

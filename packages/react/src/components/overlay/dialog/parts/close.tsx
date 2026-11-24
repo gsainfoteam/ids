@@ -27,7 +27,7 @@ export function DialogClose({ asChild, children, onClick, ...props }: DialogClos
   if (children == null)
     return (
       <IconButton
-        aria-label={t('dialog.close')}
+        aria-label={t('common.close')}
         {...props}
         variant="ghost"
         size="tiny"

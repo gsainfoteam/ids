@@ -2,17 +2,19 @@
 
 import { type ComponentProps, type ReactNode } from 'react';
 
+import { ChevronLeftIcon } from '@heroicons/react/16/solid';
+
 import { QuestionnaireContext } from './context';
 import { useInternalQuestionnaire } from './hooks/use-questionnaire';
 import { type QuestionnaireAnswers } from './lib/answers';
-import { isSubmit, readQuestions } from './lib/questions';
+import { isSkip, isSubmit, readQuestions } from './lib/questions';
 import { QuestionnaireSubmit } from './parts/submit';
 import { questionnaireStyle } from './style';
 import { useInternalTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 import { flattenFragments } from '../../../utils/children';
-import { Button } from '../../action/button';
 import { ButtonGroup } from '../../action/button-group';
+import { IconButton } from '../../action/icon-button';
 import { Progress } from '../../feedback/progress';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -68,6 +70,7 @@ export function QuestionnaireRoot({
   const showsForward = current !== undefined && !opensTheNextStepOnSelect;
   const parts = flattenFragments(children);
   const submit = parts.find(isSubmit) ?? <QuestionnaireSubmit />;
+  const skipButton = parts.find(isSkip);
 
   return (
     <QuestionnaireContext.Provider
@@ -79,6 +82,7 @@ export function QuestionnaireRoot({
         draftOf,
         setDraft,
         advance,
+        skip,
         last,
         canLeaveCurrent,
       }}
@@ -104,7 +108,7 @@ export function QuestionnaireRoot({
             <Progress.Track className={styles.progressTrack()} />
           </Progress>
         )}
-        {parts.filter((node) => !isSubmit(node))}
+        {parts.filter((node) => !isSubmit(node) && !isSkip(node))}
         {(showsPrevious || showsSkip || showsForward) && (
           <ButtonGroup
             size="tiny"
@@ -113,20 +117,16 @@ export function QuestionnaireRoot({
           >
             <div className={styles.navigationItems()}>
               {showsPrevious && (
-                <Button
+                <IconButton
                   type="button"
                   variant="outline"
+                  aria-label={t('common.previous')}
+                  icon={<ChevronLeftIcon aria-hidden="true" />}
                   className={styles.previous()}
                   onClick={() => goTo(index - 1)}
-                >
-                  {t('questionnaire.previous')}
-                </Button>
+                />
               )}
-              {showsSkip && (
-                <Button type="button" variant="outline" onClick={skip}>
-                  {t('questionnaire.skip')}
-                </Button>
-              )}
+              {showsSkip && skipButton}
               {showsForward && submit}
             </div>
           </ButtonGroup>

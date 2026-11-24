@@ -1,5 +1,6 @@
 import { clamp } from 'es-toolkit';
 
+import type { IntlWords } from '../../lib/intl-words';
 import type { KeyMap } from '../../lib/keys';
 import type { Translate } from '../../translate';
 
@@ -106,7 +107,12 @@ export function separatorProps({
   } as const;
 }
 
-export function axisSeparatorProps(axis: ResizeAxis, t: Translate, disabled: boolean) {
+export function axisSeparatorProps(
+  axis: ResizeAxis,
+  t: Translate,
+  words: IntlWords,
+  disabled: boolean,
+) {
   const value = axis.size === undefined ? undefined : Math.round(axis.size);
 
   return {
@@ -116,12 +122,10 @@ export function axisSeparatorProps(axis: ResizeAxis, t: Translate, disabled: boo
       min: Math.round(axis.min),
       max: Number.isFinite(axis.max) ? Math.round(axis.max) : axis.max,
       valueText:
-        value === undefined
-          ? undefined
-          : (axis.valueLabel?.(value) ?? t('resizable.value', { value })),
+        value === undefined ? undefined : (axis.valueLabel?.(value) ?? words.pixels(value)),
       controls: axis.controls,
       disabled,
     }),
-    'aria-label': t(`resizable.${axis.dimension}`),
+    'aria-label': t('common.resize'),
   };
 }

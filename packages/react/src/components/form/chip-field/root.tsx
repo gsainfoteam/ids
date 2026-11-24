@@ -78,7 +78,7 @@ export function ChipFieldRoot({
   ...rootInputProps
 }: ChipField.Props) {
   const t = useInternalTranslate();
-  const removeLabel = removeLabelProp ?? ((label: string) => t('chipField.remove', { label }));
+  const removeLabel = removeLabelProp ?? ((label: string) => t('common.removeItem', { label }));
 
   const {
     onChange: _wouldRecordQueryAsValue,
@@ -146,7 +146,6 @@ export function ChipFieldRoot({
   const styles = chipFieldStyle({ variant, size: resolvedSize });
 
   const inputDefaults: InputAttributes = {
-    placeholder: t('chipField.placeholder'),
     size: 1,
     autoComplete: 'off',
     'aria-invalid': isInvalid || undefined,
@@ -181,7 +180,7 @@ export function ChipFieldRoot({
   const labelledBy = merged['aria-labelledby'];
   const listLabel = labelledBy
     ? { 'aria-labelledby': labelledBy }
-    : { 'aria-label': merged['aria-label'] ?? t('chipField.listbox') };
+    : { 'aria-label': merged['aria-label'] ?? t('common.options') };
 
   return (
     <ChipContext
@@ -250,7 +249,7 @@ export function ChipFieldRoot({
           onClose={field.actions.close}
           mobileVariant={mobileVariant}
           matchWidth
-          label={merged['aria-label'] ?? t('chipField.listbox')}
+          label={merged['aria-label'] ?? t('common.options')}
           aria-labelledby={drawer ? labelledBy : undefined}
           data-chip-field-popup={ids.listbox}
           onBlur={(event) => {

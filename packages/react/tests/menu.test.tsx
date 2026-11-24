@@ -236,7 +236,7 @@ test('hovering a nested trigger opens its submenu, and selecting inside closes t
   const { screen, trigger, item } = await renderActions({ onEmail, onOpenChange });
   await userEvent.click(trigger);
   await userEvent.hover(item('Share'));
-  const submenu = screen.getByRole('menu', { name: 'Share 하위 메뉴' });
+  const submenu = screen.getByRole('menu', { name: 'Share' });
   await expect.element(submenu).toBeVisible();
   await expect.element(item('Share')).toHaveAttribute('aria-expanded', 'true');
   await expect.element(item('Share')).toHaveFocus();
@@ -260,7 +260,7 @@ test('ArrowRight enters a submenu, ArrowLeft and Escape leave only the submenu',
   await expect.element(item('Share')).toHaveFocus();
 
   await userEvent.keyboard('{ArrowRight}');
-  const submenu = screen.getByRole('menu', { name: 'Share 하위 메뉴' });
+  const submenu = screen.getByRole('menu', { name: 'Share' });
   await expect.element(item('Email')).toHaveFocus();
   await userEvent.keyboard('{ArrowDown}');
   await expect.element(item('Link')).toHaveFocus();
@@ -294,9 +294,7 @@ test('a nested trigger is a menuitem of its parent, reached by arrows and typing
   await userEvent.keyboard('sh');
   await expect.element(share).toHaveFocus();
   await expect.element(share).toHaveAttribute('data-highlighted');
-  await expect
-    .element(screen.getByRole('menu', { name: 'Share 하위 메뉴' }))
-    .not.toBeInTheDocument();
+  await expect.element(screen.getByRole('menu', { name: 'Share' })).not.toBeInTheDocument();
 
   await userEvent.keyboard('{ArrowDown}');
   await expect.element(item('Delete')).toHaveFocus();
@@ -349,9 +347,7 @@ test('a nested trigger matches typing by textValue, and a disabled one is skippe
   vi.runOnlyPendingTimers();
   await userEvent.click(item('Archive'), { force: true });
   await expect.element(item('Archive')).toHaveAttribute('aria-expanded', 'false');
-  await expect
-    .element(screen.getByRole('menu', { name: 'Archive 하위 메뉴' }))
-    .not.toBeInTheDocument();
+  await expect.element(screen.getByRole('menu', { name: 'Archive' })).not.toBeInTheDocument();
 });
 
 test('a nested Menu warns that triggerType belongs to the outermost Menu, and still opens as a submenu', async () => {
@@ -379,7 +375,7 @@ test('a nested Menu warns that triggerType belongs to the outermost Menu, and st
   );
   await userEvent.click(screen.getByRole('button', { name: 'File' }));
   await userEvent.hover(screen.getByRole('menuitem', { name: 'Export' }));
-  await expect.element(screen.getByRole('menu', { name: 'Export 하위 메뉴' })).toBeVisible();
+  await expect.element(screen.getByRole('menu', { name: 'Export' })).toBeVisible();
 
   const rootOnly = warn.mock.calls.filter(([message]) =>
     String(message).includes('triggerType and hotkey apply only to the outermost Menu'),
@@ -559,7 +555,7 @@ async function renderDeep(props: Parameters<typeof DeepMenu>[0] = {}, justify = 
   );
   const trigger = screen.getByRole('button', { name: 'File' });
   const item = (name: string) => screen.getByRole('menuitem', { name });
-  const submenu = (name: string) => screen.getByRole('menu', { name: `${name} 하위 메뉴` });
+  const submenu = (name: string) => screen.getByRole('menu', { name });
 
   const openByKeyboard = async () => {
     trigger.element().focus();
@@ -668,7 +664,7 @@ function Palette({ onNewFile, onGrid, ...props }: PaletteProps) {
     <Menu triggerType="command" hotkey="Mod+K" {...props}>
       <Menu.Trigger>Commands</Menu.Trigger>
       <Menu.Content>
-        <Menu.Search data-1p-ignore data-lpignore="true" />
+        <Menu.Search placeholder="명령 검색…" data-1p-ignore data-lpignore="true" />
         <Menu.Group>
           <Menu.Label>Files</Menu.Label>
           <Menu.Item onSelect={onNewFile}>
@@ -696,6 +692,7 @@ function Palette({ onNewFile, onGrid, ...props }: PaletteProps) {
           <Menu.Label>설정</Menu.Label>
           <Menu.Item>설정 열기</Menu.Item>
         </Menu.Group>
+        <Menu.Empty>결과가 없습니다.</Menu.Empty>
       </Menu.Content>
     </Menu>
   );
@@ -710,7 +707,7 @@ async function renderPalette(props: PaletteProps = {}) {
   );
   const trigger = screen.getByRole('button', { name: 'Commands' });
   const palette = screen.getByRole('dialog', { name: '명령' });
-  const search = screen.getByRole('combobox', { name: '명령 검색' });
+  const search = screen.getByRole('combobox', { name: '검색' });
   const listbox = screen.getByRole('listbox');
   const option = (name: string | RegExp) => screen.getByRole('option', { name });
   const shown = () =>

@@ -7,7 +7,7 @@ import { flushSync } from 'react-dom';
 
 import { useInternalResizeDrag, type ResizeDelta } from './use-resize-drag';
 import { keyHandler, type KeyMap } from '../../lib/keys';
-import { useInternalTranslate } from '../../translate';
+import { useInternalIntlWords, useInternalTranslate } from '../../translate';
 import {
   axisSeparatorProps,
   resizeKeyMap,
@@ -214,10 +214,11 @@ export function useInternalAxesDrag(
 
 export function useInternalAxisSeparator(axis: ResizeAxis, options: AxesDragOptions) {
   const t = useInternalTranslate();
+  const words = useInternalIntlWords();
   const drag = useInternalAxesDrag([axis], options);
 
   return {
-    ...axisSeparatorProps(axis, t, options.disabled),
+    ...axisSeparatorProps(axis, t, words, options.disabled),
     ...drag.dragProps,
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (options.disabled) return;

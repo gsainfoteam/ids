@@ -2,7 +2,11 @@
 
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { useInternalTranslate, type Translate } from '../../../../internal/translate';
+import {
+  useInternalIntlWords,
+  useInternalTranslate,
+  type Translate,
+} from '../../../../internal/translate';
 import { useInternalTextAreaCountAnnouncement } from '../../text-area/hooks/use-count-announcement';
 import { countState, type CountState } from '../../text-area/lib/count-state';
 import { resolve, type StateValue } from '../../text-area/lib/state-value';
@@ -37,6 +41,7 @@ export function EditorCount({
   ...props
 }: EditorCountProps) {
   const t = useInternalTranslate(editorMessages);
+  const words = useInternalIntlWords();
   const { editor, contentId, countId, maxLength, styles } =
     useInternalEditorContext('Editor.Count');
   const characters = useInternalEditorSelector(
@@ -64,8 +69,8 @@ export function EditorCount({
       >
         {children === undefined
           ? state.maxLength === undefined
-            ? t('textArea.count', { count: state.count })
-            : t('textArea.countOfMax', { count: state.count, maxLength: state.maxLength })
+            ? words.number(state.count)
+            : words.ratio(state.count, state.maxLength)
           : resolve(children, state)}
       </output>
       <span role="status" className="sr-only">

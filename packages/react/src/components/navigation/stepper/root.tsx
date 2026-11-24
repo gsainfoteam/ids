@@ -8,8 +8,8 @@ import { StepperContent } from './parts/content';
 import { StepperItem } from './parts/item';
 import { stepperStyle } from './style';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { resolveState } from '../../../internal/lib/state-props';
-import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { useInternalRovingFocus } from '../../utility/group/hooks/use-roving-focus';
@@ -45,7 +45,6 @@ export function StepperRoot(props: Stepper.Props) {
     ...rest
   } = props;
 
-  const t = useInternalTranslate();
   const id = useId();
   const listRef = useRef<HTMLOListElement>(null);
   const [current, setCurrent] = useControllableState({
@@ -65,7 +64,6 @@ export function StepperRoot(props: Stepper.Props) {
   const ignoredInARecord = progress
     ? ''
     : PROGRESS_ONLY_PROPS.filter((name) => props[name] !== undefined).join(', ');
-  const unnamedRecord = !progress && ariaLabel === undefined && ariaLabelledBy === undefined;
 
   const roving = useInternalRovingFocus({
     rootRef: listRef,
@@ -98,15 +96,12 @@ export function StepperRoot(props: Stepper.Props) {
     );
   }, [ignoredInARecord]);
 
-  useEffect(() => {
-    if (isDevelopment && unnamedRecord)
-      console.warn(
-        '[IDS] Stepper: progress={false} has no default list name, since "Progress" does not describe a record of events. Pass aria-label or aria-labelledby, such as aria-label="Recent activity".',
-      );
-  }, [unnamedRecord]);
+  useInternalRequiredName('Stepper', {
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+  });
 
   const styles = stepperStyle({ orientation, size, interactive, progress });
-  const defaultLabel = progress ? t('stepper.label') : undefined;
 
   return (
     <StepperContext
@@ -139,7 +134,7 @@ export function StepperRoot(props: Stepper.Props) {
       >
         <ol
           ref={listRef}
-          aria-label={ariaLabelledBy === undefined ? (ariaLabel ?? defaultLabel) : ariaLabel}
+          aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
           className={styles.list()}
         >

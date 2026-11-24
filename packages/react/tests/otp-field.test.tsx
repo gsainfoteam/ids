@@ -3,7 +3,7 @@ import { createRef, useImperativeHandle, useState, type ReactNode, type Ref } fr
 import { zodResolver } from '@hookform/resolvers/zod';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
-import { expect, test } from 'vitest';
+import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { z } from 'zod';
@@ -92,13 +92,24 @@ test('SSR: one real input carries the name, label, description, validation and a
   expect([...new FormData(doc.querySelector('form')!)]).toEqual([['code', '123456']]);
 });
 
-test('an unlabelled field gets a default accessible name; the HTML pattern only checks length', () => {
+test('an unlabelled field gets no default name; the HTML pattern only checks length', () => {
   const html = (props: Partial<OTPField.Props>) =>
     parse(renderToString(<OTPField length={4} {...props} />)).querySelector('input')!;
-  expect(html({}).getAttribute('aria-label')).toBe('인증 코드');
-  expect(html({ id: 'x' }).hasAttribute('aria-label')).toBe(false);
+  expect(html({}).hasAttribute('aria-label')).toBe(false);
+  expect(html({ 'aria-label': '인증 코드' }).getAttribute('aria-label')).toBe('인증 코드');
   expect(html({ pattern: 'alphanumeric' }).inputMode).toBe('text');
   expect(html({ pattern: /[a-c]/i }).getAttribute('pattern')).toBe('.{4}');
+});
+
+test('warns in development when nothing names the field', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  onTestFinished(() => warn.mockRestore());
+
+  await render(<OTPField length={4} />);
+
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('[IDS] OTPField: it has no accessible name'),
+  );
 });
 
 test('typed input is cleaned, complete fires once per transition to full', async () => {

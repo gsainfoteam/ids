@@ -6,6 +6,8 @@ import { invariant } from '../../../utils';
 
 import type { FileFieldState } from '.';
 import type { useInternalFileField } from './hooks/use-file-field';
+import type { FileFieldRejection } from './lib/file-rules';
+import type { FileFieldLimits } from './parts/limits';
 import type { filePartsStyle } from './style';
 import type { IdsSize } from '../../../tokens/types';
 
@@ -15,7 +17,7 @@ type FileFieldContextValue = {
   state: FileFieldState;
   size: IdsSize;
   placeholder: ReactNode;
-  limits: string;
+  limits: FileFieldLimits;
   limitsId: string;
   triggerProps: Record<string, unknown>;
   styles: ReturnType<typeof filePartsStyle>;
@@ -24,6 +26,7 @@ type FileFieldContextValue = {
 
 export const FileContext = createContext<FileFieldContextValue | null>(null);
 export const FileRowContext = createContext(false);
+export const FileRejectionContext = createContext<FileFieldRejection | null>(null);
 
 export function useInternalFile(part: string) {
   const context = use(FileContext);

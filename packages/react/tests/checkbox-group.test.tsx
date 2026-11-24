@@ -135,7 +135,7 @@ test('value: uncontrolled appends in click order, controlled follows the parent,
   await expect.element(box('js')).toHaveAttribute('aria-readonly', 'true');
 });
 
-test('required means at least one, with its own message, and reset restores the default', async () => {
+test('required means at least one, with the browser message, and reset restores the default', async () => {
   const changes: string[][] = [];
   const screen = await render(
     <form>
@@ -158,7 +158,8 @@ test('required means at least one, with its own message, and reset restores the 
   expect(validator()!.checkValidity()).toBe(true);
   await userEvent.click(ts);
   expect(validator()!.checkValidity()).toBe(false);
-  expect(validator()!.validationMessage).toBe('하나 이상 선택하세요.');
+  expect(validator()!.validity.valueMissing).toBe(true);
+  expect(validator()!.validity.customError, 'the browser writes the message').toBe(false);
   expect(form.checkValidity()).toBe(false);
   await userEvent.click(screen.getByRole('button', { name: 'Reset' }));
   await expect.element(boxOf(ts)).toHaveAttribute('data-state', 'checked');

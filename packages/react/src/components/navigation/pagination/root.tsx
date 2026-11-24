@@ -4,7 +4,7 @@ import { PaginationContext, type PaginationContextValue } from './context';
 import { useInternalPagination } from './hooks/use-pagination';
 import { PaginationList } from './parts/list';
 import { paginationStyle } from './style';
-import { useInternalTranslate } from '../../../internal/translate';
+import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { mergeEventHandlers, mergeRefs } from '../../../utils';
 
 import type { Pagination } from '.';
@@ -26,7 +26,8 @@ export function PaginationRoot({
   children,
   ...props
 }: Pagination.Props) {
-  const t = useInternalTranslate();
+  useInternalRequiredName('Pagination', props);
+
   const pagination = useInternalPagination({
     page: pageProp,
     defaultPage,
@@ -53,7 +54,6 @@ export function PaginationRoot({
   return (
     <PaginationContext value={context}>
       <nav
-        aria-label={t('pagination.label')}
         {...props}
         ref={mergeRefs(pagination.rootRef, ref)}
         data-size={size}

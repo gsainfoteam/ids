@@ -32,10 +32,10 @@ const COLOR_NAME: Record<DocumentColor, IdsMessageKey> = {
   primary: 'editor.colorPrimary',
   secondary: 'editor.colorSecondary',
   tertiary: 'editor.colorTertiary',
-  info: 'editor.colorInfo',
-  success: 'editor.colorSuccess',
-  warning: 'editor.colorWarning',
-  danger: 'editor.colorDanger',
+  info: 'common.status.info',
+  success: 'common.status.success',
+  warning: 'common.status.warning',
+  danger: 'common.status.danger',
 };
 
 const NOTHING_PICKED: Picked = { text: null, highlight: null };

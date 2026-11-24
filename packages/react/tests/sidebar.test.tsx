@@ -80,19 +80,24 @@ test('collapsible adds a collapse button to the header that hides the labels and
   const onCollapsedChange = vi.fn();
   const screen = await render(
     ui(
-      <Sidebar value="/" collapsible="icon" onCollapsedChange={onCollapsedChange}>
+      <Sidebar
+        aria-label="사이드바"
+        value="/"
+        collapsible="icon"
+        onCollapsedChange={onCollapsedChange}
+      >
         <Sidebar.Header>로고</Sidebar.Header>
         <Menu />
       </Sidebar>,
     ),
   );
 
-  const toggle = screen.getByRole('button', { name: '사이드바 접기' });
+  const toggle = screen.getByRole('button', { name: '접기' });
   await expect.element(toggle).toHaveAttribute('aria-expanded', 'true');
   await userEvent.click(toggle);
 
   expect(onCollapsedChange).toHaveBeenLastCalledWith(true);
-  const expand = screen.getByRole('button', { name: '사이드바 펼치기' });
+  const expand = screen.getByRole('button', { name: '펼치기' });
   await expect.element(expand).toHaveAttribute('aria-expanded', 'false');
   await expect.element(screen.getByRole('complementary')).toHaveAttribute('data-collapsed', '');
 
@@ -106,19 +111,19 @@ test('Mod+B collapses and expands, and persist writes the state to a cookie', as
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar collapsible="icon" persist="sidebar">
+      <Sidebar aria-label="사이드바" collapsible="icon" persist="sidebar">
         <Menu />
       </Sidebar>,
     ),
   );
 
-  await expect.element(screen.getByRole('button', { name: '사이드바 접기' })).toBeVisible();
+  await expect.element(screen.getByRole('button', { name: '접기' })).toBeVisible();
   await pressShortcut();
-  await expect.element(screen.getByRole('button', { name: '사이드바 펼치기' })).toBeVisible();
+  await expect.element(screen.getByRole('button', { name: '펼치기' })).toBeVisible();
   expect(document.cookie).toContain('sidebar=true');
 
   await pressShortcut();
-  await expect.element(screen.getByRole('button', { name: '사이드바 접기' })).toBeVisible();
+  await expect.element(screen.getByRole('button', { name: '접기' })).toBeVisible();
   expect(document.cookie).toContain('sidebar=false');
 });
 
@@ -128,7 +133,7 @@ test('Mod+B typed in a text field stays with the field', async () => {
   const screen = await render(
     ui(
       <div className="flex">
-        <Sidebar collapsible="icon" onCollapsedChange={onCollapsedChange}>
+        <Sidebar aria-label="사이드바" collapsible="icon" onCollapsedChange={onCollapsedChange}>
           <Menu />
         </Sidebar>
         <main>
@@ -141,21 +146,21 @@ test('Mod+B typed in a text field stays with the field', async () => {
   await userEvent.click(screen.getByRole('textbox', { name: '본문' }));
   await pressShortcut();
 
-  await expect.element(screen.getByRole('button', { name: '사이드바 접기' })).toBeVisible();
+  await expect.element(screen.getByRole('button', { name: '접기' })).toBeVisible();
   expect(onCollapsedChange).not.toHaveBeenCalled();
 });
 
 test('defaultCollapsed renders the icon rail in the server HTML', () => {
   const html = renderToString(
     ui(
-      <Sidebar collapsible="icon" defaultCollapsed>
+      <Sidebar aria-label="사이드바" collapsible="icon" defaultCollapsed>
         <Menu />
       </Sidebar>,
     ),
   );
 
   expect(html).toContain('data-collapsed=""');
-  expect(html).toContain('aria-label="사이드바 펼치기"');
+  expect(html).toContain('aria-label="펼치기"');
 });
 
 test('the inset body is a Card in the server HTML, and a plain main beside other variants', () => {
@@ -165,7 +170,7 @@ test('the inset body is a Card in the server HTML, and a plain main beside other
         renderToString(
           ui(
             <Sidebar.Provider>
-              <Sidebar variant={variant}>
+              <Sidebar aria-label="사이드바" variant={variant}>
                 <Menu />
               </Sidebar>
               <Sidebar.Inset>본문</Sidebar.Inset>
@@ -184,7 +189,7 @@ test('a nested item opens as an accordion, and as a menu in the icon rail', asyn
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar value="/settings/alerts" collapsible="icon">
+      <Sidebar aria-label="사이드바" value="/settings/alerts" collapsible="icon">
         <Menu />
       </Sidebar>,
     ),
@@ -198,7 +203,7 @@ test('a nested item opens as an accordion, and as a menu in the icon rail', asyn
   await userEvent.click(settings);
   await expect.element(settings).toHaveAttribute('aria-expanded', 'false');
 
-  await userEvent.click(screen.getByRole('button', { name: '사이드바 접기' }));
+  await userEvent.click(screen.getByRole('button', { name: '접기' }));
   const railSettings = screen.getByRole('button', { name: '설정' });
   await expect.element(railSettings).toHaveAttribute('data-selected', '');
   await userEvent.click(railSettings);
@@ -211,7 +216,7 @@ test('a collapsible group folds its list', async () => {
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar>
+      <Sidebar aria-label="사이드바">
         <Sidebar.Group label="즐겨찾기" collapsible>
           <Sidebar.Item href="#a">문서</Sidebar.Item>
         </Sidebar.Group>
@@ -232,7 +237,7 @@ test('a group hands its section props to its section, collapsible or not', async
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar>
+      <Sidebar aria-label="사이드바">
         <Sidebar.Group label="즐겨찾기" collapsible id="favorites" data-testid="collapsible">
           <Sidebar.Item href="#a">문서</Sidebar.Item>
         </Sidebar.Group>
@@ -258,7 +263,7 @@ test('a group hands its section props to its section, collapsible or not', async
 test('below 640px the trigger opens the sidebar in a drawer that a press on an item closes', async () => {
   const screen = await render(
     ui(
-      <Sidebar value="/">
+      <Sidebar aria-label="사이드바" value="/">
         <Menu />
       </Sidebar>,
     ),
@@ -279,7 +284,7 @@ test('with a Provider, a Trigger outside the sidebar shares its state and offcan
   const screen = await render(
     ui(
       <Sidebar.Provider>
-        <Sidebar collapsible="offcanvas" variant="inset">
+        <Sidebar aria-label="사이드바" collapsible="offcanvas" variant="inset">
           <Sidebar.Header>로고</Sidebar.Header>
           <Menu />
         </Sidebar>
@@ -310,7 +315,7 @@ test('offcanvas or inset without a Provider warns in development', async () => {
 
   await render(
     ui(
-      <Sidebar collapsible="offcanvas" variant="inset">
+      <Sidebar aria-label="사이드바" collapsible="offcanvas" variant="inset">
         <Menu />
       </Sidebar>,
     ),
@@ -324,7 +329,7 @@ test('items nest to any depth, as accordions in the panel and as nested menus in
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar value="frontend-issues" collapsible="icon">
+      <Sidebar aria-label="사이드바" value="frontend-issues" collapsible="icon">
         <Sidebar.Item value="info">
           <HomeIcon />
           인포팀
@@ -349,7 +354,7 @@ test('items nest to any depth, as accordions in the panel and as nested menus in
     .element(screen.getByRole('button', { name: '프론트엔드' }))
     .toHaveAttribute('aria-expanded', 'true');
 
-  await userEvent.click(screen.getByRole('button', { name: '사이드바 접기' }));
+  await userEvent.click(screen.getByRole('button', { name: '접기' }));
   await userEvent.click(screen.getByRole('button', { name: '인포팀' }));
   await userEvent.click(screen.getByRole('menuitem', { name: '프론트엔드' }));
   await expect
@@ -382,7 +387,7 @@ function Docs({
   const [docs, setDocs] = useState(DOCS);
 
   return (
-    <Sidebar>
+    <Sidebar aria-label="사이드바">
       <Sidebar.Group
         label="문서"
         items={docs}

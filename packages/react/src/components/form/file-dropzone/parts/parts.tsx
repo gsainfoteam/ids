@@ -5,8 +5,10 @@ import { type ComponentType } from 'react';
 import { registerPartAlias } from '../../file-field/lib/is-type';
 import { FileClear, type FileClearProps } from '../../file-field/parts/clear';
 import { FileItem, type FileItemProps } from '../../file-field/parts/item';
+import { FileLimits, type FileLimitsProps } from '../../file-field/parts/limits';
 import { FileList, type FileListProps } from '../../file-field/parts/list';
 import { FilePreview, type FilePreviewProps } from '../../file-field/parts/preview';
+import { FileRejection, type FileRejectionProps } from '../../file-field/parts/rejection';
 import { FileRemove, type FileRemoveProps } from '../../file-field/parts/remove';
 import { FileTrigger, type FileTriggerProps } from '../../file-field/parts/trigger';
 import { FileValue, type FileValueProps } from '../../file-field/parts/value';
@@ -35,6 +37,12 @@ export const FileDropzonePreview = renamedPart<FilePreviewProps>(
   'FileDropzone.Preview',
 );
 
+export const FileDropzoneLimits = renamedPart<FileLimitsProps>(FileLimits, 'FileDropzone.Limits');
+export const FileDropzoneRejection = renamedPart<FileRejectionProps>(
+  FileRejection,
+  'FileDropzone.Rejection',
+);
+
 export type FileDropzoneTriggerProps = FileTriggerProps;
 export type FileDropzoneValueProps = FileValueProps;
 export type FileDropzoneClearProps = FileClearProps;
@@ -42,3 +50,5 @@ export type FileDropzoneListProps = FileListProps;
 export type FileDropzoneItemProps = FileItemProps;
 export type FileDropzoneRemoveProps = FileRemoveProps;
 export type FileDropzonePreviewProps = FilePreviewProps;
+export type FileDropzoneLimitsProps = FileLimitsProps;
+export type FileDropzoneRejectionProps = FileRejectionProps;

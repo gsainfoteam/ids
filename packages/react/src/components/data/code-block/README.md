@@ -39,7 +39,7 @@ import { CodeBlock } from '@gsainfoteam/ids-react';
 <figure>                         {/* 루트. figcaption 이 이름이 된다 */}
   <figcaption>Title · language</figcaption>
   <hr aria-hidden />             {/* Divider */}
-  <button aria-label="코드 복사" /> {/* IconButton */}
+  <button aria-label="복사" /> {/* IconButton */}
   <pre>                          {/* ScrollArea.Viewport */}
     <code>
       <span>...</span>     {/* 줄마다 하나 */}
@@ -50,7 +50,7 @@ import { CodeBlock } from '@gsainfoteam/ids-react';
 ```
 
 - `CodeBlock.Title` 과 `language` 가 `<figcaption>` 이 됩니다. 둘 다 없으면(`language` 가 `text`) figcaption 없이 복사 버튼만 코드 위에 뜹니다. 그때 첫 줄은 오른쪽을 버튼 폭만큼 비워, 글자가 버튼 밑에 가리지 않습니다.
-- 복사 버튼은 figcaption 밖에 둡니다. 안에 두면 figure 의 이름에 "코드 복사" 가 섞입니다.
+- 복사 버튼은 figcaption 밖에 둡니다. 안에 두면 figure 의 이름에 "복사" 가 섞입니다.
 - `<pre>` 는 `dir="ltr"` 입니다. 오른쪽에서 왼쪽으로 쓰는 페이지에서도 코드는 왼쪽부터 씁니다.
 
 ## 코드 넘기기
@@ -153,7 +153,8 @@ const answer = 42;
 ```
 
 - 코드가 `collapsedLines` 보다 길면 그 줄 수만 보이고, 다음 줄이 흐리게 비칩니다. 짧으면 아무것도 바꾸지 않습니다.
-- 아래 가운데의 `Button`(outline, tiny)이 "N줄 더 보기" 와 "접기" 를 오갑니다. `aria-expanded` 와 `aria-controls`(`<pre>`)가 붙습니다.
+- 아래 가운데의 `IconButton`(outline, tiny)이 아래 chevron("펼치기")과 위 chevron("접기")을 오갑니다. 숨은 줄 수는 쓰지 않습니다.
+- 버튼에 `aria-expanded` 와 `aria-controls`(`<pre>`)가 붙어, 스크린 리더는 펼침 상태를 따로 읽습니다.
 - 접을 때 버튼이 화면 밖으로 밀려나면 버튼이 보이게 스크롤합니다.
 - 줄 수는 서버에서 셉니다. 서버 HTML 부터 접힌 채로 오고, 크기를 재지 않아 hydration 뒤에 높이가 바뀌지 않습니다.
 - 접혀 있어도 복사 버튼은 코드 전체를 복사합니다.
@@ -167,7 +168,7 @@ const answer = 42;
 </CodeBlock>
 ```
 
-- 기본 이름은 "코드 복사", 복사한 뒤 1.5초 동안 "복사했습니다" 입니다. `aria-label` 을 주면 그 이름을 그대로 씁니다.
+- 기본 이름은 "복사", 복사한 뒤 1.5초 동안 "복사했습니다" 입니다. `aria-label` 을 주면 그 이름을 그대로 씁니다.
 - 복사하면 아이콘이 체크로 바뀌고, `role="status"` 로 "복사했습니다" 를 알립니다.
 - 복사하는 것은 넘긴 코드 문자열 그대로입니다. 줄 번호도 강조도 들어가지 않습니다.
 - `navigator.clipboard.writeText` 가 없는 곳(보안 컨텍스트가 아닌 http)에서는 그리지 않습니다. 서버 HTML 에도 없고, hydration 뒤에 나타납니다. 자리를 차지하지 않는 절대 위치라 레이아웃이 밀리지 않습니다.

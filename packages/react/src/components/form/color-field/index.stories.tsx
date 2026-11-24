@@ -171,7 +171,7 @@ export const PickWithTransparencyAndAPalette: Story = {
       <div className="grid w-72 gap-3">
         <Field>
           <Field.Label>브랜드 색상</Field.Label>
-          <ColorField value={value} onValueChange={setValue}>
+          <ColorField value={value} onValueChange={setValue} placeholder="색상 선택">
             <ColorField.Content>
               <ColorPicker.Area />
               <div className="flex min-w-0 items-center gap-2">
@@ -224,7 +224,7 @@ export const PickWithTransparencyAndAPalette: Story = {
     await userEvent.keyboard('{Escape}');
     await expect(trigger).toHaveFocus();
     await expect(canvas.queryByRole('dialog')).toBeNull();
-    await userEvent.click(canvas.getByRole('button', { name: '색상 지우기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     await expect(canvas.getByLabelText('색상 결과')).toBeEmptyDOMElement();
     await expect(trigger).toHaveTextContent('색상 선택');
   },

@@ -28,7 +28,7 @@ export function MessageCopy({ text, children, onClick, ...props }: MessageCopyPr
     <>
       <IconButton
         {...props}
-        aria-label={props['aria-label'] ?? (copied ? t('message.copied') : t('message.copy'))}
+        aria-label={props['aria-label'] ?? (copied ? t('common.copied') : t('common.copy'))}
         data-copied={copied ? '' : undefined}
         icon={
           children ??
@@ -37,7 +37,7 @@ export function MessageCopy({ text, children, onClick, ...props }: MessageCopyPr
         onClick={mergeEventHandlers(onClick, copy)}
       />
       <span role="status" className={styles.hint()}>
-        {copied ? t('message.copied') : ''}
+        {copied ? t('common.copied') : ''}
       </span>
     </>
   );

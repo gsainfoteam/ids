@@ -92,7 +92,6 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
               <TextField
                 size="tiny"
                 aria-label={t('editor.imageAlt')}
-                placeholder={t('editor.imageAltPlaceholder')}
                 value={alt}
                 onValueChange={setAlt}
                 onKeyDown={onPlainEnter(applyAlt)}

@@ -21,7 +21,7 @@ export function FileClear({ className, onClick, ...props }: FileClearProps) {
   return (
     <GhostButton
       {...props}
-      aria-label={props['aria-label'] ?? t('fileField.clear')}
+      aria-label={props['aria-label'] ?? t('common.clear')}
       disabled={c.state.disabled}
       data-file-field-clear=""
       size={c.size}
