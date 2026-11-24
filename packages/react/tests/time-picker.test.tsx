@@ -5,6 +5,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, TimePicker } from '../src';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -12,7 +13,7 @@ const ssr = (props: TimePicker.Props, locale?: string) =>
   parse(
     renderToString(
       locale ? (
-        <IdsProvider theme={testTheme} locale={locale}>
+        <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
           <TimePicker {...props} />
         </IdsProvider>
       ) : (

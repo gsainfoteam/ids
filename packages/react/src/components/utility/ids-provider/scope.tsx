@@ -2,9 +2,12 @@
 
 import { IdsProviderRoot, type IdsProviderRootProps } from './root';
 
-export type IdsProviderScopeProps = IdsProviderRootProps;
+export type IdsProviderScopeProps<Language extends string = string> =
+  IdsProviderRootProps<Language>;
 
-export function IdsProviderScope(props: IdsProviderScopeProps) {
+export function IdsProviderScope<const Language extends string = string>(
+  props: IdsProviderScopeProps<Language>,
+) {
   return <IdsProviderRoot {...props} />;
 }
 

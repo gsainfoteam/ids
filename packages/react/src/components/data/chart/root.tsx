@@ -20,7 +20,6 @@ import { ChartTitle } from './title';
 import { useChartSize } from './use-chart-size';
 import { useKeysOverARestingPointer } from './use-keys-over-a-resting-pointer';
 import { hasAccessibleName, useUnnamedWarning } from '../../../internal/accessible-name';
-import { DEFAULT_LOCALE } from '../../../internal/messages';
 import { useProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
@@ -157,7 +156,7 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
       value={{
         config,
         styles,
-        locale: providerLocale ?? DEFAULT_LOCALE,
+        locale: providerLocale,
         titleId,
         descriptionId,
         table,

@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { en } from '../../../locales/en';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
 
@@ -153,17 +154,17 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Locale">
         <Showcase.Row label="en-US">
-          <IdsProvider.Scope locale="en-US">
+          <IdsProvider.Scope locale={en}>
             <Calendar today={today} aria-label="English" />
           </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="de-DE">
-          <IdsProvider.Scope locale="de-DE">
+          <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
             <Calendar today={today} aria-label="Deutsch" />
           </IdsProvider.Scope>
         </Showcase.Row>
         <Showcase.Row label="ar-EG-u-nu-arab · rtl">
-          <IdsProvider.Scope locale="ar-EG-u-nu-arab" dir="rtl">
+          <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }} dir="rtl">
             <Calendar today={today} aria-label="العربية" />
           </IdsProvider.Scope>
         </Showcase.Row>
@@ -447,19 +448,19 @@ export const ShowWeekNumbers: Story = {
 export const FollowTheLocale: Story = {
   render: () => (
     <div className="flex flex-wrap gap-8">
-      <IdsProvider.Scope locale="en-US">
+      <IdsProvider.Scope locale={en}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="English" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="en-US-u-fw-mon">
+      <IdsProvider.Scope locale={{ ...en, tag: 'en-US-u-fw-mon' }}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Monday first" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="ja-JP">
+      <IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="日本語" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="de-DE">
+      <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Deutsch" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope locale="ar-EG-u-nu-arab" dir="rtl">
+      <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }} dir="rtl">
         <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="العربية" />
       </IdsProvider.Scope>
     </div>

@@ -264,15 +264,19 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 ## locale
 
 ```tsx
-<Scheduler aria-label="일정표" locale="en-US" />    // Sun 15, "November 15 – 21, 2026", 9:00 AM
-<Scheduler aria-label="일정표" locale="de-DE" />    // 월요일 시작, "16.–22. November 2026", 9:00
-<Scheduler aria-label="일정표" weekStartsOn={1} />  // 첫 요일을 정한다(0 일요일 ~ 6 토요일)
+<IdsProvider.Scope locale={en}>
+  <Scheduler aria-label="Schedule" />                // Sun 15, "November 15 – 21, 2026", 9:00 AM
+</IdsProvider.Scope>
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
+  <Scheduler aria-label="Kalender" />                // 월요일 시작, "16.–22. November 2026", 9:00
+</IdsProvider.Scope>
+<Scheduler aria-label="일정표" weekStartsOn={1} />   // 첫 요일을 정한다(0 일요일 ~ 6 토요일)
 ```
 
-- `locale` 이 없으면 IdsProvider 의 locale, 그다음 `ko-KR` 입니다.
+- 가장 가까운 IdsProvider 의 locale 을 따르고, 없으면 `ko-KR` 입니다.
 - 이전, 오늘, 다음 버튼과 보기 전환의 이름은 Intl 이 locale 로 그립니다(`지난주`, `오늘`, `다음 주`, `월`, `주`, `3일`, `일`). 영어는 첫 글자를 대문자로 씁니다(`Today`, `Month`).
 - `days`, `day` 보기의 이전, 다음은 `3일 전`, `3일 후`, `1일 전`, `1일 후` 입니다. 월 보기의 넘친 일정은 `+2` 입니다.
-- 그 밖의 문구(보기, 날짜로 이동, 끌기 안내)는 IdsProvider `translate` 를 따릅니다(`scheduler.*` 키).
+- 그 밖의 문구(보기, 날짜로 이동, 끌기 안내)는 IdsProvider `locale` 의 `scheduler.*` 문구를 따릅니다.
 
 ## Props
 
@@ -282,7 +286,6 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | `view` / `defaultView` / `onViewChange` | `'month' \| 'week' \| 'days' \| 'day'` | `'week'`             |
 | `dayCount` / `defaultDayCount` / `onDayCountChange` | `number` (`days` 보기의 날 수, 2 ~ 14) | `3`  |
 | `date` / `defaultDate` / `onDateChange` | `CalendarDate`                        | 오늘                 |
-| `locale`                                | `string` (BCP 47)                     | Provider locale      |
 | `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |
 | `now`                                   | `CalendarDateTime`                    | 클라이언트 시계      |
 | `onEventChange`                         | `(event, { start, end }) => void`     | 없음(옮기지 않음)    |

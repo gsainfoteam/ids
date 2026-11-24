@@ -12,7 +12,6 @@ type Context = {
   align: MessageAlign;
   name: string | undefined;
   time: Date | undefined;
-  locale: string | undefined;
   status: MessageStatus;
   unread: number | boolean | undefined;
   last: boolean;

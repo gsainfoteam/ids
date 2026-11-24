@@ -5,8 +5,9 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Empty, IdsProvider, Link } from '../src';
+import { defineIdsLocale, Empty, IdsProvider, Link } from '../src';
 import { testTheme } from './theme';
+import { en } from '../src/locales/en';
 
 type RouterState = { isActive: boolean };
 type RouterLinkProps = Omit<ComponentProps<'a'>, 'children' | 'className' | 'style'> & {
@@ -77,12 +78,15 @@ test('the rel the app gives wins, and other targets get no hint', async () => {
   expect(same.element().querySelector('[data-link-new-tab]')).toBeNull();
 });
 
-test('the hint follows the IdsProvider translate', async () => {
+test('the hint follows the IdsProvider locale', async () => {
+  const hint = defineIdsLocale({
+    language: 'en',
+    tag: 'en-US',
+    messages: { link: { newTab: '(opens in a new tab)' } },
+    base: en,
+  });
   const screen = await render(
-    <IdsProvider
-      theme={testTheme}
-      translate={(key) => (key === 'link.newTab' ? '(opens in a new tab)' : undefined)}
-    >
+    <IdsProvider theme={testTheme} locale={hint}>
       <Link href="https://www.gist.ac.kr" target="_blank">
         GIST
       </Link>
