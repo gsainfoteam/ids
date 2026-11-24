@@ -14,6 +14,7 @@ import 'components/floating_button_usecase.dart';
 import 'components/toggle_usecase.dart';
 import 'components/toggle_group_usecase.dart';
 import 'components/icon_toggle_usecase.dart';
+import 'components/tabs_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -50,6 +51,12 @@ final directories = <WidgetbookNode>[
             name: 'IdsIconToggle',
             useCases: iconToggleUseCases,
           ),
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Navigation',
+        children: [
+          WidgetbookComponent(name: 'IdsTabs', useCases: tabsUseCases),
         ],
       ),
       WidgetbookFolder(

@@ -315,7 +315,6 @@ IdsButtonGroup(
 `indeterminate`에서 활성화하면 체크 상태가 되고, `onCheckedChange`는 다음 값을
 `bool`로 전달한다. `checked`를 사용하면 호출자가 값을 갱신한다. Flutter `Form` 안에서
 `required`, `validator`, `onSaved`를 쓸 수 있다.
-`onClick`에서 `event.preventDefault()`를 호출하면 체크 상태 변경을 취소할 수 있다.
 `label`을 지정하면 레이블을 눌러 선택할 수 있으며 레이블 텍스트를 접근성 이름으로 사용한다.
 `semanticLabel`로 접근성 이름을 별도로 지정할 수 있다.
 `IdsCheckboxIndicator`를 자식으로 넣어 기본 표시를 바꿀 수 있다.
@@ -340,18 +339,17 @@ IdsCheckbox(
 지정하고, `IdsCheckboxGroupAll`을 사용해 활성 항목만 한꺼번에 선택하거나 해제한다.
 전체 선택은 일부 항목만 체크되어 있을 때 혼합 상태를 그린다.
 `IdsCheckboxGroupAll`의 `builder`와 `style`로 전체 선택 상태에 맞춰 표시를 바꿀 수 있다.
-`withParts` 빌더의 `parts.item`은 그룹과 같은 값 타입을 사용한다.
 그룹의 `style`에는 현재 상태와 기본 레이아웃 위젯이 전달된다. 선택 상태에 따라
 그룹에 배경이나 여백을 적용할 수 있다.
 
 ```dart
-IdsCheckboxGroup<String>.withParts(
+IdsCheckboxGroup<String>(
   defaultValue: const ['email'],
   semanticLabel: '알림 방식',
-  builder: (context, parts) => [
-    parts.all(semanticLabel: '전체 선택'),
-    parts.item(value: 'email', semanticLabel: '이메일'),
-    parts.item(value: 'push', semanticLabel: '푸시'),
+  children: [
+    IdsCheckboxGroupAll(semanticLabel: '전체 선택'),
+    IdsCheckboxGroupItem<String>(value: 'email', semanticLabel: '이메일'),
+    IdsCheckboxGroupItem<String>(value: 'push', semanticLabel: '푸시'),
   ],
 )
 ```
@@ -362,10 +360,7 @@ IdsCheckboxGroup<String>.withParts(
 배치된다. 시작·끝 방향과 화면 안전 영역을 적용하며 `placement: null`을 주면
 일반 레이아웃 안에 배치된다. 아이콘만 있으면 원형으로 그린다. 사용자 지정 아이콘이나
 빌더를 사용할 때는 `iconOnly`와 `semanticLabel`을 직접 지정할 수 있다.
-`href`를 주면 링크로 읽히며 클릭과 Enter로 주소를 연다.
-`onPressed`를 함께 주면 앱이 이동을 직접 처리할 수 있고, `onClick`에서
-`event.preventDefault()`를 호출하면 활성화를 취소한다.
-비활성 링크는 목적지를 노출하지 않으며 기본 탭 순서에서 제외된다.
+`onPressed`에서 화면 이동을 처리할 수 있다.
 
 ## Toggle
 
@@ -373,8 +368,6 @@ IdsCheckboxGroup<String>.withParts(
 `onPressedChange`로 외부에서 상태를 제어한다. 마우스, 터치, Space와 Enter로
 상태를 바꿀 수 있다. `IdsToggle.builder`는 눌림·포커스 등 현재 상태를 받는다.
 `style`은 현재 상태와 기본 `ShapeDecoration`을 받아 버튼의 표면을 꾸민다.
-`onClick`에서 `event.preventDefault()`를 호출하면 이번 활성화의 상태 변경과
-`onPressedChange` 호출을 막을 수 있다.
 
 ## ToggleGroup
 
@@ -385,13 +378,44 @@ IdsCheckboxGroup<String>.withParts(
 이미 선택한 항목을 다시 눌러도 선택을 유지한다.
 `IdsToggleGroup<T>`와 `IdsToggleGroup<T>.multiple`은 문자열이나 enum 같은 값을
 선택 콜백과 폼 저장까지 같은 타입으로 전달한다.
+`IdsToggleGroup.controlled(value: ...)`로 단일 선택을 제어하며, 선택이 없으면
+`value: null`을 전달한다. `IdsField` 안에서는 필드 레이블과 필수 상태를 따르고,
+Flutter `Form`에서 `validator`로 선택을 검증할 수 있다.
 
 ## IconToggle
 
 `IdsIconToggle`은 `IdsToggle`과 같은 눌림 상태를 가진 정사각형 아이콘 버튼이다.
-`semanticLabel` 또는 아이콘의 접근성 이름을 제공한다. `IdsIconToggle.builder`로
+필수 `semanticLabel`에 버튼의 접근성 이름을 지정한다. `IdsIconToggle.builder`로
 눌림 상태에 따라 아이콘을 바꿀 수 있고, `IdsToggleGroup` 안에서는 `value`로
 그룹의 선택을 따른다.
+
+## Tabs
+
+`IdsTabsList`의 `IdsTabsTrigger`와 `IdsTabsContent`는 같은 `value`로 연결한다.
+`IdsTabs`는 처음 활성화된 탭을 선택하며 `defaultValue`나 `value`로 이를 지정할 수
+있다. 수동 활성화에서는 방향키가 포커스만 옮기고 Space 또는 Enter로 탭을 선택한다.
+`IdsTabsTrigger.style`은 선택·입력 상태와 기본 `ShapeDecoration`을 받아 탭 표면을 꾸민다.
+`forceMount: true`인 패널은 숨겨질 때도 위젯과 입력 상태가 유지된다.
+`skipTraversal: true`는 패널을 Tab 순서에서 제외하고 직접 포커스할 수 있게 둔다.
+
+```dart
+const IdsTabs(
+  defaultValue: 'overview',
+  children: [
+    IdsTabsList(
+      semanticLabel: '상품 정보',
+      children: [
+        IdsTabsTrigger(value: 'overview', child: Text('개요')),
+        IdsTabsTrigger(value: 'reviews', child: Text('리뷰')),
+      ],
+    ),
+    IdsTabsContent(value: 'overview', child: Text('개요 내용')),
+    IdsTabsContent(value: 'reviews', child: Text('리뷰 내용')),
+  ],
+)
+```
+
+`IdsTabsTrigger<Section>`과 `IdsTabsContent<Section>`처럼 각 위젯에 같은 값 타입을 지정할 수 있다.
 
 ## IconButton
 

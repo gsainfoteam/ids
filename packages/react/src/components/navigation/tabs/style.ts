@@ -20,6 +20,7 @@ export const tabsStyle = tv({
     content: [
       'min-w-0 flex-1 rounded-standard text-neutral-strong focus-ring',
       '[&[hidden]:not([hidden=until-found])]:hidden',
+      '[&[hidden=until-found]]:absolute',
     ],
   },
   variants: {
