@@ -8,7 +8,7 @@ import { lengthOnlyPattern, type OTPFieldPattern } from './otp-code';
 import { OTPFieldSlot } from './slot';
 import { otpFieldStyle } from './style';
 import { useOTPField } from './use-otp-field';
-import { useTranslate } from '../../../internal/translate';
+import { useUnnamedWarning } from '../../../internal/accessible-name';
 import { invariant, mergeProps } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -74,8 +74,6 @@ export function OTPFieldRoot({
   onChange,
   ...inputProps
 }: OTPFieldProps) {
-  const t = useTranslate();
-
   invariant(
     Number.isInteger(length) && length >= 1 && length <= 12,
     'OTPField: length must be an integer from 1 to 12.',
@@ -100,6 +98,7 @@ export function OTPFieldRoot({
     inputProps['aria-label'] !== undefined ||
     inputProps['aria-labelledby'] !== undefined ||
     inputProps.id !== undefined;
+  useUnnamedWarning('OTPField', !labelled);
 
   const cleanBeforeOnChange = (event: ChangeEvent<HTMLInputElement>) => {
     handlers.onChange(event);
@@ -114,7 +113,6 @@ export function OTPFieldRoot({
       autoCapitalize: 'none',
       autoCorrect: 'off',
       spellCheck: false,
-      'aria-label': labelled ? undefined : t('otpField.label'),
       ...passwordManagerOptOut,
       ...inputProps,
     },

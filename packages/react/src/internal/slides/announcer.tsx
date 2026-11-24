@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslate } from '../translate';
+import { useIntlWords, useTranslate } from '../translate';
 
 import type { Slides } from './use-slides';
 
@@ -18,6 +18,7 @@ export function SlidesAnnouncer({
   className,
 }: SlidesAnnouncerProps) {
   const t = useTranslate();
+  const words = useIntlWords();
   const position = { index: slides.firstSlideOf(slides.selected) + 1, count: slides.slideCount };
   const hasSlides = slides.slideCount > 0;
 
@@ -28,7 +29,9 @@ export function SlidesAnnouncer({
       data-slides-announcer=""
       className={className}
     >
-      {hasSlides && counter && <span aria-hidden="true">{t('slides.counter', position)}</span>}
+      {hasSlides && counter && (
+        <span aria-hidden="true">{words.ratio(position.index, position.count)}</span>
+      )}
       {hasSlides && (
         <span className={counter ? 'sr-only' : undefined}>{t('slides.slide', position)}</span>
       )}

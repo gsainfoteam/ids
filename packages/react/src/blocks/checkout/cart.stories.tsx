@@ -91,17 +91,18 @@ export const PC: Story = {
                       </Item.Description>
                     </Item.Content>
                     <Item.Actions>
-                      <NumberField
-                        aria-label={`${product.name} 수량`}
-                        size="tiny"
-                        min={1}
-                        max={9}
-                        value={quantities[product.id]}
-                        onValueChange={(next) =>
-                          setQuantities({ ...quantities, [product.id]: next ?? 1 })
-                        }
-                        className="w-24"
-                      />
+                      <div className="w-24">
+                        <NumberField
+                          aria-label={`${product.name} 수량`}
+                          size="tiny"
+                          min={1}
+                          max={9}
+                          value={quantities[product.id]}
+                          onValueChange={(next) =>
+                            setQuantities({ ...quantities, [product.id]: next ?? 1 })
+                          }
+                        />
+                      </div>
                       <IconButton
                         variant="outline"
                         colorScheme="danger"
@@ -118,61 +119,67 @@ export const PC: Story = {
           )}
         </section>
 
-        <Card className="lg:sticky lg:top-6">
-          <Card.Header>
-            <Card.Title asChild>
-              <h2>주문 금액</h2>
-            </Card.Title>
-          </Card.Header>
-          <Card.Content className="flex flex-col gap-3">
-            <p className="flex justify-between">
-              상품 금액<span>{won.format(subtotal)}원</span>
-            </p>
-            <p className="flex justify-between">
-              배송비<span>{shipping === 0 ? '무료' : `${won.format(shipping)}원`}</span>
-            </p>
-            {discount > 0 && (
-              <p className="flex justify-between">
-                쿠폰 할인<span>−{won.format(discount)}원</span>
-              </p>
-            )}
-            <Divider />
-            <p className="text-body-b2-semibold flex justify-between">
-              결제 금액<span>{won.format(Math.max(total, 0))}원</span>
-            </p>
-            <TextField
-              aria-label="쿠폰 번호"
-              placeholder="쿠폰 번호"
-              value={coupon}
-              onValueChange={setCoupon}
-            >
-              <TextField.Input />
-              <Button
-                variant="soft"
-                size="tiny"
-                disabled={coupon.trim() === ''}
-                onClick={() => {
-                  setDiscount(2000);
-                  toast.success('쿠폰을 적용했어요', { description: '2,000원 할인' });
-                }}
-              >
-                적용
-              </Button>
-            </TextField>
-            {shipping > 0 && (
-              <Alert colorScheme="info">
-                <Alert.Description>
-                  {won.format(FREE_SHIPPING_FROM - subtotal)}원 더 담으면 배송비가 무료예요.
-                </Alert.Description>
-              </Alert>
-            )}
-          </Card.Content>
-          <Card.Footer>
-            <Button asChild className="w-full">
-              <a href="#payment">{lines.length}개 주문하기</a>
-            </Button>
-          </Card.Footer>
-        </Card>
+        <div className="lg:sticky lg:top-6">
+          <Card>
+            <Card.Header>
+              <Card.Title asChild>
+                <h2>주문 금액</h2>
+              </Card.Title>
+            </Card.Header>
+            <Card.Content>
+              <div className="flex flex-col gap-3">
+                <p className="flex justify-between">
+                  상품 금액<span>{won.format(subtotal)}원</span>
+                </p>
+                <p className="flex justify-between">
+                  배송비<span>{shipping === 0 ? '무료' : `${won.format(shipping)}원`}</span>
+                </p>
+                {discount > 0 && (
+                  <p className="flex justify-between">
+                    쿠폰 할인<span>−{won.format(discount)}원</span>
+                  </p>
+                )}
+                <Divider />
+                <p className="text-body-b2-semibold flex justify-between">
+                  결제 금액<span>{won.format(Math.max(total, 0))}원</span>
+                </p>
+                <TextField
+                  aria-label="쿠폰 번호"
+                  placeholder="쿠폰 번호"
+                  value={coupon}
+                  onValueChange={setCoupon}
+                >
+                  <TextField.Input />
+                  <Button
+                    variant="soft"
+                    size="tiny"
+                    disabled={coupon.trim() === ''}
+                    onClick={() => {
+                      setDiscount(2000);
+                      toast.success('쿠폰을 적용했어요', { description: '2,000원 할인' });
+                    }}
+                  >
+                    적용
+                  </Button>
+                </TextField>
+                {shipping > 0 && (
+                  <Alert colorScheme="info">
+                    <Alert.Description>
+                      {won.format(FREE_SHIPPING_FROM - subtotal)}원 더 담으면 배송비가 무료예요.
+                    </Alert.Description>
+                  </Alert>
+                )}
+              </div>
+            </Card.Content>
+            <Card.Footer>
+              <div className="grid flex-1">
+                <Button asChild>
+                  <a href="#payment">{lines.length}개 주문하기</a>
+                </Button>
+              </div>
+            </Card.Footer>
+          </Card>
+        </div>
       </main>
     );
   },

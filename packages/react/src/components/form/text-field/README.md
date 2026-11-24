@@ -61,7 +61,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
   <TextField.Clear />                    {/* aria-label "지우기" */}
 </TextField>
 
-<TextField.Clear aria-label="검색어 지우기" />          {/* 라벨 바꾸기 */}
+<TextField.Clear aria-label="지우기" />          {/* 라벨 바꾸기 */}
 <TextField.Clear><XCircleIcon /></TextField.Clear>     {/* 아이콘 바꾸기 */}
 <TextField.Clear asChild><button>지우기</button></TextField.Clear> {/* 버튼 직접 그리기 */}
 ```

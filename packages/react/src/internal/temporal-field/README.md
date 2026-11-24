@@ -39,7 +39,7 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
     isSame: sameDates,
     display: (next) => describeDates(next, selectionMode, formatDate),
     serialize: (next) => serializeDates(next, selectionMode),
-    messages: messages.dateField,               // range 모드면 placeholder, title 만 바꾼다
+    messages: { clear: t('common.clear'), close: t('common.close') },
     icon: CalendarDaysIcon,
     preferredWidth: cell * 7 * shown + MONTH_GAP * (shown - 1) + POPUP_PADDING_AND_BORDER,
     initialFocusSelector: '[data-calendar-day][tabindex="0"]',
@@ -74,9 +74,9 @@ export namespace DateField {
 | `isSame`               | 같은 값이면 `onValueChange` 를 부르지 않는다                                            |
 | `display`              | Trigger 와 Input 에 보일 글자                                                           |
 | `serialize`            | FormData 로 보낼 문자열. `FormValue` 의 `value`                                         |
-| `messages`             | `placeholder`, `title`, `clear`, `close`, `open`(Input 옆 버튼의 이름)                  |
+| `messages`             | `clear`, `close`, `open`(Input 옆 버튼의 이름)                                          |
 | `icon`                 | Trigger 앞의 아이콘, Input 옆 버튼의 아이콘                                             |
-| `picker`               | 팝업 내용. `{ value, change, close, size }` 를 받는다                                   |
+| `picker`               | 팝업 내용. `{ value, change, close, size, name }` 를 받는다                             |
 | `pickerParts`          | 필드의 자식 중 팝업 안 내용으로 갈 파트(`DateField.Calendar`). 셸 파트로 세지 않는다     |
 | `preferredWidth`       | 팝업의 최소 폭                                                                          |
 | `initialFocusSelector` | 팝업을 열 때 포커스를 줄 요소                                                           |
@@ -96,8 +96,12 @@ export namespace DateField {
 - Clear 는 TextField 의 Clear 와 달리 Tab 순서에 남습니다. Input 이 없는 날짜 필드에는 지울 글자가 없고, 달력에도 값을 비우는 키가 없습니다.
 - Clear 와 Input 옆 버튼은 [`fieldAction.unpadded`](../README.md#field-surfacets) 입니다. Trigger 가 상자 끝까지 차서 상자에 padding 이 없습니다.
 - 팝업은 `TemporalContent` 가 그립니다(`X.Content`). 그래서 좁은 화면의 모양 `mobileVariant` 는 루트가 아니라 Content 의 prop 이고, Content 의 나머지 속성은 팝업 안 내용 상자에 붙습니다. Content 를 주지 않으면 루트가 빈 Content 를 그립니다.
-- 팝업은 `role="dialog"` 이고 이름은 `messages.title`, `data-temporal-owner` 는 `popupId` 입니다. 머리(`FieldPopupHeader`)는 늘 렌더하고 drawer 에서만 보입니다.
-- `DateField.Calendar`, `TimeField.TimePicker` 같은 picker 파트는 `useTemporalPicker(part)` 로 `{ value, change, close, size }` 를 읽어 값을 잇습니다. 루트의 자식으로 적으면 필드 루트가 `pickerPart(children, type)` 로 찾아 `picker` 에서 그리고, `Content` 의 children 안에 적어도 같은 context 를 읽어 그 자리에 그려집니다. `pickerPart` 는 루트의 자식과 `Content` 의 children 을 함께 찾습니다. 팝업 폭(`monthsToShow`)이나 오늘(`today`)처럼 열기 전에 루트가 알아야 하는 속성이 있기 때문이고, 둘 중 한 곳만 찾으면 다른 곳에 적은 속성이 조용히 무시됩니다.
+- 팝업은 `role="dialog"` 이고 `data-temporal-owner` 는 `popupId` 입니다. 이름은 필드의 이름(`picker.name` 과 같은 `aria-labelledby` 나 `aria-label`)입니다. IDS 가 쓴 제목은 없습니다.
+- 팝업의 `aria-labelledby` 로 컨트롤을 가리키지 않습니다. combobox 를 가리키면 이름 대신 그 값이 읽힙니다(accname 의 embedded control).
+- 머리(`FieldPopupHeader`)는 닫기 버튼 하나이고, 늘 렌더하고 drawer 에서만 보입니다.
+- `placeholder` 에 기본값은 없습니다. 비어 있는 Trigger 는 아무 글자도 그리지 않습니다.
+- `DateField.Calendar`, `TimeField.TimePicker` 같은 picker 파트는 `useTemporalPicker(part)` 로 `{ value, change, close, size, name }` 를 읽어 값을 잇습니다. 루트의 자식으로 적으면 필드 루트가 `pickerPart(children, type)` 로 찾아 `picker` 에서 그리고, `Content` 의 children 안에 적어도 같은 context 를 읽어 그 자리에 그려집니다. `pickerPart` 는 루트의 자식과 `Content` 의 children 을 함께 찾습니다. 팝업 폭(`monthsToShow`)이나 오늘(`today`)처럼 열기 전에 루트가 알아야 하는 속성이 있기 때문이고, 둘 중 한 곳만 찾으면 다른 곳에 적은 속성이 조용히 무시됩니다.
+- `name` 은 필드의 이름입니다. Field 가 준 `aria-labelledby`(Field.Label 의 id), 없으면 `aria-label` 입니다. 팝업 안의 Calendar 는 이름이 필수라서 `{...picker.name}` 으로 필드 이름을 받습니다. 빼면 Calendar 가 개발 모드에서 이름이 없다고 경고합니다.
 - `panel`, `panelTime`, `panelHint` 는 DateTimeField 의 팝업입니다. 달력 옆에 시계를 두고, 휴대폰에서는 위아래로 쌓습니다(`sm:flex-row`).
 
 ### 알아둘 것

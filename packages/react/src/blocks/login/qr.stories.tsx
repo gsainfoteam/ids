@@ -58,93 +58,92 @@ export const PC: Story = {
 
     return (
       <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
-        <Card className="w-full max-w-sm">
-          <Card.Header>
-            <Card.Title asChild>
-              <h1>로그인</h1>
-            </Card.Title>
-            <Card.Description>휴대폰에 GIST 앱이 있다면 QR 코드가 더 빨라요.</Card.Description>
-          </Card.Header>
+        <div className="w-full max-w-sm">
+          <Card>
+            <Card.Header>
+              <Card.Title asChild>
+                <h1>로그인</h1>
+              </Card.Title>
+              <Card.Description>휴대폰에 GIST 앱이 있다면 QR 코드가 더 빨라요.</Card.Description>
+            </Card.Header>
 
-          <Card.Content>
-            <Tabs defaultValue="qr" variant="segmented" className="gap-5">
-              <Tabs.List aria-label="로그인 방법" className="w-full *:flex-1">
-                <Tabs.Trigger value="qr">
-                  <QrCodeIcon />
-                  QR 코드
-                </Tabs.Trigger>
-                <Tabs.Trigger value="password">
-                  <KeyIcon />
-                  비밀번호
-                </Tabs.Trigger>
-              </Tabs.List>
+            <Card.Content>
+              <Tabs defaultValue="qr" variant="segmented">
+                <Tabs.List aria-label="로그인 방법">
+                  <Tabs.Trigger value="qr">
+                    <QrCodeIcon />
+                    QR 코드
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value="password">
+                    <KeyIcon />
+                    비밀번호
+                  </Tabs.Trigger>
+                </Tabs.List>
 
-              <Tabs.Content value="qr">
-                <div className="flex flex-col items-center gap-5">
-                  <QRCode
-                    value={`https://gistory.me/login/qr/${SESSIONS[session]}`}
-                    aria-label="로그인 QR 코드"
-                    shape="rounded"
-                    size={176}
-                  >
-                    <QRCode.Logo>
-                      <CubeTransparentIcon />
-                    </QRCode.Logo>
-                  </QRCode>
+                <Tabs.Content value="qr">
+                  <div className="flex flex-col items-center gap-5">
+                    <QRCode
+                      value={`https://gistory.me/login/qr/${SESSIONS[session]}`}
+                      aria-label="로그인 QR 코드"
+                      shape="rounded"
+                      size={176}
+                    >
+                      <QRCode.Logo>
+                        <CubeTransparentIcon />
+                      </QRCode.Logo>
+                    </QRCode>
 
-                  <ItemGroup
-                    ordered
-                    aria-label="QR 코드로 로그인하는 법"
-                    size="tiny"
-                    className="w-full"
-                  >
-                    {STEPS.map((step, index) => (
-                      <Item key={step}>
-                        <Item.Media variant="soft" aria-hidden>
-                          {index + 1}
-                        </Item.Media>
-                        <Item.Content>
-                          <Item.Title>{step}</Item.Title>
-                        </Item.Content>
-                      </Item>
-                    ))}
-                  </ItemGroup>
+                    <div className="w-full">
+                      <ItemGroup ordered aria-label="QR 코드로 로그인하는 법" size="tiny">
+                        {STEPS.map((step, index) => (
+                          <Item key={step}>
+                            <Item.Media variant="soft" aria-hidden>
+                              {index + 1}
+                            </Item.Media>
+                            <Item.Content>
+                              <Item.Title>{step}</Item.Title>
+                            </Item.Content>
+                          </Item>
+                        ))}
+                      </ItemGroup>
+                    </div>
 
-                  <Button
-                    variant="outline"
-                    size="tiny"
-                    onClick={() => setSession((session + 1) % SESSIONS.length)}
-                  >
-                    <ArrowPathIcon />새 코드 받기
-                  </Button>
-                </div>
-              </Tabs.Content>
+                    <Button
+                      variant="outline"
+                      size="tiny"
+                      onClick={() => setSession((session + 1) % SESSIONS.length)}
+                    >
+                      <ArrowPathIcon />새 코드 받기
+                    </Button>
+                  </div>
+                </Tabs.Content>
 
-              <Tabs.Content value="password">
-                <form onSubmit={signIn} className="flex flex-col gap-4">
-                  <Field>
-                    <Field.Label>이메일</Field.Label>
-                    <TextField
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      placeholder="name@gm.gist.ac.kr"
-                      required
-                    />
-                  </Field>
-                  <Field>
-                    <Field.Label>비밀번호</Field.Label>
-                    <PasswordField name="password" autoComplete="current-password" required />
-                  </Field>
-                  <Button type="submit" disabled={signingIn} className="w-full">
-                    {signingIn && <Spinner />}
-                    {signingIn ? '로그인하는 중' : '로그인'}
-                  </Button>
-                </form>
-              </Tabs.Content>
-            </Tabs>
-          </Card.Content>
-        </Card>
+                <Tabs.Content value="password">
+                  <form onSubmit={signIn} className="flex flex-col gap-4">
+                    <Field>
+                      <Field.Label>이메일</Field.Label>
+                      <TextField
+                        type="email"
+                        name="email"
+                        autoComplete="email"
+                        placeholder="name@gm.gist.ac.kr"
+                        required
+                      />
+                    </Field>
+                    <Field>
+                      <Field.Label>비밀번호</Field.Label>
+                      <PasswordField name="password" autoComplete="current-password" required />
+                    </Field>
+                    <Button type="submit" disabled={signingIn}>
+                      {signingIn && <Spinner />}
+                      {signingIn ? '로그인하는 중' : '로그인'}
+                    </Button>
+                  </form>
+                </Tabs.Content>
+              </Tabs>
+            </Card.Content>
+          </Card>
+        </div>
       </main>
     );
   },

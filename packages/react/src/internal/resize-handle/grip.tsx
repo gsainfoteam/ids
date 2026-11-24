@@ -20,7 +20,7 @@ import { resizeGripStyle } from './style';
 import { axisKeyMap, readingDirection, useAxesDrag, useCornerShape } from './use-resize-axes';
 import { invariant, mergeProps } from '../../utils';
 import { keyHandler, type KeyMap } from '../keys';
-import { useTranslate } from '../translate';
+import { useIntlWords, useTranslate } from '../translate';
 
 export type ResizeGripProps = Omit<ComponentProps<'div'>, 'children'> & {
   axes: readonly [ResizeAxis, ResizeAxis];
@@ -92,6 +92,7 @@ export function ResizeGrip({
   ...props
 }: ResizeGripProps) {
   const t = useTranslate();
+  const words = useIntlWords();
   const custom = asChild || children != null;
   const shape = useCornerShape(corner);
   const arc = shape === null || custom ? null : gripArc(shape.radius, band, shape.exponent);
@@ -130,7 +131,7 @@ export function ResizeGrip({
           separators.current.delete(axis.dimension);
         };
       }}
-      {...axisSeparatorProps(axis, t, disabled)}
+      {...axisSeparatorProps(axis, t, words, disabled)}
       tabIndex={disabled ? undefined : axis.dimension === focusedAxis ? 0 : -1}
       className={styles.separator()}
       onFocus={() => setFocusedAxis(axis.dimension)}
@@ -143,7 +144,7 @@ export function ResizeGrip({
   const group = mergeProps(props, {
     ...drag.dragProps,
     role: 'group',
-    'aria-label': props['aria-label'] ?? t('resizable.handle'),
+    'aria-label': props['aria-label'] ?? t('common.resize'),
     'aria-disabled': disabled || undefined,
     'data-resize-grip': '',
     'data-disabled': disabled ? '' : undefined,

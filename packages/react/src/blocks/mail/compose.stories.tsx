@@ -70,51 +70,53 @@ export const PC: Story = {
               </Card.Action>
             </Card.Header>
 
-            <Card.Content className="flex flex-col gap-4">
-              <Field>
-                <Field.Label>받는 사람</Field.Label>
-                <ChipField
-                  name="to"
-                  value={to}
-                  onValueChange={setTo}
-                  onCreate={noop}
-                  placeholder="이름이나 메일 주소"
-                  required
-                >
-                  {CONTACTS.map((contact) => (
-                    <ChipField.Item key={contact.value} value={contact.value}>
-                      {contact.label}
-                    </ChipField.Item>
-                  ))}
-                </ChipField>
-              </Field>
-              <Field>
-                <Field.Label>제목</Field.Label>
-                <TextField name="subject" defaultValue="10월 정기 회의 안건 보충" required />
-              </Field>
-              <Field>
-                <Field.Label>내용</Field.Label>
-                <TextArea
-                  name="body"
-                  rows={8}
-                  maxRows={20}
-                  maxLength={10000}
-                  defaultValue={
-                    '안녕하세요, 지수입니다.\n\n회의 안건에 해커톤 참가 팀 구성을 하나 더 넣었어요. 금요일 전까지 참가 여부를 댓글로 알려 주세요.'
-                  }
-                >
-                  <TextArea.Input />
-                  <TextArea.Count />
-                </TextArea>
-              </Field>
-              <Field>
-                <Field.Label>첨부 파일</Field.Label>
-                <FileField name="attachments" multiple maxSize={25 * 1024 * 1024} />
-                <Field.Hint>한 파일에 25MB 까지 붙일 수 있어요.</Field.Hint>
-              </Field>
+            <Card.Content>
+              <div className="flex flex-col gap-4">
+                <Field>
+                  <Field.Label>받는 사람</Field.Label>
+                  <ChipField
+                    name="to"
+                    value={to}
+                    onValueChange={setTo}
+                    onCreate={noop}
+                    placeholder="이름이나 메일 주소"
+                    required
+                  >
+                    {CONTACTS.map((contact) => (
+                      <ChipField.Item key={contact.value} value={contact.value}>
+                        {contact.label}
+                      </ChipField.Item>
+                    ))}
+                  </ChipField>
+                </Field>
+                <Field>
+                  <Field.Label>제목</Field.Label>
+                  <TextField name="subject" defaultValue="10월 정기 회의 안건 보충" required />
+                </Field>
+                <Field>
+                  <Field.Label>내용</Field.Label>
+                  <TextArea
+                    name="body"
+                    rows={8}
+                    maxRows={20}
+                    maxLength={10000}
+                    defaultValue={
+                      '안녕하세요, 지수입니다.\n\n회의 안건에 해커톤 참가 팀 구성을 하나 더 넣었어요. 금요일 전까지 참가 여부를 댓글로 알려 주세요.'
+                    }
+                  >
+                    <TextArea.Input />
+                    <TextArea.Count />
+                  </TextArea>
+                </Field>
+                <Field>
+                  <Field.Label>첨부 파일</Field.Label>
+                  <FileField name="attachments" multiple maxSize={25 * 1024 * 1024} />
+                  <Field.Hint>한 파일에 25MB 까지 붙일 수 있어요.</Field.Hint>
+                </Field>
+              </div>
             </Card.Content>
 
-            <Card.Footer className="justify-end">
+            <Card.Footer>
               <Button type="button" variant="outline" onClick={() => toast('임시 저장했어요')}>
                 임시 저장
               </Button>

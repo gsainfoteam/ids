@@ -91,15 +91,17 @@ export const PC: Story = {
           <p className="text-body-b1-regular">
             주제를 고르면 그 주제의 질문만 보여요. 찾는 답이 없으면 GIST 도우미에게 물어보세요.
           </p>
-          <Button asChild variant="soft" className="self-start">
-            <a href="#assistant">
-              <ChatBubbleLeftRightIcon />
-              도우미에게 묻기
-            </a>
-          </Button>
+          <div className="flex">
+            <Button asChild variant="soft">
+              <a href="#assistant">
+                <ChatBubbleLeftRightIcon />
+                도우미에게 묻기
+              </a>
+            </Button>
+          </div>
         </div>
 
-        <Tabs value={topic} onValueChange={setTopic} variant="pill" className="flex flex-col gap-6">
+        <Tabs value={topic} onValueChange={setTopic} variant="pill">
           <Tabs.List aria-label="주제">
             {TOPICS.map((item) => (
               <Tabs.Trigger key={item.id} value={item.id}>

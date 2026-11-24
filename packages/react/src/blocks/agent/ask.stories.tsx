@@ -67,9 +67,11 @@ export const PC: Story = {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
         <div className="flex justify-end">
-          <Card variant="soft" className="max-w-[80%]">
-            <Card.Content>가을 축제 부스 준비 계획 세워 줘.</Card.Content>
-          </Card>
+          <div className="max-w-[80%]">
+            <Card variant="soft">
+              <Card.Content>가을 축제 부스 준비 계획 세워 줘.</Card.Content>
+            </Card>
+          </div>
         </div>
 
         <div className="flex gap-3">
@@ -120,9 +122,13 @@ export const PC: Story = {
                             {choice.label}
                           </Questionnaire.Option>
                         ))}
-                        <Questionnaire.Other placeholder="다른 답이 있으면 적어 주세요" />
+                        <Questionnaire.Other
+                          aria-label="직접 입력"
+                          placeholder="다른 답이 있으면 적어 주세요"
+                        />
                       </Questionnaire.Question>
                     ))}
+                    <Questionnaire.Skip>건너뛰기</Questionnaire.Skip>
                     <Questionnaire.Submit>계획 세우기</Questionnaire.Submit>
                   </Questionnaire>
                 </Card.Content>

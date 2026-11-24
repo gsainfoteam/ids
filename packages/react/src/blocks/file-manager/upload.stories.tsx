@@ -57,91 +57,98 @@ const UPLOADS = [
 export const PC: Story = {
   render: () => (
     <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
-      <Card asChild className="w-full max-w-lg">
-        <form
-          onSubmit={(event: FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            toast.success('자료실에 올렸어요');
-          }}
-        >
-          <Card.Header>
-            <Card.Title asChild>
-              <h1>자료 올리기</h1>
-            </Card.Title>
-            <Card.Description>인포팀 › 2026 가을 폴더에 올려요.</Card.Description>
-          </Card.Header>
+      <div className="w-full max-w-lg">
+        <Card asChild>
+          <form
+            onSubmit={(event: FormEvent<HTMLFormElement>) => {
+              event.preventDefault();
+              toast.success('자료실에 올렸어요');
+            }}
+          >
+            <Card.Header>
+              <Card.Title asChild>
+                <h1>자료 올리기</h1>
+              </Card.Title>
+              <Card.Description>인포팀 › 2026 가을 폴더에 올려요.</Card.Description>
+            </Card.Header>
 
-          <Card.Content className="flex flex-col gap-5">
-            <FileDropzone
-              aria-label="올릴 파일"
-              name="files"
-              multiple
-              maxSize={100 * 1024 * 1024}
-            />
+            <Card.Content>
+              <div className="flex flex-col gap-5">
+                <FileDropzone
+                  aria-label="올릴 파일"
+                  name="files"
+                  multiple
+                  maxSize={100 * 1024 * 1024}
+                />
 
-            <ItemGroup size="tiny" aria-label="올리는 파일">
-              {UPLOADS.map((upload) => (
-                <Item key={upload.id}>
-                  <Item.Media variant="soft">{upload.icon}</Item.Media>
-                  <Item.Content>
-                    <Item.Title>{upload.name}</Item.Title>
-                    <Item.Description>
-                      {upload.failed
-                        ? `${upload.size} · 한 파일에 100MB 까지 올릴 수 있어요`
-                        : upload.progress === 100
-                          ? `${upload.size} · 올림`
-                          : `${upload.size} · ${upload.progress}%`}
-                    </Item.Description>
-                    {!upload.failed && upload.progress < 100 && (
-                      <Progress value={upload.progress} aria-label={`${upload.name} 올리는 중`} />
-                    )}
-                  </Item.Content>
-                  <Item.Actions>
-                    {upload.failed ? (
-                      <>
-                        <Chip variant="soft" colorScheme="danger">
-                          실패
-                        </Chip>
-                        <IconButton
-                          variant="outline"
-                          size="tiny"
-                          aria-label={`${upload.name} 다시 올리기`}
-                          icon={<ArrowPathIcon />}
-                        />
-                      </>
-                    ) : upload.progress === 100 ? (
-                      <Chip variant="soft" colorScheme="success">
-                        완료
-                      </Chip>
-                    ) : (
-                      <IconButton
-                        variant="outline"
-                        size="tiny"
-                        aria-label={`${upload.name} 올리기 멈추기`}
-                        icon={<XMarkIcon />}
-                      />
-                    )}
-                  </Item.Actions>
-                </Item>
-              ))}
-            </ItemGroup>
+                <ItemGroup size="tiny" aria-label="올리는 파일">
+                  {UPLOADS.map((upload) => (
+                    <Item key={upload.id}>
+                      <Item.Media variant="soft">{upload.icon}</Item.Media>
+                      <Item.Content>
+                        <Item.Title>{upload.name}</Item.Title>
+                        <Item.Description>
+                          {upload.failed
+                            ? `${upload.size} · 한 파일에 100MB 까지 올릴 수 있어요`
+                            : upload.progress === 100
+                              ? `${upload.size} · 올림`
+                              : `${upload.size} · ${upload.progress}%`}
+                        </Item.Description>
+                        {!upload.failed && upload.progress < 100 && (
+                          <Progress
+                            value={upload.progress}
+                            aria-label={`${upload.name} 올리는 중`}
+                          />
+                        )}
+                      </Item.Content>
+                      <Item.Actions>
+                        {upload.failed ? (
+                          <>
+                            <Chip variant="soft" colorScheme="danger">
+                              실패
+                            </Chip>
+                            <IconButton
+                              variant="outline"
+                              size="tiny"
+                              aria-label={`${upload.name} 다시 올리기`}
+                              icon={<ArrowPathIcon />}
+                            />
+                          </>
+                        ) : upload.progress === 100 ? (
+                          <Chip variant="soft" colorScheme="success">
+                            완료
+                          </Chip>
+                        ) : (
+                          <IconButton
+                            variant="outline"
+                            size="tiny"
+                            aria-label={`${upload.name} 올리기 멈추기`}
+                            icon={<XMarkIcon />}
+                          />
+                        )}
+                      </Item.Actions>
+                    </Item>
+                  ))}
+                </ItemGroup>
 
-            <Field>
-              <Field.Label>볼 수 있는 사람</Field.Label>
-              <Select name="visibility" defaultValue="team">
-                <Select.Item value="team">인포팀 모두</Select.Item>
-                <Select.Item value="leads">운영진만</Select.Item>
-                <Select.Item value="me">나만</Select.Item>
-              </Select>
-            </Field>
-          </Card.Content>
+                <Field>
+                  <Field.Label>볼 수 있는 사람</Field.Label>
+                  <Select name="visibility" defaultValue="team">
+                    <Select.Item value="team">인포팀 모두</Select.Item>
+                    <Select.Item value="leads">운영진만</Select.Item>
+                    <Select.Item value="me">나만</Select.Item>
+                  </Select>
+                </Field>
+              </div>
+            </Card.Content>
 
-          <Card.Footer className="justify-end">
-            <Button variant="outline">취소</Button>
-            <Button type="submit">올리기</Button>
-          </Card.Footer>
-        </form>
-      </Card>
+            <Card.Footer>
+              <Button variant="outline">취소</Button>
+              <Button type="submit">올리기</Button>
+            </Card.Footer>
+          </form>
+        </Card>
+      </div>
     </main>
   ),
 };

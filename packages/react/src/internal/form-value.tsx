@@ -11,23 +11,13 @@ export type FormValueProps = {
   required?: boolean;
   disabled?: boolean;
   anchor: RefObject<HTMLElement | null>;
-  message?: string;
 };
 
 const readOnlyWouldBarValidation = noop;
 
-export function FormValue({
-  name,
-  form,
-  value,
-  required,
-  disabled,
-  anchor,
-  message,
-}: FormValueProps) {
+export function FormValue({ name, form, value, required, disabled, anchor }: FormValueProps) {
   const values = value == null ? [] : typeof value === 'string' ? [value] : [...value];
   const filled = values.filter((entry) => entry !== '');
-  const missing = message !== undefined && filled.length === 0 ? message : '';
   const passFocusToControlOnceTheBrowserHasReported = () =>
     requestAnimationFrame(() => anchor.current?.focus());
 
@@ -46,7 +36,6 @@ export function FormValue({
         ))}
       {required && !disabled && (
         <input
-          ref={(node) => node?.setCustomValidity(missing)}
           aria-hidden="true"
           tabIndex={-1}
           required

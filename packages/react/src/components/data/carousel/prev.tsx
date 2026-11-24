@@ -8,7 +8,7 @@ export type CarouselPrevProps = CarouselStepProps;
 export function CarouselPrev(props: CarouselPrevProps) {
   const t = useTranslate();
   return (
-    <CarouselStep {...props} part="Carousel.Prev" direction="prev" label={t('carousel.previous')} />
+    <CarouselStep {...props} part="Carousel.Prev" direction="prev" label={t('common.previous')} />
   );
 }
 

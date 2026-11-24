@@ -97,47 +97,54 @@ export const PC: Story = {
       <main className="mx-auto grid w-full max-w-5xl items-start gap-6 px-4 py-10 break-keep sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:py-14">
         <Card>
           <Card.Header>
-            <Avatar name="김지수" className="size-20" />
+            <Avatar name="김지수" />
             <Card.Title asChild>
-              <h1 className="text-headline-h4-bold">김지수</h1>
+              <h1>
+                <span className="text-headline-h4-bold block">김지수</span>
+              </h1>
             </Card.Title>
             <Card.Description>@jisu · 전기전자컴퓨터공학과 25학번</Card.Description>
           </Card.Header>
-          <Card.Content className="flex flex-col gap-4">
-            <p>웹 프론트엔드와 디자인 시스템을 좋아해요. 인포팀에서 Ziggle 을 만들어요.</p>
-            <ul aria-label="관심사" className="flex flex-wrap gap-1.5">
-              {INTERESTS.map((interest) => (
-                <li key={interest}>
-                  <Chip size="tiny">{interest}</Chip>
-                </li>
-              ))}
-            </ul>
-            <dl className="grid grid-cols-3 gap-2">
-              {STATS.map((stat) => (
-                <Card key={stat.label} variant="soft" size="tiny" asChild>
-                  <div>
-                    <dt>
-                      <Card.Description>{stat.label}</Card.Description>
-                    </dt>
-                    <dd>
-                      <Card.Title asChild className="text-body-b1-bold">
-                        <span>{stat.value}</span>
-                      </Card.Title>
-                    </dd>
-                  </div>
-                </Card>
-              ))}
-            </dl>
+          <Card.Content>
+            <div className="flex flex-col gap-4">
+              <p>웹 프론트엔드와 디자인 시스템을 좋아해요. 인포팀에서 Ziggle 을 만들어요.</p>
+              <ul aria-label="관심사" className="flex flex-wrap gap-1.5">
+                {INTERESTS.map((interest) => (
+                  <li key={interest}>
+                    <Chip size="tiny">{interest}</Chip>
+                  </li>
+                ))}
+              </ul>
+              <dl className="grid grid-cols-3 gap-2">
+                {STATS.map((stat) => (
+                  <Card key={stat.label} variant="soft" size="tiny" asChild>
+                    <div>
+                      <dt>
+                        <Card.Description>{stat.label}</Card.Description>
+                      </dt>
+                      <dd>
+                        <Card.Title asChild>
+                          <span>
+                            <span className="text-body-b1-bold block">{stat.value}</span>
+                          </span>
+                        </Card.Title>
+                      </dd>
+                    </div>
+                  </Card>
+                ))}
+              </dl>
+            </div>
           </Card.Content>
           <Card.Footer>
-            <Button
-              variant={following ? 'outline' : 'solid'}
-              className="flex-1"
-              onClick={() => setFollowing(!following)}
-            >
-              {following ? <CheckIcon /> : <UserPlusIcon />}
-              {following ? '팔로잉' : '팔로우'}
-            </Button>
+            <div className="grid flex-1">
+              <Button
+                variant={following ? 'outline' : 'solid'}
+                onClick={() => setFollowing(!following)}
+              >
+                {following ? <CheckIcon /> : <UserPlusIcon />}
+                {following ? '팔로잉' : '팔로우'}
+              </Button>
+            </div>
             <IconButton
               variant="outline"
               aria-label="메시지 보내기"
@@ -169,7 +176,7 @@ export const PC: Story = {
           </Card.Footer>
         </Card>
 
-        <Tabs defaultValue="posts" className="flex flex-col gap-6">
+        <Tabs defaultValue="posts">
           <Tabs.List aria-label="활동">
             <Tabs.Trigger value="posts">글</Tabs.Trigger>
             <Tabs.Trigger value="comments">댓글</Tabs.Trigger>

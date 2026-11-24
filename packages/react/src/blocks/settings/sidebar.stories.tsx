@@ -111,20 +111,21 @@ export const PC: Story = {
             </ItemGroup>
           </nav>
 
-          <Select
-            aria-label="설정 분류"
-            value={section}
-            onValueChange={(next) => {
-              if (next !== null && isSection(next)) setSection(next);
-            }}
-            className="md:hidden"
-          >
-            {SECTIONS.map(({ id, label }) => (
-              <Select.Item key={id} value={id}>
-                {label}
-              </Select.Item>
-            ))}
-          </Select>
+          <div className="md:hidden">
+            <Select
+              aria-label="설정 분류"
+              value={section}
+              onValueChange={(next) => {
+                if (next !== null && isSection(next)) setSection(next);
+              }}
+            >
+              {SECTIONS.map(({ id, label }) => (
+                <Select.Item key={id} value={id}>
+                  {label}
+                </Select.Item>
+              ))}
+            </Select>
+          </div>
 
           <section
             aria-labelledby="settings-section"
@@ -201,7 +202,7 @@ export const PC: Story = {
                   </Card.Title>
                   <Card.Description>이름과 학과, 소개를 볼 수 있는 사람이에요.</Card.Description>
                 </Card.Header>
-                <Card.Content className="flex flex-col gap-5">
+                <Card.Content>
                   <RadioGroup<string>
                     name="visibility"
                     defaultValue="campus"
@@ -225,15 +226,17 @@ export const PC: Story = {
                     )}
                   </RadioGroup>
                 </Card.Content>
-                <Card.Footer className="flex-col items-stretch gap-3">
-                  <Label>
-                    <Switch name="searchable" defaultChecked />
-                    이름으로 나를 찾을 수 있게 하기
-                  </Label>
-                  <Label>
-                    <Switch name="activity" />
-                    최근 활동을 프로필에 보이기
-                  </Label>
+                <Card.Footer>
+                  <div className="flex flex-1 flex-col gap-3">
+                    <Label>
+                      <Switch name="searchable" defaultChecked />
+                      이름으로 나를 찾을 수 있게 하기
+                    </Label>
+                    <Label>
+                      <Switch name="activity" />
+                      최근 활동을 프로필에 보이기
+                    </Label>
+                  </div>
                 </Card.Footer>
               </Card>
             )}

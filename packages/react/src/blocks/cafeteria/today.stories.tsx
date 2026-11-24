@@ -199,7 +199,7 @@ export const PC: Story = {
           </div>
         </div>
 
-        <Tabs defaultValue="student" className="flex flex-col gap-6">
+        <Tabs defaultValue="student">
           <Tabs.List aria-label="식당">
             <Tabs.Trigger value="student">학생식당</Tabs.Trigger>
             <Tabs.Trigger value="dorm">기숙사식당</Tabs.Trigger>
@@ -213,35 +213,43 @@ export const PC: Story = {
 
                   return (
                     <li key={menu.corner} className="flex">
-                      <Card className="w-full">
+                      <Card>
                         <Card.Header>
                           <Card.Description>
                             {menu.corner} · {menu.kcal}kcal
                           </Card.Description>
-                          <Card.Title className="text-headline-h5-bold" asChild>
-                            <h2>{menu.main}</h2>
+                          <Card.Title asChild>
+                            <h2>
+                              <span className="text-headline-h5-bold block">{menu.main}</span>
+                            </h2>
                           </Card.Title>
                           <Card.Action>
                             <Chip variant="outline">{`${won.format(menu.price)}원`}</Chip>
                           </Card.Action>
                         </Card.Header>
-                        <Card.Content className="flex flex-col gap-3">
-                          <p>{menu.sides}</p>
-                          {warned.length > 0 && (
-                            <Chip variant="soft" colorScheme="danger" className="self-start">
-                              {`${warned.join(', ')} 들어 있어요`}
-                            </Chip>
-                          )}
+                        <Card.Content>
+                          <div className="flex flex-col gap-3">
+                            <p>{menu.sides}</p>
+                            {warned.length > 0 && (
+                              <div className="flex">
+                                <Chip variant="soft" colorScheme="danger">
+                                  {`${warned.join(', ')} 들어 있어요`}
+                                </Chip>
+                              </div>
+                            )}
+                          </div>
                         </Card.Content>
-                        <Card.Footer className="justify-between">
-                          평점 {menu.score.toFixed(1)}
-                          <Rating
-                            size="tiny"
-                            aria-label={`${menu.main} 평가`}
-                            onValueChange={(value) =>
-                              toast.success(`${menu.main}에 ${value}점을 줬어요`)
-                            }
-                          />
+                        <Card.Footer>
+                          <div className="flex flex-1 items-center justify-between gap-2">
+                            평점 {menu.score.toFixed(1)}
+                            <Rating
+                              size="tiny"
+                              aria-label={`${menu.main} 평가`}
+                              onValueChange={(value) =>
+                                toast.success(`${menu.main}에 ${value}점을 줬어요`)
+                              }
+                            />
+                          </div>
                         </Card.Footer>
                       </Card>
                     </li>

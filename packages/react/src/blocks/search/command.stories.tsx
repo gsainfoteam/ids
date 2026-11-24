@@ -16,6 +16,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { toast } from '../../components/feedback/toast';
+import { AspectRatio } from '../../components/layout/aspect-ratio';
 import { Divider } from '../../components/layout/divider';
 import { Menu } from '../../components/overlay/menu';
 import { Kbd } from '../../components/typography/kbd';
@@ -51,74 +52,78 @@ export const PC: Story = {
       <div className="flex min-h-dvh flex-col break-keep">
         <header className="flex items-center gap-4 px-4 py-3 sm:px-6">
           <span className="text-body-b2-semibold">GIST 인포팀</span>
-          <Menu triggerType="command" hotkey="Mod+K" defaultOpen>
-            <Menu.Trigger asChild>
-              <Button variant="outline" className="ms-auto">
-                <MagnifyingGlassIcon />
-                찾기
-                <Kbd keys="Mod+K" size="tiny" />
-              </Button>
-            </Menu.Trigger>
-            <Menu.Content aria-label="인포팀에서 찾기">
-              <Menu.Search placeholder="페이지, 사람, 명령 찾기" />
-              <Menu.Group>
-                <Menu.Label>최근 검색</Menu.Label>
-                {RECENT.map((keyword) => (
-                  <Menu.Item key={keyword} onSelect={() => toast(`‘${keyword}’를 다시 찾아요`)}>
-                    <ClockIcon />
-                    {keyword}
+          <div className="ms-auto">
+            <Menu triggerType="command" hotkey="Mod+K" defaultOpen>
+              <Menu.Trigger asChild>
+                <Button variant="outline">
+                  <MagnifyingGlassIcon />
+                  찾기
+                  <Kbd keys="Mod+K" size="tiny" />
+                </Button>
+              </Menu.Trigger>
+              <Menu.Content aria-label="인포팀에서 찾기">
+                <Menu.Search placeholder="페이지, 사람, 명령 찾기" />
+                <Menu.Group>
+                  <Menu.Label>최근 검색</Menu.Label>
+                  {RECENT.map((keyword) => (
+                    <Menu.Item key={keyword} onSelect={() => toast(`‘${keyword}’를 다시 찾아요`)}>
+                      <ClockIcon />
+                      {keyword}
+                    </Menu.Item>
+                  ))}
+                </Menu.Group>
+                <Menu.Separator />
+                <Menu.Group>
+                  <Menu.Label>바로 가기</Menu.Label>
+                  {PLACES.map((place) => (
+                    <Menu.Item key={place.id} onSelect={() => toast(`${place.label}로 가요`)}>
+                      {place.icon}
+                      {place.label}
+                      <Menu.Shortcut keys={place.keys} />
+                    </Menu.Item>
+                  ))}
+                </Menu.Group>
+                <Menu.Separator />
+                <Menu.Group>
+                  <Menu.Label>사람</Menu.Label>
+                  {PEOPLE.map((person) => (
+                    <Menu.Item key={person} onSelect={() => toast(`${person}님의 프로필로 가요`)}>
+                      <Avatar name={person} size="tiny" />
+                      {person}
+                    </Menu.Item>
+                  ))}
+                </Menu.Group>
+                <Menu.Separator />
+                <Menu.Group>
+                  <Menu.Label>명령</Menu.Label>
+                  <Menu.Item onSelect={() => toast('새 글을 써요')}>
+                    <PencilSquareIcon />
+                    새 글 쓰기
+                    <Menu.Shortcut keys="Mod+N" />
                   </Menu.Item>
-                ))}
-              </Menu.Group>
-              <Menu.Separator />
-              <Menu.Group>
-                <Menu.Label>바로 가기</Menu.Label>
-                {PLACES.map((place) => (
-                  <Menu.Item key={place.id} onSelect={() => toast(`${place.label}로 가요`)}>
-                    {place.icon}
-                    {place.label}
-                    <Menu.Shortcut keys={place.keys} />
+                  <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
+                    <MoonIcon />
+                    어두운 화면
+                  </Menu.CheckboxItem>
+                  <Menu.Item onSelect={() => toast('설정을 열어요')}>
+                    <Cog6ToothIcon />
+                    설정
+                    <Menu.Shortcut keys="Mod+," />
                   </Menu.Item>
-                ))}
-              </Menu.Group>
-              <Menu.Separator />
-              <Menu.Group>
-                <Menu.Label>사람</Menu.Label>
-                {PEOPLE.map((person) => (
-                  <Menu.Item key={person} onSelect={() => toast(`${person}님의 프로필로 가요`)}>
-                    <Avatar name={person} size="tiny" />
-                    {person}
-                  </Menu.Item>
-                ))}
-              </Menu.Group>
-              <Menu.Separator />
-              <Menu.Group>
-                <Menu.Label>명령</Menu.Label>
-                <Menu.Item onSelect={() => toast('새 글을 써요')}>
-                  <PencilSquareIcon />
-                  새 글 쓰기
-                  <Menu.Shortcut keys="Mod+N" />
-                </Menu.Item>
-                <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
-                  <MoonIcon />
-                  어두운 화면
-                </Menu.CheckboxItem>
-                <Menu.Item onSelect={() => toast('설정을 열어요')}>
-                  <Cog6ToothIcon />
-                  설정
-                  <Menu.Shortcut keys="Mod+," />
-                </Menu.Item>
-              </Menu.Group>
-              <Menu.Empty>맞는 결과가 없어요. 다른 낱말로 찾아 보세요.</Menu.Empty>
-            </Menu.Content>
-          </Menu>
+                </Menu.Group>
+                <Menu.Empty>맞는 결과가 없어요. 다른 낱말로 찾아 보세요.</Menu.Empty>
+              </Menu.Content>
+            </Menu>
+          </div>
         </header>
         <Divider />
 
         <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
-          <Skeleton loading className="w-fit">
-            <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
-          </Skeleton>
+          <div className="w-fit">
+            <Skeleton loading>
+              <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
+            </Skeleton>
+          </div>
           <Skeleton loading>
             <p className="text-body-b3-regular">
               수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
@@ -126,21 +131,27 @@ export const PC: Story = {
             </p>
           </Skeleton>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>수강 신청</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>장학금 안내</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>동아리 모집</Card.Title>
-              </Card>
-            </Skeleton>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>수강 신청</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>장학금 안내</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>동아리 모집</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
           </div>
         </main>
       </div>

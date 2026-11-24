@@ -120,51 +120,57 @@ export const PC: Story = {
         </header>
         <Divider />
 
-        <ScrollArea fade className="min-h-0 flex-1">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 md:px-6">
-            {DAYS.map(({ day, messages }) => (
-              <section key={day} aria-label={day} className="flex flex-col gap-6">
-                <Divider>{day}</Divider>
-                {messages.map((message) => (
-                  <article key={message.id} className="flex gap-3">
-                    <Avatar name={message.author} />
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <p className="text-body-b3-semibold flex items-center gap-2">
-                        {message.author}
-                        <span className="text-caption-c1-regular">{message.time}</span>
-                      </p>
-                      {message.lines.map((line) => (
-                        <p key={line} className="text-body-b2-regular">
-                          {line}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <ScrollArea fade>
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 md:px-6">
+              {DAYS.map(({ day, messages }) => (
+                <section key={day} aria-label={day} className="flex flex-col gap-6">
+                  <Divider>{day}</Divider>
+                  {messages.map((message) => (
+                    <article key={message.id} className="flex gap-3">
+                      <Avatar name={message.author} />
+                      <div className="flex min-w-0 flex-1 flex-col gap-1">
+                        <p className="text-body-b3-semibold flex items-center gap-2">
+                          {message.author}
+                          <span className="text-caption-c1-regular">{message.time}</span>
                         </p>
-                      ))}
-                      {message.attachment && (
-                        <Card size="tiny" className="mt-2 max-w-xs">
-                          <Card.Header>
-                            <Card.Title asChild>
-                              <p>{message.attachment.name}</p>
-                            </Card.Title>
-                            <Card.Description>{message.attachment.size}</Card.Description>
-                          </Card.Header>
-                        </Card>
-                      )}
-                      {message.replies && (
-                        <Button variant="soft" size="tiny" className="mt-1 self-start">
-                          <ChatBubbleLeftRightIcon />
-                          답글 {message.replies}개
-                        </Button>
-                      )}
-                    </div>
-                  </article>
-                ))}
-              </section>
-            ))}
-            <p className="text-caption-c1-regular flex items-center gap-2">
-              <Chip variant="solid" colorScheme="success" aria-hidden />
-              이도윤님이 입력하고 있어요
-            </p>
-          </div>
-        </ScrollArea>
+                        {message.lines.map((line) => (
+                          <p key={line} className="text-body-b2-regular">
+                            {line}
+                          </p>
+                        ))}
+                        {message.attachment && (
+                          <div className="mt-2 max-w-xs">
+                            <Card size="tiny">
+                              <Card.Header>
+                                <Card.Title asChild>
+                                  <p>{message.attachment.name}</p>
+                                </Card.Title>
+                                <Card.Description>{message.attachment.size}</Card.Description>
+                              </Card.Header>
+                            </Card>
+                          </div>
+                        )}
+                        {message.replies && (
+                          <div className="mt-1 flex">
+                            <Button variant="soft" size="tiny">
+                              <ChatBubbleLeftRightIcon />
+                              답글 {message.replies}개
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </section>
+              ))}
+              <p className="text-caption-c1-regular flex items-center gap-2">
+                <Chip variant="solid" colorScheme="success" aria-hidden />
+                이도윤님이 입력하고 있어요
+              </p>
+            </div>
+          </ScrollArea>
+        </div>
 
         <form onSubmit={send} className="mx-auto w-full max-w-3xl px-4 pb-4 md:px-6">
           <TextArea

@@ -94,39 +94,43 @@ export const PC: Story = {
               </Field>
             </div>
 
-            <Tabs defaultValue="write" className="flex flex-col gap-3">
+            <Tabs defaultValue="write">
               <Tabs.List aria-label="편집 보기">
                 <Tabs.Trigger value="write">쓰기</Tabs.Trigger>
                 <Tabs.Trigger value="preview">미리 보기</Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value="write" forceMount>
-                <Editor
-                  aria-label="본문"
-                  format="markdown"
-                  maxLength={5000}
-                  value={body}
-                  onValueChange={setBody}
-                >
-                  <Editor.BlockType />
-                  <Editor.Separator />
-                  <Editor.Bold />
-                  <Editor.Italic />
-                  <Editor.Strike />
-                  <Editor.Link />
-                  <Editor.Separator />
-                  <Editor.BulletList />
-                  <Editor.OrderedList />
-                  <Editor.Blockquote />
-                  <Editor.Content className="min-h-80" />
-                  <Editor.BubbleMenu />
-                  <Editor.Count />
-                </Editor>
+                <div className="grid min-h-96">
+                  <Editor
+                    aria-label="본문"
+                    format="markdown"
+                    maxLength={5000}
+                    value={body}
+                    onValueChange={setBody}
+                  >
+                    <Editor.BlockType />
+                    <Editor.Separator />
+                    <Editor.Bold />
+                    <Editor.Italic />
+                    <Editor.Strike />
+                    <Editor.Link />
+                    <Editor.Separator />
+                    <Editor.BulletList />
+                    <Editor.OrderedList />
+                    <Editor.Blockquote />
+                    <Editor.Content />
+                    <Editor.BubbleMenu />
+                    <Editor.Count />
+                  </Editor>
+                </div>
               </Tabs.Content>
               <Tabs.Content value="preview">
                 <Card>
                   <Card.Header>
                     <Card.Title asChild>
-                      <h2 className="text-headline-h4-bold">{title || '제목 없음'}</h2>
+                      <h2>
+                        <span className="text-headline-h4-bold block">{title || '제목 없음'}</span>
+                      </h2>
                     </Card.Title>
                   </Card.Header>
                   <Card.Content>
@@ -148,7 +152,12 @@ export const PC: Story = {
                 <Card.Description>목록과 공유 미리 보기에 보여요.</Card.Description>
               </Card.Header>
               <Card.Content>
-                <FileDropzone aria-label="표지 그림" accept="image/*" maxSize={10 * 1024 * 1024} />
+                <FileDropzone
+                  aria-label="표지 그림"
+                  accept="image/*"
+                  maxSize={10 * 1024 * 1024}
+                  placeholder="그림을 끌어다 놓거나 눌러서 고르세요"
+                />
               </Card.Content>
             </Card>
 
@@ -190,28 +199,30 @@ export const PC: Story = {
                   <h2>설정</h2>
                 </Card.Title>
               </Card.Header>
-              <Card.Content className="flex flex-col gap-3">
-                <Label>
-                  <Switch name="comments" defaultChecked />
-                  댓글 받기
-                </Label>
-                <Label>
-                  <Switch name="pinned" />
-                  게시판 맨 위에 고정
-                </Label>
-                <Label>
-                  <Switch checked={scheduled} onCheckedChange={setScheduled} />
-                  나중에 올리기
-                </Label>
-                {scheduled && (
-                  <Field>
-                    <Field.Label>올릴 때</Field.Label>
-                    <DateTimeField
-                      name="publishAt"
-                      defaultValue={new CalendarDateTime(2026, 10, 2, 9, 0)}
-                    />
-                  </Field>
-                )}
+              <Card.Content>
+                <div className="flex flex-col gap-3">
+                  <Label>
+                    <Switch name="comments" defaultChecked />
+                    댓글 받기
+                  </Label>
+                  <Label>
+                    <Switch name="pinned" />
+                    게시판 맨 위에 고정
+                  </Label>
+                  <Label>
+                    <Switch checked={scheduled} onCheckedChange={setScheduled} />
+                    나중에 올리기
+                  </Label>
+                  {scheduled && (
+                    <Field>
+                      <Field.Label>올릴 때</Field.Label>
+                      <DateTimeField
+                        name="publishAt"
+                        defaultValue={new CalendarDateTime(2026, 10, 2, 9, 0)}
+                      />
+                    </Field>
+                  )}
+                </div>
               </Card.Content>
             </Card>
           </aside>

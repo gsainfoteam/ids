@@ -47,7 +47,7 @@ test('value mode binds onValueChange as well as onChange, and keeps the consumer
       <FormProvider {...form}>
         <Field name="count" controlMode="value">
           <Field.Label>Count</Field.Label>
-          <Stepper onValueChange={(next) => seen.push(next)} />
+          <Stepper aria-label="진행 단계" onValueChange={(next) => seen.push(next)} />
         </Field>
       </FormProvider>
     );

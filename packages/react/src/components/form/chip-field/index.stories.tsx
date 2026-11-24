@@ -351,6 +351,7 @@ export const LimitHowManyCanBePicked: Story = {
             Kotlin (준비 중)
           </ChipField.Item>
         </ChipField.Group>
+        <ChipField.Limit>최대 2개까지 고를 수 있습니다.</ChipField.Limit>
       </ChipField>
     </div>
   ),
@@ -358,7 +359,7 @@ export const LimitHowManyCanBePicked: Story = {
     docs: {
       description: {
         story:
-          'maxCount 에 닿으면 고르지 않은 옵션이 비활성이 되고 목록 위에 안내가 나옵니다. 고른 칩을 지우면 다시 고를 수 있습니다.',
+          'maxCount 에 닿으면 고르지 않은 옵션이 비활성이 되고 ChipField.Limit 에 쓴 안내가 목록 위에 나옵니다. 고른 칩을 지우면 다시 고를 수 있습니다.',
       },
     },
   },

@@ -75,15 +75,13 @@ export const PC: Story = {
                   required
                 />
               </Field>
-              <Button type="submit" className="w-full">
-                이메일로 계속하기
-              </Button>
+              <Button type="submit">이메일로 계속하기</Button>
             </form>
           )}
 
           <Divider>또는</Divider>
 
-          <Button variant="outline" className="w-full">
+          <Button variant="outline">
             <AcademicCapIcon />
             GIST 계정으로 계속하기
           </Button>

@@ -35,16 +35,11 @@ export const NodeLocal: Story = {
     <Showcase>
       <Showcase.Section
         title="컴포넌트 안에서"
-        description="variant, className, children에 (state) => 값을 넘기면 그 컴포넌트와 자손만 상태에 반응합니다. DOM에는 data-hovered, data-active, data-focus-visible이 붙어 CSS만으로도 꾸밀 수 있습니다."
+        description="variant, className, children에 (state) => 값을 넘기면 그 컴포넌트와 자손만 상태에 반응합니다."
       >
         <Showcase.Row label="함수 prop">
           <Button variant={(state) => (state.hovered ? 'solid' : 'outline')}>
             {(state) => (state.hovered ? '올라왔어요' : '올려 보세요')}
-          </Button>
-        </Showcase.Row>
-        <Showcase.Row label="data-* 스타일">
-          <Button variant="outline" className="data-hovered:inset-ring-primary-strong">
-            data-hovered로 테두리
           </Button>
         </Showcase.Row>
       </Showcase.Section>

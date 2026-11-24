@@ -14,7 +14,7 @@ type SelectContextValue = {
   select: ReturnType<typeof useSelect>;
   options: SelectOption[];
   state: SelectState;
-  placeholder: string;
+  placeholder?: string;
   triggerProps: Record<string, unknown>;
   listLabel: { 'aria-label'?: string; 'aria-labelledby'?: string };
   size: IdsSize;
