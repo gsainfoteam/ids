@@ -13,7 +13,6 @@ class IdsScope extends InheritedWidget {
     required this.resolved,
     required this.mode,
     required this.locale,
-    required this.translation,
     required this.setMode,
     required this.toggleMode,
     required super.child,
@@ -21,11 +20,11 @@ class IdsScope extends InheritedWidget {
 
   final IdsResolvedTheme resolved;
   final IdsMode mode;
-  final Locale locale;
-  final IdsMessages? translation;
+  final IdsLocale locale;
   final ValueChanged<IdsMode> setMode;
   final VoidCallback toggleMode;
 
+  IdsMessagesBase get messages => locale.messages;
   IdsThemeOverrides get theme => resolved.theme;
   IdsMode get resolvedMode => resolved.mode;
   bool get isDark => resolved.isDark;
@@ -62,7 +61,6 @@ class IdsScope extends InheritedWidget {
       resolved != old.resolved ||
       mode != old.mode ||
       locale != old.locale ||
-      translation != old.translation ||
       setMode != old.setMode ||
       toggleMode != old.toggleMode;
 }

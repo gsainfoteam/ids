@@ -4,12 +4,20 @@ import 'package:ids_flutter/ids.dart';
 
 import 'test_theme.dart';
 
-class _Messages with IdsMessages {
-  const _Messages(this.commonClose);
+class _French extends IdsMessagesEn {
+  const _French();
 
   @override
-  final String? commonClose;
+  String get language => 'fr';
+
+  @override
+  String get commonClose => 'Fermer';
 }
+
+final _french = IdsLocale(
+  locale: const Locale('fr'),
+  messages: const _French(),
+);
 
 class _Consumer extends StatefulWidget {
   const _Consumer(this.name);
@@ -34,7 +42,7 @@ class _ConsumerState extends State<_Consumer> {
           shape: scope.shape(),
         ),
         child: Text(
-          '${widget.name}: $count / ${scope.locale} / ${scope.translation?.commonClose ?? IdsMessages.ko.commonClose}',
+          '${widget.name}: $count / ${scope.locale.locale} / ${scope.messages.commonClose}',
           key: ValueKey(widget.name),
           style: scope.textStyle(
             IdsTypography.bodyB3Regular,
@@ -70,7 +78,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('child')));
       await tester.pump();
       final state = tester.state(find.byType(_Consumer));
-      expect(find.text('child: 1 / ko_KR / 닫기'), findsOneWidget);
+      expect(find.text('child: 1 / en_US / Close'), findsOneWidget);
       await tester.pumpWidget(
         build(
           const IdsTheme(
@@ -81,7 +89,7 @@ void main() {
         ),
       );
       expect(tester.state(find.byType(_Consumer)), same(state));
-      expect(find.text('child: 1 / ko_KR / 닫기'), findsOneWidget);
+      expect(find.text('child: 1 / en_US / Close'), findsOneWidget);
       final decoration =
           tester
                   .widget<DecoratedBox>(
@@ -110,7 +118,7 @@ void main() {
         renderedStyle(tester, 'child').fontFamily,
         'packages/ids_flutter/Pretendard GOV Variable',
       );
-      expect(find.text('child: 1 / ko_KR / 닫기'), findsOneWidget);
+      expect(find.text('child: 1 / en_US / Close'), findsOneWidget);
     },
   );
 
@@ -126,10 +134,7 @@ void main() {
                       radius: 16,
                     )
                   : testTheme,
-              translation: changed
-                  ? const _Messages('Fermer')
-                  : const _Messages('Close'),
-              locale: changed ? const Locale('fr') : const Locale('en'),
+              locale: changed ? _french : IdsLocale.en,
               child: Column(
                 children: [
                   const _Consumer('parent'),
@@ -138,8 +143,7 @@ void main() {
                     theme: overridden
                         ? const IdsThemeOverrides(radius: 3)
                         : null,
-                    translation: overridden ? const _Messages(null) : null,
-                    locale: overridden ? const Locale('ja') : null,
+                    locale: overridden ? IdsLocale.ko : null,
                     child: const _Consumer('overridden'),
                   ),
                 ],
@@ -147,14 +151,14 @@ void main() {
             ),
           );
       await tester.pumpWidget(build(changed: false, overridden: true));
-      expect(find.text('inherited: 0 / en / Close'), findsOneWidget);
-      expect(find.text('overridden: 0 / ja / 닫기'), findsOneWidget);
+      expect(find.text('inherited: 0 / en_US / Close'), findsOneWidget);
+      expect(find.text('overridden: 0 / ko_KR / 닫기'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('overridden')));
       await tester.pump();
       await tester.pumpWidget(build(changed: true, overridden: true));
       expect(find.text('parent: 0 / fr / Fermer'), findsOneWidget);
       expect(find.text('inherited: 0 / fr / Fermer'), findsOneWidget);
-      expect(find.text('overridden: 1 / ja / 닫기'), findsOneWidget);
+      expect(find.text('overridden: 1 / ko_KR / 닫기'), findsOneWidget);
       expect(scopeOf(tester, 'inherited').radius.standard, 16);
       expect(scopeOf(tester, 'overridden').radius.standard, 3);
       expect(
