@@ -2,7 +2,6 @@
 
 import {
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -33,6 +32,7 @@ import {
   turnBlockInto,
 } from './commands';
 import { markTheDraggedBlock, topLevelBlocks } from './extension';
+import { useInternalResizeObserver } from '../../../../hooks/use-resize-observer';
 import { useInternalDragSensors } from '../../../../internal/lib/drag-sensors';
 import { swallowTheClickThatEndsADrag } from '../../../../internal/lib/drag-surface';
 import { useInternalTranslate } from '../../../../internal/translate';
@@ -96,16 +96,10 @@ function useInternalBesideTheFirstLine(block: HoveredBlock | null) {
   const handleRef = useRef<HTMLButtonElement>(null);
   const [place, setPlace] = useState<CSSProperties>({});
 
-  useLayoutEffect(() => {
+  useInternalResizeObserver(block?.dom ?? null, (dom) => {
     const handle = handleRef.current;
-    if (!handle || !block) return;
-
-    const follow = () => setPlace(besideTheFirstLine(block.dom, handle));
-    follow();
-    const resizes = new ResizeObserver(follow);
-    resizes.observe(block.dom);
-    return () => resizes.disconnect();
-  }, [block]);
+    if (handle) setPlace(besideTheFirstLine(dom, handle));
+  });
 
   return [handleRef, place] as const;
 }

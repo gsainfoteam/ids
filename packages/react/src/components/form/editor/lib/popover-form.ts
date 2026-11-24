@@ -1,5 +1,7 @@
 import type { KeyboardEvent } from 'react';
 
+import { isComposingKey } from '../../../../internal/lib/keys';
+
 const HAS_SCHEME = /^[a-z][a-z\d+.-]*:/i;
 const STAYS_ON_THIS_SITE = /^[/#?]/;
 
@@ -9,7 +11,7 @@ export function withProtocol(url: string) {
 
 export const isPlainEnter = (event: KeyboardEvent) =>
   event.key === 'Enter' &&
-  !event.nativeEvent.isComposing &&
+  !isComposingKey(event.nativeEvent) &&
   !event.shiftKey &&
   !event.altKey &&
   !event.ctrlKey &&

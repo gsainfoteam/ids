@@ -1,30 +1,14 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
-
-import { noop } from 'es-toolkit';
+import { useInternalMediaQuery } from '../../../hooks/use-media-query';
 
 export type PopupPresentation = 'popover' | 'drawer';
 
 export const DRAWER_BELOW = 640;
 const SMALL_SCREEN = `(max-width: ${DRAWER_BELOW - 0.02}px)`;
 
-function subscribe(callback: () => void) {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return noop;
-
-  const query = window.matchMedia(SMALL_SCREEN);
-  query.addEventListener('change', callback);
-  return () => query.removeEventListener('change', callback);
-}
-
-function isSmallScreen() {
-  if (typeof window.matchMedia === 'function') return window.matchMedia(SMALL_SCREEN).matches;
-  return window.innerWidth < DRAWER_BELOW;
-}
-
 export function useInternalDrawerPresentation(mobileVariant: PopupPresentation | undefined) {
-  const small = useSyncExternalStore(subscribe, isSmallScreen, () => false);
-  return mobileVariant === 'drawer' && small;
+  return useInternalMediaQuery(mobileVariant === 'drawer' ? SMALL_SCREEN : null);
 }
 
 export function coveredByKeyboard(win: Window) {

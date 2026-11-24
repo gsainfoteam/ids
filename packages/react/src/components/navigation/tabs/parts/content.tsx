@@ -1,6 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, type ComponentProps } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  type ComponentProps,
+} from 'react';
 
 import { flushSync } from 'react-dom';
 
@@ -21,11 +28,7 @@ export type TabsContentProps<T extends string = string> = Omit<
 
 function useInternalFoundInPage(mounted: boolean, hidden: boolean, onFound: () => void) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const foundRef = useRef(onFound);
-
-  useLayoutEffect(() => {
-    foundRef.current = onFound;
-  });
+  const found = useEffectEvent(onFound);
 
   useLayoutEffect(() => {
     const panel = panelRef.current;
@@ -35,7 +38,7 @@ function useInternalFoundInPage(mounted: boolean, hidden: boolean, onFound: () =
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
-    const selectBeforeBrowserScrolls = () => flushSync(() => foundRef.current());
+    const selectBeforeBrowserScrolls = () => flushSync(() => found());
     panel.addEventListener('beforematch', selectBeforeBrowserScrolls);
     return () => panel.removeEventListener('beforematch', selectBeforeBrowserScrolls);
   }, [mounted]);

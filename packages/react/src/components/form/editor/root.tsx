@@ -72,7 +72,7 @@ import { useInternalFormReset } from '../../../hooks/use-form-reset';
 import { FormValue } from '../../../internal/parts/form-value';
 import { useInternalTranslate, type Translate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments, invariant } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
+import { warnOnce } from '../../../utils/dev';
 import { toast } from '../../feedback/toast/lib/toast-store';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
@@ -159,13 +159,10 @@ const BLOCK_EDITOR_BUBBLE_MENU = (
   </EditorBubbleMenu>
 );
 
-let warnedAboutToolsInABlockEditor = false;
-
 function dropTheToolbar(items: ReactNode[]) {
   const kept = items.filter((item) => !isTool(item));
-  if (isDevelopment && kept.length < items.length && !warnedAboutToolsInABlockEditor) {
-    warnedAboutToolsInABlockEditor = true;
-    console.warn(
+  if (kept.length < items.length) {
+    warnOnce(
       '`<Editor type="block">` shows no toolbar, so the tools placed beside `<Editor.Content>` are left out. Put them in `<Editor.BubbleMenu>`, or use `type="toolbar"`.',
     );
   }

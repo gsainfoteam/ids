@@ -1,18 +1,11 @@
 'use client';
 
-import {
-  createContext,
-  use,
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { createContext, use, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { noop } from 'es-toolkit';
 
+import { useControllableState } from '../../../../hooks/use-controllable-state';
+import { useInternalMediaQuery } from '../../../../hooks/use-media-query';
 import { resolveThemeVariables, type ThemeVariables } from '../lib/theme-variables';
 
 import type { IdsMode } from '../../../../tokens/types';
@@ -49,23 +42,6 @@ export const ThemeContext = createContext<ThemeContextValue>(DEFAULT_THEME);
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-function subscribeToScheme(notify: () => void) {
-  const query = window.matchMedia(DARK_QUERY);
-  query.addEventListener('change', notify);
-  return () => query.removeEventListener('change', notify);
-}
-
-const subscribeToNothing = () => noop;
-
-function useInternalPrefersDark(enabled: boolean) {
-  const supported = typeof window !== 'undefined' && typeof window.matchMedia === 'function';
-  return useSyncExternalStore(
-    enabled && supported ? subscribeToScheme : subscribeToNothing,
-    () => enabled && supported && window.matchMedia(DARK_QUERY).matches,
-    () => false,
-  );
-}
-
 type AxisOptions<T> = {
   owned: boolean;
   value: T | undefined;
@@ -83,23 +59,8 @@ function useInternalAxis<T>({
   inherited,
   setInherited,
 }: AxisOptions<T>) {
-  const [inner, setInner] = useState(defaultValue);
-  const controlled = value !== undefined;
-  const current = !owned ? inherited : controlled ? value : inner;
-
-  const latest = useRef({ current, controlled, onChange });
-  useLayoutEffect(() => {
-    latest.current = { current, controlled, onChange };
-  });
-
-  const setOwn = useCallback((next: T) => {
-    const { current, controlled, onChange } = latest.current;
-    if (Object.is(next, current)) return;
-    if (!controlled) setInner(next);
-    onChange?.(next);
-  }, []);
-
-  return [current, owned ? setOwn : setInherited] as const;
+  const [own, setOwn] = useControllableState({ value, defaultValue, onValueChange: onChange });
+  return [owned ? own : inherited, owned ? setOwn : setInherited] as const;
 }
 
 export type UseIdsProviderOptions = {
@@ -144,7 +105,9 @@ export function useInternalIdsProvider({
     setInherited: parent.setMode,
   });
 
-  const prefersDark = useInternalPrefersDark(ownsMode && currentMode === 'system');
+  const prefersDark = useInternalMediaQuery(
+    ownsMode && currentMode === 'system' ? DARK_QUERY : null,
+  );
   const resolvedMode: IdsMode = !ownsMode
     ? parent.resolvedMode
     : currentMode === 'system'

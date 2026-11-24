@@ -3,7 +3,7 @@
 import { Children, isValidElement, useEffect, type ReactNode } from 'react';
 
 import { elementTypeOf } from '../../utils';
-import { isDevelopment } from '../../utils/dev';
+import { isDevelopment, warnOnce } from '../../utils/dev';
 
 export type IconLabel = {
   label: string;
@@ -77,15 +77,14 @@ export function iconLabel(node: ReactNode): IconLabel | undefined {
   }
 }
 
-let warnedAboutMinification = false;
+const MINIFIED_ICON_NAMES = 'icon-label:minified-function-names';
 
 function warnFunctionNameLabel(component: string, label: string) {
-  if (warnedAboutMinification) return;
-  warnedAboutMinification = true;
-  console.warn(
+  warnOnce(
     `[IDS] ${component}: the accessible name "${label}" comes from the icon's function name. ` +
       'Production minifiers rename functions, so the name is gone in a production build. ' +
       'Pass aria-label, or give the icon component a displayName.',
+    MINIFIED_ICON_NAMES,
   );
 }
 

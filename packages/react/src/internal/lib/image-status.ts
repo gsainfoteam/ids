@@ -1,6 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from 'react';
 
 export type ImageStatus = 'loading' | 'loaded' | 'error';
 
@@ -28,12 +36,9 @@ export function useInternalImageStatus(
     );
   }, []);
 
-  const notify = useRef(onStatusChange);
-  useLayoutEffect(() => {
-    notify.current = onStatusChange;
-  });
+  const notify = useEffectEvent((next: ImageStatus) => onStatusChange?.(next));
   useEffect(() => {
-    notify.current?.(status);
+    notify(status);
   }, [status]);
 
   return { status, report };
