@@ -149,6 +149,22 @@
       "submit": "Submit",
       "reset": "Reset",
       "submissionResult": "Submission result"
+    },
+    "checkboxGroupSample": {
+      "selectAtLeastOneOption": "Select at least one option.",
+      "technologiesOfInterest": "Technologies of interest",
+      "youCanSelectMoreThanOne": "You can select more than one.",
+      "notifications": "Notifications",
+      "allItems": "All items",
+      "mail": "Mail",
+      "pushNotifications": "Push notifications",
+      "save": "Save",
+      "submit": "Submit",
+      "reset": "Reset",
+      "saveResult": "Save result",
+      "submissionResult": "Submission result",
+      "selectAll": "Select all",
+      "skillComingSoon": "{skill} (coming soon)"
     }
   },
   "examples": {

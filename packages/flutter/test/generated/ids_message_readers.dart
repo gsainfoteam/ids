@@ -12,6 +12,7 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'carousel.indicator': (messages) => messages.carouselIndicator(index: 7),
   'carousel.roleDescription': (messages) => messages.carouselRoleDescription,
   'checkbox.required': (messages) => messages.checkboxRequired,
+  'checkboxGroup.required': (messages) => messages.checkboxGroupRequired,
   'colorPicker.alpha': (messages) => messages.colorPickerAlpha,
   'colorPicker.area': (messages) => messages.colorPickerArea,
   'colorPicker.areaValue': (messages) => messages.colorPickerAreaValue(saturation: 'x', brightness: 'x'),

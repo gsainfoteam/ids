@@ -16,6 +16,9 @@ export const messages = {
   "checkbox": {
     "required": "이 항목을 선택하세요."
   },
+  "checkboxGroup": {
+    "required": "하나 이상 선택하세요."
+  },
   "colorPicker": {
     "alpha": "투명도",
     "area": "채도와 밝기",

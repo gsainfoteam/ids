@@ -9,6 +9,7 @@ import 'components/kbd_usecase.dart';
 import 'components/text_field_usecase.dart';
 import 'components/button_group_usecase.dart';
 import 'components/checkbox_usecase.dart';
+import 'components/checkbox_group_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -43,6 +44,10 @@ final directories = <WidgetbookNode>[
             useCases: textFieldUseCases,
           ),
           WidgetbookComponent(name: 'IdsCheckbox', useCases: checkboxUseCases),
+          WidgetbookComponent(
+            name: 'IdsCheckboxGroup',
+            useCases: checkboxGroupUseCases,
+          ),
         ],
       ),
       WidgetbookFolder(name: 'Feedback', children: [spinner]),
