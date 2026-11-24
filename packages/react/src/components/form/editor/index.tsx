@@ -1,22 +1,27 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { EditorBlockType, type EditorBlockTypeProps, type EditorHeadingLevel } from './block-type';
+import { EditorCallout, type EditorCalloutProps } from './callout/tool';
+import { EditorDetails, type EditorDetailsProps } from './details/tool';
+import { EditorImage, type EditorImageProps } from './image/tool';
+import { type EditorFormat } from './lib/value';
+import {
+  EditorBlockType,
+  type EditorBlockTypeProps,
+  type EditorHeadingLevel,
+} from './parts/block-type';
 import {
   EditorBlockquote,
   EditorBulletList,
   EditorCodeBlock,
   EditorOrderedList,
   EditorTaskList,
-} from './blocks';
-import { EditorBubbleMenu, type EditorBubbleMenuProps } from './bubble-menu';
-import { EditorCallout, type EditorCalloutProps } from './callout/tool';
-import { EditorColor, type EditorColorProps } from './color';
-import { EditorContentPart, type EditorContentProps } from './content';
-import { EditorCount, type EditorCountProps, type EditorCountState } from './count';
-import { EditorDetails, type EditorDetailsProps } from './details/tool';
-import { EditorHorizontalRule, type EditorHorizontalRuleProps } from './horizontal-rule';
-import { EditorImage, type EditorImageProps } from './image/tool';
-import { EditorLink, type EditorLinkProps } from './link';
+} from './parts/blocks';
+import { EditorBubbleMenu, type EditorBubbleMenuProps } from './parts/bubble-menu';
+import { EditorColor, type EditorColorProps } from './parts/color';
+import { EditorContentPart, type EditorContentProps } from './parts/content';
+import { EditorCount, type EditorCountProps, type EditorCountState } from './parts/count';
+import { EditorHorizontalRule, type EditorHorizontalRuleProps } from './parts/horizontal-rule';
+import { EditorLink, type EditorLinkProps } from './parts/link';
 import {
   EditorBold,
   EditorCode,
@@ -27,13 +32,16 @@ import {
   EditorSuperscript,
   EditorUnderline,
   type EditorMarkProps,
-} from './marks';
+} from './parts/marks';
+import { EditorSeparator, type EditorSeparatorProps } from './parts/separator';
+import {
+  EditorTextAlign,
+  type EditorTextAlignment,
+  type EditorTextAlignProps,
+} from './parts/text-align';
 import { EditorRoot, type EditorState, type EditorType, type EditorVariant } from './root';
-import { EditorSeparator, type EditorSeparatorProps } from './separator';
 import { editorStyle } from './style';
 import { EditorTable, type EditorTableProps } from './table/tool';
-import { EditorTextAlign, type EditorTextAlignment, type EditorTextAlignProps } from './text-align';
-import { type EditorFormat } from './value';
 
 import type { EditorMention, FindMentions } from './mention/node';
 import type { IdsSize } from '../../../tokens/types';

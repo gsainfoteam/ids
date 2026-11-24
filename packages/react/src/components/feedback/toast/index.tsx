@@ -5,7 +5,7 @@ import { type Hotkey } from '@tanstack/react-hotkeys';
 import { ToasterRoot } from './root';
 import { toasterStyle } from './style';
 
-import type { StatusColorScheme } from '../../../internal/status-palette';
+import type { StatusColorScheme } from '../../../internal/lib/status-palette';
 
 export function Toaster(props: Toaster.Props) {
   return <ToasterRoot {...props} />;
@@ -40,4 +40,4 @@ export {
   type ToastOptions,
   type ToastPromiseMessages,
   type ToastRecord,
-} from './toast-store';
+} from './lib/toast-store';

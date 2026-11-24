@@ -3,8 +3,8 @@
 import { useState } from 'react';
 
 import { PopoverContext } from './context';
+import { useInternalPopover } from './hooks/use-popover';
 import { popoverStyle } from './style';
-import { usePopover } from './use-popover';
 
 import type { Popover } from '.';
 
@@ -17,7 +17,7 @@ export function PopoverRoot({
   triggerType = 'click',
   children,
 }: Popover.Props) {
-  const popover = usePopover({
+  const popover = useInternalPopover({
     open,
     defaultOpen,
     onOpenChange,

@@ -1,15 +1,15 @@
 import { type ReactNode } from 'react';
 
-import { DialogClose, type DialogCloseProps } from './close';
-import { DialogContent, type DialogContentProps } from './content';
-import { DialogDescription, type DialogDescriptionProps } from './description';
-import { DialogFooter, type DialogFooterProps } from './footer';
-import { DialogHeader, type DialogHeaderProps } from './header';
-import { DialogOverlay, type DialogOverlayProps } from './overlay';
+import { DialogClose, type DialogCloseProps } from './parts/close';
+import { DialogContent, type DialogContentProps } from './parts/content';
+import { DialogDescription, type DialogDescriptionProps } from './parts/description';
+import { DialogFooter, type DialogFooterProps } from './parts/footer';
+import { DialogHeader, type DialogHeaderProps } from './parts/header';
+import { DialogOverlay, type DialogOverlayProps } from './parts/overlay';
+import { DialogTitle, type DialogTitleProps } from './parts/title';
+import { DialogTrigger, type DialogTriggerProps } from './parts/trigger';
 import { DialogRoot } from './root';
 import { dialogStyle } from './style';
-import { DialogTitle, type DialogTitleProps } from './title';
-import { DialogTrigger, type DialogTriggerProps } from './trigger';
 
 export function Dialog(props: Dialog.Props) {
   return <DialogRoot {...props} />;

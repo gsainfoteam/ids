@@ -1,6 +1,10 @@
-import { SliderMark, type SliderMarkProps } from './mark';
-import { SliderMarks, type SliderMarksProps } from './marks';
-import { SliderRange, type SliderRangeProps } from './range';
+import { type SliderValue } from './hooks/use-slider';
+import { SliderMark, type SliderMarkProps } from './parts/mark';
+import { SliderMarks, type SliderMarksProps } from './parts/marks';
+import { SliderRange, type SliderRangeProps } from './parts/range';
+import { SliderThumb, type SliderThumbProps } from './parts/thumb';
+import { SliderTrack, type SliderTrackProps } from './parts/track';
+import { SliderValueLabel, type SliderValueLabelProps } from './parts/value-label';
 import {
   SliderRoot,
   type SliderOrientation,
@@ -9,10 +13,6 @@ import {
   type SliderProps,
 } from './root';
 import { sliderStyle } from './style';
-import { SliderThumb, type SliderThumbProps } from './thumb';
-import { SliderTrack, type SliderTrackProps } from './track';
-import { type SliderValue } from './use-slider';
-import { SliderValueLabel, type SliderValueLabelProps } from './value-label';
 
 export function Slider<V extends SliderValue = number>(props: SliderProps<V>) {
   return <SliderRoot {...props} />;
@@ -66,4 +66,4 @@ export namespace Slider {
 }
 
 export type { SliderOrientation, SliderState, SliderThumbState, SliderProps } from './root';
-export type { SliderValue } from './use-slider';
+export type { SliderValue } from './hooks/use-slider';

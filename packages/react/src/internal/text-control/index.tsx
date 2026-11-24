@@ -14,16 +14,16 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../components/action/icon-button';
 import { elementTypeOf, flattenFragments, invariant, mergeProps } from '../../utils';
-import { type FieldSurfaceVariant } from '../surfaces/field-surface';
-import { useTranslate } from '../translate';
+import { type FieldSurfaceVariant } from '../surfaces/lib/field-surface';
+import { useInternalTranslate } from '../translate';
 import { type textControlStyle } from './style';
 
 import type { IdsSize } from '../../tokens/types';
 
-export { clearInput, replaceInput } from './clear-input';
-export { useInputValue } from './use-input-value';
-export { useMergedRef } from './use-merged-ref';
-export { useTextControl } from './use-text-control';
+export { clearInput, replaceInput } from './lib/clear-input';
+export { useInternalInputValue } from './hooks/use-input-value';
+export { useInternalMergedRef } from './hooks/use-merged-ref';
+export { useInternalTextControl } from './hooks/use-text-control';
 export { insetButtons, textControlStyle } from './style';
 
 export type TextControlState = {
@@ -131,7 +131,7 @@ export function TextControlClear({
   onClick,
   ...props
 }: TextControlClearProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   const context = use(TextControlContext);
   invariant(context, '`Clear` must be used inside a text field.');

@@ -1,10 +1,10 @@
-import { TimePickerColumn, type TimePickerColumnProps } from './column';
-import { TimePickerHeader } from './header';
-import { TimePickerPeriod, type TimePickerPeriodProps } from './period';
+import { type TimePickerOptionState, type TimePickerState } from './hooks/use-time-picker';
+import { TimePickerColumn, type TimePickerColumnProps } from './parts/column';
+import { TimePickerHeader } from './parts/header';
+import { TimePickerPeriod, type TimePickerPeriodProps } from './parts/period';
+import { TimePickerSeparator, type TimePickerSeparatorProps } from './parts/separator';
 import { TimePickerRoot, type TimePickerVariant, type TimePickerProps } from './root';
-import { TimePickerSeparator, type TimePickerSeparatorProps } from './separator';
 import { timePickerStyle } from './style';
-import { type TimePickerOptionState, type TimePickerState } from './use-time-picker';
 
 export function TimePicker(props: TimePickerProps) {
   return <TimePickerRoot {...props} />;
@@ -32,6 +32,6 @@ export namespace TimePicker {
 
 export type { TimePickerVariant, TimePickerOptions, TimePickerProps } from './root';
 
-export type { TimePrecision, HourCycle } from './time';
+export type { TimePrecision, HourCycle } from './lib/time';
 
-export type { TimePickerOptionState, TimePickerState } from './use-time-picker';
+export type { TimePickerOptionState, TimePickerState } from './hooks/use-time-picker';

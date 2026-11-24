@@ -4,7 +4,7 @@ import {
   normalizePage,
   paginationEntries,
   paginationRange,
-} from '../src/components/navigation/pagination/range';
+} from '../src/components/navigation/pagination/lib/range';
 
 const SWEEP_OF_EVERY_COMBINATION_MS = 30_000;
 

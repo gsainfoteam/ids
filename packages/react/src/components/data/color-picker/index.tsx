@@ -1,11 +1,13 @@
 import { type ComponentProps, type ReactElement } from 'react';
 
-import { ColorPickerAlphaSlider } from './alpha-slider';
-import { ColorPickerArea, type ColorPickerAreaProps } from './area';
-import { ColorPickerCopy } from './copy';
-import { ColorPickerEyeDropper } from './eye-dropper';
-import { ColorPickerHueSlider } from './hue-slider';
-import { ColorPickerInput, type ColorPickerInputProps } from './input';
+import { ColorPickerAlphaSlider } from './parts/alpha-slider';
+import { ColorPickerArea, type ColorPickerAreaProps } from './parts/area';
+import { ColorPickerCopy } from './parts/copy';
+import { ColorPickerEyeDropper } from './parts/eye-dropper';
+import { ColorPickerHueSlider } from './parts/hue-slider';
+import { ColorPickerInput, type ColorPickerInputProps } from './parts/input';
+import { ColorPickerSwatch, type ColorPickerSwatchProps } from './parts/swatch';
+import { ColorPickerSwatches, type ColorPickerSwatchesProps } from './parts/swatches';
 import {
   ColorPickerRoot,
   type ColorPickerSwatchOption,
@@ -13,8 +15,6 @@ import {
   type ColorPickerProps,
 } from './root';
 import { colorPickerStyle } from './style';
-import { ColorPickerSwatch, type ColorPickerSwatchProps } from './swatch';
-import { ColorPickerSwatches, type ColorPickerSwatchesProps } from './swatches';
 
 export function ColorPicker(props: ColorPickerProps) {
   return <ColorPickerRoot {...props} />;
@@ -50,4 +50,4 @@ export namespace ColorPicker {
 }
 
 export type { ColorPickerSwatchOption, ColorPickerState, ColorPickerProps } from './root';
-export type { ColorFormat } from './color';
+export type { ColorFormat } from './lib/color';

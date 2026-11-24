@@ -4,9 +4,9 @@ import { createContext, use, type ComponentProps, type Ref } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { CalendarDayProps } from './day';
+import type { CalendarState } from './hooks/use-calendar';
+import type { CalendarDayProps } from './parts/day';
 import type { calendarStyle } from './style';
-import type { CalendarState } from './use-calendar';
 import type { IdsSize } from '../../../tokens/types';
 
 export type NativeProps = Omit<
@@ -26,7 +26,7 @@ type ContextValue = {
 
 export const CalendarContext = createContext<ContextValue | null>(null);
 
-export function useCalendarContext(part: string) {
+export function useInternalCalendarContext(part: string) {
   const context = use(CalendarContext);
   invariant(context, `${part} must be inside Calendar.`);
   return context;

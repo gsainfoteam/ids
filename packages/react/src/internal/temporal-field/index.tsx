@@ -17,13 +17,13 @@ import {
 
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-import { temporalFieldStyle } from './style';
 import {
-  useTemporalField,
+  useInternalTemporalField,
   type TemporalChange,
   type TemporalFieldApi,
   type TemporalFieldState,
-} from './use-temporal-field';
+} from './hooks/use-temporal-field';
+import { temporalFieldStyle } from './style';
 import { IconButton } from '../../components/action/icon-button';
 import { useFieldSize } from '../../components/form/field/context';
 import {
@@ -35,14 +35,14 @@ import {
   part,
 } from '../../utils';
 import { FieldPopup, FieldPopupHeader } from '../field-popup';
-import { FormValue } from '../form-value';
-import { keyHandler, withModifiers } from '../keys';
-import { type FieldSurfaceVariant } from '../surfaces/field-surface';
+import { keyHandler, withModifiers } from '../lib/keys';
+import { FormValue } from '../parts/form-value';
+import { type FieldSurfaceVariant } from '../surfaces/lib/field-surface';
 
 import type { IdsSize } from '../../tokens/types';
-import type { AccessibleName } from '../accessible-name';
+import type { AccessibleName } from '../lib/accessible-name';
 
-export type { TemporalFieldState, TemporalChange } from './use-temporal-field';
+export type { TemporalFieldState, TemporalChange } from './hooks/use-temporal-field';
 export { temporalFieldStyle } from './style';
 
 export type TemporalFieldProps<V> = Omit<
@@ -139,7 +139,7 @@ type ContextValue = {
 
 const TemporalContext = createContext<ContextValue | null>(null);
 
-function useTemporal(part: string) {
+function useInternalTemporal(part: string) {
   const context = use(TemporalContext);
   invariant(context, `${part} must be inside its field.`);
   return context;
@@ -157,12 +157,12 @@ export function pickerPart<P>(children: ReactNode, type: unknown): ReactElement<
   return undefined;
 }
 
-export function useTemporalPicker<V>(part: string) {
-  return useTemporal(part).picker as TemporalPickerApi<V>;
+export function useInternalTemporalPicker<V>(part: string) {
+  return useInternalTemporal(part).picker as TemporalPickerApi<V>;
 }
 
 export function TemporalValue({ asChild, children, ...props }: ValueProps) {
-  const c = useTemporal('Value');
+  const c = useInternalTemporal('Value');
   const empty = c.state.empty;
   return part(
     'span',
@@ -173,7 +173,7 @@ export function TemporalValue({ asChild, children, ...props }: ValueProps) {
 }
 
 export function TemporalTrigger({ asChild, children, className, ...props }: TriggerProps) {
-  const c = useTemporal('Trigger');
+  const c = useInternalTemporal('Trigger');
   invariant(
     !flattenFragments(children).some(
       (n) => isValidElement(n) && elementTypeOf(n) === TemporalClear,
@@ -214,13 +214,13 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
 }
 
 export function TemporalInput({ asChild, ...props }: InputProps) {
-  const c = useTemporal('Input');
+  const c = useInternalTemporal('Input');
   invariant(c.input, 'Input must be a direct part of its field.');
   return part('input', asChild, undefined, mergeProps(props, c.input));
 }
 
 export function TemporalClear({ asChild, children, className, ...props }: ClearProps) {
-  const c = useTemporal('Clear');
+  const c = useInternalTemporal('Clear');
   if (c.state.empty) return null;
   const button = {
     ...mergeProps(props, {
@@ -245,7 +245,7 @@ export function TemporalClear({ asChild, children, className, ...props }: ClearP
 }
 
 export function TemporalContent({ asChild, children, mobileVariant, ...props }: ContentProps) {
-  const c = useTemporal('Content');
+  const c = useInternalTemporal('Content');
   if (!c.state.open) return null;
 
   return (
@@ -315,7 +315,7 @@ export function TemporalField<V>({
     toggle,
     show,
     onBlur: handleBlur,
-  } = useTemporalField<V>({
+  } = useInternalTemporalField<V>({
     value,
     defaultValue: defaultValue ?? config.empty,
     onValueChange,

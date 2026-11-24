@@ -4,7 +4,7 @@ import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from '@tipt
 
 import { EditorCodeLanguage, languageOf } from './language';
 import { CodeBlockContext } from '../../../data/code-block/context';
-import { CodeBlockCopy } from '../../../data/code-block/copy';
+import { CodeBlockCopy } from '../../../data/code-block/parts/copy';
 import { codeBlockStyle } from '../../../data/code-block/style';
 import { Divider } from '../../../layout/divider';
 import { ScrollArea } from '../../../layout/scroll-area';

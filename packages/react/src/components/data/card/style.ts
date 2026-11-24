@@ -1,4 +1,4 @@
-import { footerBand } from '../../../internal/surfaces/footer-band';
+import { footerBand } from '../../../internal/surfaces/lib/footer-band';
 import { tv } from '../../../utils';
 
 import type { CardVariant } from '.';

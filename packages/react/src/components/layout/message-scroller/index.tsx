@@ -1,12 +1,12 @@
 import { type ComponentProps } from 'react';
 
-import { MessageScrollerJump, type MessageScrollerJumpProps } from './jump';
-import { MessageScrollerList, type MessageScrollerListProps } from './list';
-import { type ScrollOnAppend as EngineScrollOnAppend } from './message-scroll';
+import { type ScrollOnAppend as EngineScrollOnAppend } from './lib/message-scroll';
+import { MessageScrollerJump, type MessageScrollerJumpProps } from './parts/jump';
+import { MessageScrollerList, type MessageScrollerListProps } from './parts/list';
 import { MessageScrollerRoot } from './root';
 import { messageScrollerStyle } from './style';
 
-import type { AccessibleName } from '../../../internal/accessible-name';
+import type { AccessibleName } from '../../../internal/lib/accessible-name';
 
 export function MessageScroller(props: MessageScroller.Props) {
   return <MessageScrollerRoot {...props} />;

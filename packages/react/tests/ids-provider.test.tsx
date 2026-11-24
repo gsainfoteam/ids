@@ -9,7 +9,7 @@ import { palettes } from '../.storybook/palettes';
 import { Button, IdsProvider, createIdsPalette, useTheme } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
-import { paletteFromRamp } from '../src/components/utility/ids-provider/palette-scales';
+import { paletteFromRamp } from '../src/components/utility/ids-provider/lib/palette-scales';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 

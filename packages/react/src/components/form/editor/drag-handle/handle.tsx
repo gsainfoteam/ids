@@ -33,15 +33,15 @@ import {
   turnBlockInto,
 } from './commands';
 import { markTheDraggedBlock, topLevelBlocks } from './extension';
-import { useDragSensors } from '../../../../internal/drag-sensors';
-import { swallowTheClickThatEndsADrag } from '../../../../internal/drag-surface';
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalDragSensors } from '../../../../internal/lib/drag-sensors';
+import { swallowTheClickThatEndsADrag } from '../../../../internal/lib/drag-surface';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { cn, mergeRefs } from '../../../../utils';
 import { Menu } from '../../../overlay/menu';
 import { blocksAvailableIn, turnsIntoOtherBlocks } from '../blocks/catalog';
-import { useEditorContext } from '../context';
-import { EditorGlyphButton } from '../glyph-button';
+import { useInternalEditorContext } from '../context';
 import { editorMessages } from '../messages-catalog';
+import { EditorGlyphButton } from '../parts/glyph-button';
 import { EditorTableMenuItems } from '../table/edit-menu';
 
 import type { BlockHoverStore, HoveredBlock } from './store';
@@ -92,7 +92,7 @@ function besideTheFirstLine(block: HTMLElement, handle: HTMLElement): CSSPropert
   return { top: line.top - documentTop + (line.height - handle.offsetHeight) / 2 };
 }
 
-function useBesideTheFirstLine(block: HoveredBlock | null) {
+function useInternalBesideTheFirstLine(block: HoveredBlock | null) {
   const handleRef = useRef<HTMLButtonElement>(null);
   const [place, setPlace] = useState<CSSProperties>({});
 
@@ -110,7 +110,7 @@ function useBesideTheFirstLine(block: HoveredBlock | null) {
   return [handleRef, place] as const;
 }
 
-function useForgetTheBlockWhenThePointerLeaves(
+function useInternalForgetTheBlockWhenThePointerLeaves(
   store: BlockHoverStore,
   handleRef: RefObject<HTMLButtonElement | null>,
 ) {
@@ -235,8 +235,8 @@ function DraggableGrip({
 }
 
 export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
-  const t = useTranslate(editorMessages);
-  const { editor, editable, styles } = useEditorContext('Editor');
+  const t = useInternalTranslate(editorMessages);
+  const { editor, editable, styles } = useInternalEditorContext('Editor');
   const hovered = useSyncExternalStore(store.subscribe, store.getSnapshot, () => null);
   const [menuBlock, setMenuBlock] = useState<HoveredBlock | null>(null);
   const [dragged, setDragged] = useState<Dragged | null>(null);
@@ -245,11 +245,11 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
   const draggedRef = useRef<Dragged | null>(null);
   const lineRef = useRef<DropLine | null>(null);
   const block = menuBlock ?? dragged?.block ?? hovered;
-  const [handleRef, place] = useBesideTheFirstLine(block);
+  const [handleRef, place] = useInternalBesideTheFirstLine(block);
   const node = block && editor?.state.doc.nodeAt(block.pos);
-  const sensors = useDragSensors({ touch: false });
+  const sensors = useInternalDragSensors({ touch: false });
 
-  useForgetTheBlockWhenThePointerLeaves(store, handleRef);
+  useInternalForgetTheBlockWhenThePointerLeaves(store, handleRef);
 
   const shown = editable && editor !== null && node != null && block !== null;
   const turnInto = shown && turnsIntoOtherBlocks(node) ? blocksAvailableIn(editor) : [];

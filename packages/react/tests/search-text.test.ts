@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { matchesSearch, matchRanges, searchChunks } from '../src/internal/search-text';
+import { matchesSearch, matchRanges, searchChunks } from '../src/internal/lib/search-text';
 
 const marked = (text: string, query: string | readonly string[]) =>
   searchChunks(text, query)

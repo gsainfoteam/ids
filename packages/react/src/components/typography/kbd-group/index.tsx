@@ -2,7 +2,7 @@ import { type ComponentProps } from 'react';
 
 import { KbdGroupRoot } from './root';
 import { kbdGroupStyle } from './style';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 import type { Kbd } from '../kbd';

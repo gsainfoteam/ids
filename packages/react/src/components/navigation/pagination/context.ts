@@ -5,7 +5,7 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { paginationStyle } from './style';
-import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/lib/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type PaginationContextValue = {
@@ -23,7 +23,7 @@ export type PaginationContextValue = {
 
 export const PaginationContext = createContext<PaginationContextValue | null>(null);
 
-export function usePaginationContext(part: string) {
+export function useInternalPaginationContext(part: string) {
   const context = use(PaginationContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Pagination>\`.`);
   return context;

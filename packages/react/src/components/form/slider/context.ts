@@ -22,7 +22,7 @@ type SliderContextValue = {
 
 export const SliderContext = createContext<SliderContextValue | null>(null);
 
-export function useSliderContext(part: string) {
+export function useInternalSliderContext(part: string) {
   const context = use(SliderContext);
   invariant(context, `${part} must be rendered inside Slider.`);
   return context;
@@ -30,7 +30,7 @@ export function useSliderContext(part: string) {
 
 export const SliderThumbContext = createContext<SliderThumbState | null>(null);
 
-export function useSliderThumbContext(part: string) {
+export function useInternalSliderThumbContext(part: string) {
   const context = use(SliderThumbContext);
   invariant(context, `${part} must be rendered inside Slider.Thumb.`);
   return context;

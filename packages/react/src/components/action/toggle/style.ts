@@ -1,5 +1,5 @@
-import { controlSurface } from '../../../internal/surfaces/control-surface';
-import { toggleSurface } from '../../../internal/surfaces/toggle-surface';
+import { controlSurface } from '../../../internal/surfaces/lib/control-surface';
+import { toggleSurface } from '../../../internal/surfaces/lib/toggle-surface';
 import { tv } from '../../../utils';
 
 export const toggleStyle = tv({

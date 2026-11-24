@@ -3,7 +3,7 @@ import { type ComponentProps, type ReactNode } from 'react';
 import { GroupRoot, GroupSeparator, type GroupOrientation, type GroupContextValue } from './root';
 import { groupStyle } from './style';
 
-import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/lib/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export function Group(props: Group.Props) {
@@ -30,8 +30,8 @@ export namespace Group {
 }
 
 export {
-  useGroupContext,
-  useGroupNameWarning,
+  useInternalGroupContext,
+  useInternalGroupNameWarning,
   type GroupOrientation,
   type GroupContextValue,
 } from './root';

@@ -12,7 +12,7 @@ const styles = editorStyle();
 
 const widthOf = (width: unknown) => (typeof width === 'number' ? width : undefined);
 
-function useWidthOf(element: HTMLElement | null) {
+function useInternalWidthOf(element: HTMLElement | null) {
   const [width, setWidth] = useState<number>();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ function useWidthOf(element: HTMLElement | null) {
 
 export function EditorImageView({ node, editor, selected, updateAttributes }: ReactNodeViewProps) {
   const [wrapper, setWrapper] = useState<HTMLElement | null>(null);
-  const room = useWidthOf(wrapper);
+  const room = useInternalWidthOf(wrapper);
   const { src, alt, title } = node.attrs as { src: string; alt?: string; title?: string };
   const resizable = useResizable({
     width: {

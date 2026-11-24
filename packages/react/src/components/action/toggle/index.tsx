@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { ToggleRoot } from './root';
 import { toggleStyle } from './style';
-import { type ControlColorScheme, type SurfaceVariant } from '../../../internal/surfaces/control-surface';
+import { type ControlColorScheme, type SurfaceVariant } from '../../../internal/surfaces/lib/control-surface';
 
 import type { InteractiveState, WithInteractiveValues } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';

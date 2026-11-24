@@ -6,7 +6,7 @@ import { ArrowUpRightIcon } from '@heroicons/react/16/solid';
 import { isFunction } from 'es-toolkit';
 
 import { linkStyle } from './style';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalTranslate } from '../../../internal/translate';
 import { invariant, mergeProps } from '../../../utils';
 
 import type { Link } from '.';
@@ -43,7 +43,7 @@ export function LinkRoot({
   children,
   ...rest
 }: Link.Props) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const child = asChild && isValidElement<ChildProps>(children) ? children : undefined;
   invariant(
     !asChild || child !== undefined,

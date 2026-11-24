@@ -28,7 +28,7 @@ export type TabsContextValue = {
 
 export const TabsContext = createContext<TabsContextValue | null>(null);
 
-export function useTabsContext(part: string) {
+export function useInternalTabsContext(part: string) {
   const context = use(TabsContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Tabs>\`.`);
   return context;

@@ -20,6 +20,6 @@ export type SegmentedControlContextValue = {
 
 export const SegmentedControlContext = createContext<SegmentedControlContextValue | null>(null);
 
-export function useSegmentedControlContext() {
+export function useInternalSegmentedControlContext() {
   return useContext(SegmentedControlContext);
 }

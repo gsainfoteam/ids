@@ -13,7 +13,7 @@ type Context = {
 
 export const CodeBlockContext = createContext<Context | null>(null);
 
-export function useCodeBlockContext(part: string) {
+export function useInternalCodeBlockContext(part: string) {
   const context = use(CodeBlockContext);
   invariant(context, `\`<${part}>\` must be used inside \`<CodeBlock>\`.`);
   return context;

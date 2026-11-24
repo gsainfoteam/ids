@@ -7,7 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { Carousel, useCarousel } from '../src';
 import { skipWithoutCdp } from './engines';
-import { slidesLayout, useSlides, type SlidesDragEvent } from '../src/internal/slides';
+import { slidesLayout, useInternalSlides, type SlidesDragEvent } from '../src/internal/slides';
 
 type Point = { x: number; y: number };
 
@@ -738,7 +738,7 @@ function Viewer({ refuseDrag = () => false, loop, onValueChange }: ViewerProps) 
     scrollTo,
     scrollPrev,
     cancelDrag,
-  } = useSlides({
+  } = useInternalSlides({
     slideCount: 3,
     loop,
     onValueChange,
