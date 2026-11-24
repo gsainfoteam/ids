@@ -727,7 +727,11 @@ function buildCss(sources: Sources, naming: Naming, inputs: CssInputs): Ir['css'
         'pseudo' in trigger
           ? { kind: 'pseudo' as const, pseudo: trigger.pseudo }
           : 'attribute' in trigger
-            ? { kind: 'attribute' as const, attribute: trigger.attribute }
+            ? {
+                kind: 'attribute' as const,
+                attribute: trigger.attribute,
+                ...(trigger.unlessPseudo ? { unlessPseudo: trigger.unlessPseudo } : {}),
+              }
             : {
                 kind: 'focusedInside' as const,
                 attribute: trigger.focusedInsideExceptPopups,

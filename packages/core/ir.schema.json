@@ -1122,6 +1122,10 @@
                       "attribute": {
                         "type": "string",
                         "minLength": 1
+                      },
+                      "unlessPseudo": {
+                        "type": "string",
+                        "minLength": 1
                       }
                     },
                     "required": [

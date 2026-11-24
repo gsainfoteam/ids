@@ -160,7 +160,14 @@ function modeVariants(ir: Ir) {
 
 function focusRingTrigger(ir: Ir, trigger: Ir['css']['focusRing']['triggers'][number]) {
   if (trigger.kind === 'pseudo') return compound(nesting(), pseudo(pseudoClass(trigger.pseudo)));
-  if (trigger.kind === 'attribute') return compound(nesting(), attribute(trigger.attribute));
+  if (trigger.kind === 'attribute')
+    return compound(
+      nesting(),
+      attribute(trigger.attribute),
+      ...(trigger.unlessPseudo
+        ? [pseudo(PSEUDO.not, compound(pseudo(pseudoClass(trigger.unlessPseudo))))]
+        : []),
+    );
   const focusedInside = (...scope: ReturnType<typeof attribute>[]) =>
     pseudo(
       PSEUDO.has,

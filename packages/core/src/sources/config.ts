@@ -139,7 +139,7 @@ const cssDimension = v.object({ value: v.number(), unit: v.picklist(['px', 'em',
 
 const focusRingTrigger = v.union([
   v.strictObject({ pseudo: kebabId }),
-  v.strictObject({ attribute: kebabId }),
+  v.strictObject({ attribute: kebabId, unlessPseudo: v.optional(kebabId) }),
   v.strictObject({ focusedInsideExceptPopups: kebabId }),
 ]);
 

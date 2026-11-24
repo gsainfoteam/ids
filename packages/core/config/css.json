@@ -5,7 +5,7 @@
     "variant": "focus-ring-visible",
     "triggers": [
       { "pseudo": "focus-visible" },
-      { "attribute": "data-focus-visible" },
+      { "attribute": "data-focus-visible", "unlessPseudo": "disabled" },
       { "focusedInsideExceptPopups": "data-field-input" },
       { "focusedInsideExceptPopups": "data-text-field-input" },
       { "focusedInsideExceptPopups": "data-text-area-input" }
