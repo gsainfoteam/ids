@@ -173,6 +173,15 @@
       "uploading": "업로드 중",
       "compose": "작성",
       "upload": "업로드"
+    },
+    "toggleSample": {
+      "bold": "굵게",
+      "theoffstateisquiet": "꺼져 있을 때는 조용하고, variant는 켜진 모습을 정합니다.",
+      "off": "꺼짐",
+      "on": "켜짐",
+      "showPassword": "비밀번호 보기",
+      "muteNotifications": "알림 끄기",
+      "confirmationRequest": "확인 요청"
     }
   },
   "examples": {

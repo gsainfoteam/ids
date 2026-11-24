@@ -11,6 +11,7 @@ import 'components/button_group_usecase.dart';
 import 'components/checkbox_usecase.dart';
 import 'components/checkbox_group_usecase.dart';
 import 'components/floating_button_usecase.dart';
+import 'components/toggle_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -38,6 +39,7 @@ final directories = <WidgetbookNode>[
             name: 'IdsFloatingButton',
             useCases: floatingButtonUseCases,
           ),
+          WidgetbookComponent(name: 'IdsToggle', useCases: toggleUseCases),
         ],
       ),
       WidgetbookFolder(

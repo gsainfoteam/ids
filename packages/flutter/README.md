@@ -367,6 +367,15 @@ IdsCheckboxGroup<String>.withParts(
 `event.preventDefault()`를 호출하면 활성화를 취소한다.
 비활성 링크는 목적지를 노출하지 않으며 기본 탭 순서에서 제외된다.
 
+## Toggle
+
+`IdsToggle`은 `defaultPressed`로 초기 상태를 설정하거나 `pressed`와
+`onPressedChange`로 외부에서 상태를 제어한다. 마우스, 터치, Space와 Enter로
+상태를 바꿀 수 있다. `IdsToggle.builder`는 눌림·포커스 등 현재 상태를 받는다.
+`style`은 현재 상태와 기본 `ShapeDecoration`을 받아 버튼의 표면을 꾸민다.
+`onClick`에서 `event.preventDefault()`를 호출하면 이번 활성화의 상태 변경과
+`onPressedChange` 호출을 막을 수 있다.
+
 ## IconButton
 
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며

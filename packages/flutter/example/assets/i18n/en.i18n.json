@@ -173,6 +173,15 @@
       "uploading": "Uploading",
       "compose": "Compose",
       "upload": "Upload"
+    },
+    "toggleSample": {
+      "bold": "Bold",
+      "theoffstateisquiet": "The off state is quiet. The variant determines the on state.",
+      "off": "Off",
+      "on": "On",
+      "showPassword": "Show password",
+      "muteNotifications": "Mute notifications",
+      "confirmationRequest": "Confirmation request"
     }
   },
   "examples": {
