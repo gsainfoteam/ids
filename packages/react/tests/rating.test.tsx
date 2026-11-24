@@ -43,7 +43,9 @@ test('half-step SSR: native radios sharing a name, one checked tab stop, the Fie
 
 test('arrow keys are the browser radio keys: half-steps and 0 before the first star', async () => {
   const values: number[] = [];
-  const screen = await render(<Rating step={0.5} onValueChange={(v) => values.push(v)} />);
+  const screen = await render(
+    <Rating aria-label="평점" step={0.5} onValueChange={(v) => values.push(v)} />,
+  );
   const nothingChecked = () => screen.container.querySelector('input:checked');
   option(0).element().focus();
   await userEvent.keyboard('{ArrowRight}');
@@ -62,6 +64,7 @@ test('hover previews, drawn translucent, without changing the value; half clicks
   const previews: Array<number | null> = [];
   const screen = await render(
     <Rating
+      aria-label="평점"
       defaultValue={1}
       step={0.5}
       onValueChange={(v) => values.push(v)}
@@ -95,7 +98,7 @@ test('controlled changes respect the owner; outside updates do not echo', async 
   function Demo() {
     const [value, set] = useState(2);
     update = set;
-    return <Rating value={value} onValueChange={(v) => values.push(v)} />;
+    return <Rating aria-label="평점" value={value} onValueChange={(v) => values.push(v)} />;
   }
   await render(<Demo />);
   await userEvent.click(option(4));
@@ -108,7 +111,9 @@ test('controlled changes respect the owner; outside updates do not echo', async 
 
 test('disabled blocks changes; readOnly draws one image and still submits its score', async () => {
   const onValueChange = vi.fn();
-  const disabled = await render(<Rating disabled value={2} onValueChange={onValueChange} />);
+  const disabled = await render(
+    <Rating aria-label="평점" disabled value={2} onValueChange={onValueChange} />,
+  );
   await userEvent.click(option(4), { force: true });
   option(2).element().focus();
   await userEvent.keyboard('{ArrowRight}');
@@ -146,7 +151,7 @@ test('Rating.Item: one template for every star, indexed items for their own, all
   await expect.element(items[1]!).toHaveClass('item-full');
   expect(() =>
     renderToString(
-      <Rating>
+      <Rating aria-label="평점">
         <Rating.Item>a</Rating.Item>
         <Rating.Item>b</Rating.Item>
       </Rating>,
@@ -154,7 +159,7 @@ test('Rating.Item: one template for every star, indexed items for their own, all
   ).toThrow(/one Rating.Item without an index/);
   expect(() =>
     renderToString(
-      <Rating>
+      <Rating aria-label="평점">
         <span />
       </Rating>,
     ),
@@ -165,7 +170,12 @@ test('form: radios submit only with a name and a score, required, reset without 
   const values: number[] = [];
   const screen = await render(
     <form>
-      <Rating name="score" defaultValue={2} onValueChange={(v) => values.push(v)} />
+      <Rating
+        aria-label="평점"
+        name="score"
+        defaultValue={2}
+        onValueChange={(v) => values.push(v)}
+      />
       <Rating aria-label="Nameless" defaultValue={4} />
       <button type="reset">Reset</button>
     </form>,
@@ -192,17 +202,18 @@ test('form: radios submit only with a name and a score, required, reset without 
     .toHaveAttribute('data-rating-value', '3');
   await screen.rerender(
     <form key="required">
-      <Rating name="score" required />
+      <Rating aria-label="평점" name="score" required />
     </form>,
   );
   const first = () => option(1).element() as HTMLInputElement;
-  await expect.poll(() => first().validationMessage).toBe('점수를 선택하세요.');
+  await expect.poll(() => first().validity.valueMissing).toBe(true);
+  expect(first().validity.customError, 'the browser writes the message').toBe(false);
   expect(screen.container.querySelector('form')!.checkValidity()).toBe(false);
   await userEvent.click(option(1));
   await expect.poll(() => screen.container.querySelector('form')!.checkValidity()).toBe(true);
   await screen.rerender(
     <form key="disabled">
-      <Rating name="score" disabled defaultValue={3} />
+      <Rating aria-label="평점" name="score" disabled defaultValue={3} />
     </form>,
   );
   expect(new FormData(form()).has('score')).toBe(false);
@@ -212,6 +223,7 @@ test('ref and focus stay on the group, which hands focus to the checked option',
   let root: HTMLDivElement | null = null;
   const screen = await render(
     <Rating
+      aria-label="평점"
       defaultValue={3}
       ref={(node) => {
         root = node;
@@ -270,7 +282,7 @@ test('a form reset leaves a controlled value where the parent put it', async () 
     update = set;
     return (
       <form>
-        <Rating name="score" value={value} onValueChange={set} />
+        <Rating aria-label="평점" name="score" value={value} onValueChange={set} />
         <button type="reset">Reset</button>
       </form>
     );

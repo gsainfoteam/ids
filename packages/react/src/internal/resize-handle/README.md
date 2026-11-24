@@ -74,7 +74,7 @@ resizeKeyMap(
 - Splitter 가 `resizeBy` 를 쓰는 이유: 한 걸음이 접힌 패널을 최소 크기까지 열거나 최소 크기의 패널을 접고(`keyTarget`), 앞 패널이 최소 크기에 닿으면 그 앞 패널까지 밉니다. 앞 패널의 범위로 자르면 이 두 가지가 막힙니다. `Home` `End` 는 앞 패널의 범위 끝으로 갑니다.
 - `Enter` 는 표에 없습니다. 되돌리기(Resizable, DataTable)든 접기(Splitter)든 쓰는 쪽이 정합니다.
 - `separatorProps` 는 `tabIndex={0}` 과 `data-resize-handle` 도 붙입니다. `disabled` 면 Tab 순서에서 빠지고 `aria-disabled`, `data-disabled` 가 붙습니다.
-- `axisSeparatorProps(axis, t, disabled)` 는 `ResizeAxis` 에서 값(정수 px), 이름("너비", "높이"), `aria-valuetext`("400px"), `aria-controls` 를 채웁니다. 문구는 `resizable` 묶음의 키입니다.
+- `axisSeparatorProps(axis, t, words, disabled)` 는 `ResizeAxis` 에서 값(정수 px), 이름(`common.resize`, "크기 조절"), `aria-valuetext`(`words.pixels`, "400px"), `aria-controls` 를 채웁니다. 너비인지 높이인지는 `aria-orientation` 이 알립니다.
 
 ### 알아둘 것
 

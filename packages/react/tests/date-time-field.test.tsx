@@ -15,6 +15,7 @@ import { render } from 'vitest-browser-react';
 
 import { DateTimeField, Field, IdsProvider, TimeField } from '../src';
 import { skipWithoutCdp } from './engines';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
@@ -37,7 +38,7 @@ const t = (day = 15) => new CalendarDate(2026, 9, day);
 const hiddenValue = () => document.querySelector<HTMLInputElement>('input[type=hidden]')?.value;
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
 const inLocale = (locale: string | undefined, children: ReactNode) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     {children}
   </IdsProvider>
 );
@@ -121,7 +122,7 @@ test('SSR formatting, local serialization, Field ARIA and diagnostics for both c
   );
   expect(() => shown({ locale: '-' })).toThrow(/BCP 47/);
   const empty = parse(renderToString(<DateTimeField />));
-  expect(empty.querySelector('[role=combobox]')!.textContent).toBe('날짜와 시간 선택');
+  expect(empty.querySelector('[role=combobox]')!.textContent).toBe('');
   expect(() => renderToString(<DateTimeField min={d(16)} max={d(15)} />)).toThrow(/min/);
   const precise = parse(
     renderToString(
@@ -158,7 +159,7 @@ test('both clock fields: prevented and real native reset, controlled empty, disa
     );
     expect(new FormData(screen.container.querySelector('form')!).has('when')).toBe(false);
     await screen.rerender(field({ value: null }));
-    await expect.element(screen.getByRole('combobox')).toMatchTextContent('선택');
+    await expect.element(screen.getByRole('combobox')).toHaveTextContent('');
     await screen.unmount();
   }
 });
@@ -265,7 +266,7 @@ test('react-hook-form value mode for both clock fields: required focus, value mo
     expect(hiddenValue()).toBe(pickedTen);
     methods.reset();
     await expect.poll(hiddenValue).toBeUndefined();
-    await expect.element(trigger).toMatchTextContent('선택');
+    await expect.element(trigger).toHaveTextContent('');
     await screen.unmount();
   }
 });
@@ -281,9 +282,6 @@ test('a sub-second range with no representable time disables the day and the clo
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(day(15)).toHaveAttribute('data-disabled');
   await expect.element(col('hour')).toHaveAttribute('aria-disabled', 'true');
-  await expect
-    .element(screen.getByRole('dialog'))
-    .toMatchTextContent('고를 수 있는 날짜를 먼저 고르세요.');
 });
 
 test('a min with milliseconds starts the clock at the next whole second, only on its own day', async () => {

@@ -1,5 +1,7 @@
 'use client';
 
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
+
 import { ImageViewerCaption } from './caption';
 import { ImageViewerContext } from '../context';
 import { useInternalImageViewerPresence } from '../hooks/use-image-viewer-presence';
@@ -7,10 +9,12 @@ import { useInternalImageViewerSession } from '../hooks/use-image-viewer-session
 import { isNear } from '../lib/viewer-stage';
 import { imageStyle } from '../style';
 import { ImageViewerToolbar } from './toolbar';
+import { ImageViewerFallback } from './viewer-fallback';
 import { ImageViewerSlide } from './viewer-slide';
 import { ModalLayer, OverlayItemContext } from '../../../../internal/overlay';
 import { SlidesAnnouncer } from '../../../../internal/slides';
 import { useInternalTranslate } from '../../../../internal/translate';
+import { elementTypeOf, flattenFragments } from '../../../../utils';
 
 import type { ImageViewerLook, ImageViewerSource } from './viewer';
 import type { ImageViewerReport } from '../hooks/use-image-viewer-surfaces';
@@ -23,6 +27,9 @@ const DEFAULT_PARTS = (
     <ImageViewerToolbar />
   </>
 );
+
+const isFallback = (node: ReactNode): node is ReactElement =>
+  isValidElement(node) && elementTypeOf(node) === ImageViewerFallback;
 
 function ViewerSession({
   source,
@@ -52,6 +59,9 @@ function ViewerSession({
   } = useInternalImageViewerSession({ source, report, styles });
   const { open, items } = source;
   const count = items.length;
+  const parts = flattenFragments(look.children ?? DEFAULT_PARTS);
+  const fallback = parts.find(isFallback);
+  const chrome = parts.filter((node) => !isFallback(node));
 
   return (
     <ModalLayer
@@ -102,12 +112,13 @@ function ViewerSession({
                 attachArea={attachArea}
                 attachBox={attachBox}
                 styles={styles}
+                fallback={fallback}
               />
             ))}
           </div>
         </section>
         <OverlayItemContext value={null}>
-          <ImageViewerContext value={context}>{look.children ?? DEFAULT_PARTS}</ImageViewerContext>
+          <ImageViewerContext value={context}>{chrome}</ImageViewerContext>
         </OverlayItemContext>
         <SlidesAnnouncer slides={slides} className={styles.announcer()} />
       </div>

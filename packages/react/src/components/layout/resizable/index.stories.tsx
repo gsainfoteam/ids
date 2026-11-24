@@ -262,7 +262,7 @@ export const SnapTheSizeToAStep: Story = {
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const root = canvasElement.querySelector<HTMLElement>('[data-resizable]')!;
-    const edge = canvas.getByRole('separator', { name: '높이' });
+    const edge = canvas.getByRole('separator', { name: '크기 조절' });
     await expect(edge).toHaveAttribute('aria-valuetext', '2시간');
 
     edge.focus();
@@ -305,7 +305,7 @@ export const LimitTheSize: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const edge = canvas.getByRole('separator', { name: '너비' });
+    const edge = canvas.getByRole('separator', { name: '크기 조절' });
     edge.focus();
     await userEvent.keyboard('{End}');
     await waitFor(() => expect(valueOf(edge)).toBe(320));
@@ -342,7 +342,8 @@ export const ControlTheSize: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    canvas.getByRole('separator', { name: '너비' }).focus();
+    const [width] = canvas.getAllByRole('separator', { name: '크기 조절' });
+    width!.focus();
     await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
     await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('216 x 140'));
     await userEvent.keyboard('{ArrowUp}');
@@ -416,12 +417,12 @@ export const Keyboard: Story = {
     docs: {
       description: {
         story:
-          '가장자리 손잡이는 separator 하나입니다. 모서리 손잡이는 "크기 조절" group 안의 separator 둘(너비, 높이)이 Tab 한 칸을 나눠 씁니다. ↑ ↓ 를 누르면 포커스가 높이 separator 로 옮겨 가서, 스크린 리더는 늘 값이 바뀐 separator 를 읽습니다.',
+          '가장자리 손잡이는 separator 하나입니다. 모서리 손잡이는 "크기 조절" group 안의 separator 둘(너비는 aria-orientation vertical, 높이는 horizontal)이 Tab 한 칸을 나눠 씁니다. ↑ ↓ 를 누르면 포커스가 높이 separator 로 옮겨 가서, 스크린 리더는 늘 값이 바뀐 separator 를 읽습니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const [edge, width] = canvas.getAllByRole('separator', { name: '너비' });
+    const [edge, width, height] = canvas.getAllByRole('separator', { name: '크기 조절' });
     edge!.focus();
     await userEvent.keyboard('{ArrowRight}');
     await waitFor(() => expect(valueOf(edge!)).toBe(256));
@@ -433,9 +434,8 @@ export const Keyboard: Story = {
     await userEvent.tab();
     await expect(width).toHaveFocus();
     await userEvent.keyboard('{ArrowDown}');
-    const height = canvas.getByRole('separator', { name: '높이' });
     await waitFor(() => expect(height).toHaveFocus());
-    await expect(valueOf(height)).toBe(136);
+    await expect(valueOf(height!)).toBe(136);
     await expect(width).toHaveAttribute('tabindex', '-1');
   },
 };

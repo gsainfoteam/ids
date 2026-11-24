@@ -24,7 +24,7 @@ const dialog = () => page.getByRole('dialog');
 const editor = () => page.getByRole('textbox', { name: '색상 값' });
 const slider = (name: string) => page.getByRole('slider', { name });
 const swatch = (name: string) => page.getByRole('radio', { name });
-const clearButton = () => page.getByRole('button', { name: '색상 지우기' });
+const clearButton = () => page.getByRole('button', { name: '지우기' });
 const triggerText = () => trigger().element().textContent;
 
 const resetHandlersHaveRun = () => new Promise((resolve) => setTimeout(resolve));
@@ -109,7 +109,7 @@ test('SSR: the value is written in the field format, and the trigger reads label
     'an aria-label is kept and the value is read after it',
   ).toBe(`brand ${doc.querySelector('[id$=-value]')!.id}`);
   expect(doc.querySelector<HTMLElement>('[data-color-field-swatch]')!.dataset.empty).toBe('');
-  expect(doc.querySelector('[id$=-value]')!.textContent).toBe('색상 선택');
+  expect(doc.querySelector('[id$=-value]')!.textContent).toBe('');
   expect(doc.querySelector('[data-color-field-clear]'), 'nothing to clear').toBeNull();
 });
 
@@ -117,7 +117,7 @@ test('click or ArrowDown opens a dialog on the first control; Escape closes it b
   const state = tracked({ defaultValue: '#3B82F6' });
   await render(state.node);
   await userEvent.click(trigger());
-  await expect.element(dialog()).toHaveAttribute('aria-label', 'Color');
+  await expect.element(dialog()).toHaveAccessibleName('Color');
   await expect.element(trigger()).toHaveAttribute('aria-expanded', 'true');
   await expect.element(trigger()).toHaveAttribute('aria-controls', dialog().element().id);
   await expect.element(slider('채도'), { message: 'focus starts on the area' }).toHaveFocus();
@@ -185,7 +185,7 @@ test('Clear empties the value and focuses the trigger; it is hidden while read-o
   await expect.element(trigger()).toHaveFocus();
   await expect.element(clearButton()).not.toBeInTheDocument();
   await expect.element(trigger()).toHaveAttribute('data-placeholder', '');
-  await expect.poll(triggerText).toBe('색상 선택');
+  await expect.poll(triggerText).toBe('');
   await screen.rerender(
     <Fragment key="read-only">
       {tracked({ defaultValue: '#FF0000', readOnly: true }).node}
@@ -474,7 +474,7 @@ test('parts: a custom trigger, and Clear must sit beside the trigger', async () 
   ).toThrow(/one Trigger, Content and Clear/);
 });
 
-test('drawer on a small screen: modal dialog with a title and a close button', async () => {
+test('drawer on a small screen: modal dialog named by the field, with a close button', async () => {
   try {
     await page.viewport(390, 844);
     const drawer = <ColorField.Content mobileVariant="drawer" />;
@@ -483,7 +483,8 @@ test('drawer on a small screen: modal dialog with a title and a close button', a
     await userEvent.click(trigger());
     await expect.element(dialog()).toHaveAttribute('data-presentation', 'drawer');
     await expect.element(dialog()).toHaveAttribute('aria-modal', 'true');
-    await expect.element(dialog()).toHaveTextContent('색상 선택');
+    await expect.element(dialog()).toHaveAccessibleName('Color');
+    await expect.element(page.getByRole('button', { name: '닫기' })).toBeVisible();
     await expect.element(slider('채도')).toHaveFocus();
     expect(document.body.hasAttribute('data-scroll-locked'), 'the page scroll is locked').toBe(
       true,
@@ -565,7 +566,7 @@ test('react-hook-form value mode: validation focuses the trigger, selection, res
   await userEvent.click(submit);
   await expect.poll(() => results).toEqual([{ color: '#FF0000' }]);
   form.current!.reset();
-  await expect.poll(triggerText).toBe('색상 선택');
+  await expect.poll(triggerText).toBe('');
   form.current!.setValue('color', '#0000FF');
   await expect.poll(triggerText).toBe('#0000FF');
   await screen.rerender(<RHFColor form={form} disabled onSubmit={onSubmit} />);

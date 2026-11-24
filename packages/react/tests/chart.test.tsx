@@ -14,11 +14,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { expect, test, vi } from 'vitest';
+import { expect, onTestFinished, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { AspectRatio, Button, IdsProvider } from '../src';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Chart } from '../src/chart';
 import { resolveColors } from '../src/components/utility/ids-provider/lib/theme-roles';
@@ -32,7 +33,7 @@ const ROWS = [
 const CONFIG = { web: { label: '웹' }, app: { label: '앱' } } satisfies Chart.Config;
 
 const visits = (inside: ReactNode = <Chart.Tooltip />, locale?: string) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     <div style={{ width: 400 }}>
       <Chart config={CONFIG}>
         <Chart.Title>방문</Chart.Title>
@@ -148,13 +149,13 @@ test('a Chart inside an AspectRatio fills it', async () => {
   expect(graph.element().getAttribute('height')).toBe(String(Math.floor(frame.height)));
 });
 
-test('without a title the graph is named by the catalog and described by the description', async () => {
+test('without a title the graph is named by its own aria-label and described by the description', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
           <Chart.Description>최근 사흘</Chart.Description>
-          <BarChart data={ROWS}>
+          <BarChart aria-label="방문" data={ROWS}>
             <XAxis dataKey="day" />
             <Bar dataKey="web" />
           </BarChart>
@@ -164,8 +165,33 @@ test('without a title the graph is named by the catalog and described by the des
   );
 
   await expect
-    .element(screen.getByRole('img', { name: '차트' }))
+    .element(screen.getByRole('img', { name: '방문' }))
     .toHaveAccessibleDescription('최근 사흘');
+});
+
+test('a graph with neither a title nor its own name is warned about in development', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  onTestFinished(() => warn.mockRestore());
+
+  await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ width: 400 }}>
+        <Chart config={CONFIG}>
+          <BarChart data={ROWS}>
+            <XAxis dataKey="day" />
+            <Bar dataKey="web" />
+          </BarChart>
+        </Chart>
+      </div>
+    </IdsProvider>,
+  );
+
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('[IDS] Chart: it has no accessible name'),
+  );
+  expect(document.querySelector('[data-chart] svg[role="img"]')?.hasAttribute('aria-label')).toBe(
+    false,
+  );
 });
 
 test('series take the default order, skip a series with its own color, and an own fill wins', async () => {
@@ -175,7 +201,7 @@ test('series take the default order, skip a series with its own color, and an ow
     <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={{ ...config, b: { label: 'b', color: 'danger' } }}>
-          <BarChart data={[{ name: 'x', a: 1, b: 2, c: 3, d: 4 }]}>
+          <BarChart aria-label="방문" data={[{ name: 'x', a: 1, b: 2, c: 3, d: 4 }]}>
             <XAxis dataKey="name" />
             <Bar dataKey="a" />
             <Bar dataKey="b" fill="var(--ids-color-bg-neutral-soft)" />
@@ -208,7 +234,7 @@ test('more series without a color than the default order is warned about in deve
     <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={config}>
-          <BarChart data={[{ name: 'x', a: 1 }]}>
+          <BarChart aria-label="방문" data={[{ name: 'x', a: 1 }]}>
             <XAxis dataKey="name" />
             <Bar dataKey="a" />
           </BarChart>
@@ -230,7 +256,7 @@ test('the series follow a dark Scope and a Scope that adds a brand family', asyn
       <IdsProvider.Scope mode="dark" theme={{ secondary: '#7c3aed' }}>
         <div style={{ width: 400 }}>
           <Chart config={CONFIG}>
-            <BarChart data={ROWS}>
+            <BarChart aria-label="방문" data={ROWS}>
               <XAxis dataKey="day" />
               <Bar dataKey="web" />
               <Bar dataKey="app" />
@@ -253,7 +279,7 @@ test('lines are stroked with their series variable', async () => {
     <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
-          <LineChart data={ROWS}>
+          <LineChart aria-label="방문" data={ROWS}>
             <XAxis dataKey="day" />
             <Line dataKey="web" />
           </LineChart>
@@ -272,7 +298,7 @@ test('areas fade from their series color to transparent, and an own fill wins', 
     <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
-          <AreaChart data={ROWS}>
+          <AreaChart aria-label="방문" data={ROWS}>
             <XAxis dataKey="day" />
             <Area dataKey="web" />
             <Area dataKey="app" fill="var(--ids-color-bg-neutral-soft)" />

@@ -92,7 +92,7 @@ export function ColorFieldRoot({
   readOnly = false,
   required = false,
   disabled = false,
-  placeholder: placeholderProp,
+  placeholder,
   open,
   defaultOpen,
   onOpenChange,
@@ -106,7 +106,6 @@ export function ColorFieldRoot({
   ...native
 }: ColorFieldProps) {
   const t = useInternalTranslate();
-  const placeholder = placeholderProp ?? t('colorField.placeholder');
 
   const nodes = flattenFragments(children);
   const triggers = nodes.filter(isType(ColorFieldTrigger));
@@ -243,7 +242,6 @@ export function ColorFieldRoot({
           id={popupId}
           aria-labelledby={native['aria-labelledby']}
           aria-label={native['aria-labelledby'] ? undefined : native['aria-label']}
-          label={t('colorField.dialog')}
           data-color-field-popup={popupId}
           className={styles.popup()}
           onBlur={(event) => {
@@ -257,11 +255,7 @@ export function ColorFieldRoot({
           }}
         >
           {drawer && (
-            <FieldPopupHeader
-              title={t('colorField.dialog')}
-              closeLabel={t('colorField.close')}
-              onClose={() => actions.close(true)}
-            />
+            <FieldPopupHeader closeLabel={t('common.close')} onClose={() => actions.close(true)} />
           )}
           {contents.length ? contents : <ColorFieldContent />}
         </FieldPopup>

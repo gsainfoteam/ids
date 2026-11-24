@@ -17,14 +17,16 @@ const twoQuestions = (props: Partial<Questionnaire.Props> = {}) => (
       <Questionnaire.Description>나중에 바꿀 수 있어요.</Questionnaire.Description>
       <Questionnaire.Option value="formal">격식</Questionnaire.Option>
       <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
-      <Questionnaire.Other />
+      <Questionnaire.Other aria-label="직접 입력" />
     </Questionnaire.Question>
     <Questionnaire.Question name="topics" selectionMode="multiple" optional>
       무엇을 넣을까요?
       <Questionnaire.Option value="summary">요약</Questionnaire.Option>
       <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
-      <Questionnaire.Other />
+      <Questionnaire.Other aria-label="직접 입력" />
     </Questionnaire.Question>
+    <Questionnaire.Skip>건너뛰기</Questionnaire.Skip>
+    <Questionnaire.Submit>보내기</Questionnaire.Submit>
   </Questionnaire>
 );
 
@@ -186,6 +188,7 @@ test('a single question shows no progress bar', async () => {
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
       </Questionnaire.Question>
+      <Questionnaire.Submit>보내기</Questionnaire.Submit>
     </Questionnaire>,
   );
 
@@ -193,11 +196,36 @@ test('a single question shows no progress bar', async () => {
   await expect.element(button('보내기')).toBeInTheDocument();
 });
 
-test('Questionnaire.Submit names the last button and stays the next button before it', async () => {
+test('without app text next, submit and previous are icons, and skip is left out', async () => {
+  await render(
+    <Questionnaire>
+      <Questionnaire.Question name="tone">
+        어떤 말투로 쓸까요?
+        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+      </Questionnaire.Question>
+      <Questionnaire.Question name="length" optional>
+        얼마나 길게 쓸까요?
+        <Questionnaire.Option value="short">짧게</Questionnaire.Option>
+      </Questionnaire.Question>
+    </Questionnaire>,
+  );
+
+  const navigation = page.getByRole('group', { name: '질문 이동' });
+  await expect.element(button('다음')).toHaveTextContent('');
+  await userEvent.click(radio('격식'));
+  await userEvent.click(button('다음'));
+  await expect.element(button('이전')).toHaveTextContent('');
+  await expect.element(button('다음')).toHaveAttribute('type', 'submit');
+  expect(navigation.getByRole('button').elements()).toHaveLength(2);
+});
+
+test('a function child of Questionnaire.Submit names the next and the last button', async () => {
   const onComplete = vi.fn();
   await render(
     <Questionnaire onComplete={onComplete}>
-      <Questionnaire.Submit className="submit">계획 세우기</Questionnaire.Submit>
+      <Questionnaire.Submit className="submit">
+        {({ last }) => (last ? '계획 세우기' : '계속')}
+      </Questionnaire.Submit>
       <Questionnaire.Question name="tone">
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
@@ -210,9 +238,9 @@ test('Questionnaire.Submit names the last button and stays the next button befor
   );
 
   const navigation = page.getByRole('group', { name: '질문 이동' });
-  await expect.element(navigation.getByRole('button', { name: '다음' })).toHaveClass('submit');
+  await expect.element(navigation.getByRole('button', { name: '계속' })).toHaveClass('submit');
   await userEvent.click(radio('격식'));
-  await userEvent.click(button('다음'));
+  await userEvent.click(button('계속'));
   await userEvent.click(radio('짧게'));
   await expect.element(navigation.getByRole('button', { name: '계획 세우기' })).toBeVisible();
   await userEvent.click(button('계획 세우기'));

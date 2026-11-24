@@ -15,23 +15,23 @@ import { Calendar } from '@gsainfoteam/ids-react';
 
 const [date, setDate] = useState<CalendarDate | null>(null);
 
-<Calendar value={date} onValueChange={setDate} />;
+<Calendar aria-label="달력" value={date} onValueChange={setDate} />;
 ```
 
 ## 선택
 
 ```tsx
-<Calendar value={date} onValueChange={setDate} />                              // single(기본): CalendarDate | null
-<Calendar selectionMode="range" value={range} onValueChange={setRange} />      // DateRange | null
-<Calendar selectionMode="multiple" value={dates} onValueChange={setDates} />   // CalendarDate[]
-<Calendar readOnly value={meeting} />                                          // 표시만. 고를 수 없다
+<Calendar aria-label="달력" value={date} onValueChange={setDate} />                             // single(기본): CalendarDate | null
+<Calendar aria-label="달력" selectionMode="range" value={range} onValueChange={setRange} />     // DateRange | null
+<Calendar aria-label="달력" selectionMode="multiple" value={dates} onValueChange={setDates} />  // CalendarDate[]
+<Calendar aria-label="달력" readOnly value={meeting} />                                         // 표시만. 고를 수 없다
 
-<Calendar defaultValue={new CalendarDate(2026, 9, 15)} />                      // 비제어. 월은 1부터
+<Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 9, 15)} />                     // 비제어. 월은 1부터
 ```
 
 - 값을 만들려면 앱도 `@internationalized/date` 를 설치합니다. IDS 는 다시 내보내지 않습니다. 오늘은 `today(getLocalTimeZone())` 입니다.
 - 값은 `instanceof` 가 아니라 모양(`year`, `month`, `day`, `calendar.identifier`, `compare`)으로 검사합니다. 다른 버전의 패키지여도 되고, `Date` 나 문자열은 오류입니다.
-- 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `IdsProvider` 의 `locale="ja-JP-u-ca-japanese"` 처럼 태그에 적습니다.
+- 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `IdsProvider` locale 의 태그에 적습니다(`tag: 'ja-JP-u-ca-japanese'`).
 - `onValueChange` 는 값이 바뀔 때만 부릅니다. 이미 고른 날을 다시 눌러도 부르지 않습니다.
 - 고른 날은 primary 로 채웁니다. 오늘은 `text-primary` 글자에 primary 테두리를 두르고, 고른 날이 오늘이면 채움만 보입니다. `Calendar.Day` 로 칸 안에 점을 그려도 오늘 표시와 겹치지 않습니다.
 - `multiple` 에서 고른 날을 다시 누르면 빠집니다.
@@ -43,7 +43,7 @@ import { Calendar, type DateRange } from '@gsainfoteam/ids-react';
 
 const [range, setRange] = useState<DateRange | null>(null);
 
-<Calendar selectionMode="range" value={range} onValueChange={setRange} monthsToShow={2} />;
+<Calendar aria-label="달력" selectionMode="range" value={range} onValueChange={setRange} monthsToShow={2} />;
 // 첫 클릭   { start: 24일, end: null }    이후 포인터가 있는 날까지 미리 보기
 // 두 번째   { start: 24일, end: 10월 2일 } 더 이른 날을 누르면 시작과 끝이 바뀐다
 // 세 번째   { start: 새 날, end: null }    새 기간을 시작
@@ -56,15 +56,15 @@ const [range, setRange] = useState<DateRange | null>(null);
 ## 월과 연도 이동
 
 ```tsx
-<Calendar>
-  <Calendar.Caption layout="dropdown" />                            // 제목 대신 연도, 월 목록
+<Calendar aria-label="달력">
+  <Calendar.Caption layout="dropdown" />                                    // 제목 대신 연도, 월 목록
 </Calendar>
-<Calendar min={new CalendarDate(1920, 1, 1)} max={today(getLocalTimeZone())}>
+<Calendar aria-label="달력" min={new CalendarDate(1920, 1, 1)} max={today(getLocalTimeZone())}>
   <Calendar.Caption layout="dropdown" />
 </Calendar>
-<Calendar monthsToShow={2} />                                       // 1~12. 이전은 첫 달, 다음은 마지막 달에만
-<Calendar defaultMonth={new CalendarDate(2026, 9, 1)} />            // 처음 보일 달
-<Calendar month={month} onMonthChange={setMonth} />                 // 보이는 달을 제어. 그 달 1일의 CalendarDate
+<Calendar aria-label="달력" monthsToShow={2} />                             // 1~12. 이전은 첫 달, 다음은 마지막 달에만
+<Calendar aria-label="달력" defaultMonth={new CalendarDate(2026, 9, 1)} />  // 처음 보일 달
+<Calendar aria-label="달력" month={month} onMonthChange={setMonth} />       // 보이는 달을 제어. 그 달 1일의 CalendarDate
 ```
 
 - 처음 보이는 달은 `defaultMonth`, 첫 선택 날, 오늘 순서이고 min/max 안으로 들어옵니다.
@@ -79,14 +79,15 @@ const [range, setRange] = useState<DateRange | null>(null);
 
 ```tsx
 <Calendar
+  aria-label="달력"
   min={new CalendarDate(2026, 1, 1)}           // 양 끝 포함. min === max 도 된다
   max={new CalendarDate(2026, 12, 31)}
   disabled={{ dayOfWeek: [0, 6] }}             // DateMatcher
 />
-<Calendar disabled={(date) => isHoliday(date)} />
-<Calendar disabled={[new CalendarDate(2026, 9, 17), { start, end }]} />
-<Calendar disabled />                          // 전체를 막는다. 이동, 선택, Tab 진입 모두
-<Calendar readOnly value={date} />             // 이동은 되고 선택은 안 된다
+<Calendar aria-label="달력" disabled={(date) => isHoliday(date)} />
+<Calendar aria-label="달력" disabled={[new CalendarDate(2026, 9, 17), { start, end }]} />
+<Calendar aria-label="달력" disabled />               // 전체를 막는다. 이동, 선택, Tab 진입 모두
+<Calendar aria-label="달력" readOnly value={date} />  // 이동은 되고 선택은 안 된다
 ```
 
 | `DateMatcher`                               | 막는 날                                     |
@@ -124,15 +125,15 @@ const [range, setRange] = useState<DateRange | null>(null);
 locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나만 다른 언어로 그리려면 그 둘레에 `IdsProvider.Scope` 를 둡니다.
 
 ```tsx
-<Calendar />                                   // 한국어: 2026년 9월, 일 월 화 ...
-<IdsProvider.Scope locale="en-US">
-  <Calendar />                                 // September 2026, S M T ...
+<Calendar aria-label="달력" />                                                                 // 한국어: 2026년 9월, 일 월 화 ...
+<IdsProvider.Scope locale={en}>
+  <Calendar aria-label="달력" />                                                               // September 2026, S M T ...
 </IdsProvider.Scope>
-<IdsProvider.Scope locale="de-DE"><Calendar /></IdsProvider.Scope>            // 월요일부터 시작
-<IdsProvider.Scope locale="ko-KR-u-fw-mon"><Calendar /></IdsProvider.Scope>   // -u-fw- 확장으로 주 시작을 바꾼다
-<IdsProvider.Scope locale="ja-JP"><Calendar /></IdsProvider.Scope>            // 2026年9月
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}><Calendar aria-label="달력" /></IdsProvider.Scope>           // 월요일부터 시작
+<IdsProvider.Scope locale={{ ...ko, tag: 'ko-KR-u-fw-mon' }}><Calendar aria-label="달력" /></IdsProvider.Scope>  // -u-fw- 확장으로 주 시작을 바꾼다
+<IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}><Calendar aria-label="달력" /></IdsProvider.Scope>           // 2026年9月
 <div dir="rtl">
-  <IdsProvider.Scope locale="ar-EG-u-nu-arab"><Calendar /></IdsProvider.Scope> // -u-nu- 확장으로 아랍 숫자(١٥), 좌우 반전
+  <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }}><Calendar aria-label="달력" /></IdsProvider.Scope> // -u-nu- 확장으로 아랍 숫자(١٥), 좌우 반전
 </div>
 ```
 
@@ -142,21 +143,23 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 | 요일 머리글 / 요일 이름      | `{ weekday: 'narrow' }` / `{ weekday: 'long' }`             |
 | 날짜 숫자, 연도 목록         | `day` / `year` 부분만(`formatToParts`)                      |
 | 월 목록                      | `{ month: 'long' }`                                         |
-| 날짜 버튼 이름               | `{ dateStyle: 'full' }` 에 IDS 메시지(`오늘`, `선택됨`)     |
+| 날짜 버튼 이름               | `{ dateStyle: 'full' }`, 오늘이면 앞에 `RelativeTimeFormat` |
 | 주차                         | 두 자리 숫자                                                |
+| 이전/다음 달 버튼            | `RelativeTimeFormat` 의 -1 / +1 month(`지난달`, `다음 달`)  |
+| 연도/월 목록, 주차 머리글    | `DisplayNames` 의 `year` / `month` / `weekOfYear`           |
 
 - 잘못된 태그(`'de_DE'`, date-fns `Locale` 객체)는 오류입니다.
 - 숫자 체계는 태그의 `-u-nu-` 확장입니다. 날짜, 제목, 주차, 이름 모두 그 숫자로 그립니다.
 - 주 시작은 locale 에서 구합니다(`@internationalized/date` 의 `getDayOfWeek`). 태그의 `-u-fw-` 확장이 있으면 그쪽을 따릅니다.
-- 이전/다음 달 버튼, 연도/월 목록, 주차 이름은 IDS 메시지(한국어)입니다. 날짜, 격자, 요일 이름은 locale 을 따르고 영어로 새지 않습니다.
-- 날짜 버튼 이름은 `오늘, 2026년 9월 15일 화요일, 선택됨` 처럼 오늘과 선택 여부를 함께 읽습니다.
+- 버튼, 목록, 날짜, 격자, 요일 이름은 모두 locale 을 따르고 메시지 카탈로그를 거치지 않습니다.
+- 날짜 버튼 이름은 `오늘, 2026년 9월 15일 화요일` 처럼 오늘을 함께 읽습니다. 선택 여부는 `aria-selected` 가 알립니다.
 
 ## 날짜 칸 꾸미기
 
 날짜에 이름을 붙이고(`modifiers`), 그 이름으로 날짜 버튼의 내용을 그립니다(children 함수).
 
 ```tsx
-<Calendar>
+<Calendar aria-label="달력">
   <Calendar.Day modifiers={{ event: eventDates, weekend: { dayOfWeek: [0, 6] } }}>
     {(day, state) => (
       <>
@@ -200,7 +203,7 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 
 ```tsx
 <div className="flex justify-center">
-  <Calendar />
+  <Calendar aria-label="달력" />
 </div>
 ```
 
@@ -219,8 +222,9 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 | `dir`                                      | 부모 방향                                                 |
 | `size`                                     | `standard`(칸 36px) / `tiny`(32px). 생략하면 `Field` 크기 |
 | `autoFocus`                                | 선택한 날, 없으면 오늘에 포커스                           |
+| `aria-label` / `aria-labelledby`           | 필수. 달력의 이름. 없으면 개발 모드에서 경고              |
 | `className` / `style`                      | 루트. 상태를 받는 함수도 된다                             |
-| 그 외 native 속성, `ref`                   | 루트 `div`. 기본 `role="group"`, 이름 `달력`              |
+| 그 외 native 속성, `ref`                   | 루트 `div`. 기본 `role="group"`                           |
 
 | part                  | 하는 일                                                        |
 | --------------------- | -------------------------------------------------------------- |

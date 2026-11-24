@@ -19,11 +19,7 @@ export function PromptInputSubmit({ className, onClick, ...props }: PromptInputS
 
   const stops = c.busy && c.stop !== undefined;
   const waits = c.busy && !stops;
-  const label = stops
-    ? t('promptInput.stop')
-    : waits
-      ? t('promptInput.sending')
-      : t('promptInput.send');
+  const label = stops ? t('promptInput.stop') : waits ? t('common.sending') : t('promptInput.send');
   const icon = stops ? (
     <StopIcon aria-hidden="true" />
   ) : waits ? (

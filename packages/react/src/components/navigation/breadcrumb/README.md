@@ -10,7 +10,7 @@
 ```tsx
 import { Breadcrumb } from '@gsainfoteam/ids-react';
 
-<Breadcrumb>
+<Breadcrumb aria-label="이동 경로">
   <Breadcrumb.Item>
     <Breadcrumb.Link href="/">홈</Breadcrumb.Link>
   </Breadcrumb.Item>
@@ -58,7 +58,7 @@ import { Link } from 'react-router';
 - 직접 쓴 구분자도 `maxItems` 로 접힙니다. 숨은 항목 앞의 구분자는 함께 빠지고, 말줄임 앞의 구분자 하나만 남습니다.
 
 ```tsx
-<Breadcrumb>
+<Breadcrumb aria-label="이동 경로">
   <Breadcrumb.List>
     <Breadcrumb.Item>...</Breadcrumb.Item>
     <Breadcrumb.Separator>/</Breadcrumb.Separator>
@@ -73,11 +73,11 @@ import { Link } from 'react-router';
 ## 긴 경로 접기
 
 ```tsx
-<Breadcrumb maxItems={3}>
+<Breadcrumb aria-label="이동 경로" maxItems={3}>
   {/* 홈 / … / 내비게이션 / Breadcrumb */}
 </Breadcrumb>
 
-<Breadcrumb>
+<Breadcrumb aria-label="이동 경로">
   <Breadcrumb.Item>...</Breadcrumb.Item>
   <Breadcrumb.Ellipsis>
     <Breadcrumb.Item>
@@ -105,11 +105,11 @@ import { Link } from 'react-router';
 ## 크기
 
 ```tsx
-<Breadcrumb size="standard" />  // body b3, 16px 아이콘
-<Breadcrumb size="tiny" />      // caption c1, 14px 아이콘
+<Breadcrumb aria-label="이동 경로" size="standard" />  // body b3, 16px 아이콘
+<Breadcrumb aria-label="이동 경로" size="tiny" />      // caption c1, 14px 아이콘
 
 <div className="w-80">
-  <Breadcrumb>...</Breadcrumb>  {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
+  <Breadcrumb aria-label="이동 경로">...</Breadcrumb>  {/* 좁게 둘 때는 앱의 요소로 감싼다 */}
 </div>
 ```
 
@@ -118,5 +118,6 @@ import { Link } from 'react-router';
 
 ## 이름
 
-- 기본 이름은 "이동 경로" (`breadcrumb.label`) 입니다. 한 페이지에 둘 이상 두면 `aria-label` 로 이름을 나눕니다.
+- `aria-label` 은 필수입니다(`aria-label="이동 경로"`). 보이는 제목이 이름이면 그 `id` 를 `aria-labelledby` 로 줍니다. 한 페이지에 둘 이상 두면 서로 다른 이름을 줍니다.
+- 이름이 없으면 개발 모드에서 경고합니다.
 - 항목이 하나도 없으면 개발 모드에서 경고합니다.

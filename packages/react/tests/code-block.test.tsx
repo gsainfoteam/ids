@@ -89,7 +89,7 @@ test('the copy button writes the code, without line numbers, to the clipboard', 
     </CodeBlock>,
   );
 
-  await userEvent.click(screen.getByRole('button', { name: '코드 복사' }));
+  await userEvent.click(screen.getByRole('button', { name: '복사' }));
   await expect.element(screen.getByRole('status')).toHaveTextContent('복사했습니다');
   await expect
     .element(screen.getByRole('button', { name: '복사했습니다' }))
@@ -127,7 +127,7 @@ test('without a caption, the first line ends before the copy button when scrolle
   const firstLineText = document.createRange();
   firstLineText.selectNodeContents(screen.container.querySelector('[data-line="1"]')!);
   const firstRow = firstLineText.getClientRects()[0]!;
-  const button = screen.getByRole('button', { name: '코드 복사' }).element();
+  const button = screen.getByRole('button', { name: '복사' }).element();
 
   expect(firstRow.right).toBeLessThanOrEqual(button.getBoundingClientRect().left);
 });
@@ -146,7 +146,7 @@ test('a long line scrolls sideways from the keyboard once Tab reaches the code',
 
   await userEvent.click(screen.getByRole('button', { name: '앞' }));
   await userEvent.keyboard('{Tab}');
-  await expect.element(screen.getByRole('button', { name: '코드 복사' })).toHaveFocus();
+  await expect.element(screen.getByRole('button', { name: '복사' })).toHaveFocus();
   await userEvent.keyboard('{Tab}');
   expect(document.activeElement).toBe(pre);
 

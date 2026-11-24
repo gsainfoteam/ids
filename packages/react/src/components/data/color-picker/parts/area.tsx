@@ -2,7 +2,7 @@
 
 import { type ComponentProps } from 'react';
 
-import { useInternalTranslate } from '../../../../internal/translate';
+import { useInternalIntlWords, useInternalTranslate } from '../../../../internal/translate';
 import { mergeProps } from '../../../../utils';
 import { useInternalPicker } from '../context';
 import { cssColor } from '../lib/color';
@@ -12,12 +12,16 @@ export type ColorPickerAreaProps = Omit<ComponentProps<'div'>, 'children'>;
 
 export function ColorPickerArea({ className, style, ...props }: ColorPickerAreaProps) {
   const t = useInternalTranslate();
+  const words = useInternalIntlWords();
 
   const c = useInternalPicker('ColorPicker.Area');
   const { color, rgba } = c.picker.state;
   const saturation = Math.round(color.s * 100);
   const brightness = Math.round(color.v * 100);
-  const valueText = t('colorPicker.areaValue', { saturation, brightness });
+  const valueText = t('colorPicker.areaValue', {
+    saturation: words.percent(saturation),
+    brightness: words.percent(brightness),
+  });
   const channel = {
     type: 'range',
     min: 0,

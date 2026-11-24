@@ -11,8 +11,11 @@ import { ChartDescription } from './parts/description';
 import { ChartTable } from './parts/table';
 import { ChartTitle } from './parts/title';
 import { chartStyle } from './style';
-import { DEFAULT_LOCALE } from '../../../internal/messages';
-import { useInternalProviderLocale, useInternalTranslate } from '../../../internal/translate';
+import {
+  hasAccessibleName,
+  useInternalUnnamedWarning,
+} from '../../../internal/lib/accessible-name';
+import { useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Chart } from '.';
@@ -79,7 +82,6 @@ function paintedChildren(
 }
 
 export function ChartRoot({ config, className, style, children, ...props }: Chart.Props) {
-  const t = useInternalTranslate();
   const providerLocale = useInternalProviderLocale();
   const id = useId();
   const { frameRef, size, keysOverARestingPointer } = useInternalChartFrame();
@@ -102,9 +104,14 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
   const titleId = title ? (title.props.id ?? `${id}title`) : undefined;
   const descriptionId = description ? (description.props.id ?? `${id}description`) : undefined;
   const table = recognised ? tableOf(graph.props, config) : undefined;
+  const graphName = {
+    'aria-label': graph?.props['aria-label'],
+    'aria-labelledby': graph?.props['aria-labelledby'] ?? titleId,
+  };
 
   const wrapsAnUnknownChart = graph !== undefined && !recognised && !hasOwnTable;
   const uncoloredSeries = uncoloredKeys(config).length;
+  useInternalUnnamedWarning('Chart', graph !== undefined && !hasAccessibleName(graphName));
 
   useInternalChartWarnings({ wrapsAnUnknownChart, uncoloredSeries });
 
@@ -116,10 +123,7 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
             width: size.width,
             height: size.height,
             role: graph.props.role ?? 'img',
-            'aria-labelledby': graph.props['aria-labelledby'] ?? titleId,
-            'aria-label': titleId
-              ? graph.props['aria-label']
-              : (graph.props['aria-label'] ?? t('chart.label')),
+            ...graphName,
             'aria-describedby': graph.props['aria-describedby'] ?? descriptionId,
           } as Partial<GraphElement['props']>,
           ...(recognised ? [paintedChildren(graph, config, fadeIdOf)] : []),
@@ -131,7 +135,7 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
       value={{
         config,
         styles,
-        locale: providerLocale ?? DEFAULT_LOCALE,
+        locale: providerLocale,
         titleId,
         descriptionId,
         table,

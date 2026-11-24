@@ -71,7 +71,7 @@ const picker = () => document.querySelector<HTMLInputElement>(`#${FORM_ID} input
 const labelled = (role: Parameters<typeof page.getByRole>[0]) =>
   page.getByRole(role, { name: LABEL, exact: true });
 const namedFrom = (role: Parameters<typeof page.getByRole>[0]) =>
-  page.getByRole(role, { name: new RegExp(`^${LABEL} `) });
+  page.getByRole(role, { name: new RegExp(`^${LABEL}( |$)`) });
 const calendarDay = (key: string) =>
   page.elementLocator(document.querySelector(`[data-calendar-day="${key}"]`)!);
 const timeOption = (unit: string, n: number) =>
@@ -562,7 +562,7 @@ const specs: Spec[] = [
     control: 'PromptInput',
     ownsForm: true,
     draw: ({ filled, required }) => (
-      <PromptInput id={FORM_ID} defaultValue={filled ? 'hi' : undefined}>
+      <PromptInput aria-label="메시지" id={FORM_ID} defaultValue={filled ? 'hi' : undefined}>
         <PromptInput.Input name={NAME} aria-label={LABEL} required={required} />
       </PromptInput>
     ),

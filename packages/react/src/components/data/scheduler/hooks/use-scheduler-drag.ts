@@ -76,10 +76,10 @@ export function useInternalSchedulerDrag<P extends SchedulerDragPiece>({
     active.data.current as P | undefined;
 
   const announced =
-    (key: 'scheduler.drag.start' | 'scheduler.drag.end' | 'scheduler.drag.cancel') =>
+    (key: 'common.drag.start' | 'common.drag.end' | 'common.drag.cancel') =>
     (event: Pick<DragStartEvent, 'active'>) => {
       const piece = pieceOf(event);
-      return piece && t(key, { event: titleOf(piece) });
+      return piece && t(key, { item: titleOf(piece) });
     };
 
   const snapToTheGrid: Modifier = ({ transform }) => {
@@ -89,10 +89,10 @@ export function useInternalSchedulerDrag<P extends SchedulerDragPiece>({
   };
 
   const announcements: Announcements = {
-    onDragStart: announced('scheduler.drag.start'),
+    onDragStart: announced('common.drag.start'),
     onDragOver: () => undefined,
-    onDragEnd: announced('scheduler.drag.end'),
-    onDragCancel: announced('scheduler.drag.cancel'),
+    onDragEnd: announced('common.drag.end'),
+    onDragCancel: announced('common.drag.cancel'),
   };
 
   const endGrab = (message: string) => {
@@ -111,7 +111,7 @@ export function useInternalSchedulerDrag<P extends SchedulerDragPiece>({
           const measured = measure(piece as P, element);
           if (!measured) return;
           setGrab({ measure: measured, shift: NOTHING_MOVED });
-          setAnnouncement(t('scheduler.drag.start', { event: titleOf(piece) }));
+          setAnnouncement(t('common.drag.start', { item: titleOf(piece) }));
         },
         nudge: (by) => {
           if (!grab) return;
@@ -126,13 +126,11 @@ export function useInternalSchedulerDrag<P extends SchedulerDragPiece>({
           if (!grab) return;
           const { piece } = grab.measure;
           const moved = isShifted(grab.shift);
-          endGrab(
-            t(moved ? 'scheduler.drag.end' : 'scheduler.drag.cancel', { event: titleOf(piece) }),
-          );
+          endGrab(t(moved ? 'common.drag.end' : 'common.drag.cancel', { item: titleOf(piece) }));
           if (moved) move(piece, grab.shift);
         },
         cancel: () => {
-          if (grab) endGrab(t('scheduler.drag.cancel', { event: titleOf(grab.measure.piece) }));
+          if (grab) endGrab(t('common.drag.cancel', { item: titleOf(grab.measure.piece) }));
         },
         resize: (segment, height) => {
           if (hourHeight === undefined || Math.abs(height - segment.hours * hourHeight) < 0.5)

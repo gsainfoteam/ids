@@ -141,7 +141,6 @@ export function CodeBlockRoot({
             className={styles.fold()}
             controls={preId}
             expanded={expanded}
-            hiddenLines={hiddenLines}
             onExpandedChange={setExpanded}
           />
         )}

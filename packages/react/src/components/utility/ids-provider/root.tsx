@@ -3,8 +3,9 @@
 import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 
 import { ThemeContext, useInternalIdsProvider, type ThemeMode } from './hooks/use-ids-provider';
+import { warnWhenTagLeavesLanguage } from '../../../internal/date-locale';
 import { OverlayHost, PortalRootContext } from '../../../internal/overlay/parts/host';
-import { LanguageContext, type IdsTranslate } from '../../../internal/translate';
+import { LanguageContext } from '../../../internal/translate';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { DefaultToaster } from '../../feedback/toast';
@@ -12,23 +13,25 @@ import { TooltipDelayGroup } from '../../overlay/tooltip/parts/delay-group';
 import { Slot } from '../slot';
 
 import type { IdsThemeOverrides } from './lib/theme';
+import type { IdsLocale } from '../../../internal/locale';
 
-export type IdsProviderRootProps = Omit<ComponentProps<'div'>, 'color' | 'translate'> & {
+export type IdsProviderRootProps<Language extends string = string> = Omit<
+  ComponentProps<'div'>,
+  'color'
+> & {
   theme?: IdsThemeOverrides;
   mode?: ThemeMode;
   defaultMode?: ThemeMode;
   onModeChange?: (mode: ThemeMode) => void;
-  translate?: IdsTranslate;
-  locale?: string;
+  locale?: IdsLocale<Language>;
   asChild?: boolean;
 };
 
-export function IdsProviderRoot({
+export function IdsProviderRoot<const Language extends string = string>({
   theme,
   mode,
   defaultMode,
   onModeChange,
-  translate,
   locale,
   asChild = false,
   className,
@@ -36,7 +39,7 @@ export function IdsProviderRoot({
   ref,
   children,
   ...rest
-}: IdsProviderRootProps) {
+}: IdsProviderRootProps<Language>) {
   const { context, ownVariables, ownScale, issues, outermost, paintsSurface } =
     useInternalIdsProvider({
       theme,
@@ -45,13 +48,7 @@ export function IdsProviderRoot({
       onModeChange,
     });
   const inherited = use(LanguageContext);
-  const language = useMemo(
-    () => ({
-      translate: translate ?? inherited.translate,
-      locale: locale ?? inherited.locale,
-    }),
-    [translate, locale, inherited.translate, inherited.locale],
-  );
+  const language = useMemo(() => (locale ? { locale } : inherited), [locale, inherited]);
   const elementRef = useRef<HTMLElement>(null);
   const [element, setElement] = useState<HTMLElement | null>(null);
   const mergedRef = useCallback(
@@ -70,6 +67,10 @@ export function IdsProviderRoot({
     for (const issue of issues)
       console.warn(`[IDS] IdsProvider theme.${issue.path}: ${issue.message}`);
   }, [hasPrimary, issues]);
+
+  useEffect(() => {
+    if (locale) warnWhenTagLeavesLanguage(locale);
+  }, [locale]);
 
   useEffect(() => {
     if (!isDevelopment || !hasPrimary || !elementRef.current) return;

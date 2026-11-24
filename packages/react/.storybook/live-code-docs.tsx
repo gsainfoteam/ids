@@ -46,9 +46,10 @@ const heroiconDeclarations = (icons: object) =>
 
 const entryDeclaration = (module: string) => {
   const entry = module.replace('@gsainfoteam/ids-react', '') || '/index';
+  const toPackageRoot = '../'.repeat(entry.split('/').length - 2) || './';
   return [
     `file:///node_modules/@gsainfoteam/ids-react${entry}.d.ts`,
-    `export * from './dist${entry}';`,
+    `export * from '${toPackageRoot}dist${entry}';`,
   ];
 };
 

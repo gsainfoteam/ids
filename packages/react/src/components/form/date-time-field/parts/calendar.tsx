@@ -19,6 +19,8 @@ export type DateTimeFieldCalendarProps = Omit<
   | 'readOnly'
   | 'size'
   | 'autoFocus'
+  | 'aria-label'
+  | 'aria-labelledby'
 >;
 
 const MIDNIGHT = new Time();
@@ -36,6 +38,7 @@ export function DateTimeFieldCalendar(props: DateTimeFieldCalendarProps) {
 
   return (
     <Calendar
+      {...picker.name}
       {...props}
       value={picker.value && dayOf(picker.value)}
       onValueChange={pickDay}

@@ -1,12 +1,17 @@
 import type { HourCycle, TimePrecision, TimeUnit } from './time';
-import type { IdsMessageKey } from '../../../../internal/messages';
+import type { DateTimeFieldName, IntlWords } from '../../../../internal/lib/intl-words';
 
-export const unitMessageKey = {
-  hour: 'timePicker.hour',
-  minute: 'timePicker.minute',
-  second: 'timePicker.second',
-  period: 'timePicker.period',
-} as const satisfies Record<TimeUnit, IdsMessageKey>;
+const unitField = {
+  hour: 'hour',
+  minute: 'minute',
+  second: 'second',
+  period: 'dayPeriod',
+} as const satisfies Record<TimeUnit, DateTimeFieldName>;
+
+export function unitName(unit: TimeUnit, words: IntlWords, locale: string) {
+  const name = words.field(unitField[unit]);
+  return name.charAt(0).toLocaleUpperCase(locale) + name.slice(1);
+}
 
 export function defaultUnits(
   precision: TimePrecision,
