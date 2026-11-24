@@ -53,7 +53,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 - 보기 카드 전체가 `<label>` 이라 어디를 눌러도 고릅니다.
 - 라디오나 체크박스는 카드 앞쪽, 제목 첫 줄 높이에 놓입니다. 고른 카드는 테두리가 primary 가 되고 바탕이 옅게 깔립니다.
 - 보기 카드와 직접 입력은 높이와 radius(`standard`)가 같습니다. `description` 이 있는 카드만 두 줄만큼 높아집니다.
-- 보기 카드는 컨테이너가 아니라 입력과 같은 컨트롤로 그립니다. 바탕과 테두리는 직접 입력과 같은 `internal/surfaces/field-surface` 의 `outline` 이고, 모서리는 `concentric-p-*` 대신 입력처럼 `rounded-standard` 와 가로 여백입니다. 카드 모서리에 10px 컨트롤이 없어 concentric 이 키운 radius 는 직접 입력과 어긋납니다.
+- 보기 카드는 컨테이너가 아니라 입력과 같은 컨트롤로 그립니다. 바탕과 테두리는 직접 입력과 같은 `internal/surfaces/lib/field-surface` 의 `outline` 이고, 모서리는 `concentric-p-*` 대신 입력처럼 `rounded-standard` 와 가로 여백입니다. 카드 모서리에 10px 컨트롤이 없어 concentric 이 키운 radius 는 직접 입력과 어긋납니다.
 - 고른 카드는 `bg-neutral-soft` 에 primary 테두리입니다. hover 와 누름은 다른 컨트롤처럼 state layer(`state-hover`, `state-press`)를 바탕 위에 얹고, 비활성 카드에는 얹지 않습니다.
 
 ## 모양
