@@ -90,8 +90,8 @@ WidgetbookUseCase(
   - `IdsThemeAddon`: mode, primary, secondary, tertiary, neutral, status, corner. React toolbar의
     globals와 같은 항목이다. 팔레트 17개는 `catalog/palettes.dart`에 있고, 값은
     `.storybook/palettes.ts`의 seed와 같다.
-  - `IdsLocaleAddon`: ko 또는 en이다. `IdsProviderScope`의 `locale`과 `translation`, 데모 문구를
-    함께 바꾼다.
+  - `IdsLocaleAddon`: ko 또는 en이다. `IdsProviderScope`의 `locale`(`IdsLocale.ko`,
+    `IdsLocale.en`)과 데모 문구를 함께 바꾼다.
   - `TextScaleAddon`: 1부터 3까지다.
 - 캔버스는 페이지 색(`bgBase`)에 32px padding을 둔다. 캔버스 자체는 스크롤하지
   않는다. `Showcase`는 스스로 스크롤하고, 페이지 전체를 그리는 데모는 자기 scroll view를 가진다.
@@ -99,7 +99,7 @@ WidgetbookUseCase(
 
 ### 문구와 색
 
-- 컴포넌트 문구는 `IdsMessages`가 정한다(`IdsProvider`의 `translation`). use case는 이 문구를
+- 컴포넌트 문구는 `IdsLocale.messages`가 정한다(`IdsProvider`의 `locale`). use case는 이 문구를
   직접 쓰지 않는다.
 - 데모 문구는 `example/assets/i18n/{ko,en}.i18n.json`의 `demo`에, 예제 설명은 `examples`에,
   섹션 설명과 knob 설명은 `notes`에 두고 `context.strings`로 읽는다. 설명 문장은 영어여도
@@ -112,8 +112,7 @@ WidgetbookUseCase(
 ### 테스트
 
 ```bash
-cd packages/flutter && dart run slang
-cd example && dart run slang && flutter analyze && flutter test
+cd packages/flutter/example && dart run slang && flutter analyze && flutter test
 ```
 
 - `test/use_cases_test.dart`는 트리의 모든 use case를 light/dark × ko/en으로 띄운다. 예외가
