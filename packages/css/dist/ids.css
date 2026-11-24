@@ -295,7 +295,7 @@
 
 @custom-variant focus-ring-visible {
   &:focus-visible,
-  &[data-focus-visible],
+  &[data-focus-visible]:not(:disabled),
   &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
   &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
@@ -307,7 +307,7 @@
   outline: none;
 
   &:focus-visible,
-  &[data-focus-visible],
+  &[data-focus-visible]:not(:disabled),
   &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
   &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
@@ -319,7 +319,7 @@
     @apply inset-ring-danger-strong;
 
     &:focus-visible,
-    &[data-focus-visible],
+    &[data-focus-visible]:not(:disabled),
     &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
     &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
@@ -332,7 +332,7 @@
   outline: none;
 
   &:focus-visible,
-  &[data-focus-visible],
+  &[data-focus-visible]:not(:disabled),
   &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
   &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
@@ -344,7 +344,7 @@
     @apply inset-ring-danger-strong;
 
     &:focus-visible,
-    &[data-focus-visible],
+    &[data-focus-visible]:not(:disabled),
     &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
     &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
@@ -357,7 +357,7 @@
   outline: none;
 
   &:focus-visible,
-  &[data-focus-visible],
+  &[data-focus-visible]:not(:disabled),
   &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
   &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
@@ -369,7 +369,7 @@
     @apply inset-ring-danger-strong;
 
     &:focus-visible,
-    &[data-focus-visible],
+    &[data-focus-visible]:not(:disabled),
     &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
     &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
