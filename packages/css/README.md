@@ -185,7 +185,7 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 <div class="flex [&>*]:focus-ring-visible:z-30">…</div>
 ```
 
-- 조건은 `focus-ring` 과 같은 표에서 나옵니다: `:focus-visible`, `[data-focus-visible]`, 안쪽 입력(`data-field-input` 등)에 포커스가 있는 껍데기.
+- 조건은 `focus-ring` 과 같은 표에서 나옵니다: `:focus-visible`, `:disabled` 가 아닌 요소의 `[data-focus-visible]`, 안쪽 입력(`data-field-input` 등)에 포커스가 있는 껍데기.
 - `focus-visible:` 이나 `data-focus-visible:` 하나만 쓰면 다른 조건으로 그린 ring(TextField 껍데기 같은)이 옆 요소 밑에 깔립니다.
 
 ### state-layer
