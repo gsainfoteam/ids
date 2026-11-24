@@ -39,6 +39,14 @@
     },
     "themedSample": {
       "linkDestination": "링크 대상"
+    },
+    "iconButtonSample": {
+      "add": "추가",
+      "close": "닫기",
+      "saving": "저장 중",
+      "openLink": "링크 열기",
+      "like": "좋아요",
+      "more": "더보기"
     }
   },
   "examples": {

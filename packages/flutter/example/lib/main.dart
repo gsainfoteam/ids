@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import 'catalog/addons.dart';
 import 'components/button_usecase.dart';
+import 'components/icon_button_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -19,6 +20,10 @@ final directories = <WidgetbookNode>[
         name: 'Action',
         children: [
           WidgetbookComponent(name: 'IdsButton', useCases: buttonUseCases),
+          WidgetbookComponent(
+            name: 'IdsIconButton',
+            useCases: iconButtonUseCases,
+          ),
         ],
       ),
       WidgetbookFolder(name: 'Form', children: [field]),
