@@ -5,8 +5,8 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { Avatar } from '.';
+import type { AvatarStatus } from './hooks/use-avatar';
 import type { avatarStyle } from './style';
-import type { AvatarStatus } from './use-avatar';
 import type { IdsSize } from '../../../tokens/types';
 
 export type AvatarCutout = 'start' | 'end';
@@ -29,7 +29,7 @@ type Context = {
 
 export const AvatarContext = createContext<Context | null>(null);
 
-export function useAvatarContext(part: string) {
+export function useInternalAvatarContext(part: string) {
   const context = use(AvatarContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Avatar>\`.`);
   return context;

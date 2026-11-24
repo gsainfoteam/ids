@@ -1,5 +1,5 @@
-import { listStyles } from '../../../internal/list-styles';
-import { overlayStyles } from '../../../internal/overlay/styles';
+import { listStyles } from '../../../internal/lib/list-styles';
+import { overlayStyles } from '../../../internal/overlay/lib/styles';
 import { tv } from '../../../utils';
 
 export const menuStyle = tv({

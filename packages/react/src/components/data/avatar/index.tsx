@@ -1,12 +1,12 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { type AvatarCutout } from './context';
-import { AvatarFallback, type AvatarFallbackProps } from './fallback';
-import { AvatarImage, type AvatarImageProps } from './image';
+import { type AvatarStatus } from './hooks/use-avatar';
+import { AvatarFallback, type AvatarFallbackProps } from './parts/fallback';
+import { AvatarImage, type AvatarImageProps } from './parts/image';
 import { AvatarRoot } from './root';
 import { avatarStyle } from './style';
-import { type AvatarStatus } from './use-avatar';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -43,5 +43,5 @@ export namespace Avatar {
 
   export const Style = avatarStyle;
 }
-export { initialsOf } from './initials';
-export type { AvatarStatus } from './use-avatar';
+export { initialsOf } from './lib/initials';
+export type { AvatarStatus } from './hooks/use-avatar';

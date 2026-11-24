@@ -15,7 +15,7 @@ type Context = {
 
 export const CircularProgressContext = createContext<Context | null>(null);
 
-export function useCircularProgressContext(part: string) {
+export function useInternalCircularProgressContext(part: string) {
   const context = use(CircularProgressContext);
   invariant(context, `${part} must be rendered inside CircularProgress.`);
   return context;

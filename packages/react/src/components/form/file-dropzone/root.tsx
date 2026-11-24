@@ -3,14 +3,14 @@
 import { ArrowUpTrayIcon } from '@heroicons/react/16/solid';
 
 import { fileDropzoneStyle } from './style';
-import { resolveState } from '../../../internal/state-props';
+import { resolveState } from '../../../internal/lib/state-props';
 import { invariant } from '../../../utils';
-import { FileClear } from '../file-field/clear';
 import { FileContext } from '../file-field/context';
-import { isType } from '../file-field/is-type';
-import { FileList } from '../file-field/list';
-import { FileTrigger } from '../file-field/trigger';
-import { useFileFieldRoot } from '../file-field/use-file-field-root';
+import { useInternalFileFieldRoot } from '../file-field/hooks/use-file-field-root';
+import { isType } from '../file-field/lib/is-type';
+import { FileClear } from '../file-field/parts/clear';
+import { FileList } from '../file-field/parts/list';
+import { FileTrigger } from '../file-field/parts/trigger';
 
 import type { FileFieldProps, FileFieldState, FileFieldVariant } from '../file-field/root';
 
@@ -27,7 +27,7 @@ export function FileDropzoneRoot(props: FileDropzoneProps) {
     messages,
     structure: nodes,
     limitsParts,
-  } = useFileFieldRoot(props, 'dropzone');
+  } = useInternalFileFieldRoot(props, 'dropzone');
   const { state, placeholder } = context;
   const styles = fileDropzoneStyle({ variant, size: context.size });
 

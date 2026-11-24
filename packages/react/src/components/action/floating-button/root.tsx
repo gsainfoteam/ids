@@ -1,7 +1,7 @@
 'use client';
 
+import { useInternalFloatingButton } from './hooks/use-floating-button';
 import { floatingButtonStyle } from './style';
-import { useFloatingButton } from './use-floating-button';
 
 import type { FloatingButton } from '.';
 
@@ -12,7 +12,7 @@ export function FloatingButtonRoot(props: FloatingButton.Props) {
     iconOnly,
     label,
     render,
-  } = useFloatingButton(props);
+  } = useInternalFloatingButton(props);
 
   return render({
     ...rest,

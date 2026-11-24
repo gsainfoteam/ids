@@ -4,8 +4,8 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { OTPSlotState } from './hooks/use-otp-field';
 import type { otpFieldStyle } from './style';
-import type { OTPSlotState } from './use-otp-field';
 
 type Context = {
   slots: OTPSlotState[];
@@ -18,7 +18,7 @@ type Context = {
 export const OTPContext = createContext<Context | null>(null);
 export const GroupContext = createContext(false);
 
-export function useOTPContext(part: string) {
+export function useInternalOTPContext(part: string) {
   const context = use(OTPContext);
   invariant(context, `${part} must be rendered inside OTPField.`);
   return context;

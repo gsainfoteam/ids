@@ -3,12 +3,12 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { SliderContext } from './context';
-import { resolve, type StateProp } from './state-prop';
+import { useInternalSlider, useInternalValueShape, type SliderValue } from './hooks/use-slider';
+import { resolve, type StateProp } from './lib/state-prop';
+import { SliderTrack } from './parts/track';
 import { sliderStyle } from './style';
-import { SliderTrack } from './track';
-import { useSlider, useValueShape, type SliderValue } from './use-slider';
-import { FormValue } from '../../../internal/form-value';
-import { useTranslate } from '../../../internal/translate';
+import { FormValue } from '../../../internal/parts/form-value';
+import { useInternalTranslate } from '../../../internal/translate';
 import { containsElementOfType, invariant, mergeProps } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -61,7 +61,7 @@ export type SliderProps<V extends SliderValue = SliderValue> = Omit<
 const TRACK = new Set<unknown>([SliderTrack]);
 
 export function SliderRoot<V extends SliderValue>(props: SliderProps<V>) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
 
   const {
     value,
@@ -99,10 +99,10 @@ export function SliderRoot<V extends SliderValue>(props: SliderProps<V>) {
 
   invariant(min < max, 'Slider: `min` must be less than `max`.');
   invariant(step > 0, 'Slider: `step` must be positive.');
-  const range = useValueShape(value ?? defaultValue);
+  const range = useInternalValueShape(value ?? defaultValue);
 
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const slider = useSlider({
+  const slider = useInternalSlider({
     range,
     value,
     defaultValue,

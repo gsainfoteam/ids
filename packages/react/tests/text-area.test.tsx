@@ -10,7 +10,7 @@ import { render } from 'vitest-browser-react';
 import { Field, IconButton, Menu, Resizable, TextArea } from '../src';
 import { skipWithoutCdp } from './engines';
 import { arcOf, expectTheArcToHug, middleOfTheArc, pointsAlong, type Point } from './resize-grip';
-import { clearOfCurve } from '../src/components/layout/scroll-area/geometry';
+import { clearOfCurve } from '../src/components/layout/scroll-area/lib/geometry';
 import { Field as RhfField } from '../src/react-hook-form';
 
 const LINE_PX = 20;

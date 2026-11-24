@@ -3,9 +3,9 @@
 import { isValidElement, useState, type ReactElement, type ReactNode } from 'react';
 
 import { DialogContext } from './context';
-import { DialogOverlay, type DialogOverlayProps } from './overlay';
+import { useInternalDialog } from './hooks/use-dialog';
+import { DialogOverlay, type DialogOverlayProps } from './parts/overlay';
 import { dialogStyle } from './style';
-import { useDialog } from './use-dialog';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Dialog } from '.';
@@ -22,7 +22,13 @@ export function DialogRoot({
   role = 'dialog',
   children,
 }: Dialog.Props) {
-  const dialog = useDialog({ open, defaultOpen, onOpenChange, onOpenChangeComplete, dismissible });
+  const dialog = useInternalDialog({
+    open,
+    defaultOpen,
+    onOpenChange,
+    onOpenChangeComplete,
+    dismissible,
+  });
 
   const [titled, setTitled] = useState(false);
   const [described, setDescribed] = useState(false);

@@ -21,9 +21,9 @@ import {
   TextQuote,
 } from 'lucide-react';
 
-import { matchesSearch } from '../../../../internal/search-text';
+import { matchesSearch } from '../../../../internal/lib/search-text';
+import { hasExtension } from '../parts/tool';
 import { insertTable } from '../table/insert';
-import { hasExtension } from '../tool';
 
 import type { Translate } from '../../../../internal/translate';
 import type { ChainedCommands, Editor as TiptapEditor } from '@tiptap/core';

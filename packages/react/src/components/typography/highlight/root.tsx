@@ -2,9 +2,9 @@
 
 import { Fragment, isValidElement, type ReactElement, type ReactNode } from 'react';
 
-import { HighlightMark, type HighlightMarkProps } from './mark';
+import { HighlightMark, type HighlightMarkProps } from './parts/mark';
 import { highlightStyle } from './style';
-import { searchChunks, textOf } from '../../../internal/search-text';
+import { searchChunks, textOf } from '../../../internal/lib/search-text';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Highlight } from '.';

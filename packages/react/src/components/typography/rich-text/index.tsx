@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import { documentOf, renderDocument, type RichTextFormat } from './render';
+import { documentOf, renderDocument, type RichTextFormat } from './parts/render';
 import { richTextStyle } from './style';
 
 import type { IdsSize } from '../../../tokens/types';

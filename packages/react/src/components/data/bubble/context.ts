@@ -14,7 +14,7 @@ type Context = {
 
 export const BubbleContext = createContext<Context | null>(null);
 
-export function useBubbleContext(part: string) {
+export function useInternalBubbleContext(part: string) {
   const context = use(BubbleContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Bubble>\`.`);
   return context;

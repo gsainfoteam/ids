@@ -1,4 +1,4 @@
-import { sliderSurface } from '../../../internal/surfaces/slider-surface';
+import { sliderSurface } from '../../../internal/surfaces/lib/slider-surface';
 import { cn, tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';

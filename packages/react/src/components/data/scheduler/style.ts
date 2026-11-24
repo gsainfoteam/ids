@@ -1,7 +1,7 @@
-import { dragSurface } from '../../../internal/drag-surface';
+import { dragSurface } from '../../../internal/lib/drag-surface';
 import { cn, tv } from '../../../utils';
 
-import type { SchedulerColorScheme, SchedulerView } from './layout';
+import type { SchedulerColorScheme, SchedulerView } from './lib/layout';
 
 export const schedulerStyle = tv({
   slots: {

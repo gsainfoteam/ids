@@ -1,4 +1,4 @@
-import { dragSurface } from '../../../internal/drag-surface';
+import { dragSurface } from '../../../internal/lib/drag-surface';
 import { cn, tv } from '../../../utils';
 
 export type SidebarVariant = 'sidebar' | 'floating' | 'inset';

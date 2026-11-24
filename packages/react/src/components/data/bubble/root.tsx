@@ -3,8 +3,8 @@
 import { cloneElement, isValidElement, use, type ReactNode } from 'react';
 
 import { BubbleAlignContext, BubbleContext } from './context';
-import { fitToLongestLine } from './fit-to-longest-line';
-import { BubbleReactions } from './reactions';
+import { fitToLongestLine } from './lib/fit-to-longest-line';
+import { BubbleReactions } from './parts/reactions';
 import { bubbleStyle } from './style';
 import { elementTypeOf, flattenFragments, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';

@@ -25,7 +25,7 @@ export const CarouselContext = createContext<CarouselContextValue | null>(null);
 
 export const SlideIndexContext = createContext<number | null>(null);
 
-export function useCarouselContext(part: string) {
+export function useInternalCarouselContext(part: string) {
   const context = use(CarouselContext);
   invariant(context, `\`<${part}>\` must be used inside \`<Carousel>\`.`);
   return context;

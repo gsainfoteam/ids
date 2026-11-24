@@ -1,11 +1,11 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { ProgressIndicator, type ProgressIndicatorProps } from './indicator';
-import { ProgressLabel, type ProgressLabelProps } from './label';
+import { ProgressIndicator, type ProgressIndicatorProps } from './parts/indicator';
+import { ProgressLabel, type ProgressLabelProps } from './parts/label';
+import { ProgressTrack, type ProgressTrackProps } from './parts/track';
+import { ProgressValue, type ProgressValueProps } from './parts/value';
 import { ProgressRoot } from './root';
 import { progressStyle } from './style';
-import { ProgressTrack, type ProgressTrackProps } from './track';
-import { ProgressValue, type ProgressValueProps } from './value';
 
 import type { IdsSize } from '../../../tokens/types';
 

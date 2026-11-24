@@ -1,11 +1,11 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
-import { TelFieldCountrySelect, type TelFieldCountrySelectProps } from './country-select';
-import { TelFieldInput } from './input';
-import { type CountryCode, type TelFieldFormat } from './phone';
+import { type TelFieldInputProps } from './hooks/use-tel-field';
+import { type CountryCode, type TelFieldFormat } from './lib/phone';
+import { TelFieldCountrySelect, type TelFieldCountrySelectProps } from './parts/country-select';
+import { TelFieldInput } from './parts/input';
 import { TelFieldRoot, type StateValue, type TelFieldVariant, type TelFieldState } from './root';
 import { telFieldStyle } from './style';
-import { type TelFieldInputProps } from './use-tel-field';
 import { TextControlClear, type TextControlClearProps } from '../../../internal/text-control';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -49,7 +49,7 @@ export namespace TelField {
 }
 
 export type { TelFieldVariant, TelFieldState } from './root';
-export type { CountryCode, TelFieldFormat } from './phone';
-export type { TelFieldInputProps } from './use-tel-field';
+export type { CountryCode, TelFieldFormat } from './lib/phone';
+export type { TelFieldInputProps } from './hooks/use-tel-field';
 
 export type TelFieldProps = TelField.Props;

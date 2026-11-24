@@ -1,12 +1,12 @@
 import { type ComponentProps, type CSSProperties } from 'react';
 
-import { ScrollAreaCorner, type ScrollAreaCornerProps } from './corner';
+import { ScrollAreaCorner, type ScrollAreaCornerProps } from './parts/corner';
+import { ScrollAreaScrollbar, type ScrollAreaScrollbarProps } from './parts/scrollbar';
+import { type ScrollAreaThumbProps, ScrollAreaThumb } from './parts/thumb';
+import { ScrollAreaViewport, type ScrollAreaViewportProps } from './parts/viewport';
 import { ScrollAreaRoot } from './root';
-import { ScrollAreaScrollbar, type ScrollAreaScrollbarProps } from './scrollbar';
 import { scrollAreaStyle } from './style';
-import { type ScrollAreaThumbProps, ScrollAreaThumb } from './thumb';
-import { ScrollAreaViewport, type ScrollAreaViewportProps } from './viewport';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 

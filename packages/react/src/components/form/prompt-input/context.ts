@@ -22,7 +22,7 @@ type PromptInputContextValue = {
 
 export const PromptInputContext = createContext<PromptInputContextValue | null>(null);
 
-export function usePromptInputContext(part: string) {
+export function useInternalPromptInputContext(part: string) {
   const context = use(PromptInputContext);
   invariant(context != null, `\`<${part}>\` must be used inside \`<PromptInput>\`.`);
   return context;

@@ -5,10 +5,10 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { NumberFieldState } from '.';
+import type { useInternalNumberField } from './hooks/use-number-field';
 import type { numberFieldStyle } from './style';
-import type { useNumberField } from './use-number-field';
 
-type Field = ReturnType<typeof useNumberField>;
+type Field = ReturnType<typeof useInternalNumberField>;
 
 type NumberFieldContextValue = {
   field: Field;
@@ -20,7 +20,7 @@ export const NumberFieldContext = createContext<NumberFieldContextValue | null>(
 
 export const InsideStepperContext = createContext(false);
 
-export function useNumberContext(part: string) {
+export function useInternalNumberContext(part: string) {
   const context = use(NumberFieldContext);
   invariant(context != null, `\`<NumberField.${part}>\` must be used inside \`<NumberField>\`.`);
   return context;

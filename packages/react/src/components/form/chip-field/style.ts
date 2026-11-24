@@ -1,5 +1,5 @@
-import { listStyles } from '../../../internal/list-styles';
-import { fieldTrigger } from '../../../internal/surfaces/field-surface';
+import { listStyles } from '../../../internal/lib/list-styles';
+import { fieldTrigger } from '../../../internal/surfaces/lib/field-surface';
 import { tv } from '../../../utils';
 
 import type { ChipFieldVariant } from '.';

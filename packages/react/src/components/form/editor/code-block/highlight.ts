@@ -9,7 +9,7 @@ import {
   loadLazyLanguages,
   subscribeToLazyLanguages,
   type CodeLine,
-} from '../../../data/code-block/highlight';
+} from '../../../data/code-block/lib/highlight';
 
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 

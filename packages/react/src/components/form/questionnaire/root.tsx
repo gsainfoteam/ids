@@ -15,6 +15,7 @@ import { ChevronLeftIcon } from '@heroicons/react/16/solid';
 import { flushSync } from 'react-dom';
 import { focusable } from 'tabbable';
 
+import { QuestionnaireContext } from './context';
 import {
   EMPTY_DRAFT,
   answerOf,
@@ -23,16 +24,15 @@ import {
   type QuestionnaireAnswers,
   type QuestionnaireDraft,
   type QuestionnaireQuestionShape,
-} from './answers';
-import { QuestionnaireContext } from './context';
-import { QuestionnaireOption, type QuestionnaireOptionProps } from './option';
-import { QuestionnaireOther } from './other';
-import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './question';
-import { QuestionnaireSkip } from './skip';
+} from './lib/answers';
+import { QuestionnaireOption, type QuestionnaireOptionProps } from './parts/option';
+import { QuestionnaireOther } from './parts/other';
+import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './parts/question';
+import { QuestionnaireSkip } from './parts/skip';
+import { QuestionnaireSubmit } from './parts/submit';
 import { questionnaireStyle } from './style';
-import { QuestionnaireSubmit } from './submit';
-import { useFormReset } from '../../../hooks/use-form-reset';
-import { useTranslate } from '../../../internal/translate';
+import { useInternalFormReset } from '../../../hooks/use-form-reset';
+import { useInternalTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils/children';
 import { ButtonGroup } from '../../action/button-group';
@@ -104,7 +104,7 @@ export function QuestionnaireRoot({
   onSubmit,
   ...rest
 }: QuestionnaireProps) {
-  const t = useTranslate();
+  const t = useInternalTranslate();
   const questions = readQuestions(children);
   const [drafts, setDrafts] = useState(() => draftsFrom(questions, defaultValue));
   const draftsRef = useRef<Record<string, QuestionnaireDraft>>(drafts);
@@ -158,7 +158,7 @@ export function QuestionnaireRoot({
     focusTarget(question)?.focus();
   }, [index]);
 
-  useFormReset(formRef, () => {
+  useInternalFormReset(formRef, () => {
     draftsRef.current = draftsFrom(questions, defaultValue);
     setDrafts(draftsRef.current);
     setStep(0);

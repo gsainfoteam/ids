@@ -5,7 +5,7 @@ import { createContext, use, type ComponentProps, type CSSProperties, type React
 import { switchStyle } from './style';
 import { invariant } from '../../../utils';
 import { Slot } from '../../utility/slot';
-import { useCheckbox } from '../checkbox/use-checkbox';
+import { useInternalCheckbox } from '../checkbox/hooks/use-checkbox';
 import { useFieldSize } from '../field/context';
 
 import type { Switch } from '.';
@@ -81,7 +81,7 @@ export function SwitchRoot({
     'Switch takes either `checked` or `defaultChecked`, not both.',
   );
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const { checked, interaction, inputRef, handlers } = useCheckbox({
+  const { checked, interaction, inputRef, handlers } = useInternalCheckbox({
     checked: checkedProp,
     defaultChecked,
     onCheckedChange,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { editorMessages } from '../messages-catalog';
 import { EditorSuggestionPopup } from '../suggestion/popup';
 
@@ -8,7 +8,7 @@ import type { EditorBlock } from '../blocks/catalog';
 import type { SuggestionStore } from '../suggestion/store';
 
 export function EditorSlashMenu({ store }: { store: SuggestionStore<EditorBlock> }) {
-  const t = useTranslate(editorMessages);
+  const t = useInternalTranslate(editorMessages);
 
   return (
     <EditorSuggestionPopup

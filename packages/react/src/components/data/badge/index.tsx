@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties, ReactElement, ReactNode } from 'rea
 
 import { BadgeRoot, type BadgePlacement, type BadgeVariant, type BadgeColorScheme } from './root';
 import { badgeStyle } from './style';
-import { type StateValue } from '../../../internal/state-props';
+import { type StateValue } from '../../../internal/lib/state-props';
 
 import type { IdsSize } from '../../../tokens/types';
 

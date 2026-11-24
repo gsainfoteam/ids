@@ -1,5 +1,5 @@
 import { cn, tv } from '../../utils';
-import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../surfaces/field-surface';
+import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../surfaces/lib/field-surface';
 
 import type { IdsSize } from '../../tokens/types';
 

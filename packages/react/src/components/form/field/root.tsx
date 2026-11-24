@@ -26,18 +26,18 @@ import {
   type FieldOrientation,
   type FieldState,
 } from './context';
-import { FieldDescription } from './description';
-import { FieldError } from './error';
-import { errorShown } from './error-shown';
-import { FieldHint } from './hint';
-import { FieldLabel } from './label';
-import { resolve, stateAttributes, type StateValue } from './state-value';
+import { useInternalField } from './hooks/use-field';
+import { errorShown } from './lib/error-shown';
+import { resolve, stateAttributes, type StateValue } from './lib/state-value';
+import { FieldDescription } from './parts/description';
+import { FieldError } from './parts/error';
+import { FieldHint } from './parts/hint';
+import { FieldLabel } from './parts/label';
 import { fieldStyle } from './style';
-import { useField } from './use-field';
 import { elementTypeOf } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
-import type { FieldValidity, FieldValidityKey } from './control-state';
+import type { FieldValidity, FieldValidityKey } from './lib/control-state';
 import type { IdsSize } from '../../../tokens/types';
 
 export type FieldProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> & {
@@ -102,7 +102,7 @@ export function FieldRoot({
   const groupOrientation = use(FieldGroupContext);
   const orientation = orientationProp ?? groupOrientation ?? 'vertical';
   const generatedId = useId();
-  const field = useField({ dirty, touched });
+  const field = useInternalField({ dirty, touched });
   const nodes = flatten(children);
   const controls = nodes.filter(
     (node) =>

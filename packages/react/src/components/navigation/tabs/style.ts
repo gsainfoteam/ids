@@ -1,4 +1,4 @@
-import { segmentSurface } from '../../../internal/surfaces/segment-surface';
+import { segmentSurface } from '../../../internal/surfaces/lib/segment-surface';
 import { tv } from '../../../utils';
 
 import type { TabsVariant, TabsColorScheme, TabsOrientation } from './context';

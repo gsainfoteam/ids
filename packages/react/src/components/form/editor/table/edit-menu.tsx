@@ -13,12 +13,12 @@ import {
   TableCellsSplit,
 } from 'lucide-react';
 
-import { useTranslate } from '../../../../internal/translate';
+import { useInternalTranslate } from '../../../../internal/translate';
 import { Menu } from '../../../overlay/menu';
-import { useEditorContext } from '../context';
+import { useInternalEditorContext } from '../context';
+import { useInternalEditorSelector } from '../hooks/use-editor-selector';
 import { editorMessages } from '../messages-catalog';
-import { EditorToolTip, type EditorToolTipProps } from '../tool';
-import { useEditorSelector } from '../use-editor-selector';
+import { EditorToolTip, type EditorToolTipProps } from '../parts/tool';
 
 import type { IdsMessageKey } from '../../../../internal/messages';
 import type { ChainedCommands, Editor as TiptapEditor } from '@tiptap/core';
@@ -79,9 +79,9 @@ function cellState(editor: TiptapEditor) {
 }
 
 export function EditorTableMenuItems({ deletesTheTable = true }: { deletesTheTable?: boolean }) {
-  const t = useTranslate(editorMessages);
-  const { editor, format, styles } = useEditorContext('Editor.Table');
-  const { headerRow, mergeable, splittable } = useEditorSelector(editor, cellState, {
+  const t = useInternalTranslate(editorMessages);
+  const { editor, format, styles } = useInternalEditorContext('Editor.Table');
+  const { headerRow, mergeable, splittable } = useInternalEditorSelector(editor, cellState, {
     headerRow: true,
     mergeable: false,
     splittable: false,

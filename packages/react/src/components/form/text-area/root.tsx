@@ -3,19 +3,19 @@
 import { isValidElement, useId, type ReactElement, type ReactNode } from 'react';
 
 import { TextAreaContext } from './context';
-import { TextAreaCount, type TextAreaCountProps } from './count';
-import { TextAreaInput, type TextAreaInputPartProps } from './input';
-import { resolve } from './state-value';
+import { useInternalTextArea, type CountState } from './hooks/use-text-area';
+import { useInternalTextAreaResize } from './hooks/use-text-area-resize';
+import { resolve } from './lib/state-value';
+import { TextAreaCount, type TextAreaCountProps } from './parts/count';
+import { TextAreaInput, type TextAreaInputPartProps } from './parts/input';
 import { textAreaStyle } from './style';
-import { useTextArea, type CountState } from './use-text-area';
-import { useTextAreaResize } from './use-text-area-resize';
 import { ResizeEdge, ResizeGrip, type ResizeAxis } from '../../../internal/resize-handle';
 import { stateAttributes, type TextControlState } from '../../../internal/text-control';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { TextArea } from '.';
-import type { FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
+import type { FieldSurfaceVariant } from '../../../internal/surfaces/lib/field-surface';
 
 export type TextAreaVariant = FieldSurfaceVariant;
 export type TextAreaState = TextControlState;
@@ -73,7 +73,7 @@ export function TextAreaRoot({
       isValidElement(item) && elementTypeOf(item) === TextAreaCount,
   );
   const countId = countNode?.props.id ?? `ids-text-area-count-${generatedId}`;
-  const field = useTextArea({
+  const field = useInternalTextArea({
     rootProps: { ...rootProps, rows },
     input: input.props,
     disabled,
@@ -86,7 +86,7 @@ export function TextAreaRoot({
   const state: TextAreaState = { size, variant, ...field.state };
   const autoResize = resize === 'auto';
   const handle = autoResize ? 'none' : resize;
-  const { setShell, shell, axes, ...resizing } = useTextAreaResize({
+  const { setShell, shell, axes, ...resizing } = useInternalTextAreaResize({
     resize: handle,
     disabled: field.state.disabled,
     shellId: `ids-text-area-shell-${generatedId}`,

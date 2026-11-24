@@ -17,7 +17,7 @@ import {
   type FileDropzoneRemoveProps,
   type FileDropzoneTriggerProps,
   type FileDropzoneValueProps,
-} from './parts';
+} from './parts/parts';
 import {
   FileDropzoneRoot,
   type FileDropzoneProps,

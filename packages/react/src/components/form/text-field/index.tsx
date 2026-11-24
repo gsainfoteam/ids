@@ -1,5 +1,6 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
+import { type TextFieldInputProps } from './hooks/use-text-field';
 import {
   TextFieldRoot,
   TextFieldInput,
@@ -7,7 +8,6 @@ import {
   type TextFieldVariant,
   type TextFieldState,
 } from './root';
-import { type TextFieldInputProps } from './use-text-field';
 import { TextControlClear, type TextControlClearProps } from '../../../internal/text-control';
 import { textControlStyle } from '../../../internal/text-control/style';
 
@@ -49,6 +49,6 @@ export namespace TextField {
 }
 
 export type { TextFieldVariant, TextFieldState } from './root';
-export type { TextFieldInputProps } from './use-text-field';
+export type { TextFieldInputProps } from './hooks/use-text-field';
 
 export type TextFieldProps = TextField.Props;

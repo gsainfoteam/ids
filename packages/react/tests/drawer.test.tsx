@@ -9,6 +9,7 @@ import { Button, FloatingButton, IdsProvider, Select, overlay } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 import { Drawer } from '../src/components/overlay/drawer';
+import { useDrawer } from '../src/components/overlay/drawer/hooks/use-drawer';
 import {
   DRAG_THRESHOLD,
   latchAxis,
@@ -19,8 +20,7 @@ import {
   snapOffsets,
   translateAlong,
   velocityOf,
-} from '../src/components/overlay/drawer/drawer-gesture';
-import { useDrawer } from '../src/components/overlay/drawer/use-drawer';
+} from '../src/components/overlay/drawer/lib/drawer-gesture';
 
 type Point = { x: number; y: number };
 

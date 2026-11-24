@@ -3,7 +3,7 @@
 import { createContext, useContext } from 'react';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { CheckedState } from '../checkbox/use-checkbox';
+import type { CheckedState } from '../checkbox/hooks/use-checkbox';
 
 export type CheckboxGroupContextValue = {
   value: readonly string[];
@@ -23,6 +23,6 @@ export type CheckboxGroupContextValue = {
 
 export const CheckboxGroupContext = createContext<CheckboxGroupContextValue | null>(null);
 
-export function useCheckboxGroupContext() {
+export function useInternalCheckboxGroupContext() {
   return useContext(CheckboxGroupContext);
 }
