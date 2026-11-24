@@ -200,6 +200,9 @@ export const messages = {
     "limitReached": "글자 수 제한에 도달했습니다.",
     "remaining": "{remaining}자 남았습니다."
   },
+  "textField": {
+    "required": "값을 입력해 주세요."
+  },
   "timePicker": {
     "label": "시간"
   },

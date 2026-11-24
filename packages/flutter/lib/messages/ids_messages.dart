@@ -434,6 +434,8 @@ abstract class IdsMessagesBase {
 
   String textAreaRemaining({required num remaining});
 
+  String get textFieldRequired;
+
   String get timePickerLabel;
 
   String get toastRegion;
@@ -1090,6 +1092,9 @@ class IdsMessagesEn extends IdsMessagesBase {
 
   @override
   String textAreaRemaining({required num remaining}) => 'Characters left: ${_number(remaining)}';
+
+  @override
+  String get textFieldRequired => 'Enter a value.';
 
   @override
   String get timePickerLabel => 'Time';
@@ -1749,6 +1754,9 @@ class IdsMessagesKo extends IdsMessagesBase {
 
   @override
   String textAreaRemaining({required num remaining}) => '${_number(remaining)}자 남았습니다.';
+
+  @override
+  String get textFieldRequired => '값을 입력해 주세요.';
 
   @override
   String get timePickerLabel => '시간';

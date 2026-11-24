@@ -10,19 +10,21 @@ class IdsLabel extends StatelessWidget {
     this.size = IdsSize.standard,
     this.required = false,
     this.disabled = false,
+    this.invalid = false,
     required this.child,
   });
 
   final IdsSize size;
   final bool required;
   final bool disabled;
+  final bool invalid;
   final Widget child;
 
   static const _asteriskLiftToPretendard = (1041 - 725) / 2048;
 
   @override
   Widget build(BuildContext context) {
-    final ids = IdsProvider.of(context);
+    final theme = IdsProvider.of(context);
     final style = switch (size) {
       IdsSize.standard => IdsTypography.bodyB3Medium,
       IdsSize.tiny => IdsTypography.captionC1Medium,
@@ -31,10 +33,15 @@ class IdsLabel extends StatelessWidget {
     return Opacity(
       opacity: disabled ? 0.5 : 1,
       child: DefaultTextStyle(
-        style: ids.textStyle(style, color: ids.colors.textNeutralStrong),
+        style: theme.textStyle(
+          style,
+          color: invalid
+              ? theme.colors.textDanger
+              : theme.colors.textNeutralStrong,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: ids.dimension(4),
+          spacing: theme.dimension(4),
           children: [
             Flexible(child: child),
             if (required)
@@ -47,7 +54,7 @@ class IdsLabel extends StatelessWidget {
                   ),
                   child: Text(
                     '*',
-                    style: TextStyle(color: ids.colors.textDanger),
+                    style: TextStyle(color: theme.colors.textDanger),
                   ),
                 ),
               ),

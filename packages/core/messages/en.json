@@ -282,6 +282,9 @@
       "limitReached": "Character limit reached.",
       "remaining": "Characters left: {remaining, number}"
     },
+    "textField": {
+      "required": "Enter a value."
+    },
     "timePicker": {
       "label": "Time"
     },
