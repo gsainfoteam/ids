@@ -57,14 +57,14 @@ type Menus = {
 };
 
 const inProvider = ({
-  locale,
   eventMenu,
   slotMenu,
   children,
+  locale,
   ...props
 }: Partial<Omit<Scheduler.Props, 'children'>> & {
-  locale?: string;
   children?: (event: Scheduler.EventData) => ReactNode;
+  locale?: string;
 } & Menus = {}) => (
   <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     <Scheduler

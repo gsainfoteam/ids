@@ -80,12 +80,7 @@ test('collapsible adds a collapse button to the header that hides the labels and
   const onCollapsedChange = vi.fn();
   const screen = await render(
     ui(
-      <Sidebar
-        aria-label="사이드바"
-        value="/"
-        collapsible="icon"
-        onCollapsedChange={onCollapsedChange}
-      >
+      <Sidebar aria-label="사이드바" value="/" collapsible="icon" onCollapsedChange={onCollapsedChange}>
         <Sidebar.Header>로고</Sidebar.Header>
         <Menu />
       </Sidebar>,
