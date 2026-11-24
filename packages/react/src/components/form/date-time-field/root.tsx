@@ -33,7 +33,11 @@ import {
 import { useInternalProviderLocale, useInternalTranslate } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { type DateMatcher } from '../../data/calendar';
-import { resolveHourCycle, type HourCycle, type TimePrecision } from '../../data/time-picker/lib/time';
+import {
+  resolveHourCycle,
+  type HourCycle,
+  type TimePrecision,
+} from '../../data/time-picker/lib/time';
 import { useFieldSize } from '../field/context';
 
 export type DateTimeFieldProps = Omit<TemporalFieldProps<CalendarDateTime | null>, 'disabled'> & {

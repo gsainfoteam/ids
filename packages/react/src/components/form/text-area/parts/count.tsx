@@ -2,7 +2,11 @@
 
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { useInternalIntlWords, useInternalTranslate, type Translate } from '../../../../internal/translate';
+import {
+  useInternalIntlWords,
+  useInternalTranslate,
+  type Translate,
+} from '../../../../internal/translate';
 import { useInternalTextAreaContext } from '../context';
 import { countState, useInternalCountAnnouncement, type CountState } from '../hooks/use-text-area';
 import { resolve, type StateValue } from '../lib/state-value';

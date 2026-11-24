@@ -40,12 +40,13 @@ export function IdsProviderRoot<const Language extends string = string>({
   children,
   ...rest
 }: IdsProviderRootProps<Language>) {
-  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } = useInternalIdsProvider({
-    theme,
-    mode,
-    defaultMode,
-    onModeChange,
-  });
+  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } =
+    useInternalIdsProvider({
+      theme,
+      mode,
+      defaultMode,
+      onModeChange,
+    });
   const inherited = use(LanguageContext);
   const language = useMemo(() => (locale ? { locale } : inherited), [locale, inherited]);
   const elementRef = useRef<HTMLElement>(null);

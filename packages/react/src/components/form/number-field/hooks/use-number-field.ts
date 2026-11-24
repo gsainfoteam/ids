@@ -26,7 +26,11 @@ import { clamp, noop } from 'es-toolkit';
 import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { useInternalFormReset } from '../../../../hooks/use-form-reset';
 import { keyHandler, withModifiers } from '../../../../internal/lib/keys';
-import { isInvalid, useInternalMergedRef, useInternalTextControl } from '../../../../internal/text-control';
+import {
+  isInvalid,
+  useInternalMergedRef,
+  useInternalTextControl,
+} from '../../../../internal/text-control';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { invariant, mergeProps } from '../../../../utils';
 import { FieldNotifyContext } from '../../field/context';

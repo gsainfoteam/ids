@@ -19,7 +19,9 @@ type StepButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
 export function StepButton({ direction, className, ...props }: StepButtonProps) {
   const t = useInternalTranslate();
   const stacked = use(InsideStepperContext);
-  const { field, state, styles } = useInternalNumberContext(direction > 0 ? 'Increment' : 'Decrement');
+  const { field, state, styles } = useInternalNumberContext(
+    direction > 0 ? 'Increment' : 'Decrement',
+  );
   const blocked =
     state.disabled || state.readOnly || !(direction > 0 ? field.canIncrease : field.canDecrease);
   const icon = stacked ? (

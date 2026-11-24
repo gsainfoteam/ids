@@ -49,7 +49,11 @@ function useInternalAnchorBox(anchor: (() => DOMRect | null) | null, open: boole
   return [anchorRef, box] as const;
 }
 
-function useInternalActiveDescendant(dom: HTMLElement | undefined, listId: string, activeId?: string) {
+function useInternalActiveDescendant(
+  dom: HTMLElement | undefined,
+  listId: string,
+  activeId?: string,
+) {
   useEffect(() => {
     if (!dom || !activeId) return;
     dom.setAttribute('aria-controls', listId);

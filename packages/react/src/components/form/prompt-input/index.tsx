@@ -1,5 +1,8 @@
 import { PromptInputActionMenu, type PromptInputActionMenuProps } from './parts/action-menu';
-import { PromptInputAddAttachments, type PromptInputAddAttachmentsProps } from './parts/add-attachments';
+import {
+  PromptInputAddAttachments,
+  type PromptInputAddAttachmentsProps,
+} from './parts/add-attachments';
 import { PromptInputAttach, type PromptInputAttachProps } from './parts/attach';
 import { PromptInputAttachments, type PromptInputAttachmentsProps } from './parts/attachments';
 import { PromptInputInput, type PromptInputInputProps } from './parts/input';

@@ -19,7 +19,10 @@ import { ChartDescription } from './parts/description';
 import { ChartTable } from './parts/table';
 import { ChartTitle } from './parts/title';
 import { chartStyle } from './style';
-import { hasAccessibleName, useInternalUnnamedWarning } from '../../../internal/lib/accessible-name';
+import {
+  hasAccessibleName,
+  useInternalUnnamedWarning,
+} from '../../../internal/lib/accessible-name';
 import { useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';

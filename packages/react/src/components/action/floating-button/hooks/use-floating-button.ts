@@ -28,7 +28,10 @@ const mounted = new WeakMap<Document, Set<{ node: HTMLElement; placement: Floati
 const overlaps = (a: DOMRect, b: DOMRect) =>
   a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 
-function useInternalPlacementCheck(nodeRef: RefObject<HTMLElement | null>, placement: FloatingPlacement) {
+function useInternalPlacementCheck(
+  nodeRef: RefObject<HTMLElement | null>,
+  placement: FloatingPlacement,
+) {
   useLayoutEffect(() => {
     const node = nodeRef.current;
     if (!isDevelopment || !node || node.hidden) return;

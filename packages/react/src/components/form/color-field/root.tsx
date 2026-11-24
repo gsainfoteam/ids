@@ -17,7 +17,11 @@ import { ColorFieldClear } from './parts/clear';
 import { ColorFieldContent, type ColorFieldContentProps } from './parts/content';
 import { ColorFieldTrigger } from './parts/trigger';
 import { colorFieldStyle } from './style';
-import { FieldPopup, FieldPopupHeader, useInternalDrawerPresentation } from '../../../internal/field-popup';
+import {
+  FieldPopup,
+  FieldPopupHeader,
+  useInternalDrawerPresentation,
+} from '../../../internal/field-popup';
 import { resolveState } from '../../../internal/lib/state-props';
 import { FormValue } from '../../../internal/parts/form-value';
 import { useInternalTranslate } from '../../../internal/translate';

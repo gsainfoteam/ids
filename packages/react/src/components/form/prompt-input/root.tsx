@@ -16,7 +16,10 @@ import { PromptInputSubmit } from './parts/submit';
 import { promptInputStyle } from './style';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useInternalFormReset } from '../../../hooks/use-form-reset';
-import { useInternalRequiredName, type AccessibleName } from '../../../internal/lib/accessible-name';
+import {
+  useInternalRequiredName,
+  type AccessibleName,
+} from '../../../internal/lib/accessible-name';
 import { keyHandler } from '../../../internal/lib/keys';
 import {
   elementTypeOf,
