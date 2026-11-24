@@ -65,14 +65,18 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 
 ## 상태
 
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+- 크기는 앱이 넘긴 `size` 이고, 넘기지 않으면 주변 컨트롤이나 글자를 따릅니다.
+
 | 상태        | 뜻                                                     |
 | ----------- | ------------------------------------------------------ |
 | `size`      | 적용된 크기. 주변 컨트롤이나 글자를 따르면 `undefined` |
 | `announced` | 스크린 리더에 이름을 적었다                            |
 
-- IDS 위에 새 디자인을 얹을 때 `className` 과 `style` 은 이 상태를 받는 함수로도 줄 수 있습니다.
+- 새 디자인(`custom-design`)에서만 `className` 에 이 상태(`Spinner.State`)를 받는 함수를 줍니다.
 
-```tsx
+```tsx custom-design
 <Spinner className={(state) => (state.announced ? 'text-primary' : undefined)} />
 ```
 
@@ -84,7 +88,7 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 | `size`             | `standard` / `tiny`. 생략하면 Field → 주변 컨트롤 → 글자 크기 |
 | `aria-label`       | 읽을 문장. 기본 `불러오는 중`                                 |
 | `aria-hidden`      | `true` 면 알리지 않고, `false` 면 버튼 안에서도 알린다        |
-| `className`        | svg로 간다. 상태를 받는 함수도 된다                           |
+| `className`        | svg로 간다. 새 디자인에서만 쓴다                              |
 | `ref` / 그 외 속성 | svg로 간다                                                    |
 
 ## 알아둘 것

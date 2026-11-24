@@ -69,7 +69,9 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 ```tsx
 <Item>
   <Item.Content>...</Item.Content>
-  <Item.Content className="items-end">2분 전</Item.Content> {/* 둘째 Content는 늘어나지 않는다 */}
+  <Item.Content>                                {/* 둘째 Content는 늘어나지 않는다 */}
+    <div className="grid justify-items-end">2분 전</div>  {/* 칸 안의 정렬은 안쪽 요소가 */}
+  </Item.Content>
 </Item>
 ```
 
@@ -115,7 +117,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 </Item>
 ```
 
-- 선택된 행은 variant와 상관없이 글자색 press 층(`state-press`)이 깔리고 `data-selected` 가 붙습니다. 선택된 행은 올려도 hover 층으로 바뀌지 않습니다.
+- 선택된 행은 variant와 상관없이 글자색 press 층(`state-press`)이 깔립니다. 선택된 행은 올려도 hover 층으로 바뀌지 않습니다.
 
 ## 목록
 
@@ -131,18 +133,20 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 <Item size="tiny" />        // standard(패딩 12px, 기본) / tiny(8px)
 ```
 
-## 상태와 data 속성
+## 상태
 
-| 속성                                                                | 뜻              |
-| ------------------------------------------------------------------- | --------------- |
-| `data-item`, `data-variant`, `data-size`                            | 루트            |
-| `data-interactive`                                                  | 누를 수 있는 행 |
-| `data-selected`                                                     | 선택됨          |
-| `data-disabled`                                                     | 비활성          |
-| `data-hovered`, `data-active`, `data-focus-visible`                 | 인터랙션 상태   |
-| `data-item-media`, `-content`, `-title`, `-description`, `-actions` | 각 부분         |
+앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-루트의 `className`, `style`, `children` 은 `{ interactive, selected, hovered, ... }` 를 받는 함수가 될 수 있습니다.
+- 선택, 비활성, 모양은 앱이 넘긴 `selected`, `disabled`, `variant`, `size` 입니다.
+- 올림, 누름, 포커스는 `onInteractionChange` 가 `{ hovered, active, focused, focusVisible, pressed, disabled }` 로 알립니다.
+- 루트의 `children` 은 `Item.State`(위 값과 `interactive`, `selected`)를 받는 함수가 될 수 있습니다.
+- 새 디자인(`custom-design`)에서만 루트의 `className`, `style` 에 `Item.State` 를 받는 함수를 줍니다.
+
+```tsx custom-design
+<Item onClick={open} className={(state) => (state.selected ? 'font-semibold' : undefined)}>
+  ...
+</Item>
+```
 
 ## 속성
 
