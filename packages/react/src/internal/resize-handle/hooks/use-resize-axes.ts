@@ -70,7 +70,9 @@ export function axisKeyMap<E extends Element>(
     : {};
 }
 
-export function useInternalMeasuredAxes(targets: Partial<Record<ResizeDimension, HTMLElement | null>>) {
+export function useInternalMeasuredAxes(
+  targets: Partial<Record<ResizeDimension, HTMLElement | null>>,
+) {
   const [measured, setMeasured] = useState<MeasuredAxes>({});
   const { width, height } = targets;
 

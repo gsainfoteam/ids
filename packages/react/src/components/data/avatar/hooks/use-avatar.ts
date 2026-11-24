@@ -6,7 +6,11 @@ import type { ImageStatus } from '../../../../internal/lib/image-status';
 
 export type AvatarStatus = ImageStatus;
 
-export function useInternalFallbackVisible(status: AvatarStatus, src: string | undefined, delay: number) {
+export function useInternalFallbackVisible(
+  status: AvatarStatus,
+  src: string | undefined,
+  delay: number,
+) {
   const [elapsedFor, setElapsedFor] = useState<{ src: string | undefined } | null>(null);
   useEffect(() => {
     if (status !== 'loading' || delay <= 0) return;

@@ -54,7 +54,10 @@ function clearInset(root: HTMLElement) {
 
 type Watch = { root: HTMLElement; wrapped: Element; observer: ResizeObserver };
 
-export function useInternalBadgeInset(rootRef: RefObject<HTMLElement | null>, placement: BadgePlacement) {
+export function useInternalBadgeInset(
+  rootRef: RefObject<HTMLElement | null>,
+  placement: BadgePlacement,
+) {
   const watch = useRef<Watch | null>(null);
   const currentPlacement = useRef(placement);
 

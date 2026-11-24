@@ -1,7 +1,11 @@
 import { type ComponentProps } from 'react';
 
 import { StepperBody, type StepperBodyProps, type StepperBodyState } from './parts/body';
-import { StepperContent, type StepperContentProps, type StepperContentState } from './parts/content';
+import {
+  StepperContent,
+  type StepperContentProps,
+  type StepperContentState,
+} from './parts/content';
 import {
   StepperDescription,
   type StepperDescriptionProps,
@@ -19,7 +23,11 @@ import {
   type StepperSeparatorState,
 } from './parts/separator';
 import { StepperTitle, type StepperTitleProps, type StepperTitleState } from './parts/title';
-import { StepperTrigger, type StepperTriggerProps, type StepperTriggerState } from './parts/trigger';
+import {
+  StepperTrigger,
+  type StepperTriggerProps,
+  type StepperTriggerState,
+} from './parts/trigger';
 import { StepperRoot, type StepperOrientation } from './root';
 import { stepperStyle } from './style';
 import { type StateRenderProps } from '../../../internal/lib/state-props';

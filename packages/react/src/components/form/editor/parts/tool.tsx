@@ -93,7 +93,9 @@ export function EditorToolTip({
 
 const IDLE = { active: false, enabled: true };
 
-export function useInternalToolState(spec: Pick<EditorToggleSpec, 'isActive' | 'can' | 'extension'>) {
+export function useInternalToolState(
+  spec: Pick<EditorToggleSpec, 'isActive' | 'can' | 'extension'>,
+) {
   const { editor } = useInternalEditorContext('Editor');
   return useInternalEditorSelector(
     editor,

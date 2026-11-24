@@ -2,8 +2,16 @@
 
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { useInternalIntlWords, useInternalTranslate, type Translate } from '../../../../internal/translate';
-import { countState, useInternalCountAnnouncement, type CountState } from '../../text-area/hooks/use-text-area';
+import {
+  useInternalIntlWords,
+  useInternalTranslate,
+  type Translate,
+} from '../../../../internal/translate';
+import {
+  countState,
+  useInternalCountAnnouncement,
+  type CountState,
+} from '../../text-area/hooks/use-text-area';
 import { resolve, type StateValue } from '../../text-area/lib/state-value';
 import { useInternalEditorContext } from '../context';
 import { useInternalEditorSelector } from '../hooks/use-editor-selector';
@@ -37,7 +45,8 @@ export function EditorCount({
 }: EditorCountProps) {
   const t = useInternalTranslate(editorMessages);
   const words = useInternalIntlWords();
-  const { editor, contentId, countId, maxLength, styles } = useInternalEditorContext('Editor.Count');
+  const { editor, contentId, countId, maxLength, styles } =
+    useInternalEditorContext('Editor.Count');
   const characters = useInternalEditorSelector(
     editor,
     (current) => current.storage.characterCount.characters(),

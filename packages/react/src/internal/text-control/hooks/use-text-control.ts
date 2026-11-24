@@ -23,7 +23,12 @@ export type UseTextControlOptions = {
   clearable?: boolean;
 };
 
-export function useInternalTextControl({ inputRef, disabled, readOnly, clearable }: UseTextControlOptions) {
+export function useInternalTextControl({
+  inputRef,
+  disabled,
+  readOnly,
+  clearable,
+}: UseTextControlOptions) {
   const [focused, setFocused] = useState(false);
 
   const clear = () => {

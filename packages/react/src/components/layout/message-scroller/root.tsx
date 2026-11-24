@@ -52,7 +52,10 @@ export function MessageScrollerRoot({
   ...props
 }: MessageScroller.Props) {
   const t = useInternalTranslate();
-  useInternalRequiredName('MessageScroller', { 'aria-label': label, 'aria-labelledby': labelledBy });
+  useInternalRequiredName('MessageScroller', {
+    'aria-label': label,
+    'aria-labelledby': labelledBy,
+  });
 
   const loading = ariaBusy === true || ariaBusy === 'true';
   const { scroll, viewportProps, atEnd, unseen } = useInternalMessageScroller({

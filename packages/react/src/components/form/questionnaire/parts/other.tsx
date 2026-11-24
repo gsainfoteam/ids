@@ -1,6 +1,9 @@
 'use client';
 
-import { useInternalRequiredName, type AccessibleName } from '../../../../internal/lib/accessible-name';
+import {
+  useInternalRequiredName,
+  type AccessibleName,
+} from '../../../../internal/lib/accessible-name';
 import { TextField } from '../../text-field';
 import { useInternalQuestionContext } from '../context';
 import { questionnaireStyle } from '../style';
@@ -20,7 +23,8 @@ export type QuestionnaireOtherProps = Omit<
 
 export function QuestionnaireOther({ className, ...props }: QuestionnaireOtherProps) {
   useInternalRequiredName('Questionnaire.Other', props);
-  const { name, orientation, draft, size, setOther } = useInternalQuestionContext('Questionnaire.Other');
+  const { name, orientation, draft, size, setOther } =
+    useInternalQuestionContext('Questionnaire.Other');
   const filled = draft.other.trim() !== '';
 
   return (

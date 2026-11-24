@@ -1,5 +1,9 @@
 import { cornerExponent, insetClipPath } from '../../../../internal/lib/corner-shape';
-import { motionDuration, prefersReducedMotion, SHEET_EASING } from '../../../../internal/lib/motion';
+import {
+  motionDuration,
+  prefersReducedMotion,
+  SHEET_EASING,
+} from '../../../../internal/lib/motion';
 
 type Box = { x: number; y: number; width: number; height: number };
 

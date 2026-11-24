@@ -19,7 +19,11 @@ export function EditorHorizontalRule({
   const t = useInternalTranslate(editorMessages);
   const { editor, editable } = useInternalEditorContext('Editor.HorizontalRule');
   const tool = useInternalEditorToolProps('HorizontalRule');
-  const enabled = useInternalEditorSelector(editor, (current) => current.can().setHorizontalRule(), true);
+  const enabled = useInternalEditorSelector(
+    editor,
+    (current) => current.can().setHorizontalRule(),
+    true,
+  );
 
   const label = ariaLabel ?? t('editor.horizontalRule');
   const disabled = !editable || !enabled;

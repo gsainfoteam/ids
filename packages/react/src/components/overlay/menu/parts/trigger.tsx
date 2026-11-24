@@ -13,7 +13,12 @@ import { ChevronRightIcon } from '@heroicons/react/16/solid';
 
 import { CommandTrigger } from './command';
 import { buttonTypeFor, mergeProps, mergeRefs, part } from '../../../../utils';
-import { CommandContext, MenuContext, useInternalContentContext, useInternalMenuContext } from '../context';
+import {
+  CommandContext,
+  MenuContext,
+  useInternalContentContext,
+  useInternalMenuContext,
+} from '../context';
 import { useInternalMenuItem } from '../hooks/use-menu-item';
 import { menuStyle } from '../style';
 
