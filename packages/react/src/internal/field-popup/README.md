@@ -24,7 +24,7 @@
 | [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`                                               |
 | Menu                                          | `FieldPopupSearch`(명령 팔레트의 `Menu.Search`)                                |
 
-- `parts/search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/search` 에서 직접 가져옵니다.
+- `parts/search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/parts/search` 에서 직접 가져옵니다.
 
 ## index.tsx
 
