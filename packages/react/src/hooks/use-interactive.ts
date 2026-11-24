@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { startTransition, useLayoutEffect, useRef, useState } from 'react';
 import type { FocusEvent, KeyboardEvent, PointerEvent } from 'react';
 
 import { isFunction, pickBy } from 'es-toolkit';
@@ -22,6 +22,11 @@ const INTERACTIVE_INIT = {
   focused: false,
   focusVisible: false,
 };
+
+function deferPastFormActionWhenDisabled(element: Element, update: () => void) {
+  if (element.matches(':disabled')) startTransition(update);
+  else update();
+}
 
 export type UseInteractiveOptions<E extends Element = Element> = {
   disabled?: boolean;
@@ -88,7 +93,10 @@ export function useInteractive<E extends Element = Element>({
       onPointerEnter?.(e);
     },
     onPointerLeave(e: PointerEvent<E>) {
-      if (e.pointerType === 'mouse') setState((s) => ({ ...s, hovered: false, active: false }));
+      if (e.pointerType === 'mouse')
+        deferPastFormActionWhenDisabled(e.currentTarget, () =>
+          setState((s) => ({ ...s, hovered: false, active: false })),
+        );
       onPointerLeave?.(e);
     },
     onPointerDown(e: PointerEvent<E>) {
@@ -96,11 +104,15 @@ export function useInteractive<E extends Element = Element>({
       onPointerDown?.(e);
     },
     onPointerUp(e: PointerEvent<E>) {
-      setState((s) => ({ ...s, active: false }));
+      deferPastFormActionWhenDisabled(e.currentTarget, () =>
+        setState((s) => ({ ...s, active: false })),
+      );
       onPointerUp?.(e);
     },
     onPointerCancel(e: PointerEvent<E>) {
-      setState((s) => ({ ...s, active: false, hovered: false }));
+      deferPastFormActionWhenDisabled(e.currentTarget, () =>
+        setState((s) => ({ ...s, active: false, hovered: false })),
+      );
       onPointerCancel?.(e);
     },
     onFocus(e: FocusEvent<E>) {
@@ -111,7 +123,9 @@ export function useInteractive<E extends Element = Element>({
       onFocus?.(e);
     },
     onBlur(e: FocusEvent<E>) {
-      setState((s) => ({ ...s, focused: false, focusVisible: false }));
+      deferPastFormActionWhenDisabled(e.currentTarget, () =>
+        setState((s) => ({ ...s, focused: false, focusVisible: false })),
+      );
       onBlur?.(e);
     },
     onKeyDown(e: KeyboardEvent<E>) {
@@ -121,7 +135,10 @@ export function useInteractive<E extends Element = Element>({
       onKeyDown?.(e);
     },
     onKeyUp(e: KeyboardEvent<E>) {
-      if (e.key === 'Enter' || e.key === ' ') setState((s) => ({ ...s, active: false }));
+      if (e.key === 'Enter' || e.key === ' ')
+        deferPastFormActionWhenDisabled(e.currentTarget, () =>
+          setState((s) => ({ ...s, active: false })),
+        );
       onKeyUp?.(e);
     },
   };

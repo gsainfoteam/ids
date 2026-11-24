@@ -401,7 +401,7 @@ const focusedInsideButNotInItsPopups = (marker) =>
 
 const FOCUS_RING_TRIGGERS = {
   formControl: "&:focus-visible",
-  useInteractive: "&[data-focus-visible]",
+  useInteractive: "&[data-focus-visible]:not(:disabled)",
   shellAroundFieldInput: focusedInsideButNotInItsPopups("data-field-input"),
   textField: focusedInsideButNotInItsPopups("data-text-field-input"),
   textArea: focusedInsideButNotInItsPopups("data-text-area-input"),
