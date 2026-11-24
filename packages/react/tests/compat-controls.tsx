@@ -456,15 +456,8 @@ export const controls: ControlSpec[] = [
     shows: shownText,
     focusTarget: textbox,
     open: {
-      'rhf-field': PROMPT_INPUT_IS_A_FORM,
       'rhf-controller': PROMPT_INPUT_IS_A_FORM,
-      'rhf-reset': PROMPT_INPUT_IS_A_FORM,
       'rhf-focus-error': PROMPT_INPUT_IS_A_FORM,
-      'rhf-dirty': PROMPT_INPUT_IS_A_FORM,
-      'tanstack-field': PROMPT_INPUT_IS_A_FORM,
-      'tanstack-app-field': PROMPT_INPUT_IS_A_FORM,
-      'tanstack-reset': PROMPT_INPUT_IS_A_FORM,
-      'tanstack-dirty': PROMPT_INPUT_IS_A_FORM,
     },
   },
   {
