@@ -78,7 +78,9 @@ export const Scale: Story = {
               추가
             </Button>
             <IconButton size={size} variant="outline" icon={<PlusIcon />} aria-label="추가" />
-            <TextField size={size} aria-label="이름" placeholder="이름" className="w-48" />
+            <div className="w-48">
+              <TextField size={size} aria-label="이름" placeholder="이름" />
+            </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>

@@ -12,18 +12,30 @@ Storybook 맨 앞의 표지입니다. IDS 로고 둘레에 실제 IDS 컴포넌�
 ```tsx
 <section className="relative h-dvh">
   <h1 className="sr-only">IDS, GIST Infoteam Design System</h1>
-  <IdsProvider mode="dark" inert aria-hidden className="absolute inset-0">
-    <div className="absolute inset-0 flex items-center justify-center gap-4">
-      <div className="flex w-[300px] shrink-0 flex-col gap-4 -translate-y-24">...</div>
-      <div className="grid h-full w-[840px] grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-        <div className="flex items-end">...</div>
-        <div>테마 카드, IDS, 코드 카드, 검색창</div>
-        <div className="flex items-start">...</div>
-      </div>
-      <div className="flex w-[320px] shrink-0 flex-col gap-4 translate-y-8">...</div>
+  <IdsProvider.Scope mode="light" asChild>
+    <div inert aria-hidden className="absolute inset-0 grid overflow-hidden">
+      <IdsProvider.Scope mode="dark">
+        <div className="absolute inset-0 flex items-center justify-center gap-4">
+          <div className="flex w-[300px] shrink-0 flex-col gap-4 -translate-y-24">
+            <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
+              <Card size="tiny">...</Card>
+            </IdsProvider.Scope>
+          </div>
+          <div className="grid h-full w-[840px] grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+            <div className="flex items-end">...</div>
+            <div>테마 카드, IDS, 코드 카드, 검색창</div>
+            <div className="flex items-start">...</div>
+          </div>
+          <div className="flex w-[320px] shrink-0 flex-col gap-4 translate-y-8">...</div>
+        </div>
+      </IdsProvider.Scope>
     </div>
-  </IdsProvider>
-  <IdsProvider mode="light" className="[clip-path:circle(71%_at_0_0)]">...</IdsProvider>
+  </IdsProvider.Scope>
+  <IdsProvider.Scope mode="dark" asChild>
+    <div className="absolute inset-0 grid [clip-path:circle(71%_at_0_0)]">
+      <IdsProvider.Scope mode="light">...</IdsProvider.Scope>
+    </div>
+  </IdsProvider.Scope>
 </section>
 ```
 
@@ -31,7 +43,12 @@ Storybook 맨 앞의 표지입니다. IDS 로고 둘레에 실제 IDS 컴포넌�
 - 가운데 열은 세 칸 격자입니다. 위 칸의 카드는 아래로, 아래 칸의 카드는 위로 붙어 로고 줄에 닿고, 넘치는 쪽은 화면 밖으로 잘립니다. `minmax(0, 1fr)` 이라 칸이 카드 높이만큼 늘지 않고, 로고 줄이 늘 화면 세로 가운데에 옵니다.
 - 좌우에 열을 세 개씩 둡니다. 열은 세로 가운데에 놓고 `translate-y` 로 조금씩 어긋나게 해 벽돌처럼 보이게 합니다.
 - 열 높이는 옆 열이 약 1,900px, 가운데 위아래 칸이 각각 700px 이상입니다. 2560×1440 화면까지 빈 곳 없이 채웁니다.
-- 다크 장면은 바탕을 `bg-base`, 카드를 `bg-neutral-soft` 로 바꿔 카드가 바탕 위로 떠 보이게 합니다(`dark:` 변형).
+- 장면의 위치와 `clip-path` 는 감싸는 `<div>` 에 둡니다. IDS 컴포넌트에는 `className` 을 주지 않습니다.
+- 장면마다 반대 모드의 `IdsProvider.Scope` 를 바깥에 하나 더 둡니다. 바깥과 모드가 다른 Scope 만 `bg-base` 를 칠하므로, 이렇게 해야 Storybook 툴바의 모드와 상관없이 두 장면이 모두 자기 바탕을 칠합니다. 라이트 장면이 바탕을 칠하지 않으면 그 아래 다크 장면이 비쳐 보입니다.
+- 바깥 Scope 는 `asChild` 로 감싸는 `<div>` 를 자기 요소로 씁니다. 그 `<div>` 가 `grid` 라서 장면 Scope 가 화면 전체로 늘어납니다.
+- 바탕은 두 장면 모두 `bg-base` 입니다. 카드는 Card 의 기본 `outline` 모양을 그대로 씁니다. 따로 그림자나 다크 배경을 주지 않습니다.
+- 카드 안의 가로 배치(`flex`, `grid grid-cols-2`, 가운데 정렬)는 Card 의 자식 `<div>` 가 맡습니다.
+- 휴대폰 화면과 브라우저 창도 `Card` 로 그립니다. 브라우저 창의 주소 줄은 `Card.Header className="border-b"`, 그 아래 Splitter 는 `Card.Media` 에 넣어 카드 가장자리까지 채웁니다.
 
 ## 알아둘 것
 

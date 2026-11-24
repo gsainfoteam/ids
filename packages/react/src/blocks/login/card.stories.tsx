@@ -44,56 +44,62 @@ export const PC: Story = {
 
     return (
       <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
-        <Card className="w-full max-w-sm">
-          <Card.Header>
-            <Card.Title asChild>
-              <h1>로그인</h1>
-            </Card.Title>
-            <Card.Description>GIST 계정 하나로 인포팀의 모든 서비스를 써요.</Card.Description>
-          </Card.Header>
+        <div className="w-full max-w-sm">
+          <Card>
+            <Card.Header>
+              <Card.Title asChild>
+                <h1>로그인</h1>
+              </Card.Title>
+              <Card.Description>GIST 계정 하나로 인포팀의 모든 서비스를 써요.</Card.Description>
+            </Card.Header>
 
-          <Card.Content className="flex flex-col gap-5">
-            <Button variant="outline" className="w-full">
-              <AcademicCapIcon />
-              GIST 계정으로 계속하기
-            </Button>
+            <Card.Content>
+              <div className="flex flex-col gap-5">
+                <Button variant="outline">
+                  <AcademicCapIcon />
+                  GIST 계정으로 계속하기
+                </Button>
 
-            <Divider>또는 이메일로</Divider>
+                <Divider>또는 이메일로</Divider>
 
-            <form onSubmit={signIn} className="flex flex-col gap-4">
-              <Field>
-                <Field.Label>이메일</Field.Label>
-                <TextField
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  placeholder="name@gm.gist.ac.kr"
-                  required
-                />
-              </Field>
-              <Field>
-                <Field.Label>비밀번호</Field.Label>
-                <PasswordField name="password" autoComplete="current-password" required />
-              </Field>
-              <div className="text-body-b3-regular flex items-center justify-between gap-3">
-                <Label>
-                  <Checkbox name="remember" defaultChecked />
-                  로그인 상태 유지
-                </Label>
-                <Link href="#forgot-password">비밀번호 찾기</Link>
+                <form onSubmit={signIn} className="flex flex-col gap-4">
+                  <Field>
+                    <Field.Label>이메일</Field.Label>
+                    <TextField
+                      type="email"
+                      name="email"
+                      autoComplete="email"
+                      placeholder="name@gm.gist.ac.kr"
+                      required
+                    />
+                  </Field>
+                  <Field>
+                    <Field.Label>비밀번호</Field.Label>
+                    <PasswordField name="password" autoComplete="current-password" required />
+                  </Field>
+                  <div className="text-body-b3-regular flex items-center justify-between gap-3">
+                    <Label>
+                      <Checkbox name="remember" defaultChecked />
+                      로그인 상태 유지
+                    </Label>
+                    <Link href="#forgot-password">비밀번호 찾기</Link>
+                  </div>
+                  <Button type="submit" disabled={signingIn}>
+                    {signingIn && <Spinner />}
+                    {signingIn ? '로그인하는 중' : '로그인'}
+                  </Button>
+                </form>
               </div>
-              <Button type="submit" disabled={signingIn} className="w-full">
-                {signingIn && <Spinner />}
-                {signingIn ? '로그인하는 중' : '로그인'}
-              </Button>
-            </form>
-          </Card.Content>
+            </Card.Content>
 
-          <Card.Footer className="justify-center">
-            처음이신가요?
-            <Link href="#sign-up">회원가입</Link>
-          </Card.Footer>
-        </Card>
+            <Card.Footer>
+              <div className="flex flex-1 items-center justify-center gap-2">
+                처음이신가요?
+                <Link href="#sign-up">회원가입</Link>
+              </div>
+            </Card.Footer>
+          </Card>
+        </div>
       </main>
     );
   },

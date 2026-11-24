@@ -67,18 +67,22 @@ export const PC: Story = {
         ))}
       </Accordion>
 
-      <Card variant="soft" className="items-center text-center">
+      <Card variant="soft">
         <Card.Header>
-          <Card.Title>아직 궁금한 게 있나요?</Card.Title>
-          <Card.Description>보통 하루 안에 인포팀이 답해요.</Card.Description>
+          <div className="flex flex-col gap-1 text-center">
+            <Card.Title>아직 궁금한 게 있나요?</Card.Title>
+            <Card.Description>보통 하루 안에 인포팀이 답해요.</Card.Description>
+          </div>
         </Card.Header>
         <Card.Footer>
-          <Button asChild variant="outline">
-            <a href="mailto:team@gistory.me">
-              <EnvelopeIcon />
-              인포팀에 묻기
-            </a>
-          </Button>
+          <div className="flex flex-1 justify-center">
+            <Button asChild variant="outline">
+              <a href="mailto:team@gistory.me">
+                <EnvelopeIcon />
+                인포팀에 묻기
+              </a>
+            </Button>
+          </div>
         </Card.Footer>
       </Card>
     </section>
