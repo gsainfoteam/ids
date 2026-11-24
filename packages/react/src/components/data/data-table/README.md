@@ -92,7 +92,7 @@ const table = useDataTable({
 | `DataTable.Content`   | 표 카드(머리글, 행, 로딩 막)                                                   |
 | `DataTable.Pagination`| 페이지 이동. Toolbar 안이면 줄 끝에, 바깥이면 자기 줄에                        |
 | `DataTable.Caption`   | `Table.Caption`. 표 아래 `<caption>` 이고 표의 이름이 된다                      |
-| `DataTable.Empty`     | 행이 없을 때의 칸 내용. 기본 "데이터가 없습니다."                              |
+| `DataTable.Empty`     | 행이 없을 때의 칸 내용. 기본값은 없고, 주지 않으면 빈 칸                              |
 
 - `Toolbar`, `Content`, `Pagination` 은 적은 순서대로 그립니다. 하나라도 적으면 기본 배치는 그리지 않으니 `Content` 도 적습니다.
 - `Caption` 과 `Empty` 는 어디에 적어도 표 안에 들어갑니다.
@@ -196,9 +196,9 @@ useDataTable({                                                                  
 });
 ```
 
-- 켜면 아래 Toolbar 에 IDS `Pagination` 이 붙습니다. 첫 페이지(`Pagination.First`), 이전, "1 / 5 페이지", 다음, 마지막 페이지(`Pagination.Last`) 순서이고, 버튼은 ghost `IconButton` 입니다.
+- 켜면 아래 Toolbar 에 IDS `Pagination` 이 붙습니다. 첫 페이지(`Pagination.First`), 이전, "1 / 5", 다음, 마지막 페이지(`Pagination.Last`) 순서이고, 버튼은 ghost `IconButton` 입니다.
 - 끝에 닿은 버튼은 `aria-disabled` 로 꺼지고 포커스를 잃지 않습니다(`focusableWhenDisabled`).
-- 페이지 글자는 `aria-live="polite"` 라 바뀐 페이지를 읽습니다. 버튼 묶음은 이름 "페이지 탐색" 인 `<nav>` 입니다.
+- 페이지 글자는 `aria-live="polite"` 라 바뀐 페이지를 읽습니다. 버튼 묶음은 `<nav>` 이고, DataTable 의 `aria-label` 이나 `aria-labelledby` 가 그 이름이 됩니다.
 - 키보드는 Pagination 과 같습니다. 버튼에서 `←` `→` 는 이전, 다음 페이지, `Home` `End` 는 첫, 마지막 페이지입니다.
 - 데이터나 정렬이 바뀌면 TanStack 이 첫 페이지로 돌아갑니다(`autoResetPageIndex`). `manual` 이면 돌아가지 않습니다.
 
@@ -225,9 +225,9 @@ useDataTable({ columns, data, columnSizing: { value: widths, onValueChange: setW
 ## 빈 상태와 로딩
 
 ```tsx
-<DataTable table={table} />                                         // 행이 없으면 "데이터가 없습니다."
+<DataTable table={table} />                                         // 행이 없으면 빈 칸 하나
 <DataTable table={table}>
-  <DataTable.Empty>아직 멤버가 없습니다.</DataTable.Empty>          // 문구 바꾸기
+  <DataTable.Empty>아직 멤버가 없습니다.</DataTable.Empty>          // 앱이 쓰는 문구
 </DataTable>
 <DataTable table={table}>
   <DataTable.Empty><Empty>...</Empty></DataTable.Empty>             // Empty 컴포넌트를 그대로 넣는다

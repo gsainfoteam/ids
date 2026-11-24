@@ -113,7 +113,7 @@ import { ColorField, Field } from '@gsainfoteam/ids-react';
 - `Esc`, 바깥 클릭, 포커스가 나갈 때도 `onOpenChange(false)` 가 불립니다.
 - `disabled` 나 `readOnly` 면 `open` 이어도 열리지 않습니다.
 - 팝업이 남은 화면보다 길면 안에서 스크롤하고, 위나 아래에 내용이 더 남은 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)).
-- 하단 시트는 모달입니다. 제목과 닫기 버튼이 붙고, 배경이 어두워지며 페이지 스크롤이 잠깁니다. 닫기 버튼이나 배경을 누르면 닫히고 트리거로 포커스가 돌아갑니다.
+- 하단 시트는 모달입니다. 닫기 버튼이 붙고, 배경이 어두워지며 페이지 스크롤이 잠깁니다. 닫기 버튼이나 배경을 누르면 닫히고 트리거로 포커스가 돌아갑니다.
 
 ## 폼
 
@@ -163,7 +163,7 @@ const methods = useForm({ defaultValues: { color: '' } });
 | `format`                 | `hex`(기본) / `rgb` / `hsl` / `oklch`                               |
 | `open` / `defaultOpen`   | 열림 상태                                                           |
 | `onOpenChange`           | 열리고 닫힐 때                                                      |
-| `placeholder`            | `색상 선택`                                                         |
+| `placeholder`            | 기본 없음                                                           |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                  |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                          |
 | `invalid`                | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선          |
@@ -174,7 +174,7 @@ const methods = useForm({ defaultValues: { color: '' } });
 
 ## 알아둘 것
 
-- 이름은 `Field.Label` 이나 `aria-label` 로 줍니다. 팝업도 같은 이름으로 읽히고, 이름이 없으면 `색상 선택` 입니다.
+- 이름은 `Field.Label` 이나 `aria-label` 로 줍니다. 팝업도 같은 이름으로 읽힙니다. IDS 가 쓴 팝업 제목은 없습니다.
 - `Field` 안에서는 값이 바뀌거나 팝업이 열리고 닫힐 때마다 `Field` 가 채워졌는지와 바뀌었는지를 다시 읽습니다.
 - `onBlur` 는 포커스가 트리거와 팝업을 모두 벗어날 때만 불립니다.
 - 팝업 위치와 폭은 지우기 버튼을 포함한 필드 전체를 기준으로 잡습니다.

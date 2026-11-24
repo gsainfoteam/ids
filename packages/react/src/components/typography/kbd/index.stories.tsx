@@ -156,7 +156,7 @@ export const ShowTheShortcutForTheVisitorsPlatform: Story = {
     await expect(spoken(mac)).toBe('커맨드 K');
     const windows = canvas.getByTestId('windows');
     await expect(visible(windows)).toBe('Ctrl+K');
-    await expect(spoken(windows)).toBe('컨트롤 + K');
+    await expect(spoken(windows)).toBe('Ctrl + K');
     const auto = canvas.getByTestId('auto');
     await expect(auto).toHaveAttribute('data-platform', detectPlatform());
   },
@@ -199,7 +199,7 @@ export const WriteTheKeysAsSymbols: Story = {
     docs: {
       description: {
         story:
-          '⌘ ⇧ ← 같은 기호는 스크린 리더가 제대로 읽지 못합니다. children 으로 적은 기호도 `keys` 로 그린 기호처럼 숨기고 "커맨드" 같은 이름을 대신 읽게 합니다.',
+          '⌘ ⇧ ← 같은 기호는 스크린 리더가 제대로 읽지 못합니다. children 으로 적은 기호도 `keys` 로 그린 기호처럼 숨기고 "커맨드" 같은 이름을 대신 읽게 합니다. `Ctrl`, `Tab` 처럼 글자로 그린 키는 글자 그대로 읽습니다.',
       },
     },
   },

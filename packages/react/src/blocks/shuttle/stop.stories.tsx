@@ -98,12 +98,12 @@ export const PC: Story = {
           </ItemGroup>
         </Card>
 
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex-1">
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="outline">
             <MapPinIcon />
             지도에서 보기
           </Button>
-          <Button variant="outline" className="flex-1" onClick={() => toast('새로 고쳤어요')}>
+          <Button variant="outline" onClick={() => toast('새로 고쳤어요')}>
             <ArrowPathIcon />
             새로 고치기
           </Button>

@@ -4,15 +4,26 @@
 
 - **FileField 와 같은 동작.** 값, 제한과 거부, 미리보기, 폼, react-hook-form 연결은 [FileField](../file-field/README.md) 와 같습니다. 두 컴포넌트는 같은 내부 훅을 씁니다.
 - **필드 모양이 필요하면 FileField.** 한 줄짜리 필드 안에 파일 이름을 보여 줍니다.
-- **규칙을 먼저 보여 줍니다.** `accept`, `maxSize`, `maxCount` 를 주면 `PDF, 이미지 · 파일당 최대 5 MB · 최대 5개` 처럼 영역 안에 보이고, 트리거의 `aria-describedby` 로 읽힙니다.
-- **끌어 올리면 색이 바뀝니다.** 파일을 끌어 올리는 동안 영역이 `bg-primary-soft` 로 바뀌고 안내 문구가 `여기에 놓으세요` 로 바뀝니다.
+- **규칙을 먼저 보여 줍니다.** `FileDropzone.Limits` 에 쓴 규칙은 영역 안 안내 문구 아래에 보이고, 트리거의 `aria-describedby` 로 읽힙니다.
+- **끌어 올리면 색이 바뀝니다.** 파일을 끌어 올리는 동안 영역이 `bg-primary-soft` 로 바뀝니다. 안내 문구는 `placeholder` 그대로입니다.
 
 ```tsx
 import { Field, FileDropzone } from '@gsainfoteam/ids-react';
 
 <Field>
   <Field.Label>증빙 자료</Field.Label>
-  <FileDropzone name="evidence" multiple accept="image/*,.pdf" maxSize={5 * 1024 * 1024} />
+  <FileDropzone
+    name="evidence"
+    multiple
+    accept="image/*,.pdf"
+    maxSize={5 * 1024 * 1024}
+    placeholder="파일을 끌어다 놓거나 눌러서 고르세요"
+  >
+    <FileDropzone.Limits>이미지, PDF · 파일당 최대 5 MB</FileDropzone.Limits>
+    <FileDropzone.Rejection>
+      {({ file }) => `${file.name}: 올릴 수 없는 파일입니다.`}
+    </FileDropzone.Rejection>
+  </FileDropzone>
 </Field>;
 ```
 
@@ -31,7 +42,7 @@ import { Field, FileDropzone } from '@gsainfoteam/ids-react';
 
 ```tsx
 <FileDropzone multiple>
-  <FileDropzone.Trigger /> {/* 생략하면 아이콘 + 안내 문구 + 규칙 */}
+  <FileDropzone.Trigger /> {/* 생략하면 아이콘 + placeholder + Limits */}
   <FileDropzone.List>
     {(files) =>
       files.map((file) => (
@@ -50,13 +61,18 @@ import { Field, FileDropzone } from '@gsainfoteam/ids-react';
 </FileDropzone>
 ```
 
-- part 는 FileField 와 같습니다: `Trigger`, `Value`, `Clear`, `List`, `Item`, `Remove`, `Preview`. `FileField.Trigger` 처럼 FileField 의 이름으로 써도 같게 동작합니다.
+- part 는 FileField 와 같습니다: `Trigger`, `Value`, `Clear`, `List`, `Item`, `Remove`, `Preview`, `Limits`, `Rejection`. `FileField.Trigger` 처럼 FileField 의 이름으로 써도 같게 동작합니다.
 - children 을 생략하면 `Trigger` 와 `List` 가 나옵니다. `Clear` 는 직접 둘 때만 나옵니다.
 - `Trigger` 는 꼭 하나 둡니다. `Clear`, `List`, `Item` 은 `Trigger` 안이 아니라 옆에 둡니다.
+- 루트에 둔 `Limits` 는 기본 트리거 안으로 들어갑니다. `Trigger` 에 children 을 주면 `Limits` 도 그 안에 직접 둡니다.
 
 ## 상태
 
 앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
+
+```tsx
+<FileDropzone className={(state) => (state.dragging ? 'ring-2' : undefined)} />
+```
 
 - 값은 `value` / `onValueChange`, 거부된 파일은 `onReject` 로 읽습니다. 비어 있는지는 `null` 이나 빈 배열로 압니다.
 - `disabled`, `readOnly`, `required`, `multiple` 은 앱이 준 값 그대로입니다.
@@ -76,10 +92,10 @@ import { Field, FileDropzone } from '@gsainfoteam/ids-react';
 
 FileField 와 같습니다. 다른 것만 적습니다.
 
-| 속성          | 기본 / 동작                            |
-| ------------- | -------------------------------------- |
-| `placeholder` | `파일을 끌어다 놓거나 눌러서 고르세요` |
-| `variant`     | `outline`(기본) / `soft` / `ghost`     |
+| 속성          | 기본 / 동작                          |
+| ------------- | ------------------------------------ |
+| `placeholder` | 기본값 없음. 영역 가운데의 안내 문구 |
+| `variant`     | `outline`(기본) / `soft` / `ghost`   |
 
 ## 알아둘 것
 

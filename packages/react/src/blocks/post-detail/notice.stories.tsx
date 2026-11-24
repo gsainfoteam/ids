@@ -61,69 +61,75 @@ export const PC: Story = {
               </Chip>
             </div>
             <Card.Title asChild>
-              <h1 className="text-headline-h4-bold">2026학년도 2학기 수강 정정 안내</h1>
+              <h1>
+                <span className="text-headline-h4-bold block">2026학년도 2학기 수강 정정 안내</span>
+              </h1>
             </Card.Title>
             <Card.Description>학사팀 · 2026년 9월 30일 · 조회 2,841</Card.Description>
           </Card.Header>
 
-          <Card.Content className="text-body-b2-regular flex flex-col gap-5">
-            <p>
-              2학기 수강 정정 기간을 알려 드립니다. 정정 기간에는 과목을 더하거나 빼거나 분반을 바꿀
-              수 있고, 정정 기간이 끝나면 취소만 할 수 있습니다.
-            </p>
+          <Card.Content>
+            <div className="text-body-b2-regular flex flex-col gap-5">
+              <p>
+                2학기 수강 정정 기간을 알려 드립니다. 정정 기간에는 과목을 더하거나 빼거나 분반을
+                바꿀 수 있고, 정정 기간이 끝나면 취소만 할 수 있습니다.
+              </p>
 
-            <Table aria-label="수강 정정 일정">
-              <Table.Header>
-                <Table.Row>
-                  <Table.Head>구분</Table.Head>
-                  <Table.Head>기간</Table.Head>
-                  <Table.Head>방법</Table.Head>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {SCHEDULE.map((row) => (
-                  <Table.Row key={row.step}>
-                    <Table.Cell>{row.step}</Table.Cell>
-                    <Table.Cell>{row.when}</Table.Cell>
-                    <Table.Cell>{row.where}</Table.Cell>
+              <Table aria-label="수강 정정 일정">
+                <Table.Header>
+                  <Table.Row>
+                    <Table.Head>구분</Table.Head>
+                    <Table.Head>기간</Table.Head>
+                    <Table.Head>방법</Table.Head>
                   </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
+                </Table.Header>
+                <Table.Body>
+                  {SCHEDULE.map((row) => (
+                    <Table.Row key={row.step}>
+                      <Table.Cell>{row.step}</Table.Cell>
+                      <Table.Cell>{row.when}</Table.Cell>
+                      <Table.Cell>{row.where}</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
 
-            <Alert colorScheme="warning">
-              <Alert.Title>18학점을 넘기려면 먼저 승인을 받으세요</Alert.Title>
-              <Alert.Description>
-                직전 학기 평점이 3.5 이상이면 21학점까지 들을 수 있어요. 지도 교수의 승인을 받은
-                뒤에 신청해 주세요.
-              </Alert.Description>
-            </Alert>
+              <Alert colorScheme="warning">
+                <Alert.Title>18학점을 넘기려면 먼저 승인을 받으세요</Alert.Title>
+                <Alert.Description>
+                  직전 학기 평점이 3.5 이상이면 21학점까지 들을 수 있어요. 지도 교수의 승인을 받은
+                  뒤에 신청해 주세요.
+                </Alert.Description>
+              </Alert>
 
-            <p>문의는 학사팀(062-715-2000)으로 해 주세요.</p>
+              <p>문의는 학사팀(062-715-2000)으로 해 주세요.</p>
+            </div>
           </Card.Content>
 
-          <Card.Footer className="flex-col items-stretch">
-            <ItemGroup size="tiny" aria-label="첨부 파일">
-              {ATTACHMENTS.map((file) => (
-                <Item key={file.name}>
-                  <Item.Media variant="soft">
-                    <DocumentTextIcon />
-                  </Item.Media>
-                  <Item.Content>
-                    <Item.Title>{file.name}</Item.Title>
-                    <Item.Description>{file.size}</Item.Description>
-                  </Item.Content>
-                  <Item.Actions>
-                    <IconButton
-                      variant="outline"
-                      size="tiny"
-                      aria-label={`${file.name} 내려받기`}
-                      icon={<ArrowDownTrayIcon />}
-                    />
-                  </Item.Actions>
-                </Item>
-              ))}
-            </ItemGroup>
+          <Card.Footer>
+            <div className="min-w-0 flex-1">
+              <ItemGroup size="tiny" aria-label="첨부 파일">
+                {ATTACHMENTS.map((file) => (
+                  <Item key={file.name}>
+                    <Item.Media variant="soft">
+                      <DocumentTextIcon />
+                    </Item.Media>
+                    <Item.Content>
+                      <Item.Title>{file.name}</Item.Title>
+                      <Item.Description>{file.size}</Item.Description>
+                    </Item.Content>
+                    <Item.Actions>
+                      <IconButton
+                        variant="outline"
+                        size="tiny"
+                        aria-label={`${file.name} 내려받기`}
+                        icon={<ArrowDownTrayIcon />}
+                      />
+                    </Item.Actions>
+                  </Item>
+                ))}
+              </ItemGroup>
+            </div>
           </Card.Footer>
         </article>
       </Card>
@@ -145,12 +151,14 @@ export const PC: Story = {
         </Card>
       </nav>
 
-      <Button asChild variant="outline" className="self-start">
-        <a href="#notices">
-          <ListBulletIcon />
-          목록으로
-        </a>
-      </Button>
+      <div className="flex">
+        <Button asChild variant="outline">
+          <a href="#notices">
+            <ListBulletIcon />
+            목록으로
+          </a>
+        </Button>
+      </div>
     </main>
   ),
 };

@@ -507,19 +507,19 @@ export const PageThroughManyRows: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const pages = canvas.getByRole('navigation', { name: '페이지 탐색' });
-    await expect(pages).toHaveTextContent('1 / 9 페이지');
-    await expect(canvas.getByRole('button', { name: '이전 페이지' })).toHaveAttribute(
+    const pages = canvas.getByRole('navigation', { name: '멤버' });
+    await expect(pages).toHaveTextContent('1 / 9');
+    await expect(canvas.getByRole('button', { name: '이전' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
     await expect(canvas.getAllByRole('row')).toHaveLength(6);
 
-    await userEvent.click(canvas.getByRole('button', { name: '다음 페이지' }));
-    await expect(pages).toHaveTextContent('2 / 9 페이지');
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
+    await expect(pages).toHaveTextContent('2 / 9');
 
     await userEvent.click(canvas.getByRole('button', { name: '마지막 페이지' }));
-    await expect(pages).toHaveTextContent('9 / 9 페이지');
+    await expect(pages).toHaveTextContent('9 / 9');
     await expect(canvas.getAllByRole('row')).toHaveLength(3);
     await expect(canvas.getByRole('button', { name: '마지막 페이지' })).toHaveFocus();
   },
@@ -663,7 +663,7 @@ export const ShowLoadingAndEmptyStates: Story = {
     docs: {
       description: {
         story:
-          '행이 없으면 `DataTable.Empty` 를 모든 열을 가로지르는 한 칸에 그립니다(기본 "데이터가 없습니다."). 글자나 `Empty` 컴포넌트를 children 으로 줍니다. `aria-busy` 를 주면 `<table>` 에 그대로 붙고, 행이 없으면 그 칸에, 있으면 표 위에 Spinner 를 겹칩니다.',
+          '행이 없으면 `DataTable.Empty` 를 모든 열을 가로지르는 한 칸에 그립니다. IDS 는 기본 문구를 쓰지 않습니다. 글자나 `Empty` 컴포넌트를 children 으로 줍니다. `aria-busy` 를 주면 `<table>` 에 그대로 붙고, 행이 없으면 그 칸에, 있으면 표 위에 Spinner 를 겹칩니다.',
       },
     },
   },
@@ -721,10 +721,10 @@ export const SortAndPageOnTheServer: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const pages = canvas.getByRole('navigation', { name: '페이지 탐색' });
-    await expect(pages).toHaveTextContent('1 / 9 페이지');
-    await userEvent.click(canvas.getByRole('button', { name: '다음 페이지' }));
-    await expect(pages).toHaveTextContent('2 / 9 페이지');
+    const pages = canvas.getByRole('navigation', { name: '서버 멤버' });
+    await expect(pages).toHaveTextContent('1 / 9');
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
+    await expect(pages).toHaveTextContent('2 / 9');
     await expect(canvas.getAllByRole('row')[1]).toHaveTextContent('한가람');
   },
 };

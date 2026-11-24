@@ -7,7 +7,8 @@
 - **글자와 같은 높이.** 문장 속 키는 주변 글자의 대문자 높이 가운데에 섭니다. 한글 글자 몸의 가운데와 같은 높이라, `vertical-align: middle`(x-height 기준)처럼 1px 가라앉지 않습니다. flex 행 안에서는 행의 가운데 정렬을 따릅니다.
 - **아이콘 크기는 키가 정합니다.** 메뉴 행처럼 안의 아이콘을 모두 키우는 곳에서도 키 기호는 키 크기를 지킵니다.
 - **기호는 아이콘으로 그립니다.** Mac 의 `⌘` `⌥` `⇧` `↩` `⌫` 와 방향키는 글자가 아니라 아이콘(lucide)이라, 글꼴과 상관없이 키 한가운데에 놓입니다.
-- **기호에 이름을 붙입니다.** `⌘` `⇧` `←` 같은 기호는 스크린 리더가 제대로 읽지 못해서, 기호는 숨기고 "커맨드" "시프트" "왼쪽 화살표" 를 대신 읽게 합니다. children으로 적은 기호에도 적용됩니다.
+- **기호에만 이름을 붙입니다.** `⌘` `⇧` `←` 같은 기호는 스크린 리더가 제대로 읽지 못해서, 기호는 숨기고 "커맨드" "시프트" "왼쪽 화살표" 를 대신 읽게 합니다. children으로 적은 기호에도 적용됩니다.
+- **글자로 그린 키는 글자 그대로 읽습니다.** `Ctrl`, `Shift`, `Esc`, `Tab`, `PgUp` 처럼 글자로 그린 키에는 따로 이름을 붙이지 않습니다.
 - **어느 배경에서나.** 키 모양은 주변 글자색에서 옅게 칠해져 본문, solid 버튼, 어두운 툴팁 위에서 따로 꾸미지 않아도 어울립니다.
 - **서버 렌더링.** 서버는 방문자의 플랫폼을 모르므로 `windows` 로 그리고, 하이드레이션 직후 방문자의 플랫폼으로 바꿉니다. 경고는 나지 않습니다.
 
@@ -33,24 +34,25 @@ import { Kbd } from '@gsainfoteam/ids-react';
 - `keys` 의 타입은 TanStack Hotkeys 의 `Hotkey` 에 수식 키 하나(`Mod`, `Control`, `Alt`, `Shift`, `Meta`)를 더한 `Kbd.Keys` 입니다.
 - 수식 키는 `Mod`(또는 `Control`), `Alt`, `Shift`, `Meta` 순서로 적고, 글자는 대문자로 적습니다. `'mod+k'`, `'Shift+Mod+K'` 는 타입 오류입니다.
 
-| 이름                                           | mac     | windows            | linux              |
-| ---------------------------------------------- | ------- | ------------------ | ------------------ |
-| `Mod`                                          | ⌘       | Ctrl               | Ctrl               |
-| `Meta`                                         | ⌘       | Win                | Super              |
-| `Control`                                      | ⌃       | Ctrl               | Ctrl               |
-| `Alt`                                          | ⌥       | Alt                | Alt                |
-| `Shift`                                        | ⇧       | Shift              | Shift              |
-| `Enter`                                        | ↩       | Enter              | Enter              |
-| `Backspace`                                    | ⌫       | Backspace          | Backspace          |
-| `Delete`                                       | ⌦       | Del                | Del                |
-| `Escape`                                       | Esc     | Esc                | Esc                |
-| `Tab`                                          | ⇥       | Tab                | Tab                |
-| `Space`                                        | Space   | Space              | Space              |
-| `ArrowUp` `ArrowDown` `ArrowLeft` `ArrowRight` | ↑ ↓ ← → | ↑ ↓ ← →            | ↑ ↓ ← →            |
-| `PageUp` `PageDown` `Home` `End`               | ⇞ ⇟ ↖ ↘ | PgUp PgDn Home End | PgUp PgDn Home End |
-| `CapsLock` `Fn`                                | ⇪ fn    | Caps Lock fn       | Caps Lock fn       |
+| 이름                                           | mac                | windows            | linux              |
+| ---------------------------------------------- | ------------------ | ------------------ | ------------------ |
+| `Mod`                                          | ⌘                  | Ctrl               | Ctrl               |
+| `Meta`                                         | ⌘                  | Win                | Super              |
+| `Control`                                      | ⌃                  | Ctrl               | Ctrl               |
+| `Alt`                                          | ⌥                  | Alt                | Alt                |
+| `Shift`                                        | ⇧                  | Shift              | Shift              |
+| `Enter`                                        | ↩                  | Enter              | Enter              |
+| `Backspace`                                    | ⌫                  | Backspace          | Backspace          |
+| `Delete`                                       | ⌦                  | Del                | Del                |
+| `Escape`                                       | Esc                | Esc                | Esc                |
+| `Tab`                                          | Tab                | Tab                | Tab                |
+| `Space`                                        | Space              | Space              | Space              |
+| `ArrowUp` `ArrowDown` `ArrowLeft` `ArrowRight` | ↑ ↓ ← →            | ↑ ↓ ← →            | ↑ ↓ ← →            |
+| `PageUp` `PageDown` `Home` `End`               | PgUp PgDn Home End | PgUp PgDn Home End | PgUp PgDn Home End |
+| `CapsLock` `Fn`                                | Caps Lock fn       | Caps Lock fn       | Caps Lock fn       |
 
 - 표에 없는 키(`F5`, `/`, `K`)는 적은 그대로 그립니다.
+- 이름을 읽는 기호는 `⌘` `⌃` `⌥` `⇧` `↩` `⏎` `↵` `⌫` `⌦` `↑` `↓` `←` `→` 입니다. 그 밖의 기호는 children 에 적어도 적은 그대로 둡니다.
 
 ## 플랫폼
 
@@ -94,9 +96,10 @@ import { Kbd } from '@gsainfoteam/ids-react';
 ## 읽는 이름 바꾸기
 
 ```tsx
-<Kbd keys="Mod+K" labels={{ command: 'Command', control: 'Control' }} />
+<Kbd keys="Mod+K" platform="mac" labels={{ command: 'Command' }} />
 ```
 
+- 바꿀 수 있는 이름은 기호로 그린 키의 것뿐입니다: `command`, `control`, `option`, `shift`, `return`, `macDelete`, `forwardDelete`, `up`, `down`, `left`, `right`.
 - 기본 이름은 한국어입니다(`커맨드`, `컨트롤`, `시프트` …).
 
 ## 상태
@@ -114,14 +117,14 @@ import { Kbd } from '@gsainfoteam/ids-react';
 | 속성        | 기본 / 동작                                                    |
 | ----------- | -------------------------------------------------------------- |
 | `keys`      | 단축키 문자열(`Kbd.Keys`). 없으면 `children` 을 그린다         |
-| `size`      | `standard` / `tiny`. 생략하면 KbdGroup → Field → `standard`     |
+| `size`      | `standard` / `tiny`. 생략하면 KbdGroup → Field → `standard`    |
 | `platform`  | `mac` / `windows` / `linux`. 생략하면 기기를 따른다            |
-| `labels`    | 스크린 리더가 읽을 키 이름                                     |
+| `labels`    | 기호로 그린 키를 스크린 리더가 읽을 이름                       |
 | `className` | 키 칸(묶음이면 바깥 `<kbd>`)으로 간다. 상태를 받는 함수도 된다 |
 | 그 외 속성  | `<kbd>` 로 간다                                                |
 
-| 파트            | 기본 / 동작                                              |
-| --------------- | -------------------------------------------------------- |
+| 파트            | 기본 / 동작                                                |
+| --------------- | ---------------------------------------------------------- |
 | `Kbd.Separator` | `<span>`. 키 사이 표시. 글자를 비우면 `+`. 그 외 span 속성 |
 
 ## 알아둘 것

@@ -23,7 +23,7 @@ export function AlertClose({ className, children, onClick, ...props }: AlertClos
   const { state, styles, close } = useAlertContext('Alert.Close');
   return (
     <IconButton
-      aria-label={t('alert.close')}
+      aria-label={t('common.close')}
       {...props}
       variant="ghost"
       colorScheme={state.colorScheme}

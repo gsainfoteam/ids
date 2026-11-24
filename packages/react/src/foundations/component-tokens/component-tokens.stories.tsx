@@ -30,8 +30,6 @@ const colorTokens = Object.entries(IDS_COMPONENT_COLORS);
 
 const shadowTokens = Object.entries(IDS_COMPONENT_SHADOWS);
 
-const panel = cn('w-max concentric-p-4 inset-ring-1 inset-ring-neutral');
-
 const columnLabel = cn('text-caption-c1-medium text-neutral');
 
 const tokenRow = cn('grid items-center gap-x-4');
@@ -72,20 +70,24 @@ function TokenTable() {
   return (
     <div className="flex flex-col gap-4">
       {modes.map((mode) => (
-        <IdsProvider.Scope key={mode} mode={mode} className={panel}>
-          <div data-token-table={mode} className="flex flex-col gap-2">
-            <div className={tokenRow} style={tokenColumns}>
-              <span className={columnLabel}>{mode}</span>
-              <span className={columnLabel}>role</span>
-            </div>
-            {colorTokens.map(([token, roles]) => (
-              <ColorRow key={token} token={token} role={roles[mode]} />
-            ))}
-            {shadowTokens.map(([token, steps]) => (
-              <ShadowRow key={token} token={token} step={steps[mode]} />
-            ))}
-          </div>
-        </IdsProvider.Scope>
+        <div key={mode} className="w-max">
+          <IdsProvider.Scope mode={mode} asChild>
+            <Card>
+              <div data-token-table={mode} className="flex flex-col gap-2">
+                <div className={tokenRow} style={tokenColumns}>
+                  <span className={columnLabel}>{mode}</span>
+                  <span className={columnLabel}>role</span>
+                </div>
+                {colorTokens.map(([token, roles]) => (
+                  <ColorRow key={token} token={token} role={roles[mode]} />
+                ))}
+                {shadowTokens.map(([token, steps]) => (
+                  <ShadowRow key={token} token={token} step={steps[mode]} />
+                ))}
+              </div>
+            </Card>
+          </IdsProvider.Scope>
+        </div>
       ))}
     </div>
   );
@@ -127,34 +129,42 @@ export const Surfaces: Story = {
       >
         <div className="flex flex-col gap-4">
           {modes.map((mode) => (
-            <IdsProvider.Scope
-              key={mode}
-              mode={mode}
-              className="concentric-p-4 flex flex-wrap gap-4"
-            >
-              <Card variant="outline" className="w-72">
-                <Card.Header>
-                  <Card.Title>{mode} · bg-surface</Card.Title>
-                  <Card.Description>shadow-surface 은 라이트 모드에서만 그립니다.</Card.Description>
-                </Card.Header>
-                <Card.Content className="flex flex-col gap-3">
-                  <TextField aria-label="이름" placeholder="이름" />
-                  <Button variant="outline">outline</Button>
-                </Card.Content>
-                <Card.Footer className="justify-end">
-                  <Button variant="outline">bg-block footer</Button>
-                </Card.Footer>
-              </Card>
-              <Card variant="soft" className="w-72">
-                <Card.Header>
-                  <Card.Title>{mode} · bg-block</Card.Title>
-                  <Card.Description>soft Card 는 바탕 위의 구역입니다.</Card.Description>
-                </Card.Header>
-                <Card.Content className="flex flex-col gap-3">
-                  <TextField aria-label="이름" placeholder="이름" />
-                  <Button variant="outline">outline</Button>
-                </Card.Content>
-              </Card>
+            <IdsProvider.Scope key={mode} mode={mode}>
+              <div className="flex flex-wrap gap-4 p-4">
+                <div className="w-72">
+                  <Card variant="outline">
+                    <Card.Header>
+                      <Card.Title>{mode} · bg-surface</Card.Title>
+                      <Card.Description>
+                        shadow-surface 은 라이트 모드에서만 그립니다.
+                      </Card.Description>
+                    </Card.Header>
+                    <Card.Content>
+                      <div className="flex flex-col gap-3">
+                        <TextField aria-label="이름" placeholder="이름" />
+                        <Button variant="outline">outline</Button>
+                      </div>
+                    </Card.Content>
+                    <Card.Footer>
+                      <Button variant="outline">bg-block footer</Button>
+                    </Card.Footer>
+                  </Card>
+                </div>
+                <div className="w-72">
+                  <Card variant="soft">
+                    <Card.Header>
+                      <Card.Title>{mode} · bg-block</Card.Title>
+                      <Card.Description>soft Card 는 바탕 위의 구역입니다.</Card.Description>
+                    </Card.Header>
+                    <Card.Content>
+                      <div className="flex flex-col gap-3">
+                        <TextField aria-label="이름" placeholder="이름" />
+                        <Button variant="outline">outline</Button>
+                      </div>
+                    </Card.Content>
+                  </Card>
+                </div>
+              </div>
             </IdsProvider.Scope>
           ))}
         </div>

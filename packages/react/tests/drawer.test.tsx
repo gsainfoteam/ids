@@ -703,7 +703,7 @@ describe('snap points', () => {
         />
       </IdsProvider>,
     );
-    const handle = screen.getByRole('button', { name: '끌어서 크기 조절' });
+    const handle = screen.getByRole('button', { name: '크기 조절' });
     await expect.element(screen.getByRole('textbox', { name: 'Keyword' })).toHaveFocus();
     const backdrop = document.querySelector<HTMLElement>('[data-drawer-backdrop]')!;
     (handle.element() as HTMLElement).focus();

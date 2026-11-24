@@ -188,14 +188,16 @@ export const PC: Story = {
 
               return (
                 <li key={ride.id} className="flex">
-                  <Card className="w-full">
+                  <Card>
                     <Card.Header>
                       <Card.Description>
                         {ride.day} {ride.time} 출발
                       </Card.Description>
-                      <Card.Title className="text-headline-h5-bold" asChild>
+                      <Card.Title asChild>
                         <h2>
-                          {direction === 'out' ? `학교 → ${ride.place}` : `${ride.place} → 학교`}
+                          <span className="text-headline-h5-bold block">
+                            {direction === 'out' ? `학교 → ${ride.place}` : `${ride.place} → 학교`}
+                          </span>
                         </h2>
                       </Card.Title>
                       <Card.Action>
@@ -204,33 +206,36 @@ export const PC: Story = {
                         </Chip>
                       </Card.Action>
                     </Card.Header>
-                    <Card.Content className="flex items-center gap-3">
-                      <AvatarGroup size="tiny" aria-label={`${riders.length}명 모임`}>
-                        {riders.map((name) => (
-                          <Avatar key={name} name={name} />
-                        ))}
-                      </AvatarGroup>
-                      {riders.length}/{ride.seats}명 · 1인 {ride.fare}
+                    <Card.Content>
+                      <div className="flex items-center gap-3">
+                        <AvatarGroup size="tiny" aria-label={`${riders.length}명 모임`}>
+                          {riders.map((name) => (
+                            <Avatar key={name} name={name} />
+                          ))}
+                        </AvatarGroup>
+                        {riders.length}/{ride.seats}명 · 1인 {ride.fare}
+                      </div>
                     </Card.Content>
                     <Card.Footer>
-                      <Button
-                        className="w-full"
-                        variant={joined.includes(ride.id) ? 'outline' : 'solid'}
-                        disabled={left === 0 && !joined.includes(ride.id)}
-                        onClick={() =>
-                          setJoined(
-                            joined.includes(ride.id)
-                              ? joined.filter((id) => id !== ride.id)
-                              : [...joined, ride.id],
-                          )
-                        }
-                      >
-                        {joined.includes(ride.id)
-                          ? '같이 타기 취소'
-                          : left === 0
-                            ? '마감'
-                            : '같이 타기'}
-                      </Button>
+                      <div className="grid flex-1">
+                        <Button
+                          variant={joined.includes(ride.id) ? 'outline' : 'solid'}
+                          disabled={left === 0 && !joined.includes(ride.id)}
+                          onClick={() =>
+                            setJoined(
+                              joined.includes(ride.id)
+                                ? joined.filter((id) => id !== ride.id)
+                                : [...joined, ride.id],
+                            )
+                          }
+                        >
+                          {joined.includes(ride.id)
+                            ? '같이 타기 취소'
+                            : left === 0
+                              ? '마감'
+                              : '같이 타기'}
+                        </Button>
+                      </div>
                     </Card.Footer>
                   </Card>
                 </li>

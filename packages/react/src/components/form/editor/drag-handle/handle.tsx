@@ -12,12 +12,7 @@ import {
   type RefObject,
 } from 'react';
 
-import {
-  DndContext,
-  DragOverlay,
-  useDraggable,
-  type DragMoveEvent,
-} from '@dnd-kit/core';
+import { DndContext, DragOverlay, useDraggable, type DragMoveEvent } from '@dnd-kit/core';
 import { getEventCoordinates } from '@dnd-kit/utilities';
 import {
   ArrowPathIcon,
@@ -378,7 +373,7 @@ export function EditorBlockHandle({ store }: { store: BlockHoverStore }) {
           <Menu.Separator />
           <Menu.Item onSelect={run(deleteBlock)} className={styles.destructiveItem()}>
             <TrashIcon aria-hidden="true" />
-            {t('editor.blockDelete')}
+            {t('common.remove')}
           </Menu.Item>
         </Menu.Content>
       </Menu>

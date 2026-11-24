@@ -820,7 +820,7 @@ test('a value set from outside is left alone when the field is focused and left'
   expect(form.changes).toEqual([]);
   await expect.element(input).toHaveAttribute('aria-invalid', 'true');
   expect(node(input).validity.customError).toBe(true);
-  expect(node(input).validationMessage).toBe('값은 10 이하여야 합니다.');
+  expect(node(input).validationMessage).toBe('올바른 값이 아닙니다.');
   await userEvent.fill(input, '3');
   expect(node(input).validity.valid).toBe(true);
 });
@@ -838,7 +838,7 @@ test('out-of-range values reach Field.Error through native validity', async () =
   );
   const error = () => screen.container.querySelector('[data-field-part=error]');
   await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-  await expect.poll(() => error()?.textContent).toBe('값은 1 이상이어야 합니다.');
+  await expect.poll(() => error()?.textContent).toBe('올바른 값이 아닙니다.');
   const input = screen.getByRole('spinbutton', { name: 'Seats' });
   node(input).focus();
   await userEvent.keyboard('{ArrowUp}');

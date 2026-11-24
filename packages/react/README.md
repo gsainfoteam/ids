@@ -324,7 +324,11 @@ function ThemeToggle() {
 
 ## 문구와 언어
 
-IDS 가 스스로 그리는 문구(닫기 버튼 이름, 달력 버튼, placeholder, 검증 문구, 스크린 리더 안내)는 기본이 한국어다. 앱의 i18n 라이브러리를 `IdsProvider` 에 한 번 꽂으면 그 언어로 바뀐다.
+IDS 가 스스로 그리는 문구는 아이콘만 있는 버튼의 이름(닫기, 확대, 보내기)과 스크린 리더 안내(`3개 선택됨`, 끌기 안내)뿐이고, 기본이 한국어다. 앱의 i18n 라이브러리를 `IdsProvider` 에 한 번 꽂으면 그 언어로 바뀐다.
+
+- 화면에 보이는 글(placeholder, 빈 결과, 검증 문구, 버튼 글)은 IDS 에 기본값이 없다. 앱이 part 의 children 이나 `placeholder` 로 쓴다(`<Select.Empty>검색 결과가 없습니다.</Select.Empty>`).
+- 오늘, 다음 달, 시, 분, `42%` 같은 낱말은 `locale` 로 Intl 이 만든다.
+- 영역의 이름(달력, 차트, 사이드바, 일정표, 페이지 탐색)은 앱이 `aria-label` 로 준다. 주지 않으면 개발 중에 경고한다.
 
 ```tsx
 <IdsProvider translate={(key, values) => myT(`ids.${key}`, values)} locale="en-US">
@@ -334,7 +338,7 @@ IDS 가 스스로 그리는 문구(닫기 버튼 이름, 달력 버튼, placehol
 
 - `translate(key, values)` 는 문구 하나를 돌려준다. `undefined` 나 키 그대로를 돌려주면 그 문구는 한국어 기본값으로 돌아간다.
 - `key` 는 점으로 이은 경로(`'dialog.close'`, `'textArea.remaining'`)다. 타입은 `IdsMessageKey` 로 가져온다.
-- `values` 는 문구에 끼울 값(`{ count: 3 }`)이다. 문구는 ICU 메시지 문법이라 `{count, plural, one {…} other {…}}` 를 앱의 라이브러리가 포맷한다.
+- `values` 는 문구에 끼울 값(`{ count: 3 }`)이다. 문구는 `{name}` 자리만 쓰고 복수형이 없어서, ICU 를 읽지 못하는 라이브러리도 그대로 포맷한다.
 - `locale` 은 날짜, 시간, 숫자, 국가 이름 형식에만 쓴다. 컴포넌트에 준 `locale` 이 이긴다.
 - 안쪽 `IdsProvider` 는 `translate`, `locale` 을 주지 않으면 바깥 것을 물려받고, 주면 그 안에서 바꾼다.
 - `translate` 는 함수라서, Next.js App Router 에서는 `IdsProvider` 를 감싼 클라이언트 컴포넌트에서 넘긴다.
@@ -349,7 +353,7 @@ import en from '@gsainfoteam/ids-react/messages/en.json';
 ```
 
 ```json
-{ "calendar": { "previousMonth": "Previous month", "weekNumber": "Week {week}" }, "dialog": { "close": "Close" } }
+{ "common": { "close": "Close", "removeItem": "Remove {label}" }, "dataTable": { "selected": "{count} selected" } }
 ```
 
 - 앱 카탈로그의 `ids` 아래에 그대로 붙이면 `ids.dialog.close` 로 읽힌다. 바꾸고 싶은 문구만 고친다.
@@ -384,7 +388,7 @@ export function IdsWithI18next({ children }: { children: React.ReactNode }) {
 }
 ```
 
-- 리소스의 `ids` 아래에 카탈로그를 둔다. ICU 문법(`{count}`, plural)을 읽으려면 [`i18next-icu`](https://github.com/i18next/i18next-icu) 를 쓴다.
+- 리소스의 `ids` 아래에 카탈로그를 둔다. i18next 는 `{{count}}` 를 읽으므로 `interpolation: { prefix: '{', suffix: '}' }` 를 준다.
 
 ### react-intl
 

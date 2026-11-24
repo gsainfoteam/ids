@@ -265,43 +265,48 @@ export const PC: Story = {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <TextField
-            type="search"
-            aria-label="할 일 찾기"
-            placeholder="번호나 제목으로 찾기"
-            value={query}
-            onValueChange={setQuery}
-            className="w-full sm:w-64"
-          >
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-          </TextField>
-          <Select
-            aria-label="상태"
-            value={status}
-            onValueChange={(next) => setStatus(next !== null && isStatus(next) ? next : 'all')}
-            className="w-36"
-          >
-            <Select.Item value="all">모든 상태</Select.Item>
-            {(Object.keys(STATUS) as Status[]).map((value) => (
-              <Select.Item key={value} value={value}>
-                {STATUS[value].label}
-              </Select.Item>
-            ))}
-          </Select>
-          <Select
-            aria-label="우선순위"
-            value={priority}
-            onValueChange={(next) => setPriority(next !== null && isPriority(next) ? next : 'all')}
-            className="w-36"
-          >
-            <Select.Item value="all">모든 우선순위</Select.Item>
-            {(Object.keys(PRIORITY) as Priority[]).map((value) => (
-              <Select.Item key={value} value={value}>
-                {PRIORITY[value]}
-              </Select.Item>
-            ))}
-          </Select>
+          <div className="w-full sm:w-64">
+            <TextField
+              type="search"
+              aria-label="할 일 찾기"
+              placeholder="번호나 제목으로 찾기"
+              value={query}
+              onValueChange={setQuery}
+            >
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+            </TextField>
+          </div>
+          <div className="w-36">
+            <Select
+              aria-label="상태"
+              value={status}
+              onValueChange={(next) => setStatus(next !== null && isStatus(next) ? next : 'all')}
+            >
+              <Select.Item value="all">모든 상태</Select.Item>
+              {(Object.keys(STATUS) as Status[]).map((value) => (
+                <Select.Item key={value} value={value}>
+                  {STATUS[value].label}
+                </Select.Item>
+              ))}
+            </Select>
+          </div>
+          <div className="w-36">
+            <Select
+              aria-label="우선순위"
+              value={priority}
+              onValueChange={(next) =>
+                setPriority(next !== null && isPriority(next) ? next : 'all')
+              }
+            >
+              <Select.Item value="all">모든 우선순위</Select.Item>
+              {(Object.keys(PRIORITY) as Priority[]).map((value) => (
+                <Select.Item key={value} value={value}>
+                  {PRIORITY[value]}
+                </Select.Item>
+              ))}
+            </Select>
+          </div>
           {filtering && (
             <Button
               variant="outline"
@@ -316,10 +321,12 @@ export const PC: Story = {
             </Button>
           )}
           {selectedIds.length > 0 && (
-            <Button variant="soft" className="ms-auto" onClick={markSelectedDone}>
-              <CheckCircleIcon />
-              고른 {selectedIds.length}개 끝내기
-            </Button>
+            <div className="ms-auto">
+              <Button variant="soft" onClick={markSelectedDone}>
+                <CheckCircleIcon />
+                고른 {selectedIds.length}개 끝내기
+              </Button>
+            </div>
           )}
         </div>
 

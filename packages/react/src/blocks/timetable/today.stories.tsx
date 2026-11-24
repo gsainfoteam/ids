@@ -38,8 +38,10 @@ export const PC: Story = {
       <Card>
         <Card.Header>
           <Card.Description>다음 수업까지 16분</Card.Description>
-          <Card.Title className="text-headline-h5-bold" asChild>
-            <h2>{CLASSES[NOW_INDEX].name}</h2>
+          <Card.Title asChild>
+            <h2>
+              <span className="text-headline-h5-bold block">{CLASSES[NOW_INDEX].name}</span>
+            </h2>
           </Card.Title>
           <Card.Action>
             <Chip variant="soft" colorScheme="primary">
@@ -47,15 +49,19 @@ export const PC: Story = {
             </Chip>
           </Card.Action>
         </Card.Header>
-        <Card.Content className="flex flex-col gap-4">
-          <Progress value={68} aria-label="다음 수업까지 남은 시간" />
-          <p>{CLASSES[NOW_INDEX].room}</p>
+        <Card.Content>
+          <div className="flex flex-col gap-4">
+            <Progress value={68} aria-label="다음 수업까지 남은 시간" />
+            <p>{CLASSES[NOW_INDEX].room}</p>
+          </div>
         </Card.Content>
         <Card.Footer>
-          <Button variant="outline" className="w-full">
-            <MapPinIcon />
-            강의실 가는 길
-          </Button>
+          <div className="grid flex-1">
+            <Button variant="outline">
+              <MapPinIcon />
+              강의실 가는 길
+            </Button>
+          </div>
         </Card.Footer>
       </Card>
 

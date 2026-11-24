@@ -17,10 +17,10 @@ import { QRCode } from '@gsainfoteam/ids-react';
 ## 모양
 
 ```tsx
-<QRCode value={url} />                                  // square 모듈, square 파인더
-<QRCode value={url} shape="rounded" />                  // 붙은 모듈은 이어지고 바깥 모서리만 둥글다
-<QRCode value={url} shape="dots" />                     // 동그란 모듈, circle 파인더
-<QRCode value={url} shape="dots" finderShape="square" /> // 파인더만 따로
+<QRCode aria-label="QR 코드" value={url} />                                    // square 모듈, square 파인더
+<QRCode aria-label="QR 코드" value={url} shape="rounded" />                    // 붙은 모듈은 이어지고 바깥 모서리만 둥글다
+<QRCode aria-label="QR 코드" value={url} shape="dots" />                       // 동그란 모듈, circle 파인더
+<QRCode aria-label="QR 코드" value={url} shape="dots" finderShape="square" />  // 파인더만 따로
 ```
 
 - `finderShape` 를 주지 않으면 `shape` 를 따릅니다: `square` → `square`, `rounded` → `rounded`, `dots` → `circle`.
@@ -31,12 +31,12 @@ import { QRCode } from '@gsainfoteam/ids-react';
 - **hug.** QRCode 는 `size` 가 정한 정사각형입니다. 부모가 그보다 좁으면 부모 폭까지 줄어들고(`max-w-full`), 줄어도 정사각형입니다. 부모가 넓어도 커지지 않습니다.
 
 ```tsx
-<QRCode value={url} size="tiny" />        // 96px
-<QRCode value={url} />                    // standard, 128px
-<QRCode value={url} size={240} />         // px. 부모가 240px 보다 좁으면 부모 폭
+<QRCode aria-label="QR 코드" value={url} size="tiny" />  // 96px
+<QRCode aria-label="QR 코드" value={url} />              // standard, 128px
+<QRCode aria-label="QR 코드" value={url} size={240} />   // px. 부모가 240px 보다 좁으면 부모 폭
 
-<QRCode value={url} quietZone={4} />      // 기본. 둘레에 모듈 4칸을 비운다(표준)
-<QRCode value={url} quietZone={0} />      // 여백 없음. 모서리도 둥글게 깎지 않는다
+<QRCode aria-label="QR 코드" value={url} quietZone={4} />  // 기본. 둘레에 모듈 4칸을 비운다(표준)
+<QRCode aria-label="QR 코드" value={url} quietZone={0} />  // 여백 없음. 모서리도 둥글게 깎지 않는다
 ```
 
 - 여백(quiet zone)은 스캐너가 코드의 경계를 찾는 자리입니다. 줄이려면 코드 둘레가 이미 비어 있어야 합니다.
@@ -45,10 +45,10 @@ import { QRCode } from '@gsainfoteam/ids-react';
 ## 오류 정정
 
 ```tsx
-<QRCode value={url} errorCorrection="L" />  // 7% 복구. 가장 성김
-<QRCode value={url} />                      // M, 15% 복구 (기본)
-<QRCode value={url} errorCorrection="Q" />  // 25% 복구
-<QRCode value={url} errorCorrection="H" />  // 30% 복구. 로고가 있으면 기본
+<QRCode aria-label="QR 코드" value={url} errorCorrection="L" />  // 7% 복구. 가장 성김
+<QRCode aria-label="QR 코드" value={url} />                      // M, 15% 복구 (기본)
+<QRCode aria-label="QR 코드" value={url} errorCorrection="Q" />  // 25% 복구
+<QRCode aria-label="QR 코드" value={url} errorCorrection="H" />  // 30% 복구. 로고가 있으면 기본
 ```
 
 ## 로고
@@ -60,13 +60,13 @@ import { QRCode } from '@gsainfoteam/ids-react';
   </QRCode.Logo>
 </QRCode>
 
-<QRCode value={url}>
+<QRCode aria-label="QR 코드" value={url}>
   <QRCode.Logo>
     <AcademicCapIcon />           {/* 아이콘은 모듈 색을 따른다 */}
   </QRCode.Logo>
 </QRCode>
 
-<QRCode value={url}>
+<QRCode aria-label="QR 코드" value={url}>
   <QRCode.Logo asChild>
     <a href="/brand">...</a>      {/* 기본 div 대신 자식 요소 */}
   </QRCode.Logo>
@@ -80,12 +80,12 @@ import { QRCode } from '@gsainfoteam/ids-react';
 ## 색과 다크 모드
 
 ```tsx
-<QRCode value={url} />                    // theme(기본): 테마를 따른다. 다크 모드에서는 밝은 모듈, 어두운 바탕
-<QRCode value={url} variant="light" />    // 어느 모드에서나 밝은 바탕에 어두운 모듈
-<QRCode value={url} variant="dark" />     // 어느 모드에서나 어두운 바탕에 밝은 모듈
+<QRCode aria-label="QR 코드" value={url} />                  // theme(기본): 테마를 따른다. 다크 모드에서는 밝은 모듈, 어두운 바탕
+<QRCode aria-label="QR 코드" value={url} variant="light" />  // 어느 모드에서나 밝은 바탕에 어두운 모듈
+<QRCode aria-label="QR 코드" value={url} variant="dark" />   // 어느 모드에서나 어두운 바탕에 밝은 모듈
 
 <div className="[--qr-code-foreground:var(--ids-color-text-primary)]">  {/* 모듈 색 */}
-  <QRCode value={url} />
+  <QRCode aria-label="QR 코드" value={url} />
 </div>
 ```
 
@@ -97,7 +97,6 @@ import { QRCode } from '@gsainfoteam/ids-react';
 ## 접근성
 
 ```tsx
-<QRCode value={url} />                                     // 이름 "QR 코드"
 <QRCode value={url} aria-label="결제 페이지로 가는 QR 코드" />
 
 <figure>
@@ -106,7 +105,8 @@ import { QRCode } from '@gsainfoteam/ids-react';
 </figure>
 ```
 
-- 기본 이름은 번역 키 `qrCode.label` 입니다. 값(`value`)은 이름에 넣지 않습니다. 긴 URL 을 한 글자씩 읽게 되기 때문입니다.
+- `aria-label` 은 필수입니다. 보이는 설명이 있으면 그 `id` 를 `aria-labelledby` 로 줍니다. 이름이 없으면 개발 모드에서 경고합니다.
+- 값(`value`)은 이름에 넣지 않습니다. 긴 URL 을 한 글자씩 읽게 되기 때문입니다.
 - 무엇으로 가는 코드인지 `aria-label` 로 적고, 같은 주소를 링크나 글자로도 보여 줍니다(WCAG 1.1.1).
 
 ## 상태
