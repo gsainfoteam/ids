@@ -26,18 +26,20 @@ const meta = {
   },
   args: { variant: 'bordered', size: 'standard', 'aria-label': '멤버' },
   render: (args) => (
-    <ItemGroup {...args} className="w-80">
-      {['김철수', '이영희', '박민수'].map((name) => (
-        <Item key={name}>
-          <Item.Media>
-            <Avatar name={name} />
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>{name}</Item.Title>
-          </Item.Content>
-        </Item>
-      ))}
-    </ItemGroup>
+    <div className="w-80">
+      <ItemGroup {...args}>
+        {['김철수', '이영희', '박민수'].map((name) => (
+          <Item key={name}>
+            <Item.Media>
+              <Avatar name={name} />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>{name}</Item.Title>
+            </Item.Content>
+          </Item>
+        ))}
+      </ItemGroup>
+    </div>
   ),
 } satisfies Meta<typeof ItemGroup>;
 
@@ -48,18 +50,20 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <ItemGroup className="w-80" aria-label="멤버">
-      {['김철수', '이영희', '박민수'].map((name) => (
-        <Item key={name}>
-          <Item.Media>
-            <Avatar name={name} />
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>{name}</Item.Title>
-          </Item.Content>
-        </Item>
-      ))}
-    </ItemGroup>
+    <div className="w-80">
+      <ItemGroup aria-label="멤버">
+        {['김철수', '이영희', '박민수'].map((name) => (
+          <Item key={name}>
+            <Item.Media>
+              <Avatar name={name} />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>{name}</Item.Title>
+            </Item.Content>
+          </Item>
+        ))}
+      </ItemGroup>
+    </div>
   ),
 };
 
@@ -71,50 +75,54 @@ export const Gallery: Story = {
         description="ghost 그룹 안의 Item.Separator 는 목록 항목으로 세지 않는 구분선입니다."
       >
         <Showcase.Row>
-          <ItemGroup variant="ghost" className="w-80" aria-label="설정">
-            <Item>
-              <Item.Media>
-                <BellIcon />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>알림</Item.Title>
-                <Item.Description>새 메시지 알림 받기</Item.Description>
-              </Item.Content>
-              <Item.Actions>
-                <Switch defaultChecked aria-label="알림" />
-              </Item.Actions>
-            </Item>
-            <Item.Separator />
-            <Item>
-              <Item.Media>
-                <MoonIcon />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>다크 모드</Item.Title>
-              </Item.Content>
-              <Item.Actions>
-                <Switch aria-label="다크 모드" />
-              </Item.Actions>
-            </Item>
-          </ItemGroup>
+          <div className="w-80">
+            <ItemGroup variant="ghost" aria-label="설정">
+              <Item>
+                <Item.Media>
+                  <BellIcon />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>알림</Item.Title>
+                  <Item.Description>새 메시지 알림 받기</Item.Description>
+                </Item.Content>
+                <Item.Actions>
+                  <Switch defaultChecked aria-label="알림" />
+                </Item.Actions>
+              </Item>
+              <Item.Separator />
+              <Item>
+                <Item.Media>
+                  <MoonIcon />
+                </Item.Media>
+                <Item.Content>
+                  <Item.Title>다크 모드</Item.Title>
+                </Item.Content>
+                <Item.Actions>
+                  <Switch aria-label="다크 모드" />
+                </Item.Actions>
+              </Item>
+            </ItemGroup>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Variant">
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
-            <ItemGroup variant={variant} size="tiny" className="w-72" aria-label={variant}>
-              {['보고서.pdf', '예산안.xlsx', '회의록.md'].map((file) => (
-                <Item key={file}>
-                  <Item.Media>
-                    <DocumentIcon />
-                  </Item.Media>
-                  <Item.Content>
-                    <Item.Title>{file}</Item.Title>
-                  </Item.Content>
-                </Item>
-              ))}
-            </ItemGroup>
+            <div className="w-72">
+              <ItemGroup variant={variant} size="tiny" aria-label={variant}>
+                {['보고서.pdf', '예산안.xlsx', '회의록.md'].map((file) => (
+                  <Item key={file}>
+                    <Item.Media>
+                      <DocumentIcon />
+                    </Item.Media>
+                    <Item.Content>
+                      <Item.Title>{file}</Item.Title>
+                    </Item.Content>
+                  </Item>
+                ))}
+              </ItemGroup>
+            </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>
@@ -179,18 +187,20 @@ export const ChooseHowRowsAreSeparated: Story = {
 
 export const ReadTheItemsInOrder: Story = {
   render: () => (
-    <ItemGroup ordered variant="separated" className="w-80" aria-label="가입 절차">
-      {['이메일 인증', '이름 정하기', '약관 동의'].map((step, index) => (
-        <Item key={step}>
-          <Item.Media variant="soft" aria-hidden>
-            {index + 1}
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>{step}</Item.Title>
-          </Item.Content>
-        </Item>
-      ))}
-    </ItemGroup>
+    <div className="w-80">
+      <ItemGroup ordered variant="separated" aria-label="가입 절차">
+        {['이메일 인증', '이름 정하기', '약관 동의'].map((step, index) => (
+          <Item key={step}>
+            <Item.Media variant="soft" aria-hidden>
+              {index + 1}
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>{step}</Item.Title>
+            </Item.Content>
+          </Item>
+        ))}
+      </ItemGroup>
+    </div>
   ),
   parameters: {
     docs: {
