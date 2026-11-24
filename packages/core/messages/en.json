@@ -15,6 +15,9 @@
       "indicator": "Go to slide {index, number}",
       "roleDescription": "carousel"
     },
+    "checkbox": {
+      "required": "Select this item."
+    },
     "colorPicker": {
       "alpha": "Opacity",
       "area": "Saturation and brightness",

@@ -126,6 +126,29 @@
       "archive": "보관",
       "report": "신고",
       "snooze": "미루기"
+    },
+    "checkboxSample": {
+      "acceptTheTerms": "약관 동의",
+      "eachcellshowsuncheckedchecked": "칸마다 미체크, 체크, 일부 선택 순서입니다.",
+      "iAcceptTheTerms": "약관에 동의합니다",
+      "marketingUpdates": "마케팅 수신",
+      "keepMeSignedIn": "자동 로그인",
+      "like": "좋아요",
+      "roundCheckbox": "둥근 체크박스",
+      "readOnly": "읽기 전용",
+      "selectAll": "전체 선택",
+      "mixedStateControlledByTheParent": "부모가 고정한 일부 선택",
+      "favorite": "즐겨찾기",
+      "youMustAcceptTheTerms": "약관에 동의해야 합니다.",
+      "registrationComplete": "가입 완료",
+      "signUp": "가입",
+      "agreeToAll": "모두 동의",
+      "registrationResult": "가입 결과",
+      "iAcceptTheTermsRequired": "약관에 동의합니다 (필수)",
+      "receiveUpdates": "소식 받기",
+      "submit": "제출",
+      "reset": "초기화",
+      "submissionResult": "제출 결과"
     }
   },
   "examples": {

@@ -126,6 +126,29 @@
       "archive": "Archive",
       "report": "Report",
       "snooze": "Snooze"
+    },
+    "checkboxSample": {
+      "acceptTheTerms": "Accept the terms",
+      "eachcellshowsuncheckedchecked": "Each cell shows unchecked, checked, then mixed.",
+      "iAcceptTheTerms": "I accept the terms",
+      "marketingUpdates": "Marketing updates",
+      "keepMeSignedIn": "Keep me signed in",
+      "like": "Like",
+      "roundCheckbox": "Round checkbox",
+      "readOnly": "Read only",
+      "selectAll": "Select all",
+      "mixedStateControlledByTheParent": "Mixed state controlled by the parent",
+      "favorite": "Favorite",
+      "youMustAcceptTheTerms": "You must accept the terms.",
+      "registrationComplete": "Registration complete",
+      "signUp": "Sign up",
+      "agreeToAll": "Agree to all",
+      "registrationResult": "Registration result",
+      "iAcceptTheTermsRequired": "I accept the terms (required)",
+      "receiveUpdates": "Receive updates",
+      "submit": "Submit",
+      "reset": "Reset",
+      "submissionResult": "Submission result"
     }
   },
   "examples": {

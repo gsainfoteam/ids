@@ -309,6 +309,30 @@ IdsButtonGroup(
 )
 ```
 
+## Checkbox
+
+`IdsCheckbox`의 `checked` 또는 `defaultChecked`에 `IdsCheckedState`를 준다.
+`indeterminate`에서 활성화하면 체크 상태가 되고, `onCheckedChange`는 다음 값을
+`bool`로 전달한다. `checked`를 사용하면 호출자가 값을 갱신한다. Flutter `Form` 안에서
+`required`, `validator`, `onSaved`를 쓸 수 있다.
+`onClick`에서 `event.preventDefault()`를 호출하면 체크 상태 변경을 취소할 수 있다.
+`label`을 지정하면 레이블을 눌러 선택할 수 있으며 레이블 텍스트를 접근성 이름으로 사용한다.
+`semanticLabel`로 접근성 이름을 별도로 지정할 수 있다.
+`IdsCheckboxIndicator`를 자식으로 넣어 기본 표시를 바꿀 수 있다.
+`builder`와 `style`은 체크박스 상태를 받으며, 선택을 해제하면 표시가 숨겨진다.
+
+```dart
+IdsCheckbox(
+  defaultChecked: IdsCheckedState.indeterminate,
+  semanticLabel: '알림 받기',
+  onCheckedChange: updateNotifications,
+  child: IdsCheckboxIndicator(
+    builder: (context, state) =>
+        state.indeterminate ? null : const Icon(Icons.star),
+  ),
+)
+```
+
 ## IconButton
 
 `IdsIconButton`은 정사각형 아이콘 버튼입니다. `semanticLabel`로 버튼의 목적을 전달하며

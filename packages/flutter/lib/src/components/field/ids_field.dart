@@ -9,6 +9,7 @@ class IdsField extends StatefulWidget {
   const IdsField({
     super.key,
     this.size = IdsSize.standard,
+    this.orientation = Axis.vertical,
     this.required = false,
     this.disabled = false,
     this.invalid = false,
@@ -16,6 +17,7 @@ class IdsField extends StatefulWidget {
   });
 
   final IdsSize size;
+  final Axis orientation;
   final bool required;
   final bool disabled;
   final bool invalid;
@@ -118,13 +120,40 @@ class _IdsFieldState extends State<IdsField> {
         child: DefaultTextStyle(
           style: theme.textStyle(style, color: theme.colors.textNeutralStrong),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: widget.orientation == Axis.horizontal
+                ? MainAxisSize.min
+                : MainAxisSize.max,
+            crossAxisAlignment: widget.orientation == Axis.horizontal
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.stretch,
             spacing: theme.dimension(8),
-            children: [
-              for (final child in widget.children)
-                if (!(invalid ? child is IdsFieldHint : child is IdsFieldError))
-                  child,
-            ],
+            children: widget.orientation == Axis.horizontal
+                ? [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: theme.dimension(8),
+                      children: [
+                        for (final child in widget.children)
+                          if (child is! IdsFieldDescription &&
+                              child is! IdsFieldHint &&
+                              child is! IdsFieldError)
+                            Flexible(child: child),
+                      ],
+                    ),
+                    for (final child in widget.children)
+                      if (child is IdsFieldDescription ||
+                          (invalid
+                              ? child is IdsFieldError
+                              : child is IdsFieldHint))
+                        child,
+                  ]
+                : [
+                    for (final child in widget.children)
+                      if (!(invalid
+                          ? child is IdsFieldHint
+                          : child is IdsFieldError))
+                        child,
+                  ],
           ),
         ),
       ),
@@ -144,6 +173,7 @@ class IdsFieldLabel extends StatelessWidget {
     final field = scope.field;
     return Align(
       alignment: AlignmentDirectional.centerStart,
+      widthFactor: field.orientation == Axis.horizontal ? 1 : null,
       child: GestureDetector(
         excludeFromSemantics: true,
         onTap: field.disabled

@@ -18,6 +18,9 @@ export const en = defineIdsLocale({
       "indicator": "Go to slide {index}",
       "roleDescription": "carousel"
     },
+    "checkbox": {
+      "required": "Select this item."
+    },
     "colorPicker": {
       "alpha": "Opacity",
       "area": "Saturation and brightness",
