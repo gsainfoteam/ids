@@ -9,6 +9,8 @@ import * as Recharts from 'recharts';
 import * as Ids from '../src';
 import * as ChartEntry from '../src/chart';
 import * as EditorEntry from '../src/editor';
+import * as EnglishLocale from '../src/locales/en';
+import * as KoreanLocale from '../src/locales/ko';
 import * as RichTextEntry from '../src/rich-text';
 
 export const heroiconSets = {
@@ -23,6 +25,8 @@ export const idsEntries = {
   '@gsainfoteam/ids-react/chart': ChartEntry,
   '@gsainfoteam/ids-react/editor': EditorEntry,
   '@gsainfoteam/ids-react/rich-text': RichTextEntry,
+  '@gsainfoteam/ids-react/locales/ko': KoreanLocale,
+  '@gsainfoteam/ids-react/locales/en': EnglishLocale,
 };
 
 export const liveImports: Record<string, Record<string, unknown>> = {

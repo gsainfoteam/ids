@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 
 import { Calendar, DateField, DateTimeField, Field, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
@@ -28,7 +29,7 @@ const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone:
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 const inLocale = (locale: string | undefined, children: ReactNode) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     {children}
   </IdsProvider>
 );

@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
 
 import { useForm as useTanStackForm } from '@tanstack/react-form';
-import { IntlMessageFormat } from 'intl-messageformat';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import englishCatalog from '../messages/en.json';
-import { DataTable, IdsProvider, useDataTable, type IdsTranslate } from '../src';
+import { DataTable, IdsProvider, useDataTable } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
+import { en } from '../src/locales/en';
 import { Field as RhfField } from '../src/react-hook-form';
 import { Field as TanStackField } from '../src/tanstack-form';
 
@@ -517,12 +516,6 @@ test('empty and loading states', async () => {
 });
 
 test('every string speaks the translation', async () => {
-  const english: IdsTranslate = (key, values) => {
-    const pattern = key
-      .split('.')
-      .reduce<unknown>((node, name) => (node as Record<string, unknown>)[name], englishCatalog);
-    return new IntlMessageFormat(pattern as string, 'en-US').format(values) as string;
-  };
   function Everything() {
     const people = useDataTable({
       columns,
@@ -541,7 +534,7 @@ test('every string speaks the translation', async () => {
     );
   }
   const screen = await render(
-    <IdsProvider theme={testTheme} translate={english} locale="en-US">
+    <IdsProvider theme={testTheme} locale={en}>
       <Everything />
     </IdsProvider>,
   );

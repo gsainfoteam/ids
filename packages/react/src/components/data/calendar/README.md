@@ -31,7 +31,7 @@ const [date, setDate] = useState<CalendarDate | null>(null);
 
 - 값을 만들려면 앱도 `@internationalized/date` 를 설치합니다. IDS 는 다시 내보내지 않습니다. 오늘은 `today(getLocalTimeZone())` 입니다.
 - 값은 `instanceof` 가 아니라 모양(`year`, `month`, `day`, `calendar.identifier`, `compare`)으로 검사합니다. 다른 버전의 패키지여도 되고, `Date` 나 문자열은 오류입니다.
-- 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `IdsProvider` 의 `locale="ja-JP-u-ca-japanese"` 처럼 태그에 적습니다.
+- 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `IdsProvider` locale 의 태그에 적습니다(`tag: 'ja-JP-u-ca-japanese'`).
 - `onValueChange` 는 값이 바뀔 때만 부릅니다. 이미 고른 날을 다시 눌러도 부르지 않습니다.
 - 고른 날은 primary 로 채웁니다. 오늘은 `text-primary` 글자에 primary 테두리를 두르고, 고른 날이 오늘이면 채움만 보입니다. `Calendar.Day` 로 칸 안에 점을 그려도 오늘 표시와 겹치지 않습니다.
 - `multiple` 에서 고른 날을 다시 누르면 빠집니다.
@@ -126,14 +126,14 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 
 ```tsx
 <Calendar aria-label="달력" />                                                                 // 한국어: 2026년 9월, 일 월 화 ...
-<IdsProvider.Scope locale="en-US">
+<IdsProvider.Scope locale={en}>
   <Calendar aria-label="달력" />                                                               // September 2026, S M T ...
 </IdsProvider.Scope>
-<IdsProvider.Scope locale="de-DE"><Calendar aria-label="달력" /></IdsProvider.Scope>           // 월요일부터 시작
-<IdsProvider.Scope locale="ko-KR-u-fw-mon"><Calendar aria-label="달력" /></IdsProvider.Scope>  // -u-fw- 확장으로 주 시작을 바꾼다
-<IdsProvider.Scope locale="ja-JP"><Calendar aria-label="달력" /></IdsProvider.Scope>           // 2026年9月
+<IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}><Calendar aria-label="달력" /></IdsProvider.Scope>           // 월요일부터 시작
+<IdsProvider.Scope locale={{ ...ko, tag: 'ko-KR-u-fw-mon' }}><Calendar aria-label="달력" /></IdsProvider.Scope>  // -u-fw- 확장으로 주 시작을 바꾼다
+<IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}><Calendar aria-label="달력" /></IdsProvider.Scope>           // 2026年9月
 <div dir="rtl">
-  <IdsProvider.Scope locale="ar-EG-u-nu-arab"><Calendar aria-label="달력" /></IdsProvider.Scope> // -u-nu- 확장으로 아랍 숫자(١٥), 좌우 반전
+  <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }}><Calendar aria-label="달력" /></IdsProvider.Scope> // -u-nu- 확장으로 아랍 숫자(١٥), 좌우 반전
 </div>
 ```
 

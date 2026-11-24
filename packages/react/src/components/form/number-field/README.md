@@ -91,7 +91,7 @@ const [seats, setSeats] = useState<number | null>(2);
 ```
 
 - 파트는 `Input`, `Stepper`, `Increment`, `Decrement`, `Clear` 입니다. 단위 글자나 아이콘 같은 장식은 파트가 아니라서, 장식만 넣으면 위아래 버튼이 그대로 붙습니다.
-- 버튼의 기본 이름은 "값 늘리기", "값 줄이기" 입니다. `IdsProvider` 의 `translate` 가 `numberField.increment`, `numberField.decrement` 로 바꿉니다.
+- 버튼의 기본 이름은 "값 늘리기", "값 줄이기" 입니다. `IdsProvider` 의 `locale` 이 `numberField.increment`, `numberField.decrement` 로 바꿉니다.
 
 - 버튼은 탭 순서에 없습니다. 키보드에서는 입력의 ↑↓가 같은 일을 합니다.
 - 경계에 닿으면 그쪽 버튼이 비활성이 됩니다.
@@ -100,7 +100,7 @@ const [seats, setSeats] = useState<number | null>(2);
 ## 형식
 
 ```tsx
-<IdsProvider theme={theme} locale="de-DE">
+<IdsProvider theme={theme} locale={{ ...en, language: 'de', tag: 'de-DE' }}>
   <NumberField defaultValue={1234.567} formatOptions={{ style: 'currency', currency: 'EUR' }} />
   {/* "1.234,57 €". 포커스해도 이 글자를 그대로 고친다. 값은 1234.567 그대로다 */}
 </IdsProvider>
@@ -109,7 +109,7 @@ const [seats, setSeats] = useState<number | null>(2);
 // "12.5%". 퍼센트로 입력한다: "25" 나 "25%" 는 0.25
 ```
 
-- 숫자 형식은 가장 가까운 `IdsProvider` 의 `locale` 을 따르고, 없으면 `en-US` 입니다. SSR과 브라우저가 같은 글자를 그리게 하기 위해서입니다.
+- 숫자 형식은 가장 가까운 `IdsProvider` 의 `locale` 태그를 따르고, 없으면 `ko-KR` 입니다. 서버와 브라우저가 같은 글자를 그리도록 브라우저 언어는 읽지 않습니다.
 - 형식의 반올림은 보이는 글자와 `aria-valuetext` 에만 씁니다. 글자를 고치지 않으면 값은 그대로입니다.
 - `notation` 은 `standard` 만 됩니다. `1.2E-6` 이나 `1.2K` 는 다시 숫자로 읽을 수 없기 때문입니다.
 

@@ -42,7 +42,7 @@ function controlled(props: NumberField.Props = {}, locale?: string) {
   }
   return {
     node: (
-      <LanguageContext value={{ locale }}>
+      <LanguageContext value={{ tag: locale }}>
         <Controlled />
       </LanguageContext>
     ),
@@ -101,19 +101,21 @@ function touchPointOn(target: Locator) {
 test('SSR Field wiring, formatted ARIA, and canonical native FormData', () => {
   const doc = parse(
     renderToString(
-      <form>
-        <Field required invalid size="tiny">
-          <Field.Label>Price</Field.Label>
-          <NumberField
-            name="price"
-            defaultValue={1234.5}
-            min={0}
-            max={2000}
-            formatOptions={{ style: 'currency', currency: 'USD' }}
-          />
-          <Field.Error>Check price</Field.Error>
-        </Field>
-      </form>,
+      <LanguageContext value={{ tag: 'en-US' }}>
+        <form>
+          <Field required invalid size="tiny">
+            <Field.Label>Price</Field.Label>
+            <NumberField
+              name="price"
+              defaultValue={1234.5}
+              min={0}
+              max={2000}
+              formatOptions={{ style: 'currency', currency: 'USD' }}
+            />
+            <Field.Error>Check price</Field.Error>
+          </Field>
+        </form>
+      </LanguageContext>,
     ),
   );
   const input = doc.querySelector<HTMLInputElement>('[role=spinbutton]')!;
@@ -232,9 +234,10 @@ test('localized digits and accounting parentheses parse; text that is no number 
   expect(arabic.value()).toBe(12);
   await screen.unmount();
 
-  const accounting = controlled({
-    formatOptions: { style: 'currency', currency: 'USD', currencySign: 'accounting' },
-  });
+  const accounting = controlled(
+    { formatOptions: { style: 'currency', currency: 'USD', currencySign: 'accounting' } },
+    'en-US',
+  );
   const next = await render(accounting.node);
   const field = next.getByRole('spinbutton');
   await userEvent.fill(field, '(');

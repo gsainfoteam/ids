@@ -7,6 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { Breadcrumb, IdsProvider } from '../src';
 import { testTheme } from './theme';
+import { en } from '../src/locales/en';
 
 function RouterLink({
   to,
@@ -294,9 +295,8 @@ test('size sets the text scale of the trail', async () => {
 });
 
 test('the app names the landmark and the English catalog names the menu button', async () => {
-  const english = { 'breadcrumb.more': 'Show hidden path' };
   const screen = await render(
-    <IdsProvider theme={testTheme} translate={(key) => english[key as keyof typeof english] ?? key}>
+    <IdsProvider theme={testTheme} locale={en}>
       <Breadcrumb aria-label="Breadcrumb" maxItems={2}>
         {crumbs(['Home', 'Docs', 'Page'])}
       </Breadcrumb>

@@ -15,6 +15,7 @@ import { render } from 'vitest-browser-react';
 
 import { DateTimeField, Field, IdsProvider, TimeField } from '../src';
 import { skipWithoutCdp } from './engines';
+import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 import { Field as RHFField } from '../src/react-hook-form';
 
@@ -37,7 +38,7 @@ const t = (day = 15) => new CalendarDate(2026, 9, day);
 const hiddenValue = () => document.querySelector<HTMLInputElement>('input[type=hidden]')?.value;
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
 const inLocale = (locale: string | undefined, children: ReactNode) => (
-  <IdsProvider theme={testTheme} locale={locale}>
+  <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
     {children}
   </IdsProvider>
 );
