@@ -246,38 +246,39 @@ export const PC: Story = {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <TextField
-            type="search"
-            aria-label="게시판에서 찾기"
-            placeholder="제목이나 내용으로 찾기"
-            value={query}
-            onValueChange={(next) => {
-              setQuery(next);
-              setPage(1);
-            }}
-            className="flex-1"
-          >
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-            <TextField.Clear />
-          </TextField>
-          <Select
-            aria-label="정렬"
-            value={sort}
-            onValueChange={(next) => {
-              if (next !== null && isSort(next)) setSort(next);
-            }}
-            className="sm:w-40"
-          >
-            <Select.Item value="recent">최신순</Select.Item>
-            <Select.Item value="comments">댓글 많은 순</Select.Item>
-            <Select.Item value="views">많이 본 순</Select.Item>
-          </Select>
+          <div className="min-w-0 flex-1">
+            <TextField
+              type="search"
+              aria-label="게시판에서 찾기"
+              placeholder="제목이나 내용으로 찾기"
+              value={query}
+              onValueChange={(next) => {
+                setQuery(next);
+                setPage(1);
+              }}
+            >
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+              <TextField.Clear />
+            </TextField>
+          </div>
+          <div className="sm:w-40">
+            <Select
+              aria-label="정렬"
+              value={sort}
+              onValueChange={(next) => {
+                if (next !== null && isSort(next)) setSort(next);
+              }}
+            >
+              <Select.Item value="recent">최신순</Select.Item>
+              <Select.Item value="comments">댓글 많은 순</Select.Item>
+              <Select.Item value="views">많이 본 순</Select.Item>
+            </Select>
+          </div>
         </div>
 
         <Tabs
           value={category}
-          className="flex flex-col gap-6"
           onValueChange={(next) => {
             setCategory(next);
             setPage(1);
@@ -291,57 +292,58 @@ export const PC: Story = {
             ))}
           </Tabs.List>
           {TABS.map((tab) => (
-            <Tabs.Content key={tab.value} value={tab.value} className="flex flex-col gap-6">
-              {shown.length === 0 ? (
-                <Empty>
-                  <Empty.Media>
-                    <MagnifyingGlassIcon />
-                  </Empty.Media>
-                  <Empty.Title>‘{query}’에 맞는 글이 없어요</Empty.Title>
-                  <Empty.Description>
-                    다른 낱말로 찾거나 분류를 전체로 바꿔 보세요.
-                  </Empty.Description>
-                </Empty>
-              ) : (
-                <Card size="tiny">
-                  <ItemGroup aria-label="글 목록">
-                    {shown.map((post) => (
-                      <Item key={post.id} asChild>
-                        <a href={`#${post.id}`}>
-                          <Item.Media variant="soft">{CATEGORY_ICON[post.category]}</Item.Media>
-                          <Item.Content>
-                            <Item.Title>
-                              {post.pinned && (
-                                <Chip variant="soft" colorScheme="primary">
-                                  고정
-                                </Chip>
-                              )}
-                              {post.title}
-                            </Item.Title>
-                            <Item.Description>
-                              {CATEGORY_LABEL[post.category]} · {post.author} ·{' '}
-                              {dayOf(post.postedOn)}
-                            </Item.Description>
-                          </Item.Content>
-                          <Item.Actions>
-                            <Chip variant="outline">{`댓글 ${post.comments}`}</Chip>
-                          </Item.Actions>
-                        </a>
-                      </Item>
-                    ))}
-                  </ItemGroup>
-                </Card>
-              )}
+            <Tabs.Content key={tab.value} value={tab.value}>
+              <div className="flex flex-col gap-6">
+                {shown.length === 0 ? (
+                  <Empty>
+                    <Empty.Media>
+                      <MagnifyingGlassIcon />
+                    </Empty.Media>
+                    <Empty.Title>‘{query}’에 맞는 글이 없어요</Empty.Title>
+                    <Empty.Description>
+                      다른 낱말로 찾거나 분류를 전체로 바꿔 보세요.
+                    </Empty.Description>
+                  </Empty>
+                ) : (
+                  <Card size="tiny">
+                    <ItemGroup aria-label="글 목록">
+                      {shown.map((post) => (
+                        <Item key={post.id} asChild>
+                          <a href={`#${post.id}`}>
+                            <Item.Media variant="soft">{CATEGORY_ICON[post.category]}</Item.Media>
+                            <Item.Content>
+                              <Item.Title>
+                                {post.pinned && (
+                                  <Chip variant="soft" colorScheme="primary">
+                                    고정
+                                  </Chip>
+                                )}
+                                {post.title}
+                              </Item.Title>
+                              <Item.Description>
+                                {CATEGORY_LABEL[post.category]} · {post.author} ·{' '}
+                                {dayOf(post.postedOn)}
+                              </Item.Description>
+                            </Item.Content>
+                            <Item.Actions>
+                              <Chip variant="outline">{`댓글 ${post.comments}`}</Chip>
+                            </Item.Actions>
+                          </a>
+                        </Item>
+                      ))}
+                    </ItemGroup>
+                  </Card>
+                )}
 
-              {pageCount > 1 && (
-                <Pagination
-                  aria-label="글 목록 페이지"
-                  page={page}
-                  pageCount={pageCount}
-                  onPageChange={setPage}
-                  className="self-center"
-                />
-              )}
+                {pageCount > 1 && (
+                  <Pagination
+                    aria-label="글 목록 페이지"
+                    page={page}
+                    pageCount={pageCount}
+                    onPageChange={setPage}
+                  />
+                )}
+              </div>
             </Tabs.Content>
           ))}
         </Tabs>

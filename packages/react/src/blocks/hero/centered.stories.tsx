@@ -65,60 +65,62 @@ export const PC: Story = {
         </div>
       </div>
 
-      <Card variant="soft" aria-hidden className="w-full max-w-4xl">
-        <div className="grid gap-3 md:grid-cols-[1.2fr_1fr]">
-          <Card>
-            <Card.Header>
-              <Card.Title>새 공지</Card.Title>
-              <Card.Action>
-                <Chip variant="soft" colorScheme="primary">
-                  3
-                </Chip>
-              </Card.Action>
-            </Card.Header>
-            <ItemGroup size="tiny">
-              {NOTICES.map((notice) => (
-                <Item key={notice.id}>
-                  <Item.Media variant="soft">
-                    <MegaphoneIcon />
-                  </Item.Media>
-                  <Item.Content>
-                    <Item.Title>{notice.title}</Item.Title>
-                    <Item.Description>
-                      {notice.board} · {notice.time}
-                    </Item.Description>
-                  </Item.Content>
-                </Item>
-              ))}
-            </ItemGroup>
-          </Card>
-          <div className="flex flex-col gap-3">
+      <div className="w-full max-w-4xl">
+        <Card variant="soft" aria-hidden>
+          <div className="grid gap-3 md:grid-cols-[1.2fr_1fr]">
             <Card>
               <Card.Header>
-                <Card.Description>다음 셔틀 · 학생회관</Card.Description>
-                <Card.Title>8분 뒤 광주송정역행</Card.Title>
+                <Card.Title>새 공지</Card.Title>
                 <Card.Action>
                   <Chip variant="soft" colorScheme="primary">
-                    12:20
+                    3
                   </Chip>
                 </Card.Action>
               </Card.Header>
-              <Card.Content>
-                <Progress value={72} aria-label="다음 셔틀까지" />
-              </Card.Content>
+              <ItemGroup size="tiny">
+                {NOTICES.map((notice) => (
+                  <Item key={notice.id}>
+                    <Item.Media variant="soft">
+                      <MegaphoneIcon />
+                    </Item.Media>
+                    <Item.Content>
+                      <Item.Title>{notice.title}</Item.Title>
+                      <Item.Description>
+                        {notice.board} · {notice.time}
+                      </Item.Description>
+                    </Item.Content>
+                  </Item>
+                ))}
+              </ItemGroup>
             </Card>
-            <Card>
-              <Card.Header>
-                <Card.Description>오늘 점심 · 학생식당</Card.Description>
-                <Card.Title>제육볶음, 된장찌개</Card.Title>
-                <Card.Action>
-                  <Chip variant="outline">5,000원</Chip>
-                </Card.Action>
-              </Card.Header>
-            </Card>
+            <div className="flex flex-col gap-3">
+              <Card>
+                <Card.Header>
+                  <Card.Description>다음 셔틀 · 학생회관</Card.Description>
+                  <Card.Title>8분 뒤 광주송정역행</Card.Title>
+                  <Card.Action>
+                    <Chip variant="soft" colorScheme="primary">
+                      12:20
+                    </Chip>
+                  </Card.Action>
+                </Card.Header>
+                <Card.Content>
+                  <Progress value={72} aria-label="다음 셔틀까지" />
+                </Card.Content>
+              </Card>
+              <Card>
+                <Card.Header>
+                  <Card.Description>오늘 점심 · 학생식당</Card.Description>
+                  <Card.Title>제육볶음, 된장찌개</Card.Title>
+                  <Card.Action>
+                    <Chip variant="outline">5,000원</Chip>
+                  </Card.Action>
+                </Card.Header>
+              </Card>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </main>
   ),
 };

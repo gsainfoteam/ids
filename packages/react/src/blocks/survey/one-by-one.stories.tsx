@@ -8,6 +8,7 @@ import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { Progress } from '../../components/feedback/progress';
 import { RadioGroup } from '../../components/form/radio-group';
+import { Spacer } from '../../components/layout/spacer';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -63,90 +64,95 @@ export const PC: Story = {
 
     return (
       <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
-        <Card className="w-full max-w-lg">
-          <Card.Header>
-            <Card.Description>학생식당 만족도 조사 · 총학생회</Card.Description>
-            <Progress
-              value={(index / QUESTIONS.length) * 100}
-              aria-label={`${QUESTIONS.length}문항 중 ${Math.min(index + 1, QUESTIONS.length)}번째`}
-            />
-          </Card.Header>
+        <div className="w-full max-w-lg">
+          <Card>
+            <Card.Header>
+              <Card.Description>학생식당 만족도 조사 · 총학생회</Card.Description>
+              <Progress
+                value={(index / QUESTIONS.length) * 100}
+                aria-label={`${QUESTIONS.length}문항 중 ${Math.min(index + 1, QUESTIONS.length)}번째`}
+              />
+            </Card.Header>
 
-          {done ? (
-            <Empty variant="soft">
-              <Empty.Media>
-                <CheckCircleIcon />
-              </Empty.Media>
-              <Empty.Title>답해 줘서 고마워요</Empty.Title>
-              <Empty.Description>결과는 다음 주 월요일 게시판에 올라와요.</Empty.Description>
-              <Empty.Actions>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIndex(0);
-                    setAnswers({});
-                  }}
-                >
-                  처음부터 다시
-                </Button>
-              </Empty.Actions>
-            </Empty>
-          ) : (
-            <>
-              <Card.Content className="flex flex-col gap-5">
-                <p className="text-body-b3-semibold">
-                  {index + 1} / {QUESTIONS.length}
-                </p>
-                <h1 id={`${current.id}-question`} className="text-headline-h4-bold">
-                  {current.question}
-                </h1>
-                <RadioGroup<string>
-                  key={current.id}
-                  name={current.id}
-                  value={answers[current.id] ?? null}
-                  onValueChange={(value) => setAnswers({ ...answers, [current.id]: value })}
-                  aria-labelledby={`${current.id}-question`}
-                >
-                  {({ Item: Radio }) => (
-                    <div className="flex flex-col gap-2">
-                      {current.options.map((option) => (
-                        <Item
-                          key={option.value}
-                          variant="outline"
-                          asChild
-                          selected={answers[current.id] === option.value}
-                        >
-                          <label>
-                            <Item.Content>
-                              <Item.Title>{option.label}</Item.Title>
-                              <Item.Description>{option.description}</Item.Description>
-                            </Item.Content>
-                            <Item.Actions>
-                              <Radio value={option.value} />
-                            </Item.Actions>
-                          </label>
-                        </Item>
-                      ))}
-                    </div>
-                  )}
-                </RadioGroup>
-              </Card.Content>
-              <Card.Footer className="justify-between">
-                <Button
-                  variant="outline"
-                  disabled={index === 0}
-                  onClick={() => setIndex(index - 1)}
-                >
-                  <ArrowLeftIcon />
-                  이전
-                </Button>
-                <Button disabled={!answers[current.id]} onClick={() => setIndex(index + 1)}>
-                  {index === QUESTIONS.length - 1 ? '보내기' : '다음'}
-                </Button>
-              </Card.Footer>
-            </>
-          )}
-        </Card>
+            {done ? (
+              <Empty variant="soft">
+                <Empty.Media>
+                  <CheckCircleIcon />
+                </Empty.Media>
+                <Empty.Title>답해 줘서 고마워요</Empty.Title>
+                <Empty.Description>결과는 다음 주 월요일 게시판에 올라와요.</Empty.Description>
+                <Empty.Actions>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIndex(0);
+                      setAnswers({});
+                    }}
+                  >
+                    처음부터 다시
+                  </Button>
+                </Empty.Actions>
+              </Empty>
+            ) : (
+              <>
+                <Card.Content>
+                  <div className="flex flex-col gap-5">
+                    <p className="text-body-b3-semibold">
+                      {index + 1} / {QUESTIONS.length}
+                    </p>
+                    <h1 id={`${current.id}-question`} className="text-headline-h4-bold">
+                      {current.question}
+                    </h1>
+                    <RadioGroup<string>
+                      key={current.id}
+                      name={current.id}
+                      value={answers[current.id] ?? null}
+                      onValueChange={(value) => setAnswers({ ...answers, [current.id]: value })}
+                      aria-labelledby={`${current.id}-question`}
+                    >
+                      {({ Item: Radio }) => (
+                        <div className="flex flex-col gap-2">
+                          {current.options.map((option) => (
+                            <Item
+                              key={option.value}
+                              variant="outline"
+                              asChild
+                              selected={answers[current.id] === option.value}
+                            >
+                              <label>
+                                <Item.Content>
+                                  <Item.Title>{option.label}</Item.Title>
+                                  <Item.Description>{option.description}</Item.Description>
+                                </Item.Content>
+                                <Item.Actions>
+                                  <Radio value={option.value} />
+                                </Item.Actions>
+                              </label>
+                            </Item>
+                          ))}
+                        </div>
+                      )}
+                    </RadioGroup>
+                  </div>
+                </Card.Content>
+                <Card.Footer>
+                  <Button
+                    variant="outline"
+                    disabled={index === 0}
+                    onClick={() => setIndex(index - 1)}
+                  >
+                    <ArrowLeftIcon />
+                    이전
+                  </Button>
+                  <Spacer />
+                  <Button disabled={!answers[current.id]} onClick={() => setIndex(index + 1)}>
+                    {index === QUESTIONS.length - 1 ? '보내기' : '다음'}
+                  </Button>
+                </Card.Footer>
+              </>
+            )}
+          </Card>
+        </div>
       </main>
     );
   },

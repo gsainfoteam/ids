@@ -144,7 +144,7 @@ export const PC: Story = {
           </Button>
         </div>
 
-        <Tabs defaultValue="all" className="flex flex-col gap-6">
+        <Tabs defaultValue="all">
           <Tabs.List aria-label="알림 종류">
             {TABS.map((tab) => (
               <Tabs.Trigger key={tab.value} value={tab.value}>
@@ -159,61 +159,63 @@ export const PC: Story = {
             );
 
             return (
-              <Tabs.Content key={tab.value} value={tab.value} className="flex flex-col gap-6">
-                {shown.length === 0 && (
-                  <Empty>
-                    <Empty.Media>
-                      <BellSlashIcon />
-                    </Empty.Media>
-                    <Empty.Title>알림이 없어요</Empty.Title>
-                  </Empty>
-                )}
-                {DAYS.map((day) => {
-                  const ofTheDay = shown.filter((notification) => notification.day === day);
-                  if (ofTheDay.length === 0) return null;
+              <Tabs.Content key={tab.value} value={tab.value}>
+                <div className="flex flex-col gap-6">
+                  {shown.length === 0 && (
+                    <Empty>
+                      <Empty.Media>
+                        <BellSlashIcon />
+                      </Empty.Media>
+                      <Empty.Title>알림이 없어요</Empty.Title>
+                    </Empty>
+                  )}
+                  {DAYS.map((day) => {
+                    const ofTheDay = shown.filter((notification) => notification.day === day);
+                    if (ofTheDay.length === 0) return null;
 
-                  return (
-                    <section
-                      key={day}
-                      aria-labelledby={`${tab.value}-${day}`}
-                      className="flex flex-col gap-3"
-                    >
-                      <h2 id={`${tab.value}-${day}`} className="text-body-b3-semibold">
-                        {day}
-                      </h2>
-                      <Card size="tiny">
-                        <ItemGroup aria-label={`${day} 알림`}>
-                          {ofTheDay.map((notification) => (
-                            <Item key={notification.id} onClick={() => markRead(notification.id)}>
-                              <Item.Media variant={notification.icon ? 'soft' : undefined}>
-                                {notification.icon ?? (
-                                  <Avatar name={notification.who} size="tiny" />
+                    return (
+                      <section
+                        key={day}
+                        aria-labelledby={`${tab.value}-${day}`}
+                        className="flex flex-col gap-3"
+                      >
+                        <h2 id={`${tab.value}-${day}`} className="text-body-b3-semibold">
+                          {day}
+                        </h2>
+                        <Card size="tiny">
+                          <ItemGroup aria-label={`${day} 알림`}>
+                            {ofTheDay.map((notification) => (
+                              <Item key={notification.id} onClick={() => markRead(notification.id)}>
+                                <Item.Media variant={notification.icon ? 'soft' : undefined}>
+                                  {notification.icon ?? (
+                                    <Avatar name={notification.who} size="tiny" />
+                                  )}
+                                </Item.Media>
+                                <Item.Content>
+                                  <Item.Title>{notification.text}</Item.Title>
+                                  <Item.Description>
+                                    {notification.quote
+                                      ? `${notification.time} · ${notification.quote}`
+                                      : notification.time}
+                                  </Item.Description>
+                                </Item.Content>
+                                {unread.includes(notification.id) && (
+                                  <Item.Actions>
+                                    <Chip
+                                      variant="solid"
+                                      colorScheme="primary"
+                                      aria-label="읽지 않음"
+                                    />
+                                  </Item.Actions>
                                 )}
-                              </Item.Media>
-                              <Item.Content>
-                                <Item.Title>{notification.text}</Item.Title>
-                                <Item.Description>
-                                  {notification.quote
-                                    ? `${notification.time} · ${notification.quote}`
-                                    : notification.time}
-                                </Item.Description>
-                              </Item.Content>
-                              {unread.includes(notification.id) && (
-                                <Item.Actions>
-                                  <Chip
-                                    variant="solid"
-                                    colorScheme="primary"
-                                    aria-label="읽지 않음"
-                                  />
-                                </Item.Actions>
-                              )}
-                            </Item>
-                          ))}
-                        </ItemGroup>
-                      </Card>
-                    </section>
-                  );
-                })}
+                              </Item>
+                            ))}
+                          </ItemGroup>
+                        </Card>
+                      </section>
+                    );
+                  })}
+                </div>
               </Tabs.Content>
             );
           })}

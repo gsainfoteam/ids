@@ -147,103 +147,111 @@ const CURRENT = 'board';
 
 export const PC: Story = {
   render: () => (
-    <Sidebar.Provider className="break-keep">
-      <Sidebar value={CURRENT} aria-label="주 메뉴">
-        <Sidebar.Header>
-          <Avatar name="인포팀" size="tiny" aria-hidden>
-            <Avatar.Fallback>
-              <CubeTransparentIcon />
-            </Avatar.Fallback>
-          </Avatar>
-          <span className="text-body-b2-semibold">GIST 인포팀</span>
-        </Sidebar.Header>
-        {GROUPS.map((group) => (
-          <Sidebar.Group key={group.label} label={group.label}>
-            {group.items.map((item) => (
-              <Sidebar.Item
-                key={item.id}
-                value={item.id}
-                href={`#${item.id}`}
-                colorScheme={item.colorScheme}
-              >
-                {item.icon}
-                {item.label}
-                {item.badge}
-              </Sidebar.Item>
-            ))}
-          </Sidebar.Group>
-        ))}
-        <Sidebar.Footer>
-          <Menu>
-            <Menu.Trigger asChild>
-              <Button variant="outline" className="w-full">
-                <Avatar name="김지수" size="tiny" />
-                김지수
-                <Spacer />
-                <ChevronUpDownIcon />
-              </Button>
-            </Menu.Trigger>
-            <Menu.Content>
-              <Menu.Item>
-                <UserIcon />내 프로필
-              </Menu.Item>
-              <Menu.Item>
-                <Cog6ToothIcon />
-                설정
-              </Menu.Item>
-              <Menu.Separator />
-              <Menu.Item>
-                <ArrowRightStartOnRectangleIcon />
-                로그아웃
-              </Menu.Item>
-            </Menu.Content>
-          </Menu>
-        </Sidebar.Footer>
-      </Sidebar>
+    <div className="break-keep">
+      <Sidebar.Provider>
+        <Sidebar value={CURRENT} aria-label="주 메뉴">
+          <Sidebar.Header>
+            <Avatar name="인포팀" size="tiny" aria-hidden>
+              <Avatar.Fallback>
+                <CubeTransparentIcon />
+              </Avatar.Fallback>
+            </Avatar>
+            <span className="text-body-b2-semibold">GIST 인포팀</span>
+          </Sidebar.Header>
+          {GROUPS.map((group) => (
+            <Sidebar.Group key={group.label} label={group.label}>
+              {group.items.map((item) => (
+                <Sidebar.Item
+                  key={item.id}
+                  value={item.id}
+                  href={`#${item.id}`}
+                  colorScheme={item.colorScheme}
+                >
+                  {item.icon}
+                  {item.label}
+                  {item.badge}
+                </Sidebar.Item>
+              ))}
+            </Sidebar.Group>
+          ))}
+          <Sidebar.Footer>
+            <Menu>
+              <Menu.Trigger asChild>
+                <Button variant="outline">
+                  <Avatar name="김지수" size="tiny" />
+                  김지수
+                  <Spacer />
+                  <ChevronUpDownIcon />
+                </Button>
+              </Menu.Trigger>
+              <Menu.Content>
+                <Menu.Item>
+                  <UserIcon />내 프로필
+                </Menu.Item>
+                <Menu.Item>
+                  <Cog6ToothIcon />
+                  설정
+                </Menu.Item>
+                <Menu.Separator />
+                <Menu.Item>
+                  <ArrowRightStartOnRectangleIcon />
+                  로그아웃
+                </Menu.Item>
+              </Menu.Content>
+            </Menu>
+          </Sidebar.Footer>
+        </Sidebar>
 
-      <Sidebar.Inset>
-        <header className="flex items-center gap-3 px-4 py-3 md:px-8">
-          <Sidebar.Trigger />
-          <Breadcrumb aria-label="위치">
-            <Breadcrumb.Item>
-              <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              <Breadcrumb.Page>게시판</Breadcrumb.Page>
-            </Breadcrumb.Item>
-          </Breadcrumb>
-          <Spacer />
-          <IconButton variant="outline" aria-label="알림" icon={<BellIcon />} />
-        </header>
-        <Divider />
+        <Sidebar.Inset>
+          <header className="flex items-center gap-3 px-4 py-3 md:px-8">
+            <Sidebar.Trigger />
+            <Breadcrumb aria-label="위치">
+              <Breadcrumb.Item>
+                <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+              </Breadcrumb.Item>
+              <Breadcrumb.Item>
+                <Breadcrumb.Page>게시판</Breadcrumb.Page>
+              </Breadcrumb.Item>
+            </Breadcrumb>
+            <Spacer />
+            <IconButton variant="outline" aria-label="알림" icon={<BellIcon />} />
+          </header>
+          <Divider />
 
-        <div className="flex flex-col gap-6 px-4 py-8 md:px-8">
-          <h1 className="text-headline-h3-bold">게시판</h1>
-          <Skeleton loading>
-            <p className="text-body-b3-regular">
-              수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
-              시간표가 겹치지 않는지 미리 살펴 두세요.
-            </p>
-          </Skeleton>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Skeleton loading asChild>
-              <Card className="h-40">
-                <Card.Title>수강 신청</Card.Title>
-              </Card>
+          <div className="flex flex-col gap-6 px-4 py-8 md:px-8">
+            <h1 className="text-headline-h3-bold">게시판</h1>
+            <Skeleton loading>
+              <p className="text-body-b3-regular">
+                수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
+                확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
+              </p>
             </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="h-40">
-                <Card.Title>장학금 안내</Card.Title>
-              </Card>
-            </Skeleton>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid h-40">
+                <Skeleton loading asChild>
+                  <Card>
+                    <Card.Title>수강 신청</Card.Title>
+                  </Card>
+                </Skeleton>
+              </div>
+              <div className="grid h-40">
+                <Skeleton loading asChild>
+                  <Card>
+                    <Card.Title>장학금 안내</Card.Title>
+                  </Card>
+                </Skeleton>
+              </div>
+            </div>
+            <div className="grid h-64">
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>본문</Card.Title>
+                </Card>
+              </Skeleton>
+            </div>
           </div>
-          <Skeleton loading asChild>
-            <Card className="h-64">
-              <Card.Title>본문</Card.Title>
-            </Card>
-          </Skeleton>
-        </div>
-      </Sidebar.Inset>
-    </Sidebar.Provider>
+        </Sidebar.Inset>
+      </Sidebar.Provider>
+    </div>
   ),
 };

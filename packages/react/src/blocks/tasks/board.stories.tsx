@@ -257,7 +257,7 @@ export const PC: Story = {
                       </li>
                     ))}
                   </ul>
-                  <Button variant="outline" size="tiny" className="w-full">
+                  <Button variant="outline" size="tiny">
                     <PlusIcon />
                     카드 더하기
                   </Button>

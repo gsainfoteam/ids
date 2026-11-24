@@ -15,6 +15,7 @@ import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { TextField } from '../../components/form/text-field';
+import { AspectRatio } from '../../components/layout/aspect-ratio';
 import { Divider } from '../../components/layout/divider';
 import { ScrollArea } from '../../components/layout/scroll-area';
 import { Popover } from '../../components/overlay/popover';
@@ -58,9 +59,11 @@ export const PC: Story = {
     return (
       <div className="min-h-dvh break-keep">
         <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
-          <Skeleton loading className="w-fit">
-            <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
-          </Skeleton>
+          <div className="w-fit">
+            <Skeleton loading>
+              <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
+            </Skeleton>
+          </div>
           <Skeleton loading>
             <p className="text-body-b3-regular">
               수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
@@ -68,21 +71,27 @@ export const PC: Story = {
             </p>
           </Skeleton>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>수강 신청</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>장학금 안내</Card.Title>
-              </Card>
-            </Skeleton>
-            <Skeleton loading asChild>
-              <Card className="aspect-video">
-                <Card.Title>동아리 모집</Card.Title>
-              </Card>
-            </Skeleton>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>수강 신청</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>장학금 안내</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
+            <AspectRatio ratio={16 / 9}>
+              <Skeleton loading asChild>
+                <Card>
+                  <Card.Title>동아리 모집</Card.Title>
+                </Card>
+              </Skeleton>
+            </AspectRatio>
           </div>
         </main>
 
@@ -92,75 +101,94 @@ export const PC: Story = {
               <ChatBubbleOvalLeftEllipsisIcon />
             </FloatingButton>
           </Popover.Trigger>
-          <Popover.Content side="top" align="end" className="flex w-80 flex-col gap-3 sm:w-96">
-            <div className="flex items-center gap-2">
-              <Item size="tiny" className="min-w-0 flex-1">
-                <Item.Media>{bot}</Item.Media>
-                <Item.Content>
-                  <Item.Title asChild>
-                    <h2>인포팀 도우미</h2>
-                  </Item.Title>
-                  <Item.Description>보통 바로 답해요 · 사람은 평일 9시부터 6시</Item.Description>
-                </Item.Content>
-              </Item>
-              <Popover.Close asChild>
-                <IconButton variant="outline" size="tiny" aria-label="닫기" icon={<XMarkIcon />} />
-              </Popover.Close>
-            </div>
-            <Divider />
+          <Popover.Content side="top" align="end">
+            <div className="flex w-80 flex-col gap-3 sm:w-96">
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <Item size="tiny">
+                    <Item.Media>{bot}</Item.Media>
+                    <Item.Content>
+                      <Item.Title asChild>
+                        <h2>인포팀 도우미</h2>
+                      </Item.Title>
+                      <Item.Description>
+                        보통 바로 답해요 · 사람은 평일 9시부터 6시
+                      </Item.Description>
+                    </Item.Content>
+                  </Item>
+                </div>
+                <Popover.Close asChild>
+                  <IconButton
+                    variant="outline"
+                    size="tiny"
+                    aria-label="닫기"
+                    icon={<XMarkIcon />}
+                  />
+                </Popover.Close>
+              </div>
+              <Divider />
 
-            <ScrollArea fade className="h-72">
-              <ol aria-label="대화" className="flex flex-col gap-4 pe-2">
-                <li className="flex gap-2">
-                  {bot}
-                  <div className="text-body-b3-regular flex flex-col gap-3">
-                    <p>안녕하세요. 인포팀 서비스를 쓰다 막힌 곳이 있으면 물어보세요.</p>
-                    <div role="group" aria-label="자주 묻는 것" className="flex flex-wrap gap-1.5">
-                      {QUICK_REPLIES.map((reply) => (
-                        <Chip key={reply} size="tiny" onClick={() => ask(reply)}>
-                          {reply}
-                        </Chip>
-                      ))}
-                    </div>
-                  </div>
-                </li>
-                {asked.map((text, index) => (
-                  <li key={`${text}-${index}`} className="flex flex-col gap-4">
-                    <div className="flex justify-end">
-                      <Card variant="soft" size="tiny" className="max-w-[85%]">
-                        <Card.Content>{text}</Card.Content>
-                      </Card>
-                    </div>
-                    <div className="flex gap-2">
+              <div className="flex h-72 flex-col">
+                <ScrollArea fade>
+                  <ol aria-label="대화" className="flex flex-col gap-4 pe-2">
+                    <li className="flex gap-2">
                       {bot}
-                      <p className="text-body-b3-regular">
-                        로그인 화면의 비밀번호 찾기에서 GIST 메일로 재설정 링크를 받을 수 있어요.
-                        링크가 오지 않으면 스팸함을 봐 주세요.
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </ScrollArea>
+                      <div className="text-body-b3-regular flex flex-col gap-3">
+                        <p>안녕하세요. 인포팀 서비스를 쓰다 막힌 곳이 있으면 물어보세요.</p>
+                        <div
+                          role="group"
+                          aria-label="자주 묻는 것"
+                          className="flex flex-wrap gap-1.5"
+                        >
+                          {QUICK_REPLIES.map((reply) => (
+                            <Chip key={reply} size="tiny" onClick={() => ask(reply)}>
+                              {reply}
+                            </Chip>
+                          ))}
+                        </div>
+                      </div>
+                    </li>
+                    {asked.map((text, index) => (
+                      <li key={`${text}-${index}`} className="flex flex-col gap-4">
+                        <div className="flex justify-end">
+                          <div className="max-w-[85%]">
+                            <Card variant="soft" size="tiny">
+                              <Card.Content>{text}</Card.Content>
+                            </Card>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          {bot}
+                          <p className="text-body-b3-regular">
+                            로그인 화면의 비밀번호 찾기에서 GIST 메일로 재설정 링크를 받을 수
+                            있어요. 링크가 오지 않으면 스팸함을 봐 주세요.
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </ScrollArea>
+              </div>
 
-            <form onSubmit={send}>
-              <TextField
-                aria-label="메시지"
-                placeholder="메시지를 적어 주세요"
-                value={draft}
-                onValueChange={setDraft}
-              >
-                <TextField.Input />
-                <IconButton
-                  type="submit"
-                  variant="solid"
-                  aria-label="보내기"
-                  icon={<ArrowUpIcon />}
-                  disabled={draft.trim() === ''}
-                />
-              </TextField>
-            </form>
-            <p className="text-caption-c1-regular text-center">인포팀이 운영해요</p>
+              <form onSubmit={send}>
+                <TextField
+                  aria-label="메시지"
+                  placeholder="메시지를 적어 주세요"
+                  value={draft}
+                  onValueChange={setDraft}
+                >
+                  <TextField.Input />
+                  <IconButton
+                    type="submit"
+                    variant="solid"
+                    aria-label="보내기"
+                    icon={<ArrowUpIcon />}
+                    disabled={draft.trim() === ''}
+                  />
+                </TextField>
+              </form>
+              <p className="text-caption-c1-regular text-center">인포팀이 운영해요</p>
+            </div>
           </Popover.Content>
         </Popover>
       </div>

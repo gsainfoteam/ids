@@ -129,21 +129,22 @@ export const PC: Story = {
               <MagnifyingGlassIcon />
               <TextField.Input />
             </TextField>
-            <Select
-              aria-label="팀"
-              value={team}
-              onValueChange={(next) => {
-                if (next === 'all' || (next !== null && isTeam(next))) setTeam(next);
-              }}
-              className="sm:w-36"
-            >
-              <Select.Item value="all">모든 팀</Select.Item>
-              {(Object.keys(TEAM_LABEL) as Team[]).map((value) => (
-                <Select.Item key={value} value={value}>
-                  {TEAM_LABEL[value]}
-                </Select.Item>
-              ))}
-            </Select>
+            <div className="sm:w-36">
+              <Select
+                aria-label="팀"
+                value={team}
+                onValueChange={(next) => {
+                  if (next === 'all' || (next !== null && isTeam(next))) setTeam(next);
+                }}
+              >
+                <Select.Item value="all">모든 팀</Select.Item>
+                {(Object.keys(TEAM_LABEL) as Team[]).map((value) => (
+                  <Select.Item key={value} value={value}>
+                    {TEAM_LABEL[value]}
+                  </Select.Item>
+                ))}
+              </Select>
+            </div>
           </div>
         </div>
 
@@ -159,7 +160,7 @@ export const PC: Story = {
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {shown.map((member) => (
               <li key={member.id} className="flex">
-                <Card className="w-full">
+                <Card>
                   <Card.Header>
                     <Avatar name={member.name} />
                     <Card.Title asChild>
@@ -176,23 +177,27 @@ export const PC: Story = {
                       </Card.Action>
                     )}
                   </Card.Header>
-                  <Card.Content className="flex flex-col gap-3">
-                    <p>{member.bio}</p>
-                    <ul aria-label={`${member.name}의 기술`} className="flex flex-wrap gap-1.5">
-                      {member.skills.map((skill) => (
-                        <li key={skill}>
-                          <Chip size="tiny">{skill}</Chip>
-                        </li>
-                      ))}
-                    </ul>
+                  <Card.Content>
+                    <div className="flex flex-col gap-3">
+                      <p>{member.bio}</p>
+                      <ul aria-label={`${member.name}의 기술`} className="flex flex-wrap gap-1.5">
+                        {member.skills.map((skill) => (
+                          <li key={skill}>
+                            <Chip size="tiny">{skill}</Chip>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </Card.Content>
                   <Card.Footer>
-                    <Button variant="outline" size="tiny" className="flex-1">
-                      메시지
-                    </Button>
-                    <Button asChild variant="soft" size="tiny" className="flex-1">
-                      <a href={`#${member.id}`}>프로필 보기</a>
-                    </Button>
+                    <div className="grid flex-1 grid-cols-2 gap-2">
+                      <Button variant="outline" size="tiny">
+                        메시지
+                      </Button>
+                      <Button asChild variant="soft" size="tiny">
+                        <a href={`#${member.id}`}>프로필 보기</a>
+                      </Button>
+                    </div>
                   </Card.Footer>
                 </Card>
               </li>

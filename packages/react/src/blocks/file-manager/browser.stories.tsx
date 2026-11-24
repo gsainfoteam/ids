@@ -234,7 +234,7 @@ export const PC: Story = {
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {shown.map((file) => (
                 <li key={file.id} className="flex">
-                  <Card size="tiny" className="w-full">
+                  <Card size="tiny">
                     <Card.Header>
                       <Avatar name={file.name} aria-hidden>
                         <Avatar.Fallback>{KIND_ICON[file.kind]}</Avatar.Fallback>
@@ -269,17 +269,19 @@ export const PC: Story = {
           )}
         </section>
 
-        <Card variant="soft" size="tiny" className="sm:max-w-sm">
-          <Card.Header>
-            <Card.Title asChild>
-              <h2>저장 공간</h2>
-            </Card.Title>
-            <Card.Description>인포팀 공용 · 10GB 중 3.2GB</Card.Description>
-          </Card.Header>
-          <Card.Content>
-            <Progress value={32} aria-label="저장 공간 쓴 양" />
-          </Card.Content>
-        </Card>
+        <div className="sm:max-w-sm">
+          <Card variant="soft" size="tiny">
+            <Card.Header>
+              <Card.Title asChild>
+                <h2>저장 공간</h2>
+              </Card.Title>
+              <Card.Description>인포팀 공용 · 10GB 중 3.2GB</Card.Description>
+            </Card.Header>
+            <Card.Content>
+              <Progress value={32} aria-label="저장 공간 쓴 양" />
+            </Card.Content>
+          </Card>
+        </div>
       </main>
     );
   },

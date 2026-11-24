@@ -58,14 +58,16 @@ export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <Skeleton loading className="max-w-sm">
-      <Card>
-        <Card.Header>
-          <Card.Title>2026 가을 학기 공지</Card.Title>
-          <Card.Description>수강 신청 일정과 유의 사항을 확인하세요.</Card.Description>
-        </Card.Header>
-      </Card>
-    </Skeleton>
+    <div className="max-w-sm">
+      <Skeleton loading>
+        <Card>
+          <Card.Header>
+            <Card.Title>2026 가을 학기 공지</Card.Title>
+            <Card.Description>수강 신청 일정과 유의 사항을 확인하세요.</Card.Description>
+          </Card.Header>
+        </Card>
+      </Skeleton>
+    </div>
   ),
 };
 
@@ -80,12 +82,14 @@ export const Gallery: Story = {
           rows={wrappings}
           columns={animations}
           render={(wrapping, animation) => (
-            <Skeleton loading animation={animation} asChild={wrapping === 'asChild'}>
-              <Card className="w-48">
-                <Card.Title>학기 공지</Card.Title>
-                <Card.Description>9월 1일 오전 10시</Card.Description>
-              </Card>
-            </Skeleton>
+            <div className="w-48">
+              <Skeleton loading animation={animation} asChild={wrapping === 'asChild'}>
+                <Card>
+                  <Card.Title>학기 공지</Card.Title>
+                  <Card.Description>9월 1일 오전 10시</Card.Description>
+                </Card>
+              </Skeleton>
+            </div>
           )}
         />
         <Showcase.Row label="wave, rtl">
@@ -102,14 +106,18 @@ export const Gallery: Story = {
         description="끝나면 속성과 클래스만 빠지고 같은 구조에서 자식이 보입니다."
       >
         <Showcase.Row label="loading" className="items-start">
-          <Skeleton loading className="w-48">
-            <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
-          </Skeleton>
+          <div className="w-48">
+            <Skeleton loading>
+              <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+            </Skeleton>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="loading={false}" className="items-start">
-          <Skeleton loading={false} className="w-48">
-            <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
-          </Skeleton>
+          <div className="w-48">
+            <Skeleton loading={false}>
+              <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+            </Skeleton>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -136,12 +144,16 @@ export const Gallery: Story = {
           </Skeleton>
         </Showcase.Row>
         <Showcase.Row label="Text" className="items-start">
-          <Skeleton loading className="w-fit">
-            <p className="text-body-b2-semibold">학기 공지</p>
-          </Skeleton>
-          <Skeleton loading className="w-fit">
-            <p className="text-caption-c1-regular">인포팀 · 3분 전</p>
-          </Skeleton>
+          <div className="w-fit">
+            <Skeleton loading>
+              <p className="text-body-b2-semibold">학기 공지</p>
+            </Skeleton>
+          </div>
+          <div className="w-fit">
+            <Skeleton loading>
+              <p className="text-caption-c1-regular">인포팀 · 3분 전</p>
+            </Skeleton>
+          </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -157,7 +169,7 @@ export const ShowACardWhileItLoads: Story = {
         <Button variant="outline" onClick={() => setLoading((value) => !value)}>
           {loading ? '불러오기 끝내기' : '다시 불러오기'}
         </Button>
-        <Skeleton loading={loading} className="w-full">
+        <Skeleton loading={loading}>
           <Card>
             <Card.Header>
               <Card.Title>2026 가을 학기 공지</Card.Title>
@@ -213,12 +225,14 @@ export const KeepTheShapeOfAnAvatarOrCard: Story = {
           <Skeleton loading={loading} asChild>
             <Avatar name="김지스트" />
           </Skeleton>
-          <Skeleton loading={loading} asChild>
-            <Card className="w-64">
-              <Card.Title>김지스트</Card.Title>
-              <Card.Description>인포팀 프론트엔드</Card.Description>
-            </Card>
-          </Skeleton>
+          <div className="w-64">
+            <Skeleton loading={loading} asChild>
+              <Card>
+                <Card.Title>김지스트</Card.Title>
+                <Card.Description>인포팀 프론트엔드</Card.Description>
+              </Card>
+            </Skeleton>
+          </div>
         </div>
       </div>
     );
@@ -253,12 +267,16 @@ export const KeepTheShapeOfAnAvatarOrCard: Story = {
 export const HoldTheHeightOfText: Story = {
   render: () => (
     <div className="flex items-start gap-4">
-      <Skeleton loading data-testid="loading" className="w-40">
-        <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
-      </Skeleton>
-      <Skeleton loading={false} data-testid="loaded" className="w-40">
-        <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
-      </Skeleton>
+      <div className="w-40">
+        <Skeleton loading data-testid="loading">
+          <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+        </Skeleton>
+      </div>
+      <div className="w-40">
+        <Skeleton loading={false} data-testid="loaded">
+          <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
+        </Skeleton>
+      </div>
     </div>
   ),
   parameters: {
@@ -285,7 +303,7 @@ export const LoadAList: Story = {
         <Button variant="outline" onClick={() => setLoading((value) => !value)}>
           {loading ? '불러오기 끝내기' : '다시 불러오기'}
         </Button>
-        <ItemGroup aria-label="멤버" aria-busy={loading} className="w-full">
+        <ItemGroup aria-label="멤버" aria-busy={loading}>
           {members.map((member) => (
             <Item key={member.name}>
               <Item.Media>
@@ -294,12 +312,16 @@ export const LoadAList: Story = {
                 </Skeleton>
               </Item.Media>
               <Item.Content>
-                <Skeleton loading={loading} asChild className="w-fit">
-                  <Item.Title>{member.name}</Item.Title>
-                </Skeleton>
-                <Skeleton loading={loading} asChild className="w-fit">
-                  <Item.Description>{member.team}</Item.Description>
-                </Skeleton>
+                <div className="w-fit">
+                  <Skeleton loading={loading} asChild>
+                    <Item.Title>{member.name}</Item.Title>
+                  </Skeleton>
+                </div>
+                <div className="w-fit">
+                  <Skeleton loading={loading} asChild>
+                    <Item.Description>{member.team}</Item.Description>
+                  </Skeleton>
+                </div>
               </Item.Content>
             </Item>
           ))}

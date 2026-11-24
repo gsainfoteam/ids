@@ -165,9 +165,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="custom">
           <AvatarGroup max={2} aria-label="custom overflow">
-            <AvatarGroup.Overflow className="bg-primary-solid text-on-primary-solid">
-              {({ count }) => `${count}+`}
-            </AvatarGroup.Overflow>
+            <AvatarGroup.Overflow>{({ count }) => `${count}+`}</AvatarGroup.Overflow>
             {MEMBERS.map((member) => (
               <Avatar key={member.name} src={member.src} name={member.name} />
             ))}
