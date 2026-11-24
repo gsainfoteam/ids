@@ -34,6 +34,7 @@ const meta = {
     colorScheme: { control: 'select', options: colorSchemes },
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
+    focusableWhenDisabled: { control: 'boolean' },
     asChild: { table: { disable: true } },
   },
   args: {
@@ -203,11 +204,19 @@ export const ConfirmBeforeTurningOff: Story = {
 };
 
 export const LabelEachState: Story = {
-  render: () => <Toggle variant="outline">{(state) => (state.pressed ? '켜짐' : '꺼짐')}</Toggle>,
+  args: {
+    style: (state) =>
+      state.pressed ? { backgroundColor: 'var(--ids-color-bg-info-soft)' } : undefined,
+  },
+  render: (args) => (
+    <Toggle {...args} variant="outline">
+      {(state) => (state.pressed ? '켜짐' : '꺼짐')}
+    </Toggle>
+  ),
   parameters: {
     docs: {
       description: {
-        story: 'children과 className은 상태를 받는 함수도 됩니다. state.pressed가 켜짐 여부입니다.',
+        story: 'children과 style은 상태를 받는 함수도 됩니다. state.pressed가 켜짐 여부입니다.',
       },
     },
   },

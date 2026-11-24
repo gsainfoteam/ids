@@ -30,3 +30,4 @@ export 'src/components/kbd/ids_kbd.dart';
 export 'src/components/label/ids_label.dart';
 export 'src/components/spinner/ids_spinner.dart';
 export 'src/components/text_field/ids_text_field.dart';
+export 'src/components/toggle/ids_toggle.dart';
