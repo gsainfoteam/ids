@@ -33,7 +33,7 @@ export function MarqueePause({ icon = pauseOrPlay, className, ...props }: Marque
 
   return (
     <IconToggle
-      aria-label={t('marquee.pause')}
+      aria-label={t('common.pause')}
       variant="ghost"
       {...props}
       icon={icon}

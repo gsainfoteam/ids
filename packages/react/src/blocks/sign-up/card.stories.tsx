@@ -48,90 +48,104 @@ export const PC: Story = {
 
     return (
       <main className="flex min-h-dvh items-center justify-center px-4 py-12 break-keep">
-        <Card className="w-full max-w-md">
-          <Card.Header>
-            <Card.Title asChild>
-              <h1>회원가입</h1>
-            </Card.Title>
-            <Card.Description>GIST 메일로 인포팀 계정을 만들어요.</Card.Description>
-          </Card.Header>
+        <div className="w-full max-w-md">
+          <Card>
+            <Card.Header>
+              <Card.Title asChild>
+                <h1>회원가입</h1>
+              </Card.Title>
+              <Card.Description>GIST 메일로 인포팀 계정을 만들어요.</Card.Description>
+            </Card.Header>
 
-          <Card.Content className="flex flex-col gap-5">
-            <Button variant="outline" className="w-full">
-              <AcademicCapIcon />
-              GIST 계정으로 가입하기
-            </Button>
+            <Card.Content>
+              <div className="flex flex-col gap-5">
+                <Button variant="outline">
+                  <AcademicCapIcon />
+                  GIST 계정으로 가입하기
+                </Button>
 
-            <Divider>또는 직접 입력</Divider>
+                <Divider>또는 직접 입력</Divider>
 
-            <form onSubmit={signUp} className="flex flex-col gap-5">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field>
-                  <Field.Label>이름</Field.Label>
-                  <TextField name="name" autoComplete="name" required />
-                </Field>
-                <Field>
-                  <Field.Label>학번</Field.Label>
-                  <TextField
-                    name="studentId"
-                    inputMode="numeric"
-                    pattern="\d{8}"
-                    placeholder="20251234"
-                    required
-                  />
-                </Field>
-              </div>
-              <Field>
-                <Field.Label>GIST 메일</Field.Label>
-                <TextField name="email" autoComplete="username" placeholder="아이디" required>
-                  <TextField.Input />
-                  <span>@gm.gist.ac.kr</span>
-                </TextField>
-                <Field.Hint>인증 코드를 이 주소로 보내요.</Field.Hint>
-              </Field>
-              <Field>
-                <Field.Label>비밀번호</Field.Label>
-                <PasswordField name="password" autoComplete="new-password" minLength={8} required />
-                <Field.Hint>8자 이상, 영문과 숫자를 섞어 주세요.</Field.Hint>
-              </Field>
-
-              <CheckboxGroup<Term>
-                name="terms"
-                value={agreed}
-                onValueChange={setAgreed}
-                aria-label="약관 동의"
-              >
-                {({ All, Item }) => (
-                  <div className="flex flex-col gap-3">
-                    <Label>
-                      <All />
-                      모두 동의해요
-                    </Label>
-                    <Divider />
-                    {TERMS.map((term) => (
-                      <Label key={term.value}>
-                        <Item value={term.value} />
-                        {term.label}
-                        <Chip variant="soft" colorScheme={term.required ? 'primary' : 'neutral'}>
-                          {term.required ? '필수' : '선택'}
-                        </Chip>
-                      </Label>
-                    ))}
+                <form onSubmit={signUp} className="flex flex-col gap-5">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field>
+                      <Field.Label>이름</Field.Label>
+                      <TextField name="name" autoComplete="name" required />
+                    </Field>
+                    <Field>
+                      <Field.Label>학번</Field.Label>
+                      <TextField
+                        name="studentId"
+                        inputMode="numeric"
+                        pattern="\d{8}"
+                        placeholder="20251234"
+                        required
+                      />
+                    </Field>
                   </div>
-                )}
-              </CheckboxGroup>
+                  <Field>
+                    <Field.Label>GIST 메일</Field.Label>
+                    <TextField name="email" autoComplete="username" placeholder="아이디" required>
+                      <TextField.Input />
+                      <span>@gm.gist.ac.kr</span>
+                    </TextField>
+                    <Field.Hint>인증 코드를 이 주소로 보내요.</Field.Hint>
+                  </Field>
+                  <Field>
+                    <Field.Label>비밀번호</Field.Label>
+                    <PasswordField
+                      name="password"
+                      autoComplete="new-password"
+                      minLength={8}
+                      required
+                    />
+                    <Field.Hint>8자 이상, 영문과 숫자를 섞어 주세요.</Field.Hint>
+                  </Field>
 
-              <Button type="submit" disabled={!requiredAgreed} className="w-full">
-                가입하기
-              </Button>
-            </form>
-          </Card.Content>
+                  <CheckboxGroup<Term>
+                    name="terms"
+                    value={agreed}
+                    onValueChange={setAgreed}
+                    aria-label="약관 동의"
+                  >
+                    {({ All, Item }) => (
+                      <div className="flex flex-col gap-3">
+                        <Label>
+                          <All />
+                          모두 동의해요
+                        </Label>
+                        <Divider />
+                        {TERMS.map((term) => (
+                          <Label key={term.value}>
+                            <Item value={term.value} />
+                            {term.label}
+                            <Chip
+                              variant="soft"
+                              colorScheme={term.required ? 'primary' : 'neutral'}
+                            >
+                              {term.required ? '필수' : '선택'}
+                            </Chip>
+                          </Label>
+                        ))}
+                      </div>
+                    )}
+                  </CheckboxGroup>
 
-          <Card.Footer className="justify-center">
-            이미 계정이 있나요?
-            <Link href="#login">로그인</Link>
-          </Card.Footer>
-        </Card>
+                  <Button type="submit" disabled={!requiredAgreed}>
+                    가입하기
+                  </Button>
+                </form>
+              </div>
+            </Card.Content>
+
+            <Card.Footer>
+              <div className="flex flex-1 items-center justify-center gap-2">
+                이미 계정이 있나요?
+                <Link href="#login">로그인</Link>
+              </div>
+            </Card.Footer>
+          </Card>
+        </div>
       </main>
     );
   },

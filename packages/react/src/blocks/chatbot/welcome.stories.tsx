@@ -51,16 +51,12 @@ export const PC: Story = {
     return (
       <div className="flex min-h-dvh flex-col break-keep">
         <header className="flex items-center gap-2 px-4 py-3">
-          <Select
-            aria-label="모델"
-            size="tiny"
-            value={model}
-            onValueChange={setModel}
-            className="w-44"
-          >
-            <Select.Item value="fast">GIST 도우미 · 빠르게</Select.Item>
-            <Select.Item value="deep">GIST 도우미 · 깊게 생각</Select.Item>
-          </Select>
+          <div className="w-44">
+            <Select aria-label="모델" size="tiny" value={model} onValueChange={setModel}>
+              <Select.Item value="fast">GIST 도우미 · 빠르게</Select.Item>
+              <Select.Item value="deep">GIST 도우미 · 깊게 생각</Select.Item>
+            </Select>
+          </div>
           <Spacer />
           <IconButton
             variant="outline"
@@ -115,7 +111,7 @@ export const PC: Story = {
           <ul aria-label="이렇게 물어보세요" className="grid gap-3 sm:grid-cols-2">
             {STARTERS.map((starter) => (
               <li key={starter.title} className="flex">
-                <Card size="tiny" className="w-full" onClick={() => setDraft(starter.title)}>
+                <Card size="tiny" onClick={() => setDraft(starter.title)}>
                   <Card.Header>
                     <Card.Title asChild>
                       <h2>{starter.title}</h2>

@@ -5,7 +5,7 @@ import { use, useEffect } from 'react';
 import { cssColor } from './color';
 import { PickerDefaultsContext, usePicker } from './context';
 import { CHECKER, GRADIENT_DIRECTION, overChecker } from './gradient';
-import { useTranslate } from '../../../internal/translate';
+import { useIntlWords, useTranslate } from '../../../internal/translate';
 import { isDevelopment } from '../../../utils/dev';
 import { Slider } from '../../form/slider';
 
@@ -13,6 +13,7 @@ import type { ColorPicker } from '.';
 
 export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.SliderProps) {
   const t = useTranslate();
+  const words = useIntlWords();
 
   const c = usePicker('ColorPicker.AlphaSlider');
   const hiddenFromTheRoot = !c.alpha && use(PickerDefaultsContext).alpha === undefined;
@@ -36,7 +37,7 @@ export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.Slid
       largeStep={10}
       value={Math.round(color.a * 100)}
       onValueChange={(percent) => c.picker.actions.setChannel('alpha', percent)}
-      formatLabel={(value: number) => t('colorPicker.percent', { value })}
+      formatLabel={words.percent}
       aria-label={props['aria-label'] ?? t('colorPicker.alpha')}
       size={c.size}
       disabled={c.state.disabled}

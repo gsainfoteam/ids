@@ -3,7 +3,7 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
 import { useSelectContext } from './context';
-import { useTranslate } from '../../../internal/translate';
+import { useIntlWords } from '../../../internal/translate';
 import { mergeProps, part } from '../../../utils';
 
 import type { SelectValueState } from '.';
@@ -23,7 +23,7 @@ export function SelectValue({
   className,
   ...props
 }: SelectValueProps) {
-  const t = useTranslate();
+  const words = useIntlWords();
 
   const c = useSelectContext('Select.Value');
 
@@ -46,9 +46,7 @@ export function SelectValue({
               {state.placeholder ? (placeholder ?? c.placeholder) : shown.join(', ')}
             </span>
             {labels.length > shown.length && (
-              <span className={c.styles.more()}>
-                {t('select.more', { count: labels.length - shown.length })}
-              </span>
+              <span className={c.styles.more()}>{words.signed(labels.length - shown.length)}</span>
             )}
           </>
         ));

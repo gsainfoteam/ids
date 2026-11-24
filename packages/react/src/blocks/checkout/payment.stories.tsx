@@ -98,65 +98,67 @@ export const PC: Story = {
                   <h2>받는 방법</h2>
                 </Card.Title>
               </Card.Header>
-              <Card.Content className="flex flex-col gap-5">
-                <RadioGroup<string>
-                  name="delivery"
-                  value={delivery}
-                  onValueChange={setDelivery}
-                  aria-label="받는 방법"
-                >
-                  {({ Item: Radio }) => (
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {DELIVERY.map((option) => (
-                        <Item
-                          key={option.value}
-                          variant="outline"
-                          asChild
-                          selected={option.value === delivery}
-                        >
-                          <label>
-                            <Item.Media variant="soft">{option.icon}</Item.Media>
-                            <Item.Content>
-                              <Item.Title>{option.label}</Item.Title>
-                              <Item.Description>{option.description}</Item.Description>
-                            </Item.Content>
-                            <Item.Actions>
-                              <Radio value={option.value} />
-                            </Item.Actions>
-                          </label>
-                        </Item>
-                      ))}
-                    </div>
-                  )}
-                </RadioGroup>
+              <Card.Content>
+                <div className="flex flex-col gap-5">
+                  <RadioGroup<string>
+                    name="delivery"
+                    value={delivery}
+                    onValueChange={setDelivery}
+                    aria-label="받는 방법"
+                  >
+                    {({ Item: Radio }) => (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {DELIVERY.map((option) => (
+                          <Item
+                            key={option.value}
+                            variant="outline"
+                            asChild
+                            selected={option.value === delivery}
+                          >
+                            <label>
+                              <Item.Media variant="soft">{option.icon}</Item.Media>
+                              <Item.Content>
+                                <Item.Title>{option.label}</Item.Title>
+                                <Item.Description>{option.description}</Item.Description>
+                              </Item.Content>
+                              <Item.Actions>
+                                <Radio value={option.value} />
+                              </Item.Actions>
+                            </label>
+                          </Item>
+                        ))}
+                      </div>
+                    )}
+                  </RadioGroup>
 
-                <div className="grid items-start gap-4 sm:grid-cols-2">
-                  <Field>
-                    <Field.Label>받는 사람</Field.Label>
-                    <TextField name="name" autoComplete="name" defaultValue="김지수" required />
-                  </Field>
-                  <Field>
-                    <Field.Label>휴대폰</Field.Label>
-                    <TelField
-                      name="phone"
-                      defaultCountry="KR"
-                      defaultValue="010-2345-6789"
-                      required
-                    />
-                  </Field>
+                  <div className="grid items-start gap-4 sm:grid-cols-2">
+                    <Field>
+                      <Field.Label>받는 사람</Field.Label>
+                      <TextField name="name" autoComplete="name" defaultValue="김지수" required />
+                    </Field>
+                    <Field>
+                      <Field.Label>휴대폰</Field.Label>
+                      <TelField
+                        name="phone"
+                        defaultCountry="KR"
+                        defaultValue="010-2345-6789"
+                        required
+                      />
+                    </Field>
+                  </div>
+                  {delivery === 'parcel' && (
+                    <Field>
+                      <Field.Label>주소</Field.Label>
+                      <TextField
+                        name="address"
+                        autoComplete="street-address"
+                        placeholder="광주광역시 북구 첨단과기로 123"
+                        required
+                      />
+                      <Field.Hint>기숙사라면 동과 호수까지 적어 주세요.</Field.Hint>
+                    </Field>
+                  )}
                 </div>
-                {delivery === 'parcel' && (
-                  <Field>
-                    <Field.Label>주소</Field.Label>
-                    <TextField
-                      name="address"
-                      autoComplete="street-address"
-                      placeholder="광주광역시 북구 첨단과기로 123"
-                      required
-                    />
-                    <Field.Hint>기숙사라면 동과 호수까지 적어 주세요.</Field.Hint>
-                  </Field>
-                )}
               </Card.Content>
             </Card>
 
@@ -200,50 +202,56 @@ export const PC: Story = {
             </Card>
           </div>
 
-          <Card className="lg:sticky lg:top-6">
-            <Card.Header>
-              <Card.Title asChild>
-                <h2>주문 상품</h2>
-              </Card.Title>
-            </Card.Header>
-            <ItemGroup size="tiny" aria-label="주문 상품">
-              {LINES.map((line) => (
-                <Item key={line.id}>
-                  <Item.Media>
-                    <Avatar name={line.name} size="tiny" />
-                  </Item.Media>
-                  <Item.Content>
-                    <Item.Title>{line.name}</Item.Title>
-                    <Item.Description>{line.option}</Item.Description>
-                  </Item.Content>
-                  <Item.Actions>{won.format(line.price)}원</Item.Actions>
-                </Item>
-              ))}
-            </ItemGroup>
-            <Card.Content className="flex flex-col gap-3">
-              <Divider />
-              <p className="flex justify-between">
-                상품 금액<span>{won.format(subtotal)}원</span>
-              </p>
-              <p className="flex justify-between">
-                배송비<span>{fee === 0 ? '무료' : `${won.format(fee)}원`}</span>
-              </p>
-              <Divider />
-              <p className="text-body-b2-semibold flex justify-between">
-                결제 금액<span>{won.format(total)}원</span>
-              </p>
-              <Label>
-                <Checkbox name="agree" required />
-                주문 내용을 확인했고 결제에 동의해요
-              </Label>
-            </Card.Content>
-            <Card.Footer>
-              <Button type="submit" className="w-full">
-                <LockClosedIcon />
-                {won.format(total)}원 결제하기
-              </Button>
-            </Card.Footer>
-          </Card>
+          <div className="lg:sticky lg:top-6">
+            <Card>
+              <Card.Header>
+                <Card.Title asChild>
+                  <h2>주문 상품</h2>
+                </Card.Title>
+              </Card.Header>
+              <ItemGroup size="tiny" aria-label="주문 상품">
+                {LINES.map((line) => (
+                  <Item key={line.id}>
+                    <Item.Media>
+                      <Avatar name={line.name} size="tiny" />
+                    </Item.Media>
+                    <Item.Content>
+                      <Item.Title>{line.name}</Item.Title>
+                      <Item.Description>{line.option}</Item.Description>
+                    </Item.Content>
+                    <Item.Actions>{won.format(line.price)}원</Item.Actions>
+                  </Item>
+                ))}
+              </ItemGroup>
+              <Card.Content>
+                <div className="flex flex-col gap-3">
+                  <Divider />
+                  <p className="flex justify-between">
+                    상품 금액<span>{won.format(subtotal)}원</span>
+                  </p>
+                  <p className="flex justify-between">
+                    배송비<span>{fee === 0 ? '무료' : `${won.format(fee)}원`}</span>
+                  </p>
+                  <Divider />
+                  <p className="text-body-b2-semibold flex justify-between">
+                    결제 금액<span>{won.format(total)}원</span>
+                  </p>
+                  <Label>
+                    <Checkbox name="agree" required />
+                    주문 내용을 확인했고 결제에 동의해요
+                  </Label>
+                </div>
+              </Card.Content>
+              <Card.Footer>
+                <div className="grid flex-1">
+                  <Button type="submit">
+                    <LockClosedIcon />
+                    {won.format(total)}원 결제하기
+                  </Button>
+                </div>
+              </Card.Footer>
+            </Card>
+          </div>
         </form>
       </main>
     );

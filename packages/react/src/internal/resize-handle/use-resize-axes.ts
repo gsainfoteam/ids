@@ -25,7 +25,7 @@ import {
 } from './measure';
 import { useResizeDrag, type ResizeDelta } from './use-resize-drag';
 import { keyHandler, type KeyMap } from '../keys';
-import { useTranslate } from '../translate';
+import { useIntlWords, useTranslate } from '../translate';
 
 type Started = {
   dimension: ResizeDimension;
@@ -212,10 +212,11 @@ export function useAxesDrag(
 
 export function useAxisSeparator(axis: ResizeAxis, options: AxesDragOptions) {
   const t = useTranslate();
+  const words = useIntlWords();
   const drag = useAxesDrag([axis], options);
 
   return {
-    ...axisSeparatorProps(axis, t, options.disabled),
+    ...axisSeparatorProps(axis, t, words, options.disabled),
     ...drag.dragProps,
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (options.disabled) return;

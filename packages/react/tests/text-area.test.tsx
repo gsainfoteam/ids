@@ -211,7 +211,7 @@ test('resize="auto" grows, caps at maxRows, shrinks, follows controlled changes 
   await screen.rerender(view('a', 'vertical'));
   expect(textarea().style.height).toBe('99px');
   expect(textarea().style.overflowY).toBe('scroll');
-  await expect.element(screen.getByRole('separator', { name: '높이' })).toBeInTheDocument();
+  await expect.element(screen.getByRole('separator', { name: '크기 조절' })).toBeInTheDocument();
 });
 
 test('native form reset resizes after defaultValue is restored', async () => {
@@ -465,7 +465,7 @@ test('each resize mode draws the handle Resizable draws for that direction, as t
   const textarea = () => screen.getByRole('textbox', { name: '메모' }).element() as HTMLElement;
   const shell = () => shellOf(textarea());
 
-  const height = screen.getByRole('separator', { name: '높이' });
+  const height = screen.getByRole('separator', { name: '크기 조절' });
   await expect.element(height).toHaveAttribute('aria-controls', textarea().id);
   await expect.element(height).toHaveAttribute('aria-orientation', 'horizontal');
   await expect.element(height).toHaveAttribute('aria-valuenow', String(textarea().offsetHeight));
@@ -474,7 +474,7 @@ test('each resize mode draws the handle Resizable draws for that direction, as t
   expect(getComputedStyle(textarea()).resize).toBe('none');
 
   await screen.rerender(resizable('horizontal'));
-  const width = screen.getByRole('separator', { name: '너비' });
+  const width = screen.getByRole('separator', { name: '크기 조절' });
   await expect.element(width).toHaveAttribute('aria-controls', shell().id);
   await expect.element(width).toHaveAttribute('aria-orientation', 'vertical');
   await expect.element(width).toHaveAttribute('aria-valuenow', '288');
@@ -782,15 +782,15 @@ test('keys resize the height on the textarea and the width on the whole field; E
 
   await userEvent.click(screen.getByRole('textbox', { name: '메모' }));
   await userEvent.keyboard('{Tab}');
-  await expect.element(screen.getByRole('separator', { name: '너비' })).toHaveFocus();
+  await expect.element(screen.getByRole('separator', { name: '크기 조절' }).nth(0)).toHaveFocus();
 
   await userEvent.keyboard('{ArrowDown}');
-  await expect.element(screen.getByRole('separator', { name: '높이' })).toHaveFocus();
+  await expect.element(screen.getByRole('separator', { name: '크기 조절' }).nth(1)).toHaveFocus();
   await expect.poll(() => textarea().style.height).toBe(`${naturalHeight + 16}px`);
   expect(shell().style.height).toBe('');
 
   await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
-  await expect.element(screen.getByRole('separator', { name: '너비' })).toHaveFocus();
+  await expect.element(screen.getByRole('separator', { name: '크기 조절' }).nth(0)).toHaveFocus();
   await expect.poll(() => shell().style.width).toBe('224px');
   expect(textarea().offsetWidth).toBe(224);
 
@@ -809,7 +809,7 @@ test('the height floor is one line and maxRows caps it', async () => {
       <TextArea.Input ref={pinRowMetrics} />
     </TextArea>,
   );
-  const handle = screen.getByRole('separator', { name: '높이' });
+  const handle = screen.getByRole('separator', { name: '크기 조절' });
   await expect.element(handle).toHaveAttribute('aria-valuemin', String(LINE_PX + PADDING_PX * 2));
   await expect
     .element(handle)
@@ -871,7 +871,7 @@ test('dragging a handle resizes the field; Escape during a drag restores it and 
 
 test('a disabled TextArea keeps its handle out of the tab order', async () => {
   const screen = await render(<TextArea resize="vertical" disabled aria-label="메모" />);
-  const handle = screen.getByRole('separator', { name: '높이' });
+  const handle = screen.getByRole('separator', { name: '크기 조절' });
   await expect.element(handle).toHaveAttribute('aria-disabled', 'true');
   await expect.element(handle).not.toHaveAttribute('tabindex');
 });

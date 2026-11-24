@@ -52,19 +52,21 @@ export const PC: Story = {
               <Chip variant="soft">약 2시간 남음</Chip>
             </Card.Action>
           </Card.Header>
-          <Card.Content className="flex flex-col gap-6">
-            <Progress value={45}>
-              <Progress.Label>진행</Progress.Label>
-              <Progress.Value />
-            </Progress>
-            <Stepper value={1} orientation="vertical" size="tiny" aria-label="점검 일정">
-              {SCHEDULE.map((step) => (
-                <Stepper.Item key={step.title}>
-                  <Stepper.Title>{step.title}</Stepper.Title>
-                  <Stepper.Description>{step.time}</Stepper.Description>
-                </Stepper.Item>
-              ))}
-            </Stepper>
+          <Card.Content>
+            <div className="flex flex-col gap-6">
+              <Progress value={45}>
+                <Progress.Label>진행</Progress.Label>
+                <Progress.Value />
+              </Progress>
+              <Stepper value={1} orientation="vertical" size="tiny" aria-label="점검 일정">
+                {SCHEDULE.map((step) => (
+                  <Stepper.Item key={step.title}>
+                    <Stepper.Title>{step.title}</Stepper.Title>
+                    <Stepper.Description>{step.time}</Stepper.Description>
+                  </Stepper.Item>
+                ))}
+              </Stepper>
+            </div>
           </Card.Content>
         </Card>
 
@@ -75,16 +77,18 @@ export const PC: Story = {
           }}
           className="flex items-end gap-2"
         >
-          <Field className="flex-1">
-            <Field.Label>끝나면 알려 드릴까요?</Field.Label>
-            <TextField
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="name@gm.gist.ac.kr"
-              required
-            />
-          </Field>
+          <div className="min-w-0 flex-1">
+            <Field>
+              <Field.Label>끝나면 알려 드릴까요?</Field.Label>
+              <TextField
+                type="email"
+                name="email"
+                autoComplete="email"
+                placeholder="name@gm.gist.ac.kr"
+                required
+              />
+            </Field>
+          </div>
           <Button type="submit" variant="outline">
             알림 받기
           </Button>

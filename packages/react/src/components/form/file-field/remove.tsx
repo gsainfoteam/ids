@@ -21,7 +21,7 @@ export function FileRemove({ file, className, onClick, ...props }: FileRemovePro
   return (
     <GhostButton
       {...props}
-      aria-label={props['aria-label'] ?? t('fileField.remove', { name: file.name })}
+      aria-label={props['aria-label'] ?? t('common.removeItem', { label: file.name })}
       disabled={c.state.disabled}
       data-file-field-remove=""
       size={c.size}

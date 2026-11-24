@@ -59,7 +59,7 @@ export const PC: Story = {
         </Alert.Description>
       </Alert>
 
-      <Tabs defaultValue="student" className="flex flex-col gap-6">
+      <Tabs defaultValue="student">
         <Tabs.List aria-label="식당">
           <Tabs.Trigger value="student">학생식당</Tabs.Trigger>
           <Tabs.Trigger value="dorm">기숙사식당</Tabs.Trigger>

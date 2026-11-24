@@ -56,8 +56,8 @@ const BENEFITS = [
 export const PC: Story = {
   render: () => (
     <main className="grid min-h-dvh break-keep lg:grid-cols-2">
-      <div className="hidden p-3 lg:flex">
-        <Card variant="soft" className="flex-1">
+      <div className="hidden p-3 lg:grid">
+        <Card variant="soft">
           <div className="flex flex-1 flex-col justify-between gap-10 p-6">
             <div className="text-body-b2-semibold flex items-center gap-2">
               <Avatar name="인포팀" size="tiny" aria-hidden>
@@ -107,7 +107,7 @@ export const PC: Story = {
             <p className="text-body-b2-regular">GIST 학생이라면 누구나 무료로 써요.</p>
           </div>
 
-          <Button variant="outline" className="w-full">
+          <Button variant="outline">
             <AcademicCapIcon />
             GIST 계정으로 가입하기
           </Button>
@@ -146,9 +146,7 @@ export const PC: Story = {
               <Checkbox name="terms" required />
               이용약관과 개인정보 처리방침에 동의해요
             </Label>
-            <Button type="submit" className="w-full">
-              가입하기
-            </Button>
+            <Button type="submit">가입하기</Button>
           </form>
 
           <div className="text-body-b3-regular flex items-center justify-center gap-2">

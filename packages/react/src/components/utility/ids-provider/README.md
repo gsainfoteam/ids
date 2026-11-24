@@ -359,7 +359,7 @@ const { mode, resolvedMode } = useTheme();
 
   <IdsProvider.Scope mode="dark">
     {/* 테마는 바깥을 물려받는다 */}
-    <Sidebar />
+    <Sidebar aria-label="사이드바" />
   </IdsProvider.Scope>
 
   <IdsProvider.Scope theme={{ primary: promoPalette, radius: 16 }}>

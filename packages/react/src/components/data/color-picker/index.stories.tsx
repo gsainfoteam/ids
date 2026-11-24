@@ -263,7 +263,7 @@ export const CopyTheValue: Story = {
       configurable: true,
       value: { writeText: async (text: string) => void copied.push(text) },
     });
-    await userEvent.click(canvas.getByRole('button', { name: '색상 값 복사' }));
+    await userEvent.click(canvas.getByRole('button', { name: '복사' }));
     await waitFor(() => expect(copied).toEqual(['#8B5CF6']));
     await expect(canvas.getByRole('status')).toHaveTextContent('복사했습니다');
   },

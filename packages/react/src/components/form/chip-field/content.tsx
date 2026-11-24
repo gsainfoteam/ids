@@ -28,7 +28,7 @@ function DrawerSearch() {
   return (
     <FieldPopupSearch
       ref={drawerInputRef}
-      aria-label={t('chipField.search')}
+      aria-label={t('common.search')}
       data-chip-field-search=""
       value={s.query}
       placeholder={c.inputDefaults.placeholder}
@@ -66,7 +66,7 @@ export function ChipContent({
   return (
     <>
       {c.drawer && <DrawerSearch />}
-      {limits.length ? limits : <ChipLimit />}
+      {limits}
       <ScrollArea fade="y" className={c.styles.listArea()}>
         <ScrollArea.Viewport asChild>
           {part(
@@ -83,7 +83,7 @@ export function ChipContent({
           )}
         </ScrollArea.Viewport>
       </ScrollArea>
-      {empties.length ? empties : <ChipEmpty />}
+      {empties}
     </>
   );
 }

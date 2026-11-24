@@ -100,9 +100,7 @@ export function useChipField({
   const enabled = visible.filter(selectable);
   const exists = !!findOption(options, trimmed) || selected.some((item) => sameText(item, trimmed));
   const canCreate = creatable && !!trimmed && !full && !exists;
-  const createError = canCreate
-    ? validationError(validate?.(trimmed), t('chipField.invalid'))
-    : null;
+  const createError = canCreate ? validationError(validate?.(trimmed), t('common.invalid')) : null;
   const createRow: Candidate[] = canCreate && !createError ? [CREATE] : [];
   const candidates: Candidate[] = [...enabled.map((option) => option.value), ...createRow];
   const exact = trimmed

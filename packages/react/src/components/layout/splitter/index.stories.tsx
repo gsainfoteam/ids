@@ -257,15 +257,15 @@ export const CollapseASidebar: Story = {
   play: async ({ canvas, canvasElement, userEvent, args }) => {
     const [handle] = handlesIn(canvasElement);
     const sidebar = canvasElement.querySelector<HTMLElement>('[data-splitter-panel]')!;
-    await userEvent.click(canvas.getByRole('button', { name: '패널 접기' }));
+    await userEvent.click(canvas.getByRole('button', { name: '접기' }));
     await waitFor(() => expect(valueOf(handle!)).toBe(0));
     await expect(sidebar).toHaveAttribute('data-collapsed');
-    await expect(handle).toHaveAttribute('aria-valuetext', '접힘');
+    await expect(handle).toHaveAttribute('aria-valuetext', '0%');
     await expect(args.onValueCommit).toHaveBeenLastCalledWith([0, 100]);
     handle!.focus();
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(valueOf(handle!)).toBe(30));
-    await expect(canvas.getByRole('button', { name: '패널 접기' })).toHaveAttribute(
+    await expect(canvas.getByRole('button', { name: '접기' })).toHaveAttribute(
       'aria-expanded',
       'true',
     );

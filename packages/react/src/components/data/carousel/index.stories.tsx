@@ -380,13 +380,13 @@ export const JumpToASlideFromOutside: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getByText('지금 단풍 든 언덕')).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole('button', { name: '다음 슬라이드' }));
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
     await expect(canvas.getByText('지금 눈 덮인 운동장')).toBeInTheDocument();
     await userEvent.click(canvas.getByRole('button', { name: '처음으로' }));
     await expect(canvas.getByRole('group', { name: '5장 중 1번째' })).toHaveAttribute(
       'data-selected',
     );
-    await expect(canvas.getByRole('button', { name: '이전 슬라이드' })).toHaveAttribute(
+    await expect(canvas.getByRole('button', { name: '이전' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
@@ -431,7 +431,7 @@ export const ShowSeveralCardsAtOnce: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getAllByRole('button', { name: /번째 슬라이드로$/ })).toHaveLength(2);
-    await userEvent.click(canvas.getByRole('button', { name: '다음 슬라이드' }));
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
     await expect(canvas.getByRole('button', { name: '4번째 슬라이드로' })).toHaveAttribute(
       'aria-current',
       'true',
@@ -465,11 +465,11 @@ export const ConnectTheEnds: Story = {
     },
   },
   play: async ({ canvas, userEvent, args }) => {
-    const previous = canvas.getByRole('button', { name: '이전 슬라이드' });
+    const previous = canvas.getByRole('button', { name: '이전' });
     await expect(previous).not.toHaveAttribute('aria-disabled');
     await userEvent.click(previous);
     await expect(args.onValueChange).toHaveBeenLastCalledWith(4);
-    await userEvent.click(canvas.getByRole('button', { name: '다음 슬라이드' }));
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(0);
   },
 };
@@ -502,7 +502,7 @@ export const RotateABanner: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const carousel = () => canvas.getByRole('region', { name: '공지 배너' });
-    const pause = () => canvas.getByRole('button', { name: '자동 넘김 멈춤' });
+    const pause = () => canvas.getByRole('button', { name: '일시 정지' });
     const startsPaused = prefersReducedMotion();
 
     await expectPauseToHold(carousel, pause, startsPaused);
@@ -548,7 +548,7 @@ export const FlowLogosWithoutStopping: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const carousel = () => canvas.getByRole('region', { name: '후원 단체' });
-    const pause = () => canvas.getByRole('button', { name: '자동 넘김 멈춤' });
+    const pause = () => canvas.getByRole('button', { name: '일시 정지' });
     const startsPaused = prefersReducedMotion();
 
     await expectPauseToHold(carousel, pause, startsPaused);
@@ -584,7 +584,7 @@ export const StackNoticesVertically: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: '다음 슬라이드' }));
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
     await expect(canvas.getByRole('group', { name: '3장 중 2번째' })).toHaveAttribute(
       'data-selected',
     );
@@ -656,8 +656,8 @@ export const PlaceYourOwnControls: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getByRole('region', { name: '추천 상품' })).toBeInTheDocument();
-    await expect(canvas.getAllByRole('button', { name: '다음 슬라이드' })).toHaveLength(1);
-    await userEvent.click(canvas.getByRole('button', { name: '다음 슬라이드' }));
+    await expect(canvas.getAllByRole('button', { name: '다음' })).toHaveLength(1);
+    await userEvent.click(canvas.getByRole('button', { name: '다음' }));
     await expect(canvas.getByRole('button', { name: '2번째 슬라이드로' })).toHaveAttribute(
       'aria-current',
       'true',

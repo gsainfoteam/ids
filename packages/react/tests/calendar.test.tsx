@@ -8,15 +8,15 @@ import { Calendar, IdsProvider } from '../src';
 import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
-const ssr = (props: Calendar.Props, locale?: string) =>
+const ssr = (props: Partial<Calendar.Props>, locale?: string) =>
   parse(
     renderToString(
       locale ? (
         <IdsProvider theme={testTheme} locale={locale}>
-          <Calendar {...props} />
+          <Calendar {...({ 'aria-label': '달력', ...props } as Calendar.Props)} />
         </IdsProvider>
       ) : (
-        <Calendar {...props} />
+        <Calendar {...({ 'aria-label': '달력', ...props } as Calendar.Props)} />
       ),
     ),
   );
@@ -42,7 +42,7 @@ test('SSR: Korean by default, two months without duplicate dates, one tab stop',
   );
   expect(new Set(keys).size).toBe(keys.length);
   expect(doc.querySelectorAll('[data-calendar-day][tabindex="0"]')).toHaveLength(1);
-  expect(doc.querySelectorAll('[aria-label="이전 달"]')).toHaveLength(1);
+  expect(doc.querySelectorAll('[aria-label="지난달"]')).toHaveLength(1);
   expect(doc.querySelectorAll('[aria-label="다음 달"]')).toHaveLength(1);
   expect([...doc.querySelectorAll('[role=status]')].map((node) => node.textContent)).toEqual([
     '2024년 2월',
@@ -64,7 +64,7 @@ test('any BCP 47 tag drives names, the first weekday and the day labels without 
       .querySelector(`[data-calendar-day="${key}"]`)!
       .getAttribute('aria-label');
   expect(labelOf('en-US')).toBe('Tuesday, September 15, 2026');
-  expect(labelOf('en-US', '2026-09-14')).toBe('오늘, Monday, September 14, 2026');
+  expect(labelOf('en-US', '2026-09-14')).toBe('today, Monday, September 14, 2026');
   expect(labelOf('fr-FR')).toBe('mardi 15 septembre 2026');
   const japanese = ssr({ today: d(2026, 9, 15) }, 'ja-JP');
   expect(japanese.querySelector('[data-calendar]')!.getAttribute('lang')).toBe('ja-JP');
@@ -96,8 +96,8 @@ test('grid, weekday and week number labels are Korean by default', () => {
   expect(doc.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('2026년 9월');
   expect(
     [...doc.querySelectorAll('th[scope=col]')].map((th) => th.getAttribute('aria-label')),
-  ).toEqual(['주차', '일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']);
-  expect(doc.querySelector('[role=rowheader]')!.getAttribute('aria-label')).toMatch(/^\d+주차$/);
+  ).toEqual(['주', '일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']);
+  expect(doc.querySelector('[role=rowheader]')!.getAttribute('aria-label')).toMatch(/^\d{2}$/);
 });
 
 test('diagnostics for mismatched values, limits and parts outside the calendar', () => {
@@ -113,7 +113,7 @@ test('diagnostics for mismatched values, limits and parts outside the calendar',
 test('keyboard: month ends clamp, Home and End follow the week start, Shift jumps', async () => {
   await render(
     <IdsProvider theme={testTheme} locale="ko-KR-u-fw-mon">
-      <Calendar defaultValue={d(2024, 1, 31)} today={d(2024, 1, 1)} autoFocus />
+      <Calendar aria-label="달력" defaultValue={d(2024, 1, 31)} today={d(2024, 1, 1)} autoFocus />
     </IdsProvider>,
   );
   await expect.element(day('2024-01-31')).toHaveFocus();
@@ -140,7 +140,7 @@ test('keyboard: month ends clamp, Home and End follow the week start, Shift jump
 test('an inherited right-to-left direction swaps the horizontal arrows', async () => {
   const screen = await render(
     <div dir="rtl">
-      <Calendar defaultValue={d(2026, 9, 15)} today={d(2026, 9, 15)} autoFocus />
+      <Calendar aria-label="달력" defaultValue={d(2026, 9, 15)} today={d(2026, 9, 15)} autoFocus />
     </div>,
   );
   await expect.element(screen.getByRole('group', { name: '달력' })).toHaveAttribute('dir', 'rtl');
@@ -155,6 +155,7 @@ test('single: blocked days refuse, the value is a CalendarDate, a re-click is no
   const changes: (CalendarDate | null)[] = [];
   await render(
     <Calendar
+      aria-label="달력"
       today={d(2026, 9, 15)}
       min={d(2026, 9, 10)}
       max={d(2026, 9, 20)}
@@ -178,15 +179,14 @@ test('single: blocked days refuse, the value is a CalendarDate, a re-click is no
   await expect.element(day('2026-09-15')).toHaveFocus();
   await expect.element(day('2026-09-18')).toHaveAttribute('data-selected');
   await expect.element(day('2026-09-15')).toHaveAttribute('data-today');
-  await expect
-    .element(day('2026-09-18'))
-    .toHaveAttribute('aria-label', '2026년 9월 18일 금요일, 선택됨');
+  await expect.element(day('2026-09-18')).toHaveAttribute('aria-label', '2026년 9월 18일 금요일');
 });
 
 test('a DayPicker matcher blocks days, and equal min and max leave one day and no months', async () => {
   let value = null as CalendarDate | null;
   const screen = await render(
     <Calendar
+      aria-label="달력"
       today={d(2026, 9, 15)}
       disabled={{ dayOfWeek: [0, 6] }}
       onValueChange={(next) => (value = next)}
@@ -196,6 +196,7 @@ test('a DayPicker matcher blocks days, and equal min and max leave one day and n
   await expect.element(day('2026-09-18')).not.toHaveAttribute('disabled');
   await screen.rerender(
     <Calendar
+      aria-label="달력"
       key="one day"
       today={d(2026, 9, 15)}
       min={d(2026, 9, 15)}
@@ -205,7 +206,7 @@ test('a DayPicker matcher blocks days, and equal min and max leave one day and n
   );
   await userEvent.click(day('2026-09-15'));
   expect(dateKey(value)).toBe('2026-09-15');
-  const previous = screen.getByRole('button', { name: '이전 달' });
+  const previous = screen.getByRole('button', { name: '지난달' });
   await expect.element(previous).toHaveAttribute('aria-disabled', 'true');
   previous.element().focus();
   await userEvent.click(previous, { force: true });
@@ -217,6 +218,7 @@ test('range: a partial value, ordered ends, restart, and a preview under the poi
   let value = null as Calendar.Range | null;
   const screen = await render(
     <Calendar
+      aria-label="달력"
       selectionMode="range"
       today={d(2026, 9, 15)}
       onValueChange={(next) => (value = next)}
@@ -237,7 +239,7 @@ test('range: a partial value, ordered ends, restart, and a preview under the poi
   await expect.element(day('2026-09-24')).not.toHaveAttribute('data-range-preview');
   await userEvent.hover(day('2026-09-22'));
   await expect.element(day('2026-09-18')).not.toHaveAttribute('data-range-preview');
-  await userEvent.hover(screen.getByRole('button', { name: '이전 달' }));
+  await userEvent.hover(screen.getByRole('button', { name: '지난달' }));
   await expect.element(day('2026-09-18')).toHaveAttribute('data-range-preview');
   await userEvent.click(day('2026-09-10'));
   expect(dateKey(value?.start)).toBe('2026-09-10');
@@ -256,6 +258,7 @@ test('multiple toggles by day and marks the grid multiselectable', async () => {
   let value: CalendarDate[] = [];
   const screen = await render(
     <Calendar
+      aria-label="달력"
       selectionMode="multiple"
       today={d(2026, 9, 15)}
       onValueChange={(next) => (value = next)}
@@ -272,7 +275,7 @@ test('multiple toggles by day and marks the grid multiselectable', async () => {
 test('readOnly browses without changes and keeps a value; disabled blocks navigation and selection', async () => {
   const onValueChange = vi.fn();
   const screen = await render(
-    <Calendar today={d(2026, 9, 15)} onValueChange={onValueChange} readOnly />,
+    <Calendar aria-label="달력" today={d(2026, 9, 15)} onValueChange={onValueChange} readOnly />,
   );
   await userEvent.click(day('2026-09-15'));
   expect(onValueChange).not.toHaveBeenCalled();
@@ -280,13 +283,25 @@ test('readOnly browses without changes and keeps a value; disabled blocks naviga
   await userEvent.click(screen.getByRole('button', { name: '다음 달' }));
   await expect.element(day('2026-10-15')).toBeInTheDocument();
   await screen.rerender(
-    <Calendar key="readonly value" today={d(2026, 9, 15)} readOnly value={d(2026, 9, 18)} />,
+    <Calendar
+      aria-label="달력"
+      key="readonly value"
+      today={d(2026, 9, 15)}
+      readOnly
+      value={d(2026, 9, 18)}
+    />,
   );
   await expect.element(day('2026-09-18')).toHaveAttribute('data-selected');
   await userEvent.click(day('2026-09-20'));
   await expect.element(day('2026-09-20')).not.toHaveAttribute('data-selected');
   await screen.rerender(
-    <Calendar key="disabled" today={d(2026, 9, 15)} onValueChange={onValueChange} disabled />,
+    <Calendar
+      aria-label="달력"
+      key="disabled"
+      today={d(2026, 9, 15)}
+      onValueChange={onValueChange}
+      disabled
+    />,
   );
   await userEvent.click(day('2026-09-15'), { force: true });
   expect(onValueChange).not.toHaveBeenCalled();
@@ -303,6 +318,7 @@ test('caption dropdowns jump by year and month within min and max', async () => 
   const months: CalendarDate[] = [];
   const screen = await render(
     <Calendar
+      aria-label="달력"
       today={d(2026, 9, 15)}
       min={d(2020, 3, 10)}
       max={d(2026, 10, 5)}
@@ -312,7 +328,7 @@ test('caption dropdowns jump by year and month within min and max', async () => 
     </Calendar>,
   );
   const [year, month] = screen.container.querySelectorAll('select');
-  expect(year).toHaveAttribute('aria-label', '연도');
+  expect(year).toHaveAttribute('aria-label', '년');
   expect(month).toHaveAttribute('aria-label', '월');
   expect(month).toHaveAttribute('data-field-input');
   expect([...year.options].map((option) => option.value)).toEqual([
@@ -336,11 +352,11 @@ test('caption dropdowns jump by year and month within min and max', async () => 
 
 test('without limits the year menu spans a century either side of today', async () => {
   const screen = await render(
-    <Calendar today={d(2026, 9, 15)}>
+    <Calendar aria-label="달력" today={d(2026, 9, 15)}>
       <Calendar.Caption layout="dropdown" />
     </Calendar>,
   );
-  const year = screen.getByRole('combobox', { name: '연도' }).element() as HTMLSelectElement;
+  const year = screen.getByRole('combobox', { name: '년' }).element() as HTMLSelectElement;
   expect(year.options[0].value).toBe('1926');
   expect(year.options[year.options.length - 1].value).toBe('2126');
   expect(year).toHaveValue('2026');
@@ -349,7 +365,12 @@ test('without limits the year menu spans a century either side of today', async 
 test('a month picked in the second caption lands in the second grid', async () => {
   const months: CalendarDate[] = [];
   const screen = await render(
-    <Calendar monthsToShow={2} today={d(2026, 9, 15)} onMonthChange={(next) => months.push(next)}>
+    <Calendar
+      aria-label="달력"
+      monthsToShow={2}
+      today={d(2026, 9, 15)}
+      onMonthChange={(next) => months.push(next)}
+    >
       <Calendar.Caption layout="dropdown" />
     </Calendar>,
   );
@@ -364,6 +385,7 @@ test('Previous and Next are ghost IconButtons that keep focus once the last mont
   const months: CalendarDate[] = [];
   const screen = await render(
     <Calendar
+      aria-label="달력"
       today={d(2026, 9, 15)}
       max={d(2026, 10, 31)}
       size="tiny"
@@ -391,18 +413,20 @@ test('Previous and Next are ghost IconButtons that keep focus once the last mont
   await userEvent.keyboard('{Enter}');
   expect(months).toHaveLength(1);
   await expect
-    .element(screen.getByRole('button', { name: '이전 달' }))
+    .element(screen.getByRole('button', { name: '지난달' }))
     .not.toHaveAttribute('aria-disabled');
 });
 
 test('several months: Previous before the first grid only, Next after the last only', async () => {
-  const screen = await render(<Calendar today={d(2026, 9, 15)} monthsToShow={3} />);
+  const screen = await render(
+    <Calendar aria-label="달력" today={d(2026, 9, 15)} monthsToShow={3} />,
+  );
   const months = screen
     .getByRole('grid')
     .elements()
     .map((grid) => page.elementLocator(grid.parentElement!));
   expect(months).toHaveLength(3);
-  await expect.element(months[0].getByRole('button', { name: '이전 달' })).toBeInTheDocument();
+  await expect.element(months[0].getByRole('button', { name: '지난달' })).toBeInTheDocument();
   await expect.element(months[0].getByRole('button', { name: '다음 달' })).not.toBeInTheDocument();
   await expect.element(months[2].getByRole('button', { name: '다음 달' })).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '다음 달' }));
@@ -418,6 +442,7 @@ test('a controlled month waits for the parent', async () => {
   let month = null as CalendarDate | null;
   const screen = await render(
     <Calendar
+      aria-label="달력"
       today={d(2026, 9, 15)}
       month={d(2026, 9, 1)}
       onMonthChange={(next) => (month = next)}
@@ -432,6 +457,7 @@ test('Calendar.Day children replace only the content and get the day state; modi
   const states: Record<string, Calendar.DayState> = {};
   const screen = await render(
     <Calendar
+      aria-label="달력"
       selectionMode="range"
       today={d(2026, 9, 15)}
       defaultValue={{ start: d(2026, 9, 21), end: d(2026, 9, 23) }}
@@ -460,7 +486,7 @@ test('Calendar.Day children replace only the content and get the day state; modi
   expect(day('2026-09-06').textContent).toBe('6일');
   expect(day('2026-09-06')).toHaveClass('rounded-standard');
   expect(day('2026-09-22')).toHaveAttribute('data-range-middle');
-  expect(day('2026-09-22')).toHaveAttribute('aria-label', '2026년 9월 22일 화요일, 선택됨');
+  expect(day('2026-09-22')).toHaveAttribute('aria-label', '2026년 9월 22일 화요일');
   expect(states['2026-09-04'].modifiers).toEqual({ event: true, weekend: false });
   expect(states['2026-09-05']).toMatchObject({ disabled: true, modifiers: { weekend: true } });
   expect(states['2026-09-15']).toMatchObject({ today: true, selected: false });
@@ -508,7 +534,7 @@ test('parts: Day modifiers reach the day state; WeekNumber, a dropdown Caption a
   expect(saturday.querySelector('[data-booked-mark]')).toBeNull();
   expect(doc.querySelectorAll('[role=rowheader]')).toHaveLength(6);
   expect(doc.querySelector('[role=rowheader]')!.classList.contains('custom-week')).toBe(true);
-  expect(doc.querySelector('th[scope=col]')!.getAttribute('aria-label')).toBe('주차');
+  expect(doc.querySelector('th[scope=col]')!.getAttribute('aria-label')).toBe('주');
   expect(doc.querySelectorAll('select')).toHaveLength(2);
   expect(doc.querySelector('.custom-caption select')).not.toBeNull();
   const footer = doc.querySelector('p[role=status]')!;
@@ -626,6 +652,7 @@ test('a range band is primary subtle, a preview neutral, and today a primary lab
   await render(
     <IdsProvider theme={testTheme}>
       <Calendar
+        aria-label="달력"
         selectionMode="range"
         defaultValue={{ start: d(2026, 9, 10), end: d(2026, 9, 17) }}
         today={d(2026, 9, 15)}

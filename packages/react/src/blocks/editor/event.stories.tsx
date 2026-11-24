@@ -69,86 +69,88 @@ export const PC: Story = {
               <Card.Description>만든 행사는 게시판과 캘린더에 함께 올라가요.</Card.Description>
             </Card.Header>
 
-            <Card.Content className="flex flex-col gap-5">
-              <Field>
-                <Field.Label>행사 이름</Field.Label>
-                <TextField name="name" value={name} onValueChange={setName} required />
-              </Field>
-              <Field>
-                <Field.Label>소개</Field.Label>
-                <Editor
-                  name="description"
-                  format="markdown"
-                  maxLength={300}
-                  defaultValue="동아리 부스, 푸드트럭, 저녁 공연까지. 이틀 동안 광장이 **축제**가 돼요."
-                >
-                  <Editor.Bold />
-                  <Editor.Italic />
-                  <Editor.Link />
-                  <Editor.Separator />
-                  <Editor.BulletList />
-                  <Editor.Content />
-                  <Editor.Count />
-                </Editor>
-              </Field>
-              <div className="grid items-start gap-4 sm:grid-cols-2">
+            <Card.Content>
+              <div className="flex flex-col gap-5">
                 <Field>
-                  <Field.Label>날짜</Field.Label>
-                  <DateField
-                    name="dates"
-                    selectionMode="range"
-                    value={dates}
-                    onValueChange={setDates}
-                    required
-                  />
+                  <Field.Label>행사 이름</Field.Label>
+                  <TextField name="name" value={name} onValueChange={setName} required />
                 </Field>
                 <Field>
-                  <Field.Label>시작 시간</Field.Label>
-                  <TimeField
-                    name="startsAt"
-                    value={startsAt}
-                    onValueChange={setStartsAt}
-                    step={30}
-                  />
+                  <Field.Label>소개</Field.Label>
+                  <Editor
+                    name="description"
+                    format="markdown"
+                    maxLength={300}
+                    defaultValue="동아리 부스, 푸드트럭, 저녁 공연까지. 이틀 동안 광장이 **축제**가 돼요."
+                  >
+                    <Editor.Bold />
+                    <Editor.Italic />
+                    <Editor.Link />
+                    <Editor.Separator />
+                    <Editor.BulletList />
+                    <Editor.Content />
+                    <Editor.Count />
+                  </Editor>
                 </Field>
+                <div className="grid items-start gap-4 sm:grid-cols-2">
+                  <Field>
+                    <Field.Label>날짜</Field.Label>
+                    <DateField
+                      name="dates"
+                      selectionMode="range"
+                      value={dates}
+                      onValueChange={setDates}
+                      required
+                    />
+                  </Field>
+                  <Field>
+                    <Field.Label>시작 시간</Field.Label>
+                    <TimeField
+                      name="startsAt"
+                      value={startsAt}
+                      onValueChange={setStartsAt}
+                      step={30}
+                    />
+                  </Field>
+                </div>
+                <div className="grid items-start gap-4 sm:grid-cols-2">
+                  <Field>
+                    <Field.Label>장소</Field.Label>
+                    <Select name="place" value={place} onValueChange={setPlace}>
+                      {PLACES.map((option) => (
+                        <Select.Item key={option} value={option}>
+                          {option}
+                        </Select.Item>
+                      ))}
+                    </Select>
+                  </Field>
+                  <Field>
+                    <Field.Label>정원</Field.Label>
+                    <NumberField
+                      name="capacity"
+                      value={capacity}
+                      onValueChange={setCapacity}
+                      min={1}
+                      max={1000}
+                      step={10}
+                    />
+                  </Field>
+                </div>
+                <Label>
+                  <Switch name="signUp" checked={signUp} onCheckedChange={setSignUp} />
+                  참가 신청 받기
+                </Label>
+                {signUp && (
+                  <Field>
+                    <Field.Label>신청 마감</Field.Label>
+                    <DateField name="closesOn" defaultValue={new CalendarDate(2026, 10, 12)} />
+                    <Field.Hint>마감하면 신청 버튼이 꺼져요.</Field.Hint>
+                  </Field>
+                )}
               </div>
-              <div className="grid items-start gap-4 sm:grid-cols-2">
-                <Field>
-                  <Field.Label>장소</Field.Label>
-                  <Select name="place" value={place} onValueChange={setPlace}>
-                    {PLACES.map((option) => (
-                      <Select.Item key={option} value={option}>
-                        {option}
-                      </Select.Item>
-                    ))}
-                  </Select>
-                </Field>
-                <Field>
-                  <Field.Label>정원</Field.Label>
-                  <NumberField
-                    name="capacity"
-                    value={capacity}
-                    onValueChange={setCapacity}
-                    min={1}
-                    max={1000}
-                    step={10}
-                  />
-                </Field>
-              </div>
-              <Label>
-                <Switch name="signUp" checked={signUp} onCheckedChange={setSignUp} />
-                참가 신청 받기
-              </Label>
-              {signUp && (
-                <Field>
-                  <Field.Label>신청 마감</Field.Label>
-                  <DateField name="closesOn" defaultValue={new CalendarDate(2026, 10, 12)} />
-                  <Field.Hint>마감하면 신청 버튼이 꺼져요.</Field.Hint>
-                </Field>
-              )}
             </Card.Content>
 
-            <Card.Footer className="justify-end">
+            <Card.Footer>
               <Button variant="outline">취소</Button>
               <Button type="submit">만들기</Button>
             </Card.Footer>
@@ -161,10 +163,16 @@ export const PC: Story = {
           </h2>
           <Card>
             <Card.Header>
-              <Chip variant="soft" colorScheme="primary" className="justify-self-start">
-                행사
-              </Chip>
-              <Card.Title className="text-headline-h5-bold">{name || '행사 이름'}</Card.Title>
+              <div className="flex">
+                <Chip variant="soft" colorScheme="primary">
+                  행사
+                </Chip>
+              </div>
+              <Card.Title asChild>
+                <h3>
+                  <span className="text-headline-h5-bold block">{name || '행사 이름'}</span>
+                </h3>
+              </Card.Title>
             </Card.Header>
             <ItemGroup size="tiny" aria-label="행사 정보">
               <Item>
@@ -195,9 +203,9 @@ export const PC: Story = {
               </Item>
             </ItemGroup>
             <Card.Footer>
-              <Button className="w-full" disabled={!signUp}>
-                {signUp ? '신청하기' : '신청을 받지 않아요'}
-              </Button>
+              <div className="grid flex-1">
+                <Button disabled={!signUp}>{signUp ? '신청하기' : '신청을 받지 않아요'}</Button>
+              </div>
             </Card.Footer>
           </Card>
         </section>

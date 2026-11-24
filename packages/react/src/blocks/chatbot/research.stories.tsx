@@ -63,112 +63,121 @@ export const PC: Story = {
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
         <h1 className="text-headline-h3-bold">기숙사 외박 신청은 어떻게 하나요?</h1>
 
-        <Tabs defaultValue="answer" className="flex flex-col gap-6">
+        <Tabs defaultValue="answer">
           <Tabs.List aria-label="답변 보기">
             <Tabs.Trigger value="answer">답변</Tabs.Trigger>
             <Tabs.Trigger value="sources">출처 {SOURCES.length}</Tabs.Trigger>
           </Tabs.List>
 
-          <Tabs.Content value="answer" className="text-body-b1-regular flex flex-col gap-5">
-            <ol aria-label="출처" className="grid grid-cols-2 gap-2 md:grid-cols-4">
-              {SOURCES.map((source, index) => (
-                <li key={source.id} className="flex">
-                  <Card size="tiny" variant="soft" asChild className="w-full">
-                    <a href={`#${source.id}`}>
-                      <Card.Header>
-                        <Card.Description>
-                          {index + 1} · {source.site}
-                        </Card.Description>
-                        <Card.Title asChild>
-                          <h2>{source.title}</h2>
-                        </Card.Title>
-                      </Card.Header>
-                    </a>
-                  </Card>
-                </li>
-              ))}
-            </ol>
+          <Tabs.Content value="answer">
+            <div className="text-body-b1-regular flex flex-col gap-5">
+              <ol aria-label="출처" className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                {SOURCES.map((source, index) => (
+                  <li key={source.id} className="flex">
+                    <Card size="tiny" variant="soft" asChild>
+                      <a href={`#${source.id}`}>
+                        <Card.Header>
+                          <Card.Description>
+                            {index + 1} · {source.site}
+                          </Card.Description>
+                          <Card.Title asChild>
+                            <h2>{source.title}</h2>
+                          </Card.Title>
+                        </Card.Header>
+                      </a>
+                    </Card>
+                  </li>
+                ))}
+              </ol>
 
-            <Item size="tiny" variant="outline" className="w-auto self-start">
-              <Item.Media>
-                <CheckCircleIcon />
-              </Item.Media>
-              <Item.Content>
-                <Item.Title>출처 4곳을 읽고 답했어요</Item.Title>
-              </Item.Content>
-            </Item>
-
-            <p>
-              외박은 나가기 전날 밤 10시까지 포털에서 신청해요{' '}
-              <Chip variant="outline">
-                {
-                  <>
-                    <span className="sr-only">출처 </span>1
-                  </>
-                }
-              </Chip>
-              . 신청하지 않고 외박하면 벌점 3점이 쌓여요{' '}
-              <Chip variant="outline">
-                {
-                  <>
-                    <span className="sr-only">출처 </span>2
-                  </>
-                }
-              </Chip>
-              .
-            </p>
-
-            <ItemGroup ordered aria-label="신청하는 순서">
-              {STEPS.map((step, index) => (
-                <Item key={step.text}>
-                  <Item.Media variant="soft" aria-hidden>
-                    {index + 1}
+              <div className="self-start">
+                <Item size="tiny" variant="outline">
+                  <Item.Media>
+                    <CheckCircleIcon />
                   </Item.Media>
                   <Item.Content>
-                    <Item.Title>{step.text}</Item.Title>
-                    <Item.Description>출처 {step.source}</Item.Description>
+                    <Item.Title>출처 4곳을 읽고 답했어요</Item.Title>
                   </Item.Content>
                 </Item>
-              ))}
-            </ItemGroup>
+              </div>
 
-            <Alert colorScheme="info">
-              <Alert.Title>주말과 공휴일 외박도 신청해요</Alert.Title>
-              <Alert.Description>
-                금요일에 나가면 목요일 밤까지 신청해야 해요. 게시판에도 같은 질문이 있었어요 (출처
-                4).
-              </Alert.Description>
-            </Alert>
+              <p>
+                외박은 나가기 전날 밤 10시까지 포털에서 신청해요{' '}
+                <Chip variant="outline">
+                  {
+                    <>
+                      <span className="sr-only">출처 </span>1
+                    </>
+                  }
+                </Chip>
+                . 신청하지 않고 외박하면 벌점 3점이 쌓여요{' '}
+                <Chip variant="outline">
+                  {
+                    <>
+                      <span className="sr-only">출처 </span>2
+                    </>
+                  }
+                </Chip>
+                .
+              </p>
 
-            <div className="flex gap-1">
-              <IconButton
-                variant="outline"
-                size="tiny"
-                aria-label="답 복사"
-                icon={<DocumentDuplicateIcon />}
-                onClick={() => toast.success('답을 복사했어요')}
-              />
-              <IconButton variant="outline" size="tiny" aria-label="답 공유" icon={<ShareIcon />} />
-              <IconToggle size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
-              <IconToggle size="tiny" aria-label="아쉬운 답" icon={<HandThumbDownIcon />} />
+              <ItemGroup ordered aria-label="신청하는 순서">
+                {STEPS.map((step, index) => (
+                  <Item key={step.text}>
+                    <Item.Media variant="soft" aria-hidden>
+                      {index + 1}
+                    </Item.Media>
+                    <Item.Content>
+                      <Item.Title>{step.text}</Item.Title>
+                      <Item.Description>출처 {step.source}</Item.Description>
+                    </Item.Content>
+                  </Item>
+                ))}
+              </ItemGroup>
+
+              <Alert colorScheme="info">
+                <Alert.Title>주말과 공휴일 외박도 신청해요</Alert.Title>
+                <Alert.Description>
+                  금요일에 나가면 목요일 밤까지 신청해야 해요. 게시판에도 같은 질문이 있었어요 (출처
+                  4).
+                </Alert.Description>
+              </Alert>
+
+              <div className="flex gap-1">
+                <IconButton
+                  variant="outline"
+                  size="tiny"
+                  aria-label="답 복사"
+                  icon={<DocumentDuplicateIcon />}
+                  onClick={() => toast.success('답을 복사했어요')}
+                />
+                <IconButton
+                  variant="outline"
+                  size="tiny"
+                  aria-label="답 공유"
+                  icon={<ShareIcon />}
+                />
+                <IconToggle size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
+                <IconToggle size="tiny" aria-label="아쉬운 답" icon={<HandThumbDownIcon />} />
+              </div>
+
+              <section aria-labelledby="related" className="flex flex-col gap-3">
+                <h2 id="related" className="text-headline-h5-bold">
+                  이어서 많이 묻는 질문
+                </h2>
+                <Card size="tiny">
+                  <ItemGroup aria-label="이어서 많이 묻는 질문">
+                    {RELATED.map((question) => (
+                      <Item key={question} onClick={() => setDraft(question)}>
+                        <Item.Content>
+                          <Item.Title>{question}</Item.Title>
+                        </Item.Content>
+                      </Item>
+                    ))}
+                  </ItemGroup>
+                </Card>
+              </section>
             </div>
-
-            <section aria-labelledby="related" className="flex flex-col gap-3">
-              <h2 id="related" className="text-headline-h5-bold">
-                이어서 많이 묻는 질문
-              </h2>
-              <Card size="tiny">
-                <ItemGroup aria-label="이어서 많이 묻는 질문">
-                  {RELATED.map((question) => (
-                    <Item key={question} onClick={() => setDraft(question)}>
-                      <Item.Content>
-                        <Item.Title>{question}</Item.Title>
-                      </Item.Content>
-                    </Item>
-                  ))}
-                </ItemGroup>
-              </Card>
-            </section>
           </Tabs.Content>
 
           <Tabs.Content value="sources">
