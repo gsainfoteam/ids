@@ -26,6 +26,7 @@ export 'src/components/field/ids_field.dart'
     hide FieldControlBinding, bindFieldControl;
 export 'src/components/floating_button/ids_floating_button.dart';
 export 'src/components/icon_button/ids_icon_button.dart';
+export 'src/components/icon_toggle/ids_icon_toggle.dart';
 export 'src/components/kbd/ids_kbd.dart';
 export 'src/components/label/ids_label.dart';
 export 'src/components/spinner/ids_spinner.dart';

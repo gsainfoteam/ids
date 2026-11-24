@@ -13,6 +13,7 @@ import 'components/checkbox_group_usecase.dart';
 import 'components/floating_button_usecase.dart';
 import 'components/toggle_usecase.dart';
 import 'components/toggle_group_usecase.dart';
+import 'components/icon_toggle_usecase.dart';
 import 'components/feedback/spinner.dart';
 import 'components/form/field.dart';
 import 'components/layout/divider.dart';
@@ -44,6 +45,10 @@ final directories = <WidgetbookNode>[
           WidgetbookComponent(
             name: 'IdsToggleGroup',
             useCases: toggleGroupUseCases,
+          ),
+          WidgetbookComponent(
+            name: 'IdsIconToggle',
+            useCases: iconToggleUseCases,
           ),
         ],
       ),

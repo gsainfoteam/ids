@@ -470,20 +470,20 @@ Widget _alignment(
   variant: variant,
   disabled: disabled,
   children: [
-    IdsToggle(
+    IdsIconToggle(
       value: 'left',
       semanticLabel: context.strings.demo.toggleGroupSample.alignLeft,
-      child: Icon(Icons.format_align_left),
+      icon: Icon(Icons.format_align_left),
     ),
-    IdsToggle(
+    IdsIconToggle(
       value: 'center',
       semanticLabel: context.strings.demo.toggleGroupSample.alignCenter,
-      child: Icon(Icons.format_align_center),
+      icon: Icon(Icons.format_align_center),
     ),
-    IdsToggle(
+    IdsIconToggle(
       value: 'right',
       semanticLabel: context.strings.demo.toggleGroupSample.alignRight,
-      child: Icon(Icons.format_align_right),
+      icon: Icon(Icons.format_align_right),
     ),
   ],
 );
@@ -516,26 +516,26 @@ Widget _formats(BuildContext context, [IdsVariant? variant]) =>
       defaultValue: const [_TextFormat.bold],
       variant: variant,
       children: [
-        IdsToggle(
+        IdsIconToggle(
           value: _TextFormat.bold,
           semanticLabel: context.strings.demo.toggleGroupSample.bold,
-          child: Icon(Icons.format_bold),
+          icon: Icon(Icons.format_bold),
         ),
-        IdsToggle(
+        IdsIconToggle(
           value: _TextFormat.italic,
           semanticLabel: context.strings.demo.toggleGroupSample.italic,
-          child: Icon(Icons.format_italic),
+          icon: Icon(Icons.format_italic),
         ),
-        IdsToggle(
+        IdsIconToggle(
           value: _TextFormat.underline,
           semanticLabel: context.strings.demo.toggleGroupSample.underline,
-          child: Icon(Icons.format_underlined),
+          icon: Icon(Icons.format_underlined),
         ),
         IdsToggleGroup.separator(),
-        IdsToggle(
+        IdsIconToggle(
           value: _TextFormat.strike,
           semanticLabel: context.strings.demo.toggleGroupSample.strikethrough,
-          child: Icon(Icons.strikethrough_s),
+          icon: Icon(Icons.strikethrough_s),
         ),
       ],
     );

@@ -225,6 +225,18 @@
       "italic": "기울임",
       "underline": "밑줄",
       "strikethrough": "취소선"
+    },
+    "iconToggleSample": {
+      "favorite": "즐겨찾기",
+      "theoffstateisunderstated": "꺼지면 조용하고, variant는 켜진 모습을 정합니다.",
+      "bold": "굵게",
+      "italic": "기울임",
+      "like": "좋아요",
+      "listView": "목록 보기",
+      "gridView": "격자로 보기",
+      "grid": "격자",
+      "list": "목록",
+      "star": "별"
     }
   },
   "examples": {
