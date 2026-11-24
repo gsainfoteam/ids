@@ -6,7 +6,7 @@ import type { SchedulerColorScheme, SchedulerView } from './layout';
 export const schedulerStyle = tv({
   slots: {
     root: [
-      'flex h-144 min-h-0 w-full min-w-0 flex-col gap-3 text-neutral-strong',
+      'flex h-(--scheduler-height,36rem) min-h-0 w-full min-w-0 flex-col gap-3 text-neutral-strong',
       '[--scheduler-hour:calc(var(--spacing)*12)] [--scheduler-gutter:calc(var(--spacing)*16)]',
     ],
     toolbar: 'flex flex-wrap items-center gap-2',

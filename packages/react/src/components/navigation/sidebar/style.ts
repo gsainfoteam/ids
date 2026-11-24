@@ -5,19 +5,12 @@ export type SidebarVariant = 'sidebar' | 'floating' | 'inset';
 export type SidebarCollapsibleMode = 'icon' | 'offcanvas';
 export type SidebarPanelState = 'expanded' | 'rail' | 'hidden';
 export type SidebarIconColorScheme =
-  | 'neutral'
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'danger';
+  'neutral' | 'primary' | 'secondary' | 'tertiary' | 'info' | 'success' | 'warning' | 'danger';
 
 export const sidebarStyle = tv({
   slots: {
     root: [
-      'group/sidebar sticky top-0 flex h-dvh shrink-0 self-start text-neutral-strong',
+      'group/sidebar sticky top-0 flex h-(--sidebar-height,100dvh) shrink-0 self-start text-neutral-strong',
       '[--sidebar-width:--spacing(60)]',
     ],
     mobileBar: 'flex flex-col p-2 sm:hidden',
@@ -60,7 +53,7 @@ export const sidebarStyle = tv({
     dropLine: dragSurface.dropLine,
     dragPreview: cn('w-full', dragSurface.preview),
     inset: 'flex min-w-0 flex-1 flex-col',
-    provider: 'group/sidebar-provider flex min-h-dvh w-full',
+    provider: 'group/sidebar-provider flex min-h-(--sidebar-height,100dvh) w-full',
   },
   variants: {
     variant: {

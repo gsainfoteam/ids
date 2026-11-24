@@ -848,6 +848,9 @@ on IDS, tagged `tags: ['custom-design']`.
 - No margin on a component. Spacing is the parent's `gap`. A ratio is `<AspectRatio>` around it.
 - A CSS variable a component's CSS reads is set on the wrapping element and inherited
   (`<div className="[--toaster-gap:8px]"><Toaster /></div>`); the component's JS never reads it.
+  A component with a fixed default height takes it from such a variable with the default as its
+  fallback (`h-(--sidebar-height,100dvh)`, `h-(--scheduler-height,36rem)`), so a story or an
+  app frames it without a class.
 - A part that frames content (`Card.Header`, `Card.Footer`) has a sensible default layout (flex,
   gap, alignment), so the app needs no class on it.
 - Each component has one size contract, written in its README:
@@ -862,6 +865,14 @@ on IDS, tagged `tags: ['custom-design']`.
     parent gives and can shrink (`min-h-0`).
 - What wrapping cannot do, because it changes the inside of a component (Tabs triggers sharing
   the width equally), may become an enum prop after a decision, never a class.
+
+`tests/usage-rules.test.ts` checks both rules. It fails on `className` or `style` given to an IDS
+component or part in a story under `src/` or in a `tsx`/`jsx` sample of a component, block,
+foundation or overview README, on a `data-*` variant in a story, and on a README table row that
+starts with a data attribute. A story tagged `custom-design` (or a file whose meta is), a README
+fence opened as ```` ```tsx custom-design ````, and `Card.Header`'s documented `border-b` are
+exempt. Internal READMEs (`src/internal`, `src/hooks`, `src/utils`) describe data attributes to
+maintainers and are left out.
 
 Every other prop is an option. The rules for options:
 
