@@ -1,17 +1,15 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use } from 'react';
 
 import { LanguageContext, useInternalTranslate } from '../../../../internal/translate';
 import { NumberField } from '../../../form/number-field';
+import { useInternalSchedulerDayCountDraft } from '../hooks/use-scheduler-day-count-draft';
 import { FEWEST_DAYS, MOST_DAYS } from '../lib/layout';
 
 import type { SchedulerContextValue } from '../context';
 
 const DAYS = { style: 'unit', unit: 'day', unitDisplay: 'long', maximumFractionDigits: 0 } as const;
-
-const isDayCount = (count: number | null): count is number =>
-  count !== null && Number.isInteger(count) && count >= FEWEST_DAYS && count <= MOST_DAYS;
 
 type SchedulerDayCountFieldProps = Pick<SchedulerContextValue, 'styles'> & {
   dayCount: number;
@@ -27,25 +25,17 @@ export function SchedulerDayCountField({
 }: SchedulerDayCountFieldProps) {
   const t = useInternalTranslate();
   const language = use(LanguageContext);
-  const [draft, setDraft] = useState<number | null>(dayCount);
-  const [committed, setCommitted] = useState(dayCount);
-
-  if (committed !== dayCount) {
-    setCommitted(dayCount);
-    setDraft(dayCount);
-  }
+  const { draft, onValueChange, onBlur } = useInternalSchedulerDayCountDraft(
+    dayCount,
+    onDayCountChange,
+  );
 
   return (
     <LanguageContext value={{ ...language, tag: locale }}>
       <NumberField
         value={draft}
-        onValueChange={(count) => {
-          setDraft(count);
-          if (isDayCount(count)) onDayCountChange(count);
-        }}
-        onBlur={() => {
-          if (!isDayCount(draft)) setDraft(dayCount);
-        }}
+        onValueChange={onValueChange}
+        onBlur={onBlur}
         min={FEWEST_DAYS}
         max={MOST_DAYS}
         step={1}

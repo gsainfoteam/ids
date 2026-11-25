@@ -7,11 +7,8 @@ import {
   useInternalTranslate,
   type Translate,
 } from '../../../../internal/translate';
-import {
-  countState,
-  useInternalCountAnnouncement,
-  type CountState,
-} from '../../text-area/hooks/use-text-area';
+import { useInternalTextAreaCountAnnouncement } from '../../text-area/hooks/use-count-announcement';
+import { countState, type CountState } from '../../text-area/lib/count-state';
 import { resolve, type StateValue } from '../../text-area/lib/state-value';
 import { useInternalEditorContext } from '../context';
 import { useInternalEditorSelector } from '../hooks/use-editor-selector';
@@ -54,7 +51,7 @@ export function EditorCount({
   );
 
   const state = countState(characters, maxLength, threshold);
-  const spoken = useInternalCountAnnouncement(
+  const spoken = useInternalTextAreaCountAnnouncement(
     state.nearLimit ? (announce?.(state) ?? defaultAnnouncement(state, t)) : '',
   );
 

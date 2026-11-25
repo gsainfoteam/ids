@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState, type ReactElement } from 'react';
+import { use, type ReactElement } from 'react';
 
 import {
   SidebarFoldedContext,
@@ -8,20 +8,22 @@ import {
   SidebarSortableContext,
   useInternalSidebarContext,
 } from '../context';
-import {
-  containsValue,
-  linkChildrenOf,
-  linkElementOf,
-  splitItemChildren,
-  type ItemParts,
-} from './item-children';
-import { SidebarRow, tintedIcon } from './row';
+import { linkElementOf } from './link-element';
+import { SidebarRow } from './row';
 import { SidebarDragFrame } from './sortable';
 import { cn, elementTypeOf } from '../../../../utils';
 import { Accordion } from '../../../data/accordion';
 import { Item } from '../../../data/item';
 import { Divider } from '../../../layout/divider';
 import { Menu } from '../../../overlay/menu';
+import { useInternalSidebarSubmenuOpen } from '../hooks/use-sidebar-submenu-open';
+import {
+  containsValue,
+  linkChildrenOf,
+  splitItemChildren,
+  type ItemParts,
+} from '../lib/item-children';
+import { tintedIcon } from '../lib/tinted-icon';
 import { TREE_KEY_PROP } from '../lib/tree';
 
 import type { SidebarItemProps } from './item';
@@ -47,14 +49,12 @@ export function SidebarAccordionSubmenu({
   const sidebar = useInternalSidebarContext('Sidebar.Item');
   const sortable = use(SidebarSortableContext);
   const folded = use(SidebarFoldedContext);
-  const revealed = sortable?.revealed ?? null;
-  const [open, setOpen] = useState(() => containsValue(parts.subItems, sidebar.value));
-  const [seenReveal, setSeenReveal] = useState(revealed?.times);
-
-  if (revealed && revealed.times !== seenReveal) {
-    setSeenReveal(revealed.times);
-    if (treeKey !== undefined && revealed.ancestors.includes(treeKey)) setOpen(true);
-  }
+  const [open, setOpen] = useInternalSidebarSubmenuOpen({
+    treeKey,
+    subItems: parts.subItems,
+    value: sidebar.value,
+    revealed: sortable?.revealed ?? null,
+  });
 
   return (
     <Accordion

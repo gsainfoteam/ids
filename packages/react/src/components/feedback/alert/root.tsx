@@ -1,9 +1,10 @@
 'use client';
 
-import { isValidElement, useCallback, useEffect, type ReactElement, type ReactNode } from 'react';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { AlertContext } from './context';
 import { useInternalAlert } from './hooks/use-alert';
+import { useInternalAlertTextWarning } from './hooks/use-alert-text-warning';
 import { resolve } from './lib/part-props';
 import { AlertClose } from './parts/close';
 import { AlertDescription } from './parts/description';
@@ -11,8 +12,7 @@ import { AlertIcon } from './parts/icon';
 import { AlertTitle } from './parts/title';
 import { alertStyle } from './style';
 import { announcedAssertively } from '../../../internal/lib/status-palette';
-import { elementTypeOf, flattenFragments, mergeEventHandlers, mergeRefs } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
+import { elementTypeOf, flattenFragments, mergeEventHandlers } from '../../../utils';
 
 import type { Alert } from '.';
 
@@ -43,22 +43,15 @@ export function AlertRoot({
   const hasText = nodes.some((node) => isPart(node, AlertTitle) || isPart(node, AlertDescription));
 
   const {
-    setNode,
+    ref: mergedRef,
     open: isOpen,
     mounted,
     ending,
     close: requestClose,
     onKeyDown: onAlertKeyDown,
-  } = useInternalAlert({ open, defaultOpen, onOpenChange, dismissible });
-  const mergedRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(setNode, ref)(node),
-    [setNode, ref],
-  );
+  } = useInternalAlert({ open, defaultOpen, onOpenChange, dismissible, ref });
 
-  useEffect(() => {
-    if (isDevelopment && !hasText)
-      console.warn('[IDS] Alert: give it an AlertTitle or an AlertDescription.');
-  }, [hasText]);
+  useInternalAlertTextWarning(hasText);
 
   if (!mounted) return null;
 

@@ -3,27 +3,21 @@
 import {
   isValidElement,
   useId,
-  useState,
   type ComponentProps,
   type ReactElement,
   type ReactNode,
 } from 'react';
 
-import {
-  getLocalTimeZone,
-  today as todayIn,
-  type CalendarDate,
-  type CalendarDateTime,
-} from '@internationalized/date';
+import { type CalendarDate, type CalendarDateTime } from '@internationalized/date';
 
 import { SchedulerContext } from './context';
 import { useInternalNow } from './hooks/use-now';
+import { useInternalSchedulerNavigation } from './hooks/use-scheduler-navigation';
 import { schedulerFormat } from './lib/format';
 import {
   dateOf,
   daysOf,
   DEFAULT_DAY_COUNT,
-  shownDayCount,
   type SchedulerEventChange,
   type SchedulerEventData,
   type SchedulerSlot,
@@ -40,7 +34,6 @@ import {
 import { SchedulerMonth } from './parts/month';
 import { SchedulerToolbar } from './parts/toolbar';
 import { schedulerStyle } from './style';
-import { useControllableState } from '../../../hooks/use-controllable-state';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
 import {
   useInternalRequiredName,
@@ -126,27 +119,21 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   const resolvedLocale = resolveLocale(providerLocale);
   const weekStart = weekStartsOn ?? weekStartOf(resolvedLocale);
   const now = useInternalNow(nowProp);
-  const [firstShownDate] = useState(() => defaultDate ?? todayIn(getLocalTimeZone()));
   const today = now && dateOf(now);
   const generatedHintId = useId();
   const hintId = onEventChange ? `${generatedHintId}-drag-hint` : undefined;
   const describedBy = [ariaDescribedBy, hintId].filter(Boolean).join(' ') || undefined;
 
-  const [view, setView] = useControllableState({
-    value: viewProp,
-    defaultValue: defaultView,
-    onValueChange: onViewChange,
-  });
-  const [dayCountValue, setDayCount] = useControllableState({
-    value: dayCountProp,
-    defaultValue: defaultDayCount,
-    onValueChange: onDayCountChange,
-  });
-  const dayCount = shownDayCount(dayCountValue);
-  const [date, setDate] = useControllableState({
-    value: dateProp,
-    defaultValue: firstShownDate,
-    onValueChange: onDateChange,
+  const { view, setView, dayCount, setDayCount, date, setDate } = useInternalSchedulerNavigation({
+    view: viewProp,
+    defaultView,
+    onViewChange,
+    dayCount: dayCountProp,
+    defaultDayCount,
+    onDayCountChange,
+    date: dateProp,
+    defaultDate,
+    onDateChange,
   });
 
   const days = daysOf(view, date, weekStart, dayCount);

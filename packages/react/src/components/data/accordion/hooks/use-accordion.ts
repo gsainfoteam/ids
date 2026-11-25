@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useEffectEvent,
   useId,
   useLayoutEffect,
   useRef,
@@ -183,17 +184,14 @@ export function useInternalAccordionPanel({
   }, [hidden, disabled]);
 
   const [instant, setInstant] = useState(false);
-  const revealRef = useRef(onReveal);
-  useLayoutEffect(() => {
-    revealRef.current = onReveal;
-  });
+  const reveal = useEffectEvent(onReveal);
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
     const expandBeforeBrowserScrolls = () =>
       flushSync(() => {
         setInstant(true);
-        revealRef.current();
+        reveal();
       });
     panel.addEventListener('beforematch', expandBeforeBrowserScrolls);
     return () => panel.removeEventListener('beforematch', expandBeforeBrowserScrolls);

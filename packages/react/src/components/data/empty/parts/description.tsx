@@ -2,7 +2,7 @@
 
 import { type ComponentProps } from 'react';
 
-import { useInternalParagraphRef } from '../../../../internal/lib/paragraph';
+import { useInternalParagraphRef } from '../../../../internal/hooks/use-paragraph-ref';
 import { Slot } from '../../../utility/slot';
 import { useInternalEmptyContext } from '../context';
 

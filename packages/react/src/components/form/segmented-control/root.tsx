@@ -1,19 +1,11 @@
 'use client';
 
-import {
-  isValidElement,
-  useEffect,
-  useId,
-  type ComponentProps,
-  type ComponentType,
-  type ReactNode,
-} from 'react';
+import { useId, type ComponentProps, type ComponentType, type ReactNode } from 'react';
 
 import { SegmentedControlContext, type SegmentedControlOrientation } from './context';
+import { useInternalSegmentedControlChildrenWarning } from './hooks/use-segmented-control-children-warning';
 import { SegmentedControlItem, type SegmentedControlItemProps } from './parts/item';
 import { segmentedControlStyle } from './style';
-import { elementTypeOf, flattenFragments } from '../../../utils/children';
-import { isDevelopment } from '../../../utils/dev';
 import { useFieldSize } from '../field/context';
 import { useInternalRadioGroup } from '../radio-group/hooks/use-radio-group';
 
@@ -42,23 +34,6 @@ export type SegmentedControlProps<T extends string> = Omit<
 };
 
 const render = { Item: SegmentedControlItem } as SegmentedControlRenderProps<string>;
-
-const isItem = (node: ReactNode) =>
-  isValidElement(node) && elementTypeOf(node) === SegmentedControlItem;
-
-const holdsOnlyItems = (children: ReactNode) =>
-  flattenFragments(children).every(
-    (child) => child === null || typeof child === 'boolean' || isItem(child),
-  );
-
-function useInternalWarnAboutOtherChildren(onlyItems: boolean) {
-  useEffect(() => {
-    if (isDevelopment && !onlyItems)
-      console.warn(
-        '[IDS] SegmentedControl: put only SegmentedControl.Item inside. A segment holds its text or icon as the children of an Item.',
-      );
-  }, [onlyItems]);
-}
 
 export function SegmentedControlRoot<T extends string>({
   value: valueProp,
@@ -97,7 +72,7 @@ export function SegmentedControlRoot<T extends string>({
     typeof children === 'function'
       ? children(render as unknown as SegmentedControlRenderProps<T>)
       : children;
-  useInternalWarnAboutOtherChildren(holdsOnlyItems(items));
+  useInternalSegmentedControlChildrenWarning(items);
 
   return (
     <SegmentedControlContext.Provider

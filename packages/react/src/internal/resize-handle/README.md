@@ -10,6 +10,7 @@
 | [`hooks/use-resize-axes.ts`](#hooksuse-resize-axests) | `ResizeAxis` 를 끌기, 키, separator 에 잇는 hook, 크기와 모서리 모양을 지켜보는 hook |
 | [`parts/edge.tsx`](#partsedgetsx)                     | 가장자리 손잡이 `ResizeEdge`. 한 축의 separator 이고 가장자리 위의 막대로 그린다     |
 | [`lib/arc.ts`](#libarcts)                         | 모서리 손잡이의 호와 누를 띠의 SVG path, 손잡이 상자의 크기(순수 함수)               |
+| [`hooks/use-resize-grip-separators.ts`](#hooksuse-resize-grip-separatorsts) | 모서리 손잡이의 두 separator 가 나눠 쓰는 roving tabindex, 키, 포커스 옮기기 |
 | [`parts/grip.tsx`](#partsgriptsx)                     | 모서리 손잡이 `ResizeGrip`. 숨은 separator 둘(너비, 높이)을 담은 group               |
 | [`style.ts`](#stylets)                     | 손잡이 클래스 조각 `resizeHandle`, `resizeEdgeStyle`, `resizeGripStyle`              |
 
@@ -243,6 +244,8 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 - `outward` 의 띠는 선보다 10px 바깥에 반지름이 10px 큰 같은 중심 path 입니다. 24px 띠의 안쪽 끝이 선의 안쪽 끝과 겹칩니다([누를 띠](#누를-띠)).
 - 좌표는 0.01px 로 반올림해 path 문자열을 짧게 둡니다.
 
+`sizedToArc(style, arc)` 는 손잡이 상자의 `style` 에 `arc.size` 를 너비와 높이로 더합니다. `arc` 가 없으면(모서리를 아직 재지 않았으면) `style` 을 그대로 돌려줍니다.
+
 ## parts/grip.tsx
 
 모서리 손잡이입니다. 손잡이는 `role="group"`(이름 "크기 조절")이고, 안에 숨은 separator 둘(너비, 높이)이 roving tabindex 로 Tab 한 칸을 나눠 씁니다.
@@ -263,7 +266,7 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 - 손잡이는 가장 가까운 positioned 조상의 끝 아래 꼭짓점에 스스로 섭니다(`absolute end-0 bottom-0`). `corner` 는 그 조상이어야 호가 모서리와 같은 중심이 됩니다.
 - 두 축의 요소가 달라도 됩니다. 축마다 `target` 이 있어, TextArea 는 높이를 textarea 에, 너비를 필드 전체에 씁니다.
 - 반지름과 모양은 `useInternalCornerShape(corner)` 로 읽습니다. 읽기 전에는(서버 렌더, 첫 렌더) 호를 그리지 않고 separator 만 둡니다.
-- `←` `→` 가 너비를 바꾸고 너비 separator 로, `↑` `↓` 가 높이를 바꾸고 높이 separator 로 포커스를 옮깁니다. 값을 바꾼 뒤(`flushSync`) 포커스를 옮기므로, 포커스는 늘 값이 이미 바뀐 separator 에 있어 스크린 리더가 바뀐 값을 읽습니다. `Home` `End` 는 포커스한 축, `Enter` 와 두 번 누르기는 두 축 모두를 되돌립니다.
+- 키와 roving tabindex 는 [hooks/use-resize-grip-separators.ts](#hooksuse-resize-grip-separatorsts) 가 separator 마다 props 로 돌려줍니다. 두 번 누르기는 두 축 모두를 되돌립니다.
 - 포인터로는 두 축을 함께 끕니다.
 
 ### 왜 이렇게
@@ -280,6 +283,36 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 
 - Storybook 의 `userEvent` 는 `pointer-events: none` 인 요소를 누르지 못합니다. play 에서는 `[data-resize-grip-target]` path 를 누릅니다. 테스트는 `[data-resize-grip-arc]` path 의 `getPointAtLength` 와 `getScreenCTM` 으로 호 위의 점을 구합니다(`tests/resize-grip.ts`).
 - 부모에 `overflow: hidden` 이 있으면 선의 바깥 2px 과 띠의 바깥 부분(`centered` 12px, `outward` 22px)이 잘립니다. 가장자리 손잡이와 같습니다.
+
+## hooks/use-resize-grip-separators.ts
+
+`useInternalResizeGripSeparators(axes, disabled)` 는 모서리 손잡이의 숨은 separator 둘(너비, 높이)에 줄 props 를 축마다 돌려주는 hook 입니다.
+
+```tsx
+// internal/resize-handle/parts/grip.tsx
+const separator = useInternalResizeGripSeparators(axes, disabled);
+
+<div {...axisSeparatorProps(axis, t, disabled)} {...separator(axis)} />
+```
+
+- 돌려주는 함수는 축 하나에 `ref`, `tabIndex`, `onFocus`, `onKeyDown` 을 줍니다.
+- 두 separator 가 Tab 한 칸을 나눠 씁니다. 마지막에 포커스한 축의 separator 만 `tabIndex={0}` 이고, 다른 쪽은 `-1` 입니다. `disabled` 면 둘 다 `tabIndex` 가 없고 키를 받지 않습니다.
+- `←` `→` 는 너비를 바꾸고 너비 separator 로, `↑` `↓` 는 높이를 바꾸고 높이 separator 로 포커스를 옮깁니다. `Home` `End` 는 포커스한 축에 걸리고, `Enter` 는 두 축 모두를 되돌립니다.
+
+### 쓰는 곳
+
+- [parts/grip.tsx](#partsgriptsx) 의 `ResizeGrip`
+
+### 왜 이렇게
+
+- 값을 바꾸는 일과 포커스한 축을 바꾸는 일을 `flushSync` 로 한 번에 그린 뒤 포커스를 옮깁니다. 포커스는 늘 값이 이미 바뀐 separator 에 있어, 스크린 리더가 바뀐 값을 읽습니다.
+- 키 표는 포커스한 축의 것을 나중에 펼칩니다. 두 축의 키가 겹치면(`Home`, `End`) 포커스한 축이 이깁니다.
+- 방향키의 좌우는 separator 가 놓인 쓰는 방향(`readingDirection`)으로 읽습니다.
+
+### 알아둘 것
+
+- separator 의 ref 는 축의 `dimension` 을 열쇠로 Map 에 담습니다. 같은 `dimension` 의 축 둘을 넘기면 포커스가 한쪽으로만 갑니다.
+- `flushSync` 를 빼면 포커스가 옛 값을 가진 separator 로 먼저 가고, 스크린 리더가 바뀌기 전의 값을 읽습니다.
 
 ## style.ts
 

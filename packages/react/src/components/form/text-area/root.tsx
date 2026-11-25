@@ -3,7 +3,7 @@
 import { isValidElement, useId, type ReactElement, type ReactNode } from 'react';
 
 import { TextAreaContext } from './context';
-import { useInternalTextArea, type CountState } from './hooks/use-text-area';
+import { useInternalTextArea } from './hooks/use-text-area';
 import { useInternalTextAreaResize } from './hooks/use-text-area-resize';
 import { resolve } from './lib/state-value';
 import { TextAreaCount, type TextAreaCountProps } from './parts/count';
@@ -15,6 +15,7 @@ import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { TextArea } from '.';
+import type { CountState } from './lib/count-state';
 import type { FieldSurfaceVariant } from '../../../internal/surfaces/lib/field-surface';
 
 export type TextAreaVariant = FieldSurfaceVariant;
