@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  isValidElement,
-  useEffect,
-  useLayoutEffect,
-  type ComponentProps,
-  type ReactNode,
-} from 'react';
+import { isValidElement, type ComponentProps, type ReactNode } from 'react';
 
 import { PopoverArrow } from './arrow';
 import { ModalLayer, OverlayItemContext } from '../../../../internal/overlay';
@@ -14,6 +8,7 @@ import { elementTypeOf, flattenFragments } from '../../../../utils';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { useInternalPopoverContext } from '../context';
 import { DEFAULT_PLACEMENT } from '../hooks/use-popover';
+import { useInternalPopoverContent } from '../hooks/use-popover-content';
 
 import type { Popover } from '..';
 
@@ -36,14 +31,15 @@ export function PopoverContent({
   ...props
 }: PopoverContentProps) {
   const { popover } = useInternalPopoverContext('Popover.Content');
-  const { setPlacement, mountContent } = popover;
-  const anchored = anchor !== undefined;
 
-  useLayoutEffect(() => {
-    setPlacement({ side, align, sideOffset, alignOffset, anchor, initialFocus });
-  }, [setPlacement, side, align, sideOffset, alignOffset, anchor, initialFocus]);
-
-  useEffect(() => mountContent(anchored), [mountContent, anchored]);
+  useInternalPopoverContent(popover, {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    anchor,
+    initialFocus,
+  });
 
   if (!popover.mounted) return null;
 

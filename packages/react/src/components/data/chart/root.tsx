@@ -1,19 +1,11 @@
 'use client';
 
-import {
-  cloneElement,
-  isValidElement,
-  useEffect,
-  useId,
-  useRef,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { cloneElement, isValidElement, useId, type ReactElement, type ReactNode } from 'react';
 
 import { ChartContext } from './context';
-import { useInternalChartSize } from './hooks/use-chart-size';
-import { useInternalKeysOverARestingPointer } from './hooks/use-keys-over-a-resting-pointer';
-import { DEFAULT_SERIES, seriesColor, seriesVariables, uncoloredKeys } from './lib/config';
+import { useInternalChartFrame } from './hooks/use-chart-frame';
+import { useInternalChartWarnings } from './hooks/use-chart-warnings';
+import { seriesColor, seriesVariables, uncoloredKeys } from './lib/config';
 import { fadedSeriesOf, paintSeries, RECHARTS_CHARTS, tableOf, type GraphProps } from './lib/graph';
 import { ChartDescription } from './parts/description';
 import { ChartTable } from './parts/table';
@@ -25,7 +17,6 @@ import {
 } from '../../../internal/lib/accessible-name';
 import { useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { Chart } from '.';
 
@@ -45,12 +36,6 @@ const isElementOf =
   (type: unknown) =>
   (node: ReactNode): node is ReactElement<{ id?: string }> =>
     isValidElement(node) && elementTypeOf(node) === type;
-
-const WRAPPED_CHART_WARNING =
-  '[IDS] Chart: its chart child is not a Recharts chart, so Chart cannot paint its series or add the screen reader table. Place the Recharts chart as a direct child, or place Chart.Table yourself.';
-
-const tooManySeriesWarning = (count: number) =>
-  `[IDS] Chart: ${count} series have no color, but the default colors are only ${DEFAULT_SERIES.join(', ')}, so the rest draw in neutral. Give the 4th and later series a color in the config.`;
 
 const FADE_START_OPACITY = 0.4;
 const FADE_END_OPACITY = 0;
@@ -99,9 +84,7 @@ function paintedChildren(
 export function ChartRoot({ config, className, style, children, ...props }: Chart.Props) {
   const providerLocale = useInternalProviderLocale();
   const id = useId();
-  const frameRef = useRef<HTMLDivElement>(null);
-  const size = useInternalChartSize(frameRef);
-  const keysOverARestingPointer = useInternalKeysOverARestingPointer(frameRef);
+  const { frameRef, size, keysOverARestingPointer } = useInternalChartFrame();
   const styles = chartStyle();
 
   const elements = flattenFragments(children);
@@ -130,14 +113,7 @@ export function ChartRoot({ config, className, style, children, ...props }: Char
   const uncoloredSeries = uncoloredKeys(config).length;
   useInternalUnnamedWarning('Chart', graph !== undefined && !hasAccessibleName(graphName));
 
-  useEffect(() => {
-    if (isDevelopment && wrapsAnUnknownChart) console.warn(WRAPPED_CHART_WARNING);
-  }, [wrapsAnUnknownChart]);
-
-  useEffect(() => {
-    if (isDevelopment && uncoloredSeries > DEFAULT_SERIES.length)
-      console.warn(tooManySeriesWarning(uncoloredSeries));
-  }, [uncoloredSeries]);
+  useInternalChartWarnings({ wrapsAnUnknownChart, uncoloredSeries });
 
   const drawn =
     graph && size

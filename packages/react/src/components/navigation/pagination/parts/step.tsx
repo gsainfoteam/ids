@@ -2,10 +2,11 @@
 
 import type { ComponentProps, MouseEvent, ReactElement } from 'react';
 
-import { useInternalPaginationContext } from '../context';
-import { useInternalPaginationControl } from './control';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { IconButton } from '../../../action/icon-button';
+import { useInternalPaginationContext } from '../context';
+import { useInternalPaginationControl } from '../hooks/use-pagination-control';
+import { stepTarget, type StepDirection } from '../lib/step-target';
 
 import type { IdsMessageKey } from '../../../../internal/messages';
 
@@ -20,8 +21,6 @@ export type PaginationStepProps = Omit<
   onClick?: (event: MouseEvent<HTMLElement>) => void;
 };
 
-type StepDirection = 'first' | 'previous' | 'next' | 'last';
-
 const STEP_NAME_KEY = {
   first: 'pagination.first',
   previous: 'common.previous',
@@ -34,19 +33,6 @@ type StepOptions = {
   direction: StepDirection;
   defaultIcon: ReactElement;
 };
-
-function stepTarget(direction: StepDirection, page: number, pageCount: number) {
-  switch (direction) {
-    case 'first':
-      return 1;
-    case 'previous':
-      return Math.max(1, page - 1);
-    case 'next':
-      return Math.min(pageCount, page + 1);
-    case 'last':
-      return pageCount;
-  }
-}
 
 export function PaginationStep({
   part,

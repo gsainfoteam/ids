@@ -1,10 +1,10 @@
 'use client';
 
-import { use, useEffect, type ComponentProps } from 'react';
+import { use, type ComponentProps } from 'react';
 
 import { mergeProps, part } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
 import { ScrollAreaContext, ScrollbarContext } from '../context';
+import { useInternalScrollAreaThumbWarning } from '../hooks/use-scroll-area-thumb-warning';
 import { scrollAreaStyle } from '../style';
 
 export type ScrollAreaThumbProps = ComponentProps<'div'> & { asChild?: boolean };
@@ -13,12 +13,7 @@ export function ScrollAreaThumb({ asChild, children, className, ...props }: Scro
   const c = use(ScrollAreaContext);
   const axis = use(ScrollbarContext);
 
-  useEffect(() => {
-    if (isDevelopment && (!c || !axis))
-      console.warn(
-        '[IDS] ScrollArea.Thumb is drawn only inside <ScrollArea.Scrollbar>; it renders nothing here.',
-      );
-  }, [c, axis]);
+  useInternalScrollAreaThumbWarning(c, axis);
 
   if (!c || !axis) return null;
 

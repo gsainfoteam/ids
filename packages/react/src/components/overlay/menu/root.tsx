@@ -1,12 +1,12 @@
 'use client';
 
-import { use, useEffect } from 'react';
+import { use } from 'react';
 
 import { CommandContext, ContentContext, MenuContext, useInternalMenuContext } from './context';
 import { useInternalMenuLevel, type MenuLevel, type MenuTriggerType } from './hooks/use-menu';
+import { useInternalMenuRootOnlyPropsWarning } from './hooks/use-menu-root-only-props-warning';
 import { CommandMenu, CommandNestedMenu } from './parts/command';
 import { FloatingNode, FloatingTree } from '../../../internal/overlay';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { Menu } from '.';
 
@@ -71,12 +71,7 @@ function NestedMenu({
 
   const setsRootOnlyProps = ignoredTriggerType !== undefined || ignoredHotkey !== undefined;
 
-  useEffect(() => {
-    if (isDevelopment && setsRootOnlyProps)
-      console.warn(
-        '[IDS] Menu: triggerType and hotkey apply only to the outermost Menu. A Menu inside Menu.Content is a submenu and ignores them.',
-      );
-  }, [setsRootOnlyProps]);
+  useInternalMenuRootOnlyPropsWarning(setsRootOnlyProps);
 
   return (
     <MenuContext value={{ level, root, triggerType }}>

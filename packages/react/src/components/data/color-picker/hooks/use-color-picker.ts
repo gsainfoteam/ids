@@ -1,8 +1,6 @@
 'use client';
 
 import {
-  useEffect,
-  useRef,
   useState,
   useSyncExternalStore,
   type ChangeEvent,
@@ -13,6 +11,7 @@ import {
 import { clamp, noop } from 'es-toolkit';
 
 import { useControllableState } from '../../../../hooks/use-controllable-state';
+import { useInternalCopyFeedback } from '../../../../internal/hooks/use-copy-feedback';
 import { keyHandler, withModifiers } from '../../../../internal/lib/keys';
 import {
   hsvaToRgba,
@@ -51,7 +50,6 @@ export function useInternalEyeDropperSupport() {
 }
 
 const START: HSVA = { h: 0, s: 1, v: 1, a: 1 };
-const COPIED_FOR = 1500;
 
 export type UseColorPickerOptions = {
   value: string | undefined;
@@ -96,9 +94,6 @@ export function useInternalColorPicker({
   const commitRgba = (next: Rgb) => commit(rgbaToHsva(next, color));
 
   const [draft, setDraft] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  useEffect(() => () => clearTimeout(copiedTimer.current), []);
 
   const areaFromPointer = (event: PointerEvent<HTMLElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -196,16 +191,11 @@ export function useInternalColorPicker({
     if (picked) commitRgba({ ...picked, alpha: color.a });
   };
 
+  const feedback = useInternalCopyFeedback(() => text);
+  const copied = feedback.copied;
   const copy = async () => {
     if (!value || !parsed || typeof navigator.clipboard?.writeText !== 'function') return;
-    const written = await navigator.clipboard.writeText(text).then(
-      () => true,
-      () => false,
-    );
-    if (!written) return;
-    setCopied(true);
-    clearTimeout(copiedTimer.current);
-    copiedTimer.current = setTimeout(() => setCopied(false), COPIED_FOR);
+    await feedback.copy();
   };
 
   const isCurrent = (swatch: string) => {

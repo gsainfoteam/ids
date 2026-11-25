@@ -1,25 +1,24 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use } from 'react';
 
 import { mergeProps } from '../../../../utils';
 import { Divider } from '../../../layout/divider';
 import { CommandContext } from '../context';
+import { useInternalMenuSection } from '../hooks/use-menu-section';
 import { menuStyle } from '../style';
 
 import type { Menu } from '..';
 
 export function MenuSeparator({ className, ...props }: Menu.SeparatorProps) {
   const palette = use(CommandContext);
-  const [element, setElement] = useState<HTMLElement | null>(null);
-
-  const hidden = !!element && !!palette?.hiddenSections.has(element);
+  const section = useInternalMenuSection(palette);
 
   return (
     <Divider
-      {...mergeProps(props, { ref: palette ? setElement : undefined })}
+      {...mergeProps(props, { ref: section.ref })}
       aria-hidden={!!palette}
-      hidden={hidden || undefined}
+      hidden={section.hidden || undefined}
       data-menu-separator=""
       className={menuStyle().separator({ className })}
     />

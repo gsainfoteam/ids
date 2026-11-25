@@ -1,15 +1,16 @@
 'use client';
 
-import { isValidElement, useCallback, useState, type ReactNode } from 'react';
+import { isValidElement, type ReactNode } from 'react';
 
 import { ChipContext } from './context';
 import { useInternalChip } from './hooks/use-chip';
+import { useInternalChipInteraction } from './hooks/use-chip-interaction';
 import { ChipClose } from './parts/close';
 import { ChipLabel } from './parts/label';
 import { chipStyle } from './style';
-import { interactiveDataProps, useInteractive } from '../../../hooks/use-interactive';
+import { interactiveDataProps } from '../../../hooks/use-interactive';
 import { resolveState } from '../../../internal/lib/state-props';
-import { elementTypeOf, flattenFragments, mergeRefs } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Chip } from '.';
@@ -80,35 +81,24 @@ export function ChipRoot({
     disabled,
   });
   const rootIsButton = chip.interactive && !asChild;
-  const [innerFocusVisible, setInnerFocusVisible] = useState(false);
-  const { state: interaction, handlers } = useInteractive<HTMLElement>({
-    disabled,
-    onInteractionChange,
-    onKeyDown: (event) => {
-      onKeyDown?.(event);
-      if (!event.defaultPrevented && rootIsButton && event.target === event.currentTarget)
-        chip.removeOnKey(event);
-    },
-    onKeyUp,
-    onFocus: (event) => {
-      onFocus?.(event);
-      if (event.target !== event.currentTarget)
-        setInnerFocusVisible((event.target as Element).matches(':focus-visible'));
-    },
-    onBlur: (event) => {
-      onBlur?.(event);
-      setInnerFocusVisible(false);
-    },
-    onPointerEnter,
-    onPointerLeave,
-    onPointerDown,
-    onPointerUp,
-    onPointerCancel,
-  });
-  const mergedRef = useCallback(
-    (node: HTMLElement | null) => mergeRefs(chip.rootRef, ref)(node),
-    [chip.rootRef, ref],
-  );
+  const { interaction, handlers, innerFocusVisible, mergedRef, toggleOnClick } =
+    useInternalChipInteraction({
+      chip,
+      rootIsButton,
+      disabled,
+      ref,
+      onClick,
+      onInteractionChange,
+      onKeyDown,
+      onKeyUp,
+      onFocus,
+      onBlur,
+      onPointerEnter,
+      onPointerLeave,
+      onPointerDown,
+      onPointerUp,
+      onPointerCancel,
+    });
 
   const state: Chip.State = {
     ...interaction,
@@ -144,11 +134,7 @@ export function ChipRoot({
         {...rest}
         {...handlers}
         ref={mergedRef}
-        onClick={(event) => {
-          onClick?.(event);
-          if (event.defaultPrevented || disabled) return;
-          if (chip.selectable) chip.toggle();
-        }}
+        onClick={toggleOnClick}
         data-chip=""
         data-variant={variant}
         data-color-scheme={colorScheme}

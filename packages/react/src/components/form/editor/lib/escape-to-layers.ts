@@ -1,6 +1,7 @@
 import { Extension } from '@tiptap/core';
 import { Plugin } from '@tiptap/pm/state';
 
+import { isComposingKey } from '../../../../internal/lib/keys';
 import { aSuggestionIsOpen } from '../suggestion/keys';
 
 export const LeaveEscapeToTheLayers = Extension.create({
@@ -11,7 +12,7 @@ export const LeaveEscapeToTheLayers = Extension.create({
         props: {
           handleDOMEvents: {
             keydown: (view, event) =>
-              event.key === 'Escape' && !event.isComposing && !aSuggestionIsOpen(view.state),
+              event.key === 'Escape' && !isComposingKey(event) && !aSuggestionIsOpen(view.state),
           },
         },
       }),

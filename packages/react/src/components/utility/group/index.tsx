@@ -1,8 +1,9 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
-import { GroupRoot, GroupSeparator, type GroupOrientation, type GroupContextValue } from './root';
+import { GroupRoot, GroupSeparator } from './root';
 import { groupStyle } from './style';
 
+import type { GroupOrientation, GroupContextValue } from './context';
 import type { SurfaceVariant } from '../../../internal/surfaces/lib/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
@@ -29,9 +30,5 @@ export namespace Group {
   export const Style = groupStyle;
 }
 
-export {
-  useInternalGroupContext,
-  useInternalGroupNameWarning,
-  type GroupOrientation,
-  type GroupContextValue,
-} from './root';
+export { useInternalGroupContext, type GroupOrientation, type GroupContextValue } from './context';
+export { useInternalGroupNameWarning } from './hooks/use-group-name-warning';

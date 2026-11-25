@@ -1,24 +1,16 @@
 'use client';
 
-import { useRef, useState } from 'react';
-
-import { useInternalPresence } from '../../../../internal/overlay';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { Chip } from '../../chip';
 import { useInternalMessageContext } from '../context';
-
-function isUnread(unread: number | boolean | undefined): unread is number | true {
-  return unread === true || (typeof unread === 'number' && unread > 0);
-}
+import { useInternalMessageUnread } from '../hooks/use-message-unread';
+import { isUnread } from '../lib/unread';
 
 export function MessageUnread() {
   const t = useInternalTranslate();
   const { styles, unread, status } = useInternalMessageContext('Message');
-  const ref = useRef<HTMLSpanElement>(null);
   const showing = status === 'sent' && isUnread(unread);
-  const [lastShown, setLastShown] = useState(showing ? unread : undefined);
-  if (showing && lastShown !== unread) setLastShown(unread);
-  const { mounted, ending } = useInternalPresence(showing, { elements: () => [ref.current] });
+  const { ref, lastShown, mounted, ending } = useInternalMessageUnread(showing, unread);
 
   if (!mounted || !isUnread(lastShown)) return null;
 

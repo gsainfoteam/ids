@@ -2,16 +2,16 @@
 
 import type { CSSProperties } from 'react';
 
-import { parseHotkey, useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
+import { useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
 
 import { useInternalToaster } from './hooks/use-toaster';
+import { ariaShortcutOf } from './lib/aria-shortcut';
 import { ToastView } from './parts/toast-view';
 import { toasterStyle } from './style';
 import { useInternalTranslate } from '../../../internal/translate';
 import { useInternalPlatform } from '../../typography/kbd/hooks/use-kbd';
 
 import type { Toaster } from '.';
-import type { KbdPlatform } from '../../typography/kbd/lib/keys';
 
 const REGION_KEY = 'F6';
 const DEFAULT_HOTKEY: Hotkey = 'Alt+T';
@@ -20,11 +20,6 @@ const ONCE_PER_PRESS_EVEN_IN_INPUTS = {
   ignoreInputs: false,
   stopPropagation: false,
 } as const;
-
-function ariaShortcutOf(hotkey: Hotkey, platform: KbdPlatform) {
-  const parsed = parseHotkey(hotkey, platform);
-  return [...parsed.modifiers, parsed.key ?? parsed.code].join('+');
-}
 
 type ToasterShortcutsProps = { hotkey: Hotkey; enabled: boolean; onPress: () => void };
 

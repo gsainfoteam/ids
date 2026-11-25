@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
+import { useInternalInputTypeWarning } from './hooks/use-input-type-warning';
 import { useInternalTranslate } from '../../../internal/translate';
-import { isDevelopment } from '../../../utils/dev';
 import { NumberField, type NumberFieldProps } from '../number-field';
 import { PasswordField, type PasswordFieldProps } from '../password-field';
 import { TelField, type TelFieldProps } from '../tel-field';
@@ -34,12 +32,7 @@ export function InputRoot(props: InputProps) {
 
   const { type = 'text' } = props;
   const supported = SUPPORTED.includes(type);
-  useEffect(() => {
-    if (isDevelopment && !supported)
-      console.warn(
-        `[IDS] Input: unsupported type "${type}"; using text. Use the dedicated field for dates, times, colors, files and OTP.`,
-      );
-  }, [supported, type]);
+  useInternalInputTypeWarning(type, supported);
 
   if (props.type === 'number') {
     const { type: _type, ...rest } = props;

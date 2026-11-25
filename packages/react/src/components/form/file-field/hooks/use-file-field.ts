@@ -1,23 +1,19 @@
 'use client';
 
 import {
-  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
   type ChangeEvent,
   type ClipboardEvent,
   type DragEvent,
 } from 'react';
 
-import { noop } from 'es-toolkit';
-
 import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { useInternalFormReset } from '../../../../hooks/use-form-reset';
-import { isImage, parseAccept, receiveFiles, type FileFieldRejection } from '../lib/file-rules';
+import { parseAccept, receiveFiles, type FileFieldRejection } from '../lib/file-rules';
 
 export type FileFieldValue = File | File[] | null;
 
@@ -189,36 +185,4 @@ export function useInternalFileField({
     },
     handlers,
   };
-}
-
-const previews = new Map<File, { url: string; users: number }>();
-
-function watchPreview(file: File) {
-  let entry = previews.get(file);
-  if (!entry) {
-    entry = { url: URL.createObjectURL(file), users: 0 };
-    previews.set(file, entry);
-  }
-  const current = entry;
-  current.users += 1;
-  const revokeUnlessResubscribed = () => {
-    if (current.users > 0 || previews.get(file) !== current) return;
-    previews.delete(file);
-    URL.revokeObjectURL(current.url);
-  };
-  return () => {
-    current.users -= 1;
-    queueMicrotask(revokeUnlessResubscribed);
-  };
-}
-
-export function useInternalPreviewUrl(file: File | undefined) {
-  const shown =
-    file && isImage(file) && typeof URL.createObjectURL === 'function' ? file : undefined;
-  const subscribe = useCallback(() => (shown ? watchPreview(shown) : noop), [shown]);
-  return useSyncExternalStore(
-    subscribe,
-    () => (shown ? previews.get(shown)?.url : undefined),
-    () => undefined,
-  );
 }

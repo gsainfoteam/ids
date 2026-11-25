@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useLayoutEffect, type ComponentProps } from 'react';
+import { use, type ComponentProps } from 'react';
 
 import { createPortal } from 'react-dom';
 
@@ -9,6 +9,7 @@ import { mergeRefs } from '../../../../utils';
 import { KbdGroupContext, type KbdGroupContextValue } from '../../../typography/kbd/hooks/use-kbd';
 import { useInternalTooltipContext } from '../context';
 import { DEFAULT_PLACEMENT } from '../hooks/use-tooltip';
+import { useInternalTooltipPlacement } from '../hooks/use-tooltip-placement';
 
 import type { AnchoredAlign, AnchoredSide } from '../../../../internal/overlay';
 
@@ -32,10 +33,7 @@ export function TooltipContent({
 }: TooltipContentProps) {
   const { tooltip } = useInternalTooltipContext('Tooltip.Content');
 
-  const { setPlacement } = tooltip;
-  useLayoutEffect(() => {
-    setPlacement({ side, align, sideOffset });
-  }, [setPlacement, side, align, sideOffset]);
+  useInternalTooltipPlacement(tooltip.setPlacement, { side, align, sideOffset });
 
   if (!tooltip.mounted) return null;
   return <TooltipPopup {...props} />;

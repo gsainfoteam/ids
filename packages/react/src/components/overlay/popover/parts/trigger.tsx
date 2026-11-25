@@ -1,10 +1,11 @@
 'use client';
 
-import { useLayoutEffect, type ComponentProps, type MouseEvent } from 'react';
+import type { ComponentProps, MouseEvent } from 'react';
 
 import { buttonTypeFor, mergeProps, part } from '../../../../utils';
 import { useInternalPopoverContext } from '../context';
 import { DEFAULT_HOVER_DELAYS } from '../hooks/use-popover';
+import { useInternalPopoverTriggerDelays } from '../hooks/use-popover-trigger-delays';
 
 export type PopoverTriggerProps = ComponentProps<'button'> & {
   asChild?: boolean;
@@ -21,10 +22,7 @@ export function PopoverTrigger({
 }: PopoverTriggerProps) {
   const { popover } = useInternalPopoverContext('Popover.Trigger');
 
-  const { setDelays } = popover;
-  useLayoutEffect(() => {
-    setDelays({ open: openDelay, close: closeDelay });
-  }, [setDelays, openDelay, closeDelay]);
+  useInternalPopoverTriggerDelays(popover.setDelays, openDelay, closeDelay);
 
   return part(
     'button',

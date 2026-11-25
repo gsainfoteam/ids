@@ -1,9 +1,10 @@
 'use client';
 
-import { isValidElement, useLayoutEffect, type ComponentProps } from 'react';
+import { isValidElement, type ComponentProps } from 'react';
 
 import { flattenFragments, mergeRefs } from '../../../../utils';
 import { useInternalMessageScrollerContext } from '../context';
+import { useInternalMessageScrollerListChange } from '../hooks/use-message-scroller-list-change';
 import { messageScrollerStyle } from '../style';
 
 export type MessageScrollerListProps = ComponentProps<'ol'>;
@@ -17,9 +18,7 @@ export function MessageScrollerList({
   const scroll = useInternalMessageScrollerContext('MessageScroller.List');
   const styles = messageScrollerStyle();
 
-  useLayoutEffect(() => {
-    scroll.contentChanged();
-  });
+  useInternalMessageScrollerListChange(scroll);
 
   return (
     <ol

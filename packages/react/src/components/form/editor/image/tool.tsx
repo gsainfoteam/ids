@@ -1,28 +1,23 @@
 'use client';
 
-import { useId, useRef, useState, type KeyboardEvent } from 'react';
-
 import { PhotoIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useInternalEditorContext } from '../context';
 import { IMAGE_ACCEPT } from './types';
 import { useInternalTranslate } from '../../../../internal/translate';
-import { isDevelopment } from '../../../../utils/dev';
+import { warnOnce } from '../../../../utils/dev';
 import { Button } from '../../../action/button';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Spinner } from '../../../feedback/spinner';
 import { Popover } from '../../../overlay/popover';
-import { isWebAddress } from '../../../typography/rich-text/schema/url-rules';
 import { TextField } from '../../text-field';
-import { isPlainEnter, withProtocol } from '../lib/popover-form';
+import { useInternalEditorImagePopover } from '../hooks/use-editor-image-popover';
+import { useInternalEditorToolProps } from '../hooks/use-editor-tool-props';
+import { useInternalEditorToolState } from '../hooks/use-editor-tool-state';
+import { onPlainEnter } from '../lib/popover-form';
 import { editorMessages } from '../messages-catalog';
-import {
-  EditorToolTip,
-  useInternalEditorToolProps,
-  useInternalToolState,
-  type EditorToolProps,
-} from '../parts/tool';
+import { EditorToolTip, type EditorToolProps } from '../parts/tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
@@ -33,29 +28,31 @@ const IMAGE = {
   can: () => true,
 };
 
-let warnedWithoutUpload = false;
-
 function warnThereIsNoUpload() {
-  if (!isDevelopment || warnedWithoutUpload) return;
-  warnedWithoutUpload = true;
-  console.warn(
+  warnOnce(
     '`<Editor.Image>` renders nothing without `onImageUpload` on `<Editor>`, since the image would have nowhere to go.',
   );
 }
 
-type ImagePopover = 'insert' | 'alt';
-
 export function EditorImage({ icon, 'aria-label': ariaLabel, className }: EditorImageProps) {
   const t = useInternalTranslate(editorMessages);
   const { editor, editable, images, styles } = useInternalEditorContext('Editor.Image');
-  const state = useInternalToolState(IMAGE);
+  const state = useInternalEditorToolState(IMAGE);
   const tool = useInternalEditorToolProps('Image');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const urlErrorId = useId();
-  const [open, setOpen] = useState<ImagePopover | null>(null);
-  const [alt, setAlt] = useState('');
-  const [url, setUrl] = useState('');
-  const [urlRejected, setUrlRejected] = useState(false);
+  const {
+    inputRef,
+    urlErrorId,
+    open,
+    onOpenChange,
+    alt,
+    setAlt,
+    applyAlt,
+    url,
+    changeUrl,
+    urlRejected,
+    insertUrl,
+    pickFiles,
+  } = useInternalEditorImagePopover(editor);
 
   if (!images) {
     warnThereIsNoUpload();
@@ -65,51 +62,9 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
   const uploading = images.pending > 0;
   const label = ariaLabel ?? t('editor.image');
 
-  const applyAlt = () => {
-    editor?.chain().focus().updateAttributes('image', { alt: alt.trim() }).run();
-    setOpen(null);
-  };
-
-  const insertUrl = () => {
-    const src = withProtocol(url.trim());
-    if (!isWebAddress(src)) {
-      setUrlRejected(true);
-      return;
-    }
-    editor?.chain().focus().setImage({ src }).run();
-    setOpen(null);
-  };
-
-  const pickFiles = () => {
-    setOpen(null);
-    inputRef.current?.click();
-  };
-
-  const onEnter = (action: () => void) => (event: KeyboardEvent) => {
-    if (!isPlainEnter(event)) return;
-    event.preventDefault();
-    action();
-  };
-
   return (
     <>
-      <Popover
-        open={open !== null}
-        onOpenChange={(next) => {
-          if (!next) {
-            setOpen(null);
-            return;
-          }
-          if (editor?.isActive('image')) {
-            setAlt((editor.getAttributes('image').alt as string | null | undefined) ?? '');
-            setOpen('alt');
-            return;
-          }
-          setUrl('');
-          setUrlRejected(false);
-          setOpen('insert');
-        }}
-      >
+      <Popover open={open !== null} onOpenChange={onOpenChange}>
         <EditorToolTip label={label} disabled={!editable}>
           <Popover.Trigger asChild>
             <IconToggle
@@ -139,7 +94,7 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
                 aria-label={t('editor.imageAlt')}
                 value={alt}
                 onValueChange={setAlt}
-                onKeyDown={onEnter(applyAlt)}
+                onKeyDown={onPlainEnter(applyAlt)}
                 data-1p-ignore=""
                 data-lpignore="true"
               />
@@ -159,11 +114,8 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
                 value={url}
                 invalid={urlRejected}
                 aria-describedby={urlRejected ? urlErrorId : undefined}
-                onValueChange={(next) => {
-                  setUrl(next);
-                  setUrlRejected(false);
-                }}
-                onKeyDown={onEnter(insertUrl)}
+                onValueChange={changeUrl}
+                onKeyDown={onPlainEnter(insertUrl)}
                 data-1p-ignore=""
                 data-lpignore="true"
               />
