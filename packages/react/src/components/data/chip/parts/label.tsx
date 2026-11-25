@@ -2,7 +2,7 @@
 
 import { type ComponentProps } from 'react';
 
-import { useInternalRegisteredId } from '../../../../internal/lib/surface';
+import { useInternalRegisteredId } from '../../../../internal/hooks/use-registered-id';
 import { Slot } from '../../../utility/slot';
 import { useInternalChipContext } from '../context';
 

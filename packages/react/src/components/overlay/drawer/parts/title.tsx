@@ -1,19 +1,17 @@
 'use client';
 
-import { useLayoutEffect, type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 import { Slot } from '../../../utility/slot';
 import { useInternalDrawerContext } from '../context';
+import { useInternalDrawerPartPresence } from '../hooks/use-drawer-part-presence';
 
 export type DrawerTitleProps = ComponentProps<'h2'> & { asChild?: boolean };
 
 export function DrawerTitle({ asChild, className, ...props }: DrawerTitleProps) {
   const { styles, drawer, setTitled } = useInternalDrawerContext('Drawer.Title');
 
-  useLayoutEffect(() => {
-    setTitled(true);
-    return () => setTitled(false);
-  }, [setTitled]);
+  useInternalDrawerPartPresence(setTitled);
 
   const Root = asChild ? Slot : 'h2';
 

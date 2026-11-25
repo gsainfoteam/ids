@@ -1,26 +1,18 @@
 'use client';
 
-import {
-  isValidElement,
-  useRef,
-  type ComponentProps,
-  type SubmitEvent,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
 import { PromptInputContext } from './context';
+import { useInternalPromptInput } from './hooks/use-prompt-input';
+import { NO_FILES, NO_TOOLS } from './lib/empty-defaults';
 import { PromptInputAttachments } from './parts/attachments';
 import { PromptInputInput, type PromptInputInputProps } from './parts/input';
 import { PromptInputSubmit } from './parts/submit';
 import { promptInputStyle } from './style';
-import { useControllableState } from '../../../hooks/use-controllable-state';
-import { useInternalFormReset } from '../../../hooks/use-form-reset';
 import {
   useInternalRequiredName,
   type AccessibleName,
 } from '../../../internal/lib/accessible-name';
-import { keyHandler } from '../../../internal/lib/keys';
 import {
   elementTypeOf,
   flattenFragments,
@@ -31,7 +23,8 @@ import {
 } from '../../../utils';
 import { useFieldSize } from '../field/context';
 import { FileContext } from '../file-field/context';
-import { useInternalFileFieldRoot } from '../file-field/hooks/use-file-field-root';
+import { FileMessages } from '../file-field/parts/messages';
+import { FilePicker } from '../file-field/parts/picker';
 import { TextArea } from '../text-area';
 import { TextAreaInput } from '../text-area/parts/input';
 
@@ -69,8 +62,6 @@ export type PromptInputProps = Omit<
     children?: ReactNode;
   };
 
-const NO_FILES: File[] = [];
-const NO_TOOLS: string[] = [];
 const ROOM_FOR_TWO_LINES = 2;
 const LINES_BEFORE_SCROLLING = 6;
 
@@ -125,68 +116,39 @@ export function PromptInputRoot({
   ...formProps
 }: PromptInputProps) {
   const size = useFieldSize(sizeProp) ?? 'standard';
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const [text, setText] = useControllableState({ value, defaultValue, onValueChange });
-  const [files, setFiles] = useControllableState({
-    value: filesProp,
-    defaultValue: defaultFiles,
-    onValueChange: onFilesChange,
+  const {
+    formRef,
+    text,
+    setText,
+    tools,
+    toggleTool,
+    attachments,
+    busy,
+    canSend,
+    send,
+    sendOrStop,
+  } = useInternalPromptInput({
+    value,
+    defaultValue,
+    onValueChange,
+    files: filesProp,
+    defaultFiles,
+    onFilesChange,
+    tools: toolsProp,
+    defaultTools,
+    onToolsChange,
+    onSend,
+    onStop,
+    onSubmit,
+    status,
+    accept,
+    maxSize,
+    maxCount,
+    onReject,
+    disabled,
+    size,
   });
-  const [tools, setTools] = useControllableState({
-    value: toolsProp,
-    defaultValue: defaultTools,
-    onValueChange: onToolsChange,
-  });
-  const toggleTool = (tool: string) =>
-    setTools(tools.includes(tool) ? tools.filter((on) => on !== tool) : [...tools, tool]);
-
-  const attachments = useInternalFileFieldRoot(
-    {
-      multiple: true,
-      value: files,
-      onValueChange: setFiles,
-      accept,
-      maxSize,
-      maxCount,
-      onReject,
-      disabled,
-      size,
-    },
-    'embedded',
-  );
-
-  const busy = status !== 'idle';
-  const canSend = !disabled && !busy && (text.trim() !== '' || files.length > 0);
   const styles = promptInputStyle({ size });
-
-  useInternalFormReset(formRef, () => {
-    setText(defaultValue, { silent: true });
-    setFiles(defaultFiles, { silent: true });
-    setTools(defaultTools, { silent: true });
-  });
-
-  const send = (event: SubmitEvent<HTMLFormElement>) => {
-    onSubmit?.(event);
-    if (event.defaultPrevented) return;
-    if (!canSend) {
-      event.preventDefault();
-      return;
-    }
-    if (!onSend) return;
-    event.preventDefault();
-    onSend({ text, files, tools });
-    setText('');
-    setFiles(NO_FILES);
-  };
-
-  const sendOrStop = keyHandler<HTMLTextAreaElement>({
-    Enter: (event) => event.currentTarget.form?.requestSubmit(),
-    Escape: () => {
-      if (!busy || !onStop) return false;
-      onStop();
-    },
-  });
 
   const { top, input, bottom } = splitByInput(children);
   const {
@@ -225,7 +187,7 @@ export function PromptInputRoot({
           className={styles.root({ className })}
           onSubmit={send}
         >
-          {attachments.picker}
+          <FilePicker {...attachments.picker} />
           <TextArea
             variant={variant}
             size={size}
@@ -248,7 +210,7 @@ export function PromptInputRoot({
             />
             {bottom}
           </TextArea>
-          {attachments.messages}
+          <FileMessages {...attachments.messages} />
         </form>
       </FileContext>
     </PromptInputContext>

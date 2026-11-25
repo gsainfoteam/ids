@@ -4,10 +4,11 @@ import { MinusIcon } from '@heroicons/react/16/solid';
 
 import { useInternalEditorContext } from '../context';
 import { editorMessages } from '../messages-catalog';
-import { EditorToolTip, useInternalEditorToolProps, type EditorToolProps } from './tool';
+import { EditorToolTip, type EditorToolProps } from './tool';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { IconButton } from '../../../action/icon-button';
 import { useInternalEditorSelector } from '../hooks/use-editor-selector';
+import { useInternalEditorToolProps } from '../hooks/use-editor-tool-props';
 
 export type EditorHorizontalRuleProps = EditorToolProps;
 

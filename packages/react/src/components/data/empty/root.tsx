@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { EmptyContext } from './context';
+import { useInternalEmptyTitleWarning } from './hooks/use-empty-title-warning';
 import { EmptyMedia } from './parts/media';
 import { EmptyTitle } from './parts/title';
 import { emptyStyle } from './style';
 import { containsElementOfType } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { Empty } from '.';
 
@@ -26,9 +24,7 @@ export function EmptyRoot({
   const hasTitle = containsElementOfType(children, EMPTY_TITLE);
   const styles = emptyStyle({ variant, size, align });
 
-  useEffect(() => {
-    if (isDevelopment && !hasTitle) console.warn('[IDS] Empty: give it an Empty.Title.');
-  }, [hasTitle]);
+  useInternalEmptyTitleWarning(hasTitle);
 
   return (
     <EmptyContext value={{ styles }}>

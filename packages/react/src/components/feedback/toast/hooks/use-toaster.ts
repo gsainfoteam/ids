@@ -13,6 +13,7 @@ import {
 
 import { isEqual } from 'es-toolkit';
 
+import { useInternalResizeObserver } from '../../../../hooks/use-resize-observer';
 import { keyHandler, withModifiers } from '../../../../internal/lib/keys';
 import {
   blurWithin,
@@ -163,14 +164,7 @@ export function useInternalToaster({ explicit, max, expanded }: UseToasterOption
     if (shown) measure();
   }, [shown, toasts, measure]);
 
-  useEffect(() => {
-    if (!region || !shown || typeof ResizeObserver === 'undefined') return;
-
-    const observer = new ResizeObserver(() => measure());
-    observer.observe(region);
-
-    return () => observer.disconnect();
-  }, [region, shown, measure]);
+  useInternalResizeObserver(shown ? region : null, measure);
 
   const hasLive = live.length > 0;
 

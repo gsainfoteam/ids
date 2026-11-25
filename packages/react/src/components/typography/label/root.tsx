@@ -4,15 +4,12 @@ import { cloneElement, isValidElement, type ReactNode } from 'react';
 
 import { useInternalLabel } from './hooks/use-label';
 import { labelStyle } from './style';
+import { resolveState } from '../../../internal/lib/state-props';
 import { invariant, mergeEventHandlers, mergeProps } from '../../../utils';
 
 import type { Label } from '.';
 
 type ChildProps = { id?: string; htmlFor?: string; children?: ReactNode };
-
-function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
 
 export function LabelRoot({
   size = 'standard',
@@ -59,8 +56,8 @@ export function LabelRoot({
     'data-disabled': state.disabled ? '' : undefined,
     'data-required': state.required ? '' : undefined,
     'data-invalid': state.invalid ? '' : undefined,
-    className: root({ className: resolve(className, state) }),
-    style: resolve(style, state),
+    className: root({ className: resolveState(className, state) }),
+    style: resolveState(style, state),
   };
   const asterisk = state.required && (
     <span aria-hidden="true" data-label-required="" className={marker()}>

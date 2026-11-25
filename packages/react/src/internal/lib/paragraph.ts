@@ -1,10 +1,3 @@
-'use client';
-
-import { useCallback, useEffect, useRef, type Ref, type RefCallback } from 'react';
-
-import { mergeRefs } from '../../utils';
-import { isDevelopment } from '../../utils/dev';
-
 const CLOSES_A_PARAGRAPH = [
   'address',
   'article',
@@ -39,23 +32,7 @@ const CLOSES_A_PARAGRAPH = [
   'ul',
 ].join(',');
 
-export function useInternalParagraphRef<T extends HTMLElement>(
-  part: string,
-  ref: Ref<T> | undefined,
-): RefCallback<T> {
-  const node = useRef<T | null>(null);
-  const warned = useRef(false);
-
-  useEffect(() => {
-    const paragraph = node.current;
-    if (!isDevelopment || warned.current || paragraph?.localName !== 'p') return;
-    const block = paragraph.querySelector(CLOSES_A_PARAGRAPH);
-    if (!block) return;
-    warned.current = true;
-    console.warn(
-      `[IDS] ${part}: it renders a <p>, which cannot hold a <${block.localName}>. Put block content in with asChild: <${part} asChild><div>…</div></${part}>.`,
-    );
-  });
-
-  return useCallback((element: T | null) => mergeRefs(node, ref)(element), [ref]);
+export function blockInsideParagraph(paragraph: Element | null) {
+  if (paragraph?.localName !== 'p') return null;
+  return paragraph.querySelector(CLOSES_A_PARAGRAPH);
 }

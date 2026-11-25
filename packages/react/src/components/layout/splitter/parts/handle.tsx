@@ -13,7 +13,8 @@ import { useInternalResizeDrag } from '../../../../internal/resize-handle';
 import { mergeProps, part } from '../../../../utils';
 import { IconButton } from '../../../action/icon-button';
 import { HandleIndexContext, useInternalSplitterPart } from '../context';
-import { splitterStyle, type SplitterToggleSide } from '../style';
+import { sideLeftOpen } from '../lib/toggle-side';
+import { splitterStyle } from '../style';
 
 export type SplitterHandleProps = ComponentProps<'div'> & { asChild?: boolean };
 
@@ -21,11 +22,6 @@ const CHEVRONS = {
   horizontal: { towardStart: ChevronLeftIcon, towardEnd: ChevronRightIcon },
   vertical: { towardStart: ChevronUpIcon, towardEnd: ChevronDownIcon },
 };
-
-function sideLeftOpen(toggle: { collapsed: boolean; before: boolean }): SplitterToggleSide {
-  if (!toggle.collapsed) return 'center';
-  return toggle.before ? 'after' : 'before';
-}
 
 export function SplitterHandle({ asChild, className, children, ...props }: SplitterHandleProps) {
   const { orientation, styles, splitter, index } = useInternalSplitterPart(

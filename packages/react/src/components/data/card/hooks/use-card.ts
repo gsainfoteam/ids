@@ -1,10 +1,10 @@
 'use client';
 
+import { useInternalLabelling } from '../../../../internal/hooks/use-labelling';
 import {
-  useInternalLabelling,
   useInternalSurface,
   type UseSurfaceOptions,
-} from '../../../../internal/lib/surface';
+} from '../../../../internal/hooks/use-surface';
 
 export function useInternalCard<E extends HTMLElement>(options: UseSurfaceOptions<E>) {
   return {

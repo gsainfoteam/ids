@@ -213,3 +213,11 @@ export function qrCodeGeometry(value: string, options: QRCodeGeometryOptions): Q
           },
   };
 }
+
+export function geometryThatFits(value: string, options: QRCodeGeometryOptions) {
+  try {
+    return qrCodeGeometry(value, options);
+  } catch {
+    return undefined;
+  }
+}

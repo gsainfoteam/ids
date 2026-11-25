@@ -1042,7 +1042,7 @@ each X what it needs through a context declared in X's own folder (`ItemGroupCon
 **A description is a paragraph.** A `Description` part of prose (Card, Item, Empty, Alert, Field,
 Dialog, Popover) renders a `<p>`; one inside a button (Stepper) stays a `<span>`. Block content
 goes in through `asChild` (`<Card.Description asChild><div>…</div></Card.Description>`), the way a
-Title takes another heading level. `internal/lib/paragraph.ts` warns in development when a block
+Title takes another heading level. `internal/hooks/use-paragraph-ref.ts` warns in development when a block
 element lands inside the `<p>`, which the HTML parser would split apart on the server.
 
 **Group-like controls keep a stable focus target.** RadioGroup, CheckboxGroup, Rating and

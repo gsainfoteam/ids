@@ -1,22 +1,16 @@
 'use client';
 
-import {
-  isValidElement,
-  useCallback,
-  useEffect,
-  type ComponentProps,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
 import { HandleIndexContext, PanelIndexContext, SplitterContext } from './context';
 import { useInternalSplitter, type SplitterOrientation } from './hooks/use-splitter';
-import { sameSize } from './lib/layout';
+import { useInternalSplitterRootRef } from './hooks/use-splitter-root-ref';
+import { useInternalSplitterWarnings } from './hooks/use-splitter-warnings';
+import { defaultTotalOf } from './lib/layout';
 import { SplitterHandle, type SplitterHandleProps } from './parts/handle';
 import { SplitterPanel, type SplitterPanelProps } from './parts/panel';
 import { splitterStyle } from './style';
-import { elementTypeOf, flattenFragments, mergeProps, mergeRefs } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
+import { elementTypeOf, flattenFragments, mergeProps } from '../../../utils';
 
 export type SplitterProps = Omit<ComponentProps<'div'>, 'defaultValue' | 'onChange'> & {
   orientation?: SplitterOrientation;
@@ -25,9 +19,6 @@ export type SplitterProps = Omit<ComponentProps<'div'>, 'defaultValue' | 'onChan
   onValueChange?: (value: number[]) => void;
   onValueCommit?: (value: number[]) => void;
 };
-
-const FEWEST_PANELS = 2;
-const WHOLE = 100;
 
 const isPart =
   <P,>(type: unknown) =>
@@ -82,12 +73,6 @@ function arrange(children: ReactNode) {
   return { panels: panels.map((panel) => panel.props), placed, handleIds, stray };
 }
 
-function useInternalDevelopmentWarning(message: string | false) {
-  useEffect(() => {
-    if (isDevelopment && message) console.warn(`[IDS] ${message}`);
-  }, [message]);
-}
-
 export function SplitterRoot({
   orientation = 'horizontal',
   value,
@@ -112,31 +97,13 @@ export function SplitterRoot({
     handleIds: layout.handleIds,
   });
 
-  const { rootRef } = splitter;
-  const mergedRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(rootRef, ref)(node),
-    [rootRef, ref],
-  );
+  const mergedRef = useInternalSplitterRootRef(splitter.rootRef, ref);
 
-  const panelCount = layout.panels.length;
-  const givenDefaults = (defaultValue ?? layout.panels.map((panel) => panel.defaultSize)).filter(
-    (size): size is number => size !== undefined,
-  );
-  const defaultTotal = givenDefaults.reduce((total, size) => total + size, 0);
-
-  useInternalDevelopmentWarning(
-    panelCount < FEWEST_PANELS &&
-      `Splitter needs at least two Splitter.Panel children; it has ${panelCount}.`,
-  );
-  useInternalDevelopmentWarning(
-    defaultTotal > WHOLE &&
-      !sameSize(defaultTotal, WHOLE) &&
-      `Splitter: the default sizes add up to ${defaultTotal}%, past 100%. They are scaled down to fit.`,
-  );
-  useInternalDevelopmentWarning(
-    layout.stray > 0 &&
-      `Splitter: ${layout.stray} Splitter.Handle not drawn. A handle goes between two panels, one per gap.`,
-  );
+  useInternalSplitterWarnings({
+    panelCount: layout.panels.length,
+    defaultTotal: defaultTotalOf(defaultValue, layout.panels),
+    stray: layout.stray,
+  });
 
   const styles = splitterStyle({ orientation });
 

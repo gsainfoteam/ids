@@ -1,28 +1,12 @@
 'use client';
 
-import {
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ComponentProps,
-  type ReactElement,
-  type Ref,
-} from 'react';
+import { type ComponentProps, type ReactElement, type Ref } from 'react';
 
-import {
-  FloatingFocusManager,
-  useFloatingRootContext,
-  type FloatingRootContext,
-} from '@floating-ui/react';
-import { noop } from 'es-toolkit';
+import { FloatingFocusManager, type FloatingRootContext } from '@floating-ui/react';
 import { RemoveScroll } from 'react-remove-scroll';
 
-import { mergeRefs } from '../../../utils';
+import { useInternalModalLayer } from '../hooks/use-modal-layer';
 import { elementsAbove, type Layer } from '../lib/layer-stack';
-import { raiseInTopLayer, raiseWhatStaysAboveLayers, showInTopLayer } from '../lib/top-layer';
-
-const SCROLLABLE_LAYERS_ABOVE = 8;
 
 export type ModalLayerProps = {
   open: boolean;
@@ -45,36 +29,14 @@ export function ModalLayer({
   onBackdropClick,
   children,
 }: ModalLayerProps) {
-  const backdropRef = useRef<HTMLDivElement>(null);
-  const givenBackdropRef = backdrop === false ? undefined : backdrop.ref;
-  const setBackdrop = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(backdropRef, givenBackdropRef)(node),
-    [givenBackdropRef],
-  );
-
-  const ownContext = useFloatingRootContext({
-    open,
-    onOpenChange: noop,
-    elements: { reference: null, floating: element },
-  });
-
-  const [layersAboveScroll] = useState(() =>
-    Array.from({ length: SCROLLABLE_LAYERS_ABOVE }, (_, index) => ({
-      get current() {
-        return elementsAbove(layer)[index] ?? null;
-      },
-    })),
-  );
-
   const hasBackdrop = backdrop !== false;
-
-  useLayoutEffect(() => {
-    if (!open || !element) return;
-
-    if (hasBackdrop && backdropRef.current) showInTopLayer(backdropRef.current);
-    raiseInTopLayer(element);
-    raiseWhatStaysAboveLayers();
-  }, [open, element, hasBackdrop]);
+  const { setBackdrop, context, layersAboveScroll } = useInternalModalLayer({
+    open,
+    layer,
+    element,
+    hasBackdrop,
+    backdropRef: backdrop === false ? undefined : backdrop.ref,
+  });
 
   return (
     <>
@@ -91,7 +53,7 @@ export function ModalLayer({
         />
       )}
       <FloatingFocusManager
-        context={givenContext ?? ownContext}
+        context={givenContext ?? context}
         disabled={!open}
         modal
         closeOnFocusOut={false}

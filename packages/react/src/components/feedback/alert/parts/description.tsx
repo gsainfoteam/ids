@@ -1,6 +1,6 @@
 'use client';
 
-import { useInternalParagraphRef } from '../../../../internal/lib/paragraph';
+import { useInternalParagraphRef } from '../../../../internal/hooks/use-paragraph-ref';
 import { Slot } from '../../../utility/slot';
 import { useInternalAlertContext } from '../context';
 import { resolve, type PartProps } from '../lib/part-props';

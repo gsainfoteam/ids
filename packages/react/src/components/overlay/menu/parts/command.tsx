@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  isValidElement,
-  useEffect,
-  useLayoutEffect,
-  type ChangeEvent,
-  type ReactNode,
-} from 'react';
+import { isValidElement, type ChangeEvent, type ReactNode } from 'react';
 
 import { useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
 
@@ -30,9 +24,10 @@ import {
   mergeProps,
   part,
 } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { useInternalCommandOption, useInternalCommandPalette } from '../hooks/use-command';
+import { useInternalCommandListSync } from '../hooks/use-command-list-sync';
+import { useInternalCommandNestedMenuWarning } from '../hooks/use-command-nested-menu-warning';
 import { selectItem } from '../hooks/use-menu-item';
 import { menuStyle } from '../style';
 
@@ -113,25 +108,11 @@ function CommandPopup({
 }: Menu.ContentProps) {
   const t = useInternalTranslate();
 
-  const {
-    open,
-    ending,
-    stacked,
-    layer,
-    content,
-    ids,
-    query,
-    setOpen,
-    setContent,
-    setBackdrop,
-    setList,
-    syncList,
-    highlightFirst,
-  } = useInternalCommandContext('Menu.Content');
+  const palette = useInternalCommandContext('Menu.Content');
+  const { open, ending, stacked, layer, content, ids, setOpen, setContent, setBackdrop, setList } =
+    palette;
 
-  useLayoutEffect(() => syncList());
-
-  useLayoutEffect(() => highlightFirst(), [query, highlightFirst]);
+  useInternalCommandListSync(palette);
 
   const nodes = flattenFragments(children);
   const searches = nodes.filter(isType(CommandSearch));
@@ -351,12 +332,7 @@ export function CommandRadioItem({
 }
 
 export function CommandNestedMenu() {
-  useEffect(() => {
-    if (isDevelopment)
-      console.warn(
-        '[IDS] Menu: a Menu nested in a triggerType="command" palette is not supported and renders nothing. Put its items in a Menu.Group instead.',
-      );
-  }, []);
+  useInternalCommandNestedMenuWarning();
 
   return null;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useInternalParagraphRef } from '../../../../internal/lib/paragraph';
+import { useInternalParagraphRef } from '../../../../internal/hooks/use-paragraph-ref';
 import { useInternalFieldContext, type FieldState } from '../context';
 import { renderPart, type FieldPartProps } from '../lib/part';
 import { resolve, stateAttributes } from '../lib/state-value';

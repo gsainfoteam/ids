@@ -1,23 +1,18 @@
 'use client';
 
-import { use, useLayoutEffect } from 'react';
+import { use } from 'react';
 
 import { mergeProps, part } from '../../../../utils';
 import { GroupContext } from '../context';
+import { useInternalMenuLabelPresence } from '../hooks/use-menu-label-presence';
 import { menuStyle } from '../style';
 
 import type { Menu } from '..';
 
 export function MenuLabel({ asChild, className, children, ...props }: Menu.LabelProps) {
   const group = use(GroupContext);
-  const setLabelled = group?.setLabelled;
 
-  useLayoutEffect(() => {
-    if (!setLabelled) return;
-
-    setLabelled(true);
-    return () => setLabelled(false);
-  }, [setLabelled]);
+  useInternalMenuLabelPresence(group?.setLabelled);
 
   return part(
     'div',

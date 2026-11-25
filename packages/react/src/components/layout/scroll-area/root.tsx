@@ -1,24 +1,17 @@
 'use client';
 
-import {
-  cloneElement,
-  Fragment,
-  isValidElement,
-  useEffect,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { cloneElement, Fragment, isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { PlacementContext, ScrollAreaContext } from './context';
 import { useInternalScrollArea } from './hooks/use-scroll-area';
-import { axisOf, fadedAlong, orientationOf } from './lib/orientation';
+import { useInternalScrollAreaRepeatedBarWarning } from './hooks/use-scroll-area-repeated-bar-warning';
+import { AXES, axisOf, fadedAlong, orientationOf, scrollsAlong } from './lib/orientation';
 import { ScrollAreaCorner } from './parts/corner';
 import { ScrollAreaScrollbar } from './parts/scrollbar';
 import { ScrollAreaViewport } from './parts/viewport';
 import { scrollAreaStyle } from './style';
 import { resolveState } from '../../../internal/lib/state-props';
 import { elementTypeOf, flattenFragments, invariant, mergeProps, mergeRefs } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { ScrollArea } from '.';
 import type { Axis, Placement } from './lib/geometry';
@@ -27,17 +20,6 @@ type DeclaredBar = {
   node: ReactElement<ScrollArea.ScrollbarProps>;
   axis: Axis;
   placement: Placement;
-};
-
-const AXES: Record<ScrollArea.Orientation, Axis[]> = {
-  vertical: ['y'],
-  horizontal: ['x'],
-  both: ['y', 'x'],
-};
-
-const scrollsAlong = (axes: Record<Axis, boolean>): ScrollArea.Orientation => {
-  if (axes.x && axes.y) return 'both';
-  return axes.x ? 'horizontal' : 'vertical';
 };
 
 const isType =
@@ -116,12 +98,7 @@ export function ScrollAreaRoot({
 
   const repeated = layout.repeated.map(orientationOf).join(', ');
 
-  useEffect(() => {
-    if (isDevelopment && repeated)
-      console.warn(
-        `[IDS] ScrollArea has more than one Scrollbar for the same orientation (${repeated}). Only the last one is laid out.`,
-      );
-  }, [repeated]);
+  useInternalScrollAreaRepeatedBarWarning(repeated);
 
   const scrolls = scrollsAlong(layout.axes);
 

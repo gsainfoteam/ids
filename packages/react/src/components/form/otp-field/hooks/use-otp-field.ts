@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -16,6 +17,7 @@ import {
   type PointerEvent,
 } from 'react';
 
+import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { useInternalFormReset } from '../../../../hooks/use-form-reset';
 import { mergeRefs } from '../../../../utils';
 import {
@@ -80,13 +82,14 @@ export function useInternalOTPField({
   const accepts = useMemo(() => createCharacterTest(pattern), [pattern]);
   const clean = (raw: string) => sanitize(raw, accepts);
 
-  const [inner, setInner] = useState(() =>
-    Array.from(clean(defaultValue)).slice(0, length).join(''),
-  );
+  const fit = (raw: string) => Array.from(clean(raw)).slice(0, length).join('');
+  const [given, setCode] = useControllableState({
+    value,
+    defaultValue: fit(defaultValue),
+    onValueChange,
+  });
   const controlled = value !== undefined;
-  const code = Array.from(clean(controlled ? value : inner))
-    .slice(0, length)
-    .join('');
+  const code = fit(given);
 
   const [composition, setComposition] = useState<string | null>(null);
   const composing = useRef(false);
@@ -103,8 +106,7 @@ export function useInternalOTPField({
 
   const commit = (next: string) => {
     if (next === code) return;
-    if (!controlled) setInner(next);
-    onValueChange?.(next);
+    setCode(next);
     if (next.length === length && code.length !== length) onComplete?.(next);
   };
 
@@ -131,10 +133,7 @@ export function useInternalOTPField({
         : next,
     );
   };
-  const syncRef = useRef(syncSelection);
-  useLayoutEffect(() => {
-    syncRef.current = syncSelection;
-  });
+  const syncSelectionLater = useEffectEvent(syncSelection);
 
   useLayoutEffect(() => {
     const input = inputRef.current;
@@ -148,7 +147,7 @@ export function useInternalOTPField({
 
   useEffect(() => {
     if (!focused) return;
-    const onSelectionChange = () => syncRef.current();
+    const onSelectionChange = () => syncSelectionLater();
     document.addEventListener('selectionchange', onSelectionChange);
     return () => document.removeEventListener('selectionchange', onSelectionChange);
   }, [focused]);
@@ -218,7 +217,7 @@ export function useInternalOTPField({
   }, []);
 
   useInternalFormReset(inputRef, () => {
-    if (!controlled) setInner(Array.from(clean(defaultValue)).slice(0, length).join(''));
+    if (!controlled) setCode(fit(defaultValue), { silent: true });
     setComposition(null);
     previousSelection.current = null;
   });

@@ -14,11 +14,10 @@ import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { useInternalFormReset } from '../../../../hooks/use-form-reset';
 import { mergeRefs } from '../../../../utils';
 import { isDevelopment } from '../../../../utils/dev';
+import { isCheckedScore } from '../lib/score';
 
 const radiosOf = (root: HTMLElement) =>
   root.querySelectorAll<HTMLInputElement>('input[type=radio][data-rating-value]');
-
-export const isCheckedScore = (score: number, current: number) => score > 0 && score === current;
 
 export type UseRatingOptions = {
   value?: number;
