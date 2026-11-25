@@ -1,63 +1,22 @@
 'use client';
 
-import { isValidElement, useLayoutEffect, useRef, type ReactNode } from 'react';
-
-import { isEqual, isPlainObject } from 'es-toolkit';
+import { isValidElement, type ReactNode } from 'react';
 
 import { DataTableContext } from './context';
+import { useInternalDataTableDirection } from './hooks/use-data-table-direction';
+import { useInternalDataTableSelection } from './hooks/use-data-table-selection';
 import { DataTableCaption } from './parts/caption';
 import { DataTableContent } from './parts/content';
 import { DataTableEmpty } from './parts/empty';
 import { DataTablePagination } from './parts/pagination';
 import { DataTableToolbar } from './parts/toolbar';
 import { dataTableStyle } from './style';
-import { useControllableState } from '../../../hooks/use-controllable-state';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { DataTable } from '.';
 import type { DataTableFeatures } from './lib/features';
 import type { ReactTable } from '@tanstack/react-table';
-import type { RowData, RowSelectionState, Updater } from '@tanstack/table-core';
-
-const NO_SELECTION: RowSelectionState = {};
-
-function selectionOf(value: unknown) {
-  if (value === undefined) return undefined;
-  return isPlainObject(value) ? (value as RowSelectionState) : NO_SELECTION;
-}
-
-function applied(updater: Updater<RowSelectionState>, previous: RowSelectionState) {
-  return typeof updater === 'function' ? updater(previous) : updater;
-}
-
-function useInternalSelectionTrio(
-  table: ReactTable<DataTableFeatures, RowData>,
-  trio: Pick<DataTable.Props<RowData>, 'value' | 'defaultValue' | 'onValueChange'>,
-) {
-  const meta = table.options.meta;
-  const [selection, setSelection] = useControllableState({
-    value: selectionOf(trio.value),
-    defaultValue: trio.defaultValue ?? NO_SELECTION,
-    onValueChange: trio.onValueChange,
-  });
-  const shown = table.state.rowSelection;
-
-  useLayoutEffect(() =>
-    meta?.ownSelection((updater) => setSelection((previous) => applied(updater, previous))),
-  );
-
-  useLayoutEffect(() => {
-    if (meta && !isEqual(selection, shown)) meta.showSelection(selection);
-  }, [meta, selection, shown]);
-
-  return selection;
-}
-
-function isRtl(element: HTMLElement) {
-  const direction = element.ownerDocument.defaultView?.getComputedStyle(element).direction;
-  if (direction) return direction === 'rtl';
-  return element.closest('[dir]')?.getAttribute('dir') === 'rtl';
-}
+import type { RowData } from '@tanstack/table-core';
 
 function isPart(child: ReactNode, part: unknown) {
   return isValidElement(child) && elementTypeOf(child) === part;
@@ -91,13 +50,8 @@ export function DataTableRoot<TData extends RowData>({
   children,
 }: DataTable.Props<TData>) {
   const table = instance as unknown as ReactTable<DataTableFeatures, RowData>;
-  const rootRef = useRef<HTMLDivElement>(null);
-  const setRtl = table.options.meta?.setRtl;
-  const selection = useInternalSelectionTrio(table, { value, defaultValue, onValueChange });
-
-  useLayoutEffect(() => {
-    if (rootRef.current) setRtl?.(isRtl(rootRef.current));
-  }, [setRtl]);
+  const selection = useInternalDataTableSelection(table, { value, defaultValue, onValueChange });
+  const rootRef = useInternalDataTableDirection(table.options.meta?.setRtl);
 
   const parts = flattenFragments(children);
   const caption = parts.find((child) => isPart(child, DataTableCaption));

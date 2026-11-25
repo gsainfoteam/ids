@@ -6,10 +6,12 @@ import { TextAlignCenter, TextAlignEnd, TextAlignJustify, TextAlignStart } from 
 
 import { useInternalEditorContext } from '../context';
 import { editorMessages } from '../messages-catalog';
-import { EditorToolTip, extensionIsLoaded, hasExtension, useInternalEditorToolProps } from './tool';
+import { EditorToolTip } from './tool';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { IconToggle } from '../../../action/icon-toggle';
 import { useInternalEditorSelector } from '../hooks/use-editor-selector';
+import { useInternalEditorToolProps } from '../hooks/use-editor-tool-props';
+import { extensionIsLoaded, hasExtension } from '../lib/extensions';
 
 import type { IdsMessageKey } from '../../../../internal/messages';
 import type { Hotkey } from '@tanstack/react-hotkeys';

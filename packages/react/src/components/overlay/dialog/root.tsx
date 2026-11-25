@@ -1,9 +1,10 @@
 'use client';
 
-import { isValidElement, useState, type ReactElement, type ReactNode } from 'react';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { DialogContext } from './context';
 import { useInternalDialog } from './hooks/use-dialog';
+import { useInternalDialogLabelling } from './hooks/use-dialog-labelling';
 import { DialogOverlay, type DialogOverlayProps } from './parts/overlay';
 import { dialogStyle } from './style';
 import { elementTypeOf, flattenFragments } from '../../../utils';
@@ -30,8 +31,7 @@ export function DialogRoot({
     dismissible,
   });
 
-  const [titled, setTitled] = useState(false);
-  const [described, setDescribed] = useState(false);
+  const labelling = useInternalDialogLabelling();
 
   const parts = flattenFragments(children);
   const overlay = parts.find(isOverlay);
@@ -43,10 +43,7 @@ export function DialogRoot({
         role,
         dismissible,
         overlay: overlay?.props,
-        titled,
-        setTitled,
-        described,
-        setDescribed,
+        ...labelling,
         styles: dialogStyle(),
       }}
     >

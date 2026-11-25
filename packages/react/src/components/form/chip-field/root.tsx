@@ -1,39 +1,25 @@
 'use client';
 
-import {
-  isValidElement,
-  useEffect,
-  useId,
-  type ComponentProps,
-  type FocusEvent,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { useId, type ComponentProps, type FocusEvent } from 'react';
 
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
-import { isNotNil } from 'es-toolkit';
 
-import { ChipContext, useInternalChip, type InputAttributes } from './context';
+import { ChipContext, type InputAttributes } from './context';
 import { useInternalChipField } from './hooks/use-chip-field';
-import { isType } from './lib/is-type';
-import { ChipContent, type ChipContentProps } from './parts/content';
-import { ChipCreate } from './parts/create';
-import { ChipEmpty } from './parts/empty';
-import { ChipGroup, OPTION_KINDS } from './parts/group';
-import { ChipInput, type ChipInputProps } from './parts/input';
-import { ChipItem } from './parts/item';
-import { ChipLimit } from './parts/limit';
+import { useInternalChipFieldItemsWarning } from './hooks/use-chip-field-items-warning';
+import { chipOptionsIn, isForeignComponent, splitChildren } from './lib/chip-children';
+import { ChipAdornments } from './parts/adornments';
+import { ChipContent } from './parts/content';
+import { ChipInput } from './parts/input';
+import { ChipValues } from './parts/values';
 import { chipFieldStyle } from './style';
 import { FieldPopup, useInternalDrawerPresentation } from '../../../internal/field-popup';
 import { resolveState } from '../../../internal/lib/state-props';
 import { FormValue } from '../../../internal/parts/form-value';
 import { type FieldTriggerVariant } from '../../../internal/surfaces/lib/field-surface';
 import { useInternalTranslate } from '../../../internal/translate';
-import { elementTypeOf, flattenFragments, invariant, isNodeFromAnyWindow } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
-import { Chip } from '../../data/chip';
+import { invariant, isNodeFromAnyWindow } from '../../../utils';
 import { useFieldSize } from '../field/context';
-import { collectOptions, slotChildren } from '../select/lib/select-options';
 
 import type { ChipField } from '.';
 
@@ -67,70 +53,6 @@ export type ChipFieldInputProps = Omit<
   | 'color'
   | 'disabled'
 >;
-
-const POPUP_PARTS: unknown[] = [ChipContent, ChipItem, ChipGroup, ChipCreate, ChipEmpty, ChipLimit];
-
-function isForeignComponent(node: ReactNode): boolean {
-  return flattenFragments(node).some(
-    (child) =>
-      isValidElement<ChipContentProps>(child) &&
-      (elementTypeOf(child) === ChipContent
-        ? isForeignComponent(slotChildren(child.props.children, child.props.asChild))
-        : typeof elementTypeOf(child) === 'function' &&
-          !POPUP_PARTS.includes(elementTypeOf(child))),
-  );
-}
-
-const cancelChipFocusMove = (event: Chip.RemoveEvent) => event.preventDefault();
-
-function isPopupPart(node: ReactNode) {
-  return POPUP_PARTS.some((type) => isType(type)(node));
-}
-
-function splitChildren(children: ReactNode) {
-  const nodes = flattenFragments(children);
-  const popup = nodes.filter(isPopupPart);
-  const contents = popup.filter(isType(ChipContent));
-  invariant(contents.length <= 1, '`<ChipField>` accepts at most one `<ChipField.Content>`.');
-  invariant(
-    contents.length === 0 || popup.length === 1,
-    '`<ChipField>` takes options either inside `<ChipField.Content>` or directly, not both.',
-  );
-
-  const items = nodes.filter((node) => !isPopupPart(node));
-  const inputIndexes = items
-    .map((child, index) => (isType(ChipInput)(child) ? index : null))
-    .filter(isNotNil);
-  invariant(inputIndexes.length <= 1, '`<ChipField>` accepts at most one `<ChipField.Input />`.');
-
-  const inputIndex = inputIndexes[0];
-  const adornments =
-    inputIndex == null
-      ? { leading: items, input: <ChipInput />, trailing: [] as ReactNode[] }
-      : {
-          leading: items.slice(0, inputIndex),
-          input: items[inputIndex] as ReactElement<ChipInputProps>,
-          trailing: items.slice(inputIndex + 1),
-        };
-  const content = contents[0] as ReactElement<ChipContentProps> | undefined;
-  return {
-    ...adornments,
-    popup: contents.length ? contents : <ChipContent>{popup}</ChipContent>,
-    mobileVariant: content?.props.mobileVariant ?? 'drawer',
-  };
-}
-
-function Adornments({ items, className }: { items: ReactNode[]; className: string }) {
-  return items.map((item, index) => (
-    <span
-      key={(isValidElement(item) && item.key) || index}
-      data-chip-field-adornment=""
-      className={className}
-    >
-      {item}
-    </span>
-  ));
-}
 
 export function ChipFieldRoot({
   value,
@@ -167,16 +89,11 @@ export function ChipFieldRoot({
     maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
     '`<ChipField>` `maxCount` must be a non-negative integer.',
   );
-  const options = collectOptions(children, OPTION_KINDS);
-  invariant(
-    options.every((option) => typeof option.value === 'string'),
-    '`<ChipField.Item>` `value` is required.',
-  );
-  invariant(
-    new Set(options.map((option) => option.value)).size === options.length,
-    '`<ChipField>` has a duplicate `<ChipField.Item>` value.',
-  );
-  const { leading, input, trailing, popup, mobileVariant } = splitChildren(children);
+  const options = chipOptionsIn(children);
+  const split = splitChildren(children);
+  const { leading, trailing, mobileVariant } = split;
+  const input = split.input ?? <ChipInput />;
+  const popup = split.contents.length ? split.contents : <ChipContent>{split.loose}</ChipContent>;
   const creatable = onCreate !== undefined;
 
   const merged = { ...inputProps, ...input.props };
@@ -213,13 +130,7 @@ export function ChipFieldRoot({
       new Set(s.selected).size === s.selected.length,
     '`<ChipField>` `value` must contain unique strings.',
   );
-  const hidesItems = !options.length && !creatable && isForeignComponent(popup);
-  useEffect(() => {
-    if (isDevelopment && hidesItems)
-      console.warn(
-        '[IDS] ChipField found no ChipField.Item. Items are read from the children of ChipField, ChipField.Content and ChipField.Group, and from Fragments, but not from inside other components.',
-      );
-  }, [hidesItems]);
+  useInternalChipFieldItemsWarning(!options.length && !creatable && isForeignComponent(popup));
 
   const fallbackId = useId();
   const state: ChipFieldState = {
@@ -314,12 +225,12 @@ export function ChipFieldRoot({
           field.actions.setOpen(true);
         }}
       >
-        <Adornments items={leading} className={styles.adornment()} />
+        <ChipAdornments items={leading} className={styles.adornment()} />
         <div data-chip-field-values="" className={styles.values()}>
-          <Chips />
+          <ChipValues />
           {input}
         </div>
-        <Adornments items={trailing} className={styles.adornment()} />
+        <ChipAdornments items={trailing} className={styles.adornment()} />
         {options.length > 0 && (
           <ChevronDownIcon aria-hidden="true" data-chip-field-icon="" className={styles.icon()} />
         )}
@@ -351,42 +262,4 @@ export function ChipFieldRoot({
       )}
     </ChipContext>
   );
-}
-
-function Chips() {
-  const c = useInternalChip('Chips');
-  return c.field.state.selected.map((item) => {
-    const option = c.options.find((candidate) => candidate.value === item);
-    const label = option?.label ?? item;
-    const removable = !c.field.state.blocked && !option?.disabled;
-    return (
-      <Chip
-        key={item}
-        size={c.size}
-        disabled={option?.disabled}
-        data-chip-field-chip=""
-        className={c.styles.chip()}
-        onRemove={
-          removable
-            ? (event) => {
-                cancelChipFocusMove(event);
-                c.field.handlers.onChipRemove(item);
-              }
-            : undefined
-        }
-      >
-        {label}
-        {removable && (
-          <Chip.Close
-            tabIndex={-1}
-            aria-label={c.removeLabel(label)}
-            data-chip-field-remove={item}
-            data-field-input=""
-            className={c.styles.chipRemove()}
-            onKeyDown={(event) => c.field.handlers.onChipKeyDown(event, item)}
-          />
-        )}
-      </Chip>
-    );
-  });
 }

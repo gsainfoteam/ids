@@ -1,11 +1,11 @@
 'use client';
 
-import { useInternalEditorContext } from '../context';
-import { editorMessages } from '../messages-catalog';
-import { useInternalEditorToolProps } from './tool';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { Select } from '../../select';
+import { useInternalEditorContext } from '../context';
 import { useInternalEditorSelector } from '../hooks/use-editor-selector';
+import { useInternalEditorToolProps } from '../hooks/use-editor-tool-props';
+import { editorMessages } from '../messages-catalog';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 

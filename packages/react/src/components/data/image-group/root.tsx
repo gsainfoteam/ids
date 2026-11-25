@@ -1,16 +1,10 @@
 'use client';
 
-import {
-  isValidElement,
-  useCallback,
-  useLayoutEffect,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from 'react';
+import { isValidElement, type CSSProperties, type ReactNode } from 'react';
 
+import { useInternalImageGroupDocumentOrder } from './hooks/use-image-group-document-order';
 import { imageGroupStyle } from './style';
-import { flattenFragments, invariant, mergeRefs } from '../../../utils';
+import { flattenFragments, invariant } from '../../../utils';
 import { ImageGroupContext } from '../image/context';
 import { useInternalImageGroup } from '../image/hooks/use-image-group';
 import { ImageViewer } from '../image/parts/viewer';
@@ -56,21 +50,7 @@ export function ImageGroupRoot({
     onZoomChange,
     loop,
   });
-  const [list, setList] = useState<HTMLUListElement | null>(null);
-  const attachList = useCallback(
-    (node: HTMLUListElement | null) => mergeRefs(setList, ref)(node),
-    [ref],
-  );
-  const { followTheDocumentOrder } = group;
-
-  useLayoutEffect(() => {
-    if (!list) return;
-
-    const observer = new MutationObserver(followTheDocumentOrder);
-    observer.observe(list, { childList: true });
-
-    return () => observer.disconnect();
-  }, [list, followTheDocumentOrder]);
+  const attachList = useInternalImageGroupDocumentOrder(group.followTheDocumentOrder, ref);
 
   const styles = imageGroupStyle({ layout });
   const columnCount = layout === 'grid' ? ({ '--image-columns': columns } as CSSProperties) : null;

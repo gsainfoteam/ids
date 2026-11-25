@@ -3,10 +3,8 @@
 import {
   isValidElement,
   use,
-  useEffect,
   useId,
   useRef,
-  useState,
   type ChangeEvent,
   type ComponentProps,
   type ReactNode,
@@ -135,36 +133,4 @@ export function useInternalTextArea({
       filled: value !== '',
     },
   };
-}
-
-export type CountState = {
-  count: number;
-  maxLength: number | undefined;
-  remaining: number | undefined;
-  nearLimit: boolean;
-  atLimit: boolean;
-};
-
-export function countState(length: number, maxLength: number | undefined, threshold?: number) {
-  const remaining = maxLength === undefined ? undefined : maxLength - length;
-  const warnAt =
-    threshold ?? (maxLength === undefined ? 0 : Math.max(10, Math.ceil(maxLength * 0.1)));
-  return {
-    count: length,
-    maxLength,
-    remaining,
-    nearLimit: remaining !== undefined && remaining <= warnAt,
-    atLimit: remaining !== undefined && remaining <= 0,
-  } satisfies CountState;
-}
-
-const TYPING_PAUSE = 600;
-
-export function useInternalCountAnnouncement(message: string, delay = TYPING_PAUSE) {
-  const [spoken, setSpoken] = useState('');
-  useEffect(() => {
-    const timer = window.setTimeout(() => setSpoken(message), message ? delay : 0);
-    return () => window.clearTimeout(timer);
-  }, [message, delay]);
-  return spoken;
 }

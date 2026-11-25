@@ -94,6 +94,9 @@ export const MOST_DAYS = 14;
 export const shownDayCount = (count: number) =>
   Number.isFinite(count) ? clamp(Math.round(count), FEWEST_DAYS, MOST_DAYS) : DEFAULT_DAY_COUNT;
 
+export const isDayCount = (count: number | null): count is number =>
+  count !== null && Number.isInteger(count) && count >= FEWEST_DAYS && count <= MOST_DAYS;
+
 const daysFrom = (first: CalendarDate, count: number) =>
   Array.from({ length: count }, (_, index) => first.add({ days: index }));
 

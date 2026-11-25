@@ -4,6 +4,7 @@ import {
   isValidElement,
   use,
   useEffect,
+  useEffectEvent,
   useId,
   useLayoutEffect,
   useRef,
@@ -116,22 +117,19 @@ export function useInternalPasswordField({
       );
   }, [native.name]);
 
-  const latestSetVisible = useRef(setVisible);
-  useLayoutEffect(() => {
-    latestSetVisible.current = setVisible;
-  });
+  const hide = useEffectEvent(() => setVisible(false));
   useEffect(() => {
     const form = inputRef.current?.form;
     if (!form) return;
     let active = true;
     const hideOnceResetCannotBeCancelled = (event: Event) =>
       setTimeout(() => {
-        if (active && !event.defaultPrevented) latestSetVisible.current(false);
+        if (active && !event.defaultPrevented) hide();
       });
     const hideBeforePasswordManagersRead = () => {
       const node = inputRef.current;
       if (node && node.type !== 'password') node.type = 'password';
-      latestSetVisible.current(false);
+      hide();
     };
     form.addEventListener('reset', hideOnceResetCannotBeCancelled);
     form.addEventListener('submit', hideBeforePasswordManagersRead, true);

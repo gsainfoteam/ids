@@ -1,23 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 import { QRCodeContext } from './context';
-import {
-  qrCodeGeometry,
-  type QRCodeFinderShape,
-  type QRCodeGeometry,
-  type QRCodeGeometryOptions,
-  type QRCodeModuleShape,
-} from './lib/qr-path';
+import { useInternalQRCodeGeometry } from './hooks/use-qr-code-geometry';
+import { useInternalQRCodeWarnings } from './hooks/use-qr-code-warnings';
 import { QRCodeLogo } from './parts/logo';
 import { qrCodeStyle } from './style';
 import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
 import { resolveState } from '../../../internal/lib/state-props';
 import { containsElementOfType } from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
 
 import type { QRCode } from '.';
+import type { QRCodeFinderShape, QRCodeModuleShape } from './lib/qr-path';
 
 const LOGO_PARTS: ReadonlySet<unknown> = new Set([QRCodeLogo]);
 
@@ -29,17 +24,7 @@ const FINDER_FOR_SHAPE: Record<QRCodeModuleShape, QRCodeFinderShape> = {
   dots: 'circle',
 };
 
-const LEVELS_TOO_LOW_FOR_A_LOGO = new Set(['L', 'M']);
-
 const EMPTY_PLATE = 1;
-
-function geometryThatFits(value: string, options: QRCodeGeometryOptions) {
-  try {
-    return qrCodeGeometry(value, options);
-  } catch {
-    return undefined;
-  }
-}
 
 export function QRCodeRoot({
   value,
@@ -62,31 +47,9 @@ export function QRCodeRoot({
   const level = errorCorrection ?? (hasLogo ? 'H' : 'M');
   const finder = finderShape ?? FINDER_FOR_SHAPE[shape];
 
-  const geometry: QRCodeGeometry | undefined = useMemo(
-    () =>
-      geometryThatFits(value, {
-        errorCorrection: level,
-        shape,
-        finderShape: finder,
-        quietZone,
-        logo: hasLogo,
-      }),
-    [value, level, shape, finder, quietZone, hasLogo],
-  );
+  const geometry = useInternalQRCodeGeometry({ value, level, shape, finder, quietZone, hasLogo });
   const overflow = geometry === undefined;
-
-  useEffect(() => {
-    if (!isDevelopment) return;
-    if (value === '') console.warn('[IDS] QRCode: value is empty.');
-    if (overflow)
-      console.warn(
-        `[IDS] QRCode: value is too long to encode at error correction level ${level}. Lower errorCorrection or shorten the value.`,
-      );
-    if (hasLogo && LEVELS_TOO_LOW_FOR_A_LOGO.has(level))
-      console.warn(
-        `[IDS] QRCode: a logo covers modules, so use errorCorrection 'Q' or 'H' instead of '${level}'.`,
-      );
-  }, [value, overflow, hasLogo, level]);
+  useInternalQRCodeWarnings({ value, overflow, hasLogo, level });
 
   const state: QRCode.State = {
     version: geometry?.version,

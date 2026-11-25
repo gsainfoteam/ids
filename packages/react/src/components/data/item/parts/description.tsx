@@ -2,8 +2,8 @@
 
 import { type ComponentProps } from 'react';
 
-import { useInternalParagraphRef } from '../../../../internal/lib/paragraph';
-import { useInternalRegisteredId } from '../../../../internal/lib/surface';
+import { useInternalParagraphRef } from '../../../../internal/hooks/use-paragraph-ref';
+import { useInternalRegisteredId } from '../../../../internal/hooks/use-registered-id';
 import { Slot } from '../../../utility/slot';
 import { useInternalItemContext } from '../context';
 
