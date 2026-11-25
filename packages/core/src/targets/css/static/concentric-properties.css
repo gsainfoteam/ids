@@ -1,0 +1,11 @@
+@property --ids-concentric-pad {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --ids-concentric-nested {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}

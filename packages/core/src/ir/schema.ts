@@ -1,5 +1,7 @@
 import * as v from 'valibot';
 
+import { TEXT_STYLE_PARTS, TYPOGRAPHY_GROUPS } from '../sources/config.ts';
+
 export const IR_VERSION = 1;
 
 const segment = v.pipe(v.string(), v.regex(/^[a-z0-9]+$/));
@@ -8,6 +10,7 @@ const identifier = v.pipe(v.string(), v.minLength(1));
 
 export const NameSchema = v.object({
   segments: v.array(segment),
+  sub: v.optional(v.array(segment)),
   css: v.object({ identifier, customProperty: identifier, themeProperty: identifier }),
   ts: v.object({ constant: identifier, member: identifier, type: identifier, key: identifier }),
   dart: v.object({ member: identifier, type: identifier, key: identifier }),
@@ -33,7 +36,7 @@ export const LineHeightSchema = v.variant('kind', [
   v.object({ kind: v.literal('multiplier'), multiplier: v.number() }),
 ]);
 
-const variableEntry = { name: NameSchema, variable: NameSchema };
+const variableEntry = { name: NameSchema, variable: NameSchema, tailwind: v.array(NameSchema) };
 
 export const DimensionTokenSchema = v.object({ ...variableEntry, value: DimensionSchema });
 
@@ -128,14 +131,12 @@ export const ComponentColorSchema = v.object({
   ...variableEntry,
   property: segment,
   part: NameSchema,
-  tailwind: v.array(NameSchema),
   modes: v.array(v.object({ mode: segment, role: identifier })),
 });
 
 export const ComponentShadowSchema = v.object({
   ...variableEntry,
   part: NameSchema,
-  tailwind: v.array(NameSchema),
   modes: v.array(v.object({ mode: segment, shadow: identifier })),
 });
 
@@ -163,6 +164,13 @@ export const TextStyleSchema = v.object({
   fontWeight: v.number(),
   lineHeight: LineHeightSchema,
   letterSpacing: DimensionSchema,
+  parts: v.array(
+    v.object({
+      part: v.picklist(TEXT_STYLE_PARTS),
+      variable: NameSchema,
+      tailwind: v.array(NameSchema),
+    }),
+  ),
   flutter: v.object({ fontSize: v.number(), height: v.number(), letterSpacing: v.number() }),
 });
 
@@ -193,6 +201,42 @@ export const PaletteModelSchema = v.object({
   steps: v.array(identifier),
   series: v.array(v.object({ name: NameSchema, coefficients: v.array(v.array(v.number())) })),
   statusPalettes: v.array(v.object({ name: NameSchema, colors: v.array(ColorSchema) })),
+});
+
+const FocusRingTriggerSchema = v.variant('kind', [
+  v.object({ kind: v.literal('pseudo'), pseudo: identifier }),
+  v.object({
+    kind: v.literal('attribute'),
+    attribute: identifier,
+    unlessPseudo: v.optional(identifier),
+  }),
+  v.object({ kind: v.literal('focusedInside'), attribute: identifier, exceptIn: identifier }),
+]);
+
+export const CssSchema = v.object({
+  attributes: v.object({ mode: identifier, scale: identifier, popover: identifier }),
+  modeVariants: v.array(v.object({ name: NameSchema, mode: segment, others: v.array(segment) })),
+  focusRing: v.object({ variant: identifier, triggers: v.array(FocusRingTriggerSchema) }),
+  concentric: v.object({
+    utility: NameSchema,
+    classPrefix: identifier,
+    nested: NameSchema,
+    spacing: NameSchema,
+    pads: v.array(v.object({ pad: v.number(), className: identifier })),
+    overlayDepths: v.pipe(v.number(), v.integer(), v.minValue(1)),
+  }),
+  typographyOrder: v.array(v.picklist(TYPOGRAPHY_GROUPS)),
+  scale: v.object({
+    factor: NameSchema,
+    spacing: NameSchema,
+    spacingUnit: DimensionSchema,
+    wholePixel: DimensionSchema,
+    cornerRadiusScale: NameSchema,
+    providerRadius: v.array(
+      v.object({ variable: NameSchema, provider: NameSchema, fallback: DimensionSchema }),
+    ),
+    lengths: v.array(v.object({ variable: NameSchema, value: DimensionSchema })),
+  }),
 });
 
 const directory = v.pipe(v.string(), v.endsWith('/'));
@@ -231,6 +275,7 @@ export const IrSchema = v.object({
   typography: TypographySchema,
   fonts: FontsSchema,
   paletteModel: PaletteModelSchema,
+  css: CssSchema,
 });
 
 export const IR_DEFINITIONS = {

@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
+import postcss from 'postcss';
+import valueParser from 'postcss-value-parser';
 import { describe, expect, test } from 'vitest';
 
 import { paletteHues, palettes } from '../.storybook/palettes';
@@ -35,15 +37,33 @@ const resolveCss = (entry: string) => createRequire(import.meta.url).resolve(ent
 
 const css = readFileSync(resolveCss('@gsainfoteam/ids-css/no-fonts.css'), 'utf8');
 
-const modeBlock = (mode: IdsMode) =>
-  css.match(new RegExp(`\\[data-mode="${mode}"\\] \\{([^}]*)\\}`))?.[1] ?? '';
+const stylesheet = postcss.parse(css);
+
+const COLOR_VARIABLE = '--ids-color-';
+
+const modeDeclarations = (mode: IdsMode) =>
+  stylesheet.nodes.flatMap((node) =>
+    node.type === 'rule' && node.selector === `[data-mode="${mode}"]`
+      ? node.nodes.filter((child) => child.type === 'decl')
+      : [],
+  );
+
+const varArguments = (value: string) =>
+  valueParser(value)
+    .nodes.flatMap((node) => (node.type === 'function' && node.value === 'var' ? node.nodes : []))
+    .filter((node) => node.type !== 'div' && node.type !== 'space')
+    .map((node) => valueParser.stringify(node))
+    .join(', ');
 
 const isComponentToken = (slot: string) => slot in IDS_COMPONENT_COLORS;
 
 const mappedVariables = (mode: IdsMode) =>
-  [...modeBlock(mode).matchAll(/--ids-color-([\w-]+): var\((.+)\);/g)].map(
-    ([, slot, value]) => [slot!, value!] as const,
-  );
+  modeDeclarations(mode)
+    .filter((declaration) => declaration.prop.startsWith(COLOR_VARIABLE))
+    .map(
+      (declaration) =>
+        [declaration.prop.slice(COLOR_VARIABLE.length), varArguments(declaration.value)] as const,
+    );
 
 const mappedSlots = (mode: IdsMode) =>
   Object.fromEntries(mappedVariables(mode).filter(([slot]) => !isComponentToken(slot)));

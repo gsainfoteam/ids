@@ -9,7 +9,12 @@ import { uniq } from 'es-toolkit/array';
 import { posix } from 'node:path';
 import * as v from 'valibot';
 
-import { FAMILY_PLACEHOLDER, type TargetsConfig } from '../sources/config.ts';
+import {
+  FAMILY_PLACEHOLDER,
+  TEXT_STYLE_PARTS,
+  type CssConfig,
+  type TargetsConfig,
+} from '../sources/config.ts';
 import { SourceError, type Sources } from '../sources/load.ts';
 import { createNaming, type Naming, type Segments } from './naming.ts';
 import {
@@ -119,14 +124,17 @@ function buildIrUnchecked(sources: Sources): Ir {
   const naming = createNaming(config.targets);
   const { name } = naming;
 
-  const variableToken = (group: Segments, path: readonly string[]) => ({
+  const theme = themeNames(config.css, naming);
+
+  const variableToken = (group: Segments, path: readonly string[], namespace?: ThemeGroup) => ({
     name: name(segmentsOf(path)),
     variable: name([...segmentsOf(group), ...segmentsOf(path)]),
+    tailwind: theme(namespace, segmentsOf(path)),
   });
 
-  const dimensionTokens = (group: string): DimensionToken[] =>
+  const dimensionTokens = (group: string, namespace?: ThemeGroup): DimensionToken[] =>
     tokensIn(tokens, [group], ['dimension']).map(({ path, token }) => ({
-      ...variableToken([group], path),
+      ...variableToken([group], path, namespace),
       value: dimensionOf(token.$value),
     }));
 
@@ -136,6 +144,9 @@ function buildIrUnchecked(sources: Sources): Ir {
 
   const color = buildColor(sources, naming, modes);
   const state = buildState(tokens, naming);
+  const radius = dimensionTokens('radius', 'radius');
+  const size = dimensionTokens('size');
+  const typography = buildTypography(sources, naming);
 
   return {
     version: IR_VERSION,
@@ -178,12 +189,13 @@ function buildIrUnchecked(sources: Sources): Ir {
       ...variableToken(['motion'], path),
       milliseconds: token.$value.unit === 's' ? token.$value.value * 1000 : token.$value.value,
     })),
-    radius: dimensionTokens('radius'),
-    size: dimensionTokens('size'),
+    radius,
+    size,
     spacing: dimensionTokens('spacing'),
-    typography: buildTypography(sources, naming),
+    typography,
     fonts: buildFonts(sources),
     paletteModel: buildPaletteModel(sources, naming),
+    css: buildCss(sources, naming, { modes, radius, size, typography }),
   };
 }
 
@@ -363,7 +375,11 @@ function tailwindNames(sources: Sources, naming: Naming) {
 function buildState(tokens: TokenNormalizedSet, naming: Naming) {
   const { name } = naming;
   const entries = tokensIn(tokens, ['state'], ['number', 'color']).map(({ path, token }) => {
-    const names = { name: name(segmentsOf(path)), variable: name(['state', ...segmentsOf(path)]) };
+    const names = {
+      name: name(segmentsOf(path)),
+      variable: name(['state', ...segmentsOf(path)]),
+      tailwind: [],
+    };
     return token.$type === 'number'
       ? {
           kind: 'opacity' as const,
@@ -382,6 +398,7 @@ function buildShadows(tokens: TokenNormalizedSet, naming: Naming) {
   return tokensIn(tokens, ['shadow'], ['shadow']).map(({ path, token }) => ({
     name: naming.name(segmentsOf(path)),
     variable: naming.name(['shadow', ...segmentsOf(path)]),
+    tailwind: [],
     layers: token.$value.map((layer) => ({
       offsetX: dimensionOf(layer.offsetX),
       offsetY: dimensionOf(layer.offsetY),
@@ -474,31 +491,38 @@ function buildTypography(sources: Sources, naming: Naming) {
   const { tokens } = sources;
   const { name } = naming;
 
-  const entry = (group: string, path: readonly string[]) => ({
+  const theme = themeNames(sources.config.css, naming);
+  const { textStyleParts } = sources.config.css.typography;
+
+  const entry = (group: string, path: readonly string[], namespace?: ThemeGroup) => ({
     name: name(segmentsOf(path)),
     variable: name([...segmentsOf([group]), ...segmentsOf(path)]),
+    tailwind: theme(namespace, segmentsOf(path)),
   });
 
   const bundledFamilyOf = bundledFamilyResolver(sources);
 
   return {
     fontSizes: tokensIn(tokens, ['font-size'], ['dimension']).map(({ path, token }) => ({
-      ...entry('font-size', path),
+      ...entry('font-size', path, 'fontSizes'),
       value: dimensionOf(token.$value),
     })),
     fontWeights: tokensIn(tokens, ['font-weight'], ['fontWeight']).map(({ path, token }) => ({
-      ...entry('font-weight', path),
+      ...entry('font-weight', path, 'fontWeights'),
       value: fontWeightOf(token.id, token.$value),
     })),
     lineHeights: tokensIn(tokens, ['line-height'], ['dimension', 'number']).map(
-      ({ path, token }) => ({ ...entry('line-height', path), value: lineHeightOf(token.$value) }),
+      ({ path, token }) => ({
+        ...entry('line-height', path, 'lineHeights'),
+        value: lineHeightOf(token.$value),
+      }),
     ),
     letterSpacings: tokensIn(tokens, ['letter-spacing'], ['dimension']).map(({ path, token }) => ({
-      ...entry('letter-spacing', path),
+      ...entry('letter-spacing', path, 'letterSpacings'),
       value: dimensionOf(token.$value),
     })),
     fontFamilies: tokensIn(tokens, ['font-family'], ['fontFamily']).map(({ path, token }) => ({
-      ...entry('font-family', path),
+      ...entry('font-family', path, 'fontFamilies'),
       stack: token.$value,
       flutter: flutterFamily(sources, token.id, token.$value, bundledFamilyOf),
     })),
@@ -513,13 +537,19 @@ function buildTypography(sources: Sources, naming: Naming) {
       const spacing = dimensionOf(letterSpacing);
       const [primaryFamily] = fontFamily;
       if (!primaryFamily) throw new SourceError(`tokens: ${token.id}: fontFamily is empty`);
+      const style = entry('text', path, 'textStyles');
       return {
-        ...entry('text', path),
+        ...style,
         fontFamily: primaryFamily,
         fontSize: dimensionOf(fontSize),
         fontWeight: fontWeightOf(token.id, fontWeight),
         lineHeight: height,
         letterSpacing: spacing,
+        parts: TEXT_STYLE_PARTS.map((part) => ({
+          part,
+          variable: name(style.variable.segments, textStyleParts[part]),
+          tailwind: style.tailwind.map((tailwind) => name(tailwind.segments, textStyleParts[part])),
+        })),
         flutter: {
           fontSize: size,
           height:
@@ -622,6 +652,121 @@ function buildPaletteModel(sources: Sources, naming: Naming) {
         return colorOf(token.id, token.$value);
       }),
     })),
+  };
+}
+
+type ThemeGroup = keyof CssConfig['theme'];
+
+function themeNames(css: CssConfig, naming: Naming) {
+  return (group: ThemeGroup | undefined, segments: Segments) =>
+    group === undefined ? [] : [naming.name([...css.theme[group], ...segments])];
+}
+
+interface CssInputs {
+  modes: readonly string[];
+  radius: readonly DimensionToken[];
+  size: readonly DimensionToken[];
+  typography: Ir['typography'];
+}
+
+function buildCss(sources: Sources, naming: Naming, inputs: CssInputs): Ir['css'] {
+  const { name, key } = naming;
+  const { css } = sources.config;
+  const file = 'config/css.json';
+
+  for (const mode of css.modeVariants)
+    if (!inputs.modes.includes(mode))
+      throw new SourceError(`${file}: modeVariants: ${mode} is not a mode`);
+
+  const radiusKeys = inputs.radius.map((entry) => entry.name.css.identifier);
+  for (const kept of css.scale.radiusTheProviderLeavesAlone)
+    if (!radiusKeys.includes(kept))
+      throw new SourceError(`${file}: scale.radiusTheProviderLeavesAlone: ${kept} is not a radius`);
+
+  const utility = name(css.concentric.utility);
+  const isPixels = (value: Dimension) => value.unit === 'px';
+  const valueOfPart = (style: Ir['typography']['textStyles'][number], part: string) =>
+    part === 'fontSize'
+      ? style.fontSize
+      : style.lineHeight.kind === 'length'
+        ? style.lineHeight.length
+        : null;
+
+  const lengthsOf = {
+    textStyles: () =>
+      inputs.typography.textStyles.flatMap((style) =>
+        style.parts
+          .filter(({ part }) => css.scale.textStyleParts.includes(part))
+          .flatMap(({ part, variable }) => {
+            const value = valueOfPart(style, part);
+            return value && isPixels(value) ? [{ variable, value }] : [];
+          }),
+      ),
+    fontSizes: () =>
+      inputs.typography.fontSizes.map(({ variable, value }) => ({ variable, value })),
+    lineHeights: () =>
+      inputs.typography.lineHeights.flatMap(({ variable, value }) =>
+        value.kind === 'length' && isPixels(value.length)
+          ? [{ variable, value: value.length }]
+          : [],
+      ),
+    size: () => inputs.size.map(({ variable, value }) => ({ variable, value })),
+  };
+
+  return {
+    attributes: css.attributes,
+    modeVariants: css.modeVariants.map((mode) => ({
+      name: name([mode]),
+      mode,
+      others: inputs.modes.filter((other) => other !== mode),
+    })),
+    focusRing: {
+      variant: css.focusRing.variant,
+      triggers: css.focusRing.triggers.map((trigger) =>
+        'pseudo' in trigger
+          ? { kind: 'pseudo' as const, pseudo: trigger.pseudo }
+          : 'attribute' in trigger
+            ? {
+                kind: 'attribute' as const,
+                attribute: trigger.attribute,
+                ...(trigger.unlessPseudo ? { unlessPseudo: trigger.unlessPseudo } : {}),
+              }
+            : {
+                kind: 'focusedInside' as const,
+                attribute: trigger.focusedInsideExceptPopups,
+                exceptIn: css.attributes.popover,
+              },
+      ),
+    },
+    concentric: {
+      utility,
+      classPrefix: [utility.css.identifier, ''].join('-'),
+      nested: name(css.concentric.nested),
+      spacing: name(css.scale.spacing),
+      pads: css.concentric.pads.map((pad) => ({
+        pad,
+        className: key([...css.concentric.utility, String(pad)]),
+      })),
+      overlayDepths: css.concentric.overlayDepths,
+    },
+    typographyOrder: css.typography.order,
+    scale: {
+      factor: name(css.scale.factor),
+      spacing: name(css.scale.spacing),
+      spacingUnit: css.scale.spacingUnit,
+      wholePixel: css.scale.wholePixel,
+      cornerRadiusScale: name(css.scale.cornerRadiusScale),
+      providerRadius: inputs.radius
+        .filter(
+          (entry) => !css.scale.radiusTheProviderLeavesAlone.includes(entry.name.css.identifier),
+        )
+        .map((entry) => ({
+          variable: entry.variable,
+          provider: name([...css.scale.providerRadius, ...entry.name.segments]),
+          fallback: entry.value,
+        })),
+      lengths: css.scale.lengths.flatMap((group) => lengthsOf[group]()),
+    },
   };
 }
 

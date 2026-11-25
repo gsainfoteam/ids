@@ -1,0 +1,56 @@
+{
+  "attributes": { "mode": "data-mode", "scale": "data-scale", "popover": "popover" },
+  "modeVariants": ["dark"],
+  "focusRing": {
+    "variant": "focus-ring-visible",
+    "triggers": [
+      { "pseudo": "focus-visible" },
+      { "attribute": "data-focus-visible", "unlessPseudo": "disabled" },
+      { "focusedInsideExceptPopups": "data-field-input" },
+      { "focusedInsideExceptPopups": "data-text-field-input" },
+      { "focusedInsideExceptPopups": "data-text-area-input" }
+    ]
+  },
+  "concentric": {
+    "utility": ["concentric", "p"],
+    "nested": ["concentric", "nested"],
+    "pads": [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8],
+    "overlayDepths": 3
+  },
+  "theme": {
+    "radius": ["radius"],
+    "fontSizes": ["text"],
+    "fontFamilies": ["font"],
+    "fontWeights": ["font", "weight"],
+    "letterSpacings": ["tracking"],
+    "lineHeights": ["leading"],
+    "textStyles": ["text"]
+  },
+  "typography": {
+    "order": [
+      "fontSizes",
+      "fontFamilies",
+      "fontWeights",
+      "letterSpacings",
+      "lineHeights",
+      "fontSizeAdjusts"
+    ],
+    "textStyleParts": {
+      "fontSize": [],
+      "fontWeight": ["font", "weight"],
+      "lineHeight": ["line", "height"],
+      "letterSpacing": ["letter", "spacing"]
+    }
+  },
+  "scale": {
+    "factor": ["scale"],
+    "spacing": ["spacing"],
+    "spacingUnit": { "value": 0.25, "unit": "rem" },
+    "wholePixel": { "value": 1, "unit": "px" },
+    "cornerRadiusScale": ["corner", "radius", "scale"],
+    "providerRadius": ["theme", "radius"],
+    "radiusTheProviderLeavesAlone": ["full"],
+    "lengths": ["textStyles", "fontSizes", "lineHeights", "size"],
+    "textStyleParts": ["fontSize", "lineHeight"]
+  }
+}

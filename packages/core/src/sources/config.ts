@@ -34,6 +34,7 @@ export const TargetsConfigSchema = v.object({
     css: v.object({
       manifest: v.string(),
       names: v.object({ identifier: spelling, customProperty: spelling, themeProperty: spelling }),
+      subSeparator: v.pipe(v.string(), v.minLength(1)),
       symbols,
       outputs,
     }),
@@ -116,6 +117,72 @@ export const PaletteModelConfigSchema = v.object({
   series: v.record(kebabId, v.array(v.array(v.number()))),
 });
 
+export const TYPOGRAPHY_GROUPS = [
+  'fontSizes',
+  'fontWeights',
+  'lineHeights',
+  'letterSpacings',
+  'fontFamilies',
+  'fontSizeAdjusts',
+] as const;
+
+export const TEXT_STYLE_PARTS = ['fontSize', 'fontWeight', 'lineHeight', 'letterSpacing'] as const;
+
+const typographyGroup = v.picklist(TYPOGRAPHY_GROUPS);
+
+const textStylePart = v.picklist(TEXT_STYLE_PARTS);
+
+const cssDimension = v.object({ value: v.number(), unit: v.picklist(['px', 'em', 'rem']) });
+
+const focusRingTrigger = v.union([
+  v.strictObject({ pseudo: kebabId }),
+  v.strictObject({ attribute: kebabId, unlessPseudo: v.optional(kebabId) }),
+  v.strictObject({ focusedInsideExceptPopups: kebabId }),
+]);
+
+const segments = v.array(word);
+
+export const CssConfigSchema = v.object({
+  attributes: v.object({ mode: kebabId, scale: kebabId, popover: kebabId }),
+  modeVariants: v.array(word),
+  focusRing: v.object({ variant: kebabId, triggers: v.array(focusRingTrigger) }),
+  concentric: v.object({
+    utility: segments,
+    nested: segments,
+    pads: v.array(v.pipe(v.number(), v.minValue(0))),
+    overlayDepths: v.pipe(v.number(), v.integer(), v.minValue(1)),
+  }),
+  theme: v.object({
+    radius: segments,
+    fontSizes: segments,
+    fontFamilies: segments,
+    fontWeights: segments,
+    letterSpacings: segments,
+    lineHeights: segments,
+    textStyles: segments,
+  }),
+  typography: v.object({
+    order: v.array(typographyGroup),
+    textStyleParts: v.object({
+      fontSize: segments,
+      fontWeight: segments,
+      lineHeight: segments,
+      letterSpacing: segments,
+    }),
+  }),
+  scale: v.object({
+    factor: segments,
+    spacing: segments,
+    spacingUnit: cssDimension,
+    wholePixel: cssDimension,
+    cornerRadiusScale: segments,
+    providerRadius: segments,
+    radiusTheProviderLeavesAlone: v.array(kebabId),
+    lengths: v.array(v.picklist(['textStyles', 'fontSizes', 'lineHeights', 'size'])),
+    textStyleParts: v.array(textStylePart),
+  }),
+});
+
 export const NpmManifestSchema = v.object({ name: v.string() });
 
 export const PubManifestSchema = v.object({
@@ -135,6 +202,7 @@ export const CONFIG_FILES = {
   enums: { file: 'config/enums.json', schema: EnumsConfigSchema },
   fonts: { file: 'config/fonts.json', schema: FontsConfigSchema },
   paletteModel: { file: 'config/palette-model.json', schema: PaletteModelConfigSchema },
+  css: { file: 'config/css.json', schema: CssConfigSchema },
 } as const;
 
 export { FAMILY as FAMILY_PLACEHOLDER };
@@ -146,4 +214,5 @@ export type ComponentTokensConfig = v.InferOutput<typeof ComponentTokensConfigSc
 export type EnumsConfig = v.InferOutput<typeof EnumsConfigSchema>;
 export type FontsConfig = v.InferOutput<typeof FontsConfigSchema>;
 export type PaletteModelConfig = v.InferOutput<typeof PaletteModelConfigSchema>;
+export type CssConfig = v.InferOutput<typeof CssConfigSchema>;
 export type PubManifest = v.InferOutput<typeof PubManifestSchema>;

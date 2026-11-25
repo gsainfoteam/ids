@@ -493,6 +493,12 @@
                   "variable": {
                     "$ref": "#/$defs/Name"
                   },
+                  "tailwind": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/Name"
+                    }
+                  },
                   "ratio": {
                     "type": "number"
                   },
@@ -504,6 +510,7 @@
                   "kind",
                   "name",
                   "variable",
+                  "tailwind",
                   "ratio",
                   "percent"
                 ]
@@ -520,6 +527,12 @@
                   "variable": {
                     "$ref": "#/$defs/Name"
                   },
+                  "tailwind": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/Name"
+                    }
+                  },
                   "color": {
                     "$ref": "#/$defs/Color"
                   }
@@ -528,6 +541,7 @@
                   "kind",
                   "name",
                   "variable",
+                  "tailwind",
                   "color"
                 ]
               }
@@ -556,18 +570,18 @@
           "variable": {
             "$ref": "#/$defs/Name"
           },
+          "tailwind": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Name"
+            }
+          },
           "property": {
             "type": "string",
             "pattern": "^[a-z0-9]+$"
           },
           "part": {
             "$ref": "#/$defs/Name"
-          },
-          "tailwind": {
-            "type": "array",
-            "items": {
-              "$ref": "#/$defs/Name"
-            }
           },
           "modes": {
             "type": "array",
@@ -593,9 +607,9 @@
         "required": [
           "name",
           "variable",
+          "tailwind",
           "property",
           "part",
-          "tailwind",
           "modes"
         ]
       }
@@ -611,14 +625,14 @@
           "variable": {
             "$ref": "#/$defs/Name"
           },
-          "part": {
-            "$ref": "#/$defs/Name"
-          },
           "tailwind": {
             "type": "array",
             "items": {
               "$ref": "#/$defs/Name"
             }
+          },
+          "part": {
+            "$ref": "#/$defs/Name"
           },
           "modes": {
             "type": "array",
@@ -644,8 +658,8 @@
         "required": [
           "name",
           "variable",
-          "part",
           "tailwind",
+          "part",
           "modes"
         ]
       }
@@ -661,6 +675,12 @@
           "variable": {
             "$ref": "#/$defs/Name"
           },
+          "tailwind": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Name"
+            }
+          },
           "milliseconds": {
             "type": "number"
           }
@@ -668,6 +688,7 @@
         "required": [
           "name",
           "variable",
+          "tailwind",
           "milliseconds"
         ]
       }
@@ -710,6 +731,12 @@
               "variable": {
                 "$ref": "#/$defs/Name"
               },
+              "tailwind": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Name"
+                }
+              },
               "value": {
                 "type": "number"
               }
@@ -717,6 +744,7 @@
             "required": [
               "name",
               "variable",
+              "tailwind",
               "value"
             ]
           }
@@ -732,6 +760,12 @@
               "variable": {
                 "$ref": "#/$defs/Name"
               },
+              "tailwind": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Name"
+                }
+              },
               "value": {
                 "$ref": "#/$defs/LineHeight"
               }
@@ -739,6 +773,7 @@
             "required": [
               "name",
               "variable",
+              "tailwind",
               "value"
             ]
           }
@@ -759,6 +794,12 @@
               },
               "variable": {
                 "$ref": "#/$defs/Name"
+              },
+              "tailwind": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Name"
+                }
               },
               "stack": {
                 "type": "array",
@@ -808,6 +849,7 @@
             "required": [
               "name",
               "variable",
+              "tailwind",
               "stack",
               "flutter"
             ]
@@ -824,6 +866,12 @@
               "variable": {
                 "$ref": "#/$defs/Name"
               },
+              "tailwind": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Name"
+                }
+              },
               "value": {
                 "type": "number"
               }
@@ -831,6 +879,7 @@
             "required": [
               "name",
               "variable",
+              "tailwind",
               "value"
             ]
           }
@@ -980,6 +1029,277 @@
         "series",
         "statusPalettes"
       ]
+    },
+    "css": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "popover": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "mode",
+            "scale",
+            "popover"
+          ]
+        },
+        "modeVariants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "mode": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+$"
+              },
+              "others": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+$"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "mode",
+              "others"
+            ]
+          }
+        },
+        "focusRing": {
+          "type": "object",
+          "properties": {
+            "variant": {
+              "type": "string",
+              "minLength": 1
+            },
+            "triggers": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "pseudo"
+                      },
+                      "pseudo": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "pseudo"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "attribute"
+                      },
+                      "attribute": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "unlessPseudo": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "attribute"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "focusedInside"
+                      },
+                      "attribute": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "exceptIn": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "attribute",
+                      "exceptIn"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "variant",
+            "triggers"
+          ]
+        },
+        "concentric": {
+          "type": "object",
+          "properties": {
+            "utility": {
+              "$ref": "#/$defs/Name"
+            },
+            "classPrefix": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nested": {
+              "$ref": "#/$defs/Name"
+            },
+            "spacing": {
+              "$ref": "#/$defs/Name"
+            },
+            "pads": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "pad": {
+                    "type": "number"
+                  },
+                  "className": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "pad",
+                  "className"
+                ]
+              }
+            },
+            "overlayDepths": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "utility",
+            "classPrefix",
+            "nested",
+            "spacing",
+            "pads",
+            "overlayDepths"
+          ]
+        },
+        "typographyOrder": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "fontSizes",
+              "fontWeights",
+              "lineHeights",
+              "letterSpacings",
+              "fontFamilies",
+              "fontSizeAdjusts"
+            ],
+            "type": "string"
+          }
+        },
+        "scale": {
+          "type": "object",
+          "properties": {
+            "factor": {
+              "$ref": "#/$defs/Name"
+            },
+            "spacing": {
+              "$ref": "#/$defs/Name"
+            },
+            "spacingUnit": {
+              "$ref": "#/$defs/Dimension"
+            },
+            "wholePixel": {
+              "$ref": "#/$defs/Dimension"
+            },
+            "cornerRadiusScale": {
+              "$ref": "#/$defs/Name"
+            },
+            "providerRadius": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "variable": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "provider": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "fallback": {
+                    "$ref": "#/$defs/Dimension"
+                  }
+                },
+                "required": [
+                  "variable",
+                  "provider",
+                  "fallback"
+                ]
+              }
+            },
+            "lengths": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "variable": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "value": {
+                    "$ref": "#/$defs/Dimension"
+                  }
+                },
+                "required": [
+                  "variable",
+                  "value"
+                ]
+              }
+            }
+          },
+          "required": [
+            "factor",
+            "spacing",
+            "spacingUnit",
+            "wholePixel",
+            "cornerRadiusScale",
+            "providerRadius",
+            "lengths"
+          ]
+        }
+      },
+      "required": [
+        "attributes",
+        "modeVariants",
+        "focusRing",
+        "concentric",
+        "typographyOrder",
+        "scale"
+      ]
     }
   },
   "required": [
@@ -1000,7 +1320,8 @@
     "spacing",
     "typography",
     "fonts",
-    "paletteModel"
+    "paletteModel",
+    "css"
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
@@ -1008,6 +1329,13 @@
       "type": "object",
       "properties": {
         "segments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+$"
+          }
+        },
+        "sub": {
           "type": "array",
           "items": {
             "type": "string",
@@ -1192,6 +1520,12 @@
         "variable": {
           "$ref": "#/$defs/Name"
         },
+        "tailwind": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Name"
+          }
+        },
         "value": {
           "$ref": "#/$defs/Dimension"
         }
@@ -1199,6 +1533,7 @@
       "required": [
         "name",
         "variable",
+        "tailwind",
         "value"
       ]
     },
@@ -1211,6 +1546,12 @@
         "variable": {
           "$ref": "#/$defs/Name"
         },
+        "tailwind": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Name"
+          }
+        },
         "layers": {
           "type": "array",
           "items": {
@@ -1221,6 +1562,7 @@
       "required": [
         "name",
         "variable",
+        "tailwind",
         "layers"
       ]
     },
@@ -1361,6 +1703,12 @@
         "variable": {
           "$ref": "#/$defs/Name"
         },
+        "tailwind": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Name"
+          }
+        },
         "fontFamily": {
           "type": "string",
           "minLength": 1
@@ -1376,6 +1724,37 @@
         },
         "letterSpacing": {
           "$ref": "#/$defs/Dimension"
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "part": {
+                "enum": [
+                  "fontSize",
+                  "fontWeight",
+                  "lineHeight",
+                  "letterSpacing"
+                ],
+                "type": "string"
+              },
+              "variable": {
+                "$ref": "#/$defs/Name"
+              },
+              "tailwind": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Name"
+                }
+              }
+            },
+            "required": [
+              "part",
+              "variable",
+              "tailwind"
+            ]
+          }
         },
         "flutter": {
           "type": "object",
@@ -1400,11 +1779,13 @@
       "required": [
         "name",
         "variable",
+        "tailwind",
         "fontFamily",
         "fontSize",
         "fontWeight",
         "lineHeight",
         "letterSpacing",
+        "parts",
         "flutter"
       ]
     }

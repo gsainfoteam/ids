@@ -1,11 +1,7 @@
-import { writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-
 import { mapValues } from 'es-toolkit/object';
-import { format, resolveConfig } from 'prettier';
 
 import type { DimensionToken, Ir } from '../../ir/schema.ts';
-import { SourceError } from '../../sources/load.ts';
+import { outputOf, writeFormatted } from '../output.ts';
 
 const FOUNDATIONS = 'foundations';
 
@@ -32,11 +28,5 @@ export function foundationsData(ir: Ir) {
 }
 
 export async function writeFoundations(root: URL, ir: Ir) {
-  const output = ir.targets.ts.outputs[FOUNDATIONS];
-  if (!output)
-    throw new SourceError(`config/targets.json: targets.ts.outputs.${FOUNDATIONS}: missing`);
-  const file = new URL(output, new URL(ir.packages.ts.directory, root));
-  const filepath = fileURLToPath(file);
-  const options = await resolveConfig(filepath);
-  writeFileSync(file, await format(JSON.stringify(foundationsData(ir)), { ...options, filepath }));
+  await writeFormatted(outputOf(root, ir, 'ts', FOUNDATIONS), JSON.stringify(foundationsData(ir)));
 }

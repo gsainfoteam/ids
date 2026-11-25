@@ -8,6 +8,7 @@ import { IR_SCHEMA_FILE, irJsonSchema } from '../src/ir/write.ts';
 import { legacyOutputs } from '../src/legacy/write.ts';
 import { CONFIG_FILES } from '../src/sources/config.ts';
 import { loadSources, SourceError, validated, type Sources } from '../src/sources/load.ts';
+import { cssOutputs } from '../src/targets/css/emit.ts';
 
 const root = new URL('../', import.meta.url);
 
@@ -34,7 +35,8 @@ describe('the IR', () => {
   });
 
   test('gives every generated file the bytes that are committed', async () => {
-    const outputs = legacyOutputs(buildIr(await sources()));
+    const ir = buildIr(await sources());
+    const outputs = { ...legacyOutputs(ir), ...(await cssOutputs(root, ir)) };
 
     for (const [file, source] of Object.entries(outputs)) expect(source, file).toBe(read(file));
   });

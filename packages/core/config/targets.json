@@ -9,8 +9,9 @@
         "customProperty": { "case": "customProperty", "prefixed": true },
         "themeProperty": { "case": "customProperty", "prefixed": false }
       },
+      "subSeparator": "--",
       "symbols": {},
-      "outputs": {}
+      "outputs": { "stylesheet": "dist/ids.css" }
     },
     "ts": {
       "manifest": "../react/package.json",

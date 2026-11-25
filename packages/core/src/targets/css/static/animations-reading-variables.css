@@ -1,0 +1,4 @@
+@theme inline {
+  --animate-marquee: ids-marquee var(--marquee-duration, 20s) linear infinite
+    var(--marquee-direction, normal) var(--marquee-play-state, running);
+}

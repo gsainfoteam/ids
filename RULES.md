@@ -23,7 +23,8 @@ stylesheet holds a class only `@source` on `ids-react/dist` produces. Changesets
 These files are written by `pnpm codegen` (`packages/core/src/codegen.ts`, which builds the IR and runs
 every emitter, then the message generation). Edits will be overwritten.
 
-- `packages/css/dist/ids.css`
+- `packages/css/dist/ids.css`, built as postcss nodes by `packages/core/src/targets/css` from the IR,
+  `packages/core/config/css.json` and the hand-written `src/targets/css/static/*.css`
 - `packages/react/src/tokens/types.ts`
 - `packages/react/src/tokens/palette-model.ts` and
   `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/config/palette-model.json`)
@@ -56,7 +57,7 @@ kind or a target.
 
 ```bash
 pnpm codegen          # Build the IR from packages/core and write css/react/flutter from it
-pnpm --filter @gsainfoteam/ids-core test  # IR schema, source errors, generated files equal to the committed ones
+pnpm --filter @gsainfoteam/ids-core test  # IR schema, source errors, generated files equal to the committed ones, Tailwind compile of ids.css
 pnpm build            # Build all packages (turbo, css before react)
 pnpm typecheck        # TypeScript check all packages
 pnpm lint             # ESLint all packages
