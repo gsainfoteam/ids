@@ -25,7 +25,7 @@ every emitter, then the message generation). Edits will be overwritten.
 
 - `packages/css/dist/ids.css`, built as postcss nodes by `packages/core/src/targets/css` from the IR,
   `packages/core/config/css.json` and the hand-written `src/targets/css/static/*.css`
-- `packages/react/src/tokens/types.ts`
+- `packages/react/src/tokens/types.ts` (with `color-roles.ts`, `component-tokens.ts` and `palette-model.ts`, built as TypeScript factory nodes by `packages/core/src/targets/ts`)
 - `packages/react/src/tokens/palette-model.ts` and
   `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/config/palette-model.json`)
 - `packages/react/src/tokens/component-tokens.ts` and

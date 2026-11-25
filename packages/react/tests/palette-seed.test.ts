@@ -14,7 +14,7 @@ import { RAMP_STEPS, type IdsRamp } from '../src/components/utility/ids-provider
 import { resolveColors } from '../src/components/utility/ids-provider/lib/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/lib/theme-variables';
 import { IDS_NEUTRAL_SCALES } from '../src/tokens/color-roles';
-import { STATUS_PALETTES } from '../src/tokens/palette-model';
+import { IDS_STATUS_PALETTES } from '../src/tokens/palette-model';
 
 const stepsOf = (built: IdsRamp) => RAMP_STEPS.map((step) => built[step]);
 
@@ -22,9 +22,9 @@ const seedAt = (l: number, c: number, h: number) =>
   formatHex(clampChroma({ mode: 'oklch', l, c, h }, 'oklch'));
 
 test('the status palettes are the four in core', () => {
-  for (const [name, steps] of Object.entries(STATUS_PALETTES))
+  for (const [name, steps] of Object.entries(IDS_STATUS_PALETTES))
     expect(steps).toEqual(
-      RAMP_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value.hex),
+      RAMP_STEPS.map((step) => palette[name as keyof typeof IDS_STATUS_PALETTES][step].$value.hex),
     );
 });
 
@@ -144,7 +144,7 @@ test(
   'strong text is a step beyond text, so the two never read the same',
   { timeout: SWEEP_OF_EVERY_SEED_ON_A_SHARED_RUNNER_MS },
   () => {
-    const same = [...everySeed(), ...Object.values(STATUS_PALETTES).map((steps) => steps[6]!)]
+    const same = [...everySeed(), ...Object.values(IDS_STATUS_PALETTES).map((steps) => steps[6]!)]
       .flatMap((seed) =>
         (['light', 'dark'] as const).map(
           (mode) => [seed, mode, createIdsPalette(seed)![mode]] as const,

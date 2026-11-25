@@ -1,6 +1,7 @@
 {
   "prefix": ["ids"],
   "placeholders": { "family": "{family}" },
+  "collections": { "familyGroup": ["families"] },
   "targets": {
     "css": {
       "manifest": "../css/package.json",
@@ -21,8 +22,27 @@
         "type": { "case": "pascal", "prefixed": true },
         "key": { "case": "kebab", "prefixed": false }
       },
-      "symbols": {},
-      "outputs": { "foundations": "src/tokens/foundations.json" }
+      "symbols": {
+        "colorFamilies": ["color", "families"],
+        "familySlots": ["family", "slots"],
+        "neutralOnlySlots": ["neutral", "only", "slots"],
+        "stateOpacity": ["state", "opacity"],
+        "stateFillColor": ["state", "fill", "color"],
+        "neutralScales": ["neutral", "scales"],
+        "neutralSteps": ["neutral", "steps"],
+        "shadows": ["shadows"],
+        "componentColors": ["component", "colors"],
+        "componentShadows": ["component", "shadows"],
+        "paletteModel": ["palette", "model"],
+        "statusPalettes": ["status", "palettes"]
+      },
+      "outputs": {
+        "foundations": "src/tokens/foundations.json",
+        "types": "src/tokens/types.ts",
+        "colorRoles": "src/tokens/color-roles.ts",
+        "componentTokens": "src/tokens/component-tokens.ts",
+        "paletteModel": "src/tokens/palette-model.ts"
+      }
     },
     "dart": {
       "manifest": "../flutter/pubspec.yaml",

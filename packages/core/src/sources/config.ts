@@ -25,11 +25,14 @@ const spelling = v.object({ case: nameCase, prefixed: v.boolean() });
 
 const symbols = v.record(v.string(), v.array(word));
 
-const outputs = v.record(word, v.pipe(v.string(), v.minLength(1)));
+const outputKey = v.pipe(v.string(), v.regex(/^[a-z][A-Za-z0-9]*$/, 'must be camelCase'));
+
+const outputs = v.record(outputKey, v.pipe(v.string(), v.minLength(1)));
 
 export const TargetsConfigSchema = v.object({
   prefix: v.array(word),
   placeholders: v.object({ family: v.string() }),
+  collections: v.object({ familyGroup: v.array(word) }),
   targets: v.object({
     css: v.object({
       manifest: v.string(),

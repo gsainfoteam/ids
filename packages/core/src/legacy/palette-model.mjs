@@ -2,30 +2,8 @@ const GENERATED = "// GENERATED — do not edit manually";
 
 const listOf = (values) => `[${values.join(", ")}]`;
 
-const quoted = (hexes) => listOf(hexes.map((hex) => `'${hex}'`));
-
 const statusHexes = (palette, name) => palette.find((entry) => entry.name === name).hexes;
 const namesOf = (palette) => palette.map((entry) => entry.name);
-
-function moduleSource(model, palette) {
-  const parts = Object.entries(model)
-    .map(([name, steps]) => `  ${name}: [\n${steps.map((s) => `    ${listOf(s)},`).join("\n")}\n  ],`)
-    .join("\n");
-  const statuses = namesOf(palette).map(
-    (name) => `  ${name}: ${quoted(statusHexes(palette, name))},`,
-  ).join("\n");
-
-  return `${GENERATED}
-
-export const PALETTE_MODEL = {
-${parts}
-} as const;
-
-export const STATUS_PALETTES = {
-${statuses}
-} as const;
-`;
-}
 
 const dartColor = (hex) => `Color(0xFF${hex.slice(1).toUpperCase()})`;
 
@@ -59,7 +37,6 @@ ${statuses}
 
 export function legacyPaletteModelOutputs({ model, statusPalettes }) {
   return {
-    "../react/src/tokens/palette-model.ts": moduleSource(model, statusPalettes),
     "../flutter/lib/tokens/ids_palette_model.dart": dartSource(model, statusPalettes),
   };
 }

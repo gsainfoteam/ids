@@ -36,12 +36,12 @@ import {
 } from '../src/components/utility/ids-provider/lib/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/lib/theme-variables';
 import { IDS_STATUS_FAMILIES } from '../src/tokens/color-roles';
-import { STATUS_PALETTES } from '../src/tokens/palette-model';
+import { IDS_STATUS_PALETTES } from '../src/tokens/palette-model';
 
 import type { IdsStatusFamily } from '../src/components/utility/ids-provider/lib/theme';
 
 const statusReference = (family: IdsStatusFamily) =>
-  rampFromSteps(STATUS_PALETTES[STATUS_PALETTE_NAMES[family]]);
+  rampFromSteps(IDS_STATUS_PALETTES[STATUS_PALETTE_NAMES[family]]);
 
 describe('status references', () => {
   test('every status reference reads as its status', () => {

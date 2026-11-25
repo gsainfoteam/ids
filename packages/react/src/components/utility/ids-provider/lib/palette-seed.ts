@@ -14,7 +14,7 @@ import {
 import { clamp, minBy, range } from 'es-toolkit';
 
 import { RAMP_STEPS, type IdsRamp } from './theme';
-import { PALETTE_MODEL } from '../../../../tokens/palette-model';
+import { IDS_PALETTE_MODEL } from '../../../../tokens/palette-model';
 
 type Shade = { l: number; c: number; h: number };
 
@@ -61,9 +61,9 @@ const gamutChroma = (l: number, h: number) =>
 
 function modelAt(hue: number): ModelShade[] {
   return RAMP_STEPS.map((_, index) => ({
-    l: seriesAt(PALETTE_MODEL.lightness[index]!, hue),
-    gamutShare: clamp(seriesAt(PALETTE_MODEL.chroma[index]!, hue), 0, 1),
-    h: hue + seriesAt(PALETTE_MODEL.hueShift[index]!, hue),
+    l: seriesAt(IDS_PALETTE_MODEL.lightness[index]!, hue),
+    gamutShare: clamp(seriesAt(IDS_PALETTE_MODEL.chroma[index]!, hue), 0, 1),
+    h: hue + seriesAt(IDS_PALETTE_MODEL.hueShift[index]!, hue),
   }));
 }
 

@@ -92,7 +92,9 @@ export const SchemeUtilitySchema = v.object({
 });
 
 export const ColorRolesSchema = v.object({
-  familyGroups: v.array(v.object({ name: NameSchema, families: v.array(segment) })),
+  familyGroups: v.array(
+    v.object({ name: NameSchema, list: NameSchema, families: v.array(segment) }),
+  ),
   families: v.array(NameSchema),
   slots: v.array(SlotSchema),
   roles: v.array(RoleSchema),

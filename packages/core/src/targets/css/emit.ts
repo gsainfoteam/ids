@@ -89,7 +89,7 @@ function colorBridge(ir: Ir) {
   ];
 }
 
-const shadowValue = (layers: Ir['shadows'][number]['layers']) =>
+export const shadowValue = (layers: Ir['shadows'][number]['layers']) =>
   layers.length === 0
     ? NO_SHADOW_THAT_STILL_COMPOSES
     : commas(
