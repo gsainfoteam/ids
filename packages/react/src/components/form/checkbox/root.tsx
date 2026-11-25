@@ -1,15 +1,10 @@
 'use client';
 
-import {
-  useId,
-  useLayoutEffect,
-  type ComponentProps,
-  type CSSProperties,
-  type ReactNode,
-} from 'react';
+import { useId, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { CheckboxContext } from './context';
 import { useInternalCheckbox, type CheckedState } from './hooks/use-checkbox';
+import { useInternalCheckboxRegistration } from './hooks/use-checkbox-registration';
 import { dataState, resolve, type StateProp } from './lib/checkbox-state';
 import { CheckboxIndicator } from './parts/indicator';
 import { checkboxStyle } from './style';
@@ -95,10 +90,12 @@ export function CheckboxRoot({
   const generatedId = useId();
   const inputId = id ?? (group ? generatedId : undefined);
   const isDisabled = Boolean(disabled) || Boolean(group?.disabled);
-  const register = group?.register;
-  useLayoutEffect(() => {
-    if (register && inputId) return register(option, inputId, isDisabled);
-  }, [register, option, inputId, isDisabled]);
+  useInternalCheckboxRegistration({
+    register: group?.register,
+    option,
+    inputId,
+    disabled: isDisabled,
+  });
 
   const resolvedSize = useFieldSize(size ?? group?.size) ?? 'standard';
   const resolvedVariant = variant ?? group?.variant ?? 'outline';

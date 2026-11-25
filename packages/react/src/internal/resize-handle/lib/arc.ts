@@ -1,3 +1,5 @@
+import { type CSSProperties } from 'react';
+
 import { ROUND_CORNER_EXPONENT, superellipseQuarter } from '../../lib/corner-shape';
 
 export type ResizeBand = 'centered' | 'outward';
@@ -81,4 +83,8 @@ export function gripArc(
     arc: bend(vertex, { inset: 0, radius, reach, exponent }),
     target: bend(vertex, { inset: -outside, radius: radius + outside, reach: size, exponent }),
   };
+}
+
+export function sizedToArc(style: CSSProperties | undefined, arc: GripArc | null) {
+  return arc ? { ...style, width: arc.size, height: arc.size } : style;
 }

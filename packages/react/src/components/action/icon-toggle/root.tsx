@@ -1,7 +1,7 @@
 'use client';
 
 import { iconToggleStyle } from './style';
-import { useInternalIconLabel } from '../../../internal/lib/icon-label';
+import { useInternalIconLabel } from '../../../internal/hooks/use-icon-label';
 import { invariant } from '../../../utils';
 import { useInternalGroupContext } from '../../utility/group';
 import { useInternalToggle } from '../toggle/hooks/use-toggle';

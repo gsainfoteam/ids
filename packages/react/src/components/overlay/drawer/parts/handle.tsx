@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 import { useInternalTranslate } from '../../../../internal/translate';
-import { mergeRefs } from '../../../../utils';
 import { useInternalDrawerContext } from '../context';
+import { useInternalDrawerMergedRef } from '../hooks/use-drawer-merged-ref';
 
 export type DrawerHandleProps = Omit<ComponentProps<'button'>, 'type' | 'children'>;
 
@@ -13,11 +13,7 @@ export function DrawerHandle({ ref, className, onClick, ...props }: DrawerHandle
 
   const { drawer, styles } = useInternalDrawerContext('Drawer.Handle');
 
-  const { setHandle } = drawer;
-  const handleRef = useCallback(
-    (node: HTMLElement | null) => mergeRefs(ref, setHandle)(node),
-    [ref, setHandle],
-  );
+  const handleRef = useInternalDrawerMergedRef(ref, drawer.setHandle);
 
   if (!drawer.drag.cycles)
     return (

@@ -1,14 +1,11 @@
 'use client';
 
-import { useEffect, type ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
-import {
-  interactiveDataProps,
-  useInteractive,
-  type InteractiveState,
-} from '../../../../hooks/use-interactive';
+import { interactiveDataProps, type InteractiveState } from '../../../../hooks/use-interactive';
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
-import { contentIdOf, triggerIdOf, useInternalTabsContext } from '../context';
+import { contentIdOf, triggerIdOf } from '../context';
+import { useInternalTabsTrigger } from '../hooks/use-tabs-trigger';
 
 export type TabsTriggerState = InteractiveState & { value: string; selected: boolean };
 
@@ -38,32 +35,20 @@ export function TabsTrigger<T extends string = string>({
   onPointerCancel,
   ...rest
 }: TabsTriggerProps<T>) {
-  const tabs = useInternalTabsContext('Tabs.Trigger');
-  const { registerTrigger } = tabs;
-  useEffect(() => registerTrigger(value), [registerTrigger, value]);
-
-  const selected = tabs.value === value;
-  const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
-    disabled,
-    onKeyDown: (event) => {
-      onKeyDown?.(event);
-      if (!event.defaultPrevented) tabs.onTriggerKeyDown(event);
-    },
-    onKeyUp,
-    onFocus: (event) => {
-      onFocus?.(event);
-      tabs.onTriggerFocus(value);
-    },
-    onBlur,
-    onPointerEnter,
-    onPointerLeave,
-    onPointerDown,
-    onPointerUp,
-    onPointerCancel,
-  });
+  const { tabs, selected, interaction, handlers, tabIndex, controlsMountedPanel } =
+    useInternalTabsTrigger(value, {
+      disabled,
+      onKeyDown,
+      onKeyUp,
+      onFocus,
+      onBlur,
+      onPointerEnter,
+      onPointerLeave,
+      onPointerDown,
+      onPointerUp,
+      onPointerCancel,
+    });
   const state: TabsTriggerState = { ...interaction, value, selected };
-  const tabIndex = tabs.tabStop === undefined ? undefined : tabs.tabStop === value ? 0 : -1;
-  const controlsMountedPanel = selected || tabs.keptMounted.has(value);
 
   return (
     <button

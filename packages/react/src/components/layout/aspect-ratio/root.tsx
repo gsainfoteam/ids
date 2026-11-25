@@ -1,13 +1,10 @@
 'use client';
 
 import { aspectRatioStyle } from './style';
+import { resolveState } from '../../../internal/lib/state-props';
 import { invariant } from '../../../utils';
 
 import type { AspectRatio } from '.';
-
-function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
 
 export function AspectRatioRoot({
   ratio = 1,
@@ -27,8 +24,8 @@ export function AspectRatioRoot({
     <div
       {...rest}
       data-aspect-ratio=""
-      className={root({ className: resolve(className, state) })}
-      style={{ aspectRatio: ratio, ...resolve(style, state) }}
+      className={root({ className: resolveState(className, state) })}
+      style={{ aspectRatio: ratio, ...resolveState(style, state) }}
     >
       <div className={content()}>{children}</div>
     </div>

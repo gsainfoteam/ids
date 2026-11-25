@@ -54,20 +54,6 @@ function toArray(value: SliderValue | undefined, range: boolean) {
   return [typeof value === 'number' ? value : value[0]];
 }
 
-export function useInternalValueShape(first: SliderValue | undefined) {
-  const [range] = useState(() => Array.isArray(first));
-
-  const drifted = first !== undefined && Array.isArray(first) !== range;
-  useEffect(() => {
-    if (isDevelopment && drifted)
-      console.warn(
-        `[IDS] Slider: the value changed from ${range ? '[start, end]' : 'a number'} to ${range ? 'a number' : '[start, end]'}. A Slider keeps the shape of its first value; give it a new key to switch.`,
-      );
-  }, [drifted, range]);
-
-  return range;
-}
-
 export function useInternalSlider({
   range,
   value,

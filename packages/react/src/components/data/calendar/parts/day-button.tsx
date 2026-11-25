@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
 import { type DayButtonProps } from 'react-day-picker';
 
 import { cn } from '../../../../utils';
 import { useInternalCalendarContext } from '../context';
+import { useInternalCalendarDayFocus } from '../hooks/use-calendar-day-focus';
 import { dayKey } from '../lib/date';
 import { fromLocalDate } from '../lib/day-picker-bridge';
 import { calendarStyle } from '../style';
@@ -20,11 +19,7 @@ export function CalendarDayButton({
   ...props
 }: DayButtonProps) {
   const c = useInternalCalendarContext('Calendar');
-  const own = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (modifiers.focused) own.current?.focus();
-  }, [modifiers.focused]);
+  const own = useInternalCalendarDayFocus(modifiers.focused);
 
   const preview = !!modifiers.range_preview && !modifiers.selected;
   const styles = calendarStyle({

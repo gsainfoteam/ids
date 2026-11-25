@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-
 import { PopoverContext } from './context';
 import { useInternalPopover } from './hooks/use-popover';
+import { useInternalPopoverLabelling } from './hooks/use-popover-labelling';
 import { popoverStyle } from './style';
 
 import type { Popover } from '.';
@@ -26,17 +25,13 @@ export function PopoverRoot({
     triggerType,
   });
 
-  const [titled, setTitled] = useState(false);
-  const [described, setDescribed] = useState(false);
+  const labelling = useInternalPopoverLabelling();
 
   return (
     <PopoverContext
       value={{
         popover,
-        titled,
-        setTitled,
-        described,
-        setDescribed,
+        ...labelling,
         styles: popoverStyle(),
       }}
     >

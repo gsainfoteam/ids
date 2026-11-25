@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 import { ModalLayer, OverlayItemContext } from '../../../../internal/overlay';
-import { mergeEventHandlers, mergeRefs } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
+import { mergeEventHandlers } from '../../../../utils';
 import { ScrollArea } from '../../../layout/scroll-area';
 import { useInternalDrawerContext } from '../context';
+import { useInternalDrawerMergedRef } from '../hooks/use-drawer-merged-ref';
+import { useInternalDrawerNameWarning } from '../hooks/use-drawer-name-warning';
 
 export type DrawerContentProps = ComponentProps<'div'>;
 
@@ -28,29 +29,13 @@ function DrawerPopup({
   const { drawer, styles, overlay } = c;
   const { ids, position, ending, open, content } = drawer;
 
-  useEffect(() => {
-    if (!isDevelopment || !content) return;
-
-    const named =
-      content.hasAttribute('aria-label') ||
-      !!props['aria-labelledby'] ||
-      !!content.querySelector('[data-drawer-title]');
-
-    if (!named)
-      console.warn(
-        '[IDS] Drawer: add Drawer.Title, or aria-label on Drawer.Content, so screen readers can name the drawer.',
-      );
-  }, [content, props]);
+  useInternalDrawerNameWarning(content, props);
 
   const labelledBy =
     props['aria-labelledby'] ??
     (props['aria-label'] === undefined && c.titled ? ids.title : undefined);
 
-  const { setContent } = drawer;
-  const contentRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(ref, setContent)(node),
-    [ref, setContent],
-  );
+  const contentRef = useInternalDrawerMergedRef(ref, drawer.setContent);
 
   const sheet = (
     <ScrollArea asChild>

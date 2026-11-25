@@ -1,80 +1,17 @@
 'use client';
 
-import {
-  createContext,
-  use,
-  useLayoutEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { use } from 'react';
 
 import { ThemeContext } from '../../../components/utility/ids-provider/hooks/use-ids-provider';
-import {
-  bindLayer,
-  overlay,
-  overlayHosts,
-  overlayItems,
-  registerOverlayHost,
-  removeClosed,
-  removeIfNothingExits,
-  type OverlayItem,
-  type OverlayOptions,
-  type OverlayRender,
-} from '../lib/store';
-
-export type OverlayItemBinding = {
-  open: boolean;
-  close: (value?: unknown) => void;
-  exited: () => void;
-  bind: () => () => void;
-};
-
-export const OverlayItemContext = createContext<OverlayItemBinding | null>(null);
-
-export const PortalRootContext = createContext<HTMLElement | null>(null);
-
-const NO_ITEMS: readonly OverlayItem[] = [];
-
-export function useInternalOverlayItem(controlledOpen: boolean | undefined) {
-  const item = use(OverlayItemContext);
-  const bound = controlledOpen === undefined ? item : null;
-
-  useLayoutEffect(() => bound?.bind(), [bound]);
-
-  return bound;
-}
-
-export function useOverlay() {
-  const theme = use(ThemeContext);
-
-  return useMemo(
-    () => ({
-      ...overlay,
-      open: <T,>(render: OverlayRender<T>, options: OverlayOptions = {}) =>
-        overlay.open(render, { theme, ...options }),
-    }),
-    [theme],
-  );
-}
+import { OverlayItemContext } from '../context';
+import { useInternalOverlayHost } from '../hooks/use-overlay-host';
+import { useInternalOverlayItemBinding } from '../hooks/use-overlay-item-binding';
+import { overlay, type OverlayItem } from '../lib/store';
 
 function OverlayItemView({ item }: { item: OverlayItem }) {
   const hostTheme = use(ThemeContext);
   const theme = item.theme ?? hostTheme;
-
-  useLayoutEffect(() => {
-    if (!item.open) removeIfNothingExits(item.id);
-  }, [item.open, item.id]);
-
-  const binding = useMemo<OverlayItemBinding>(
-    () => ({
-      open: item.open,
-      close: (value) => overlay.close(item.id, value),
-      exited: () => removeClosed(item.id),
-      bind: () => bindLayer(item.id),
-    }),
-    [item.open, item.id],
-  );
+  const binding = useInternalOverlayItemBinding(item);
 
   return (
     <ThemeContext value={theme}>
@@ -99,17 +36,7 @@ function OverlayItemView({ item }: { item: OverlayItem }) {
 }
 
 export function OverlayHost() {
-  const [host] = useState(() => Symbol('overlay host'));
+  const items = useInternalOverlayHost();
 
-  useLayoutEffect(() => registerOverlayHost(host), [host]);
-
-  const elected = useSyncExternalStore(
-    overlayHosts.subscribe,
-    () => overlayHosts.get()[0] === host,
-    () => false,
-  );
-  const items = useSyncExternalStore(overlayItems.subscribe, overlayItems.get, () => NO_ITEMS);
-
-  if (!elected) return null;
   return items.map((item) => <OverlayItemView key={item.id} item={item} />);
 }

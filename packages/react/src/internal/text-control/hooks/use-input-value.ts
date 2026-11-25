@@ -1,6 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useState,
+  type RefObject,
+} from 'react';
 
 type TextElement = HTMLInputElement | HTMLTextAreaElement;
 
@@ -22,10 +29,7 @@ export function useInternalInputValue(
   onExternalChange?: () => void,
 ) {
   const [value, setValue] = useState(initial);
-  const external = useRef(onExternalChange);
-  useLayoutEffect(() => {
-    external.current = onExternalChange;
-  });
+  const reportExternalChange = useEffectEvent(() => onExternalChange?.());
 
   const sync = useCallback(() => {
     const node = ref.current;
@@ -43,7 +47,7 @@ export function useInternalInputValue(
     const syncAndReport = () => {
       if (!alive) return;
       sync();
-      external.current?.();
+      reportExternalChange();
     };
     const syncOnceSettled = () => queueMicrotask(syncAndReport);
     const syncAfterBrowserRestoresValues = () => setTimeout(syncAndReport);

@@ -6,14 +6,14 @@ import { DocumentIcon } from '@heroicons/react/16/solid';
 
 import { Item } from '../../../data/item';
 import { FileRowContext, useInternalFile } from '../context';
-import { useInternalPreviewUrl } from '../hooks/use-file-field';
+import { useInternalFilePreviewUrl } from '../hooks/use-file-preview-url';
 
 export type FilePreviewProps = Omit<ComponentProps<'span'>, 'children'> & { file: File };
 
 export function FilePreview({ file, className, ...props }: FilePreviewProps) {
   const c = useInternalFile('FileField.Preview');
   const inRow = use(FileRowContext);
-  const url = useInternalPreviewUrl(file);
+  const url = useInternalFilePreviewUrl(file);
 
   const glyph = url ? <img src={url} alt="" draggable={false} /> : <DocumentIcon />;
 

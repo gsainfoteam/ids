@@ -8,7 +8,8 @@ import {
   type Translate,
 } from '../../../../internal/translate';
 import { useInternalTextAreaContext } from '../context';
-import { countState, useInternalCountAnnouncement, type CountState } from '../hooks/use-text-area';
+import { useInternalTextAreaCountAnnouncement } from '../hooks/use-count-announcement';
+import { countState, type CountState } from '../lib/count-state';
 import { resolve, type StateValue } from '../lib/state-value';
 
 export type TextAreaCountProps = Omit<ComponentProps<'span'>, 'children' | 'className'> & {
@@ -38,7 +39,7 @@ export function TextAreaCount({
   const { count, countId, styles } = useInternalTextAreaContext('TextArea.Count');
 
   const state = countState(count.length, count.maxLength, threshold);
-  const spoken = useInternalCountAnnouncement(
+  const spoken = useInternalTextAreaCountAnnouncement(
     state.nearLimit ? (announce?.(state) ?? defaultAnnouncement(state, t)) : '',
   );
 

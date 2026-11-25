@@ -1,8 +1,9 @@
 'use client';
 
-import { isValidElement, useState, type ReactElement, type ReactNode } from 'react';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { DrawerContext } from './context';
+import { useInternalDrawerLabelling } from './hooks/use-drawer-labelling';
 import { useInternalDrawerRoot } from './hooks/use-drawer-root';
 import { DrawerOverlay, type DrawerOverlayProps } from './parts/overlay';
 import { drawerStyle } from './style';
@@ -38,8 +39,7 @@ export function DrawerRoot({
     snap,
   });
 
-  const [titled, setTitled] = useState(false);
-  const [described, setDescribed] = useState(false);
+  const labelling = useInternalDrawerLabelling();
 
   const parts = flattenFragments(children);
   const overlay = parts.find(isOverlay);
@@ -53,10 +53,7 @@ export function DrawerRoot({
         modal,
         dismissible,
         overlay: overlay?.props,
-        titled,
-        setTitled,
-        described,
-        setDescribed,
+        ...labelling,
         styles: drawerStyle({ side, snapping: snap !== null }),
       }}
     >

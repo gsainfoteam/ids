@@ -1,25 +1,20 @@
 'use client';
 
-import { useEffect, type ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 import { StepperBody } from './body';
-import { useInternalItemContext, useInternalRootContext } from '../context';
 import { StepperIndicator } from './indicator';
-import {
-  interactiveDataProps,
-  useInteractive,
-  type InteractiveState,
-} from '../../../../hooks/use-interactive';
+import { interactiveDataProps, type InteractiveState } from '../../../../hooks/use-interactive';
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { flattenFragments } from '../../../../utils';
-import { isDevelopment } from '../../../../utils/dev';
+import { useInternalStepperTrigger } from '../hooks/use-stepper-trigger';
+import { useInternalStepperTriggerBodyWarning } from '../hooks/use-stepper-trigger-body-warning';
 import { isType } from '../lib/is-type';
+import { statusText } from '../lib/status-text';
 import { flag, statusAttributes } from '../lib/step-state';
 
 import type { StepperItemState } from './item';
-import type { Translate } from '../../../../internal/translate';
-import type { StepperStatus } from '../lib/step-state';
 
 export type StepperTriggerState = InteractiveState & StepperItemState;
 
@@ -28,12 +23,6 @@ export type StepperTriggerProps = Omit<
   'children' | 'className' | 'style' | 'type' | 'disabled' | 'id'
 > &
   StateRenderProps<StepperTriggerState>;
-
-function statusText(status: StepperStatus, t: Translate) {
-  if (status === 'completed') return t('stepper.completed');
-  if (status === 'error') return t('stepper.error');
-  return undefined;
-}
 
 export function StepperTrigger({
   className,
@@ -51,21 +40,11 @@ export function StepperTrigger({
   onPointerCancel,
   ...rest
 }: StepperTriggerProps) {
-  const root = useInternalRootContext('Stepper.Trigger');
-  const item = useInternalItemContext('Stepper.Trigger');
   const t = useInternalTranslate();
-  const step = String(item.state.index);
-  const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
-    disabled: !item.reachable,
-    onKeyDown: (event) => {
-      onKeyDown?.(event);
-      root.onTriggerKeyDown(event);
-    },
+  const { root, item, step, interaction, handlers } = useInternalStepperTrigger({
+    onKeyDown,
     onKeyUp,
-    onFocus: (event) => {
-      onFocus?.(event);
-      root.onTriggerFocus(step);
-    },
+    onFocus,
     onBlur,
     onPointerEnter,
     onPointerLeave,
@@ -80,12 +59,7 @@ export function StepperTrigger({
   const holdsBody = nodes.some(isType(StepperBody));
   const status = statusText(item.state.status, t);
 
-  useEffect(() => {
-    if (isDevelopment && holdsBody)
-      console.warn(
-        '[IDS] Stepper: Stepper.Body belongs in Stepper.Item next to Stepper.Trigger. Inside the trigger it becomes part of the step button, which cannot hold links or buttons.',
-      );
-  }, [holdsBody]);
+  useInternalStepperTriggerBodyWarning(holdsBody);
 
   const shared = {
     id: item.ids.trigger,
