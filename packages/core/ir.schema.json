@@ -1,0 +1,1412 @@
+{
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "packages": {
+      "type": "object",
+      "properties": {
+        "css": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "directory": {
+              "type": "string",
+              "pattern": "/$"
+            }
+          },
+          "required": [
+            "name",
+            "directory"
+          ]
+        },
+        "ts": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "directory": {
+              "type": "string",
+              "pattern": "/$"
+            }
+          },
+          "required": [
+            "name",
+            "directory"
+          ]
+        },
+        "dart": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "directory": {
+              "type": "string",
+              "pattern": "/$"
+            }
+          },
+          "required": [
+            "name",
+            "directory"
+          ]
+        }
+      },
+      "required": [
+        "css",
+        "ts",
+        "dart"
+      ]
+    },
+    "targets": {
+      "type": "object",
+      "properties": {
+        "css": {
+          "type": "object",
+          "properties": {
+            "symbols": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/Name"
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "symbols",
+            "outputs"
+          ]
+        },
+        "ts": {
+          "type": "object",
+          "properties": {
+            "symbols": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/Name"
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "symbols",
+            "outputs"
+          ]
+        },
+        "dart": {
+          "type": "object",
+          "properties": {
+            "symbols": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/Name"
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "symbols",
+            "outputs"
+          ]
+        }
+      },
+      "required": [
+        "css",
+        "ts",
+        "dart"
+      ]
+    },
+    "placeholders": {
+      "type": "object",
+      "properties": {
+        "family": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "family"
+      ]
+    },
+    "modes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Name"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    "enums": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Name"
+          },
+          "ts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Name"
+            }
+          },
+          "dart": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Name"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "ts",
+          "dart"
+        ]
+      }
+    },
+    "color": {
+      "type": "object",
+      "properties": {
+        "familyGroups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "families": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+$"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "families"
+            ]
+          }
+        },
+        "families": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Name"
+          }
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Slot"
+          }
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Role"
+          }
+        },
+        "neutralScales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+$"
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Color"
+                }
+              }
+            },
+            "required": [
+              "mode",
+              "steps"
+            ]
+          }
+        },
+        "neutralSteps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "minLength": 1
+              },
+              "step": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "role",
+              "step"
+            ]
+          }
+        },
+        "scheme": {
+          "type": "object",
+          "properties": {
+            "family": {
+              "$ref": "#/$defs/Name"
+            },
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "variable": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "slot": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "tailwind": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/Name"
+                    }
+                  },
+                  "targets": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "family": {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+$"
+                        },
+                        "role": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "family",
+                        "role"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "variable",
+                  "slot",
+                  "tailwind",
+                  "targets"
+                ]
+              }
+            },
+            "utilities": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "family": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+$"
+                  },
+                  "name": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "layer": {
+                    "type": "object",
+                    "properties": {
+                      "variable": {
+                        "$ref": "#/$defs/Name"
+                      },
+                      "color": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "const": "role"
+                              },
+                              "role": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "role"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "const": "keyword"
+                              },
+                              "keyword": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "keyword"
+                            ]
+                          }
+                        ]
+                      },
+                      "hover": {
+                        "type": "object",
+                        "properties": {
+                          "variable": {
+                            "$ref": "#/$defs/Name"
+                          },
+                          "opacity": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": [
+                          "variable",
+                          "opacity"
+                        ]
+                      },
+                      "press": {
+                        "type": "object",
+                        "properties": {
+                          "variable": {
+                            "$ref": "#/$defs/Name"
+                          },
+                          "opacity": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": [
+                          "variable",
+                          "opacity"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "variable",
+                      "color",
+                      "hover",
+                      "press"
+                    ]
+                  }
+                },
+                "required": [
+                  "family",
+                  "name",
+                  "layer"
+                ]
+              }
+            }
+          },
+          "required": [
+            "family",
+            "roles",
+            "utilities"
+          ]
+        }
+      },
+      "required": [
+        "familyGroups",
+        "families",
+        "slots",
+        "roles",
+        "neutralScales",
+        "neutralSteps",
+        "scheme"
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "opacity"
+                  },
+                  "name": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "variable": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "ratio": {
+                    "type": "number"
+                  },
+                  "percent": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name",
+                  "variable",
+                  "ratio",
+                  "percent"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "color"
+                  },
+                  "name": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "variable": {
+                    "$ref": "#/$defs/Name"
+                  },
+                  "color": {
+                    "$ref": "#/$defs/Color"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name",
+                  "variable",
+                  "color"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "tokens"
+      ]
+    },
+    "shadows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Shadow"
+      }
+    },
+    "componentColors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Name"
+          },
+          "variable": {
+            "$ref": "#/$defs/Name"
+          },
+          "property": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+$"
+          },
+          "part": {
+            "$ref": "#/$defs/Name"
+          },
+          "tailwind": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Name"
+            }
+          },
+          "modes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+$"
+                },
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "mode",
+                "role"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "variable",
+          "property",
+          "part",
+          "tailwind",
+          "modes"
+        ]
+      }
+    },
+    "componentShadows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Name"
+          },
+          "variable": {
+            "$ref": "#/$defs/Name"
+          },
+          "part": {
+            "$ref": "#/$defs/Name"
+          },
+          "tailwind": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Name"
+            }
+          },
+          "modes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+$"
+                },
+                "shadow": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "mode",
+                "shadow"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "variable",
+          "part",
+          "tailwind",
+          "modes"
+        ]
+      }
+    },
+    "motion": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Name"
+          },
+          "variable": {
+            "$ref": "#/$defs/Name"
+          },
+          "milliseconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "variable",
+          "milliseconds"
+        ]
+      }
+    },
+    "radius": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DimensionToken"
+      }
+    },
+    "size": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DimensionToken"
+      }
+    },
+    "spacing": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DimensionToken"
+      }
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "fontSizes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DimensionToken"
+          }
+        },
+        "fontWeights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "variable": {
+                "$ref": "#/$defs/Name"
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "variable",
+              "value"
+            ]
+          }
+        },
+        "lineHeights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "variable": {
+                "$ref": "#/$defs/Name"
+              },
+              "value": {
+                "$ref": "#/$defs/LineHeight"
+              }
+            },
+            "required": [
+              "name",
+              "variable",
+              "value"
+            ]
+          }
+        },
+        "letterSpacings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DimensionToken"
+          }
+        },
+        "fontFamilies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "variable": {
+                "$ref": "#/$defs/Name"
+              },
+              "stack": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "flutter": {
+                "type": "object",
+                "properties": {
+                  "family": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "package": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "qualifiedFamily": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "fallback": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": [
+                  "family",
+                  "package",
+                  "qualifiedFamily",
+                  "fallback"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "variable",
+              "stack",
+              "flutter"
+            ]
+          }
+        },
+        "fontSizeAdjusts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "variable": {
+                "$ref": "#/$defs/Name"
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "variable",
+              "value"
+            ]
+          }
+        },
+        "textStyles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TextStyle"
+          }
+        }
+      },
+      "required": [
+        "fontSizes",
+        "fontWeights",
+        "lineHeights",
+        "letterSpacings",
+        "fontFamilies",
+        "fontSizeAdjusts",
+        "textStyles"
+      ]
+    },
+    "fonts": {
+      "type": "object",
+      "properties": {
+        "bundled": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "family": {
+                "type": "string",
+                "minLength": 1
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "font": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "to": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              },
+              "license": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "to": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              }
+            },
+            "required": [
+              "family",
+              "aliases",
+              "font",
+              "license"
+            ]
+          }
+        }
+      },
+      "required": [
+        "bundled"
+      ]
+    },
+    "paletteModel": {
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "coefficients": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "required": [
+              "name",
+              "coefficients"
+            ]
+          }
+        },
+        "statusPalettes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "colors": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Color"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "colors"
+            ]
+          }
+        }
+      },
+      "required": [
+        "steps",
+        "series",
+        "statusPalettes"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "packages",
+    "targets",
+    "placeholders",
+    "modes",
+    "enums",
+    "color",
+    "state",
+    "shadows",
+    "componentColors",
+    "componentShadows",
+    "motion",
+    "radius",
+    "size",
+    "spacing",
+    "typography",
+    "fonts",
+    "paletteModel"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Name": {
+      "type": "object",
+      "properties": {
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+$"
+          }
+        },
+        "css": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "minLength": 1
+            },
+            "customProperty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "themeProperty": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "identifier",
+            "customProperty",
+            "themeProperty"
+          ]
+        },
+        "ts": {
+          "type": "object",
+          "properties": {
+            "constant": {
+              "type": "string",
+              "minLength": 1
+            },
+            "member": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "constant",
+            "member",
+            "type",
+            "key"
+          ]
+        },
+        "dart": {
+          "type": "object",
+          "properties": {
+            "member": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "member",
+            "type",
+            "key"
+          ]
+        }
+      },
+      "required": [
+        "segments",
+        "css",
+        "ts",
+        "dart"
+      ]
+    },
+    "Color": {
+      "type": "object",
+      "properties": {
+        "red": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "green": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "blue": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "alpha": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "hex": {
+          "type": "string",
+          "pattern": "^#[0-9a-f]{6}([0-9a-f]{2})?$"
+        }
+      },
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha",
+        "hex"
+      ]
+    },
+    "Dimension": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "px",
+            "em",
+            "rem"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ]
+    },
+    "LineHeight": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "length"
+            },
+            "length": {
+              "$ref": "#/$defs/Dimension"
+            }
+          },
+          "required": [
+            "kind",
+            "length"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "multiplier"
+            },
+            "multiplier": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind",
+            "multiplier"
+          ]
+        }
+      ]
+    },
+    "DimensionToken": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "variable": {
+          "$ref": "#/$defs/Name"
+        },
+        "value": {
+          "$ref": "#/$defs/Dimension"
+        }
+      },
+      "required": [
+        "name",
+        "variable",
+        "value"
+      ]
+    },
+    "Shadow": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "variable": {
+          "$ref": "#/$defs/Name"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ShadowLayer"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "variable",
+        "layers"
+      ]
+    },
+    "ShadowLayer": {
+      "type": "object",
+      "properties": {
+        "offsetX": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "offsetY": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "blur": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "spread": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "color": {
+          "$ref": "#/$defs/Color"
+        }
+      },
+      "required": [
+        "offsetX",
+        "offsetY",
+        "blur",
+        "spread",
+        "color"
+      ]
+    },
+    "Role": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "variable": {
+          "$ref": "#/$defs/Name"
+        },
+        "property": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$"
+        },
+        "family": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$"
+        },
+        "slot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "theme": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+$"
+              },
+              "variable": {
+                "$ref": "#/$defs/Name"
+              },
+              "fallback": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Color"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "mode",
+              "variable",
+              "fallback"
+            ]
+          }
+        },
+        "tailwind": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Name"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "variable",
+        "property",
+        "family",
+        "slot",
+        "theme",
+        "tailwind"
+      ]
+    },
+    "Slot": {
+      "type": "object",
+      "properties": {
+        "property": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$"
+        },
+        "usesFamily": {
+          "type": "boolean"
+        },
+        "neutralOnly": {
+          "type": "boolean"
+        },
+        "template": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "key"
+          ]
+        }
+      },
+      "required": [
+        "property",
+        "usesFamily",
+        "neutralOnly",
+        "template"
+      ]
+    },
+    "TextStyle": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "variable": {
+          "$ref": "#/$defs/Name"
+        },
+        "fontFamily": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fontSize": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "fontWeight": {
+          "type": "number"
+        },
+        "lineHeight": {
+          "$ref": "#/$defs/LineHeight"
+        },
+        "letterSpacing": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "flutter": {
+          "type": "object",
+          "properties": {
+            "fontSize": {
+              "type": "number"
+            },
+            "height": {
+              "type": "number"
+            },
+            "letterSpacing": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "fontSize",
+            "height",
+            "letterSpacing"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "variable",
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "lineHeight",
+        "letterSpacing",
+        "flutter"
+      ]
+    }
+  }
+}

@@ -4,8 +4,7 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import composites from '../../../../core/tokens/semantic/typography.json';
-import primitives from '../../../../core/tokens/typography.json';
+import { typography } from '../../tokens/foundations.json';
 import { cn } from '../../utils';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -86,31 +85,20 @@ const caption = {
   },
 };
 
-type TokenTree = { [key: string]: TokenTree | string | number | object };
+const compositeClasses = typography.textStyles.map((name) => `text-${name}`);
 
-const compositeNames = (node: TokenTree, path: string[] = []): string[] =>
-  node.$type === 'typography'
-    ? [path.join('-')]
-    : Object.entries(node).flatMap(([key, child]) =>
-        typeof child === 'object' && child !== null
-          ? compositeNames(child as TokenTree, [...path, key])
-          : [],
-      );
-
-const compositeClasses = compositeNames(composites.text).map((name) => `text-${name}`);
-
-const primitiveTokens = Object.entries(primitives).flatMap(([category, tokens]) =>
-  Object.keys(tokens).map((name) => ({ category, variable: `--ids-${category}-${name}` })),
+const primitiveTokens = Object.entries(typography.primitives).flatMap(([category, variables]) =>
+  variables.map((variable) => ({ category, variable })),
 );
 
 const primitiveSample = (category: string, value: string): CSSProperties =>
   ({
-    'font-size': { fontSize: value },
-    'font-weight': { fontWeight: value },
-    'line-height': { lineHeight: value },
-    'letter-spacing': { letterSpacing: value },
-    'font-family': { fontFamily: value },
-    'font-size-adjust': { fontFamily: 'var(--ids-font-family-mono)', fontSizeAdjust: value },
+    fontSizes: { fontSize: value },
+    fontWeights: { fontWeight: value },
+    lineHeights: { lineHeight: value },
+    letterSpacings: { letterSpacing: value },
+    fontFamilies: { fontFamily: value },
+    fontSizeAdjusts: { fontFamily: 'var(--ids-font-family-mono)', fontSizeAdjust: value },
   })[category] ?? {};
 
 function readPrimitives(element: HTMLElement | null) {
@@ -255,7 +243,7 @@ export const Primitives: Story = {
     <Showcase>
       <Showcase.Section
         title="원시값"
-        description="typography.json 의 크기, 굵기, 행간, 자간, 글꼴입니다. 텍스트 스타일이 이 값을 묶어 쓰므로 직접 쓸 일은 드뭅니다. 오른쪽 값은 --ids-* 변수에서 읽은 것입니다."
+        description="typography.tokens.json 의 크기, 굵기, 행간, 자간, 글꼴입니다. 텍스트 스타일이 이 값을 묶어 쓰므로 직접 쓸 일은 드뭅니다. 오른쪽 값은 --ids-* 변수에서 읽은 것입니다."
       >
         <div ref={readPrimitives} className="flex flex-col gap-2">
           {primitiveTokens.map(({ category, variable }) => (

@@ -1,0 +1,111 @@
+{
+  "spacing": [
+    { "name": "xs", "value": { "value": 4, "unit": "px" } },
+    { "name": "sm", "value": { "value": 8, "unit": "px" } },
+    { "name": "md", "value": { "value": 16, "unit": "px" } },
+    { "name": "lg", "value": { "value": 24, "unit": "px" } },
+    { "name": "xl", "value": { "value": 32, "unit": "px" } },
+    { "name": "xxl", "value": { "value": 48, "unit": "px" } }
+  ],
+  "size": [
+    { "name": "control-standard", "value": { "value": 36, "unit": "px" } },
+    { "name": "control-tiny", "value": { "value": 32, "unit": "px" } },
+    { "name": "icon-standard", "value": { "value": 16, "unit": "px" } },
+    { "name": "icon-tiny", "value": { "value": 14, "unit": "px" } }
+  ],
+  "radius": [
+    { "name": "standard", "value": { "value": 10, "unit": "px" } },
+    { "name": "indicator", "value": { "value": 4, "unit": "px" } },
+    { "name": "container", "value": { "value": 16, "unit": "px" } },
+    { "name": "full", "value": { "value": 9999, "unit": "px" } }
+  ],
+  "motion": [
+    { "name": "fast", "milliseconds": 150 },
+    { "name": "normal", "milliseconds": 250 },
+    { "name": "slow", "milliseconds": 400 }
+  ],
+  "typography": {
+    "textStyles": [
+      "headline-h1-bold",
+      "headline-h1-semibold",
+      "headline-h1-medium",
+      "headline-h2-bold",
+      "headline-h2-semibold",
+      "headline-h2-medium",
+      "headline-h3-bold",
+      "headline-h3-semibold",
+      "headline-h3-medium",
+      "headline-h4-bold",
+      "headline-h4-semibold",
+      "headline-h4-medium",
+      "headline-h5-bold",
+      "headline-h5-semibold",
+      "headline-h5-medium",
+      "headline-h6-bold",
+      "headline-h6-semibold",
+      "headline-h6-medium",
+      "body-b1-bold",
+      "body-b1-semibold",
+      "body-b1-medium",
+      "body-b1-regular",
+      "body-b2-bold",
+      "body-b2-semibold",
+      "body-b2-medium",
+      "body-b2-regular",
+      "body-b3-bold",
+      "body-b3-semibold",
+      "body-b3-medium",
+      "body-b3-regular",
+      "caption-c1-semibold",
+      "caption-c1-medium",
+      "caption-c1-regular",
+      "caption-c2-semibold",
+      "caption-c2-medium",
+      "caption-c2-regular"
+    ],
+    "primitives": {
+      "fontSizes": [
+        "--ids-font-size-c2",
+        "--ids-font-size-c1",
+        "--ids-font-size-b3",
+        "--ids-font-size-b2",
+        "--ids-font-size-b1",
+        "--ids-font-size-h6",
+        "--ids-font-size-h5",
+        "--ids-font-size-h4",
+        "--ids-font-size-h3",
+        "--ids-font-size-h2",
+        "--ids-font-size-h1"
+      ],
+      "fontWeights": [
+        "--ids-font-weight-regular",
+        "--ids-font-weight-medium",
+        "--ids-font-weight-semibold",
+        "--ids-font-weight-bold"
+      ],
+      "lineHeights": [
+        "--ids-line-height-none",
+        "--ids-line-height-c2",
+        "--ids-line-height-c1",
+        "--ids-line-height-b3",
+        "--ids-line-height-b2",
+        "--ids-line-height-b1",
+        "--ids-line-height-h6",
+        "--ids-line-height-h5",
+        "--ids-line-height-h4",
+        "--ids-line-height-h3",
+        "--ids-line-height-h2",
+        "--ids-line-height-h1",
+        "--ids-line-height-prose"
+      ],
+      "letterSpacings": [
+        "--ids-letter-spacing-normal",
+        "--ids-letter-spacing-snug",
+        "--ids-letter-spacing-tight",
+        "--ids-letter-spacing-tighter"
+      ],
+      "fontFamilies": ["--ids-font-family-sans", "--ids-font-family-mono"],
+      "fontSizeAdjusts": ["--ids-font-size-adjust-mono"]
+    }
+  }
+}

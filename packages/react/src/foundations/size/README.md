@@ -1,6 +1,6 @@
 # Size
 
-`packages/core/tokens/size.json` 의 컨트롤 높이와 아이콘 크기입니다. `IdsSize` 의 `standard` 와 `tiny` 두 단계뿐입니다.
+`packages/core/tokens/size.tokens.json` 의 컨트롤 높이와 아이콘 크기입니다. `IdsSize` 의 `standard` 와 `tiny` 두 단계뿐입니다.
 
 - **컨트롤이 함께 맞춥니다.** Button, IconButton, 필드, Select 가 같은 높이를 써서 한 줄에 섞어도 높이가 같습니다.
 - **아이콘은 크기를 따릅니다.** 크기 클래스가 없는 `svg` 는 컨트롤 크기의 아이콘 크기로 그려집니다.

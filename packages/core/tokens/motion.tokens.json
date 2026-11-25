@@ -1,0 +1,8 @@
+{
+  "motion": {
+    "$type": "duration",
+    "fast": { "$value": { "value": 150, "unit": "ms" } },
+    "normal": { "$value": { "value": 250, "unit": "ms" } },
+    "slow": { "$value": { "value": 400, "unit": "ms" } }
+  }
+}

@@ -1,149 +1,212 @@
 # @gsainfoteam/ids-core
 
-토큰·문구 소스 + Style Dictionary 및 문구 codegen. **배포하지 않음** — 빌드 타임 전용.
+토큰과 문구의 원본, 그리고 그것을 각 패키지 파일로 바꾸는 codegen 이다. **배포하지 않는다.** 빌드할 때만 쓴다.
 
-## 역할
+## 흐름
 
-`packages/core/tokens/`의 JSON 토큰을 읽어 아래 파일을 생성한다.
+```
+tokens/*.tokens.json (DTCG)  ─┐
+config/*.json                ─┼─ src/sources ─→ src/ir ─→ out/ir.json ─→ 타깃 emitter ─→ 각 패키지 파일
+package.json, pubspec.yaml   ─┘   (valibot 검사)   (IR + ir.schema.json)
+```
 
-| 출력 파일 | 설명 |
-|---|---|
-| `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme`. `state.json` 에서 `--ids-state-hover`, `--ids-state-press`, `--ids-state-tint-*`, `--ids-state-fill-*`, `state-layer`·`state-hover`·`state-press`·`state-fill`·`state-scheme` 유틸리티, `color-roles.json` 에서 `scheme-{계열}`·`focus-ring-scheme` 유틸리티, `@property --ids-state-opacity`·`--ids-state-color`·`--ids-state-layer-hover`·`--ids-state-layer-press` |
-| `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등) |
-| `packages/react/src/tokens/color-roles.ts` | 계열 목록, `IDS_FAMILY_SLOTS`, `IDS_NEUTRAL_ONLY_SLOTS`, `IDS_STATE_OPACITY`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IDS_STATE_FILL_COLOR`, `IDS_NEUTRAL_SCALES`(light, dark 9단계), `IDS_NEUTRAL_STEPS`(단계를 읽는 neutral 역할마다 그 단계) |
-| `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors`, `IdsColorRoles`(계열, `familySlots`, `neutralOnlySlots`, `slotsOf`, `neutralScales`, `neutralSteps`), `state.json` 에서 `IdsStateOpacity`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IdsStateLayer.fillColor` 를 만든다 |
-| `packages/react/src/tokens/component-tokens.ts` | `component.json`, `shadow.json` 에서 `IDS_COMPONENT_COLORS`, `IDS_COMPONENT_SHADOWS`, `IDS_SHADOWS` |
-| `packages/flutter/lib/tokens/ids_component_tokens.dart` | 같은 표의 Dart 판. `IdsComponentColors`, `IdsComponentShadows`, `IdsShadows`, `IdsComponentTokens` |
-| `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
-| `packages/flutter/lib/tokens/ids_palette_model.dart` | 같은 계수와 상태 색 넷의 Dart 판. `palette-model.js` 가 쓴다 |
-| `packages/flutter/fonts/*` | Flutter 패키지에 넣는 글꼴과 라이선스. `fonts.build.mjs` 가 npm 패키지에서 복사한다 |
+- `src/sources/`: 원본을 읽고 검사한다.
+  - 토큰은 `@terrazzo/parser` 가 DTCG 2025.10 규칙으로 읽는다. 별칭(`{font-family.sans}`)을 풀고, 틀린 토큰은 파일과 줄을 짚어 실패한다.
+  - Terrazzo 는 토큰을 이름순으로 돌려준다. `loadTokens` 가 파일 순서와 파일 안 위치로 다시 정렬하므로 출력 순서는 원본에 적힌 순서다.
+  - `config/*.json` 과 두 manifest 는 `src/sources/config.ts` 의 valibot 스키마로 검사한다. 오류는 `config/neutral-roles.json: bg-base: …` 처럼 파일과 키를 짚는다.
+- `src/ir/`: 원본을 타입 있는 IR 하나로 합친다.
+  - `build.ts` 가 값을 계산하고(역할, fallback, Flutter 행간과 자간, 상태 불투명도의 백분율) 서로 가리키는 이름을 확인한다. 없는 역할, 없는 slot, 맞지 않는 hex 는 여기서 실패한다.
+  - 이름은 segment 배열이다. `naming.ts` 가 타깃과 쓰임마다 철자를 만든다(아래 "이름").
+  - `schema.ts` 가 IR 의 valibot 스키마다. `build.ts` 는 결과를 이 스키마로 다시 검사한다.
+  - 실행마다 `out/ir.json`(git 에서 제외)과 `ir.schema.json`(커밋)을 쓴다. Dart 쪽 IR 모델은 `ir.schema.json` 에서 만든다.
+- 타깃 emitter: IR 만 읽는다. 이름을 다시 만들지 않고 IR 의 철자를 그대로 쓴다.
+  - `src/targets/ts/foundations.ts`: 스토리가 읽는 `react/src/tokens/foundations.json`. JSON 을 Prettier 로 정리해 쓴다.
+  - `src/fonts/copy.ts`: IR 의 `fonts.bundled` 대로 Flutter 글꼴을 복사한다.
+  - `src/legacy/`: 이전 Style Dictionary 포매터를 IR 에서 먹인다. `from-ir.ts` 가 IR 을 이전 입력 모양으로 바꾸고, 출력은 이전 파이프라인과 바이트가 같다. CSS, TS, Dart emitter 가 차례로 이 폴더를 대신한다.
+- 문구는 아직 `messages.build.mjs` 가 따로 만든다(아래 "문구 카탈로그").
 
-## 토큰 구조
+## 원본
 
 ```
 tokens/
-  palette.json          # 원시 색상 팔레트. neutral 의 light, dark 9단계 스케일과 상태 색의 기준 램프 넷(red, yellow, green, sky, 50~950)
-  spacing.json          # 간격 원시값 (xs, sm, md, ...)
-  typography.json       # 폰트 패밀리·사이즈·웨이트·행간 원시값
-  motion.json           # 애니메이션 지속시간 원시값
-  component.json        # 컴포넌트 토큰. 모드마다 역할 하나(`bg-control-outline`: light `bg-base`, dark `bg-block`)
-  shadow.json           # 그림자 원시 단계 0, 1, 2. sm/md 이름은 없다
-  state.json            # state layer 의 불투명도와 채움 층 색. hover 6%, press 10%, tint 8% / 12%, fill 검정 10% / 18%
-  enums.json            # IdsMode·IdsSize·IdsVariant 열거값. color 는 데모 hue 이름 목록(스토리 전용)이라 어디에도 나가지 않는다
-  semantic/
-    typography.json     # 텍스트 스타일. CSS 와 Dart 가 같은 이름으로 받는다
-neutral-roles.json      # 단계를 읽는 neutral 역할마다 그 스케일 단계(`bg-base` 1, `border-neutral` 5, `bg-neutral-solid` 9 …). 두 모드가 같다. `text-on-*` 는 없다(런타임에 계산). CSS fallback, tokens/color-roles.ts, Dart 의 neutralSteps 로 나간다. tokens/ 밖에 두어 Style Dictionary 가 토큰으로 읽지 않는다
-color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지, React 의 tokens/color-roles.ts, Dart 의 IdsColors 를 만든다
-tests/fixtures/theme-roles.json  # ids-react 가 데모 seed 17개 × 조합별로 쓴 역할 색. Flutter 테스트가 같은 값을 내는지 비교한다
+  palette.tokens.json     neutral 의 light, dark 9단계와 상태 색 램프 넷(red, yellow, green, sky, 50~950)
+  spacing.tokens.json     이름 붙은 간격(xs, sm, md, …)
+  size.tokens.json        컨트롤 높이와 아이콘 크기(standard, tiny)
+  radius.tokens.json      standard 10px, indicator 4px, container 16px, full
+  motion.tokens.json      전환 시간 세 단계
+  state.tokens.json       state layer 비율과 채움 층 색
+  shadow.tokens.json      그림자 단계 0, 1, 2
+  typography.tokens.json  글꼴, 크기, 굵기, 행간, 자간, font-size-adjust
+  text.tokens.json        텍스트 스타일(typography 합성 토큰)
+config/
+  targets.json            이름 접두사, 타깃별 manifest 경로, 이름 철자 규칙, symbols, outputs
+  color-roles.json        색 계열과 역할 slot, scheme, Tailwind 이름공간
+  neutral-roles.json      neutral 역할마다 읽는 스케일 단계
+  component-tokens.json   컴포넌트 토큰. 모드마다 역할 하나 또는 그림자 단계 하나
+  enums.json              IdsMode, IdsSize, IdsVariant. 타깃마다 더하는 값(`extend.dart: ["system"]`)
+  fonts.json              함께 싣는 글꼴, npm 경로, 라이선스
+  palette-model.json      팔레트 모델 계수와 상태 팔레트 이름
+tests/fixtures/theme-roles.json  ids-react 가 쓴 역할 색. Flutter 테스트가 같은 값을 내는지 비교한다
 ```
 
-hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에서 런타임에 고른다.
+- 토큰 값은 DTCG 모양으로 쓴다.
+  - 색 `{ "colorSpace": "srgb", "components": [r, g, b], "alpha": a, "hex": "#rrggbb" }`. IR 이 8비트로 반올림하고 `hex` 와 맞는지 확인한다.
+  - 길이 `{ "value": 4, "unit": "px" }`, 시간 `{ "value": 150, "unit": "ms" }`.
+  - 비율은 숫자다(`0.06`). CSS 의 `6%` 는 IR 이 `decimal.js` 로 계산한다.
+- 파일은 Prettier `--object-wrap collapse` 로 정리한다.
+- hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에서 런타임에 고른다.
 
-## 색 역할 표
+## 이름
 
-`color-roles.json` 하나가 색 이름을 정한다.
+- 이름은 segment 배열이다(`["color", "bg", "primary", "soft"]`). `config/targets.json` 이 타깃의 쓰임마다 철자(`case`)와 접두사(`prefixed`)를 정한다.
+
+| 타깃 | 쓰임 | 예 |
+|---|---|---|
+| css | `identifier`, `customProperty`, `themeProperty` | `bg-primary-soft`, `--ids-color-bg-primary-soft`, `--background-color-primary-soft` |
+| ts | `constant`, `member`, `type`, `key` | `IDS_COLOR_BG_BASE`, `bgPrimarySoft`, `IdsMode`, `bg-primary-soft` |
+| dart | `member`, `type`, `key` | `bgPrimarySoft`, `IdsMode`, `bg-primary-soft` |
+
+- 접두사는 `targets.json` 의 `prefix`(`["ids"]`)다. 패키지 이름과 경로는 `react/package.json`, `css/package.json`, `flutter/pubspec.yaml` 에서 읽는다.
+- emitter 가 쓰는 고정 이름(클래스, 상수)은 `symbols` 에 segment 배열로 적는다. IR 이 같은 규칙으로 철자를 만든다.
+- emitter 가 쓰는 파일 경로는 `outputs` 에 적는다. 경로는 그 타깃 패키지 기준이다.
+
+## 생성 파일
+
+| 출력 파일 | 원본 |
+|---|---|
+| `css/dist/ids.css` | 모든 토큰, color-roles, component-tokens |
+| `react/src/tokens/types.ts` | enums |
+| `react/src/tokens/color-roles.ts` | color-roles, neutral-roles, state, palette 의 neutral |
+| `react/src/tokens/component-tokens.ts` | component-tokens, shadow |
+| `react/src/tokens/palette-model.ts` | palette-model, palette 의 상태 색 |
+| `react/src/tokens/foundations.json` | spacing, size, radius, motion, typography. Foundations 스토리가 읽는다 |
+| `flutter/lib/tokens/*.dart` | 위와 같은 표의 Dart 판(`IdsColors`, `IdsStateOpacity`, `IdsComponentColors`, `IdsTypography`, `IdsPaletteModel` …) |
+| `flutter/fonts/*` | fonts, `node_modules` 의 글꼴 패키지 |
+| `core/ir.schema.json` | IR 스키마 |
+
+생성된 파일은 직접 고치지 않는다. `pnpm codegen` 이 덮어쓴다.
+
+## 색 역할
+
+`config/color-roles.json` 이 색 이름을 정한다.
 
 ```json
 {
-  "families": {
-    "neutral": ["neutral"],
-    "brand": ["primary", "secondary", "tertiary"],
-    "status": ["success", "warning", "danger", "info"]
-  },
-  "slots": {
-    "bg": ["base", "surface", "block", "{family}-soft", "{family}-solid"],
-    "text": ["on-base", "on-surface", "on-block", "on-{family}-soft", "on-{family}-solid", "{family}", "{family}-strong"],
-    "border": ["{family}", "{family}-strong"]
-  },
+  "families": { "neutral": ["neutral"], "brand": ["primary", "secondary", "tertiary"], "status": ["success", "warning", "danger", "info"] },
+  "slots": [["bg", "base"], ["bg", "$family", "soft"], ["text", "on", "$family", "solid"], ["border", "$family", "strong"]],
   "scheme": {
-    "neutral": {
-      "text-{family}": "text-{family}-strong"
+    "family": "scheme",
+    "redirects": [{ "family": "neutral", "from": ["text", "$family"], "to": ["text", "$family", "strong"] }],
+    "stateLayer": {
+      "default": { "color": { "role": ["bg", "$family", "solid"] }, "opacity": ["state", "tint"] },
+      "families": { "neutral": { "color": { "keyword": "currentColor" }, "opacity": ["state"] } }
     }
   },
-  "neutralOnly": ["bg-base", "bg-surface", "bg-block", "text-on-base", "text-on-surface", "text-on-block"],
-  "namespaces": {
-    "bg": ["--background-color"],
-    "text": ["--text-color", "--fill"],
-    "border": ["--border-color", "--ring-color", "--outline-color", "--stroke"]
-  }
+  "tailwindNamespaces": { "bg": ["background-color"], "text": ["text-color", "fill"], "border": ["border-color", "ring-color", "outline-color", "stroke"], "shadow": ["shadow"] }
 }
 ```
 
-- `slots` 는 `{family}` 를 넣는 틀이다. 역할은 `{속성}-{틀}` 이다(`bg-{family}-soft` → `bg-primary-soft`).
-- 배경은 쓰임새(`base`, `surface`, `block`, `soft`, `solid`)로, 선과 글자는 세기(없음, `strong`)로 부른다. 세기 단어는 `strong` 하나다.
-- `text` 의 `on-…` 틀은 `bg` 틀과 하나씩 짝이다. 그래서 `bg-{배경}` 위 글자는 언제나 `text-on-{배경}` 이다.
-- `neutralOnly` 의 역할은 neutral 에만 있다. 다른 계열은 `bg-X-soft`, `bg-X-solid`, `text-on-X-soft`, `text-on-X-solid`, `text-X`, `text-X-strong`, `border-X`, `border-X-strong` 여덟 개다.
+- slot 은 segment 배열이고 `$family` 자리에 계열이 들어간다. 첫 segment 가 속성이다(`["bg", "$family", "soft"]` → `bg-primary-soft`).
+- `$family` 가 없는 slot 은 neutral 에만 있다(`bg-base`, `text-on-surface`).
+- 배경은 쓰임새(`base`, `surface`, `block`, `soft`, `solid`)로, 선과 글자는 세기(없음, `strong`)로 부른다.
 - 역할 변수는 `--ids-color-{역할}` 이다. hover, active 역할은 없다.
-- Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-soft` 은 있고 `--color-primary` 나 `--background-color-on-primary-solid` 는 없다.
 - `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다.
   - 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다).
-  - neutral 은 없으면 `neutral-roles.json` 이 가리키는 `palette.json` 스케일 단계를 읽는다.
-  - `text-on-*` 는 neutral 도 fallback 이 없다. 두 플랫폼이 배경마다 APCA 로 계산한다.
-- `scheme-{계열}` utility 는 모든 계열에 있는 여덟 역할을 `--ids-color-*-scheme[-…]` 로 다시 가리킨다(`bg-scheme-soft` → `bg-primary-soft`). 이름공간도 같은 규칙으로 만든다(`bg-scheme-solid`, `text-on-scheme-solid`, `inset-ring-scheme-strong`).
-  - `scheme.neutral` 은 neutral 이 다른 역할을 가리키는 자리다. `text-scheme` 은 `text-neutral` 이 아니라 `text-neutral-strong` 이다. 나머지(`bg-scheme-solid` → `bg-neutral-solid`, `text-on-scheme-solid` → `text-on-neutral-solid`)는 이름 그대로다.
-  - scheme 은 층 색도 정한다. `--ids-state-layer-scheme` 은 계열 채움(`bg-X-solid`)에 tint 불투명도, neutral 은 `currentColor` 에 기본 불투명도다. `state-scheme` 이 그것을 `--ids-state-color`, `--ids-state-layer-*` 에 넣는다.
-  - `focus-ring-scheme` 은 `focus-ring` 과 같은 trigger 로 ring 을 `border-scheme-strong` 으로 칠한다. `focus-ring-current` 는 글자색으로 칠한다(채움 위의 닫기 버튼).
-- Dart 포매터도 이 표를 읽는다. `--ids-color-bg-primary-soft` 은 `IdsColors.bgPrimarySoft` 이 되고, `colors['bg-primary-soft']` 로도 읽는다.
-- `ids_palette_model.dart` 는 아래 팔레트 모델의 계수를 옮긴 것이라, 계수가 바뀌면 함께 바뀐다.
+  - neutral 은 없으면 `neutral-roles.json` 이 가리키는 스케일 단계를 읽는다. `text-on-*` 는 neutral 도 fallback 이 없다.
+- Tailwind 이름공간은 `tailwindNamespaces` 에 적힌 것만 만든다. `--color-primary` 나 `--background-color-on-primary-solid` 는 없다.
+- `scheme-{계열}` utility 는 `$family` 가 있는 역할을 `--ids-color-*-scheme[-…]` 로 다시 가리킨다.
+  - `redirects` 는 한 계열이 다른 역할을 가리키는 자리다. neutral 의 `text-scheme` 은 `text-neutral-strong` 이다.
+  - `stateLayer` 가 층 색과 불투명도를 정한다. 계열 채움(`bg-X-solid`)에 tint 비율, neutral 은 `currentColor` 에 기본 비율이다. 비율 이름은 `state.tokens.json` 에 있어야 한다.
 
 ## 컴포넌트 토큰
 
-- `component.json` 의 토큰은 `$value` 에 `light`, `dark` 두 역할을 갖는다. 그림자 토큰은 `{shadow.N}` 단계를 가리킨다.
-- 이름은 `{속성}-{그룹}[-{부분}][-{변형}]` 이다. 속성 `bg` 는 배경, `text` 는 글자와 `fill`, `border` 는 선과 `ring`·`outline`·`stroke` 이름공간에 붙는다(`bg-control-outline`, `inset-ring-control-outline`, `fill-qr-code`).
-- CSS 는 `[data-mode]` 마다 `--ids-color-{토큰}: var(--ids-color-{역할})`, `--ids-shadow-{토큰}: var(--ids-shadow-{단계})` 를 쓴다. 단계 `0` 은 `0 0 #0000` 이라 Tailwind 의 그림자 목록 안에서도 합쳐진다.
-- 이름 규칙과 대비는 `packages/react/tests/component-tokens.test.ts` 가, Flutter 와 같은 색인지는 `tests/fixtures/theme-roles.json` 의 `components` 가 확인한다.
+- `config/component-tokens.json` 의 토큰은 모드마다 `{ "role": "bg-base" }` 또는 `{ "shadow": "1" }` 하나를 갖는다. 한 토큰은 모든 모드가 역할이거나 모든 모드가 그림자다.
+- 이름은 `{속성}-{그룹}[-{부분}][-{변형}]` 이다(`bg-control-outline`, `shadow-surface`).
+- CSS 는 `[data-mode]` 마다 `--ids-color-{토큰}: var(--ids-color-{역할})`, `--ids-shadow-{토큰}: var(--ids-shadow-{단계})` 를 쓴다. 그림자 단계 `0` 은 `0 0 #0000` 이다.
+- 이름 규칙과 대비는 `react/tests/component-tokens.test.ts` 가, Flutter 와 같은 색인지는 parity fixture 의 `components` 가 확인한다.
 
 ## state layer
 
-`tokens/state.json` 이 hover 와 press 의 불투명도, 채움 층의 색을 정한다.
+`tokens/state.tokens.json` 이 hover 와 press 의 비율, 채움 층의 색을 정한다.
 
 | 토큰 | 값 | CSS | React | Dart |
 |---|---|---|---|---|
-| `state.hover` | 6% | `--ids-state-hover` | `IDS_STATE_OPACITY.hover` (0.06) | `IdsStateOpacity.hover` |
-| `state.press` | 10% | `--ids-state-press` | `IDS_STATE_OPACITY.press` (0.1) | `IdsStateOpacity.press` |
-| `state.tint.hover` | 8% | `--ids-state-tint-hover` | `IDS_STATE_OPACITY.tintHover` | `IdsStateOpacity.tintHover` |
-| `state.tint.press` | 12% | `--ids-state-tint-press` | `IDS_STATE_OPACITY.tintPress` | `IdsStateOpacity.tintPress` |
+| `state.hover` | 0.06 | `--ids-state-hover: 6%` | `IDS_STATE_OPACITY.hover` | `IdsStateOpacity.hover` |
+| `state.press` | 0.1 | `--ids-state-press` | `IDS_STATE_OPACITY.press` | `IdsStateOpacity.press` |
+| `state.tint.hover` | 0.08 | `--ids-state-tint-hover` | `IDS_STATE_OPACITY.tintHover` | `IdsStateOpacity.tintHover` |
+| `state.tint.press` | 0.12 | `--ids-state-tint-press` | `IDS_STATE_OPACITY.tintPress` | `IdsStateOpacity.tintPress` |
 | `state.fill.color` | `#000000` | `--ids-state-fill-color` | `IDS_STATE_FILL_COLOR` | `IdsStateLayer.fillColor` |
-| `state.fill.hover` | 10% | `--ids-state-fill-hover` | `IDS_STATE_OPACITY.fillHover` | `IdsStateOpacity.fillHover` |
-| `state.fill.press` | 18% | `--ids-state-fill-press` | `IDS_STATE_OPACITY.fillPress` | `IdsStateOpacity.fillPress` |
+| `state.fill.hover` | 0.1 | `--ids-state-fill-hover` | `IDS_STATE_OPACITY.fillHover` | `IdsStateOpacity.fillHover` |
+| `state.fill.press` | 0.18 | `--ids-state-fill-press` | `IDS_STATE_OPACITY.fillPress` | `IdsStateOpacity.fillPress` |
 
-- `ids.css` 의 `state-layer` 는 `--ids-state-color`(없으면 `currentColor`)를 `--ids-state-opacity` 만큼 `background-image` 로 덮는다.
-- `state-hover`, `state-press` 는 `--ids-state-layer-hover`, `--ids-state-layer-press` 를 먼저 읽고, 없으면 `--ids-state-hover`, `--ids-state-press` 를 쓴다. `state-fill` 은 층 색과 그 둘을 채움 값으로 둔다.
-- tint 는 `state-scheme` 으로 쓴다. `scheme-{계열}` 이 층 색(`bg-X-solid`)과 tint 불투명도를 `--ids-state-layer-scheme[-hover|-press]` 에 둔다.
-- `@property --ids-state-opacity`(`<percentage>`, 0%, 상속 안 함)라서 transition 으로 바뀐다. `--ids-state-color`, `--ids-state-layer-hover`, `--ids-state-layer-press` 도 상속하지 않는다. 그래서 채움 버튼 안의 요소가 바깥 층을 물려받지 않는다.
+- `state-layer` 는 `--ids-state-color`(없으면 `currentColor`)를 `--ids-state-opacity` 만큼 `background-image` 로 덮는다.
+- `@property --ids-state-opacity` 는 상속하지 않는다. 그래서 채움 버튼 안의 요소가 바깥 층을 물려받지 않는다.
 - IdsProvider(`theme-roles.ts`)와 Flutter(`theme_roles.dart`)는 같은 값으로 층 아래의 글자 대비를 잰다. 값을 바꾸면 parity fixture 를 다시 쓴다.
 
 ## 팔레트 모델
 
-`palette-model.json` 이 IdsProvider 와 `IdsRamp.fromSeed` 가 색 하나로 50~950 램프를 만들 때 읽는 모델의 계수다. `palette-model.js` 는 Style Dictionary 다음에 돌며, 이 계수와 `palette.json` 의 상태 색 넷을 `react/src/tokens/palette-model.ts` 와 `flutter/lib/tokens/ids_palette_model.dart` 로 옮긴다.
-
-- 단계마다 500 의 hue 를 받는 푸리에 급수 셋이다: 밝기, sRGB 최대 채도에 대한 채도 비율, 500 에서의 hue 회전. 한 줄이 한 단계이고, 값은 `[a0, a1, b1, a2, b2, …]` 순서다.
-- 계수는 데모 팔레트 17색에 맞춰 구한 뒤 고정했다. 17색과 맞추던 코드는 지웠다. 다시 맞추려면 `f3b8fc4b` 커밋의 `palette-model.js` 와 17색이 있던 `tokens/palette.json` 을 꺼낸다.
+- `config/palette-model.json` 은 IdsProvider 와 `IdsRamp.fromSeed` 가 색 하나로 50~950 램프를 만들 때 읽는 모델의 계수다.
+- 단계마다 500 의 hue 를 받는 푸리에 급수 셋이다: `lightness`, `chroma`(sRGB 최대 채도에 대한 비율), `hue-shift`. 한 줄이 한 단계이고, 값은 `[a0, a1, b1, a2, b2, …]` 순서다.
+- `statusPalettes` 는 `palette.tokens.json` 에서 상태 색으로 옮길 램프 이름이다.
+- 계수는 데모 팔레트 17색에 맞춰 구한 뒤 고정했다. 다시 맞추려면 `f3b8fc4b` 커밋의 `palette-model.js` 와 17색이 있던 `tokens/palette.json` 을 꺼낸다.
 - 모델의 동작은 [IdsProvider README](../react/src/components/utility/ids-provider/README.md#색-하나로-팔레트-만들기) 에 적는다.
+
+## Flutter 글꼴
+
+`config/fonts.json` 이 함께 싣는 글꼴을 정한다.
+
+```json
+{
+  "bundled": {
+    "Pretendard GOV Variable": {
+      "aliases": ["Pretendard GOV", "Pretendard Variable", "Pretendard"],
+      "font": "pretendard-gov/dist/public/variable/PretendardGOVVariable.ttf",
+      "license": { "from": "pretendard-gov/dist/LICENSE.txt", "to": "fonts/PretendardGOV-LICENSE.txt" }
+    }
+  },
+  "flutter": { "unnamedGenericFamilies": ["sans-serif", "ui-monospace"] }
+}
+```
+
+- 글꼴 파일이 놓일 자리는 `flutter/pubspec.yaml` 의 `flutter.fonts` 에서 읽는다. `fonts.json` 의 글꼴과 pubspec 의 family 가 하나씩 맞아야 한다.
+- `aliases` 는 글꼴 스택에서 같은 글꼴을 부르는 이름이다. Flutter 의 fallback 에서는 함께 싣는 family 하나로 바뀐다.
+- `unnamedGenericFamilies` 는 Flutter 가 이름으로 부를 수 없는 CSS 일반 family 다. Flutter fallback 에서 빠진다.
+- 웹은 같은 글꼴을 `pretendard-gov` 와 `@fontsource-variable/geist-mono`(woff2)로 싣는다. Flutter 는 TTF 가 필요해서 Geist Mono 는 Vercel 의 `geist` 에서 가져온다.
+- 글꼴을 올리려면 `packages/core/package.json` 의 버전을 바꾸고 `pnpm codegen` 을 돌린다. ids-css 의 `pretendard-gov` 와 같은 버전으로 맞춘다.
+
+## 토큰 종류 더하기
+
+1. `tokens/<종류>.tokens.json` 을 DTCG 로 쓴다. 그룹에 `$type` 을 둔다.
+2. `src/ir/schema.ts` 에 그 종류의 스키마를 더하고 `IrSchema` 에 넣는다. 값은 타깃 철자가 아니라 구조로 둔다(`{ value, unit }`, `milliseconds`).
+3. `src/ir/build.ts` 에서 `tokensIn(tokens, ['<종류>'], ['<$type>'])` 로 읽어 IR 을 만든다. 이름은 `variableToken` 으로 만든다.
+4. `pnpm codegen` 으로 `ir.schema.json` 을 다시 쓰고 커밋한다.
+5. 그 값을 내보낼 타깃 emitter 에서 읽는다.
+
+## 타깃 더하기
+
+1. `config/targets.json` 의 `targets` 에 manifest 경로, `names`(쓰임마다 `case`, `prefixed`), `symbols`, `outputs` 를 적는다.
+2. `src/sources/config.ts` 의 `TargetsConfigSchema` 와 `src/ir/schema.ts` 의 `NameSchema`, `TargetsSchema`, `PackagesSchema` 에 그 타깃을 더한다.
+3. `src/targets/<타깃>/` 에 emitter 를 둔다. IR 만 읽고, 문자열을 이어 붙이지 않고 그 언어의 AST 나 builder 로 만든다.
+4. `src/codegen.ts` 에서 부르고, CI 의 생성 파일 diff 목록에 출력 경로를 더한다.
+
+## 테스트
+
+```bash
+pnpm --filter @gsainfoteam/ids-core test       # vitest(tests/) 와 문구 생성기 테스트
+pnpm --filter @gsainfoteam/ids-core typecheck  # tsc6
+```
+
+- `tests/ir.test.ts`:
+  - IR 이 커밋된 `ir.schema.json` 과 같은 스키마로 만들어지고, `ir.json` 이 그 JSON Schema 를 통과하는지(ajv) 본다.
+  - IR 에서 만든 모든 생성 파일이 커밋된 파일과 바이트가 같은지 본다.
+  - 원본 오류가 파일과 키, 토큰을 짚는지 본다.
 
 ## codegen 실행
 
 ```bash
-# 루트에서
-pnpm codegen
-
-# 또는 이 패키지 직접
-pnpm build
+pnpm codegen                                    # 루트에서
+pnpm --filter @gsainfoteam/ids-core build       # 이 패키지만
 ```
-
-생성된 파일은 직접 편집하지 않는다. `pnpm codegen` 실행 시 덮어쓴다.
-
-## Flutter 글꼴
-
-`fonts.build.mjs` 는 Style Dictionary 와 문구 생성 다음에 돌며, core 의 devDependency 에서 글꼴을 복사한다.
-
-| npm 패키지 | 원본 | `packages/flutter/fonts/` |
-|---|---|---|
-| `pretendard-gov` | `dist/public/variable/PretendardGOVVariable.ttf`, `dist/LICENSE.txt` | `PretendardGOVVariable.ttf`, `PretendardGOV-LICENSE.txt` |
-| `geist` (Vercel) | `dist/fonts/geist-mono/GeistMono-Variable.ttf`, `LICENSE.txt` | `GeistMonoVariable.ttf`, `GeistMono-LICENSE.txt` |
-
-- 웹은 같은 글꼴을 `pretendard-gov` 와 `@fontsource-variable/geist-mono`(woff2)로 싣는다. Flutter 는 TTF 가 필요해서 Geist Mono 는 Vercel 의 `geist` 에서 가져온다.
-- 글꼴을 올리려면 `packages/core/package.json` 의 버전을 바꾸고 `pnpm codegen` 을 돌린다. ids-css 의 `pretendard-gov` 와 같은 버전으로 맞춘다.
 
 ## 데모 팔레트
 

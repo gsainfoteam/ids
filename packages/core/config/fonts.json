@@ -1,0 +1,18 @@
+{
+  "bundled": {
+    "Pretendard GOV Variable": {
+      "aliases": ["Pretendard GOV", "Pretendard Variable", "Pretendard"],
+      "font": "pretendard-gov/dist/public/variable/PretendardGOVVariable.ttf",
+      "license": {
+        "from": "pretendard-gov/dist/LICENSE.txt",
+        "to": "fonts/PretendardGOV-LICENSE.txt"
+      }
+    },
+    "Geist Mono Variable": {
+      "aliases": ["Geist Mono"],
+      "font": "geist/dist/fonts/geist-mono/GeistMono-Variable.ttf",
+      "license": { "from": "geist/LICENSE.txt", "to": "fonts/GeistMono-LICENSE.txt" }
+    }
+  },
+  "flutter": { "unnamedGenericFamilies": ["sans-serif", "ui-monospace"] }
+}

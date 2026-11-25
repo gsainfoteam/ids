@@ -128,7 +128,7 @@ hover 와 press 는 색 역할이 아니라 컴포넌트가 그리는 층입니�
 | `state-press` | `--ids-state-opacity: var(--ids-state-layer-press, var(--ids-state-press))` |
 | `state-fill` | 층을 검정으로, hover 10%, press 18% 로 둔다 |
 
-- 비율은 `packages/core/tokens/state.json` 에 있습니다.
+- 비율은 `packages/core/tokens/state.tokens.json` 에 있습니다.
 - 층 색은 면에 따라 다릅니다. 색 있는 컨트롤이 회색 쪽이 아니라 같은 색의 진한 쪽으로 가게 하려는 것입니다.
 
 | 면 | 층 | hover / press |
@@ -171,7 +171,7 @@ hover 와 press 는 색 역할이 아니라 컴포넌트가 그리는 층입니�
 - 구조선과 테두리는 중립입니다. 테마 색은 주요 동작과 포커스에만 씁니다.
 - 색만으로 의미를 전하지 않습니다. 아이콘이나 글자를 함께 둡니다.
 - 테마 하나의 대비는 Storybook `Foundations/Color` 의 Lab 에서 보고, 데모 팔레트 17개 전체는 `tests/tokens-contrast.test.ts` 가 검사합니다.
-- Lab 의 역할 표는 `tokens/color-roles.ts`(core 의 `color-roles.json` 에서 생성)의 계열과 역할을 읽어 그리므로 계열이나 역할을 더하면 저절로 나타납니다.
+- Lab 의 역할 표는 `tokens/color-roles.ts`(core 의 `config/color-roles.json` 에서 생성)의 계열과 역할을 읽어 그리므로 계열이나 역할을 더하면 저절로 나타납니다.
 - 테스트:
   - `tests/tokens-contrast.test.ts`: 데모 팔레트 17개 × 두 모드 × pure·tinted × harmonized·fixed 에서 모든 `text-on-*` 와 `text-X-strong` 이 Lc 75, `text-X` 가 Lc 60, `border-X-strong` 이 Lc 45 이상이다. hover, press 층 아래에서도 잰다. `ids.css` 에 `-hover`, `-active` 역할이 없다.
   - `tests/theme-roles.test.ts`: 데모 팔레트 17개가 역할 규칙을 모두 통과한다. `checkIdsTheme` 의 입력 검사.

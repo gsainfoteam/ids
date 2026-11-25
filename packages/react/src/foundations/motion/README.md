@@ -1,6 +1,6 @@
 # Motion
 
-`packages/core/tokens/motion.json` 의 전환 시간입니다.
+`packages/core/tokens/motion.tokens.json` 의 전환 시간입니다.
 
 - **세 단계.** `fast`(150ms), `normal`(250ms), `slow`(400ms) 이고 `--ids-motion-*` 변수와 Flutter `IdsMotion` 으로 나갑니다.
 - **곡선은 토큰이 아닙니다.** 대부분 `ease-out` 이고, Drawer 만 vaul 에서 가져온 `cubic-bezier(0.32, 0.72, 0, 1)` 을 씁니다.

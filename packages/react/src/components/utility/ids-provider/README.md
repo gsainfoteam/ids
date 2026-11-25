@@ -108,8 +108,8 @@ neutral 만 가지는 역할:
 - `X` 는 neutral, primary, secondary, tertiary, success, warning, danger, info 중 하나입니다.
 - 배경마다 짝이 있습니다. `bg-{배경}` 위 글자는 언제나 `text-on-{배경}` 입니다.
 - neutral 의 solid(`bg-neutral-solid`, `text-on-neutral-solid`)는 뒤집힌 채움입니다: Tooltip, neutral solid Button.
-- hover, active 역할은 없습니다. 컴포넌트가 `state-layer` 로 층을 덮습니다. 채움은 검정 10%, 18%(`state-fill`), 색 있는 soft 면과 상태 색의 outline, ghost 는 계열 채움 8%, 12%, 나머지는 글자색 6%, 10% 입니다. 비율은 `packages/core/tokens/state.json` 에 있습니다.
-- 이름은 [`packages/core/color-roles.json`](../../../../../core/color-roles.json) 한 표(`slots`, `neutralOnly`)에서 나옵니다.
+- hover, active 역할은 없습니다. 컴포넌트가 `state-layer` 로 층을 덮습니다. 채움은 검정 10%, 18%(`state-fill`), 색 있는 soft 면과 상태 색의 outline, ghost 는 계열 채움 8%, 12%, 나머지는 글자색 6%, 10% 입니다. 비율은 `packages/core/tokens/state.tokens.json` 에 있습니다.
+- 이름은 [`packages/core/config/color-roles.json`](../../../../../core/config/color-roles.json) 한 표(`slots`)에서 나옵니다.
 - 최근에 바뀐 이름은 [Color](../../../foundations/color/README.md#바뀐-이름) 에 있습니다. 그보다 예전 이름:
 
 | 예전 | 지금 |
@@ -147,7 +147,7 @@ neutral 만 가지는 역할:
   - 글자(8, 9)는 solid 와 같은 단계이거나 그보다 바깥입니다.
 - `text-on-*` 는 단계를 읽지 않습니다. [아래](#배경-위-글자)처럼 Provider 가 계산합니다.
 - 앱이 스케일을 직접 주면 그 값을 그대로 쓰고 대비만 검사합니다.
-- neutral 은 `packages/core/tokens/palette.json` 의 스케일 둘이고, 역할마다 읽는 단계는 `packages/core/neutral-roles.json` 에 있습니다. `border-neutral` 은 구조선이라 대비 규칙이 없습니다.
+- neutral 은 `packages/core/tokens/palette.tokens.json` 의 스케일 둘이고, 역할마다 읽는 단계는 `packages/core/config/neutral-roles.json` 에 있습니다. `border-neutral` 은 구조선이라 대비 규칙이 없습니다.
 - neutral 값은 shadcn/ui 의 neutral 테마를 따릅니다.
   - 다크 선 `#2e2e2e` 는 shadcn 의 반투명 선(흰색 10%)을 카드(`#171717`) 위에 칠한 색입니다.
   - 다크 진한 글자는 shadcn 의 `#e5e5e5` 대신 `#fafafa` 입니다. `#e5e5e5` 위 `#171717` 글자는 press 층 아래에서 Lc 75 에 못 미칩니다.
@@ -233,7 +233,7 @@ defineIdsTheme({ primary: blue, status: 'fixed' });                    // green,
 defineIdsTheme({ primary: blue, status: { danger: '#be123c' } });      // danger 만 앱의 색
 ```
 
-- 기준 색은 success green, warning yellow, danger red, info sky 입니다(`'fixed'`). `packages/core/tokens/palette.json` 에 50~950 램프로 있고, red, yellow, sky 는 Tailwind CSS v4 기본값, green 은 IDS 고유 값입니다.
+- 기준 색은 success green, warning yellow, danger red, info sky 입니다(`'fixed'`). `packages/core/tokens/palette.tokens.json` 에 50~950 램프로 있고, red, yellow, sky 는 Tailwind CSS v4 기본값, green 은 IDS 고유 값입니다.
 - `'harmonized'` 는 상태 색의 hue 를 primary 쪽으로 돌립니다. 최대 15° 이고, 두 hue 거리의 절반을 넘지 않습니다. 단계별 밝기와 채도는 기준 그대로입니다.
 - 돌린 색은 그 상태의 hue 범위(danger 5–31°, warning 31–108°, success 108–200°, info 200–268°) 안에 머뭅니다.
 - 돌려서 primary 와 너무 가까워지거나 적록 색각에서 success·warning 과 danger 가 비슷해지면, 그 상태는 회전을 절반씩 줄이고 끝내 0 으로 돌아갑니다.
@@ -259,7 +259,7 @@ createIdsPalette('#0d9488'); // { light: ['#ffffff', '#ffffff', …], dark: ['#0
   - 밝기 `L(h)`
   - 채도: 그 밝기와 hue 에서 sRGB 가 낼 수 있는 최대 채도에 대한 비율 `c(h)`
   - hue 회전 `Δh(h)`: 500 의 hue 에서 그 단계 hue 까지의 각도
-- 세 함수는 푸리에 급수이고, 계수는 `packages/core/palette-model.json` 에 고정되어 있습니다. `pnpm codegen` 이 `src/tokens/palette-model.ts` 로 옮깁니다.
+- 세 함수는 푸리에 급수이고, 계수는 `packages/core/config/palette-model.json` 에 고정되어 있습니다. `pnpm codegen` 이 `src/tokens/palette-model.ts` 로 옮깁니다.
   - 계수는 데모 팔레트 17색(Tailwind CSS v4 기본값과 비슷한 색)에 OKLab 거리의 가중 최소제곱과 매끄러움 벌점(고조파 k 에 k⁴)으로 맞춘 뒤 고정했습니다. 17색은 레포에서 지웠습니다.
   - 고조파 수는 밝기 3, 채도 6, hue 회전 5 입니다. 한 팔레트씩 빼고 맞춘 오차(leave-one-out)가 가장 작은 값입니다.
   - 맞출 때 17색과의 오차는 ΔE_OK×100 으로 평균 1.08, 최대 6.29(green) 였습니다. green 과 lime 은 hue 가 12° 차이인데 밝기가 많이 달라서, 매끄러운 함수로는 둘 다 맞출 수 없습니다.

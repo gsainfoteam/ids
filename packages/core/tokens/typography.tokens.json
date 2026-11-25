@@ -1,0 +1,73 @@
+{
+  "font-size": {
+    "$type": "dimension",
+    "c2": { "$value": { "value": 10, "unit": "px" } },
+    "c1": { "$value": { "value": 12, "unit": "px" } },
+    "b3": { "$value": { "value": 14, "unit": "px" } },
+    "b2": { "$value": { "value": 16, "unit": "px" } },
+    "b1": { "$value": { "value": 18, "unit": "px" } },
+    "h6": { "$value": { "value": 20, "unit": "px" } },
+    "h5": { "$value": { "value": 24, "unit": "px" } },
+    "h4": { "$value": { "value": 28, "unit": "px" } },
+    "h3": { "$value": { "value": 32, "unit": "px" } },
+    "h2": { "$value": { "value": 40, "unit": "px" } },
+    "h1": { "$value": { "value": 48, "unit": "px" } }
+  },
+  "font-weight": {
+    "$type": "fontWeight",
+    "regular": { "$value": 400 },
+    "medium": { "$value": 500 },
+    "semibold": { "$value": 600 },
+    "bold": { "$value": 700 }
+  },
+  "line-height": {
+    "none": { "$type": "number", "$value": 1 },
+    "c2": { "$type": "dimension", "$value": { "value": 14, "unit": "px" } },
+    "c1": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+    "b3": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
+    "b2": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+    "b1": { "$type": "dimension", "$value": { "value": 28, "unit": "px" } },
+    "h6": { "$type": "dimension", "$value": { "value": 28, "unit": "px" } },
+    "h5": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } },
+    "h4": { "$type": "dimension", "$value": { "value": 36, "unit": "px" } },
+    "h3": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
+    "h2": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
+    "h1": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } },
+    "prose": { "$type": "dimension", "$value": { "value": 28, "unit": "px" } }
+  },
+  "letter-spacing": {
+    "$type": "dimension",
+    "normal": { "$value": { "value": 0, "unit": "em" } },
+    "snug": { "$value": { "value": -0.015, "unit": "em" } },
+    "tight": { "$value": { "value": -0.025, "unit": "em" } },
+    "tighter": { "$value": { "value": -0.035, "unit": "em" } }
+  },
+  "font-family": {
+    "$type": "fontFamily",
+    "sans": {
+      "$value": [
+        "Pretendard GOV Variable",
+        "Pretendard GOV",
+        "Pretendard Variable",
+        "Pretendard",
+        "sans-serif"
+      ]
+    },
+    "mono": {
+      "$value": [
+        "Geist Mono Variable",
+        "Geist Mono",
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "Consolas",
+        "Pretendard GOV Variable",
+        "Pretendard GOV",
+        "Pretendard Variable",
+        "Pretendard",
+        "monospace"
+      ]
+    }
+  },
+  "font-size-adjust": { "$type": "number", "mono": { "$value": 0.53 } }
+}

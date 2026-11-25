@@ -11,7 +11,7 @@ React (Web)과 Flutter (Mobile)을 동시 지원하며, 토큰 파이프라인�
 | [`@gsainfoteam/ids-css`](packages/css) | CSS 변수 + Tailwind `@theme` | [GitHub Packages](https://github.com/gsainfoteam/ids/pkgs/npm/ids-css) |
 | [`@gsainfoteam/ids-react`](packages/react) | React 컴포넌트 | [GitHub Packages](https://github.com/gsainfoteam/ids/pkgs/npm/ids-react) |
 | [`ids_flutter`](packages/flutter) | Flutter 컴포넌트 | [pub.dev](https://pub.dev/packages/ids_flutter) |
-| [`packages/core`](packages/core) | 토큰 소스 + Style Dictionary codegen | - |
+| [`packages/core`](packages/core) | 토큰 소스(DTCG), IR, codegen | - |
 
 설치법은 각 패키지 README 에 있다. npm 패키지는 GitHub Packages 라 인증이 필요하다.
 
@@ -41,19 +41,19 @@ PR을 열면 자동으로 아래 체크가 실행된다.
 - **JS**: `pnpm codegen` → 생성 파일 동기화 확인 → `typecheck` → `lint` → `build` → 번들 크기 예산(`size`) → 예제 앱 빌드(`examples:build`) → 예제가 서버에서 IDS 를 그렸는지 확인(`examples:check`) → `test`
 - **Flutter**: `flutter test`
 
-토큰 파일(`packages/core/tokens/`)을 수정했는데 `pnpm codegen`을 실행하지 않으면 CI가 실패한다.
+토큰 파일(`packages/core/tokens/`, `packages/core/config/`)을 수정했는데 `pnpm codegen`을 실행하지 않으면 CI가 실패한다.
 
 ## 개발 워크플로우
 
 ### 토큰 수정
 
-토큰은 `packages/core/tokens/`에서만 편집한다. 직접 생성 파일을 수정하면 안 됨.
+토큰은 `packages/core/tokens/`(DTCG)와 `packages/core/config/`(역할 표, 이름 규칙)에서만 편집한다. 직접 생성 파일을 수정하면 안 됨.
 
 ```bash
 # 1. 토큰 파일 편집
-#    packages/core/tokens/palette.json
-#    packages/core/tokens/semantic/*.json
-#    packages/core/tokens/spacing.json 등
+#    packages/core/tokens/palette.tokens.json
+#    packages/core/tokens/text.tokens.json
+#    packages/core/config/color-roles.json 등
 
 # 2. 생성 파일 업데이트
 pnpm codegen

@@ -1,0 +1,39 @@
+{
+  "families": {
+    "neutral": ["neutral"],
+    "brand": ["primary", "secondary", "tertiary"],
+    "status": ["success", "warning", "danger", "info"]
+  },
+  "slots": [
+    ["bg", "base"],
+    ["bg", "surface"],
+    ["bg", "block"],
+    ["bg", "$family", "soft"],
+    ["bg", "$family", "solid"],
+    ["text", "on", "base"],
+    ["text", "on", "surface"],
+    ["text", "on", "block"],
+    ["text", "on", "$family", "soft"],
+    ["text", "on", "$family", "solid"],
+    ["text", "$family"],
+    ["text", "$family", "strong"],
+    ["border", "$family"],
+    ["border", "$family", "strong"]
+  ],
+  "scheme": {
+    "family": "scheme",
+    "redirects": [
+      { "family": "neutral", "from": ["text", "$family"], "to": ["text", "$family", "strong"] }
+    ],
+    "stateLayer": {
+      "default": { "color": { "role": ["bg", "$family", "solid"] }, "opacity": ["state", "tint"] },
+      "families": { "neutral": { "color": { "keyword": "currentColor" }, "opacity": ["state"] } }
+    }
+  },
+  "tailwindNamespaces": {
+    "bg": ["background-color"],
+    "text": ["text-color", "fill"],
+    "border": ["border-color", "ring-color", "outline-color", "stroke"],
+    "shadow": ["shadow"]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "radius": {
+    "$type": "dimension",
+    "standard": { "$value": { "value": 10, "unit": "px" } },
+    "indicator": { "$value": { "value": 4, "unit": "px" } },
+    "container": { "$value": { "value": 16, "unit": "px" } },
+    "full": { "$value": { "value": 9999, "unit": "px" } }
+  }
+}

@@ -2,8 +2,8 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import tokens from '../../../../core/tokens/radius.json';
 import { Button } from '../../components/action/button';
+import { radius } from '../../tokens/foundations.json';
 import { cn } from '../../utils';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -19,8 +19,10 @@ type Story = StoryObj<typeof meta>;
 
 const surface = cn('bg-block inset-ring-1 inset-ring-neutral');
 
+const cssLength = ({ value, unit }: { value: number; unit: string }) => `${value}${unit}`;
+
 const radii: { [token: string]: string } = Object.fromEntries(
-  Object.entries(tokens.radius).map(([token, { $value }]) => [token, $value]),
+  radius.map(({ name, value }) => [name, cssLength(value)]),
 );
 
 function Measured({ token, className }: { token: string; className: string }) {
