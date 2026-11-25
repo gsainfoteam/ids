@@ -2,12 +2,11 @@
 
 import { useCallback, useRef, type Ref, type RefCallback } from 'react';
 
-import {
-  useInternalImageSettledBeforeMount,
-  useInternalImageStatus,
-  type ImageStatus,
-} from '../../../../internal/lib/image-status';
+import { useInternalImageSettledBeforeMount } from '../../../../internal/hooks/use-image-settled-before-mount';
+import { useInternalImageStatus } from '../../../../internal/hooks/use-image-status';
 import { mergeRefs } from '../../../../utils';
+
+import type { ImageStatus } from '../../../../internal/lib/image-status';
 
 export function useInternalImagePicture(
   current: string | undefined,

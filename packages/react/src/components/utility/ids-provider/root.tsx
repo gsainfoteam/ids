@@ -6,7 +6,8 @@ import { ThemeContext, useInternalIdsProvider, type ThemeMode } from './hooks/us
 import { useInternalIdsProviderElement } from './hooks/use-ids-provider-element';
 import { useInternalIdsProviderLanguage } from './hooks/use-ids-provider-language';
 import { useInternalIdsProviderWarnings } from './hooks/use-ids-provider-warnings';
-import { OverlayHost, PortalRootContext } from '../../../internal/overlay/parts/host';
+import { PortalRootContext } from '../../../internal/overlay/context';
+import { OverlayHost } from '../../../internal/overlay/parts/host';
 import { LanguageContext } from '../../../internal/translate';
 import { cn } from '../../../utils';
 import { DefaultToaster } from '../../feedback/toast';

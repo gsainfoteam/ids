@@ -2,7 +2,7 @@
 
 import { Children, isValidElement, useLayoutEffect, type ReactNode, type RefObject } from 'react';
 
-import { useInternalIconLabel } from '../../../../internal/lib/icon-label';
+import { useInternalIconLabel } from '../../../../internal/hooks/use-icon-label';
 import { isDevelopment } from '../../../../utils/dev';
 import { useInternalButton } from '../../button/hooks/use-button';
 

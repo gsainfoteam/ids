@@ -4,15 +4,23 @@
 
 | 파일                                     | 내용                                                                     |
 | ---------------------------------------- | ------------------------------------------------------------------------ |
-| [`lib/layer-stack.ts`](#liblayer-stackts)       | 열린 레이어의 스택과 Escape, 바깥 누르기, 포커스 규칙(`useInternalLayer`)        |
+| [`lib/layer-stack.ts`](#liblayer-stackts)       | 열린 레이어의 스택과 Escape, 바깥 누르기, 포커스 규칙                    |
+| [`hooks/use-layer.ts`](#hooksuse-layerts)       | 레이어 하나를 열린 동안 스택에 올리는 hook(`useInternalLayer`)           |
 | [`lib/top-layer.ts`](#libtop-layerts)           | top layer 에 올리기, 다시 올리기, transition 없이 바꾸기, toaster 올리기 |
 | [`hooks/use-presence.ts`](#hooksuse-presencets)     | 닫힌 뒤 나가는 애니메이션이 끝날 때까지 남는 mount 상태                  |
 | [`hooks/use-anchored.ts`](#hooksuse-anchoredts)     | anchor 에 붙는 위치 계산(`@floating-ui/react` 의 `useFloating`)          |
 | [`parts/modal-layer.tsx`](#partsmodal-layertsx)     | modal 의 배경, 포커스 가두기, 나머지 페이지 숨기기, 스크롤 잠금          |
-| [`lib/sheet-viewport.ts`](#libsheet-viewportts) | 좁은 화면의 drawer 판정과 화면 키보드 높이                               |
+| [`hooks/use-modal-layer.ts`](#hooksuse-modal-layerts) | `ModalLayer` 의 배경 ref, root context, 스크롤 shard, top layer 올리기 |
+| [`lib/sheet-viewport.ts`](#libsheet-viewportts) | 좁은 화면의 media query 와 화면 키보드 높이                              |
+| [`hooks/use-drawer-presentation.ts`](#hooksuse-drawer-presentationts) | 좁은 화면에서 팝업을 drawer 로 그릴지 정하는 hook       |
 | [`lib/focus.ts`](#libfocusts)                   | 초기 포커스, 포커스 되돌리기, 늘 안으로 치는 요소                        |
 | [`lib/store.ts`](#libstorets)                   | `overlay.open` 의 항목 스토어와 host 선출                                |
-| [`parts/host.tsx`](#partshosttsx)                   | 항목을 그리는 `OverlayHost`, 항목에 붙는 binding, portal root            |
+| [`context.ts`](#contextts)                       | 항목에 붙는 binding 과 portal root 의 context                            |
+| [`parts/host.tsx`](#partshosttsx)                   | 항목을 그리는 `OverlayHost` 와 항목마다의 테마 wrapper                   |
+| [`hooks/use-overlay-host.ts`](#hooksuse-overlay-hostts) | host 등록과 선출, 그릴 항목 목록                                     |
+| [`hooks/use-overlay-item-binding.ts`](#hooksuse-overlay-item-bindingts) | 항목 하나의 binding 과 붙은 레이어 없는 항목 치우기  |
+| [`hooks/use-overlay-item.ts`](#hooksuse-overlay-itemts) | `open` 이 없는 레이어를 `overlay.open` 항목에 붙이는 hook             |
+| [`hooks/use-overlay.ts`](#hooksuse-overlayts)   | 부른 곳의 theme 으로 여는 `overlay`(공개 `useOverlay`)                   |
 | [`lib/external-store.ts`](#libexternal-storets) | `useSyncExternalStore` 가 읽는 작은 스토어                               |
 | [`lib/interactions.ts`](#libinteractionsts)     | 컴포넌트가 쓰는 `@floating-ui/react` 의 상호작용 hook 과 파트            |
 | [`lib/styles.ts`](#libstylests)                 | 목록 팝업의 표면과 modal 배경의 클래스 조각(`overlayStyles`)             |
@@ -22,6 +30,7 @@
 | 쓰는 곳                                 | 가져가는 것                                                                                                                                                                                                                  |
 | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                                                                                                           |
+| Select, ChipField, ColorField, Sidebar  | `useInternalDrawerPresentation`                                                                                                                                                                                              |
 | Alert                                   | `useInternalPresence`                                                                                                                                                                                                                |
 | Dialog                                  | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`                                                                                  |
 | Popover                                 | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `lib/interactions.ts` |
@@ -31,7 +40,7 @@
 | Drawer                                  | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `lib/sheet-viewport.ts`              |
 | Image 의 뷰어                           | `useInternalLayer`, `ModalLayer`, `useInternalPresence`, `useInternalOverlayItem`, `OverlayItemContext`, `returnFocusTo`, `focusReturnTarget`                                                                                                        |
 | Toast                                   | `createExternalStore`, `keepAboveLayers`, `withoutTransitions`, `raiseInTopLayer`, `showInTopLayer`, `supportsPopover`, `useInternalPresence`, `returnFocusTo`, `blurWithin`                                                         |
-| [field-popup](../field-popup/README.md) | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `lib/sheet-viewport.ts`                                                                                            |
+| [field-popup](../field-popup/README.md) | `useInternalLayer`, `useInternalAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `lib/sheet-viewport.ts`, `useInternalDrawerPresentation`                                                                                            |
 
 ## 조립하는 법
 
@@ -61,7 +70,7 @@ if (!presence.mounted) return null;
 
 ## lib/layer-stack.ts
 
-열린 레이어의 스택입니다. 문서마다 `keydown`, `pointerdown`, `focusin` 리스너를 하나씩 두고, 열린 순서로 쌓인 레이어를 위에서부터 봅니다.
+열린 레이어의 스택입니다. 문서마다 `keydown`, `pointerdown`, `focusin` 리스너를 하나씩 두고, 열린 순서로 쌓인 레이어를 위에서부터 봅니다. 레이어는 [hooks/use-layer.ts](#hooksuse-layerts) 의 `useInternalLayer` 가 올리고 내립니다(`registerLayer`).
 
 ### 쓰는 법
 
@@ -108,7 +117,25 @@ elementsAbove(layer);                            // 이 레이어 위에 열린 
 
 - 스택은 모듈 상태라 문서(iframe)마다 따로입니다.
 - 스택은 포커스를 되돌리지 않습니다. `onDismiss` 의 이유를 보고 컴포넌트가 `returnFocusTo(focusReturnTarget(layer))` 를 부릅니다. 바깥 누르기는 포커스가 누른 곳으로 가므로 되돌리지 않습니다.
+
+## hooks/use-layer.ts
+
+레이어 하나를 `active` 인 동안 [lib/layer-stack.ts](#liblayer-stackts) 의 스택에 올리는 hook(`useInternalLayer(active, options)`)입니다. 스택이 부르는 `Layer` 객체를 돌려줍니다.
+
+### 쓰는 곳
+
+- Dialog, Drawer, Popover, Menu, Tooltip, Image 의 뷰어, [field-popup](../field-popup/README.md)
+
+### 왜 이렇게
+
+- `Layer` 객체는 처음 한 번 만들고, 그 메서드는 매 commit 에 바꾸는 `latest` ref 의 옵션을 읽습니다. 스택은 같은 객체를 쥐고 있어도 최신 `element`, `onDismiss` 를 부릅니다.
+- 등록은 layout effect 에서 합니다. 컴포넌트가 초기 포커스를 옮기는 effect 보다 먼저 돌아야, 스택이 연 순간의 `activeElement` 를 되돌아갈 곳으로 기억합니다.
+- `active` 가 `false` 가 되는 순간 스택을 떠납니다. 나가는 애니메이션 동안은 Escape 와 바깥 누르기를 받지 않습니다.
+
+### 알아둘 것
+
 - `kind` 가 바뀌면(필드 팝업이 drawer 로 바뀔 때) 다시 등록해서 스택 맨 위로 갑니다.
+- 바꾸면 모든 오버레이의 닫기와 포커스 되돌리기가 함께 바뀝니다. `tests/overlay-core.test.tsx` 가 확인합니다.
 
 ## lib/top-layer.ts
 
@@ -209,7 +236,7 @@ const anchored = useInternalAnchored({
 
 ## parts/modal-layer.tsx
 
-modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, 스크롤 잠금입니다.
+modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, 스크롤 잠금입니다. 배경 ref 와 top layer 올리기는 [hooks/use-modal-layer.ts](#hooksuse-modal-layerts) 가 맡습니다.
 
 ### 쓰는 법
 
@@ -240,18 +267,37 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 - content 의 ref 는 `contentRef` 로 넘깁니다. `RemoveScroll` 이 자식을 복제하면서 ref 를 덮으므로 자식에 직접 단 ref 는 사라집니다.
 - `context` 를 넘기지 않으면 reference 없는 root context 를 만듭니다. anchor 에 붙는 modal(modal Popover)은 [`useInternalAnchored`](#hooksuse-anchoredts) 의 `context` 를 넘깁니다.
 
-## lib/sheet-viewport.ts
+## hooks/use-modal-layer.ts
+
+[parts/modal-layer.tsx](#partsmodal-layertsx) 의 상태와 effect 를 담은 hook(`useInternalModalLayer`)입니다. 배경에 붙일 ref(`setBackdrop`), reference 없는 floating-ui root context, `RemoveScroll` 에 넘길 `layersAboveScroll` 을 돌려줍니다.
 
 ### 쓰는 곳
 
-- [field-popup](../field-popup/README.md) 과 Select, ChipField, ColorField 의 `useInternalDrawerPresentation`
-- Drawer 의 화면 키보드 올리기(`coveredByKeyboard`, `onViewportChange`)
+- `parts/modal-layer.tsx` 의 `ModalLayer`
+
+### 왜 이렇게
+
+- 열린 동안 배경을 먼저 top layer 에 올리고 content 를 다시 올립니다(`showInTopLayer`, `raiseInTopLayer`). 그다음 toaster 처럼 늘 위에 있어야 하는 요소를 올립니다(`raiseWhatStaysAboveLayers`).
+- `layersAboveScroll` 은 ref 모양의 객체 8개이고, 읽을 때마다 이 레이어 위에 열린 레이어의 요소(`elementsAbove`)를 돌려줍니다. `RemoveScroll` 의 `shards` 는 ref 배열을 받으므로, 위에 레이어가 열리고 닫혀도 배열을 바꾸지 않고 그 안을 스크롤되게 둡니다.
+- 배경 ref 는 앱이 `backdrop.ref` 로 넘긴 ref 와 합칩니다. 그 ref 가 바뀔 때만 새 함수를 만듭니다.
+
+### 알아둘 것
+
+- 위에 열린 레이어가 8개를 넘으면 9번째부터는 스크롤 잠금 안에서 스크롤되지 않습니다.
+- 바꾸면 Dialog, Drawer, modal Popover, Menu 의 명령 팔레트, Image 의 뷰어, 필드의 drawer 가 함께 바뀝니다.
+
+## lib/sheet-viewport.ts
+
+화면 아래에 붙는 sheet 가 쓰는 값과 함수입니다. 좁은 화면의 media query(`SMALL_SCREEN`, `DRAWER_BELOW`), 화면 키보드가 덮는 높이(`coveredByKeyboard`), 보이는 높이(`visibleHeight`), viewport 변화 구독(`onViewportChange`)입니다.
+
+### 쓰는 곳
+
+- [hooks/use-drawer-presentation.ts](#hooksuse-drawer-presentationts): `SMALL_SCREEN`
+- [field-popup](../field-popup/README.md) 의 drawer, Drawer 의 화면 키보드 올리기(`coveredByKeyboard`, `onViewportChange`)
 
 ### 쓰는 법
 
 ```ts
-const drawer = useInternalDrawerPresentation(mobileVariant);   // 'drawer' 이고 640px 미만이면 true
-
 const stop = onViewportChange(win, () => {
   sheet.style.bottom = `${coveredByKeyboard(win)}px`;
   sheet.style.maxHeight = `${visibleHeight(win) * 0.7}px`;
@@ -261,8 +307,30 @@ const stop = onViewportChange(win, () => {
 ### 왜 이렇게
 
 - `max-width` 는 경계값을 포함하므로 media query 는 `DRAWER_BELOW - 0.02`(`639.98px`)로 적어 640px 을 뺍니다. `matchMedia` 가 없으면 `false` 로 보고 popover 를 씁니다.
-- 서버 렌더 값은 `false` 입니다(`useSyncExternalStore` 의 server snapshot). 서버 HTML 은 늘 popover 입니다.
 - 화면 키보드는 visual viewport 만 줄이고 fixed 요소가 쓰는 layout viewport 는 그대로 둡니다. 키보드가 덮는 만큼(`coveredByKeyboard`) sheet 를 올립니다.
+
+## hooks/use-drawer-presentation.ts
+
+`mobileVariant` 가 `'drawer'` 이고 화면이 640px 보다 좁으면 `true` 를 돌려주는 hook(`useInternalDrawerPresentation`)입니다.
+
+### 쓰는 곳
+
+- [field-popup](../field-popup/README.md), Select, ChipField, ColorField, Sidebar
+
+### 쓰는 법
+
+```ts
+const drawer = useInternalDrawerPresentation(mobileVariant);   // 'drawer' 이고 640px 미만이면 true
+```
+
+### 왜 이렇게
+
+- [`useInternalMediaQuery`](../../hooks/README.md#use-media-queryts) 로 [lib/sheet-viewport.ts](#libsheet-viewportts) 의 `SMALL_SCREEN` 을 읽습니다. `mobileVariant` 가 `'drawer'` 가 아니면 query 를 넘기지 않아 구독하지 않습니다.
+- 서버 렌더 값은 `false` 입니다(`useSyncExternalStore` 의 server snapshot). 서버 HTML 은 늘 popover 입니다.
+
+### 알아둘 것
+
+- 바꾸면 Select, ChipField, ColorField, 날짜와 시간 필드의 팝업과 Sidebar 가 drawer 로 바뀌는 너비가 함께 바뀝니다.
 
 ## lib/focus.ts
 
@@ -315,7 +383,26 @@ overlay.unmount('settings');                 // 나가는 애니메이션 없이
 - `render` 는 컴포넌트가 아니라 host 가 렌더 중에 부르는 함수입니다. 안에서 hook 을 부르지 않습니다.
 - 스토어는 모듈 상태라 문서(iframe)마다 따로입니다.
 
+## context.ts
+
+`overlay.open` 항목과 portal root 의 context 입니다.
+
+- `OverlayItemContext`: 항목 하나의 `OverlayItemBinding`(`open`, `close`, `exited`, `bind`). host 가 항목마다 주고, 붙은 레이어는 자식에게 `null` 로 넘깁니다.
+- `PortalRootContext`: 가장 가까운 IdsProvider 의 요소. Tooltip 이 그 안에 portal 합니다.
+
+### 쓰는 곳
+
+- IdsProvider(`PortalRootContext`), [parts/host.tsx](#partshosttsx), [hooks/use-overlay-item.ts](#hooksuse-overlay-itemts)
+- Dialog, Drawer, Popover, Menu, Image 의 뷰어: `<OverlayItemContext value={null}>`
+- Tooltip: `PortalRootContext`
+
+### 알아둘 것
+
+- binding 의 모양을 바꾸면 `useInternalOverlayItem` 을 쓰는 모든 레이어가 함께 바뀝니다.
+
 ## parts/host.tsx
+
+`overlay.open` 으로 연 항목을 그리는 `OverlayHost` 입니다. 항목마다 테마 wrapper 와 `OverlayItemContext` 를 두고 항목의 `render` 를 부릅니다.
 
 ### 쓰는 법
 
@@ -336,8 +423,73 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 
 - 항목마다 `display: contents` 인 wrapper 가 `data-mode` 와 연 곳의 테마 변수(`ThemeContext` 의 `variables`)를 가집니다. 항목은 host 의 theme 을 따르고, `useOverlay()` 로 열면 부른 곳의 theme 을 씁니다.
 - host 는 IdsProvider 의 요소 안, children 뒤에 그립니다. `asChild` 면 자식 요소 하나를 지켜야 하므로 요소 옆에 그립니다. 항목이 없으면 아무것도 그리지 않아서 서버 HTML 이 그대로입니다.
-- 레이어는 `open` prop 이 없을 때만 항목에 붙습니다(`useInternalOverlayItem`). 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
-- `PortalRootContext` 는 가장 가까운 IdsProvider 의 요소입니다. Tooltip 이 그 안에 portal 합니다.
+
+## hooks/use-overlay-host.ts
+
+host 를 [lib/store.ts](#libstorets) 에 등록하고, 이 host 가 선출됐을 때만 그릴 항목 목록을 돌려주는 hook(`useInternalOverlayHost`)입니다.
+
+### 쓰는 곳
+
+- [parts/host.tsx](#partshosttsx) 의 `OverlayHost`
+
+### 왜 이렇게
+
+- host 마다 `Symbol` 하나를 처음 렌더에 만들어 등록합니다(`registerOverlayHost`). 먼저 등록된 host 만 `overlayHosts.get()[0]` 이 자기라서 그립니다.
+- 선출과 항목은 `useSyncExternalStore` 로 읽습니다. 서버 snapshot 은 선출되지 않음과 빈 목록이라 서버 HTML 에 항목이 들어가지 않습니다.
+
+### 알아둘 것
+
+- 선출되지 않은 host 는 빈 목록을 받습니다. Provider 가 여럿이어도 항목이 두 번 그려지지 않습니다.
+
+## hooks/use-overlay-item-binding.ts
+
+항목 하나의 `OverlayItemBinding` 을 만드는 hook(`useInternalOverlayItemBinding(item)`)입니다. 닫힌 항목에 붙은 레이어가 없으면 바로 목록에서 치웁니다(`removeIfNothingExits`).
+
+### 쓰는 곳
+
+- [parts/host.tsx](#partshosttsx) 의 `OverlayItemView`
+
+### 왜 이렇게
+
+- binding 은 `open` 과 `id` 가 바뀔 때만 새로 만듭니다. 붙은 레이어의 `useInternalOverlayItem` 이 binding 이 바뀔 때마다 다시 붙기 때문입니다.
+- 치우기는 layout effect 에서 합니다. 같은 commit 에 붙은 레이어가 `bindLayer` 로 먼저 세어진 뒤에 판단합니다.
+
+### 알아둘 것
+
+- 바꾸면 `overlay.open` 으로 연 항목이 닫힌 뒤 남거나 나가는 애니메이션 전에 사라질 수 있습니다. `tests/overlay-store.test.tsx` 가 확인합니다.
+
+## hooks/use-overlay-item.ts
+
+`open` prop 이 없는 레이어를 그 레이어가 그려진 `overlay.open` 항목에 붙이는 hook(`useInternalOverlayItem(controlledOpen)`)입니다. 붙으면 항목의 binding 을, 아니면 `null` 을 돌려줍니다.
+
+### 쓰는 곳
+
+- Dialog, Drawer, Popover, Menu 의 명령 팔레트, Image 의 뷰어
+
+### 왜 이렇게
+
+- 레이어는 `open` prop 이 없을 때만 항목에 붙습니다. 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
+- 붙은 동안 `bind()` 로 항목에 붙은 레이어 수를 셉니다. 항목은 그 레이어의 나가기가 끝날 때(`exited`) 목록에서 빠집니다.
+
+### 알아둘 것
+
+- 바꾸면 `overlay.open` 안의 Dialog, Drawer, Popover 가 여닫히는 방식이 함께 바뀝니다.
+
+## hooks/use-overlay.ts
+
+공개 hook `useOverlay()` 입니다. [lib/store.ts](#libstorets) 의 `overlay` 와 같지만, `open` 이 부른 곳의 theme 을 항목에 넘깁니다.
+
+### 쓰는 곳
+
+- `src/index.ts` 가 공개 API 로 내보냅니다.
+
+### 왜 이렇게
+
+- `overlay.open` 은 컴포넌트 밖에서도 부르므로 theme 을 모릅니다. 이 hook 으로 열면 항목이 host 대신 부른 곳의 `ThemeContext` 를 씁니다(nested IdsProvider 의 테마).
+
+### 알아둘 것
+
+- 이름과 반환값은 공개 API 입니다. 바꾸면 앱 코드가 깨집니다.
 
 ## lib/external-store.ts
 

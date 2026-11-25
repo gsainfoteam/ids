@@ -1,15 +1,7 @@
-'use client';
-
-import { useInternalMediaQuery } from '../../../hooks/use-media-query';
-
 export type PopupPresentation = 'popover' | 'drawer';
 
 export const DRAWER_BELOW = 640;
-const SMALL_SCREEN = `(max-width: ${DRAWER_BELOW - 0.02}px)`;
-
-export function useInternalDrawerPresentation(mobileVariant: PopupPresentation | undefined) {
-  return useInternalMediaQuery(mobileVariant === 'drawer' ? SMALL_SCREEN : null);
-}
+export const SMALL_SCREEN = `(max-width: ${DRAWER_BELOW - 0.02}px)`;
 
 export function coveredByKeyboard(win: Window) {
   const visual = win.visualViewport;

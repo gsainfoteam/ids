@@ -1,22 +1,19 @@
 'use client';
 
 import {
-  useCallback,
-  useId,
-  useLayoutEffect,
-  useState,
   type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
   type PointerEvent,
 } from 'react';
 
-import { isFromNestedControl, useInternalPressable } from './pressable';
+import { useInternalPressable } from './use-pressable';
 import {
   interactiveDataProps,
   useInteractive,
   type InteractiveState,
 } from '../../hooks/use-interactive';
+import { isFromNestedControl } from '../lib/pressable';
 
 export type SurfaceHandlers<E> = {
   onClick?: (event: MouseEvent<E>) => void;
@@ -78,30 +75,4 @@ export function useInternalSurface<E extends HTMLElement>({
     },
     dataProps: interactive ? interactiveDataProps(state) : {},
   };
-}
-
-export function useInternalLabelling(surfaceIsTheButton: boolean) {
-  const [titleId, setTitleId] = useState<string>();
-  const [descriptionId, setDescriptionId] = useState<string>();
-  return {
-    labelling: surfaceIsTheButton
-      ? { 'aria-labelledby': titleId, 'aria-describedby': descriptionId }
-      : {},
-    descriptionId,
-    register: { setTitleId, setDescriptionId },
-  };
-}
-
-export function useInternalRegisteredId(
-  register: ((id: string | undefined) => void) | undefined,
-  own?: string,
-) {
-  const generated = useId();
-  const id = own ?? generated;
-  const stable = useCallback((value: string | undefined) => register?.(value), [register]);
-  useLayoutEffect(() => {
-    stable(id);
-    return () => stable(undefined);
-  }, [id, stable]);
-  return id;
 }

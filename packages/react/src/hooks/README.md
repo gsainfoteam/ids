@@ -11,7 +11,7 @@
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
 | [`use-media-query.ts`](#use-media-queryts)               | media query 가 맞는지                                | 동작 줄이기, IdsProvider 의 `system` 모드, 좁은 화면의 drawer        |
-| [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/lib/surface.ts` |
+| [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/hooks/use-surface.ts` |
 | [`use-reduced-motion.ts`](#use-reduced-motionts)         | 동작 줄이기 설정(`prefers-reduced-motion`)           | Marquee, Carousel(`internal/slides`)                                 |
 | [`use-resize-observer.ts`](#use-resize-observerts)       | 요소 크기가 바뀔 때마다 부르는 callback              | Chart, Scheduler, Toaster, Editor 의 끌기 손잡이                     |
 
@@ -123,8 +123,8 @@ useInternalFormReset(controlRef, () => {
 | 이름                                        | 쓰는 곳                                                                                                        |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `useInteractiveProps`                       | Button 의 `use-button.ts`. Button, IconButton, Toggle, IconToggle, FloatingButton 이 이 hook 을 거친다         |
-| `useInteractive`                            | Checkbox, Radio, Chip, Accordion.Trigger, [`internal/lib/surface.ts`](../internal/README.md#libsurfacets)(Card, Item) |
-| `interactiveDataProps`                      | Chip, Accordion.Trigger, `internal/lib/surface.ts`, `useInteractiveProps`                                          |
+| `useInteractive`                            | Checkbox, Radio, Chip, Accordion.Trigger, [`internal/hooks/use-surface.ts`](../internal/README.md#hooksuse-surfacets)(Card, Item) |
+| `interactiveDataProps`                      | Chip, Accordion.Trigger, `internal/hooks/use-surface.ts`, `useInteractiveProps`                                          |
 | `WithInteractiveValues`, `InteractiveState` | Button, IconButton, Toggle, IconToggle, FloatingButton 의 Props                                                |
 | `INTERACTIVE_STATE_DEFAULTS`                | InteractiveState foundation 스토리                                                                             |
 
@@ -213,7 +213,7 @@ const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
 ### 쓰는 법
 
 ```ts
-// internal/overlay/lib/sheet-viewport.ts
+// internal/overlay/hooks/use-drawer-presentation.ts
 return useInternalMediaQuery(mobileVariant === 'drawer' ? SMALL_SCREEN : null);
 ```
 

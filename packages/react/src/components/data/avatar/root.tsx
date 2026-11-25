@@ -7,7 +7,7 @@ import { useInternalAvatarNameWarning } from './hooks/use-avatar-name-warning';
 import { AvatarFallback } from './parts/fallback';
 import { AvatarImage, type AvatarImageProps } from './parts/image';
 import { avatarStyle } from './style';
-import { useInternalImageStatus } from '../../../internal/lib/image-status';
+import { useInternalImageStatus } from '../../../internal/hooks/use-image-status';
 import { resolveState } from '../../../internal/lib/state-props';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 

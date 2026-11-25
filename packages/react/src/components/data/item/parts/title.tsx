@@ -2,7 +2,7 @@
 
 import { useInternalItemContext } from '../context';
 import { Part, type ItemPartProps } from './part';
-import { useInternalRegisteredId } from '../../../../internal/lib/surface';
+import { useInternalRegisteredId } from '../../../../internal/hooks/use-registered-id';
 import { titleContent } from '../../../../internal/parts/surface-trigger';
 import { cn } from '../../../../utils';
 

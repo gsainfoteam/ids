@@ -6,7 +6,7 @@ import { getEventCoordinates } from '@dnd-kit/utilities';
 
 import { useInternalEditorBlockHandleLeave } from './use-editor-block-handle-leave';
 import { useInternalEditorBlockHandlePlace } from './use-editor-block-handle-place';
-import { useInternalDragSensors } from '../../../../internal/lib/drag-sensors';
+import { useInternalDragSensors } from '../../../../internal/hooks/use-drag-sensors';
 import { swallowTheClickThatEndsADrag } from '../../../../internal/lib/drag-surface';
 import { blocksAvailableIn, turnsIntoOtherBlocks } from '../blocks/catalog';
 import { keepTheCaretInTheTable, moveBlock, selectBlock } from '../drag-handle/commands';

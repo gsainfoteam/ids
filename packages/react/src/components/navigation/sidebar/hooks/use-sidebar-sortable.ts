@@ -6,7 +6,7 @@ import { getEventCoordinates } from '@dnd-kit/utilities';
 import { clamp, minBy } from 'es-toolkit';
 
 import { useInternalSidebarMovedItemReveal } from './use-sidebar-moved-item-reveal';
-import { useInternalDragSensors } from '../../../../internal/lib/drag-sensors';
+import { useInternalDragSensors } from '../../../../internal/hooks/use-drag-sensors';
 import { swallowTheClickThatEndsADrag } from '../../../../internal/lib/drag-surface';
 import { useInternalTranslate } from '../../../../internal/translate';
 import { ITEM_SELECTOR, sameDrop, type PendingMove } from '../lib/sortable-drop';

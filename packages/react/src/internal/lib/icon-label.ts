@@ -1,9 +1,7 @@
-'use client';
-
-import { Children, isValidElement, useEffect, type ReactNode } from 'react';
+import { Children, isValidElement, type ReactNode } from 'react';
 
 import { elementTypeOf } from '../../utils';
-import { isDevelopment, warnOnce } from '../../utils/dev';
+import { warnOnce } from '../../utils/dev';
 
 export type IconLabel = {
   label: string;
@@ -79,7 +77,7 @@ export function iconLabel(node: ReactNode): IconLabel | undefined {
 
 const MINIFIED_ICON_NAMES = 'icon-label:minified-function-names';
 
-function warnFunctionNameLabel(component: string, label: string) {
+export function warnFunctionNameLabel(component: string, label: string) {
   warnOnce(
     `[IDS] ${component}: the accessible name "${label}" comes from the icon's function name. ` +
       'Production minifiers rename functions, so the name is gone in a production build. ' +
@@ -88,33 +86,10 @@ function warnFunctionNameLabel(component: string, label: string) {
   );
 }
 
-type NameProps = { 'aria-label'?: unknown; 'aria-labelledby'?: unknown; title?: unknown };
+export type NameProps = { 'aria-label'?: unknown; 'aria-labelledby'?: unknown; title?: unknown };
 
-function hasName(props: NameProps | undefined) {
+export function hasName(props: NameProps | undefined) {
   if (!props) return false;
   const text = (value: unknown) => typeof value === 'string' && value.trim() !== '';
   return text(props['aria-label']) || props['aria-labelledby'] != null || text(props.title);
-}
-
-export function useInternalIconLabel(
-  component: string,
-  icon: ReactNode | undefined,
-  ...names: Array<NameProps | undefined>
-) {
-  const notIconOnlyRightNow = icon === undefined;
-  const needsNoLabel = notIconOnlyRightNow || names.some(hasName);
-  const derived = needsNoLabel ? undefined : iconLabel(icon);
-  const label = derived?.label;
-  const fromFunction = derived?.source === 'function';
-
-  useEffect(() => {
-    if (!isDevelopment || needsNoLabel) return;
-    if (label === undefined)
-      console.warn(
-        `[IDS] ${component}: no accessible name could be found for this icon. Pass aria-label, or give the icon component a displayName.`,
-      );
-    else if (fromFunction) warnFunctionNameLabel(component, label);
-  }, [component, needsNoLabel, label, fromFunction]);
-
-  return label;
 }

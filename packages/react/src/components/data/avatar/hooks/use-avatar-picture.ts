@@ -2,11 +2,10 @@
 
 import { useCallback, useRef, type Ref, type RefCallback } from 'react';
 
-import {
-  useInternalImageSettledBeforeMount,
-  type ImageStatus,
-} from '../../../../internal/lib/image-status';
+import { useInternalImageSettledBeforeMount } from '../../../../internal/hooks/use-image-settled-before-mount';
 import { mergeRefs } from '../../../../utils';
+
+import type { ImageStatus } from '../../../../internal/lib/image-status';
 
 export function useInternalAvatarPicture(
   current: string | undefined,
