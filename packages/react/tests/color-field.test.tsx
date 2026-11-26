@@ -574,3 +574,19 @@ test('react-hook-form value mode: validation focuses the trigger, selection, res
   await expect.poll(() => results).toHaveLength(2);
   expect(results.at(-1)!.color).toBeUndefined();
 });
+
+test('an invalid Field marks the trigger, not the picker sliders in its popup', async () => {
+  await render(
+    <Field invalid>
+      <Field.Label>색</Field.Label>
+      <ColorField defaultValue="#3B82F6">{picker({ alpha: true })}</ColorField>
+    </Field>,
+  );
+  await expect.element(trigger()).toHaveAttribute('aria-invalid', 'true');
+  await userEvent.click(trigger());
+  await expect.element(slider('색조')).not.toHaveAttribute('aria-invalid', 'true');
+  await expect.element(slider('투명도')).not.toHaveAttribute('aria-invalid', 'true');
+  expect(document.querySelector('[data-color-picker-hue]')!.hasAttribute('data-invalid')).toBe(
+    false,
+  );
+});

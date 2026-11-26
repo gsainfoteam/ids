@@ -34,6 +34,7 @@ export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.Slid
       value={Math.round(color.a * 100)}
       onValueChange={(percent) => c.picker.actions.setChannel('alpha', percent)}
       aria-label={props['aria-label'] ?? t('colorPicker.alpha')}
+      aria-invalid={props['aria-invalid'] ?? false}
       size={c.size}
       disabled={c.state.disabled}
       readOnly={c.state.readOnly}

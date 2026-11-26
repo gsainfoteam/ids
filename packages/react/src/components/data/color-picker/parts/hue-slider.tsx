@@ -27,6 +27,7 @@ export function ColorPickerHueSlider({ className, ...props }: ColorPicker.Slider
       value={Math.round(color.h)}
       onValueChange={(hue) => c.picker.actions.setChannel('hue', hue)}
       aria-label={props['aria-label'] ?? t('colorPicker.hue')}
+      aria-invalid={props['aria-invalid'] ?? false}
       size={c.size}
       disabled={c.state.disabled}
       readOnly={c.state.readOnly}
