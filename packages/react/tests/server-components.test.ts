@@ -273,6 +273,19 @@ const renderEditorFromAServerComponent = renderEntryFromAServerComponent({
   )`,
 });
 
+const renderBlockEditorFromAServerComponent = renderEntryFromAServerComponent({
+  entry: 'editor',
+  component: 'BlockEditor',
+  parts: ['Content', 'Bold', 'Link', 'TextAlign', 'Separator', 'BubbleMenu', 'Count', 'Style'],
+  page: `h(
+    BlockEditor,
+    { name: 'body', defaultValue: '<p>Hello</p>' },
+    h(BlockEditor.Content),
+    h(BlockEditor.BubbleMenu, null, h(BlockEditor.Bold), h(BlockEditor.Link)),
+    h(BlockEditor.Count),
+  )`,
+});
+
 const renderRichTextFromAServerComponent = renderEntryFromAServerComponent({
   entry: 'rich-text',
   component: 'RichText',
@@ -312,6 +325,25 @@ test(
       'EditorTextAlign',
       'EditorContentPart',
       'EditorCount',
+    ])
+      expect(rendered.stdout).toContain(`"${reference}"`);
+  },
+  coldNodeStartOnABusyRunner,
+);
+
+test(
+  'a Server Component renders BlockEditor and its parts from the editor entry',
+  () => {
+    const rendered = runNode(['react-server'], renderBlockEditorFromAServerComponent);
+    expect(rendered.status, rendered.stderr).toBe(0);
+
+    for (const reference of [
+      'BlockEditorRoot',
+      'BlockEditorContent',
+      'BlockEditorBubbleMenu',
+      'BlockEditorBold',
+      'BlockEditorLink',
+      'BlockEditorCount',
     ])
       expect(rendered.stdout).toContain(`"${reference}"`);
   },

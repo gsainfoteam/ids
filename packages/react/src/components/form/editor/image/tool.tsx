@@ -30,7 +30,7 @@ const IMAGE = {
 
 function warnThereIsNoUpload() {
   warnOnce(
-    '`<Editor.Image>` renders nothing without `onImageUpload` on `<Editor>`, since the image would have nowhere to go.',
+    '`<Editor.Image>` renders nothing without `imageUpload` in the `useEditor()` that `<Editor>` takes, since the image would have nowhere to go.',
   );
 }
 

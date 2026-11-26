@@ -36,7 +36,10 @@ export const EditorContext = createContext<EditorContextValue | null>(null);
 
 export function useInternalEditorContext(part: string) {
   const context = use(EditorContext);
-  invariant(context != null, `\`<${part}>\` must be used inside \`<Editor>\`.`);
+  invariant(
+    context != null,
+    `\`<${part}>\` must be used inside \`<Editor>\` or \`<BlockEditor>\`.`,
+  );
   return context;
 }
 

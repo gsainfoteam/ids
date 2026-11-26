@@ -672,11 +672,12 @@ Recharts 차트를 테마의 브랜드 계열에서 고른 계열 색, 툴팁, �
 `@gsainfoteam/ids-react/chart` 에서 가져오고, `recharts` 와 `react-is` 는 차트를 쓰는 앱만 설치합니다.
 [Chart API](./src/components/data/chart/README.md).
 
-## Editor
+## Editor 와 BlockEditor
 
 Tiptap 3 위의 서식 편집기입니다. 툴바, 버블 메뉴, 링크 Popover, 글자 수를 IDS 부품으로 그리고, 값은 HTML, 마크다운, JSON 으로 받습니다.
-`@gsainfoteam/ids-react/editor` 에서 가져오고, Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다. Tiptap 은 Editor 가 마운트될 때 `import()` 로 불러옵니다.
-[Editor API](./src/components/form/editor/README.md).
+`Editor` 는 툴바로 서식을 넣고, `BlockEditor` 는 툴바 없이 `/` 메뉴와 블록 손잡이로 블록을 넣고 옮깁니다. 그림 올리기와 멘션은 `useEditor()` 로 켭니다.
+`@gsainfoteam/ids-react/editor` 에서 가져오고, 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다. Tiptap 은 편집기가 마운트될 때 `import()` 로 불러옵니다.
+[Editor API](./src/components/form/editor/README.md), [BlockEditor API](./src/components/form/block-editor/README.md).
 
 ## RichText
 
