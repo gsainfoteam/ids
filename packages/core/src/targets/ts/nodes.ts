@@ -6,7 +6,8 @@ const { factory } = ts;
 
 export type Expression = ts.Expression;
 
-export const string = (value: string) => factory.createStringLiteral(value, true);
+export const string = (value: string) =>
+  ts.setEmitFlags(factory.createStringLiteral(value, true), ts.EmitFlags.NoAsciiEscaping);
 
 export const number = (value: number): Expression =>
   value < 0
@@ -64,6 +65,24 @@ export const exportUnion = (name: string, values: readonly string[]) =>
     factory.createUnionTypeNode(
       values.map((value) => factory.createLiteralTypeNode(string(value))),
     ),
+  );
+
+export const call = (callee: string, args: readonly Expression[]) =>
+  factory.createCallExpression(factory.createIdentifier(callee), undefined, [...args]);
+
+export const importNamed = (names: readonly string[], from: string) =>
+  factory.createImportDeclaration(
+    undefined,
+    factory.createImportClause(
+      false,
+      undefined,
+      factory.createNamedImports(
+        names.map((name) =>
+          factory.createImportSpecifier(false, undefined, factory.createIdentifier(name)),
+        ),
+      ),
+    ),
+    string(from),
   );
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });

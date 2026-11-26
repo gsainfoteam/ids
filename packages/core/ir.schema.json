@@ -89,6 +89,16 @@
                 "type": "string",
                 "minLength": 1
               }
+            },
+            "modules": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [
@@ -117,6 +127,16 @@
                 "type": "string",
                 "minLength": 1
               }
+            },
+            "modules": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [
@@ -137,6 +157,16 @@
               }
             },
             "outputs": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "modules": {
               "type": "object",
               "propertyNames": {
                 "type": "string"
@@ -1304,6 +1334,198 @@
         "typographyOrder",
         "scale"
       ]
+    },
+    "messages": {
+      "type": "object",
+      "properties": {
+        "fallback": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tag": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "catalog": {
+                "$ref": "#/$defs/Name"
+              },
+              "subtags": {
+                "type": "object",
+                "properties": {
+                  "language": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "script": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "region": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "language"
+                ]
+              }
+            },
+            "required": [
+              "language",
+              "tag",
+              "name",
+              "catalog",
+              "subtags"
+            ]
+          }
+        },
+        "catalogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "name",
+              "groups"
+            ]
+          }
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "name": {
+                "$ref": "#/$defs/Name"
+              },
+              "parameters": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "type": {
+                      "enum": [
+                        "string",
+                        "number"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              },
+              "texts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "language": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "const": "text"
+                              },
+                              "text": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "text"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "const": "argument"
+                              },
+                              "argument": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "argument"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "language",
+                    "parts"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "path",
+              "name",
+              "parameters",
+              "texts"
+            ]
+          }
+        }
+      },
+      "required": [
+        "fallback",
+        "locales",
+        "catalogs",
+        "entries"
+      ]
     }
   },
   "required": [
@@ -1325,7 +1547,8 @@
     "typography",
     "fonts",
     "paletteModel",
-    "css"
+    "css",
+    "messages"
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {

@@ -31,3 +31,49 @@ Expression strings(Iterable<String> values) =>
     literalList(values.map(literalString), refer('String'));
 
 final colorType = refer('Color', painting);
+
+const _quote = "'";
+const _interpolation = r'$';
+const _escapes = {
+  r'\': r'\\',
+  _quote: r"\'",
+  _interpolation: r'\$',
+  '\n': r'\n',
+  '\r': r'\r',
+  '\t': r'\t',
+};
+
+final _identifierStart = RegExp(r'^[A-Za-z0-9_]');
+
+String _escaped(String text) =>
+    text.split('').map((character) => _escapes[character] ?? character).join();
+
+bool _textRunsOn(List<Object> parts, int index) =>
+    index + 1 < parts.length &&
+    parts[index + 1] is String &&
+    _identifierStart.hasMatch(parts[index + 1] as String);
+
+String _sourceOf(Expression expression) =>
+    expression.accept(DartEmitter()).toString();
+
+Expression interpolated(List<Object> parts) {
+  final source = StringBuffer(_quote);
+  for (final (index, part) in parts.indexed) {
+    switch (part) {
+      case final String text:
+        source.write(_escaped(text));
+      case Reference(:final symbol?, url: null) when !_textRunsOn(parts, index):
+        source.write('$_interpolation$symbol');
+      case final Expression expression:
+        source.write('$_interpolation{${_sourceOf(expression)}}');
+      default:
+        throw ArgumentError.value(
+          part,
+          'parts',
+          'is not text or an expression',
+        );
+    }
+  }
+  source.write(_quote);
+  return CodeExpression(Code(source.toString()));
+}

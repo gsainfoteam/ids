@@ -5,7 +5,9 @@ import { parse as parseYaml } from 'yaml';
 
 import {
   CONFIG_FILES,
+  MessageFileSchema,
   NpmManifestSchema,
+  type MessageFile,
   PubManifestSchema,
   type PubManifest,
   type TargetsConfig,
@@ -93,6 +95,24 @@ function inSourceOrder(
   return Object.fromEntries(ordered.map((token) => [token.id, token]));
 }
 
+export const MESSAGES_DIRECTORY = 'messages/';
+
+const MESSAGE_FILE = /\.json$/;
+
+export interface MessageSource extends MessageFile {
+  file: string;
+}
+
+export function loadMessages(root: URL): MessageSource[] {
+  return readdirSync(new URL(MESSAGES_DIRECTORY, root))
+    .filter((file) => MESSAGE_FILE.test(file))
+    .sort()
+    .map((name) => {
+      const file = MESSAGES_DIRECTORY + name;
+      return { file, ...validated(file, MessageFileSchema, readJson(root, file)) };
+    });
+}
+
 export interface Manifests {
   css: { name: string };
   ts: { name: string };
@@ -112,9 +132,15 @@ export interface Sources {
   config: Config;
   tokens: TokenNormalizedSet;
   manifests: Manifests;
+  messages: MessageSource[];
 }
 
 export async function loadSources(root: URL): Promise<Sources> {
   const config = loadConfig(root);
-  return { config, tokens: await loadTokens(root), manifests: loadManifests(root, config.targets) };
+  return {
+    config,
+    tokens: await loadTokens(root),
+    manifests: loadManifests(root, config.targets),
+    messages: loadMessages(root),
+  };
 }

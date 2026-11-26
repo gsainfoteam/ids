@@ -1,10 +1,8 @@
-import 'package:ids_flutter/ids.dart';
+// GENERATED — do not edit manually
 
-const sampleArguments = <String, String>{
-  'number': '7',
-  'string': 'x',
-};
+import 'package:ids_flutter/messages/ids_messages.dart';
 
+const sampleArguments = <String, String>{'number': '7', 'string': 'x'};
 final messageReaders = <String, String Function(IdsMessagesBase)>{
   'avatarGroup.overflow': (messages) => messages.avatarGroupOverflow(count: 7),
   'breadcrumb.more': (messages) => messages.breadcrumbMore,
@@ -13,7 +11,8 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'carousel.roleDescription': (messages) => messages.carouselRoleDescription,
   'colorPicker.alpha': (messages) => messages.colorPickerAlpha,
   'colorPicker.area': (messages) => messages.colorPickerArea,
-  'colorPicker.areaValue': (messages) => messages.colorPickerAreaValue(saturation: 'x', brightness: 'x'),
+  'colorPicker.areaValue': (messages) =>
+      messages.colorPickerAreaValue(saturation: 'x', brightness: 'x'),
   'colorPicker.brightness': (messages) => messages.colorPickerBrightness,
   'colorPicker.eyeDropper': (messages) => messages.colorPickerEyeDropper,
   'colorPicker.hue': (messages) => messages.colorPickerHue,
@@ -49,7 +48,8 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'dataTable.resize': (messages) => messages.dataTableResize(column: 'x'),
   'dataTable.selectAll': (messages) => messages.dataTableSelectAll,
   'dataTable.selectRow': (messages) => messages.dataTableSelectRow(label: 'x'),
-  'dataTable.selectRowNumber': (messages) => messages.dataTableSelectRowNumber(number: 7),
+  'dataTable.selectRowNumber': (messages) =>
+      messages.dataTableSelectRowNumber(number: 7),
   'dataTable.selected': (messages) => messages.dataTableSelected(count: 7),
   'dateField.open': (messages) => messages.dateFieldOpen,
   'editor.alignCenter': (messages) => messages.editorAlignCenter,
@@ -111,8 +111,10 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'editor.subscript': (messages) => messages.editorSubscript,
   'editor.superscript': (messages) => messages.editorSuperscript,
   'editor.table': (messages) => messages.editorTable,
-  'editor.tableAddColumnAfter': (messages) => messages.editorTableAddColumnAfter,
-  'editor.tableAddColumnBefore': (messages) => messages.editorTableAddColumnBefore,
+  'editor.tableAddColumnAfter': (messages) =>
+      messages.editorTableAddColumnAfter,
+  'editor.tableAddColumnBefore': (messages) =>
+      messages.editorTableAddColumnBefore,
   'editor.tableAddRowAfter': (messages) => messages.editorTableAddRowAfter,
   'editor.tableAddRowBefore': (messages) => messages.editorTableAddRowBefore,
   'editor.tableDelete': (messages) => messages.editorTableDelete,
@@ -161,8 +163,10 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'message.unread': (messages) => messages.messageUnread,
   'message.unreadBy': (messages) => messages.messageUnreadBy(count: 7),
   'messageScroller.jump': (messages) => messages.messageScrollerJump,
-  'messageScroller.jumpUnseen': (messages) => messages.messageScrollerJumpUnseen(count: 7),
-  'messageScroller.unseen': (messages) => messages.messageScrollerUnseen(count: 7),
+  'messageScroller.jumpUnseen': (messages) =>
+      messages.messageScrollerJumpUnseen(count: 7),
+  'messageScroller.unseen': (messages) =>
+      messages.messageScrollerUnseen(count: 7),
   'numberField.decrement': (messages) => messages.numberFieldDecrement,
   'numberField.increment': (messages) => messages.numberFieldIncrement,
   'pagination.first': (messages) => messages.paginationFirst,
@@ -176,8 +180,10 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'promptInput.stop': (messages) => messages.promptInputStop,
   'questionnaire.navigation': (messages) => messages.questionnaireNavigation,
   'questionnaire.progress': (messages) => messages.questionnaireProgress,
-  'questionnaire.step': (messages) => messages.questionnaireStep(current: 7, total: 7),
-  'rating.valueLabel': (messages) => messages.ratingValueLabel(value: 7, max: 7),
+  'questionnaire.step': (messages) =>
+      messages.questionnaireStep(current: 7, total: 7),
+  'rating.valueLabel': (messages) =>
+      messages.ratingValueLabel(max: 7, value: 7),
   'scheduler.addDay': (messages) => messages.schedulerAddDay,
   'scheduler.allDay': (messages) => messages.schedulerAllDay,
   'scheduler.dayCount': (messages) => messages.schedulerDayCount,
@@ -185,7 +191,8 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'scheduler.drag.hint': (messages) => messages.schedulerDragHint,
   'scheduler.drag.monthHint': (messages) => messages.schedulerDragMonthHint,
   'scheduler.goToDate': (messages) => messages.schedulerGoToDate,
-  'scheduler.moreLabel': (messages) => messages.schedulerMoreLabel(date: 'x', count: 7),
+  'scheduler.moreLabel': (messages) =>
+      messages.schedulerMoreLabel(date: 'x', count: 7),
   'scheduler.navigation': (messages) => messages.schedulerNavigation,
   'scheduler.removeDay': (messages) => messages.schedulerRemoveDay,
   'scheduler.resize': (messages) => messages.schedulerResize(event: 'x'),
@@ -199,7 +206,7 @@ final messageReaders = <String, String Function(IdsMessagesBase)>{
   'slider.end': (messages) => messages.sliderEnd,
   'slider.start': (messages) => messages.sliderStart,
   'slides.roleDescription': (messages) => messages.slidesRoleDescription,
-  'slides.slide': (messages) => messages.slidesSlide(index: 7, count: 7),
+  'slides.slide': (messages) => messages.slidesSlide(count: 7, index: 7),
   'stepper.completed': (messages) => messages.stepperCompleted,
   'stepper.error': (messages) => messages.stepperError,
   'telField.country': (messages) => messages.telFieldCountry,

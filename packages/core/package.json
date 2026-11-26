@@ -4,13 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "codegen": "tsx src/codegen.ts && node messages.build.mjs",
+    "codegen": "tsx src/codegen.ts",
     "typecheck": "tsc6 -p .",
-    "test": "vitest run && node --test dart-messages.test.mjs",
+    "test": "vitest run",
     "lint": "eslint ."
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@formatjs/icu-messageformat-parser": "^3.5.23",
     "@tailwindcss/node": "4.3.3",
     "@terrazzo/parser": "^2.10.0",
     "@types/node": "^22.19.19",

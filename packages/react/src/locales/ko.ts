@@ -1,280 +1,282 @@
+// GENERATED — do not edit manually
+
 import { defineIdsLocale } from '../internal/locale';
 
-// prettier-ignore
 export const ko = defineIdsLocale({
   language: 'ko',
   tag: 'ko-KR',
   messages: {
-    "avatarGroup": {
-      "overflow": "외 {count}명"
+    avatarGroup: {
+      overflow: '외 {count}명',
     },
-    "breadcrumb": {
-      "more": "숨은 경로 보기"
+    breadcrumb: {
+      more: '숨은 경로 보기',
     },
-    "bubble": {
-      "reactions": "반응"
+    bubble: {
+      reactions: '반응',
     },
-    "carousel": {
-      "indicator": "{index}번째 슬라이드로",
-      "roleDescription": "캐러셀"
+    carousel: {
+      indicator: '{index}번째 슬라이드로',
+      roleDescription: '캐러셀',
     },
-    "colorPicker": {
-      "alpha": "투명도",
-      "area": "채도와 밝기",
-      "areaValue": "채도 {saturation}, 밝기 {brightness}",
-      "brightness": "밝기",
-      "eyeDropper": "화면에서 색 고르기",
-      "hue": "색조",
-      "input": "색상 값",
-      "label": "색상 선택",
-      "saturation": "채도",
-      "swatches": "팔레트",
-      "twoD": "2D 슬라이더"
+    colorPicker: {
+      alpha: '투명도',
+      area: '채도와 밝기',
+      areaValue: '채도 {saturation}, 밝기 {brightness}',
+      brightness: '밝기',
+      eyeDropper: '화면에서 색 고르기',
+      hue: '색조',
+      input: '색상 값',
+      label: '색상 선택',
+      saturation: '채도',
+      swatches: '팔레트',
+      twoD: '2D 슬라이더',
     },
-    "common": {
-      "clear": "지우기",
-      "close": "닫기",
-      "collapse": "접기",
-      "copied": "복사했습니다",
-      "copy": "복사",
-      "drag": {
-        "cancel": "제자리에 두었습니다: {item}",
-        "end": "옮겼습니다: {item}",
-        "start": "집었습니다: {item}"
+    common: {
+      clear: '지우기',
+      close: '닫기',
+      collapse: '접기',
+      copied: '복사했습니다',
+      copy: '복사',
+      drag: {
+        cancel: '제자리에 두었습니다: {item}',
+        end: '옮겼습니다: {item}',
+        start: '집었습니다: {item}',
       },
-      "expand": "펼치기",
-      "invalid": "올바른 값이 아닙니다.",
-      "loading": "불러오는 중",
-      "next": "다음",
-      "options": "옵션",
-      "pause": "일시 정지",
-      "previous": "이전",
-      "remove": "삭제",
-      "removeItem": "{label} 삭제",
-      "resize": "크기 조절",
-      "search": "검색",
-      "sending": "보내는 중",
-      "status": {
-        "danger": "위험",
-        "info": "정보",
-        "success": "성공",
-        "warning": "경고"
-      }
-    },
-    "dataTable": {
-      "resize": "{column} 열 너비",
-      "selectAll": "모든 행 선택",
-      "selectRow": "{label} 선택",
-      "selectRowNumber": "{number}번째 행 선택",
-      "selected": "{count}개 선택됨"
-    },
-    "dateField": {
-      "open": "달력 열기"
-    },
-    "editor": {
-      "alignCenter": "가운데 정렬",
-      "alignJustify": "양쪽 정렬",
-      "alignLeft": "왼쪽 정렬",
-      "alignRight": "오른쪽 정렬",
-      "blockDuplicate": "복제",
-      "blockHandle": "블록 메뉴",
-      "blockInsertBelow": "아래에 블록 넣기",
-      "blockTurnInto": "바꾸기",
-      "blockType": "문단 모양",
-      "blockquote": "인용",
-      "bold": "굵게",
-      "bubbleMenu": "선택한 글 서식",
-      "bulletList": "글머리 기호 목록",
-      "callout": "콜아웃",
-      "calloutKind": "콜아웃 종류",
-      "calloutRemove": "콜아웃 해제",
-      "code": "코드",
-      "codeBlock": "코드 블록",
-      "codeLanguage": "코드 언어",
-      "codeLanguageSearch": "언어 찾기",
-      "codePlainText": "일반 텍스트",
-      "color": "색",
-      "colorDefault": "기본",
-      "colorNone": "없음",
-      "colorPrimary": "강조 1",
-      "colorSecondary": "강조 2",
-      "colorTertiary": "강조 3",
-      "content": "본문",
-      "details": "토글",
-      "detailsSummary": "제목",
-      "detailsToggle": "내용 펼치기",
-      "heading": "제목 {level}",
-      "highlight": "형광펜",
-      "highlightColor": "형광펜 색",
-      "horizontalRule": "구분선",
-      "image": "그림",
-      "imageAlt": "대체 텍스트",
-      "imageInsert": "넣기",
-      "imagePickFiles": "파일에서 고르기",
-      "imageUploadFailed": "그림을 올리지 못했습니다",
-      "imageUploading": "그림을 올리는 중입니다",
-      "imageUrl": "그림 주소",
-      "imageUrlInvalid": "http 나 https 로 시작하는 주소를 넣어 주세요",
-      "italic": "기울임",
-      "link": "링크",
-      "linkApply": "적용",
-      "linkRemove": "링크 지우기",
-      "linkUrl": "링크 주소",
-      "mentionEmpty": "맞는 사람이 없습니다",
-      "mentionMenu": "멘션",
-      "mentionSearching": "찾는 중…",
-      "orderedList": "번호 목록",
-      "paragraph": "문단",
-      "slashMenu": "블록 넣기",
-      "slashMenuEmpty": "맞는 블록이 없습니다",
-      "strike": "취소선",
-      "subscript": "아래 첨자",
-      "superscript": "위 첨자",
-      "table": "표",
-      "tableAddColumnAfter": "오른쪽에 열 추가",
-      "tableAddColumnBefore": "왼쪽에 열 추가",
-      "tableAddRowAfter": "아래에 행 추가",
-      "tableAddRowBefore": "위에 행 추가",
-      "tableDelete": "표 지우기",
-      "tableDeleteColumn": "열 지우기",
-      "tableDeleteRow": "행 지우기",
-      "tableHeaderRow": "머리글 행",
-      "tableInsert": "표 넣기",
-      "tableMergeCells": "셀 합치기",
-      "tableSize": "{rows}행 {cols}열",
-      "tableSplitCell": "셀 나누기",
-      "taskItem": "할 일: {text}",
-      "taskItemEmpty": "빈 할 일",
-      "taskList": "할 일 목록",
-      "textAlign": "정렬",
-      "textColor": "글자 색",
-      "toolbar": "서식",
-      "underline": "밑줄"
-    },
-    "fileField": {
-      "count": "파일 {count}개",
-      "list": "고른 파일"
-    },
-    "image": {
-      "download": "내려받기",
-      "photos": "사진",
-      "preview": "{alt} 크게 보기",
-      "previewUntitled": "이미지 크게 보기",
-      "share": "공유하기",
-      "thumbnails": "사진 목록",
-      "viewer": "사진 보기",
-      "zoomIn": "확대",
-      "zoomOut": "축소",
-      "zoomReset": "{percent}, 화면에 맞추기"
-    },
-    "kbd": {
-      "command": "커맨드",
-      "control": "컨트롤",
-      "down": "아래쪽 화살표",
-      "forwardDelete": "포워드 딜리트",
-      "left": "왼쪽 화살표",
-      "macDelete": "딜리트",
-      "option": "옵션",
-      "return": "리턴",
-      "right": "오른쪽 화살표",
-      "shift": "시프트",
-      "up": "위쪽 화살표"
-    },
-    "link": {
-      "newTab": "(새 탭에서 열림)"
-    },
-    "menu": {
-      "command": "명령"
-    },
-    "message": {
-      "actions": "메시지 동작",
-      "error": "보내지 못했어요",
-      "retry": "다시 보내기",
-      "unread": "안 읽음",
-      "unreadBy": "{count}명 안 읽음"
-    },
-    "messageScroller": {
-      "jump": "맨 아래로",
-      "jumpUnseen": "맨 아래로, 새 메시지 {count}개",
-      "unseen": "새 메시지 {count}개"
-    },
-    "numberField": {
-      "decrement": "값 줄이기",
-      "increment": "값 늘리기"
-    },
-    "pagination": {
-      "first": "첫 페이지",
-      "last": "마지막 페이지",
-      "page": "{page}페이지"
-    },
-    "passwordField": {
-      "show": "비밀번호 표시"
-    },
-    "promptInput": {
-      "actions": "더하기",
-      "attach": "파일 첨부",
-      "attachments": "첨부한 파일",
-      "send": "보내기",
-      "stop": "멈추기"
-    },
-    "questionnaire": {
-      "navigation": "질문 이동",
-      "progress": "질문 진행",
-      "step": "질문 {current} / {total}"
-    },
-    "rating": {
-      "valueLabel": "{max}점 만점에 {value}점"
-    },
-    "scheduler": {
-      "addDay": "하루 늘리기",
-      "allDay": "종일",
-      "dayCount": "보여 줄 날 수",
-      "drag": {
-        "at": "{time} 시작",
-        "hint": "일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.",
-        "monthHint": "일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다."
+      expand: '펼치기',
+      invalid: '올바른 값이 아닙니다.',
+      loading: '불러오는 중',
+      next: '다음',
+      options: '옵션',
+      pause: '일시 정지',
+      previous: '이전',
+      remove: '삭제',
+      removeItem: '{label} 삭제',
+      resize: '크기 조절',
+      search: '검색',
+      sending: '보내는 중',
+      status: {
+        danger: '위험',
+        info: '정보',
+        success: '성공',
+        warning: '경고',
       },
-      "goToDate": "날짜로 이동",
-      "moreLabel": "{date} 일정 {count}개 더 보기",
-      "navigation": "날짜 이동",
-      "removeDay": "하루 줄이기",
-      "resize": "{event} 끝 시각",
-      "view": "보기"
     },
-    "sidebar": {
-      "drag": {
-        "after": "{target} 뒤",
-        "before": "{target} 앞",
-        "hint": "Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.",
-        "inside": "{target} 안",
-        "origin": "원래 자리"
+    dataTable: {
+      resize: '{column} 열 너비',
+      selectAll: '모든 행 선택',
+      selectRow: '{label} 선택',
+      selectRowNumber: '{number}번째 행 선택',
+      selected: '{count}개 선택됨',
+    },
+    dateField: {
+      open: '달력 열기',
+    },
+    editor: {
+      alignCenter: '가운데 정렬',
+      alignJustify: '양쪽 정렬',
+      alignLeft: '왼쪽 정렬',
+      alignRight: '오른쪽 정렬',
+      blockDuplicate: '복제',
+      blockHandle: '블록 메뉴',
+      blockInsertBelow: '아래에 블록 넣기',
+      blockTurnInto: '바꾸기',
+      blockType: '문단 모양',
+      blockquote: '인용',
+      bold: '굵게',
+      bubbleMenu: '선택한 글 서식',
+      bulletList: '글머리 기호 목록',
+      callout: '콜아웃',
+      calloutKind: '콜아웃 종류',
+      calloutRemove: '콜아웃 해제',
+      code: '코드',
+      codeBlock: '코드 블록',
+      codeLanguage: '코드 언어',
+      codeLanguageSearch: '언어 찾기',
+      codePlainText: '일반 텍스트',
+      color: '색',
+      colorDefault: '기본',
+      colorNone: '없음',
+      colorPrimary: '강조 1',
+      colorSecondary: '강조 2',
+      colorTertiary: '강조 3',
+      content: '본문',
+      details: '토글',
+      detailsSummary: '제목',
+      detailsToggle: '내용 펼치기',
+      heading: '제목 {level}',
+      highlight: '형광펜',
+      highlightColor: '형광펜 색',
+      horizontalRule: '구분선',
+      image: '그림',
+      imageAlt: '대체 텍스트',
+      imageInsert: '넣기',
+      imagePickFiles: '파일에서 고르기',
+      imageUploadFailed: '그림을 올리지 못했습니다',
+      imageUploading: '그림을 올리는 중입니다',
+      imageUrl: '그림 주소',
+      imageUrlInvalid: 'http 나 https 로 시작하는 주소를 넣어 주세요',
+      italic: '기울임',
+      link: '링크',
+      linkApply: '적용',
+      linkRemove: '링크 지우기',
+      linkUrl: '링크 주소',
+      mentionEmpty: '맞는 사람이 없습니다',
+      mentionMenu: '멘션',
+      mentionSearching: '찾는 중…',
+      orderedList: '번호 목록',
+      paragraph: '문단',
+      slashMenu: '블록 넣기',
+      slashMenuEmpty: '맞는 블록이 없습니다',
+      strike: '취소선',
+      subscript: '아래 첨자',
+      superscript: '위 첨자',
+      table: '표',
+      tableAddColumnAfter: '오른쪽에 열 추가',
+      tableAddColumnBefore: '왼쪽에 열 추가',
+      tableAddRowAfter: '아래에 행 추가',
+      tableAddRowBefore: '위에 행 추가',
+      tableDelete: '표 지우기',
+      tableDeleteColumn: '열 지우기',
+      tableDeleteRow: '행 지우기',
+      tableHeaderRow: '머리글 행',
+      tableInsert: '표 넣기',
+      tableMergeCells: '셀 합치기',
+      tableSize: '{rows}행 {cols}열',
+      tableSplitCell: '셀 나누기',
+      taskItem: '할 일: {text}',
+      taskItemEmpty: '빈 할 일',
+      taskList: '할 일 목록',
+      textAlign: '정렬',
+      textColor: '글자 색',
+      toolbar: '서식',
+      underline: '밑줄',
+    },
+    fileField: {
+      count: '파일 {count}개',
+      list: '고른 파일',
+    },
+    image: {
+      download: '내려받기',
+      photos: '사진',
+      preview: '{alt} 크게 보기',
+      previewUntitled: '이미지 크게 보기',
+      share: '공유하기',
+      thumbnails: '사진 목록',
+      viewer: '사진 보기',
+      zoomIn: '확대',
+      zoomOut: '축소',
+      zoomReset: '{percent}, 화면에 맞추기',
+    },
+    kbd: {
+      command: '커맨드',
+      control: '컨트롤',
+      down: '아래쪽 화살표',
+      forwardDelete: '포워드 딜리트',
+      left: '왼쪽 화살표',
+      macDelete: '딜리트',
+      option: '옵션',
+      return: '리턴',
+      right: '오른쪽 화살표',
+      shift: '시프트',
+      up: '위쪽 화살표',
+    },
+    link: {
+      newTab: '(새 탭에서 열림)',
+    },
+    menu: {
+      command: '명령',
+    },
+    message: {
+      actions: '메시지 동작',
+      error: '보내지 못했어요',
+      retry: '다시 보내기',
+      unread: '안 읽음',
+      unreadBy: '{count}명 안 읽음',
+    },
+    messageScroller: {
+      jump: '맨 아래로',
+      jumpUnseen: '맨 아래로, 새 메시지 {count}개',
+      unseen: '새 메시지 {count}개',
+    },
+    numberField: {
+      decrement: '값 줄이기',
+      increment: '값 늘리기',
+    },
+    pagination: {
+      first: '첫 페이지',
+      last: '마지막 페이지',
+      page: '{page}페이지',
+    },
+    passwordField: {
+      show: '비밀번호 표시',
+    },
+    promptInput: {
+      actions: '더하기',
+      attach: '파일 첨부',
+      attachments: '첨부한 파일',
+      send: '보내기',
+      stop: '멈추기',
+    },
+    questionnaire: {
+      navigation: '질문 이동',
+      progress: '질문 진행',
+      step: '질문 {current} / {total}',
+    },
+    rating: {
+      valueLabel: '{max}점 만점에 {value}점',
+    },
+    scheduler: {
+      addDay: '하루 늘리기',
+      allDay: '종일',
+      dayCount: '보여 줄 날 수',
+      drag: {
+        at: '{time} 시작',
+        hint: '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.',
+        monthHint:
+          '일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.',
       },
-      "open": "메뉴 열기"
+      goToDate: '날짜로 이동',
+      moreLabel: '{date} 일정 {count}개 더 보기',
+      navigation: '날짜 이동',
+      removeDay: '하루 줄이기',
+      resize: '{event} 끝 시각',
+      view: '보기',
     },
-    "slider": {
-      "end": "끝",
-      "start": "시작"
+    sidebar: {
+      drag: {
+        after: '{target} 뒤',
+        before: '{target} 앞',
+        hint: 'Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.',
+        inside: '{target} 안',
+        origin: '원래 자리',
+      },
+      open: '메뉴 열기',
     },
-    "slides": {
-      "roleDescription": "슬라이드",
-      "slide": "{count}장 중 {index}번째"
+    slider: {
+      end: '끝',
+      start: '시작',
     },
-    "stepper": {
-      "completed": "완료",
-      "error": "오류"
+    slides: {
+      roleDescription: '슬라이드',
+      slide: '{count}장 중 {index}번째',
     },
-    "telField": {
-      "country": "국가"
+    stepper: {
+      completed: '완료',
+      error: '오류',
     },
-    "textArea": {
-      "limitReached": "글자 수 제한에 도달했습니다.",
-      "remaining": "{remaining}자 남았습니다."
+    telField: {
+      country: '국가',
     },
-    "timePicker": {
-      "label": "시간"
+    textArea: {
+      limitReached: '글자 수 제한에 도달했습니다.',
+      remaining: '{remaining}자 남았습니다.',
     },
-    "toast": {
-      "region": "알림"
-    }
+    timePicker: {
+      label: '시간',
+    },
+    toast: {
+      region: '알림',
+    },
   },
 });

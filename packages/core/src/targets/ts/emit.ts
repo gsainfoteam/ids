@@ -3,6 +3,7 @@ import { SourceError } from '../../sources/load.ts';
 import { shadowValue } from '../css/emit.ts';
 import { serialize } from '../css/values.ts';
 import { formatted, outputOf, writeFormatted } from '../output.ts';
+import { messageModules } from './messages.ts';
 import {
   array,
   exportConst,
@@ -150,19 +151,21 @@ const MODULES: Record<Module, (ir: Ir) => string> = {
   },
 };
 
+const modulesOf = (root: URL, ir: Ir) => [
+  ...OUTPUTS.map((module) => [outputOf(root, ir, 'ts', module), MODULES[module](ir)] as const),
+  ...messageModules(root, ir),
+];
+
 export async function tsOutputs(root: URL, ir: Ir) {
   return Object.fromEntries(
     await Promise.all(
-      OUTPUTS.map(async (module) => {
-        const output = outputOf(root, ir, 'ts', module);
-        return [output.path, await formatted(output, MODULES[module](ir))] as const;
-      }),
+      modulesOf(root, ir).map(
+        async ([output, source]) => [output.path, await formatted(output, source)] as const,
+      ),
     ),
   );
 }
 
 export async function writeTs(root: URL, ir: Ir) {
-  await Promise.all(
-    OUTPUTS.map((module) => writeFormatted(outputOf(root, ir, 'ts', module), MODULES[module](ir))),
-  );
+  await Promise.all(modulesOf(root, ir).map(([output, source]) => writeFormatted(output, source)));
 }

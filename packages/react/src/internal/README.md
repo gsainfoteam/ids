@@ -1027,7 +1027,7 @@ formatDefaultMessage('common.removeItem', { label: '사과' }); // '사과 삭�
 ### 알아둘 것
 
 - 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`, `message-arguments.ts`, `src/locales/<language>.ts`를 생성합니다. 언어 사이에 키나 인자가 다르면 codegen 이 실패합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
-- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `messages.build.mjs` 가 그 그룹을 공용 카탈로그에서 빼서 컴포넌트 폴더에 씁니다. `IdsMessageCatalog` 타입과 `src/locales/<language>.ts` 는 두 카탈로그를 모두 담습니다. 카탈로그를 넘기지 않은 `useInternalTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
+- 한 entry 만 쓰는 큰 문구 묶음은 Editor 처럼 따로 생성할 수 있습니다. `packages/core/config/messages.json` 의 `ownCatalogs` 에 그룹을 적으면 codegen 이 그 그룹을 공용 카탈로그에서 빼서 `targets.json` 의 출력 자리에 씁니다. `IdsMessageCatalog` 타입과 `src/locales/<language>.ts` 는 두 카탈로그를 모두 담습니다. 카탈로그를 넘기지 않은 `useInternalTranslate()` 로 그 그룹의 키를 읽으면 `defaultMessage` 가 오류를 던집니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 

@@ -5,3 +5,14 @@ export const STATEMENT_SEPARATOR = '\n\n';
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
 
 export const isIdentifier = (key: string) => IDENTIFIER.test(key);
+
+export const MODULE_EXTENSION = '.ts';
+
+export const runtimeArgument = (name: string) => `{${name}}`;
+
+export const RUNTIME_ARGUMENT_DELIMITERS = /[{}]/;
+
+const RELATIVE = './';
+
+export const relativeSpecifier = (path: string) =>
+  path.startsWith('.') ? path : `${RELATIVE}${path}`;

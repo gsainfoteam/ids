@@ -16,6 +16,7 @@ import {
   type TargetsConfig,
 } from '../sources/config.ts';
 import { SourceError, type Sources } from '../sources/load.ts';
+import { buildMessages } from './messages.ts';
 import { createNaming, type Naming, type Segments } from './naming.ts';
 import {
   IR_VERSION,
@@ -196,6 +197,7 @@ function buildIrUnchecked(sources: Sources): Ir {
     fonts: buildFonts(sources),
     paletteModel: buildPaletteModel(sources, naming),
     css: buildCss(sources, naming, { modes, radius, size, typography }),
+    messages: buildMessages(sources, naming),
   };
 }
 
@@ -776,6 +778,7 @@ type TargetConfig = TargetsConfig['targets'][keyof TargetsConfig['targets']];
 const targetOf = (naming: Naming, target: TargetConfig) => ({
   symbols: naming.symbols(target.symbols),
   outputs: target.outputs,
+  ...('modules' in target ? { modules: target.modules } : {}),
 });
 
 const packageDirectory = (manifest: string) => posix.join(posix.dirname(manifest), posix.sep);

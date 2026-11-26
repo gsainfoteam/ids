@@ -1,3 +1,5 @@
+// GENERATED — do not edit manually
+
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
@@ -5,407 +7,209 @@ abstract class IdsMessagesBase {
   const IdsMessagesBase();
 
   String get language;
-
   String avatarGroupOverflow({required num count});
-
   String get breadcrumbMore;
-
   String get bubbleReactions;
-
   String carouselIndicator({required num index});
-
   String get carouselRoleDescription;
-
   String get colorPickerAlpha;
-
   String get colorPickerArea;
-
-  String colorPickerAreaValue({required String saturation, required String brightness});
-
+  String colorPickerAreaValue({
+    required String saturation,
+    required String brightness,
+  });
   String get colorPickerBrightness;
-
   String get colorPickerEyeDropper;
-
   String get colorPickerHue;
-
   String get colorPickerInput;
-
   String get colorPickerLabel;
-
   String get colorPickerSaturation;
-
   String get colorPickerSwatches;
-
   String get colorPickerTwoD;
-
   String get commonClear;
-
   String get commonClose;
-
   String get commonCollapse;
-
   String get commonCopied;
-
   String get commonCopy;
-
   String commonDragCancel({required String item});
-
   String commonDragEnd({required String item});
-
   String commonDragStart({required String item});
-
   String get commonExpand;
-
   String get commonInvalid;
-
   String get commonLoading;
-
   String get commonNext;
-
   String get commonOptions;
-
   String get commonPause;
-
   String get commonPrevious;
-
   String get commonRemove;
-
   String commonRemoveItem({required String label});
-
   String get commonResize;
-
   String get commonSearch;
-
   String get commonSending;
-
   String get commonStatusDanger;
-
   String get commonStatusInfo;
-
   String get commonStatusSuccess;
-
   String get commonStatusWarning;
-
   String dataTableResize({required String column});
-
   String get dataTableSelectAll;
-
   String dataTableSelectRow({required String label});
-
   String dataTableSelectRowNumber({required num number});
-
   String dataTableSelected({required num count});
-
   String get dateFieldOpen;
-
   String get editorAlignCenter;
-
   String get editorAlignJustify;
-
   String get editorAlignLeft;
-
   String get editorAlignRight;
-
   String get editorBlockDuplicate;
-
   String get editorBlockHandle;
-
   String get editorBlockInsertBelow;
-
   String get editorBlockTurnInto;
-
   String get editorBlockType;
-
   String get editorBlockquote;
-
   String get editorBold;
-
   String get editorBubbleMenu;
-
   String get editorBulletList;
-
   String get editorCallout;
-
   String get editorCalloutKind;
-
   String get editorCalloutRemove;
-
   String get editorCode;
-
   String get editorCodeBlock;
-
   String get editorCodeLanguage;
-
   String get editorCodeLanguageSearch;
-
   String get editorCodePlainText;
-
   String get editorColor;
-
   String get editorColorDefault;
-
   String get editorColorNone;
-
   String get editorColorPrimary;
-
   String get editorColorSecondary;
-
   String get editorColorTertiary;
-
   String get editorContent;
-
   String get editorDetails;
-
   String get editorDetailsSummary;
-
   String get editorDetailsToggle;
-
   String editorHeading({required num level});
-
   String get editorHighlight;
-
   String get editorHighlightColor;
-
   String get editorHorizontalRule;
-
   String get editorImage;
-
   String get editorImageAlt;
-
   String get editorImageInsert;
-
   String get editorImagePickFiles;
-
   String get editorImageUploadFailed;
-
   String get editorImageUploading;
-
   String get editorImageUrl;
-
   String get editorImageUrlInvalid;
-
   String get editorItalic;
-
   String get editorLink;
-
   String get editorLinkApply;
-
   String get editorLinkRemove;
-
   String get editorLinkUrl;
-
   String get editorMentionEmpty;
-
   String get editorMentionMenu;
-
   String get editorMentionSearching;
-
   String get editorOrderedList;
-
   String get editorParagraph;
-
   String get editorSlashMenu;
-
   String get editorSlashMenuEmpty;
-
   String get editorStrike;
-
   String get editorSubscript;
-
   String get editorSuperscript;
-
   String get editorTable;
-
   String get editorTableAddColumnAfter;
-
   String get editorTableAddColumnBefore;
-
   String get editorTableAddRowAfter;
-
   String get editorTableAddRowBefore;
-
   String get editorTableDelete;
-
   String get editorTableDeleteColumn;
-
   String get editorTableDeleteRow;
-
   String get editorTableHeaderRow;
-
   String get editorTableInsert;
-
   String get editorTableMergeCells;
-
   String editorTableSize({required num rows, required num cols});
-
   String get editorTableSplitCell;
-
   String editorTaskItem({required String text});
-
   String get editorTaskItemEmpty;
-
   String get editorTaskList;
-
   String get editorTextAlign;
-
   String get editorTextColor;
-
   String get editorToolbar;
-
   String get editorUnderline;
-
   String fileFieldCount({required num count});
-
   String get fileFieldList;
-
   String get imageDownload;
-
   String get imagePhotos;
-
   String imagePreview({required String alt});
-
   String get imagePreviewUntitled;
-
   String get imageShare;
-
   String get imageThumbnails;
-
   String get imageViewer;
-
   String get imageZoomIn;
-
   String get imageZoomOut;
-
   String imageZoomReset({required String percent});
-
   String get kbdCommand;
-
   String get kbdControl;
-
   String get kbdDown;
-
   String get kbdForwardDelete;
-
   String get kbdLeft;
-
   String get kbdMacDelete;
-
   String get kbdOption;
-
   String get kbdReturn;
-
   String get kbdRight;
-
   String get kbdShift;
-
   String get kbdUp;
-
   String get linkNewTab;
-
   String get menuCommand;
-
   String get messageActions;
-
   String get messageError;
-
   String get messageRetry;
-
   String get messageUnread;
-
   String messageUnreadBy({required num count});
-
   String get messageScrollerJump;
-
   String messageScrollerJumpUnseen({required num count});
-
   String messageScrollerUnseen({required num count});
-
   String get numberFieldDecrement;
-
   String get numberFieldIncrement;
-
   String get paginationFirst;
-
   String get paginationLast;
-
   String paginationPage({required num page});
-
   String get passwordFieldShow;
-
   String get promptInputActions;
-
   String get promptInputAttach;
-
   String get promptInputAttachments;
-
   String get promptInputSend;
-
   String get promptInputStop;
-
   String get questionnaireNavigation;
-
   String get questionnaireProgress;
-
   String questionnaireStep({required num current, required num total});
-
-  String ratingValueLabel({required num value, required num max});
-
+  String ratingValueLabel({required num max, required num value});
   String get schedulerAddDay;
-
   String get schedulerAllDay;
-
   String get schedulerDayCount;
-
   String schedulerDragAt({required String time});
-
   String get schedulerDragHint;
-
   String get schedulerDragMonthHint;
-
   String get schedulerGoToDate;
-
   String schedulerMoreLabel({required String date, required num count});
-
   String get schedulerNavigation;
-
   String get schedulerRemoveDay;
-
   String schedulerResize({required String event});
-
   String get schedulerView;
-
   String sidebarDragAfter({required String target});
-
   String sidebarDragBefore({required String target});
-
   String get sidebarDragHint;
-
   String sidebarDragInside({required String target});
-
   String get sidebarDragOrigin;
-
   String get sidebarOpen;
-
   String get sliderEnd;
-
   String get sliderStart;
-
   String get slidesRoleDescription;
-
-  String slidesSlide({required num index, required num count});
-
+  String slidesSlide({required num count, required num index});
   String get stepperCompleted;
-
   String get stepperError;
-
   String get telFieldCountry;
-
   String get textAreaLimitReached;
-
   String textAreaRemaining({required num remaining});
-
   String get timePickerLabel;
-
   String get toastRegion;
 }
 
@@ -429,7 +233,8 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get bubbleReactions => 'Reactions';
 
   @override
-  String carouselIndicator({required num index}) => 'Go to slide ${_number(index)}';
+  String carouselIndicator({required num index}) =>
+      'Go to slide ${_number(index)}';
 
   @override
   String get carouselRoleDescription => 'carousel';
@@ -441,7 +246,10 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get colorPickerArea => 'Saturation and brightness';
 
   @override
-  String colorPickerAreaValue({required String saturation, required String brightness}) => 'Saturation $saturation, brightness $brightness';
+  String colorPickerAreaValue({
+    required String saturation,
+    required String brightness,
+  }) => 'Saturation $saturation, brightness $brightness';
 
   @override
   String get colorPickerBrightness => 'Brightness';
@@ -483,7 +291,8 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get commonCopy => 'Copy';
 
   @override
-  String commonDragCancel({required String item}) => 'Returned to its place: $item';
+  String commonDragCancel({required String item}) =>
+      'Returned to its place: $item';
 
   @override
   String commonDragEnd({required String item}) => 'Moved: $item';
@@ -549,10 +358,12 @@ class IdsMessagesEn extends IdsMessagesBase {
   String dataTableSelectRow({required String label}) => 'Select $label';
 
   @override
-  String dataTableSelectRowNumber({required num number}) => 'Select row ${_number(number)}';
+  String dataTableSelectRowNumber({required num number}) =>
+      'Select row ${_number(number)}';
 
   @override
-  String dataTableSelected({required num count}) => '${_number(count)} selected';
+  String dataTableSelected({required num count}) =>
+      '${_number(count)} selected';
 
   @override
   String get dateFieldOpen => 'Open calendar';
@@ -684,7 +495,8 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get editorImageUrl => 'Image address';
 
   @override
-  String get editorImageUrlInvalid => 'Enter an address that starts with http or https';
+  String get editorImageUrlInvalid =>
+      'Enter an address that starts with http or https';
 
   @override
   String get editorItalic => 'Italic';
@@ -765,7 +577,8 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get editorTableMergeCells => 'Merge cells';
 
   @override
-  String editorTableSize({required num rows, required num cols}) => '${_number(rows)} by ${_number(cols)}';
+  String editorTableSize({required num rows, required num cols}) =>
+      '${_number(rows)} by ${_number(cols)}';
 
   @override
   String get editorTableSplitCell => 'Split cell';
@@ -885,10 +698,12 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get messageScrollerJump => 'Scroll to bottom';
 
   @override
-  String messageScrollerJumpUnseen({required num count}) => 'Scroll to bottom, new messages: ${_number(count)}';
+  String messageScrollerJumpUnseen({required num count}) =>
+      'Scroll to bottom, new messages: ${_number(count)}';
 
   @override
-  String messageScrollerUnseen({required num count}) => 'New messages: ${_number(count)}';
+  String messageScrollerUnseen({required num count}) =>
+      'New messages: ${_number(count)}';
 
   @override
   String get numberFieldDecrement => 'Decrease';
@@ -930,10 +745,12 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get questionnaireProgress => 'Questionnaire progress';
 
   @override
-  String questionnaireStep({required num current, required num total}) => 'Question ${_number(current)} of ${_number(total)}';
+  String questionnaireStep({required num current, required num total}) =>
+      'Question ${_number(current)} of ${_number(total)}';
 
   @override
-  String ratingValueLabel({required num value, required num max}) => '${_number(value)} out of ${_number(max)}';
+  String ratingValueLabel({required num max, required num value}) =>
+      '${_number(value)} out of ${_number(max)}';
 
   @override
   String get schedulerAddDay => 'Add a day';
@@ -948,16 +765,19 @@ class IdsMessagesEn extends IdsMessagesBase {
   String schedulerDragAt({required String time}) => 'Starts $time';
 
   @override
-  String get schedulerDragHint => 'Press Space on an event to pick it up, the arrow keys to move it by 15 minutes or a day, and Enter to drop it. Shift with the up and down arrows moves an hour. Escape cancels.';
+  String get schedulerDragHint =>
+      'Press Space on an event to pick it up, the arrow keys to move it by 15 minutes or a day, and Enter to drop it. Shift with the up and down arrows moves an hour. Escape cancels.';
 
   @override
-  String get schedulerDragMonthHint => 'Press Space on an event to pick it up, the left and right arrows to move it a day, the up and down arrows to move it a week, and Enter to drop it. Escape cancels.';
+  String get schedulerDragMonthHint =>
+      'Press Space on an event to pick it up, the left and right arrows to move it a day, the up and down arrows to move it a week, and Enter to drop it. Escape cancels.';
 
   @override
   String get schedulerGoToDate => 'Go to date';
 
   @override
-  String schedulerMoreLabel({required String date, required num count}) => 'More events on $date: ${_number(count)}';
+  String schedulerMoreLabel({required String date, required num count}) =>
+      'More events on $date: ${_number(count)}';
 
   @override
   String get schedulerNavigation => 'Navigate dates';
@@ -978,7 +798,8 @@ class IdsMessagesEn extends IdsMessagesBase {
   String sidebarDragBefore({required String target}) => 'Before $target';
 
   @override
-  String get sidebarDragHint => 'Press Space to pick up, the up and down arrows to choose a place, and Enter to drop. Escape cancels.';
+  String get sidebarDragHint =>
+      'Press Space to pick up, the up and down arrows to choose a place, and Enter to drop. Escape cancels.';
 
   @override
   String sidebarDragInside({required String target}) => 'Inside $target';
@@ -999,7 +820,8 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get slidesRoleDescription => 'slide';
 
   @override
-  String slidesSlide({required num index, required num count}) => '${_number(index)} of ${_number(count)}';
+  String slidesSlide({required num count, required num index}) =>
+      '${_number(index)} of ${_number(count)}';
 
   @override
   String get stepperCompleted => 'Completed';
@@ -1014,7 +836,8 @@ class IdsMessagesEn extends IdsMessagesBase {
   String get textAreaLimitReached => 'Character limit reached.';
 
   @override
-  String textAreaRemaining({required num remaining}) => 'Characters left: ${_number(remaining)}';
+  String textAreaRemaining({required num remaining}) =>
+      'Characters left: ${_number(remaining)}';
 
   @override
   String get timePickerLabel => 'Time';
@@ -1055,7 +878,10 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get colorPickerArea => '채도와 밝기';
 
   @override
-  String colorPickerAreaValue({required String saturation, required String brightness}) => '채도 $saturation, 밝기 $brightness';
+  String colorPickerAreaValue({
+    required String saturation,
+    required String brightness,
+  }) => '채도 $saturation, 밝기 $brightness';
 
   @override
   String get colorPickerBrightness => '밝기';
@@ -1163,7 +989,8 @@ class IdsMessagesKo extends IdsMessagesBase {
   String dataTableSelectRow({required String label}) => '$label 선택';
 
   @override
-  String dataTableSelectRowNumber({required num number}) => '${_number(number)}번째 행 선택';
+  String dataTableSelectRowNumber({required num number}) =>
+      '${_number(number)}번째 행 선택';
 
   @override
   String dataTableSelected({required num count}) => '${_number(count)}개 선택됨';
@@ -1379,7 +1206,8 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get editorTableMergeCells => '셀 합치기';
 
   @override
-  String editorTableSize({required num rows, required num cols}) => '${_number(rows)}행 ${_number(cols)}열';
+  String editorTableSize({required num rows, required num cols}) =>
+      '${_number(rows)}행 ${_number(cols)}열';
 
   @override
   String get editorTableSplitCell => '셀 나누기';
@@ -1499,10 +1327,12 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get messageScrollerJump => '맨 아래로';
 
   @override
-  String messageScrollerJumpUnseen({required num count}) => '맨 아래로, 새 메시지 ${_number(count)}개';
+  String messageScrollerJumpUnseen({required num count}) =>
+      '맨 아래로, 새 메시지 ${_number(count)}개';
 
   @override
-  String messageScrollerUnseen({required num count}) => '새 메시지 ${_number(count)}개';
+  String messageScrollerUnseen({required num count}) =>
+      '새 메시지 ${_number(count)}개';
 
   @override
   String get numberFieldDecrement => '값 줄이기';
@@ -1544,10 +1374,12 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get questionnaireProgress => '질문 진행';
 
   @override
-  String questionnaireStep({required num current, required num total}) => '질문 ${_number(current)} / ${_number(total)}';
+  String questionnaireStep({required num current, required num total}) =>
+      '질문 ${_number(current)} / ${_number(total)}';
 
   @override
-  String ratingValueLabel({required num value, required num max}) => '${_number(max)}점 만점에 ${_number(value)}점';
+  String ratingValueLabel({required num max, required num value}) =>
+      '${_number(max)}점 만점에 ${_number(value)}점';
 
   @override
   String get schedulerAddDay => '하루 늘리기';
@@ -1562,16 +1394,19 @@ class IdsMessagesKo extends IdsMessagesBase {
   String schedulerDragAt({required String time}) => '$time 시작';
 
   @override
-  String get schedulerDragHint => '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.';
+  String get schedulerDragHint =>
+      '일정에서 Space로 집고, 방향키로 15분이나 하루씩 옮긴 뒤 Enter로 놓습니다. Shift와 위아래 방향키는 1시간씩 옮깁니다. Escape는 취소합니다.';
 
   @override
-  String get schedulerDragMonthHint => '일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.';
+  String get schedulerDragMonthHint =>
+      '일정에서 Space로 집고, 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter로 놓습니다. Escape는 취소합니다.';
 
   @override
   String get schedulerGoToDate => '날짜로 이동';
 
   @override
-  String schedulerMoreLabel({required String date, required num count}) => '$date 일정 ${_number(count)}개 더 보기';
+  String schedulerMoreLabel({required String date, required num count}) =>
+      '$date 일정 ${_number(count)}개 더 보기';
 
   @override
   String get schedulerNavigation => '날짜 이동';
@@ -1592,7 +1427,8 @@ class IdsMessagesKo extends IdsMessagesBase {
   String sidebarDragBefore({required String target}) => '$target 앞';
 
   @override
-  String get sidebarDragHint => 'Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.';
+  String get sidebarDragHint =>
+      'Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.';
 
   @override
   String sidebarDragInside({required String target}) => '$target 안';
@@ -1613,7 +1449,8 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get slidesRoleDescription => '슬라이드';
 
   @override
-  String slidesSlide({required num index, required num count}) => '${_number(count)}장 중 ${_number(index)}번째';
+  String slidesSlide({required num count, required num index}) =>
+      '${_number(count)}장 중 ${_number(index)}번째';
 
   @override
   String get stepperCompleted => '완료';
@@ -1628,7 +1465,8 @@ class IdsMessagesKo extends IdsMessagesBase {
   String get textAreaLimitReached => '글자 수 제한에 도달했습니다.';
 
   @override
-  String textAreaRemaining({required num remaining}) => '${_number(remaining)}자 남았습니다.';
+  String textAreaRemaining({required num remaining}) =>
+      '${_number(remaining)}자 남았습니다.';
 
   @override
   String get timePickerLabel => '시간';
@@ -1658,11 +1496,14 @@ class IdsLocale {
   static final List<IdsLocale> values = [en, ko];
 
   final Locale locale;
+
   final IdsMessagesBase messages;
 
   @override
   bool operator ==(Object other) =>
-      other is IdsLocale && other.locale == locale && other.messages == messages;
+      other is IdsLocale &&
+      other.locale == locale &&
+      other.messages == messages;
 
   @override
   int get hashCode => Object.hash(locale, messages);
