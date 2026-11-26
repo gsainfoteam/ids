@@ -5,6 +5,10 @@ import {
 } from './lib/answers';
 import { QuestionnaireDescription, type QuestionnaireDescriptionProps } from './parts/description';
 import { QuestionnaireOption, type QuestionnaireOptionProps } from './parts/option';
+import {
+  QuestionnaireOptionDescription,
+  type QuestionnaireOptionDescriptionProps,
+} from './parts/option-description';
 import { QuestionnaireOther, type QuestionnaireOtherProps } from './parts/other';
 import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './parts/question';
 import { QuestionnaireSkip, type QuestionnaireSkipProps } from './parts/skip';
@@ -13,7 +17,7 @@ import {
   type QuestionnaireSubmitProps,
   type QuestionnaireSubmitState,
 } from './parts/submit';
-import { QuestionnaireRoot, type QuestionnaireProps } from './root';
+import { QuestionnaireRoot, type QuestionnaireAdvance, type QuestionnaireProps } from './root';
 import {
   questionnaireStyle,
   type QuestionnaireVariant,
@@ -31,9 +35,11 @@ export namespace Questionnaire {
   export type SelectionMode = QuestionnaireSelectionMode;
   export type Orientation = QuestionnaireOrientation;
   export type Variant = QuestionnaireVariant;
+  export type Advance = QuestionnaireAdvance;
 
   export type QuestionProps = QuestionnaireQuestionProps;
   export type OptionProps = QuestionnaireOptionProps;
+  export type OptionDescriptionProps = QuestionnaireOptionDescriptionProps;
   export type OtherProps = QuestionnaireOtherProps;
   export type DescriptionProps = QuestionnaireDescriptionProps;
   export type SubmitProps = QuestionnaireSubmitProps;
@@ -48,6 +54,11 @@ export namespace Questionnaire {
   export const Option = QuestionnaireOption;
   export namespace Option {
     export type Props = OptionProps;
+  }
+
+  export const OptionDescription = QuestionnaireOptionDescription;
+  export namespace OptionDescription {
+    export type Props = OptionDescriptionProps;
   }
 
   export const Other = QuestionnaireOther;
@@ -80,4 +91,4 @@ export type {
   QuestionnaireSelectionMode,
 } from './lib/answers';
 export type { QuestionnaireVariant, QuestionnaireOrientation } from './style';
-export type { QuestionnaireProps } from './root';
+export type { QuestionnaireAdvance, QuestionnaireProps } from './root';

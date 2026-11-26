@@ -5,8 +5,8 @@ import { useId, type ComponentProps, type FocusEvent } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 
 import { ChipContext, type InputAttributes } from './context';
-import { useInternalChipField } from './hooks/use-chip-field';
 import { useInternalChipFieldItemsWarning } from './hooks/use-chip-field-items-warning';
+import { useInternalChipField } from './hooks/use-chip-field-state';
 import { chipOptionsIn, isForeignComponent, splitChildren } from './lib/chip-children';
 import { ChipAdornments } from './parts/adornments';
 import { ChipContent } from './parts/content';
@@ -19,7 +19,7 @@ import { FormValue } from '../../../internal/parts/form-value';
 import { type FieldTriggerVariant } from '../../../internal/surfaces/lib/field-surface';
 import { useInternalTranslate } from '../../../internal/translate';
 import { invariant, isNodeFromAnyWindow } from '../../../utils';
-import { useFieldSize } from '../field/context';
+import { useFieldSize, useFieldState } from '../field/context';
 
 import type { ChipField } from '.';
 
@@ -61,12 +61,9 @@ export function ChipFieldRoot({
   open,
   defaultOpen,
   onOpenChange,
-  onCreate,
-  validate,
-  maxCount,
+  chipField,
   variant = 'outline',
   size,
-  invalid,
   disabled,
   required = false,
   name,
@@ -78,6 +75,7 @@ export function ChipFieldRoot({
   ...rootInputProps
 }: ChipField.Props) {
   const t = useInternalTranslate();
+  const fieldState = useFieldState();
   const removeLabel = removeLabelProp ?? ((label: string) => t('common.removeItem', { label }));
 
   const {
@@ -85,24 +83,22 @@ export function ChipFieldRoot({
     onBlur: onFieldBlur,
     ...inputProps
   } = rootInputProps as ChipFieldInputProps & { onChange?: unknown };
-  invariant(
-    maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
-    '`<ChipField>` `maxCount` must be a non-negative integer.',
-  );
+  const create = chipField?.create ?? null;
+  const maxCount = chipField?.maxCount;
   const options = chipOptionsIn(children);
   const split = splitChildren(children);
-  const { leading, trailing, mobileVariant } = split;
+  const { leading, trailing, narrow } = split;
   const input = split.input ?? <ChipInput />;
   const popup = split.contents.length ? split.contents : <ChipContent>{split.loose}</ChipContent>;
-  const creatable = onCreate !== undefined;
+  const creatable = create !== null;
 
   const merged = { ...inputProps, ...input.props };
   const isDisabled = !!(input.props.disabled ?? disabled);
   const isReadOnly = !!merged.readOnly;
-  const ariaInvalid = merged['aria-invalid'] ?? invalid;
+  const ariaInvalid = merged['aria-invalid'] ?? fieldState?.invalid;
   const isInvalid = ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false';
 
-  const drawer = useInternalDrawerPresentation(mobileVariant);
+  const drawer = useInternalDrawerPresentation(narrow);
   const { rootRef, inputRef, drawerInputRef, ...field } = useInternalChipField({
     value,
     defaultValue,
@@ -112,8 +108,8 @@ export function ChipFieldRoot({
     onOpenChange,
     options,
     creatable,
-    onCreate,
-    validate,
+    onCreate: create?.onCreate,
+    validate: create?.validate,
     maxCount,
     disabled: isDisabled,
     readOnly: isReadOnly,
@@ -247,7 +243,7 @@ export function ChipFieldRoot({
         <FieldPopup
           anchor={rootRef}
           onClose={field.actions.close}
-          narrow={mobileVariant}
+          narrow={narrow}
           matchWidth
           label={merged['aria-label'] ?? t('common.options')}
           aria-labelledby={drawer ? labelledBy : undefined}

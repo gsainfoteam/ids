@@ -1,7 +1,9 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { isValidElement, type ReactNode } from 'react';
 
+import { QuestionnaireOptionDescription } from './option-description';
+import { elementTypeOf, flattenFragments } from '../../../../utils/children';
 import { Toggle } from '../../../action/toggle';
 import { Item } from '../../../data/item';
 import { Checkbox } from '../../checkbox';
@@ -11,15 +13,16 @@ import { questionnaireStyle } from '../style';
 
 export type QuestionnaireOptionProps = {
   value: string;
-  description?: ReactNode;
   disabled?: boolean;
   className?: string;
   children?: ReactNode;
 };
 
+const isDescription = (node: ReactNode) =>
+  isValidElement(node) && elementTypeOf(node) === QuestionnaireOptionDescription;
+
 export function QuestionnaireOption({
   value,
-  description,
   disabled,
   className,
   children,
@@ -28,6 +31,10 @@ export function QuestionnaireOption({
     useInternalQuestionContext('Questionnaire.Option');
   const styles = questionnaireStyle({ orientation, size });
   const Control = selectionMode === 'single' ? Radio : Checkbox;
+  const nodes = flattenFragments(children);
+  const descriptions = nodes.filter(isDescription);
+  const label = nodes.filter((node) => !isDescription(node));
+  const title = label.length > 0 ? label : value;
 
   if (variant === 'toggle')
     return (
@@ -38,7 +45,7 @@ export function QuestionnaireOption({
         className={styles.toggle({ className })}
         data-questionnaire-option=""
       >
-        {children ?? value}
+        {title}
       </Toggle>
     );
 
@@ -55,12 +62,8 @@ export function QuestionnaireOption({
           <Control value={value} disabled={disabled} />
         </span>
         <Item.Content>
-          <Item.Title>{children ?? value}</Item.Title>
-          {description !== undefined && (
-            <Item.Description asChild>
-              <span>{description}</span>
-            </Item.Description>
-          )}
+          <Item.Title>{title}</Item.Title>
+          {descriptions}
         </Item.Content>
       </label>
     </Item>

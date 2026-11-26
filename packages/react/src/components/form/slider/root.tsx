@@ -3,7 +3,8 @@
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { SliderContext } from './context';
-import { useInternalSlider, type SliderValue } from './hooks/use-slider';
+import { useSlider, type SliderInstance } from './hooks/use-slider';
+import { useInternalSlider, type SliderValue } from './hooks/use-slider-state';
 import { useInternalSliderValueShape } from './hooks/use-slider-value-shape';
 import { resolve, type StateProp } from './lib/state-prop';
 import { SliderTrack } from './parts/track';
@@ -11,7 +12,7 @@ import { sliderStyle } from './style';
 import { FormValue } from '../../../internal/parts/form-value';
 import { useInternalTranslate } from '../../../internal/translate';
 import { containsElementOfType, invariant, mergeProps } from '../../../utils';
-import { useFieldSize } from '../field/context';
+import { useFieldSize, useFieldState } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -44,16 +45,13 @@ export type SliderProps<V extends SliderValue = SliderValue> = Omit<
   min?: number;
   max?: number;
   step?: number;
-  largeStep?: number;
-  minStepsBetweenThumbs?: number;
   orientation?: SliderOrientation;
+  slider?: SliderInstance;
   size?: IdsSize;
   disabled?: boolean;
   readOnly?: boolean;
-  invalid?: boolean;
   name?: string;
   form?: string;
-  formatLabel?: (value: number) => string;
   className?: StateProp<string | undefined>;
   style?: StateProp<CSSProperties | undefined>;
   children?: ReactNode;
@@ -72,16 +70,13 @@ export function SliderRoot<V extends SliderValue>(props: SliderProps<V>) {
     min = 0,
     max = 100,
     step = 1,
-    largeStep = step * 10,
-    minStepsBetweenThumbs = 0,
     orientation = 'horizontal',
+    slider: given,
     size,
     disabled = false,
     readOnly = false,
-    invalid,
     name,
     form,
-    formatLabel,
     className,
     style,
     children,
@@ -101,6 +96,9 @@ export function SliderRoot<V extends SliderValue>(props: SliderProps<V>) {
   invariant(min < max, 'Slider: `min` must be less than `max`.');
   invariant(step > 0, 'Slider: `step` must be positive.');
   const range = useInternalSliderValueShape(value ?? defaultValue);
+  const own = useSlider();
+  const { largeStep = step * 10, minStepsBetweenThumbs, formatLabel } = given ?? own;
+  const fieldState = useFieldState();
 
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const slider = useInternalSlider({
@@ -122,7 +120,7 @@ export function SliderRoot<V extends SliderValue>(props: SliderProps<V>) {
   const { values, dragging, anchorRef, rootRef, setTrack, setThumb, rootHandlers, thumbHandlers } =
     slider;
 
-  const ariaInvalid = ariaInvalidProp ?? invalid;
+  const ariaInvalid = ariaInvalidProp ?? fieldState?.invalid;
   const state: SliderState = {
     value: slider.value,
     values,

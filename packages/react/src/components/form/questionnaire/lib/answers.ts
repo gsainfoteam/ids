@@ -1,3 +1,5 @@
+import { isEqual } from 'es-toolkit';
+
 export type QuestionnaireSelectionMode = 'single' | 'multiple';
 
 export type QuestionnaireAnswer = string | string[];
@@ -11,7 +13,7 @@ export const EMPTY_DRAFT: QuestionnaireDraft = { choices: [], other: '' };
 export type QuestionnaireQuestionShape = {
   name: string;
   selectionMode: QuestionnaireSelectionMode;
-  optional: boolean;
+  required: boolean;
   hasOther: boolean;
   optionValues: readonly string[];
 };
@@ -55,6 +57,26 @@ export function draftFrom(
 
   if (question.selectionMode === 'multiple') return { choices, other };
   return other !== '' ? { choices: [], other } : { choices: choices.slice(0, 1), other };
+}
+
+export function draftsFollowing(
+  questions: readonly QuestionnaireQuestionShape[],
+  answers: QuestionnaireAnswers,
+  typed: Readonly<Record<string, QuestionnaireDraft>>,
+): Readonly<Record<string, QuestionnaireDraft>> {
+  let changed = false;
+  const next = Object.fromEntries(
+    questions.map((question) => {
+      const draft = typed[question.name] ?? EMPTY_DRAFT;
+      const answer = answers[question.name];
+      if (isEqual(answerOf(draft, question.selectionMode), answer)) return [question.name, draft];
+      const following = draftFrom(answer, question);
+      if (isEqual(following, draft)) return [question.name, draft];
+      changed = true;
+      return [question.name, following];
+    }),
+  );
+  return changed ? next : typed;
 }
 
 export function draftsFrom(

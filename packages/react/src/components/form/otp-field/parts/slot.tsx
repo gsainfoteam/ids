@@ -7,6 +7,7 @@ import { invariant } from '../../../../utils';
 import { GroupContext, useInternalOTPContext } from '../context';
 
 import type { OTPSlotState } from '../hooks/use-otp-field';
+import type { OTPFieldMask } from '../root';
 
 export type OTPFieldSlotProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
   index: number;
@@ -20,11 +21,10 @@ function Masked({
   className,
 }: {
   char: string;
-  mask: boolean | string | undefined;
+  mask: OTPFieldMask;
   className: string;
 }) {
-  if (mask === true) return <span className={className} />;
-  if (typeof mask === 'string' && mask !== '') return mask;
+  if (mask === 'dot') return <span className={className} />;
   return char;
 }
 

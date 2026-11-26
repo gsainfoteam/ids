@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, type SubmitEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type SubmitEvent } from 'react';
 
+import { isEqual } from 'es-toolkit';
 import { flushSync } from 'react-dom';
 
 import { useInternalFormReset } from '../../../../hooks/use-form-reset';
@@ -10,6 +11,7 @@ import {
   answerOf,
   answersOf,
   draftsFrom,
+  draftsFollowing,
   type QuestionnaireAnswers,
   type QuestionnaireDraft,
   type QuestionnaireQuestionShape,
@@ -20,24 +22,33 @@ const canLeave = (
   question: QuestionnaireQuestionShape,
   from: Readonly<Record<string, QuestionnaireDraft>>,
 ) =>
-  question.optional ||
+  !question.required ||
   answerOf(from[question.name] ?? EMPTY_DRAFT, question.selectionMode) !== undefined;
 
 export function useInternalQuestionnaire({
   questions,
+  value,
   defaultValue,
+  onValueChange,
   onComplete,
   onSubmit,
   action,
 }: {
   questions: QuestionnaireQuestionShape[];
+  value: QuestionnaireAnswers | undefined;
   defaultValue: QuestionnaireAnswers | undefined;
+  onValueChange: ((answers: QuestionnaireAnswers) => void) | undefined;
   onComplete: ((answers: QuestionnaireAnswers) => void) | undefined;
   onSubmit: ((event: SubmitEvent<HTMLFormElement>) => void) | undefined;
   action: unknown;
 }) {
-  const [drafts, setDrafts] = useState(() => draftsFrom(questions, defaultValue));
+  const [typed, setTyped] = useState(() => draftsFrom(questions, value ?? defaultValue));
+  const drafts = value === undefined ? typed : draftsFollowing(questions, value, typed);
+  if (drafts !== typed) setTyped(drafts);
   const draftsRef = useRef<Record<string, QuestionnaireDraft>>(drafts);
+  useLayoutEffect(() => {
+    draftsRef.current = drafts;
+  });
   const [step, setStep] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
   const focusTheNewStep = useRef(false);
@@ -50,8 +61,11 @@ export function useInternalQuestionnaire({
   const draftOf = (name: string) => draftsRef.current[name] ?? EMPTY_DRAFT;
 
   const setDraft = (name: string, draft: QuestionnaireDraft) => {
+    const before = answersOf(questions, draftsRef.current);
     draftsRef.current = { ...draftsRef.current, [name]: draft };
-    setDrafts(draftsRef.current);
+    setTyped(draftsRef.current);
+    const after = answersOf(questions, draftsRef.current);
+    if (!isEqual(before, after)) onValueChange?.(after);
   };
 
   const goTo = (next: number) => {
@@ -60,7 +74,7 @@ export function useInternalQuestionnaire({
   };
 
   const advance = () => {
-    flushSync(() => setDrafts(draftsRef.current));
+    flushSync(() => setTyped(draftsRef.current));
     formRef.current?.requestSubmit();
   };
 
@@ -82,7 +96,7 @@ export function useInternalQuestionnaire({
 
   useInternalFormReset(formRef, () => {
     draftsRef.current = draftsFrom(questions, defaultValue);
-    setDrafts(draftsRef.current);
+    setTyped(draftsRef.current);
     setStep(0);
   });
 

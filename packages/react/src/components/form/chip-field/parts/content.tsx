@@ -16,7 +16,7 @@ import { isType } from '../lib/is-type';
 
 import type { BoxProps } from '../lib/box-props';
 
-export type ChipContentProps = BoxProps & { mobileVariant?: PopupPresentation };
+export type ChipContentProps = BoxProps & { narrow?: PopupPresentation };
 
 function DrawerSearch() {
   const t = useInternalTranslate();
@@ -47,7 +47,7 @@ export function ChipContent({
   asChild,
   children,
   className,
-  mobileVariant: _readByTheRoot,
+  narrow: _readByTheRoot,
   ...props
 }: ChipContentProps) {
   const c = useInternalChip('Content');

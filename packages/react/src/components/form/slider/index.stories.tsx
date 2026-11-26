@@ -9,7 +9,7 @@ import { Field as FormField } from '../../../react-hook-form';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
-import { Slider } from '.';
+import { Slider, useSlider } from '.';
 
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 
@@ -25,7 +25,7 @@ const meta = {
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     min: { control: 'number' },
     max: { control: 'number' },
     step: { control: 'number' },
@@ -65,92 +65,91 @@ export const Usage: Story = {
 };
 
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section title="Size × Mode">
-        <Showcase.Matrix
-          rows={sizes}
-          columns={modes}
-          render={(size, mode) => (
-            <div className="w-64">
-              {mode === 'range' ? (
-                <Slider size={size} defaultValue={[20, 70]} aria-label={`${size} range`} />
-              ) : (
-                <Slider size={size} defaultValue={40} aria-label={`${size} single`} />
-              )}
-            </div>
-          )}
-        />
-      </Showcase.Section>
+  render: function Render() {
+    const percent = useSlider({ formatLabel: (value) => `${value}%` });
 
-      <Showcase.Section title="States">
-        {(
-          [
-            ['invalid', { invalid: true }],
-            ['disabled', { disabled: true }],
-            ['readOnly', { readOnly: true }],
-          ] as const
-        ).map(([label, props]) => (
-          <Showcase.Row key={label} label={label}>
+    return (
+      <Showcase>
+        <Showcase.Section title="Size × Mode">
+          <Showcase.Matrix
+            rows={sizes}
+            columns={modes}
+            render={(size, mode) => (
+              <div className="w-64">
+                {mode === 'range' ? (
+                  <Slider size={size} defaultValue={[20, 70]} aria-label={`${size} range`} />
+                ) : (
+                  <Slider size={size} defaultValue={40} aria-label={`${size} single`} />
+                )}
+              </div>
+            )}
+          />
+        </Showcase.Section>
+
+        <Showcase.Section title="States">
+          {(
+            [
+              ['invalid', { 'aria-invalid': true }],
+              ['disabled', { disabled: true }],
+              ['readOnly', { readOnly: true }],
+            ] as const
+          ).map(([label, props]) => (
+            <Showcase.Row key={label} label={label}>
+              <div className="w-64">
+                <Slider {...props} defaultValue={60} aria-label={label} />
+              </div>
+            </Showcase.Row>
+          ))}
+        </Showcase.Section>
+
+        <Showcase.Section title="Marks and labels">
+          <Showcase.Row label="marks">
             <div className="w-64">
-              <Slider {...props} defaultValue={60} aria-label={label} />
+              <Slider defaultValue={50} step={25} slider={percent} aria-label="단계">
+                <Slider.Marks>
+                  <Slider.Mark value={0} />
+                  <Slider.Mark value={25} />
+                  <Slider.Mark value={50} />
+                  <Slider.Mark value={75} />
+                  <Slider.Mark value={100} />
+                </Slider.Marks>
+              </Slider>
             </div>
           </Showcase.Row>
-        ))}
-      </Showcase.Section>
+          <Showcase.Row label="step ticks">
+            <div className="w-64">
+              <Slider defaultValue={3} max={10} aria-label="눈금">
+                <Slider.Marks />
+              </Slider>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section title="Marks and labels">
-        <Showcase.Row label="marks">
-          <div className="w-64">
-            <Slider
-              defaultValue={50}
-              step={25}
-              formatLabel={(value) => `${value}%`}
-              aria-label="단계"
-            >
-              <Slider.Marks>
-                <Slider.Mark value={0} />
-                <Slider.Mark value={25} />
-                <Slider.Mark value={50} />
-                <Slider.Mark value={75} />
-                <Slider.Mark value={100} />
-              </Slider.Marks>
-            </Slider>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="step ticks">
-          <div className="w-64">
-            <Slider defaultValue={3} max={10} aria-label="눈금">
-              <Slider.Marks />
-            </Slider>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section title="Layout">
-        <Showcase.Row label="vertical">
-          <div className="flex h-48 gap-8">
-            <Slider orientation="vertical" defaultValue={60} aria-label="세로" />
-            <Slider orientation="vertical" defaultValue={[20, 80]} aria-label="세로 범위" />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="rtl">
-          <div dir="rtl" className="w-64">
-            <Slider defaultValue={30} aria-label="오른쪽에서" />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="Field">
-          <div className="w-64">
-            <Field>
-              <Field.Label>밝기</Field.Label>
-              <Slider defaultValue={70} />
-              <Field.Hint>화면 밝기</Field.Hint>
-            </Field>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+        <Showcase.Section title="Layout">
+          <Showcase.Row label="vertical">
+            <div className="flex h-48 gap-8">
+              <Slider orientation="vertical" defaultValue={60} aria-label="세로" />
+              <Slider orientation="vertical" defaultValue={[20, 80]} aria-label="세로 범위" />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="rtl">
+            <div dir="rtl" className="w-64">
+              <Slider defaultValue={30} aria-label="오른쪽에서" />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="Field">
+            <div className="w-64">
+              <Field>
+                <Field.Label>밝기</Field.Label>
+                <Slider defaultValue={70} />
+                <Field.Hint>화면 밝기</Field.Hint>
+              </Field>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const ChooseARange: Story = {
@@ -158,14 +157,18 @@ export const ChooseARange: Story = {
   args: {
     defaultValue: [40, 60],
     step: 5,
-    minStepsBetweenThumbs: 2,
     'aria-label': '가격 범위',
+  },
+  render: function Render(args) {
+    const range = useSlider({ minStepsBetweenThumbs: 2 });
+
+    return <Slider {...args} slider={range} />;
   },
   parameters: {
     docs: {
       description: {
         story:
-          '`defaultValue` 나 `value` 가 `[start, end]` 면 thumb이 둘인 범위 슬라이더입니다. 두 thumb은 교차하지 않고 `minStepsBetweenThumbs` 칸만큼 떨어져 있습니다. 보조 기술도 같은 한계를 `aria-valuemin`, `aria-valuemax` 로 읽습니다.',
+          '`defaultValue` 나 `value` 가 `[start, end]` 면 thumb이 둘인 범위 슬라이더입니다. 두 thumb은 교차하지 않고 `useSlider` 의 `minStepsBetweenThumbs` 칸만큼 떨어져 있습니다. 보조 기술도 같은 한계를 `aria-valuemin`, `aria-valuemax` 로 읽습니다.',
       },
     },
   },
@@ -214,28 +217,28 @@ export const SaveWhenTheDragEnds: Story = {
 };
 
 export const LabelTheSteps: Story = {
-  render: () => (
-    <div className="w-80">
-      <Slider
-        min={1}
-        max={5}
-        defaultValue={3}
-        formatLabel={(value) => ['', '쉬움', '', '보통', '', '어려움'][value] ?? String(value)}
-        aria-label="난이도"
-      >
-        <Slider.Marks>
-          <Slider.Mark value={1} />
-          <Slider.Mark value={3} />
-          <Slider.Mark value={5} />
-        </Slider.Marks>
-      </Slider>
-    </div>
-  ),
+  render: function Render() {
+    const difficulty = useSlider({
+      formatLabel: (value) => ['', '쉬움', '', '보통', '', '어려움'][value] ?? String(value),
+    });
+
+    return (
+      <div className="w-80">
+        <Slider min={1} max={5} defaultValue={3} slider={difficulty} aria-label="난이도">
+          <Slider.Marks>
+            <Slider.Mark value={1} />
+            <Slider.Mark value={3} />
+            <Slider.Mark value={5} />
+          </Slider.Marks>
+        </Slider>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          '`Slider.Marks` 안의 `Slider.Mark` 가 그 값에 눈금과 라벨을 그립니다. 라벨은 `formatLabel` 이 만들고, `Slider.Mark` 에 children 을 주면 그것을 씁니다. `Slider.Marks` 만 두면 `step` 마다 눈금만 그립니다.',
+          '`Slider.Marks` 안의 `Slider.Mark` 가 그 값에 눈금과 라벨을 그립니다. 라벨은 `useSlider` 의 `formatLabel` 이 만들고, `Slider.Mark` 에 children 을 주면 그것을 씁니다. `Slider.Marks` 만 두면 `step` 마다 눈금만 그립니다.',
       },
     },
   },
@@ -248,16 +251,20 @@ export const LabelTheSteps: Story = {
 };
 
 export const ShowTheValueWhileDragging: Story = {
-  render: () => (
-    <div className="w-80 pt-8">
-      <Slider defaultValue={50} formatLabel={(value) => `${value}%`} aria-label="밝기" />
-    </div>
-  ),
+  render: function Render() {
+    const brightness = useSlider({ formatLabel: (value) => `${value}%` });
+
+    return (
+      <div className="w-80 pt-8">
+        <Slider defaultValue={50} slider={brightness} aria-label="밝기" />
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          '기본 thumb 은 `Slider.ValueLabel` 을 품고 있어, 끄는 동안과 키보드 포커스가 있을 때 `formatLabel` 로 만든 값을 띄웁니다. 빼려면 `<Slider.Thumb>{null}</Slider.Thumb>` 처럼 thumb 을 비웁니다.',
+          '기본 thumb 은 `Slider.ValueLabel` 을 품고 있어, 끄는 동안과 키보드 포커스가 있을 때 `useSlider` 의 `formatLabel` 로 만든 값을 띄웁니다. 빼려면 `<Slider.Thumb>{null}</Slider.Thumb>` 처럼 thumb 을 비웁니다.',
       },
     },
   },
@@ -271,23 +278,27 @@ export const ShowTheValueWhileDragging: Story = {
 };
 
 export const NameEachThumb: Story = {
-  render: () => (
-    <div className="w-80 pt-8">
-      <Slider
-        defaultValue={[20000, 60000]}
-        max={100000}
-        step={1000}
-        formatLabel={(value) => `₩${value.toLocaleString()}`}
-        aria-label="가격"
-      >
-        <Slider.Track>
-          <Slider.Range />
-          <Slider.Thumb index={0} aria-label="최저가" />
-          <Slider.Thumb index={1} aria-label="최고가" />
-        </Slider.Track>
-      </Slider>
-    </div>
-  ),
+  render: function Render() {
+    const price = useSlider({ formatLabel: (value) => `₩${value.toLocaleString()}` });
+
+    return (
+      <div className="w-80 pt-8">
+        <Slider
+          defaultValue={[20000, 60000]}
+          max={100000}
+          step={1000}
+          slider={price}
+          aria-label="가격"
+        >
+          <Slider.Track>
+            <Slider.Range />
+            <Slider.Thumb index={0} aria-label="최저가" />
+            <Slider.Thumb index={1} aria-label="최고가" />
+          </Slider.Track>
+        </Slider>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -311,17 +322,21 @@ export const NameEachThumb: Story = {
 
 export const PaintTheTrack: Story = {
   tags: ['custom-design'],
-  render: () => (
-    <div className="w-64">
-      <Slider defaultValue={200} max={360} aria-label="색상" formatLabel={(value) => `${value}°`}>
-        <Slider.Track className="bg-[linear-gradient(to_right,red,yellow,lime,cyan,blue,magenta,red)]">
-          <Slider.Thumb
-            style={(state) => ({ backgroundColor: `hsl(${state.thumbValue} 90% 55%)` })}
-          />
-        </Slider.Track>
-      </Slider>
-    </div>
-  ),
+  render: function Render() {
+    const hue = useSlider({ formatLabel: (value) => `${value}°` });
+
+    return (
+      <div className="w-64">
+        <Slider defaultValue={200} max={360} aria-label="색상" slider={hue}>
+          <Slider.Track className="bg-[linear-gradient(to_right,red,yellow,lime,cyan,blue,magenta,red)]">
+            <Slider.Thumb
+              style={(state) => ({ backgroundColor: `hsl(${state.thumbValue} 90% 55%)` })}
+            />
+          </Slider.Track>
+        </Slider>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

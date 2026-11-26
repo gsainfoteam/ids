@@ -60,7 +60,7 @@ export function splitChildren(children: ReactNode) {
     ...adornments,
     contents,
     loose: popup,
-    mobileVariant: content?.props.mobileVariant ?? 'drawer',
+    narrow: content?.props.narrow ?? 'drawer',
   };
 }
 

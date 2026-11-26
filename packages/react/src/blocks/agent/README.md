@@ -21,4 +21,4 @@ Storybook `Blocks/Agent/*`. AI 에이전트 화면 네 가지입니다.
 - **알아둘 것.**
   - Run 의 계획은 넓은 화면에서 오른쪽에 붙어 따라오고, 좁은 화면에서는 실행 기록 위로 올라옵니다(`order-first lg:order-none`).
   - 물어보고 쓰는 도구는 Builder 와 Run 모두 warning 배지로 같은 말("물어보고 써요")을 씁니다.
-  - Ask 는 `Questionnaire` 하나로 그립니다. 세 질문 모두 `optional` 이라 건너뛸 수 있고, `onComplete` 로 받은 답을 모아 보입니다.
+  - Ask 는 `Questionnaire` 하나로 그립니다. 세 질문 모두 `required` 가 없어 건너뛸 수 있고, `onComplete` 로 받은 답을 모아 보입니다.

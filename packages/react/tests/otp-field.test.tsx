@@ -314,15 +314,15 @@ test('native form reset restores the default, FormData holds one entry', async (
 
 test('mask and placeholder only change what the slots draw', async () => {
   const screen = await render(
-    tracked({ length: 4, defaultValue: '12', mask: true, placeholder: 'abcd' }).node,
+    tracked({ length: 4, defaultValue: '12', mask: 'dot', placeholder: 'abcd' }).node,
   );
   await expect.element(field()).toHaveValue('12');
   expect(shown(), 'the default mask is a drawn dot, not a character').toBe('cd');
   expect(screen.container.querySelectorAll('[data-otp-slot] span.rounded-full')).toHaveLength(2);
   await screen.rerender(
-    <div key="star">{tracked({ length: 4, defaultValue: '12', mask: '*' }).node}</div>,
+    <div key="none">{tracked({ length: 4, defaultValue: '12', mask: 'none' }).node}</div>,
   );
-  expect(shown()).toBe('**');
+  expect(shown()).toBe('12');
 });
 
 test('custom layout: groups, separators and slot render functions', async () => {

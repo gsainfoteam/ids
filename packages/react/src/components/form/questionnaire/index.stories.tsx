@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -17,21 +19,21 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     size: { control: 'radio', options: sizes },
-    advanceOnSelect: { control: 'boolean' },
+    advance: { control: 'radio', options: ['submit', 'select'] },
   },
   args: {
     size: 'standard',
-    advanceOnSelect: false,
+    advance: 'submit',
     onComplete: fn(),
     children: (
       <>
-        <Questionnaire.Question name="tone">
+        <Questionnaire.Question name="tone" required>
           어떤 말투로 쓸까요?
           <Questionnaire.Option value="formal">격식</Questionnaire.Option>
           <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
           <Questionnaire.Other aria-label="직접 입력" />
         </Questionnaire.Question>
-        <Questionnaire.Question name="topics" selectionMode="multiple" optional>
+        <Questionnaire.Question name="topics" selectionMode="multiple">
           무엇을 넣을까요?
           <Questionnaire.Option value="summary">요약</Questionnaire.Option>
           <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
@@ -66,12 +68,12 @@ export const Usage: Story = {
   render: () => (
     <div className="w-96">
       <Questionnaire>
-        <Questionnaire.Question name="tone">
+        <Questionnaire.Question name="tone" required>
           어떤 말투로 쓸까요?
           <Questionnaire.Option value="formal">격식</Questionnaire.Option>
           <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
         </Questionnaire.Question>
-        <Questionnaire.Question name="length">
+        <Questionnaire.Question name="length" required>
           얼마나 길게 쓸까요?
           <Questionnaire.Option value="short">짧게</Questionnaire.Option>
           <Questionnaire.Option value="long">길게</Questionnaire.Option>
@@ -90,18 +92,20 @@ export const Gallery: Story = {
           <Showcase.Row key={size} label={size}>
             <div className="w-96">
               <Questionnaire size={size} defaultValue={{ tone: 'casual' }}>
-                <Questionnaire.Question name="tone">
+                <Questionnaire.Question name="tone" required>
                   어떤 말투로 쓸까요?
                   <Questionnaire.Description>나중에 바꿀 수 있어요.</Questionnaire.Description>
-                  <Questionnaire.Option value="formal" description="보고서, 공지">
+                  <Questionnaire.Option value="formal">
                     격식
+                    <Questionnaire.OptionDescription>보고서, 공지</Questionnaire.OptionDescription>
                   </Questionnaire.Option>
-                  <Questionnaire.Option value="casual" description="동아리 단톡방">
+                  <Questionnaire.Option value="casual">
                     편하게
+                    <Questionnaire.OptionDescription>동아리 단톡방</Questionnaire.OptionDescription>
                   </Questionnaire.Option>
                   <Questionnaire.Other aria-label="직접 입력" />
                 </Questionnaire.Question>
-                <Questionnaire.Question name="length">
+                <Questionnaire.Question name="length" required>
                   얼마나 길게 쓸까요?
                   <Questionnaire.Option value="short">짧게</Questionnaire.Option>
                   <Questionnaire.Option value="long">길게</Questionnaire.Option>
@@ -117,7 +121,7 @@ export const Gallery: Story = {
         <Showcase.Row label="single">
           <div className="w-96">
             <Questionnaire defaultValue={{ tone: 'formal' }}>
-              <Questionnaire.Question name="tone">
+              <Questionnaire.Question name="tone" required>
                 어떤 말투로 쓸까요?
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
@@ -126,10 +130,10 @@ export const Gallery: Story = {
             </Questionnaire>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="multiple, optional">
+        <Showcase.Row label="multiple, not required">
           <div className="w-96">
             <Questionnaire defaultValue={{ topics: ['summary', '회의 일정'] }}>
-              <Questionnaire.Question name="topics" selectionMode="multiple" optional>
+              <Questionnaire.Question name="topics" selectionMode="multiple">
                 무엇을 넣을까요?
                 <Questionnaire.Option value="summary">요약</Questionnaire.Option>
                 <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
@@ -146,7 +150,7 @@ export const Gallery: Story = {
         <Showcase.Row label="unanswered">
           <div className="w-96">
             <Questionnaire>
-              <Questionnaire.Question name="tone">
+              <Questionnaire.Question name="tone" required>
                 어떤 말투로 쓸까요?
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
@@ -158,11 +162,14 @@ export const Gallery: Story = {
         <Showcase.Row label="disabled option">
           <div className="w-96">
             <Questionnaire defaultValue={{ seat: 'window' }}>
-              <Questionnaire.Question name="seat">
+              <Questionnaire.Question name="seat" required>
                 어느 자리로 할까요?
                 <Questionnaire.Option value="window">창가</Questionnaire.Option>
-                <Questionnaire.Option value="aisle" disabled description="남은 자리가 없어요">
+                <Questionnaire.Option value="aisle" disabled>
                   통로
+                  <Questionnaire.OptionDescription>
+                    남은 자리가 없어요
+                  </Questionnaire.OptionDescription>
                 </Questionnaire.Option>
               </Questionnaire.Question>
               <Questionnaire.Submit>보내기</Questionnaire.Submit>
@@ -172,7 +179,7 @@ export const Gallery: Story = {
         <Showcase.Row label="other filled">
           <div className="w-96">
             <Questionnaire defaultValue={{ tone: '반말로 짧게' }}>
-              <Questionnaire.Question name="tone">
+              <Questionnaire.Question name="tone" required>
                 어떤 말투로 쓸까요?
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
@@ -188,7 +195,12 @@ export const Gallery: Story = {
         <Showcase.Row label="toggle, single">
           <div className="w-96">
             <Questionnaire defaultValue={{ tone: 'casual' }}>
-              <Questionnaire.Question name="tone" variant="toggle" orientation="horizontal">
+              <Questionnaire.Question
+                name="tone"
+                variant="toggle"
+                orientation="horizontal"
+                required
+              >
                 어떤 말투로 쓸까요?
                 <Questionnaire.Option value="formal">격식</Questionnaire.Option>
                 <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
@@ -207,6 +219,7 @@ export const Gallery: Story = {
                 selectionMode="multiple"
                 variant="toggle"
                 orientation="horizontal"
+                required
               >
                 어떤 굿즈를 팔까요?
                 <Questionnaire.Option value="sticker">스티커</Questionnaire.Option>
@@ -223,10 +236,15 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section title="Suggested prompts">
-        <Showcase.Row label="toggle, advanceOnSelect">
+        <Showcase.Row label="toggle, advance select">
           <div className="w-120">
-            <Questionnaire advanceOnSelect size="tiny">
-              <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
+            <Questionnaire advance="select" size="tiny">
+              <Questionnaire.Question
+                name="prompt"
+                variant="toggle"
+                orientation="horizontal"
+                required
+              >
                 무엇을 도와드릴까요?
                 <Questionnaire.Option value="학식">오늘 학식</Questionnaire.Option>
                 <Questionnaire.Option value="셔틀">셔틀 시간표</Questionnaire.Option>
@@ -245,22 +263,25 @@ export const AskSeveralQuestionsInSteps: Story = {
   args: {
     children: (
       <>
-        <Questionnaire.Question name="size">
+        <Questionnaire.Question name="size" required>
           부스는 몇 칸을 쓸까요?
           <Questionnaire.Description>한 칸은 가로 3미터, 세로 2미터예요.</Questionnaire.Description>
-          <Questionnaire.Option value="one" description="굿즈 판매만 해요">
-            한 칸
+          <Questionnaire.Option value="one">
+            한 칸<Questionnaire.OptionDescription>굿즈 판매만 해요</Questionnaire.OptionDescription>
           </Questionnaire.Option>
-          <Questionnaire.Option value="two" description="판매와 체험을 함께 해요">
+          <Questionnaire.Option value="two">
             두 칸
+            <Questionnaire.OptionDescription>
+              판매와 체험을 함께 해요
+            </Questionnaire.OptionDescription>
           </Questionnaire.Option>
         </Questionnaire.Question>
-        <Questionnaire.Question name="people" optional>
+        <Questionnaire.Question name="people">
           부스를 지킬 사람은 몇 명인가요?
           <Questionnaire.Option value="few">4명 이하</Questionnaire.Option>
           <Questionnaire.Option value="many">5명 이상</Questionnaire.Option>
         </Questionnaire.Question>
-        <Questionnaire.Question name="goods" selectionMode="multiple">
+        <Questionnaire.Question name="goods" selectionMode="multiple" required>
           어떤 굿즈를 팔까요?
           <Questionnaire.Option value="sticker">스티커</Questionnaire.Option>
           <Questionnaire.Option value="keyring">키링</Questionnaire.Option>
@@ -275,7 +296,7 @@ export const AskSeveralQuestionsInSteps: Story = {
     docs: {
       description: {
         story:
-          '질문이 여럿이면 위에 Progress 가 붙고, 한 번에 한 질문만 보입니다. 답하지 않은 필수 질문에서는 다음 버튼이 꺼져 있고, optional 질문에는 Questionnaire.Skip 에 쓴 건너뛰기 버튼이 붙습니다. 이전과 다음은 아이콘 버튼이고, 마지막 질문의 버튼 글자는 Questionnaire.Submit 의 children 입니다. 마지막 질문에서 보내면 onComplete 가 건너뛴 질문을 뺀 답을 받습니다.',
+          '질문이 여럿이면 위에 Progress 가 붙고, 한 번에 한 질문만 보입니다. 답하지 않은 required 질문에서는 다음 버튼이 꺼져 있고, required 가 없는 질문에는 Questionnaire.Skip 에 쓴 건너뛰기 버튼이 붙습니다. 보기 아래 설명은 Questionnaire.OptionDescription 입니다. 이전과 다음은 아이콘 버튼이고, 마지막 질문의 버튼 글자는 Questionnaire.Submit 의 children 입니다. 마지막 질문에서 보내면 onComplete 가 건너뛴 질문을 뺀 답을 받습니다.',
       },
     },
   },
@@ -315,7 +336,7 @@ export const AskSeveralQuestionsInSteps: Story = {
 export const LetPeopleWriteTheirOwnAnswer: Story = {
   args: {
     children: (
-      <Questionnaire.Question name="tone">
+      <Questionnaire.Question name="tone" required>
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
         <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
@@ -348,16 +369,66 @@ export const LetPeopleWriteTheirOwnAnswer: Story = {
   },
 };
 
+export const FollowTheAnswersAsTheyChange: Story = {
+  render: function Render() {
+    const [answers, setAnswers] = useState<Questionnaire.Answers>({ tone: 'formal' });
+
+    return (
+      <div className="grid w-96 gap-3">
+        <Questionnaire value={answers} onValueChange={setAnswers}>
+          <Questionnaire.Question name="tone" required>
+            어떤 말투로 쓸까요?
+            <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+            <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+            <Questionnaire.Other aria-label="직접 입력" />
+          </Questionnaire.Question>
+          <Questionnaire.Submit>보내기</Questionnaire.Submit>
+        </Questionnaire>
+        <Button type="button" variant="outline" onClick={() => setAnswers({})}>
+          답 지우기
+        </Button>
+        <output aria-label="지금 답">{JSON.stringify(answers)}</output>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'value 와 onValueChange 로 답을 앱의 상태에 둡니다. 보기를 고르거나 직접 입력에 적을 때마다 onValueChange 가 새 답을 받고, 앱이 value 를 바꾸면 화면의 답도 따라 바뀝니다. 끝까지 보냈을 때는 onComplete 가 불립니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const output = within(canvasElement).getByLabelText('지금 답');
+    await expect(radio(canvasElement, '격식')).toBeChecked();
+    await userEvent.click(radio(canvasElement, '편하게'));
+    await expect(output).toHaveTextContent('{"tone":"casual"}');
+    await userEvent.type(
+      within(canvasElement).getByRole('textbox', { name: '직접 입력' }),
+      '짧게 ',
+    );
+    await expect(output).toHaveTextContent('{"tone":"짧게"}');
+    await expect(within(canvasElement).getByRole('textbox', { name: '직접 입력' })).toHaveValue(
+      '짧게 ',
+    );
+    await userEvent.click(button(canvasElement, '답 지우기'));
+    await expect(output).toHaveTextContent('{}');
+    await expect(radio(canvasElement, '편하게')).not.toBeChecked();
+    await expect(within(canvasElement).getByRole('textbox', { name: '직접 입력' })).toHaveValue('');
+  },
+};
+
 export const StartOverWithAFormReset: Story = {
   render: (args) => (
     <Questionnaire {...args} defaultValue={{ tone: 'formal' }}>
-      <Questionnaire.Question name="tone">
+      <Questionnaire.Question name="tone" required>
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
         <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
         <Questionnaire.Other aria-label="직접 입력" />
       </Questionnaire.Question>
-      <Questionnaire.Question name="length">
+      <Questionnaire.Question name="length" required>
         얼마나 길게 쓸까요?
         <Questionnaire.Option value="short">짧게</Questionnaire.Option>
         <Questionnaire.Option value="long">길게</Questionnaire.Option>
@@ -400,8 +471,13 @@ export const SuggestPromptsToStartAChat: Story = {
           <Card.Description>학교생활에 대해 무엇이든 물어보세요.</Card.Description>
         </Card.Header>
         <Card.Content>
-          <Questionnaire advanceOnSelect size="tiny" onComplete={args.onComplete}>
-            <Questionnaire.Question name="prompt" variant="toggle" orientation="horizontal">
+          <Questionnaire advance="select" size="tiny" onComplete={args.onComplete}>
+            <Questionnaire.Question
+              name="prompt"
+              variant="toggle"
+              orientation="horizontal"
+              required
+            >
               이런 걸 물어볼 수 있어요
               <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
               <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
@@ -417,7 +493,7 @@ export const SuggestPromptsToStartAChat: Story = {
     docs: {
       description: {
         story:
-          '채팅 시작 화면의 추천 질문은 한 단계짜리 Questionnaire 입니다. variant="toggle" 이라 보기가 라디오 없는 Toggle 로 그려집니다. advanceOnSelect 면 하나만 고르는 질문은 보기를 누르는 순간 넘어가고, 질문이 하나뿐이라 바로 onComplete 가 불립니다. 화살표 키로 옮겨 다니는 동안은 넘어가지 않고 Space 나 Enter 로 고릅니다.',
+          '채팅 시작 화면의 추천 질문은 한 단계짜리 Questionnaire 입니다. variant="toggle" 이라 보기가 라디오 없는 Toggle 로 그려집니다. advance="select" 면 하나만 고르는 질문은 보기를 누르는 순간 넘어가고, 질문이 하나뿐이라 바로 onComplete 가 불립니다. 화살표 키로 옮겨 다니는 동안은 넘어가지 않고 Space 나 Enter 로 고릅니다.',
       },
     },
   },
@@ -442,13 +518,13 @@ export const Keyboard: Story = {
   args: {
     children: (
       <>
-        <Questionnaire.Question name="tone">
+        <Questionnaire.Question name="tone" required>
           어떤 말투로 쓸까요?
           <Questionnaire.Option value="formal">격식</Questionnaire.Option>
           <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
           <Questionnaire.Option value="cute">귀엽게</Questionnaire.Option>
         </Questionnaire.Question>
-        <Questionnaire.Question name="topics" selectionMode="multiple">
+        <Questionnaire.Question name="topics" selectionMode="multiple" required>
           무엇을 넣을까요?
           <Questionnaire.Option value="summary">요약</Questionnaire.Option>
           <Questionnaire.Option value="todo">할 일</Questionnaire.Option>

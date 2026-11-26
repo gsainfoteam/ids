@@ -4,6 +4,7 @@ import { ChipContent, type ChipContentProps } from './parts/content';
 import { ChipCreate, type ChipCreateProps } from './parts/create';
 import { ChipEmpty, type ChipEmptyProps } from './parts/empty';
 import { ChipGroup, type ChipGroupProps } from './parts/group';
+import { ChipGroupLabel, type ChipGroupLabelProps } from './parts/group-label';
 import { ChipInput, type ChipInputProps } from './parts/input';
 import { ChipItem, type ChipItemProps } from './parts/item';
 import { ChipItemIndicator, type ChipItemIndicatorProps } from './parts/item-indicator';
@@ -17,7 +18,11 @@ import {
 } from './root';
 import { chipFieldStyle } from './style';
 
-import type { ChipValidateResult } from './lib/chip-values';
+import type {
+  ChipFieldCreateOptions,
+  ChipFieldInstance,
+  UseChipFieldOptions,
+} from './hooks/use-chip-field';
 import type { IdsSize } from '../../../tokens/types';
 
 export function ChipField(props: ChipField.Props) {
@@ -32,12 +37,9 @@ export namespace ChipField {
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
-    onCreate?: (value: string) => void;
-    validate?: (value: string) => ChipValidateResult;
-    maxCount?: number;
+    chipField?: ChipFieldInstance;
     variant?: ChipFieldVariant;
     size?: IdsSize;
-    invalid?: boolean;
     name?: string;
     form?: string;
     required?: boolean;
@@ -50,11 +52,15 @@ export namespace ChipField {
   export type State = ChipFieldState;
   export type ItemState = ChipFieldItemState;
   export type Variant = ChipFieldVariant;
+  export type Instance = ChipFieldInstance;
+  export type Options = UseChipFieldOptions;
+  export type CreateOptions = ChipFieldCreateOptions;
 
   export type ContentProps = ChipContentProps;
   export type ItemProps = ChipItemProps;
   export type IndicatorProps = ChipItemIndicatorProps;
   export type GroupProps = ChipGroupProps;
+  export type GroupLabelProps = ChipGroupLabelProps;
   export type CreateProps = ChipCreateProps;
   export type EmptyProps = ChipEmptyProps;
   export type LimitProps = ChipLimitProps;
@@ -68,6 +74,7 @@ export namespace ChipField {
   export const Item = ChipItem;
   export const ItemIndicator = ChipItemIndicator;
   export const Group = ChipGroup;
+  export const GroupLabel = ChipGroupLabel;
   export const Create = ChipCreate;
   export const Empty = ChipEmpty;
   export const Limit = ChipLimit;
@@ -83,3 +90,10 @@ export type {
 } from './root';
 
 export type ChipFieldProps = ChipField.Props;
+
+export { useChipField } from './hooks/use-chip-field';
+export type {
+  ChipFieldCreateOptions,
+  ChipFieldInstance,
+  UseChipFieldOptions,
+} from './hooks/use-chip-field';

@@ -10,7 +10,6 @@ import {
   SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { noop } from 'es-toolkit';
 
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
@@ -21,7 +20,7 @@ import { CodeBlock } from '../../components/data/code-block';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
-import { ChipField } from '../../components/form/chip-field';
+import { ChipField, useChipField } from '../../components/form/chip-field';
 import { Field } from '../../components/form/field';
 import { FileDropzone } from '../../components/form/file-dropzone';
 import { Select } from '../../components/form/select';
@@ -102,6 +101,7 @@ const EMBED = `<script
 
 export const PC: Story = {
   render: function Render() {
+    const starterChips = useChipField({ create: {} });
     const [name, setName] = useState('행사 준비 도우미');
     const [starters, setStarters] = useState<string[]>(STARTERS);
 
@@ -223,7 +223,7 @@ export const PC: Story = {
                     name="starters"
                     value={starters}
                     onValueChange={setStarters}
-                    onCreate={noop}
+                    chipField={starterChips}
                     placeholder="문장을 적고 Enter"
                   />
                 </Field>

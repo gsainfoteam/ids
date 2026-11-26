@@ -1,12 +1,11 @@
 import { useState } from 'react';
 
 import { CalendarDateTime } from '@internationalized/date';
-import { noop } from 'es-toolkit';
 
 import { Button } from '../../components/action/button';
 import { Card } from '../../components/data/card';
 import { toast } from '../../components/feedback/toast';
-import { ChipField } from '../../components/form/chip-field';
+import { ChipField, useChipField } from '../../components/form/chip-field';
 import { DateTimeField } from '../../components/form/date-time-field';
 import { Editor } from '../../components/form/editor';
 import { Field } from '../../components/form/field';
@@ -39,6 +38,7 @@ const DRAFT =
 
 export const PC: Story = {
   render: function Render() {
+    const tagChips = useChipField({ create: {} });
     const [title, setTitle] = useState('가을 축제 부스 운영 동아리 모집');
     const [body, setBody] = useState(DRAFT);
     const [scheduled, setScheduled] = useState(false);
@@ -84,7 +84,7 @@ export const PC: Story = {
                 <ChipField
                   name="tags"
                   defaultValue={['축제', '동아리']}
-                  onCreate={noop}
+                  chipField={tagChips}
                   placeholder="태그 더하기"
                 >
                   {TAGS.map((tag) => (

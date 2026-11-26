@@ -6,14 +6,13 @@ import {
   PaperAirplaneIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { noop } from 'es-toolkit';
 
 import { Button } from '../../components/action/button';
 import { ButtonGroup } from '../../components/action/button-group';
 import { IconButton } from '../../components/action/icon-button';
 import { Card } from '../../components/data/card';
 import { toast } from '../../components/feedback/toast';
-import { ChipField } from '../../components/form/chip-field';
+import { ChipField, useChipField } from '../../components/form/chip-field';
 import { Field } from '../../components/form/field';
 import { FileField, useFileField } from '../../components/form/file-field';
 import { TextArea } from '../../components/form/text-area';
@@ -43,6 +42,7 @@ const CONTACTS = [
 
 export const PC: Story = {
   render: function Render() {
+    const recipientChips = useChipField({ create: {} });
     const [to, setTo] = useState<string[]>(['team@gistory.me']);
     const attachments = useFileField({ limits: { maxSize: 25 * 1024 * 1024 } });
 
@@ -79,7 +79,7 @@ export const PC: Story = {
                     name="to"
                     value={to}
                     onValueChange={setTo}
-                    onCreate={noop}
+                    chipField={recipientChips}
                     placeholder="이름이나 메일 주소"
                     required
                   >

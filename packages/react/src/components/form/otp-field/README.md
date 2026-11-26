@@ -111,11 +111,26 @@ import { Field, OTPField } from '@gsainfoteam/ids-react';
 ## 마스크와 자리 표시
 
 ```tsx
-<OTPField aria-label="인증 코드" length={4} mask />                  // 채운 칸을 점으로
-<OTPField aria-label="인증 코드" length={4} mask="*" />              // 원하는 글자로
+<OTPField aria-label="인증 코드" length={4} mask="dot" />            // 채운 칸을 점으로. 기본 none
 <OTPField aria-label="인증 코드" length={6} placeholder="000000" />  // 빈 칸마다 한 글자씩
+
+<OTPField aria-label="인증 코드" length={4}>                          {/* 원하는 글자로 */}
+  <OTPField.Group>
+    {[0, 1, 2, 3].map((index) => (
+      <OTPField.Slot key={index} index={index}>
+        {(slot) => (
+          <>
+            {slot.isFilled && '✱'}
+            {slot.hasFakeCaret && <OTPField.Caret />}
+          </>
+        )}
+      </OTPField.Slot>
+    ))}
+  </OTPField.Group>
+</OTPField>
 ```
 
+- 다른 글자로 가리려면 `OTPField.Slot` 의 `children` 함수에서 그 글자와 `OTPField.Caret` 을 그립니다.
 - 마스크는 칸에 그리는 모양만 바꿉니다. input은 `type="text"` 그대로라 비밀번호 관리자가 끼어들지 않습니다.
 
 ## 폼
@@ -172,8 +187,10 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 ```tsx
 <OTPField aria-label="인증 코드" variant="soft" />  // outline(기본) / soft
 <OTPField aria-label="인증 코드" size="tiny" />     // standard(36px) / tiny(32px). 생략하면 Field를 따른다
-<OTPField aria-label="인증 코드" invalid />         // 테두리와 포커스 링이 danger 색
+<OTPField aria-label="인증 코드" aria-invalid />    // 테두리와 포커스 링이 danger 색
 ```
+
+- `Field` 안에서는 `Field` 의 `invalid` 를 따릅니다.
 
 ## 속성
 
@@ -184,9 +201,9 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `onValueChange`          | 코드가 바뀔 때                                                        |
 | `onComplete`             | 모든 칸이 처음 찼을 때                                                |
 | `pattern`                | `numeric`(기본) / `alphanumeric` / 한 글자를 검사하는 `RegExp`        |
-| `mask`                   | `true` 면 점, 문자열이면 그 글자                                      |
+| `mask`                   | `none`(기본) / `dot`. 채운 칸을 점으로 그린다                         |
 | `placeholder`            | 빈 칸에 한 글자씩                                                     |
-| `invalid`                | `aria-invalid` 와 danger 색                                           |
+| `aria-invalid`           | danger 색. 생략하면 `Field` 의 `invalid`                              |
 | `variant`                | `outline`(기본) / `soft`                                              |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                            |
 | `ref`                    | 실제 input                                                            |

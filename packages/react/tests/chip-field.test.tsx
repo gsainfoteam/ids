@@ -1,4 +1,3 @@
-import { noop } from 'es-toolkit';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { beforeEach, expect, test, vi } from 'vitest';
@@ -6,13 +5,15 @@ import { page, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { ChipField, Field } from '../src';
+import { ChipFieldWith } from './hook-controls';
 import { Field as RHFField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
 const items = (
   <>
-    <ChipField.Group heading="Languages">
+    <ChipField.Group>
+      <ChipField.GroupLabel>Languages</ChipField.GroupLabel>
       <ChipField.Item value="js">JavaScript</ChipField.Item>
       <ChipField.Item value="ts">TypeScript</ChipField.Item>
     </ChipField.Group>
@@ -99,10 +100,10 @@ test('SSR: Field labelling, one hidden input per chip, required validator, no ne
 test('search, groups, keyboard selection with a check, chip removal and maxCount', async () => {
   const onValueChange = vi.fn();
   const screen = await render(
-    <ChipField aria-label="Skills" maxCount={1} onValueChange={onValueChange}>
+    <ChipFieldWith aria-label="Skills" maxCount={1} onValueChange={onValueChange}>
       {items}
       <ChipField.Limit>최대 1개까지 고를 수 있습니다.</ChipField.Limit>
-    </ChipField>,
+    </ChipFieldWith>,
   );
   const input = screen.getByRole('combobox', { name: 'Skills' });
   const listbox = screen.getByRole('listbox');
@@ -188,9 +189,9 @@ test('arrow keys walk the chips; Backspace and Delete remove and keep focus near
 
 test('the container opens the list; PageDown jumps; an outside value may exceed maxCount', async () => {
   const screen = await render(
-    <ChipField aria-label="Skills" value={['js', 'ts', 'x']} maxCount={2}>
+    <ChipFieldWith aria-label="Skills" value={['js', 'ts', 'x']} maxCount={2}>
       {items}
-    </ChipField>,
+    </ChipFieldWith>,
   );
   expect(chips()).toEqual(['JavaScript', 'TypeScript', 'x']);
   const root = screen.container.querySelector<HTMLElement>('[data-chip-field]')!;
@@ -247,19 +248,18 @@ test('paste splits on commas and new lines, dedupes, and leaves what it cannot a
   expect(onValueChange).toHaveBeenCalledTimes(1);
 });
 
-test('onCreate: trims, dedupes, ignores IME, validates, and commits on comma or Enter', async () => {
+test('create: trims, dedupes, ignores IME, validates, and commits on comma or Enter', async () => {
   const onValueChange = vi.fn();
   const onCreate = vi.fn();
   const screen = await render(
-    <ChipField
+    <ChipFieldWith
       aria-label="Skills"
       maxCount={3}
-      validate={(text) => text.length >= 2 || 'Too short'}
+      create={{ onCreate, validate: (text) => text.length >= 2 || 'Too short' }}
       onValueChange={onValueChange}
-      onCreate={onCreate}
     >
       {items}
-    </ChipField>,
+    </ChipFieldWith>,
   );
   const input = screen.getByRole('combobox', { name: 'Skills' });
   const createRow = () => screen.container.querySelector('[data-chip-field-create]');
@@ -295,9 +295,9 @@ test('onCreate: trims, dedupes, ignores IME, validates, and commits on comma or 
   expect(createRow()).toBeNull();
   await screen.rerender(
     <div key="false">
-      <ChipField aria-label="Skills" onCreate={noop} validate={() => false}>
+      <ChipFieldWith aria-label="Skills" create={{ validate: () => false }}>
         {items}
-      </ChipField>
+      </ChipFieldWith>
     </div>,
   );
   await userEvent.fill(screen.getByRole('combobox', { name: 'Skills' }), 'anything');
@@ -527,7 +527,7 @@ test('Input inside a Fragment splits leading and trailing adornments', async () 
 });
 
 test('a field that only creates values has no chevron', async () => {
-  const screen = await render(<ChipField aria-label="Emails" onCreate={noop} />);
+  const screen = await render(<ChipFieldWith aria-label="Emails" create={{}} />);
   expect(layout(screen.container)).toEqual(['INPUT']);
 });
 
@@ -633,10 +633,10 @@ test('the placeholder shows only while no chip is chosen', async () => {
 test('the input takes the width of its text, so it wraps only when the text does not fit', async () => {
   const screen = await render(
     <div className="w-64">
-      <ChipField aria-label="Stack" defaultValue={['react', 'vue']} onCreate={noop}>
+      <ChipFieldWith aria-label="Stack" defaultValue={['react', 'vue']} create={{}}>
         <ChipField.Item value="react">react</ChipField.Item>
         <ChipField.Item value="vue">vue</ChipField.Item>
-      </ChipField>
+      </ChipFieldWith>
     </div>,
   );
   const top = (element: Element) => element.getBoundingClientRect().top;

@@ -9,7 +9,7 @@ import { CheckboxGroup } from '../../components/form/checkbox-group';
 import { Field } from '../../components/form/field';
 import { RadioGroup } from '../../components/form/radio-group';
 import { Rating } from '../../components/form/rating';
-import { Slider } from '../../components/form/slider';
+import { Slider, useSlider } from '../../components/form/slider';
 import { TextArea } from '../../components/form/text-area';
 import { Label } from '../../components/typography/label';
 
@@ -38,6 +38,9 @@ export const PC: Story = {
     const [pace, setPace] = useState<string | null>(null);
     const [helpful, setHelpful] = useState<string[]>([]);
     const [difficulty, setDifficulty] = useState(3);
+    const difficultyLabels = useSlider({
+      formatLabel: (value) => DIFFICULTY[value] ?? String(value),
+    });
     const [comment, setComment] = useState('');
 
     const answered = [
@@ -165,7 +168,7 @@ export const PC: Story = {
                 max={5}
                 value={difficulty}
                 onValueChange={setDifficulty}
-                formatLabel={(value) => DIFFICULTY[value] ?? String(value)}
+                slider={difficultyLabels}
                 aria-labelledby="difficulty-question"
               >
                 <Slider.Marks>

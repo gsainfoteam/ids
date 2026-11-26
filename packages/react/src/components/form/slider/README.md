@@ -40,16 +40,18 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 ## 범위
 
 ```tsx
-<Slider defaultValue={[20, 80]} minStepsBetweenThumbs={2} aria-label="가격">
+const price = useSlider({ minStepsBetweenThumbs: 2 });
+
+<Slider defaultValue={[20, 80]} slider={price} aria-label="가격">
   <Slider.Track>
     <Slider.Range />
     <Slider.Thumb index={0} aria-label="최저가" /> {/* 기본 '시작' */}
     <Slider.Thumb index={1} aria-label="최고가" /> {/* 기본 '끝' */}
   </Slider.Track>
-</Slider>
+</Slider>;
 ```
 
-- 두 thumb은 교차하지 않습니다. 시작 thumb의 `aria-valuemax` 는 끝 값, 끝 thumb의 `aria-valuemin` 은 시작 값이라 보조 기술도 같은 한계를 읽습니다.
+- 두 thumb은 교차하지 않고 `minStepsBetweenThumbs` 칸만큼 떨어져 있습니다. 시작 thumb의 `aria-valuemax` 는 끝 값, 끝 thumb의 `aria-valuemin` 은 시작 값이라 보조 기술도 같은 한계를 읽습니다.
 - 두 thumb이 겹쳐 있으면 처음 끄는 방향으로 움직일 수 있는 thumb이 따라옵니다.
 
 ## 키보드
@@ -63,13 +65,21 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 | `Home` `End`        | `min` / `max`. 범위에서는 다른 thumb 앞까지 |
 | RTL 가로 슬라이더   | `→` 가 줄이고 `←` 가 늘린다                 |
 
+```tsx
+const hue = useSlider({ largeStep: 45 });
+
+<Slider max={360} slider={hue} aria-label="색상" />;
+```
+
 - 처리한 키는 페이지를 스크롤하지 않습니다.
 - `onValueCommit` 은 키를 놓을 때, 또는 키를 누른 채 포커스가 떠날 때 한 번 불립니다.
 
 ## 눈금과 라벨
 
 ```tsx
-<Slider step={25} formatLabel={(v) => `${v}%`}>
+const percent = useSlider({ formatLabel: (v) => `${v}%` }); // 값 라벨, 눈금 라벨, aria-valuetext
+
+<Slider step={25} slider={percent}>
   <Slider.Marks>
     <Slider.Mark value={0} />                  {/* 라벨은 formatLabel(0) */}
     <Slider.Mark value={50}>절반</Slider.Mark>  {/* children 이 라벨 */}
@@ -80,8 +90,6 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 <Slider max={10}>
   <Slider.Marks />                             {/* step 마다 눈금만 */}
 </Slider>
-
-<Slider formatLabel={(v) => `₩${v.toLocaleString()}`} /> // 값 라벨, 눈금 라벨, aria-valuetext
 
 <Slider.Thumb>{null}</Slider.Thumb>            // 값 라벨 없는 thumb
 ```
@@ -117,7 +125,7 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 
 앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-- 값은 `value` / `defaultValue` / `onValueChange`, 끌기를 마친 값은 `onValueCommit` 으로 읽습니다.
+- 값은 `value` / `defaultValue` / `onValueChange`, 끌기를 마친 값은 `onValueCommit` 으로 읽습니다. `onValueCommit` 은 같은 값의 이벤트라 루트에 있습니다.
 - 새 디자인(`custom-design`)에서만 각 부분의 `className`, `style` 에 `Slider.State`(`value`, `values`, `dragging`, `orientation`, `disabled`, `readOnly`, `invalid`)를 받는 함수를 줍니다. thumb 은 `Slider.ThumbState`(더해서 `index`, `thumbValue`, `thumbDragging`)를 받습니다.
 
 ## 폼
@@ -175,19 +183,25 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `onValueChange`          | 움직이는 동안                                                 |
 | `onValueCommit`          | 손을 떼거나 키를 놓을 때                                      |
 | `min` / `max` / `step`   | `0` / `100` / `1`                                             |
-| `largeStep`              | `step × 10`                                                   |
-| `minStepsBetweenThumbs`  | `0`                                                           |
 | `orientation`            | `horizontal`(기본) / `vertical`                               |
-| `formatLabel`            | 값 라벨, 눈금 라벨, `aria-valuetext`                          |
+| `slider`                 | `useSlider()` 의 결과. 큰 걸음, thumb 간격, 라벨              |
 | `disabled` / `readOnly`  | 조작을 막는다. 읽기 전용은 포커스를 받는다                    |
-| `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선                      |
+| `aria-invalid`           | 오류 표시. 생략하면 `Field` 의 `invalid`                      |
 | `name` / `form`          | hidden input으로 제출                                         |
 | `size`                   | `standard` / `tiny`                                           |
 | `className` / `style`    | 루트로 간다. 새 디자인(`custom-design`)에서만 쓴다                          |
 | `ref`                    | 루트. `focus()` 는 첫 thumb으로 넘어간다                      |
 
+## useSlider
+
+| 옵션                    | 기본 / 동작                                     |
+| ----------------------- | ----------------------------------------------- |
+| `largeStep`             | `step × 10`. `Shift` + 방향키, `PageUp` `PageDown` |
+| `minStepsBetweenThumbs` | `0`. 범위의 두 thumb 사이에 둘 최소 칸 수        |
+| `formatLabel`           | 값 라벨, 눈금 라벨, `aria-valuetext`             |
+
 ## 알아둘 것
 
 - 루트는 `tabIndex={-1}` 이라 Tab 순서에는 없고, 포커스를 받으면 첫 thumb으로 넘깁니다. thumb만 Tab에 멈춥니다.
 - 가로 슬라이더는 부모 너비를 채웁니다. 바깥 여백은 없습니다.
-- `min >= max`, `step <= 0` 은 오류가 납니다.
+- `min >= max`, `step <= 0`, `largeStep <= 0` 은 오류가 납니다.

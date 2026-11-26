@@ -12,14 +12,14 @@ const button = (name: string) => page.getByRole('button', { name, exact: true })
 
 const twoQuestions = (props: Partial<Questionnaire.Props> = {}) => (
   <Questionnaire {...props}>
-    <Questionnaire.Question name="tone">
+    <Questionnaire.Question name="tone" required>
       어떤 말투로 쓸까요?
       <Questionnaire.Description>나중에 바꿀 수 있어요.</Questionnaire.Description>
       <Questionnaire.Option value="formal">격식</Questionnaire.Option>
       <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
       <Questionnaire.Other aria-label="직접 입력" />
     </Questionnaire.Question>
-    <Questionnaire.Question name="topics" selectionMode="multiple" optional>
+    <Questionnaire.Question name="topics" selectionMode="multiple">
       무엇을 넣을까요?
       <Questionnaire.Option value="summary">요약</Questionnaire.Option>
       <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
@@ -96,7 +96,7 @@ test('defaultValue puts listed values on the options and the rest in Other', asy
   expect(onComplete).toHaveBeenCalledWith({ tone: '반말로', topics: ['todo', '메모'] });
 });
 
-test('skipping the last optional question completes and submits without its answer', async () => {
+test('skipping the last question that is not required completes and submits without its answer', async () => {
   const onComplete = vi.fn();
   const submitted: FormData[] = [];
   await render(
@@ -117,16 +117,16 @@ test('skipping the last optional question completes and submits without its answ
   expect(submitted[0].getAll('topics')).toEqual([]);
 });
 
-test('with advanceOnSelect a pick moves on, an arrow key only moves the choice', async () => {
+test('with advance="select" a pick moves on, an arrow key only moves the choice', async () => {
   const onComplete = vi.fn();
   await render(
-    <Questionnaire advanceOnSelect onComplete={onComplete}>
-      <Questionnaire.Question name="size">
+    <Questionnaire advance="select" onComplete={onComplete}>
+      <Questionnaire.Question name="size" required>
         몇 칸을 쓸까요?
         <Questionnaire.Option value="one">한 칸</Questionnaire.Option>
         <Questionnaire.Option value="two">두 칸</Questionnaire.Option>
       </Questionnaire.Question>
-      <Questionnaire.Question name="people">
+      <Questionnaire.Question name="people" required>
         몇 명인가요?
         <Questionnaire.Option value="few">4명 이하</Questionnaire.Option>
         <Questionnaire.Option value="many">5명 이상</Questionnaire.Option>
@@ -146,16 +146,16 @@ test('with advanceOnSelect a pick moves on, an arrow key only moves the choice',
   expect(onComplete).toHaveBeenCalledWith({ size: 'two', people: 'many' });
 });
 
-test('toggle options draw no radio, join FormData and move on with advanceOnSelect', async () => {
+test('toggle options draw no radio, join FormData and move on with advance="select"', async () => {
   const onComplete = vi.fn();
   const screen = await render(
-    <Questionnaire advanceOnSelect onComplete={onComplete}>
-      <Questionnaire.Question name="size" variant="toggle" orientation="horizontal">
+    <Questionnaire advance="select" onComplete={onComplete}>
+      <Questionnaire.Question name="size" variant="toggle" orientation="horizontal" required>
         몇 칸을 쓸까요?
         <Questionnaire.Option value="one">한 칸</Questionnaire.Option>
         <Questionnaire.Option value="two">두 칸</Questionnaire.Option>
       </Questionnaire.Question>
-      <Questionnaire.Question name="people" variant="toggle" orientation="horizontal">
+      <Questionnaire.Question name="people" variant="toggle" orientation="horizontal" required>
         몇 명인가요?
         <Questionnaire.Option value="few">4명 이하</Questionnaire.Option>
         <Questionnaire.Option value="many">5명 이상</Questionnaire.Option>
@@ -184,7 +184,7 @@ test('toggle options draw no radio, join FormData and move on with advanceOnSele
 test('a single question shows no progress bar', async () => {
   await render(
     <Questionnaire>
-      <Questionnaire.Question name="tone">
+      <Questionnaire.Question name="tone" required>
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
       </Questionnaire.Question>
@@ -199,11 +199,11 @@ test('a single question shows no progress bar', async () => {
 test('without app text next, submit and previous are icons, and skip is left out', async () => {
   await render(
     <Questionnaire>
-      <Questionnaire.Question name="tone">
+      <Questionnaire.Question name="tone" required>
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
       </Questionnaire.Question>
-      <Questionnaire.Question name="length" optional>
+      <Questionnaire.Question name="length">
         얼마나 길게 쓸까요?
         <Questionnaire.Option value="short">짧게</Questionnaire.Option>
       </Questionnaire.Question>
@@ -226,11 +226,11 @@ test('a function child of Questionnaire.Submit names the next and the last butto
       <Questionnaire.Submit className="submit">
         {({ last }) => (last ? '계획 세우기' : '계속')}
       </Questionnaire.Submit>
-      <Questionnaire.Question name="tone">
+      <Questionnaire.Question name="tone" required>
         어떤 말투로 쓸까요?
         <Questionnaire.Option value="formal">격식</Questionnaire.Option>
       </Questionnaire.Question>
-      <Questionnaire.Question name="length">
+      <Questionnaire.Question name="length" required>
         얼마나 길게 쓸까요?
         <Questionnaire.Option value="short">짧게</Questionnaire.Option>
       </Questionnaire.Question>

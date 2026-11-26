@@ -4,7 +4,7 @@ import { type ComponentProps, type PointerEvent, type ReactNode } from 'react';
 
 import { keepFocusWhereItIs, mergeProps, part } from '../../../../utils';
 import { useInternalChip } from '../context';
-import { CREATE } from '../hooks/use-chip-field';
+import { CREATE } from '../hooks/use-chip-field-state';
 
 export type ChipCreateProps = Omit<ComponentProps<'div'>, 'children'> & {
   asChild?: boolean;

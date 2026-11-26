@@ -108,18 +108,17 @@ export const PC: Story = {
                 <Card.Content>
                   <Questionnaire onComplete={setAnswers}>
                     {QUESTIONS.map((question) => (
-                      <Questionnaire.Question key={question.id} name={question.id} optional>
+                      <Questionnaire.Question key={question.id} name={question.id}>
                         {question.title}
                         <Questionnaire.Description>
                           {question.description}
                         </Questionnaire.Description>
                         {question.choices.map((choice) => (
-                          <Questionnaire.Option
-                            key={choice.value}
-                            value={choice.value}
-                            description={choice.description}
-                          >
+                          <Questionnaire.Option key={choice.value} value={choice.value}>
                             {choice.label}
+                            <Questionnaire.OptionDescription>
+                              {choice.description}
+                            </Questionnaire.OptionDescription>
                           </Questionnaire.Option>
                         ))}
                         <Questionnaire.Other

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { isDevelopment } from '../../../../utils/dev';
 
-import type { SliderValue } from './use-slider';
+import type { SliderValue } from './use-slider-state';
 
 export function useInternalSliderValueShape(first: SliderValue | undefined) {
   const [range] = useState(() => Array.isArray(first));
