@@ -15,4 +15,4 @@ copyBundledFonts(root, ir);
 await writeCss(root, ir);
 await writeTs(root, ir);
 await writeFoundations(root, ir);
-writeDart(root);
+await writeDart(root);
