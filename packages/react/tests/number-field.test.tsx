@@ -431,7 +431,7 @@ test('readOnly/disabled, custom key cancellation, wheel and native editing short
   const screen = await render(
     <Field disabled invalid={false}>
       <Field.Label>Amount</Field.Label>
-      <NumberField defaultValue={5} invalid onValueChange={(value) => changes.push(value)} />
+      <NumberField defaultValue={5} aria-invalid onValueChange={(value) => changes.push(value)} />
     </Field>,
   );
   const input = screen.getByRole('spinbutton');

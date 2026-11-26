@@ -23,6 +23,7 @@ type SelectContextValue = {
 
 export const SelectContext = createContext<SelectContextValue | null>(null);
 export const ItemContext = createContext<SelectItemState | null>(null);
+export const GroupContext = createContext<{ labelId: string } | null>(null);
 
 export function useInternalSelectContext(part: string) {
   const context = use(SelectContext);

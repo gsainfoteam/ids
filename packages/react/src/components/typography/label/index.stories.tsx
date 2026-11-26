@@ -22,7 +22,7 @@ const meta = {
     size: { control: 'radio', options: ['standard', 'tiny'] },
     required: { control: 'radio', options: [undefined, true, false] },
     disabled: { control: 'radio', options: [undefined, true, false] },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: { children: '이름', htmlFor: 'label-playground' },
 } satisfies Meta<typeof Label>;
@@ -78,10 +78,10 @@ export const Gallery: Story = {
               <TextField id={`gallery-${size}-disabled`} size={size} disabled />
             </div>
             <div className="flex w-48 flex-col gap-2">
-              <Label size={size} htmlFor={`gallery-${size}-invalid`} invalid>
+              <Label size={size} htmlFor={`gallery-${size}-invalid`} aria-invalid>
                 이메일
               </Label>
-              <TextField id={`gallery-${size}-invalid`} size={size} invalid />
+              <TextField id={`gallery-${size}-invalid`} size={size} aria-invalid />
             </div>
           </Showcase.Row>
         ))}

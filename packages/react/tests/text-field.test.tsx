@@ -87,7 +87,7 @@ test('invalid structures fail clearly', () => {
 });
 
 test('the shell carries the input state; the input is marked for focus-ring', async () => {
-  const screen = await render(<TextField aria-label="Name" invalid />);
+  const screen = await render(<TextField aria-label="Name" aria-invalid />);
   const input = screen.getByRole('textbox', { name: 'Name' });
   const shell = () => screen.container.querySelector<HTMLElement>('[data-text-field]')!;
   await expect.element(input).toHaveAttribute('data-field-input');

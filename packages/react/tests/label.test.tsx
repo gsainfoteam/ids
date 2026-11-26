@@ -175,7 +175,11 @@ test('className and style read the state', async () => {
 test('invalid is set directly, not read from the control', async () => {
   const screen = await render(
     <div>
-      <Label htmlFor="e" invalid className={(state) => (state.invalid ? 'is-invalid' : 'is-valid')}>
+      <Label
+        htmlFor="e"
+        aria-invalid
+        className={(state) => (state.invalid ? 'is-invalid' : 'is-valid')}
+      >
         E
       </Label>
       <Label htmlFor="f">F</Label>

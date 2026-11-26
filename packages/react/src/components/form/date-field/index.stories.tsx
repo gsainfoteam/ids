@@ -30,7 +30,7 @@ const meta = {
     selectionMode: { control: 'radio', options: ['single', 'range', 'multiple'] },
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     required: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -133,7 +133,11 @@ export const Gallery: Story = {
       <Showcase.Section title="States">
         <Showcase.Row label="invalid">
           <div className="w-72">
-            <DateField invalid defaultValue={new CalendarDate(2026, 9, 15)} aria-label="잘못됨" />
+            <DateField
+              aria-invalid
+              defaultValue={new CalendarDate(2026, 9, 15)}
+              aria-label="잘못됨"
+            />
           </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
@@ -396,7 +400,7 @@ export const OpenAsADrawerOnPhones: Story = {
       <Field>
         <Field.Label>체크인</Field.Label>
         <DateField defaultValue={new CalendarDate(2026, 9, 15)}>
-          <DateField.Content mobileVariant="drawer" />
+          <DateField.Content narrow="drawer" />
         </DateField>
       </Field>
     </div>
@@ -405,7 +409,7 @@ export const OpenAsADrawerOnPhones: Story = {
     docs: {
       description: {
         story:
-          '좁은 화면에서 팝업을 아래에서 올라오는 드로어로 띄우려면 DateField.Content에 mobileVariant="drawer"를 줍니다. 넓은 화면에서는 그대로 팝오버입니다. 달력 옵션은 DateField.Calendar에, 팝업 옵션은 DateField.Content에 둡니다.',
+          '좁은 화면에서 팝업을 아래에서 올라오는 드로어로 띄우려면 DateField.Content에 narrow="drawer"를 줍니다. 넓은 화면에서는 그대로 팝오버입니다. 달력 옵션은 DateField.Calendar에, 팝업 옵션은 DateField.Content에 둡니다.',
       },
     },
   },

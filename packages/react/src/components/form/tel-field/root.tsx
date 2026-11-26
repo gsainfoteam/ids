@@ -38,7 +38,6 @@ export function TelFieldRoot({
   format = 'auto',
   variant = 'outline',
   size,
-  invalid,
   disabled,
   className,
   style,
@@ -66,7 +65,6 @@ export function TelFieldRoot({
     format,
     separateCountry: selects > 0,
     disabled,
-    invalid,
     clearable: countOf(items, TextControlClear) > 0,
   });
   const state: TelFieldState = { size: resolvedSize, variant, ...field.state };

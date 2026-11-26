@@ -143,7 +143,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 ```tsx
 <Checkbox variant="soft" />    // outline(기본) / soft: 테두리 대신 옅은 면
 <Checkbox size="tiny" />       // standard(16px) / tiny(14px). 생략하면 Field를 따른다
-<Checkbox invalid />           // 테두리와 체크 색이 danger
+<Checkbox aria-invalid />      // 테두리와 체크 색이 danger
 ```
 
 - **크기 계약: hug.** 상자 크기만큼 차지하고 바깥 여백이 없습니다. 자리와 간격은 감싸는 요소와 그 `gap` 이 정합니다.
@@ -156,7 +156,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `onCheckedChange`            | 사용자나 코드가 input을 바꿨을 때 `boolean`                     |
 | `value`                      | 제출되는 값. CheckboxGroup 안에서는 항목의 값                   |
 | `readOnly`                   | 바뀌지 않는다. `aria-readonly`                                  |
-| `invalid`                    | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선      |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `variant`                    | `outline`(기본) / `soft`                                        |
 | `size`                       | `standard` / `tiny`. 생략하면 `Field` 크기                      |
 | `className` / `style`        | 상자로 간다. 새 디자인(`custom-design`)에서만 쓴다                            |

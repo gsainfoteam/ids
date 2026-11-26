@@ -112,7 +112,7 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
                 aria-label={t('editor.imageUrl')}
                 placeholder="https://"
                 value={url}
-                invalid={urlRejected}
+                aria-invalid={urlRejected}
                 aria-describedby={urlRejected ? urlErrorId : undefined}
                 onValueChange={changeUrl}
                 onKeyDown={onPlainEnter(insertUrl)}

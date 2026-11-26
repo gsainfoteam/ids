@@ -223,7 +223,9 @@ test('an unreadable value is shown as it is and marks the field invalid', async 
   expect(
     screen.container.querySelector<HTMLElement>('[data-color-field-swatch]')!.dataset.empty,
   ).toBe('');
-  await screen.rerender(<ColorField key="b" aria-label="Color" defaultValue="#FF0000" invalid />);
+  await screen.rerender(
+    <ColorField key="b" aria-label="Color" defaultValue="#FF0000" aria-invalid />,
+  );
   await expect.element(trigger()).toHaveAttribute('aria-invalid', 'true');
   await screen.rerender(
     <ColorField key="c" aria-label="Color" defaultValue="nonsense" aria-invalid={false} />,
@@ -477,7 +479,7 @@ test('parts: a custom trigger, and Clear must sit beside the trigger', async () 
 test('drawer on a small screen: modal dialog named by the field, with a close button', async () => {
   try {
     await page.viewport(390, 844);
-    const drawer = <ColorField.Content mobileVariant="drawer" />;
+    const drawer = <ColorField.Content narrow="drawer" />;
     const state = tracked({ defaultValue: '#FF0000' }, drawer);
     const screen = await render(state.node);
     await userEvent.click(trigger());

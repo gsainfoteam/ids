@@ -24,7 +24,7 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     checked: { control: 'radio', options: [undefined, false, true] },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -83,7 +83,7 @@ export const Gallery: Story = {
       <Showcase.Section title="States">
         {(
           [
-            ['invalid', { invalid: true }],
+            ['invalid', { 'aria-invalid': true }],
             ['disabled', { disabled: true }],
             ['readOnly', { readOnly: true }],
           ] as const

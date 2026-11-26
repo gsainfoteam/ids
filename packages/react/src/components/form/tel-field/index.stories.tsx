@@ -26,7 +26,7 @@ const meta = {
     defaultCountry: { control: 'text' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: {
     'aria-label': '전화번호',
@@ -106,7 +106,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-60">
-            <TelField defaultValue="010-1234" invalid aria-label="잘못됨" />
+            <TelField defaultValue="010-1234" aria-invalid aria-label="잘못됨" />
           </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">

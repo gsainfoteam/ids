@@ -17,7 +17,7 @@ export type PopupAlign = 'start' | 'end';
 export type UseFieldPopupOptions = {
   anchor: RefObject<HTMLElement | null>;
   onClose: (restoreFocus: boolean) => void;
-  mobileVariant: PopupPresentation;
+  narrow: PopupPresentation;
   preferredWidth: number;
   matchWidth: boolean;
   side: PopupSide;
@@ -30,7 +30,7 @@ export type UseFieldPopupOptions = {
 export function useInternalFieldPopup({
   anchor,
   onClose,
-  mobileVariant,
+  narrow,
   preferredWidth,
   matchWidth,
   side,
@@ -40,7 +40,7 @@ export function useInternalFieldPopup({
   initialFocusSelector,
 }: UseFieldPopupOptions) {
   const [popup, setPopup] = useState<HTMLElement | null>(null);
-  const drawer = useInternalDrawerPresentation(mobileVariant);
+  const drawer = useInternalDrawerPresentation(narrow);
   const presentation: PopupPresentation = drawer ? 'drawer' : 'popover';
   const [stacked, setStacked] = useState(false);
 

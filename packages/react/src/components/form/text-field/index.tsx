@@ -22,7 +22,6 @@ export namespace TextField {
     variant?: TextFieldVariant;
     size?: IdsSize;
     disabled?: boolean;
-    invalid?: boolean;
     onValueChange?: (value: string) => void;
     children?: ReactNode;
     className?: StateValue<string | undefined>;

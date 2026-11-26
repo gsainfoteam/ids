@@ -174,7 +174,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 | `onValueChange`          | `(value: string) => void`                                             |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                    |
 | `size`                   | 생략하면 `Field` 크기, 없으면 `standard`. 글자, 패딩만 정하고 높이는 정하지 않는다 |
-| `invalid`                | danger 테두리와 `aria-invalid`. 명시한 `aria-invalid`(Field 포함)가 우선 |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `rows`                   | `3`. `minRows` 를 생략하면 최소 높이                                  |
 | `minRows` / `maxRows`    | 양의 정수. `maxRows` 를 넘으면 스크롤                                 |
 | `resize`                 | `auto`(기본, 내용에 맞춰 높이 조절) / `none` / `vertical` / `horizontal` / `both`. 뒤의 셋은 Resizable 과 같은 손잡이 |

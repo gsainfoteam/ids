@@ -27,7 +27,7 @@ const meta = {
     max: { control: { type: 'number', min: 1, max: 10 } },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: {
     'aria-label': '만족도',
@@ -74,7 +74,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="States">
         <Showcase.Row label="invalid">
-          <Rating invalid defaultValue={0} aria-label="오류" />
+          <Rating aria-invalid defaultValue={0} aria-label="오류" />
         </Showcase.Row>
         <Showcase.Row label="disabled">
           <Rating disabled defaultValue={2} aria-label="비활성" />

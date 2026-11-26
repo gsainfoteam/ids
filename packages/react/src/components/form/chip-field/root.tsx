@@ -247,7 +247,7 @@ export function ChipFieldRoot({
         <FieldPopup
           anchor={rootRef}
           onClose={field.actions.close}
-          mobileVariant={mobileVariant}
+          narrow={mobileVariant}
           matchWidth
           label={merged['aria-label'] ?? t('common.options')}
           aria-labelledby={drawer ? labelledBy : undefined}
