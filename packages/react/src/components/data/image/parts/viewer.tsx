@@ -38,6 +38,7 @@ export type ImageViewerProps = {
   onValueChange?: (index: number) => void;
   loop?: boolean;
   zoom?: number;
+  defaultZoom?: number;
   onZoomChange?: (zoom: number) => void;
   'aria-label'?: string;
   className?: string;

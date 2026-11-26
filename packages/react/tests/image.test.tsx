@@ -6,7 +6,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Image, ImageGroup } from '../src';
+import { AspectRatio, Image, ImageGroup } from '../src';
 import { skipWithoutCdp } from './engines';
 import { holdImages as holdImagesUnder } from './held-images';
 
@@ -46,7 +46,9 @@ test('the Skeleton placeholder fills the image box while it loads', async (conte
   await holdImages();
   const screen = await render(
     <div style={{ width: 240 }}>
-      <Image src={`${HELD}box.png`} alt="Lake at dawn" ratio={2} />
+      <AspectRatio ratio={2}>
+        <Image src={`${HELD}box.png`} alt="Lake at dawn" />
+      </AspectRatio>
     </div>,
   );
   const placeholder = screen.container.querySelector<HTMLElement>('[data-image-placeholder]')!;
@@ -90,7 +92,9 @@ test('the placeholder shows while loading, then a load or an error moves the sta
   const statuses: Image.Status[] = [];
   const photo = (src: string) => (
     <div style={{ width: 200 }}>
-      <Image src={src} alt="Lake at dawn" ratio={4 / 3} onStatusChange={(s) => statuses.push(s)} />
+      <AspectRatio ratio={4 / 3}>
+        <Image src={src} alt="Lake at dawn" onStatusChange={(s) => statuses.push(s)} />
+      </AspectRatio>
     </div>
   );
   const screen = await render(photo(`${HELD}a.png`));
@@ -129,15 +133,27 @@ test('an image that loaded before hydration is read on mount', async () => {
   await expect.element(frameOf(container)).toHaveAttribute('data-status', 'loaded');
 });
 
-test('ratio sizes the box through AspectRatio, and a broken image keeps its box', async () => {
+test('an AspectRatio around the image sizes its box, and a broken image keeps its box', async () => {
   const screen = await render(
     <div style={{ width: 300 }}>
-      <Image src={INLINE_PICTURE} alt="Lake at dawn" ratio={2} />
+      <AspectRatio ratio={2}>
+        <Image src={BROKEN} alt="Lake at dawn" width={400} height={100} />
+      </AspectRatio>
     </div>,
   );
   const frame = frameOf(screen.container);
-  await expect.element(frame).toHaveAttribute('data-aspect-ratio');
-  expect(frame.getBoundingClientRect().height).toBeCloseTo(150, 0);
+  await expect.element(frame).toHaveAttribute('data-status', 'error');
+  expect(frame.getBoundingClientRect().height, 'the AspectRatio wins').toBeCloseTo(150, 0);
+
+  await screen.rerender(
+    <div style={{ width: 300 }}>
+      <AspectRatio ratio={2}>
+        <Image src={INLINE_PICTURE} alt="Lake at dawn" />
+      </AspectRatio>
+    </div>,
+  );
+  await expect.element(frameOf(screen.container)).toHaveAttribute('data-status', 'loaded');
+  expect(frameOf(screen.container).getBoundingClientRect().height).toBeCloseTo(150, 0);
 
   await screen.rerender(
     <div style={{ width: 300 }}>
@@ -311,11 +327,13 @@ test('images that move keep the group value in document order before any press',
 test('the group lays images in a row, a column or a grid of columns', async () => {
   const photos = (count: number) =>
     Array.from({ length: count }, (_, index) => (
-      <Image key={index} src={INLINE_PICTURE} alt={`Photo ${index + 1}`} ratio={1} />
+      <AspectRatio key={index} ratio={1}>
+        <Image src={INLINE_PICTURE} alt={`Photo ${index + 1}`} />
+      </AspectRatio>
     ));
   const screen = await render(
     <div style={{ width: 300 }}>
-      <ImageGroup layout="grid" columns={3} aria-label="Grid">
+      <ImageGroup layout="grid" aria-label="Grid">
         {photos(6)}
       </ImageGroup>
     </div>,
@@ -331,6 +349,16 @@ test('the group lays images in a row, a column or a grid of columns', async () =
     cells[0]!.getBoundingClientRect().bottom + GAP,
     0,
   );
+
+  await screen.rerender(
+    <div style={{ width: 300 }} className="[--image-columns:2]">
+      <ImageGroup layout="grid" aria-label="Two columns">
+        {photos(4)}
+      </ImageGroup>
+    </div>,
+  );
+  const twoColumns = screen.getByRole('listitem').elements();
+  expect(twoColumns[0]!.getBoundingClientRect().width).toBeCloseTo((300 - GAP) / 2, 0);
 
   await screen.rerender(
     <div style={{ width: 300 }}>
@@ -361,7 +389,6 @@ test('the group lays images in a row, a column or a grid of columns', async () =
   );
 });
 
-test('a group with columns that are not a positive whole number throws, and parts need an Image', () => {
-  expect(() => renderToString(<ImageGroup layout="grid" columns={0} />)).toThrow(/columns/);
+test('parts need an Image', () => {
   expect(() => renderToString(<Image.Fallback />)).toThrow(/inside `<Image>`/);
 });

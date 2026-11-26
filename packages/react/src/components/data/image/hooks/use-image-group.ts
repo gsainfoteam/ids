@@ -35,6 +35,7 @@ export type UseImageGroupOptions = {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   zoom?: number;
+  defaultZoom?: number;
   onZoomChange?: (zoom: number) => void;
   loop?: boolean;
 };
@@ -66,9 +67,10 @@ export function useInternalImageGroup(options: UseImageGroupOptions) {
     defaultValue: options.defaultOpen ?? false,
     onValueChange: options.onOpenChange,
   });
+  const zoomOnOpen = options.defaultZoom ?? FITTED_ZOOM;
   const [zoom, setZoom] = useControllableState({
     value: options.zoom,
-    defaultValue: FITTED_ZOOM,
+    defaultValue: zoomOnOpen,
     onValueChange: options.onZoomChange,
   });
   const [entries, setEntries] = useState<readonly ImageGroupEntry[]>([]);
@@ -91,7 +93,7 @@ export function useInternalImageGroup(options: UseImageGroupOptions) {
 
     setEntries(ordered);
     setOpener(ordered[index]!.trigger);
-    setZoom(FITTED_ZOOM);
+    setZoom(zoomOnOpen);
     setValue(index);
     setOpen(true);
   };

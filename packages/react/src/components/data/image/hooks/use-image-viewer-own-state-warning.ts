@@ -17,6 +17,7 @@ export function useInternalImageViewerOwnStateWarning(props: ImageViewerProps) {
     props.onValueChange,
     props.loop,
     props.zoom,
+    props.defaultZoom,
     props.onZoomChange,
   ].some((prop) => prop !== undefined);
 

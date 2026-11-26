@@ -6,6 +6,7 @@ import { Showcase } from '~story-kit';
 
 import { overlay } from '../../../internal/overlay';
 import { Button } from '../../action/button';
+import { AspectRatio } from '../../layout/aspect-ratio';
 import { ImageGroup } from '../image-group';
 
 import { Image } from '.';
@@ -33,38 +34,45 @@ const ratios = [1, 4 / 3, 16 / 9, 3 / 4];
 
 const VIEWER = '사진 보기';
 
+type ImagePlaygroundArgs = Image.Props & { captionText?: string };
+
 const meta = {
   title: 'Data/Image',
   component: Image,
   tags: ['autodocs'],
   argTypes: {
-    ratio: { control: { type: 'number', min: 0.25, max: 4, step: 0.25 } },
     preview: { control: 'boolean' },
+    captionText: {
+      name: 'children',
+      control: 'text',
+      table: { category: 'Image.Caption' },
+    },
   },
-  args: { src: PHOTO, alt: '호수 위로 뜬 해', ratio: 4 / 3, onStatusChange: fn() },
-} satisfies Meta<typeof Image>;
+  args: { src: PHOTO, alt: '호수 위로 뜬 해', onStatusChange: fn() },
+} satisfies Meta<ImagePlaygroundArgs>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ImagePlaygroundArgs>;
 
 export const Playground: Story = {
-  decorators: [
-    (Story) => (
-      <div className="max-w-sm">
-        <Story />
-      </div>
-    ),
-  ],
+  render: ({ captionText, ...args }) => (
+    <div className="max-w-sm">
+      <AspectRatio ratio={4 / 3}>
+        <Image {...args}>{captionText && <Image.Caption>{captionText}</Image.Caption>}</Image>
+      </AspectRatio>
+    </div>
+  ),
 };
 
 export const Usage: Story = {
   render: () => (
     <div className="w-60">
-      <Image
-        src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'><rect width='4' height='3' fill='%2390c2f0'/><path d='M0 3 L1.2 1.4 L2.2 2.4 L3 1.6 L4 3 Z' fill='%23426b55'/></svg>"
-        alt="호수 너머의 산"
-        ratio={4 / 3}
-      />
+      <AspectRatio ratio={4 / 3}>
+        <Image
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'><rect width='4' height='3' fill='%2390c2f0'/><path d='M0 3 L1.2 1.4 L2.2 2.4 L3 1.6 L4 3 Z' fill='%23426b55'/></svg>"
+          alt="호수 너머의 산"
+        />
+      </AspectRatio>
     </div>
   ),
 };
@@ -74,12 +82,14 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Ratio"
-        description="ratio 가 폭에 맞춘 높이를 정합니다. 그림은 칸을 채우고 넘치는 부분은 잘립니다."
+        description="AspectRatio 로 감싸면 그 비율이 폭에 맞춘 높이를 정합니다. 그림은 칸을 채우고 넘치는 부분은 잘립니다."
       >
-        <Showcase.Row label="ratio">
+        <Showcase.Row label="AspectRatio">
           {ratios.map((ratio) => (
             <div key={ratio} className="w-36">
-              <Image src={PHOTO} alt="호수 위로 뜬 해" ratio={ratio} />
+              <AspectRatio ratio={ratio}>
+                <Image src={PHOTO} alt="호수 위로 뜬 해" />
+              </AspectRatio>
             </div>
           ))}
         </Showcase.Row>
@@ -99,12 +109,16 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="loaded">
           <div className="w-36">
-            <Image src={PHOTO} alt="호수 위로 뜬 해" ratio={4 / 3} />
+            <AspectRatio ratio={4 / 3}>
+              <Image src={PHOTO} alt="호수 위로 뜬 해" />
+            </AspectRatio>
           </div>
         </Showcase.Row>
         <Showcase.Row label="broken">
           <div className="w-36">
-            <Image src={BROKEN} alt="깨진 사진" ratio={4 / 3} />
+            <AspectRatio ratio={4 / 3}>
+              <Image src={BROKEN} alt="깨진 사진" />
+            </AspectRatio>
           </div>
           <div className="w-36">
             <Image src={BROKEN} alt="깨진 사진" width={640} height={360} />
@@ -112,14 +126,18 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="no src">
           <div className="w-36">
-            <Image alt="아직 올리지 않은 사진" ratio={4 / 3} />
+            <AspectRatio ratio={4 / 3}>
+              <Image alt="아직 올리지 않은 사진" />
+            </AspectRatio>
           </div>
         </Showcase.Row>
         <Showcase.Row label="custom">
           <div className="w-36">
-            <Image src={BROKEN} alt="깨진 사진" ratio={4 / 3}>
-              <Image.Fallback>불러오지 못했습니다</Image.Fallback>
-            </Image>
+            <AspectRatio ratio={4 / 3}>
+              <Image src={BROKEN} alt="깨진 사진">
+                <Image.Fallback>불러오지 못했습니다</Image.Fallback>
+              </Image>
+            </AspectRatio>
           </div>
         </Showcase.Row>
       </Showcase.Section>
@@ -135,15 +153,16 @@ export const ReactToTheLoadingStatus: Story = {
 
     return (
       <div className="flex max-w-xs flex-col items-start gap-4">
-        <Image
-          src={src}
-          alt="호수 위로 뜬 해"
-          ratio={4 / 3}
-          className={(state) =>
-            state.status === 'loaded' ? 'ring-success-strong ring-2' : undefined
-          }
-          onStatusChange={(status) => setLog((previous) => [...previous, status])}
-        />
+        <AspectRatio ratio={4 / 3}>
+          <Image
+            src={src}
+            alt="호수 위로 뜬 해"
+            className={(state) =>
+              state.status === 'loaded' ? 'ring-success-strong ring-2' : undefined
+            }
+            onStatusChange={(status) => setLog((previous) => [...previous, status])}
+          />
+        </AspectRatio>
         <div className="flex gap-2">
           <Button size="tiny" variant="outline" onClick={() => setSrc(BROKEN)}>
             깨진 주소로
@@ -189,12 +208,16 @@ export const ReplaceABrokenImage: Story = {
   render: () => (
     <div className="flex max-w-md gap-3">
       <div className="w-40">
-        <Image src={BROKEN} alt="깨진 사진" ratio={4 / 3} />
+        <AspectRatio ratio={4 / 3}>
+          <Image src={BROKEN} alt="깨진 사진" />
+        </AspectRatio>
       </div>
       <div className="w-40">
-        <Image src={BROKEN} alt="깨진 사진" ratio={4 / 3}>
-          <Image.Fallback>불러오지 못했습니다</Image.Fallback>
-        </Image>
+        <AspectRatio ratio={4 / 3}>
+          <Image src={BROKEN} alt="깨진 사진">
+            <Image.Fallback>불러오지 못했습니다</Image.Fallback>
+          </Image>
+        </AspectRatio>
       </div>
     </div>
   ),
@@ -218,9 +241,13 @@ export const ReplaceABrokenImage: Story = {
 export const BrowseAGroupInTheViewer: Story = {
   render: () => (
     <div className="max-w-md">
-      <ImageGroup layout="grid" columns={3} aria-label="풍경 사진">
+      <ImageGroup layout="grid" aria-label="풍경 사진">
         {PHOTOS.map((photo) => (
-          <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
+          <AspectRatio key={photo.id} ratio={1}>
+            <Image src={photo.src} alt={photo.alt}>
+              <Image.Caption>{photo.caption}</Image.Caption>
+            </Image>
+          </AspectRatio>
         ))}
       </ImageGroup>
     </div>
@@ -268,9 +295,13 @@ export const BrowseAGroupInTheViewer: Story = {
 export const PickTheViewerParts: Story = {
   render: () => (
     <div className="max-w-md">
-      <ImageGroup layout="grid" columns={3} loop aria-label="풍경 사진">
+      <ImageGroup layout="grid" loop aria-label="풍경 사진">
         {PHOTOS.map((photo) => (
-          <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
+          <AspectRatio key={photo.id} ratio={1}>
+            <Image src={photo.src} alt={photo.alt}>
+              <Image.Caption>{photo.caption}</Image.Caption>
+            </Image>
+          </AspectRatio>
         ))}
         <Image.Viewer aria-label="풍경 사진 보기">
           <Image.Viewer.Caption />
@@ -378,7 +409,11 @@ export const OpenTheViewerWithOverlayOpen: Story = {
 export const EnlargeASinglePhoto: Story = {
   render: () => (
     <div className="w-60">
-      <Image src={PHOTO} alt="호수 위로 뜬 해" caption="아침의 호수" ratio={4 / 3} preview />
+      <AspectRatio ratio={4 / 3}>
+        <Image src={PHOTO} alt="호수 위로 뜬 해" preview>
+          <Image.Caption>아침의 호수</Image.Caption>
+        </Image>
+      </AspectRatio>
     </div>
   ),
   parameters: {
@@ -402,7 +437,9 @@ export const HideADecorativeImage: Story = {
   render: () => (
     <div className="flex max-w-xs items-center gap-3">
       <div className="w-16 shrink-0">
-        <Image src={PHOTO} alt="" ratio={1} />
+        <AspectRatio ratio={1}>
+          <Image src={PHOTO} alt="" />
+        </AspectRatio>
       </div>
       <p className="text-body-b3-regular">아침의 호수. 해가 막 떠오른 호수의 풍경입니다.</p>
     </div>

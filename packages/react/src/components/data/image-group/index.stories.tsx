@@ -4,6 +4,7 @@ import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { AspectRatio } from '../../layout/aspect-ratio';
 import { Image } from '../image';
 
 import { ImageGroup } from '.';
@@ -34,15 +35,18 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     layout: { control: 'radio', options: layouts },
-    columns: { control: { type: 'number', min: 1, max: 6, step: 1 } },
     loop: { control: 'boolean' },
   },
-  args: { layout: 'grid', columns: 3, 'aria-label': '풍경 사진' },
+  args: { layout: 'grid', 'aria-label': '풍경 사진' },
   render: (args) => (
     <div className="max-w-md">
       <ImageGroup {...args}>
         {PHOTOS.map((photo) => (
-          <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
+          <AspectRatio key={photo.id} ratio={1}>
+            <Image src={photo.src} alt={photo.alt}>
+              <Image.Caption>{photo.caption}</Image.Caption>
+            </Image>
+          </AspectRatio>
         ))}
       </ImageGroup>
     </div>
@@ -59,7 +63,9 @@ export const Usage: Story = {
     <div className="max-w-md">
       <ImageGroup aria-label="풍경 사진">
         {PHOTOS.slice(0, 3).map((photo) => (
-          <Image key={photo.id} src={photo.src} alt={photo.alt} ratio={1} />
+          <AspectRatio key={photo.id} ratio={1}>
+            <Image src={photo.src} alt={photo.alt} />
+          </AspectRatio>
         ))}
       </ImageGroup>
     </div>
@@ -77,7 +83,9 @@ export const Gallery: Story = {
           <div className="w-full max-w-md">
             <ImageGroup layout="row" aria-label="풍경 사진">
               {PHOTOS.slice(0, 3).map((photo) => (
-                <Image key={photo.id} src={photo.src} alt={photo.alt} ratio={1} />
+                <AspectRatio key={photo.id} ratio={1}>
+                  <Image src={photo.src} alt={photo.alt} />
+                </AspectRatio>
               ))}
             </ImageGroup>
           </div>
@@ -86,22 +94,22 @@ export const Gallery: Story = {
           <div className="w-40">
             <ImageGroup layout="column" aria-label="풍경 사진">
               {PHOTOS.slice(3, 5).map((photo) => (
-                <Image key={photo.id} src={photo.src} alt={photo.alt} ratio={16 / 9} />
+                <AspectRatio key={photo.id} ratio={16 / 9}>
+                  <Image src={photo.src} alt={photo.alt} />
+                </AspectRatio>
               ))}
             </ImageGroup>
           </div>
         </Showcase.Row>
         <Showcase.Row label="grid">
           <div className="w-full max-w-md">
-            <ImageGroup layout="grid" columns={3} aria-label="풍경 사진">
+            <ImageGroup layout="grid" aria-label="풍경 사진">
               {PHOTOS.map((photo) => (
-                <Image
-                  key={photo.id}
-                  src={photo.src}
-                  alt={photo.alt}
-                  caption={photo.caption}
-                  ratio={1}
-                />
+                <AspectRatio key={photo.id} ratio={1}>
+                  <Image src={photo.src} alt={photo.alt}>
+                    <Image.Caption>{photo.caption}</Image.Caption>
+                  </Image>
+                </AspectRatio>
               ))}
             </ImageGroup>
           </div>
@@ -120,7 +128,6 @@ export const OpenTheViewerFromOutside: Story = {
       <div className="flex max-w-md flex-col gap-3">
         <ImageGroup
           layout="grid"
-          columns={3}
           value={index}
           onValueChange={setIndex}
           open={open}
@@ -128,13 +135,11 @@ export const OpenTheViewerFromOutside: Story = {
           aria-label="풍경 사진"
         >
           {PHOTOS.map((photo) => (
-            <Image
-              key={photo.id}
-              src={photo.src}
-              alt={photo.alt}
-              caption={photo.caption}
-              ratio={1}
-            />
+            <AspectRatio key={photo.id} ratio={1}>
+              <Image src={photo.src} alt={photo.alt}>
+                <Image.Caption>{photo.caption}</Image.Caption>
+              </Image>
+            </AspectRatio>
           ))}
         </ImageGroup>
         <output aria-label="뷰어 상태" className="text-body-b3-regular font-mono">

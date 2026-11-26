@@ -8,11 +8,13 @@
 - **서버 컴포넌트.** 서버 컴포넌트가 이미 그려 넘긴 `Image.Viewer` 도 자식 가운데에서 찾습니다.
 
 ```tsx
-import { Image, ImageGroup } from '@gsainfoteam/ids-react';
+import { AspectRatio, Image, ImageGroup } from '@gsainfoteam/ids-react';
 
-<ImageGroup layout="grid" columns={3} aria-label="풍경 사진">
+<ImageGroup layout="grid" aria-label="풍경 사진">
   {photos.map((photo) => (
-    <Image key={photo.id} src={photo.thumb} previewSrc={photo.full} alt={photo.alt} ratio={1} />
+    <AspectRatio key={photo.id} ratio={1}>
+      <Image src={photo.thumb} preview={{ src: photo.full }} alt={photo.alt} />
+    </AspectRatio>
   ))}
 </ImageGroup>
 ```
@@ -20,26 +22,28 @@ import { Image, ImageGroup } from '@gsainfoteam/ids-react';
 ## 늘어놓기
 
 ```tsx
-<ImageGroup layout="grid" columns={3} aria-label="풍경 사진">
+<ImageGroup layout="grid" aria-label="풍경 사진">
   {photos.map((photo) => (
-    <Image
-      key={photo.id}
-      src={photo.thumb}
-      previewSrc={photo.full}                    // 뷰어에서 보여 줄 큰 그림
-      alt={photo.alt}
-      caption={photo.caption}                    // 뷰어 아래에 보일 설명
-      ratio={1}
-    />
+    <AspectRatio key={photo.id} ratio={1}>
+      <Image src={photo.thumb} preview={{ src: photo.full }} alt={photo.alt}>  {/* 뷰어에서 보여 줄 큰 그림 */}
+        <Image.Caption>{photo.caption}</Image.Caption>                       {/* 뷰어에 보일 설명 */}
+      </Image>
+    </AspectRatio>
   ))}
 </ImageGroup>
 
 <ImageGroup layout="row" />                     // 가로로 같은 폭씩(기본)
 <ImageGroup layout="column" />                  // 세로로 쌓는다
-<ImageGroup layout="grid" columns={4} />        // 격자. columns 기본 3
+<ImageGroup layout="grid" />                    // 격자. 3열
+
+<div className="[--image-columns:4]">           {/* 열 수는 감싸는 요소가 */}
+  <ImageGroup layout="grid" />
+</div>
 ```
 
 - `<ul role="list">` 이고 사진마다 `<li>` 로 감쌉니다. 직접 `<li>` 를 적으면 그대로 둡니다. `aria-label` 로 목록의 이름을 줍니다.
-- 간격은 `gap-2`(8px)입니다. `className` 으로 바꿉니다.
+- 간격은 `gap-2`(8px)입니다.
+- 격자의 열 수는 `--image-columns`(기본 3)입니다. 크기와 자리처럼 감싸는 요소에 줍니다.
 - 사진은 컴포넌트 안에 감싸 둬도(`<figure>` 등) 문서 순서대로 번호가 매겨집니다.
 - `preview={false}` 인 사진은 누를 수 없고 번호에서 빠집니다.
 
@@ -54,13 +58,13 @@ const [index, setIndex] = useState(0);
   onOpenChange={setOpen}
   loop                                            // 끝에서 처음으로
   zoom={zoom}                                     // 확대 배율(1 이 맞춘 크기)
-  onZoomChange={setZoom}
+  onZoomChange={setZoom}                          // 비제어로 열 때 배율은 defaultZoom
 >
   ...
 </ImageGroup>
 ```
 
-- 사진을 누르거나, Tab 으로 가서 `Enter` `Space` 를 누르면 그 장이 `value` 가 되고 `open` 이 `true` 가 됩니다. 열 때 배율은 1 로 돌아갑니다.
+- 사진을 누르거나, Tab 으로 가서 `Enter` `Space` 를 누르면 그 장이 `value` 가 되고 `open` 이 `true` 가 됩니다. 열 때 배율은 `defaultZoom`(기본 1)으로 돌아갑니다.
 - `value` 는 문서 순서의 번호입니다. 사진의 순서가 바뀌면 번호도 따라갑니다.
 - 묶음 안의 `Image.Viewer` 에 이 상태들을 주면 개발 모드에서 경고합니다. 묶음이 가진 상태이므로 ImageGroup 에 줍니다.
 - 뷰어의 부품, 키보드, 포인터는 [Image 의 뷰어](../image/README.md#뷰어) 를 봅니다.
@@ -70,10 +74,9 @@ const [index, setIndex] = useState(0);
 | 속성                                       | 기본 / 동작                                  |
 | ------------------------------------------ | -------------------------------------------- |
 | `layout`                                   | `row`(기본) / `column` / `grid`              |
-| `columns`                                  | `grid` 의 열 수. 기본 `3`                    |
 | `value` / `defaultValue` / `onValueChange` | 지금 보는 장(0부터). 기본 `0`                |
 | `open` / `defaultOpen` / `onOpenChange`    | 뷰어가 열렸는가. 기본 `false`                |
 | `loop`                                     | 끝에서 처음으로 넘어가는가. 기본 `false`     |
-| `zoom` / `onZoomChange`                    | 확대 배율. 기본 `1`                          |
+| `zoom` / `defaultZoom` / `onZoomChange`    | 확대 배율. 기본 `1`                          |
 | 그 외 속성                                 | `<ul>` 로 간다(`aria-label`, `className` 등) |
 

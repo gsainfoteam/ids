@@ -11,7 +11,7 @@ export const imageGroupStyle = tv({
     layout: {
       row: { root: 'flex flex-row gap-2', item: 'flex-1' },
       column: { root: 'flex flex-col gap-2' },
-      grid: { root: 'grid grid-cols-[repeat(var(--image-columns),minmax(0,1fr))] gap-2' },
+      grid: { root: 'grid grid-cols-[repeat(var(--image-columns,3),minmax(0,1fr))] gap-2' },
     } satisfies Record<ImageGroupLayout, object>,
   },
   defaultVariants: { layout: 'row' },
