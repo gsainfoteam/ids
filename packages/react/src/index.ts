@@ -270,10 +270,14 @@ export type { FileFieldProps, FileFieldRejection } from './components/form/file-
 export { FileDropzone } from './components/form/file-dropzone';
 export type { FileDropzoneProps } from './components/form/file-dropzone';
 
-export { Calendar } from './components/data/calendar';
+export { Calendar, useCalendar } from './components/data/calendar';
 export type {
   CalendarProps,
-  CalendarOptions,
+  CalendarInstance,
+  CalendarAvailabilityOptions,
+  CalendarDisplayOptions,
+  CalendarMonthOptions,
+  UseCalendarOptions,
   CalendarState,
   CalendarDayState,
   DateMatcher,
@@ -291,9 +295,14 @@ export type {
   HourCycle,
 } from './components/data/time-picker';
 
-export { Scheduler } from './components/data/scheduler';
+export { Scheduler, useScheduler } from './components/data/scheduler';
 export type {
   SchedulerProps,
+  SchedulerInstance,
+  SchedulerViewsOptions,
+  SchedulerNavigationOptions,
+  SchedulerEditingOptions,
+  UseSchedulerOptions,
   SchedulerView,
   SchedulerEventData,
   SchedulerColorScheme,

@@ -10,7 +10,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Toggle } from '../../components/action/toggle';
 import { Avatar } from '../../components/data/avatar';
-import { Calendar } from '../../components/data/calendar';
+import { Calendar, useCalendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
 import { Chart } from '../../components/data/chart';
 import { Chip } from '../../components/data/chip';
@@ -297,6 +297,7 @@ export const Lab: Story = {
     const { theme } = useTheme();
     const issues = issuesOf(theme);
     const { colors } = resolveColorsOnce(theme);
+    const labCalendar = useCalendar({ display: { today: labToday } });
 
     return (
       <Showcase>
@@ -617,7 +618,7 @@ export const Lab: Story = {
                           <Kbd keys="Mod+K" platform="mac" />
                         </div>
                         <Calendar
-                          today={labToday}
+                          calendar={labCalendar}
                           defaultValue={labToday.add({ days: 3 })}
                           aria-label={`달력 ${mode}`}
                         />

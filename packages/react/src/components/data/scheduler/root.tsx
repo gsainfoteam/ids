@@ -8,21 +8,10 @@ import {
   type ReactNode,
 } from 'react';
 
-import { type CalendarDate, type CalendarDateTime } from '@internationalized/date';
-
 import { SchedulerContext } from './context';
-import { useInternalNow } from './hooks/use-now';
-import { useInternalSchedulerNavigation } from './hooks/use-scheduler-navigation';
+import { useScheduler, type SchedulerInstance } from './hooks/use-scheduler';
 import { schedulerFormat } from './lib/format';
-import {
-  dateOf,
-  daysOf,
-  DEFAULT_DAY_COUNT,
-  type SchedulerEventChange,
-  type SchedulerEventData,
-  type SchedulerSlot,
-  type SchedulerView,
-} from './lib/layout';
+import { dateOf, daysOf, type SchedulerEventData } from './lib/layout';
 import { SchedulerEvent } from './parts/event';
 import { SchedulerGrid } from './parts/grid';
 import {
@@ -34,14 +23,13 @@ import {
 import { SchedulerMonth } from './parts/month';
 import { SchedulerToolbar } from './parts/toolbar';
 import { schedulerStyle } from './style';
-import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
+import { resolveLocale, weekStartOf } from '../../../internal/date-locale';
 import {
   useInternalRequiredName,
   type AccessibleName,
 } from '../../../internal/lib/accessible-name';
 import { useInternalProviderLocale } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
-import { validateDate } from '../calendar/lib/date';
 
 export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = Omit<
   ComponentProps<'div'>,
@@ -49,19 +37,7 @@ export type SchedulerProps<E extends SchedulerEventData = SchedulerEventData> = 
 > &
   AccessibleName & {
     events: readonly E[];
-    view?: SchedulerView;
-    defaultView?: SchedulerView;
-    onViewChange?: (view: SchedulerView) => void;
-    dayCount?: number;
-    defaultDayCount?: number;
-    onDayCountChange?: (count: number) => void;
-    date?: CalendarDate;
-    defaultDate?: CalendarDate;
-    onDateChange?: (date: CalendarDate) => void;
-    weekStartsOn?: WeekDay;
-    now?: CalendarDateTime;
-    onEventChange?: (event: E, change: SchedulerEventChange<E>) => void;
-    onSlotSelect?: (slot: SchedulerSlot) => void;
+    scheduler?: SchedulerInstance<E>;
     children?: SchedulerChild<E> | readonly SchedulerChild<E>[];
   };
 
@@ -87,28 +63,32 @@ function splitChildren<E extends SchedulerEventData>(children: SchedulerProps<E>
   };
 }
 
-export function SchedulerRoot<E extends SchedulerEventData>({
+export function SchedulerRoot<E extends SchedulerEventData>(props: SchedulerProps<E>) {
+  if (props.scheduler) {
+    return <SchedulerBoard {...props} scheduler={props.scheduler} />;
+  }
+
+  return <SchedulerWithItsOwnHook {...props} />;
+}
+
+function SchedulerWithItsOwnHook<E extends SchedulerEventData>(props: SchedulerProps<E>) {
+  const scheduler = useScheduler<E>();
+
+  return <SchedulerBoard {...props} scheduler={scheduler} />;
+}
+
+function SchedulerBoard<E extends SchedulerEventData>({
   events,
-  view: viewProp,
-  defaultView = 'week',
-  onViewChange,
-  dayCount: dayCountProp,
-  defaultDayCount = DEFAULT_DAY_COUNT,
-  onDayCountChange,
-  date: dateProp,
-  defaultDate,
-  onDateChange,
-  weekStartsOn,
-  now: nowProp,
-  onEventChange,
-  onSlotSelect,
+  scheduler,
   children,
   className,
   'aria-label': ariaLabel,
   'aria-describedby': ariaDescribedBy,
   ...props
-}: SchedulerProps<E>) {
-  [dateProp, defaultDate].forEach((date) => validateDate(date, 'Scheduler'));
+}: SchedulerProps<E> & { scheduler: SchedulerInstance<E> }) {
+  const { view, setView, dayCount, setDayCount, date, setDate, now, onEventChange, onSlotSelect } =
+    scheduler;
+
   useInternalRequiredName('Scheduler', {
     'aria-label': ariaLabel,
     'aria-labelledby': props['aria-labelledby'],
@@ -117,24 +97,11 @@ export function SchedulerRoot<E extends SchedulerEventData>({
   const { renderEvent, eventMenu, slotMenu } = splitChildren(children);
   const providerLocale = useInternalProviderLocale();
   const resolvedLocale = resolveLocale(providerLocale);
-  const weekStart = weekStartsOn ?? weekStartOf(resolvedLocale);
-  const now = useInternalNow(nowProp);
+  const weekStart = scheduler.weekStartsOn ?? weekStartOf(resolvedLocale);
   const today = now && dateOf(now);
   const generatedHintId = useId();
   const hintId = onEventChange ? `${generatedHintId}-drag-hint` : undefined;
   const describedBy = [ariaDescribedBy, hintId].filter(Boolean).join(' ') || undefined;
-
-  const { view, setView, dayCount, setDayCount, date, setDate } = useInternalSchedulerNavigation({
-    view: viewProp,
-    defaultView,
-    onViewChange,
-    dayCount: dayCountProp,
-    defaultDayCount,
-    onDayCountChange,
-    date: dateProp,
-    defaultDate,
-    onDateChange,
-  });
 
   const days = daysOf(view, date, weekStart, dayCount);
   const styles = schedulerStyle({ view });

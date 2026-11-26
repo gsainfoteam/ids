@@ -6,6 +6,7 @@
 - **IDS 로 짓습니다.** 이동은 ButtonGroup, 보기 전환은 ToggleGroup, 날짜로 이동은 Popover 안의 Calendar, 격자는 ScrollArea, 일정은 Item, 지금 시각은 Divider 입니다.
 - **날짜는 `@internationalized/date`.** `date` 는 `CalendarDate`, 일정의 `start` / `end` 는 `CalendarDateTime` 입니다. 시간대가 없는 벽시계 시각이라 로컬 시간대가 값을 흔들지 않습니다.
 - **locale.** 요일, 날짜, 시각의 글자와 첫 요일을 Calendar 와 같은 방식으로 locale 에서 읽습니다.
+- **옵션은 훅에.** 보기, 날짜, 편집은 `useScheduler()` 가 받고, 그 결과를 `scheduler` 로 넘깁니다. 루트에는 `events` 와 이름, 일정 칸 그리기만 남습니다.
 
 ```tsx
 import { CalendarDate, CalendarDateTime } from '@internationalized/date';
@@ -29,6 +30,34 @@ const events = [
 
 <Scheduler aria-label="일정표" events={events} />;
 ```
+
+## useScheduler
+
+```tsx
+import { Scheduler, useScheduler } from '@gsainfoteam/ids-react';
+
+const scheduler = useScheduler({
+  views: { defaultValue: 'days', defaultDayCount: 4 },               // 보기와 N일 보기의 날 수
+  navigation: { defaultValue: new CalendarDate(2026, 11, 17), weekStartsOn: 1 },  // 보이는 날짜
+  editing: { onEventChange, onSlotSelect },                          // 옮기기, 빈 칸 고르기
+});
+
+<Scheduler aria-label="일정표" events={events} scheduler={scheduler} />;
+```
+
+- 기능마다 객체 하나이고, 주지 않은 기능은 기본값입니다. 훅 없이 `<Scheduler events={events} />` 만 써도 됩니다.
+- 상태는 셋으로 제어합니다. 보기는 `views.value` / `defaultValue` / `onValueChange`, 날 수는 `views.dayCount` / `defaultDayCount` / `onDayCountChange`, 날짜는 `navigation.value` / `defaultValue` / `onValueChange` 입니다.
+- 결과 하나는 Scheduler 하나에 넘깁니다.
+
+| 기능         | 키                                                  | 기본                              |
+| ------------ | --------------------------------------------------- | --------------------------------- |
+| `views`      | `value` / `defaultValue` / `onValueChange`          | `'week'`                          |
+|              | `dayCount` / `defaultDayCount` / `onDayCountChange` | `3`. `days` 보기의 날 수, 2 ~ 14  |
+| `navigation` | `value` / `defaultValue` / `onValueChange`          | 오늘. `CalendarDate`              |
+|              | `weekStartsOn`                                      | locale 의 첫 요일. `0` ~ `6`      |
+|              | `now`                                               | 클라이언트 시계. `CalendarDateTime` |
+| `editing`    | `onEventChange`                                     | 없음(옮기지 않음)                 |
+|              | `onSlotSelect`                                      | 없음(고르지 않음)                 |
 
 ## 구조
 
@@ -102,17 +131,17 @@ type EventData = {
 
 ```tsx
 const [events, setEvents] = useState(initialEvents);
+const scheduler = useScheduler({
+  editing: {
+    onEventChange: (event, { start, end }) =>
+      setEvents((all) => all.map((item) => (item.id === event.id ? { ...item, start, end } : item))),
+  },
+});
 
-<Scheduler
-  aria-label="일정표"
-  events={events}
-  onEventChange={(event, { start, end }) =>
-    setEvents((all) => all.map((item) => (item.id === event.id ? { ...item, start, end } : item)))
-  }
-/>;
+<Scheduler aria-label="일정표" events={events} scheduler={scheduler} />;
 ```
 
-- `onEventChange` 를 주면 시각이 있는 일정을 끌어 옮기고, 아래 끝을 끌어 끝 시각을 바꿉니다. 종일 일정은 옮기지 않습니다.
+- `editing.onEventChange` 를 주면 시각이 있는 일정을 끌어 옮기고, 아래 끝을 끌어 끝 시각을 바꿉니다. 종일 일정은 옮기지 않습니다.
 - 둘 다 15분 단위로 맞습니다. 옮기는 동안 일정은 15분 칸과 날짜 칸에 맞춰 움직이고, 놓을 때 한 번 `onEventChange(event, { start, end })` 를 부릅니다.
 - `start` 와 `end` 는 넘긴 값과 같은 타입(`CalendarDateTime`, `ZonedDateTime`)입니다. 옮기면 둘이 같은 만큼 움직이고, 길이를 바꾸면 `end` 만 바뀝니다.
 - 제어 컴포넌트입니다. 앱이 `events` 를 바꿔야 자리가 바뀌고, 바꾸지 않으면 원래 자리로 돌아갑니다.
@@ -156,14 +185,14 @@ const [events, setEvents] = useState(initialEvents);
 ## 빈 칸을 끌어 고르기
 
 ```tsx
-<Scheduler
-  aria-label="일정표"
-  events={events}
-  onSlotSelect={({ start, end, allDay }) => openCreateDialog({ start, end, allDay })}
-/>
+const scheduler = useScheduler({
+  editing: { onSlotSelect: ({ start, end, allDay }) => openCreateDialog({ start, end, allDay }) },
+});
+
+<Scheduler aria-label="일정표" events={events} scheduler={scheduler} />;
 ```
 
-- `onSlotSelect` 를 주면 빈 곳을 끌어 기간을 고릅니다. 일정을 옮길 때와 같은 dnd-kit 끌기라서 시작 조건, 자동 스크롤, Escape 가 같습니다. 놓을 때 한 번 `{ start, end, allDay }` 를 넘깁니다. 일정을 만드는 것은 앱입니다.
+- `editing.onSlotSelect` 를 주면 빈 곳을 끌어 기간을 고릅니다. 일정을 옮길 때와 같은 dnd-kit 끌기라서 시작 조건, 자동 스크롤, Escape 가 같습니다. 놓을 때 한 번 `{ start, end, allDay }` 를 넘깁니다. 일정을 만드는 것은 앱입니다.
 - 시간 격자에서는 누른 날 칸 안에서 위아래로 끌어 15분 단위로 고릅니다. 끄는 동안 고른 시간("오후 2:00 – 오후 3:30")이 칸 위에 그려지고, `allDay` 는 `false` 입니다.
 - 월 보기에서는 날 칸을 가로질러 끌어 여러 날을 고릅니다. 고른 날 칸은 `bg-primary-soft` 로 칠해지고, `start` 는 첫날 `00:00`, `end` 는 마지막 날 다음 날 `00:00`, `allDay` 는 `true` 입니다.
 - 마우스는 4px 를 움직여야, 터치는 250ms 를 누르고 있어야 고르기가 시작됩니다. 그 전에 떼면 아무것도 넘기지 않고, 터치는 그 전까지 스크롤됩니다. Escape 는 고르기를 취소합니다.
@@ -206,32 +235,37 @@ const [events, setEvents] = useState(initialEvents);
 - 메뉴는 `Menu triggerType="contextmenu"` 라서 우클릭한 자리에 뜹니다. 고르는 법, 키보드, 닫는 법은 Menu 와 같습니다.
 - 메뉴 part 를 두지 않은 곳(`Scheduler.EventMenu` 없이 일정, `Scheduler.SlotMenu` 없이 빈 칸, 종일 줄의 빈 곳)은 브라우저 메뉴가 그대로 뜹니다.
 - 두 part 는 `Scheduler` 의 자식이나 Fragment 안에 둡니다. 일정을 그리는 함수(`{(event) => <Scheduler.Event />}`)와 함께 둘 수 있습니다.
-- `onEventChange` 와 함께 써도 우클릭은 일정을 집지 않습니다.
+- `editing.onEventChange` 와 함께 써도 우클릭은 일정을 집지 않습니다.
 
 ## 보기와 날짜
 
 ```tsx
-<Scheduler aria-label="일정표" events={events} defaultView="day" defaultDate={new CalendarDate(2026, 11, 17)} />
-<Scheduler aria-label="일정표" events={events} defaultView="days" defaultDayCount={4} />
+useScheduler({ views: { defaultValue: 'day' }, navigation: { defaultValue: new CalendarDate(2026, 11, 17) } });
+useScheduler({ views: { defaultValue: 'days', defaultDayCount: 4 } });
 
 const [view, setView] = useState<Scheduler.View>('week');
 const [date, setDate] = useState(today(getLocalTimeZone()));
-<Scheduler aria-label="일정표" events={events} view={view} onViewChange={setView} date={date} onDateChange={setDate} />
+useScheduler({
+  views: { value: view, onValueChange: setView },
+  navigation: { value: date, onValueChange: setDate },
+});
 ```
 
-- `date` 는 보이는 기간 안의 아무 날입니다. 월 보기는 그날이 든 달, 주 보기는 그날이 든 주, `days` 는 그날부터 `dayCount` 일을 그립니다.
+- 날짜(`navigation.value`)는 보이는 기간 안의 아무 날입니다. 월 보기는 그날이 든 달, 주 보기는 그날이 든 주, `days` 는 그날부터 `dayCount` 일을 그립니다.
 - 이전, 다음은 보기만큼(한 달, 한 주, `dayCount` 일, 하루) 옮깁니다. 오늘은 오늘로 갑니다.
 - `days` 보기에서는 보기 전환 앞에 날 수 칸(NumberField)이 나옵니다. 2일부터 14일까지 직접 입력하거나 위아래 버튼, 방향키로 바꿉니다. 범위 밖이나 빈 값은 칸을 떠날 때 마지막 값으로 돌아갑니다.
 - 보기 전환의 N일 버튼 이름은 `dayCount` 를 따릅니다("3일").
-- `dayCount` 도 `view`, `date` 처럼 제어하거나(`dayCount` / `onDayCountChange`) 처음 값만 줄 수 있습니다(`defaultDayCount`). 2보다 작거나 14보다 큰 값은 범위 안으로 맞춥니다.
-- 기간 버튼은 Calendar 를 엽니다. 포커스가 `date` 로 들어가고, 날을 고르면 그날로 옮기며 닫힙니다. Escape 는 닫고 포커스를 기간 버튼에 돌려줍니다.
+- 날 수도 보기, 날짜처럼 제어하거나(`views.dayCount` / `onDayCountChange`) 처음 값만 줄 수 있습니다(`views.defaultDayCount`). 2보다 작거나 14보다 큰 값은 범위 안으로 맞춥니다.
+- 기간 버튼은 Calendar 를 엽니다. 포커스가 보이는 날짜로 들어가고, 날을 고르면 그날로 옮기며 닫힙니다. Escape 는 닫고 포커스를 기간 버튼에 돌려줍니다.
 - 보기 전환은 라디오 그룹이라 다시 눌러도 풀리지 않습니다.
-- `date` 의 기본은 오늘입니다. 서버와 클라이언트가 다른 날이면 hydration 이 어긋나므로, 서버에서 그리는 앱은 `defaultDate` 를 넘깁니다.
+- 날짜의 기본은 오늘입니다. 서버와 클라이언트가 다른 날이면 hydration 이 어긋나므로, 서버에서 그리는 앱은 `navigation.defaultValue` 를 넘깁니다.
 
 ## 월 보기
 
 ```tsx
-<Scheduler aria-label="일정표" events={events} defaultView="month" />
+const scheduler = useScheduler({ views: { defaultValue: 'month' } });
+
+<Scheduler aria-label="일정표" events={events} scheduler={scheduler} />;
 ```
 
 - 그달 1일이 든 주부터 마지막 날이 든 주까지 그립니다. 앞뒤 달의 날은 `bg-block` 으로 가라앉힙니다.
@@ -239,21 +273,21 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 - 한 주를 넘는 막대는 다음 주 줄로 이어집니다. 잘린 쪽은 모서리를 펴고 주의 가장자리까지 닿아서, 이어지는 일정으로 읽힙니다. 주 보기의 종일 줄도 같습니다.
 - 날 칸은 보드 너비에 맞춰 줄어듭니다. 칸이 좁으면(120px 아래) 시작 시각을 숨기고 점과 제목만 남깁니다.
 - 긴 막대부터, 같은 길이면 종일 일정, 시작 시각 순으로 빈 줄에 채웁니다.
-- 하루에 세 줄을 넘는 일정은 `+N개` 버튼으로 접습니다. 누르면 그날의 일 보기로 가고, `onViewChange('day')` 와 `onDateChange` 를 부릅니다.
-- `onEventChange` 를 주면 월 보기의 일정도 다른 날 칸으로 끌어 옮깁니다(아래 "월 보기에서 옮기기"). 길이는 주, N일, 일 보기에서 바꿉니다.
+- 하루에 세 줄을 넘는 일정은 `+N개` 버튼으로 접습니다. 누르면 그날의 일 보기로 가고, `views.onValueChange('day')` 와 `navigation.onValueChange` 를 부릅니다.
+- `editing.onEventChange` 를 주면 월 보기의 일정도 다른 날 칸으로 끌어 옮깁니다(아래 "월 보기에서 옮기기"). 길이는 주, N일, 일 보기에서 바꿉니다.
 - 각 주는 날짜 범위로 이름 붙은 `group` 이고, 일정은 그 안의 ItemGroup 입니다.
 
 ## 지금 시각
 
 ```tsx
-<Scheduler aria-label="일정표" events={events} />                                          // 클라이언트 시계, 1분마다
-<Scheduler aria-label="일정표" events={events} now={new CalendarDateTime(2026, 11, 17, 10, 30)} />  // 고정
+useScheduler();                                                                   // 클라이언트 시계, 1분마다
+useScheduler({ navigation: { now: new CalendarDateTime(2026, 11, 17, 10, 30) } }); // 고정
 ```
 
 - 오늘 칸에 지금 시각의 선을 긋습니다. 장식이라 화면 읽기는 읽지 않습니다.
-- `now` 가 없으면 hydration 뒤에 클라이언트 시계를 읽어 긋습니다. 서버 HTML 에는 선이 없어서 서버와 클라이언트 시각이 달라도 어긋나지 않습니다.
+- `navigation.now` 가 없으면 hydration 뒤에 클라이언트 시계를 읽어 긋습니다. 서버 HTML 에는 선이 없어서 서버와 클라이언트 시각이 달라도 어긋나지 않습니다.
 - 오늘 칸(`aria-current="date"`)도 같은 시계를 따릅니다. 서버 HTML 에는 오늘 칸이 없고, hydration 뒤에 클라이언트의 오늘을 표시합니다.
-- `now` 를 주면 그 시각에 고정하고, 오늘도 그 날짜입니다. 스토리와 테스트가 씁니다.
+- `navigation.now` 를 주면 그 시각에 고정하고, 오늘도 그 날짜입니다. 스토리와 테스트가 씁니다.
 
 ## 스크롤
 
@@ -270,7 +304,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
   <Scheduler aria-label="Kalender" />                // 월요일 시작, "16.–22. November 2026", 9:00
 </IdsProvider.Scope>
-<Scheduler aria-label="일정표" weekStartsOn={1} />   // 첫 요일을 정한다(0 일요일 ~ 6 토요일)
+useScheduler({ navigation: { weekStartsOn: 1 } });   // 첫 요일을 정한다(0 일요일 ~ 6 토요일)
 ```
 
 - 가장 가까운 IdsProvider 의 locale 을 따르고, 없으면 `ko-KR` 입니다.
@@ -283,13 +317,7 @@ const [date, setDate] = useState(today(getLocalTimeZone()));
 | Prop                                    | Type                                  | Default              |
 | --------------------------------------- | ------------------------------------- | -------------------- |
 | `events`                                | `Scheduler.EventData[]` 를 넓힌 배열   | -                    |
-| `view` / `defaultView` / `onViewChange` | `'month' \| 'week' \| 'days' \| 'day'` | `'week'`             |
-| `dayCount` / `defaultDayCount` / `onDayCountChange` | `number` (`days` 보기의 날 수, 2 ~ 14) | `3`  |
-| `date` / `defaultDate` / `onDateChange` | `CalendarDate`                        | 오늘                 |
-| `weekStartsOn`                          | `0` ~ `6`                             | locale 의 첫 요일    |
-| `now`                                   | `CalendarDateTime`                    | 클라이언트 시계      |
-| `onEventChange`                         | `(event, { start, end }) => void`     | 없음(옮기지 않음)    |
-| `onSlotSelect`                          | `({ start, end, allDay }) => void`    | 없음(고르지 않음)    |
+| `scheduler`                             | `useScheduler()` 의 결과               | 기본값               |
 | `children`                              | `(event) => ReactNode` 와 아래 part    | `<Scheduler.Event />` |
 
 나머지 `div` props 는 root 에 갑니다.
