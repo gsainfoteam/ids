@@ -15,6 +15,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
@@ -108,13 +109,15 @@ export const PC: Story = {
           <Card.Content>
             <div className="flex flex-col gap-4">
               <p>웹 프론트엔드와 디자인 시스템을 좋아해요. 인포팀에서 Ziggle 을 만들어요.</p>
-              <ul aria-label="관심사" className="flex flex-wrap gap-1.5">
-                {INTERESTS.map((interest) => (
-                  <li key={interest}>
-                    <Chip size="tiny">{interest}</Chip>
-                  </li>
-                ))}
-              </ul>
+              <ChipGroup asChild size="tiny" aria-label="관심사">
+                <ul>
+                  {INTERESTS.map((interest) => (
+                    <li key={interest}>
+                      <Chip>{interest}</Chip>
+                    </li>
+                  ))}
+                </ul>
+              </ChipGroup>
               <dl className="grid grid-cols-3 gap-2">
                 {STATS.map((stat) => (
                   <Card key={stat.label} variant="soft" size="tiny" asChild>

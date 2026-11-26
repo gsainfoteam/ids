@@ -11,6 +11,7 @@ import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -205,7 +206,7 @@ export const PC: Story = {
           <h2 id="suggestions" className="text-body-b3-semibold">
             이런 검색어는 어때요?
           </h2>
-          <div className="flex flex-wrap gap-2">
+          <ChipGroup>
             {SUGGESTIONS.map((suggestion) => (
               <Chip
                 key={suggestion}
@@ -217,7 +218,7 @@ export const PC: Story = {
                 {suggestion}
               </Chip>
             ))}
-          </div>
+          </ChipGroup>
         </section>
       </main>
     );

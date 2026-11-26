@@ -27,6 +27,7 @@ import { Accordion } from '../../components/data/accordion';
 import { Avatar } from '../../components/data/avatar';
 import { Bubble } from '../../components/data/bubble';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -383,13 +384,13 @@ export const PC: Story = {
           </div>
 
           <form onSubmit={ask} className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 pb-4">
-            <div role="group" aria-label="이어서 물어보기" className="flex flex-wrap gap-2">
+            <ChipGroup aria-label="이어서 물어보기">
               {FOLLOW_UPS.map((followUp) => (
                 <Chip key={followUp} onClick={() => setDraft(followUp)}>
                   {followUp}
                 </Chip>
               ))}
-            </div>
+            </ChipGroup>
             <TextArea
               aria-label="GIST 도우미에게 묻기"
               placeholder="이어서 물어보세요"

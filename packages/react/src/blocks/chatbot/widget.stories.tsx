@@ -12,6 +12,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { TextField } from '../../components/form/text-field';
@@ -135,17 +136,13 @@ export const PC: Story = {
                       {bot}
                       <div className="text-body-b3-regular flex flex-col gap-3">
                         <p>안녕하세요. 인포팀 서비스를 쓰다 막힌 곳이 있으면 물어보세요.</p>
-                        <div
-                          role="group"
-                          aria-label="자주 묻는 것"
-                          className="flex flex-wrap gap-1.5"
-                        >
+                        <ChipGroup size="tiny" aria-label="자주 묻는 것">
                           {QUICK_REPLIES.map((reply) => (
-                            <Chip key={reply} size="tiny" onClick={() => ask(reply)}>
+                            <Chip key={reply} onClick={() => ask(reply)}>
                               {reply}
                             </Chip>
                           ))}
-                        </div>
+                        </ChipGroup>
                       </div>
                     </li>
                     {asked.map((text, index) => (

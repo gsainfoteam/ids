@@ -6,6 +6,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Toggle } from '../../components/action/toggle';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -114,7 +115,7 @@ export const PC: Story = {
           <IconButton variant="outline" aria-label="11월" icon={<ChevronRightIcon />} />
         </div>
 
-        <div role="group" aria-label="분류" className="flex flex-wrap gap-2">
+        <ChipGroup aria-label="분류">
           <Chip selected={kind === null} onSelectedChange={() => setKind(null)}>
             전체
           </Chip>
@@ -123,7 +124,7 @@ export const PC: Story = {
               {KIND_LABEL[value]}
             </Chip>
           ))}
-        </div>
+        </ChipGroup>
 
         {shown.length === 0 ? (
           <Empty>

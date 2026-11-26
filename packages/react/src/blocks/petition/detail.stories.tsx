@@ -7,6 +7,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -70,12 +71,12 @@ export const PC: Story = {
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <article className="flex flex-col gap-8">
             <header className="flex flex-col gap-4">
-              <div className="flex flex-wrap gap-1.5">
+              <ChipGroup>
                 <Chip variant="soft">교통</Chip>
                 <Chip variant="soft" colorScheme="primary">
                   진행 중
                 </Chip>
-              </div>
+              </ChipGroup>
               <h1 className="text-headline-h2-bold">
                 평일 셔틀 막차를 밤 11시 30분으로 늦춰 주세요
               </h1>

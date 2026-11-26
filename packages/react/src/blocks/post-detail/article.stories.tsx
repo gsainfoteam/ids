@@ -16,6 +16,7 @@ import { Toggle } from '../../components/action/toggle';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
@@ -100,12 +101,12 @@ export const PC: Story = {
 
         <article className="flex flex-col gap-6">
           <header className="flex flex-col gap-4">
-            <div className="flex flex-wrap gap-1.5">
+            <ChipGroup>
               <Chip variant="soft">행사</Chip>
               <Chip variant="soft" colorScheme="warning">
                 마감 D-7
               </Chip>
-            </div>
+            </ChipGroup>
             <h1 className="text-headline-h2-bold">가을 축제 부스 운영 동아리 모집</h1>
             <Item variant="soft">
               <Item.Media>
@@ -172,11 +173,11 @@ export const PC: Story = {
           </Card>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-2">
+            <ChipGroup>
               {TAGS.map((tag) => (
                 <Chip key={tag}>#{tag}</Chip>
               ))}
-            </div>
+            </ChipGroup>
             <Toggle defaultPressed>
               <HeartIcon />
               좋아요 24

@@ -6,6 +6,7 @@ import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -92,7 +93,7 @@ export const PC: Story = {
         </div>
 
         <Card variant="soft">
-          <div role="group" aria-label="예시 질문" className="flex flex-wrap gap-2">
+          <ChipGroup aria-label="예시 질문">
             {ANSWERS.map((option, optionIndex) => (
               <Chip
                 key={option.question}
@@ -102,7 +103,7 @@ export const PC: Story = {
                 {option.question}
               </Chip>
             ))}
-          </div>
+          </ChipGroup>
           <Card>
             <Card.Header>
               <Avatar name="GIST 도우미" size="tiny" aria-hidden>

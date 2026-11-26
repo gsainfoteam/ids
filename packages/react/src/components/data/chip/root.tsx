@@ -48,7 +48,7 @@ function arrange(content: ReactNode, removable: boolean) {
 export function ChipRoot({
   variant = 'soft',
   colorScheme = 'neutral',
-  size = 'standard',
+  size: sizeProp,
   selected,
   defaultSelected,
   onSelectedChange,
@@ -80,6 +80,7 @@ export function ChipRoot({
     hasClick: onClick !== undefined,
     disabled,
   });
+  const size = sizeProp ?? chip.groupSize ?? 'standard';
   const rootIsButton = chip.interactive && !asChild;
   const { interaction, handlers, innerFocusVisible, mergedRef, toggleOnClick } =
     useInternalChipInteraction({

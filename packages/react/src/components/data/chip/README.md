@@ -5,7 +5,7 @@
 - **크기는 글에 맞춘다(hug).** 칩은 글 폭만큼이고 부모 폭을 넘지 않습니다. grid 나 `flex-col` 부모 안에서는 그 칸만큼 늘어납니다.
 - **하는 일에 맞는 요소.** 그냥 라벨은 `span`, 누르거나 켜고 끄는 칩은 진짜 `<button>` 입니다. 켜고 끄는 칩은 `aria-pressed` 로 상태를 알립니다.
 - **지우기.** `onRemove` 만 주면 끝에 삭제 버튼이 붙고, 그 이름은 "frontend 삭제" 처럼 칩의 글과 이어집니다.
-- **키보드로 지우기.** 포커스된 칩이나 삭제 버튼에서 `Backspace` 나 `Delete` 를 누르면 지워지고, 포커스는 옆 칩으로 옮겨 갑니다.
+- **키보드로 지우기.** 포커스된 칩이나 삭제 버튼에서 `Backspace` 나 `Delete` 를 누르면 지워지고, [`ChipGroup`](../chip-group/README.md) 안이면 포커스는 옆 칩으로 옮겨 갑니다.
 - **버튼 속 버튼 없이.** 켜고 끄면서 지울 수도 있는 칩은 X를 마우스 전용으로 그리고 키보드는 `Backspace` 로 지웁니다. X를 눌러도 토글되지 않습니다.
 - **강도와 의미.** `variant` 로 강도(`solid` / `soft` / `outline`), `colorScheme` 으로 의미를 고릅니다.
 
@@ -66,7 +66,7 @@ import { Chip } from '@gsainfoteam/ids-react';
 | `Enter` / `Space`      | 누르기. 삭제 버튼이면 지우기         |
 | `Backspace` / `Delete` | 포커스된 칩 지우기                   |
 
-- 지운 뒤 포커스는 다음 칩, 마지막 칩이었다면 앞 칩으로 갑니다. 칩이 실제로 사라졌을 때만 옮깁니다.
+- 지운 뒤 포커스는 같은 `ChipGroup` 의 다음 칩, 마지막 칩이었다면 앞 칩으로 갑니다. 칩이 실제로 사라졌을 때만 옮깁니다. 그룹 밖의 칩은 포커스를 옮기지 않습니다. 칩은 주변 DOM 을 뒤져 형제를 찾지 않고, 그룹이 준 context 로만 알아봅니다.
 - 실제로 목록에서 빼는 일은 `onRemove` 를 받은 쪽이 합니다.
 - `Chip.Close` 는 칩의 `colorScheme` 을 받은 ghost `IconButton` 입니다. 모양은 칩 글자색의 작은 원이고, 포커스 링과 hover 는 IconButton 과 같습니다.
 - `onRemove` 는 지우기를 부른 클릭이나 키 이벤트를 받습니다. `event.preventDefault()` 하면 칩은 포커스를 옮기지 않으니, 태그 입력창처럼 포커스를 직접 보낼 때 씁니다.

@@ -36,6 +36,7 @@ import { Badge } from '../../components/data/badge';
 import { Calendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { ColorPicker } from '../../components/data/color-picker';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
@@ -183,12 +184,12 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip defaultSelected>전공</Chip>
                         <Chip>교양</Chip>
                         <Chip defaultSelected>영어 강의</Chip>
                         <Chip>온라인</Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
 
@@ -317,7 +318,7 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip variant="solid" colorScheme="primary">
                           새 기능
                         </Chip>
@@ -333,7 +334,7 @@ export const Cover: Story = {
                         <Chip variant="soft" colorScheme="danger">
                           중단
                         </Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
                 </div>
@@ -922,11 +923,11 @@ export const Cover: Story = {
                     <div className={cn(column, 'w-[260px]')}>
                       <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                         <Card size="tiny">
-                          <div className="flex flex-wrap gap-2">
+                          <ChipGroup>
                             <Chip defaultSelected>중간고사</Chip>
                             <Chip>퀴즈</Chip>
                             <Chip defaultSelected>기말고사</Chip>
-                          </div>
+                          </ChipGroup>
                         </Card>
                       </IdsProvider.Scope>
 
@@ -1005,7 +1006,7 @@ export const Cover: Story = {
 
                       <IdsProvider.Scope theme={{ primary: palettes.pink }} asChild>
                         <Card size="tiny">
-                          <div className="flex flex-wrap gap-2">
+                          <ChipGroup>
                             <Chip defaultSelected>전체</Chip>
                             <Chip defaultSelected>학사</Chip>
                             <Chip>장학</Chip>
@@ -1013,7 +1014,7 @@ export const Cover: Story = {
                             <Chip variant="solid" colorScheme="primary" onRemove={noop}>
                               기숙사
                             </Chip>
-                          </div>
+                          </ChipGroup>
                         </Card>
                       </IdsProvider.Scope>
 
@@ -1772,13 +1773,13 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.cyan }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip defaultSelected>월</Chip>
                         <Chip>화</Chip>
                         <Chip defaultSelected>수</Chip>
                         <Chip>목</Chip>
                         <Chip defaultSelected>금</Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
                 </div>
@@ -2145,12 +2146,12 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.yellow }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip defaultSelected>맑음</Chip>
                         <Chip>흐림</Chip>
                         <Chip>비</Chip>
                         <Chip defaultSelected>주말</Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
 

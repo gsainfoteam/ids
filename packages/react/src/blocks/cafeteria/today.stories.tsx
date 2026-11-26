@@ -4,6 +4,7 @@ import { Toggle } from '../../components/action/toggle';
 import { ToggleGroup } from '../../components/action/toggle-group';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { toast } from '../../components/feedback/toast';
 import { Rating } from '../../components/form/rating';
 import { Tabs } from '../../components/navigation/tabs';
@@ -181,7 +182,7 @@ export const PC: Story = {
           <p className="text-body-b3-semibold" id="allergy-label">
             피하고 싶은 재료
           </p>
-          <div role="group" aria-labelledby="allergy-label" className="flex flex-wrap gap-2">
+          <ChipGroup aria-labelledby="allergy-label">
             {ALLERGENS.map((allergen) => (
               <Chip
                 key={allergen}
@@ -196,7 +197,7 @@ export const PC: Story = {
                 {allergen}
               </Chip>
             ))}
-          </div>
+          </ChipGroup>
         </div>
 
         <Tabs defaultValue="student">
