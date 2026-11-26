@@ -883,7 +883,7 @@ test('Escape closes a Select sheet inside first, then the drawer', async () => {
     <IdsProvider theme={testTheme}>
       <Sheet side="bottom" defaultOpen>
         <Select aria-label="Sort">
-          <Select.Content mobileVariant="drawer">
+          <Select.Content narrow="drawer">
             <Select.Item value="new">Newest</Select.Item>
             <Select.Item value="old">Oldest</Select.Item>
           </Select.Content>

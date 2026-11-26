@@ -97,7 +97,7 @@ import { ColorField, Field } from '@gsainfoteam/ids-react';
 ```
 
 - 앱은 값을 `value` / `onValueChange` 로, 열림을 `open` / `onOpenChange` 로 읽습니다. 비어 있는지는 `value === ''` 로 압니다.
-- `disabled`, `readOnly`, `invalid`, `required` 는 앱이 준 값 그대로입니다. 읽을 수 없는 값은 `aria-invalid` 로 알립니다.
+- `disabled`, `readOnly`, `required` 는 앱이 준 값 그대로이고, `invalid` 는 앱이나 Field 가 준 `aria-invalid` 입니다. 읽을 수 없는 값도 `aria-invalid` 로 알립니다.
 - 새 디자인을 그릴 때만, 루트와 `Trigger` 의 `className` 은 `ColorField.State` 를 받는 함수도 됩니다.
 
 ## 열림 상태
@@ -106,10 +106,11 @@ import { ColorField, Field } from '@gsainfoteam/ids-react';
 <ColorField open={open} onOpenChange={setOpen} />   // 제어
 <ColorField defaultOpen />                          // 처음부터 열림
 <ColorField>
-  <ColorField.Content mobileVariant="drawer" />     {/* 640px 미만에서 하단 시트 */}
+  <ColorField.Content narrow="drawer" />            {/* 640px 미만에서 하단 시트 */}
 </ColorField>
 ```
 
+- `narrow` 는 640px 보다 좁은 화면에서 팝업이 무엇으로 열리는지 정하고, `ColorField.Content` 가 받습니다. 기본은 `popover` 입니다. 색 팝업은 고칠 필드 옆에 붙어 있는 편이 읽기 쉽습니다. 목록 팝업(Select, ChipField)은 기본이 `drawer` 입니다.
 - `Esc`, 바깥 클릭, 포커스가 나갈 때도 `onOpenChange(false)` 가 불립니다.
 - `disabled` 나 `readOnly` 면 `open` 이어도 열리지 않습니다.
 - 팝업이 남은 화면보다 길면 안에서 스크롤하고, 위나 아래에 내용이 더 남은 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)).
@@ -151,7 +152,7 @@ const methods = useForm({ defaultValues: { color: '' } });
 ```tsx
 <ColorField variant="soft" />   // outline(기본) / soft / ghost
 <ColorField size="tiny" />      // standard(36px) / tiny(32px). 생략하면 Field 를 따른다
-<ColorField invalid />          // 테두리와 포커스 링이 danger 색
+<ColorField aria-invalid />     // 테두리와 포커스 링이 danger 색
 ```
 
 ## 속성
@@ -166,7 +167,7 @@ const methods = useForm({ defaultValues: { color: '' } });
 | `placeholder`            | 기본 없음                                                           |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                  |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                          |
-| `invalid`                | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선          |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `disabled` / `readOnly`  | 열기, 변경, 지우기를 막는다                                         |
 | `name` / `form`          | 형식에 맞춘 값 하나를 hidden input 으로                             |
 | `required`               | 브라우저 검증                                                       |

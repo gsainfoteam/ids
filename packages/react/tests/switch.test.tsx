@@ -54,7 +54,7 @@ test('a click toggles and reports; readOnly and invalid are exposed', async () =
       <Switch
         aria-label="Locked"
         readOnly
-        invalid
+        aria-invalid
         defaultChecked
         onCheckedChange={(next) => changes.push(next)}
       />

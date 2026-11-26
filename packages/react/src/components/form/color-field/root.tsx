@@ -61,7 +61,6 @@ export type ColorFieldProps = Omit<
   format?: ColorFormat;
   variant?: ColorFieldVariant;
   size?: IdsSize;
-  invalid?: boolean;
   readOnly?: boolean;
   required?: boolean;
   placeholder?: string;
@@ -88,7 +87,6 @@ export function ColorFieldRoot({
   format = 'hex',
   variant = 'outline',
   size,
-  invalid,
   readOnly = false,
   required = false,
   disabled = false,
@@ -117,7 +115,7 @@ export function ColorFieldRoot({
   );
   const content = contents[0] as ReactElement<ColorFieldContentProps> | undefined;
   const alpha = containsElementOfType(content?.props.children, ALPHA_SLIDER);
-  const mobileVariant = content?.props.mobileVariant;
+  const narrow = content?.props.narrow;
 
   const { rootRef, triggerRef, ...field } = useInternalColorField({
     value,
@@ -132,12 +130,12 @@ export function ColorFieldRoot({
     readOnly,
   });
   const { state: s, actions } = field;
-  const drawer = useInternalDrawerPresentation(mobileVariant);
+  const drawer = useInternalDrawerPresentation(narrow);
   const popupId = `ids-color-${useId()}`;
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = colorFieldStyle({ variant, size: resolvedSize });
 
-  const ariaInvalid = native['aria-invalid'] ?? invalid ?? (s.invalid || undefined);
+  const ariaInvalid = native['aria-invalid'] ?? (s.invalid || undefined);
   const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
   const state: ColorFieldState = {
     open: s.open,
@@ -235,7 +233,7 @@ export function ColorFieldRoot({
         <FieldPopup
           anchor={rootRef}
           onClose={actions.close}
-          mobileVariant={mobileVariant}
+          narrow={narrow}
           preferredWidth={resolvedSize === 'tiny' ? 248 : 280}
           initialFocusSelector={FIRST_CONTROL}
           role="dialog"

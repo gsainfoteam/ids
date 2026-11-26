@@ -102,11 +102,13 @@ import { Field, Select } from '@gsainfoteam/ids-react';
   </Select.Trigger>
   {/* Content 를 생략하면 나머지 자식을 감싼다 */}
   <Select.Content>
-    <Select.Group heading="한식">
+    <Select.Group>
+      <Select.GroupLabel>한식</Select.GroupLabel>
       <Select.Item value="kimchi">김치찌개</Select.Item>
     </Select.Group>
     <Select.Separator /> {/* 스크린 리더에는 숨긴다 */}
-    <Select.Group heading="양식">
+    <Select.Group>
+      <Select.GroupLabel>양식</Select.GroupLabel>
       <Select.Item value="pasta">파스타</Select.Item>
       <Select.Item value="risotto" disabled>
         리소토
@@ -117,6 +119,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 ```
 
 - `Item`, `Group` 은 `Content` 나 루트의 자식, 또는 Fragment 안에 둡니다. 다른 컴포넌트 안은 찾지 않습니다.
+- `Select.GroupLabel` 은 그룹의 이름이고, `Select.Group` 의 바로 아래 자식으로 둡니다. 그룹은 이 이름을 `aria-labelledby` 로 읽습니다. 이름 없는 그룹이면 GroupLabel 을 빼고 `aria-label` 을 줍니다.
 - `Select.Separator` 는 `decorative` 인 `Divider` 입니다. listbox 에는 옵션과 그룹만 둘 수 있어 스크린 리더에는 숨깁니다.
 - 팝업 높이는 IDS 가 정합니다. 120px 에서 360px 사이에서 화면에 남은 공간만큼 열리고, 넘치는 옵션은 목록 안에서 스크롤됩니다.
 - `Trigger`, `Clear`, `Content` 는 각각 하나까지입니다. 옵션은 `Content` 안이나 루트 중 한 곳에만 둡니다.
@@ -172,11 +175,13 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Select>
-  <Select.Content mobileVariant="drawer">{items}</Select.Content> {/* 640px 미만에서 하단 시트 */}
+  <Select.Content narrow="popover">{items}</Select.Content> {/* 640px 미만에서도 팝오버 */}
 </Select>
 ```
 
-- `mobileVariant` 는 팝업 part 인 `Select.Content` 가 받습니다. 기본은 `popover` 이고, 좁은 화면에서도 팝오버로 엽니다. 하단 시트로 열려면 옵션을 모두 `Select.Content` 안에 둡니다.
+- `narrow` 는 640px 보다 좁은 화면에서 팝업이 무엇으로 열리는지 정하고, 팝업 part 인 `Select.Content` 가 받습니다.
+- 기본은 `drawer` 입니다. 긴 목록은 좁은 화면에서 하단 시트로 열어야 자리가 넉넉합니다. 달력, 시계, 색 팝업(DateField, TimeField, DateTimeField, ColorField)은 기본이 `popover` 입니다.
+- `popover` 로 바꾸려면 옵션을 모두 `Select.Content` 안에 두고 `narrow="popover"` 를 줍니다.
 
 - 팝업은 브라우저 top layer 에 떠서 `overflow: hidden` 부모에 잘리지 않고, 테마는 그대로 이어받습니다.
 - 폭은 트리거 이상, 최소 240px 입니다. 아래 공간이 모자라면 위로 열리고, 목록을 걸러 높이가 바뀌어도 열린 쪽을 지킵니다. 페이지를 스크롤하면 트리거를 따라가고, 트리거가 화면을 벗어나면 함께 벗어납니다.
@@ -228,7 +233,7 @@ const methods = useForm({ defaultValues: { fruit: null, tags: [] } }); // 하나
 ```tsx
 <Select variant="soft" />   // outline(기본) / soft / ghost
 <Select size="tiny" />      // standard(36px) / tiny(32px). 생략하면 Field 를 따른다
-<Select invalid />          // 테두리와 포커스 링이 danger 색
+<Select aria-invalid />     // 테두리와 포커스 링이 danger 색
 ```
 
 ## 속성
@@ -243,7 +248,7 @@ const methods = useForm({ defaultValues: { fruit: null, tags: [] } }); // 하나
 | `placeholder`            | 기본값 없음. 고른 값이 없을 때 트리거에 보인다                      |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                  |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                          |
-| `invalid`                | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선          |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `disabled` / `readOnly`  | 열기와 선택을 막는다                                                |
 | `name` / `form`          | 값마다 hidden input                                                 |
 | `required`               | 브라우저 검증                                                       |
@@ -252,7 +257,7 @@ const methods = useForm({ defaultValues: { fruit: null, tags: [] } }); // 하나
 
 | `Select.Content`  | 기본 / 동작                                                         |
 | ----------------- | ------------------------------------------------------------------- |
-| `mobileVariant`   | `popover`(기본) / `drawer`: 640px 미만에서 모달 하단 시트           |
+| `narrow`          | `drawer`(기본): 640px 미만에서 모달 하단 시트 / `popover`           |
 | `asChild`         | 자식 element 가 listbox 가 된다                                     |
 
 ## 알아둘 것

@@ -10,7 +10,7 @@ import { ModalLayer, type PopupPresentation } from '../overlay';
 export type FieldPopupProps = ComponentProps<'div'> & {
   anchor: RefObject<HTMLElement | null>;
   onClose: (restoreFocus: boolean) => void;
-  mobileVariant?: PopupPresentation;
+  narrow?: PopupPresentation;
   preferredWidth?: number;
   matchWidth?: boolean;
   side?: PopupSide;
@@ -24,7 +24,7 @@ export type FieldPopupProps = ComponentProps<'div'> & {
 export function FieldPopup({
   anchor,
   onClose,
-  mobileVariant = 'popover',
+  narrow = 'popover',
   preferredWidth = 240,
   matchWidth = false,
   side = 'bottom',
@@ -42,7 +42,7 @@ export function FieldPopup({
     {
       anchor,
       onClose,
-      mobileVariant,
+      narrow,
       preferredWidth,
       matchWidth,
       side,

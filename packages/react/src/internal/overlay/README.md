@@ -311,7 +311,7 @@ const stop = onViewportChange(win, () => {
 
 ## hooks/use-drawer-presentation.ts
 
-`mobileVariant` 가 `'drawer'` 이고 화면이 640px 보다 좁으면 `true` 를 돌려주는 hook(`useInternalDrawerPresentation`)입니다.
+`narrow` 가 `'drawer'` 이고 화면이 640px 보다 좁으면 `true` 를 돌려주는 hook(`useInternalDrawerPresentation`)입니다.
 
 ### 쓰는 곳
 
@@ -320,12 +320,12 @@ const stop = onViewportChange(win, () => {
 ### 쓰는 법
 
 ```ts
-const drawer = useInternalDrawerPresentation(mobileVariant);   // 'drawer' 이고 640px 미만이면 true
+const drawer = useInternalDrawerPresentation(narrow);   // 'drawer' 이고 640px 미만이면 true
 ```
 
 ### 왜 이렇게
 
-- [`useInternalMediaQuery`](../../hooks/README.md#use-media-queryts) 로 [lib/sheet-viewport.ts](#libsheet-viewportts) 의 `SMALL_SCREEN` 을 읽습니다. `mobileVariant` 가 `'drawer'` 가 아니면 query 를 넘기지 않아 구독하지 않습니다.
+- [`useInternalMediaQuery`](../../hooks/README.md#use-media-queryts) 로 [lib/sheet-viewport.ts](#libsheet-viewportts) 의 `SMALL_SCREEN` 을 읽습니다. `narrow` 가 `'drawer'` 가 아니면 query 를 넘기지 않아 구독하지 않습니다.
 - 서버 렌더 값은 `false` 입니다(`useSyncExternalStore` 의 server snapshot). 서버 HTML 은 늘 popover 입니다.
 
 ### 알아둘 것

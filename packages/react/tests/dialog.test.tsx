@@ -180,7 +180,7 @@ test('a Select sheet opened over a dialog marks its backdrop stacked, so it does
     <IdsProvider theme={testTheme}>
       <Settings defaultOpen>
         <Select aria-label="Theme">
-          <Select.Content mobileVariant="drawer">
+          <Select.Content narrow="drawer">
             <Select.Item value="light">Light</Select.Item>
             <Select.Item value="dark">Dark</Select.Item>
           </Select.Content>

@@ -161,7 +161,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 | `formatOptions`                       | `Intl.NumberFormat` 옵션. `notation` 제외. locale 은 provider |
 | `variant`                             | `outline`(기본) / `soft` / `ghost`                            |
 | `size`                                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
-| `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `disabled` / `readOnly`               | 입력과 버튼의 변경을 모두 막는다                              |
 | `name` / `form`                       | hidden input이 숫자 문자열을 제출한다. 빈 값은 제출하지 않는다 |
 | 그 외 native 속성, ref                 | 실제 input으로 간다                                           |

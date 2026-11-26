@@ -82,7 +82,7 @@ type Period = 'day' | 'week' | 'month';
 - 모양은 segmented `Tabs` 와 같습니다. 트랙은 `bg-neutral-soft`, 고른 칸은 `bg-segment` 카드에 `shadow-xs` 입니다. 카드는 밝은 모드에서 `bg-base`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다.
 - 글자는 고르지 않은 칸이 `text-neutral`, 고른 칸이 `text-neutral-strong` 입니다.
 - 고르지 않은 칸의 hover 와 press 는 state layer 입니다. 글자색은 바뀌지 않습니다.
-- 키보드 포커스는 칸에 ring 을 그립니다. `invalid` 면 트랙에 `border-danger-strong` 테두리가 붙습니다.
+- 키보드 포커스는 칸에 ring 을 그립니다. `aria-invalid` 면 트랙에 `border-danger-strong` 테두리가 붙습니다.
 
 ## 상태
 
@@ -91,7 +91,7 @@ type Period = 'day' | 'week' | 'month';
 ```
 
 - 고른 값은 `value` 와 `onValueChange` 로 읽습니다. 비제어여도 `onValueChange` 가 새 값을 알립니다.
-- `disabled`, `readOnly`, `required`, `invalid`, `size`, `orientation` 은 앱이 넘긴 속성이라 앱이 이미 압니다.
+- `disabled`, `readOnly`, `required`, `aria-invalid`, `size`, `orientation` 은 앱이 넘긴 속성이라 앱이 이미 압니다.
 - 칸의 hover, press, 키보드 포커스는 읽을 방법이 없습니다. `className` 과 `style` 은 상태 함수를 받지 않습니다.
 
 ## 폼
@@ -137,7 +137,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `disabled`               | 모든 칸 비활성                                        |
 | `readOnly`               | 선택을 바꿀 수 없다                                   |
 | `required`               | 하나를 골라야 제출된다                                |
-| `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선              |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `children`               | `({ Item }) => ReactNode` 또는 `SegmentedControl.Item` 들 |
 | 그 외 속성               | 루트로 간다 (`id`, `aria-label`, `className` 등)      |
 

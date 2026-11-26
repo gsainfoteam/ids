@@ -29,7 +29,6 @@ export type UseTextFieldOptions = {
   rootProps: TextFieldInputProps;
   input: TextFieldInputProps & { asChild?: boolean; children?: ReactNode };
   disabled?: boolean;
-  invalid?: boolean;
   onValueChange?: (value: string) => void;
   clearable: boolean;
 };
@@ -38,7 +37,6 @@ export function useInternalTextField({
   rootProps,
   input: { asChild, children, ...own },
   disabled: disabledProp,
-  invalid,
   onValueChange,
   clearable,
 }: UseTextFieldOptions) {
@@ -51,7 +49,7 @@ export function useInternalTextField({
   const native: ComponentProps<'input'> = mergeProps(mergeProps({ ...childProps }, rootProps), own);
   const disabled = Boolean(own.disabled ?? disabledProp ?? childProps?.disabled);
   const readOnly = Boolean(native.readOnly);
-  const ariaInvalid = native['aria-invalid'] ?? invalid;
+  const ariaInvalid = native['aria-invalid'];
 
   invariant(
     native.value == null || native.onChange != null || onValueChange != null || readOnly,

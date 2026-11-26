@@ -31,7 +31,6 @@ export type UseTextAreaOptions = {
   rootProps: TextAreaInputProps;
   input: TextAreaInputProps & { asChild?: boolean; children?: ReactNode };
   disabled?: boolean;
-  invalid?: boolean;
   onValueChange?: (value: string) => void;
   minRows?: number;
   maxRows?: number;
@@ -49,7 +48,6 @@ export function useInternalTextArea({
   rootProps,
   input: { asChild, children, ...own },
   disabled: disabledProp,
-  invalid,
   onValueChange,
   minRows,
   maxRows,
@@ -78,7 +76,7 @@ export function useInternalTextArea({
   );
   const disabled = Boolean(own.disabled ?? disabledProp ?? childProps?.disabled);
   const readOnly = Boolean(native.readOnly);
-  const ariaInvalid = native['aria-invalid'] ?? invalid;
+  const ariaInvalid = native['aria-invalid'];
 
   invariant(
     native.value == null || native.onChange != null || onValueChange != null || readOnly,

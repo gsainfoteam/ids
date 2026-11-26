@@ -38,7 +38,6 @@ export type RadioProps = NativeInputProps & {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  invalid?: boolean;
   variant?: RadioVariant;
   size?: IdsSize;
   className?: StateProp<string | undefined>;
@@ -62,7 +61,6 @@ export function RadioRoot({
   checked: checkedProp,
   defaultChecked,
   onCheckedChange,
-  invalid,
   variant,
   size,
   className,
@@ -126,7 +124,7 @@ export function RadioRoot({
     onPointerCancel,
   });
 
-  const ariaInvalid = inputProps['aria-invalid'] ?? (invalid || group?.invalid || undefined);
+  const ariaInvalid = inputProps['aria-invalid'] ?? (group?.invalid || undefined);
   const state: RadioState = {
     checked,
     disabled: isDisabled,

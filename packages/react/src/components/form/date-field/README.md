@@ -80,11 +80,12 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 ```tsx
 <DateField open={open} onOpenChange={setOpen} />   // 열림도 제어할 수 있다
 <DateField>
-  <DateField.Content mobileVariant="drawer" />    // 640px 보다 좁으면 아래에서 올라오는 판
+  <DateField.Content narrow="drawer" />    // 640px 보다 좁으면 아래에서 올라오는 판
 </DateField>
 ```
 
-- `DateField.Content` 는 팝업입니다. `mobileVariant` 는 `popover`(기본) / `drawer` 이고, 나머지 속성은 팝업 안 내용 상자에 붙습니다.
+- `DateField.Content` 는 팝업입니다. 나머지 속성은 팝업 안 내용 상자에 붙습니다.
+- `narrow` 는 640px 보다 좁은 화면에서 팝업이 무엇으로 열리는지 정합니다. 기본은 `popover` 입니다. 달력은 고칠 필드 옆에 붙어 있는 편이 읽기 쉽습니다. 목록 팝업(Select, ChipField)은 기본이 `drawer` 입니다.
 
 - 달력 안의 키보드는 [Calendar](../../data/calendar/README.md#키보드) 와 같습니다.
 - `onBlur` 는 포커스가 필드와 팝업을 모두 벗어날 때만 부릅니다.
@@ -206,7 +207,7 @@ const schema = z.object({
 | `value`                              | 현재 값                       |
 | `open`                               | 팝업이 열려 있다              |
 | `empty`                              | 값이 없다                     |
-| `invalid`                            | `invalid` 또는 `aria-invalid` |
+| `invalid`                            | `aria-invalid`, 또는 읽을 수 없는 글자 |
 | `disabled` / `readOnly` / `required` | 같은 이름의 속성              |
 
 ## 크기
@@ -235,7 +236,7 @@ const schema = z.object({
 | `min` / `max` / `disabled`                                            | 달력으로 간다. `disabled={true}` 는 필드 전체            |
 | `name` / `form` / `required`                                          | 숨은 값 입력과 브라우저 검증                             |
 | `readOnly`                                                            | 열리지 않고 Clear 도 막힌다                              |
-| `invalid`                                                             | danger 테두리와 링. Field 의 `aria-invalid` 가 우선      |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `variant`                                                             | `outline`(기본) / `soft` / `ghost`                       |
 | `size`                                                                | `standard` / `tiny`. 생략하면 `Field` 크기               |
 | `className` / `style`                                                 | 필드 표면. 상태를 받는 함수도 된다                       |
@@ -245,7 +246,7 @@ const schema = z.object({
 | part                 | 받는 것                                                                    |
 | -------------------- | -------------------------------------------------------------------------- |
 | `DateField.Calendar` | `monthsToShow`, `today`, `month` 셋, `Calendar.*` part. 기본 달력을 바꾼다 |
-| `DateField.Content`  | 팝업. `mobileVariant`: `popover`(기본) / `drawer`                          |
+| `DateField.Content`  | 팝업. `narrow`: `popover`(기본) / `drawer`                                 |
 
 ## 알아둘 것
 

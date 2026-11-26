@@ -23,7 +23,6 @@ export namespace TelField {
     format?: TelFieldFormat;
     variant?: TelFieldVariant;
     size?: IdsSize;
-    invalid?: boolean;
     disabled?: boolean;
     children?: ReactNode;
     className?: StateValue<string | undefined>;

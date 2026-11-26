@@ -13,13 +13,13 @@ import { slotChildren } from '../lib/select-options';
 
 import type { BoxProps } from '../lib/box-props';
 
-export type SelectContentProps = BoxProps & { mobileVariant?: PopupPresentation };
+export type SelectContentProps = BoxProps & { narrow?: PopupPresentation };
 
 export function SelectContent({
   asChild,
   children,
   className,
-  mobileVariant: _readByTheRoot,
+  narrow: _readByTheRoot,
   ...props
 }: SelectContentProps) {
   const c = useInternalSelectContext('Select.Content');

@@ -214,7 +214,7 @@ const pause = reduced ? undefined : nodes.filter(isPause).at(-1);
 
 ```ts
 // internal/overlay/hooks/use-drawer-presentation.ts
-return useInternalMediaQuery(mobileVariant === 'drawer' ? SMALL_SCREEN : null);
+return useInternalMediaQuery(narrow === 'drawer' ? SMALL_SCREEN : null);
 ```
 
 ### 왜 이렇게

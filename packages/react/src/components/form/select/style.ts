@@ -22,7 +22,7 @@ export const selectStyle = tv({
     item: listStyles.option,
     indicator: listStyles.indicator,
     group: 'flex flex-col',
-    groupHeading: listStyles.heading,
+    groupLabel: listStyles.heading,
     separator: listStyles.separator,
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
   },

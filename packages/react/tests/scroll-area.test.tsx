@@ -1088,11 +1088,13 @@ test('adopted: a Select listbox is its own viewport inside the popup, both clear
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <Select aria-label="도시" defaultValue="도시 20">
-        {Array.from({ length: 40 }, (_, index) => (
-          <Select.Item key={index} value={`도시 ${index + 1}`}>
-            도시 {index + 1}
-          </Select.Item>
-        ))}
+        <Select.Content narrow="popover">
+          {Array.from({ length: 40 }, (_, index) => (
+            <Select.Item key={index} value={`도시 ${index + 1}`}>
+              도시 {index + 1}
+            </Select.Item>
+          ))}
+        </Select.Content>
       </Select>
     </IdsProvider>,
   );
@@ -1221,11 +1223,13 @@ test('adopted: arrowing through a Select list stops the highlighted option clear
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <Select aria-label="도시" defaultValue="도시 1">
-        {Array.from({ length: 40 }, (_, index) => (
-          <Select.Item key={index} value={`도시 ${index + 1}`}>
-            도시 {index + 1}
-          </Select.Item>
-        ))}
+        <Select.Content narrow="popover">
+          {Array.from({ length: 40 }, (_, index) => (
+            <Select.Item key={index} value={`도시 ${index + 1}`}>
+              도시 {index + 1}
+            </Select.Item>
+          ))}
+        </Select.Content>
       </Select>
     </IdsProvider>,
   );

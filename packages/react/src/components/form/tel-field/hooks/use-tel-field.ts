@@ -59,7 +59,6 @@ export type UseTelFieldOptions = {
   format: TelFieldFormat;
   separateCountry: boolean;
   disabled?: boolean;
-  invalid?: boolean;
   clearable: boolean;
 };
 
@@ -90,7 +89,6 @@ export function useInternalTelField({
   format,
   separateCountry,
   disabled: disabledProp,
-  invalid,
   clearable,
 }: UseTelFieldOptions) {
   const t = useInternalTranslate();
@@ -198,7 +196,7 @@ export function useInternalTelField({
 
   const control = useInternalTextControl({ inputRef, disabled, readOnly, clearable });
   const ref = useInternalMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
-  const ariaInvalid = native['aria-invalid'] ?? invalid;
+  const ariaInvalid = native['aria-invalid'];
 
   const inputProps = {
     ...native,

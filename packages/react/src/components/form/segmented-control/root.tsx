@@ -29,7 +29,6 @@ export type SegmentedControlProps<T extends string> = Omit<
   disabled?: boolean;
   readOnly?: boolean;
   required?: boolean;
-  invalid?: boolean;
   children: ReactNode | ((render: SegmentedControlRenderProps<T>) => ReactNode);
 };
 
@@ -46,7 +45,6 @@ export function SegmentedControlRoot<T extends string>({
   disabled = false,
   readOnly = false,
   required = false,
-  invalid,
   className,
   children,
   ref,
@@ -64,7 +62,7 @@ export function SegmentedControlRoot<T extends string>({
     ref,
   });
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const ariaInvalid = rest['aria-invalid'] ?? invalid;
+  const ariaInvalid = rest['aria-invalid'];
   const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
   const styles = segmentedControlStyle({ orientation, size: resolvedSize });
 
