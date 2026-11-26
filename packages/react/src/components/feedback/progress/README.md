@@ -24,7 +24,7 @@ import { Progress } from '@gsainfoteam/ids-react';
 <Progress value={65} />                       // 0~100
 <Progress value={uploaded} max={total} />     // max 기본 100
 <Progress />                                  // value가 없으면 진행률 없이 움직인다
-<Progress value={40} indeterminate />         // value가 있어도 진행률 없이
+<Progress value={null} />                     // null 도 진행률 없이. 알 수 없게 된 진행을 이렇게 넘긴다
 ```
 
 - 값이 `max` 에 닿으면 `complete` 상태가 됩니다. 색은 저절로 바뀌지 않으니 `colorScheme` 을 직접 넘깁니다.
@@ -91,7 +91,7 @@ import { Progress } from '@gsainfoteam/ids-react';
 | `max`                            | 쓰인 `max`                                 |
 | `percent`                        | 0~100. 진행률이 없으면 `null`              |
 | `valueLabel`                     | 값 문장. `aria-valuetext` 와 같다          |
-| `indeterminate`                  | 진행률 없이 그린다                         |
+| `indeterminate`                  | 진행률 없이 그린다(`value` 가 `null`)      |
 | `complete`                       | 값이 `max` 에 닿았다                       |
 | `size` / `colorScheme`           | 넘긴 값                                    |
 
@@ -105,9 +105,8 @@ import { Progress } from '@gsainfoteam/ids-react';
 
 | 속성                                         | 기본 / 동작                                                             |
 | -------------------------------------------- | ----------------------------------------------------------------------- |
-| `value`                                      | 진행 값. 없으면 진행률 없이 그린다                                      |
+| `value`                                      | 진행 값. 없거나 `null` 이면 진행률 없이 그린다                          |
 | `max`                                        | `100`                                                                   |
-| `indeterminate`                              | `false`                                                                 |
 | `size`                                       | `standard`(기본) / `tiny`                                               |
 | `colorScheme`                                | `primary`(기본) / `neutral` / `info` / `success` / `warning` / `danger` |
 | `getValueLabel`                              | `(value, max) => string`. 값 문장                                       |

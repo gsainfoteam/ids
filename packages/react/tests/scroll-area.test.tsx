@@ -835,10 +835,10 @@ test('fade: the mask goes only on the axes asked for that also scroll, and never
       <ScrollArea fade="x" orientation="both" className="size-32" data-testid="x">
         <div className="size-[400px]" />
       </ScrollArea>
-      <ScrollArea fade orientation="both" className="size-32" data-testid="both">
+      <ScrollArea fade="both" orientation="both" className="size-32" data-testid="both">
         <div className="size-[400px]" />
       </ScrollArea>
-      <ScrollArea fade className="size-32" data-testid="vertical">
+      <ScrollArea fade="both" className="size-32" data-testid="vertical">
         <div className="size-[400px]" />
       </ScrollArea>
       <ScrollArea fade="x" className="size-32" data-testid="x-on-vertical">
@@ -876,13 +876,13 @@ test('fade: the mask goes only on the axes asked for that also scroll, and never
 test('fade: each edge fades by the distance hidden past it, up to the fade size', async () => {
   const screen = await render(
     <div className="flex gap-4">
-      <ScrollArea fade className="h-40 w-48" data-testid="standard">
+      <ScrollArea fade="both" className="h-40 w-48" data-testid="standard">
         <Lines />
       </ScrollArea>
-      <ScrollArea fade size="tiny" className="h-40 w-48" data-testid="tiny">
+      <ScrollArea fade="both" size="tiny" className="h-40 w-48" data-testid="tiny">
         <Lines />
       </ScrollArea>
-      <ScrollArea fade className="h-40 w-48 [--scroll-area-fade-size:40px]" data-testid="custom">
+      <ScrollArea fade="both" className="h-40 w-48 [--scroll-area-fade-size:40px]" data-testid="custom">
         <Lines />
       </ScrollArea>
     </div>,
@@ -930,7 +930,7 @@ test('fade: each edge fades by the distance hidden past it, up to the fade size'
 test('fade: in RTL the x gradient runs from the right, where the start is', async () => {
   const screen = await render(
     <div dir="rtl">
-      <ScrollArea fade orientation="horizontal" className="w-48" data-testid="area">
+      <ScrollArea fade="both" orientation="horizontal" className="w-48" data-testid="area">
         <div className="h-10 w-[600px]" />
       </ScrollArea>
     </div>,
@@ -949,12 +949,12 @@ test('fade: in RTL the x gradient runs from the right, where the start is', asyn
 test('fade: what the browser scrolls into view stops a fade size away from the faded edges', async () => {
   const screen = await render(
     <div className="flex gap-4">
-      <ScrollArea fade className="h-40 w-48" data-testid="y">
+      <ScrollArea fade="both" className="h-40 w-48" data-testid="y">
         {Array.from({ length: 20 }, (_, index) => (
           <div key={index} data-row={index + 1} className="h-8" />
         ))}
       </ScrollArea>
-      <ScrollArea fade size="tiny" orientation="horizontal" className="w-48" data-testid="x">
+      <ScrollArea fade="both" size="tiny" orientation="horizontal" className="w-48" data-testid="x">
         <div className="flex w-max">
           {Array.from({ length: 20 }, (_, index) => (
             <div key={index} data-column={index + 1} className="h-8 w-16 shrink-0" />
@@ -989,7 +989,7 @@ test('fade: a tab-stop viewport drops the mask while its focus ring shows, since
   const screen = await render(
     <>
       <button type="button">앞</button>
-      <ScrollArea fade className="h-40 w-48">
+      <ScrollArea fade="both" className="h-40 w-48">
         <Lines />
       </ScrollArea>
     </>,
@@ -1010,7 +1010,7 @@ test('fade: a tab-stop viewport drops the mask while its focus ring shows, since
 
 test('fade: a textarea viewport fades the lines typed past its top', async () => {
   const screen = await render(
-    <ScrollArea fade className="h-24 w-48">
+    <ScrollArea fade="both" className="h-24 w-48">
       <ScrollArea.Viewport asChild>
         <textarea aria-label="메모" className="resize-none leading-5" />
       </ScrollArea.Viewport>
@@ -1041,7 +1041,7 @@ test('fade: a textarea viewport fades the lines typed past its top', async () =>
 test('fade SSR: the server HTML carries the mask but no distances, so nothing is faded before measuring', () => {
   const doc = new DOMParser().parseFromString(
     renderToString(
-      <ScrollArea fade orientation="both" className="h-40">
+      <ScrollArea fade="both" orientation="both" className="h-40">
         <Lines />
       </ScrollArea>,
     ),
@@ -1058,7 +1058,7 @@ test('fade SSR: the server HTML carries the mask but no distances, so nothing is
 
 test('fade hydration: the first client render matches the server, then the distances arrive', async () => {
   const area = (
-    <ScrollArea fade className="h-40 w-48">
+    <ScrollArea fade="both" className="h-40 w-48">
       <Lines />
     </ScrollArea>
   );

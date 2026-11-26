@@ -26,7 +26,7 @@ test('SSR: a muted paragraph that names its variant and size', () => {
   expect(marker.hasAttribute('role')).toBe(false);
   expect(marker.dataset.variant).toBe('default');
   expect(marker.dataset.size).toBe('standard');
-  expect(marker.hasAttribute('data-pending')).toBe(false);
+  expect(marker.hasAttribute('aria-busy')).toBe(false);
   expect(marker.className).toContain('text-neutral');
   expect(marker.className).toMatch(/\btext-body-b3-regular\b/);
   expect(marker.querySelector('.shimmer')).toBeNull();
@@ -34,10 +34,10 @@ test('SSR: a muted paragraph that names its variant and size', () => {
   expect(marker.querySelector('[data-spinner]')).toBeNull();
 });
 
-test('pending puts a quiet Spinner first and makes the paragraph the status', () => {
-  const marker = markerIn(parse(<Marker pending>생각하는 중</Marker>));
+test('aria-busy puts a quiet Spinner first and makes the paragraph the status', () => {
+  const marker = markerIn(parse(<Marker aria-busy>생각하는 중</Marker>));
   expect(marker.getAttribute('role')).toBe('status');
-  expect(marker.hasAttribute('data-pending')).toBe(true);
+  expect(marker.getAttribute('aria-busy')).toBe('true');
   const content = marker.firstElementChild!;
   expect(content.className, 'only the text shimmers, not the empty row').toMatch(/\bshimmer\b/);
   expect(marker.className).not.toMatch(/\bshimmer\b/);
@@ -50,7 +50,7 @@ test('pending puts a quiet Spinner first and makes the paragraph the status', ()
   ).toHaveLength(0);
   expect(marker.textContent).toBe('생각하는 중');
 
-  const tiny = markerIn(parse(<Marker pending size="tiny" role="log" />));
+  const tiny = markerIn(parse(<Marker aria-busy size="tiny" role="log" />));
   expect(tiny.getAttribute('role'), 'a role passed in wins').toBe('log');
   expect(tiny.querySelector('[data-spinner]')!.getAttribute('data-size')).toBe('tiny');
 });
@@ -104,7 +104,7 @@ test('asChild hands the props to the child, keeps its children and its role', as
   const ref = createRef<HTMLElement>();
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Marker asChild pending ref={ref} className="extra">
+      <Marker asChild aria-busy ref={ref} className="extra">
         <a href="#pr" className="own">
           풀 리퀘스트
         </a>
@@ -113,7 +113,7 @@ test('asChild hands the props to the child, keeps its children and its role', as
   );
   const link = screen.getByRole('link', { name: '풀 리퀘스트' });
   await expect.element(link).toHaveAttribute('data-marker');
-  expect(link.element().hasAttribute('role'), 'a pending link is still a link').toBe(false);
+  expect(link.element().hasAttribute('role'), 'a busy link is still a link').toBe(false);
   await expect.element(link).toHaveClass('own', 'extra');
   expect(link.element().firstElementChild!.classList.contains('shimmer')).toBe(true);
   expect(ref.current).toBe(link.element());

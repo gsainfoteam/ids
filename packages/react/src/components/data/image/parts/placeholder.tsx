@@ -13,7 +13,7 @@ export function ImagePlaceholder({ className, children, ...rest }: ImagePlacehol
 
   if (children === undefined)
     return (
-      <Skeleton loading asChild>
+      <Skeleton asChild>
         <span
           aria-hidden
           {...rest}

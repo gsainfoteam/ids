@@ -32,10 +32,10 @@ export const markerStyle = tv({
         content: 'gap-1.5',
       },
     } satisfies Record<IdsSize, object>,
-    pending: {
+    busy: {
       true: { content: 'shimmer' },
       false: {},
     },
   },
-  defaultVariants: { variant: 'default', size: 'standard', pending: false },
+  defaultVariants: { variant: 'default', size: 'standard', busy: false },
 });

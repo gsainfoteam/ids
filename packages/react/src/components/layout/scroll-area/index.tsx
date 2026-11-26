@@ -18,7 +18,7 @@ export namespace ScrollArea {
   export type Variant = 'auto' | 'always' | 'hover' | 'none';
   export type Orientation = 'vertical' | 'horizontal' | 'both';
   export type ScrollbarOrientation = 'vertical' | 'horizontal';
-  export type Fade = boolean | 'x' | 'y';
+  export type Fade = 'x' | 'y' | 'both';
 
   export type State = {
     variant: Variant;

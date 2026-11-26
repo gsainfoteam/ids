@@ -19,11 +19,11 @@ export const orientationOf = (axis: Axis): ScrollArea.ScrollbarOrientation =>
   axis === 'x' ? 'horizontal' : 'vertical';
 
 export function fadedAlong(
-  fade: ScrollArea.Fade,
+  fade: ScrollArea.Fade | undefined,
   scrolls: ScrollArea.Orientation,
 ): ScrollArea.Orientation | undefined {
-  const y = (fade === true || fade === 'y') && scrolls !== 'horizontal';
-  const x = (fade === true || fade === 'x') && scrolls !== 'vertical';
+  const y = (fade === 'both' || fade === 'y') && scrolls !== 'horizontal';
+  const x = (fade === 'both' || fade === 'x') && scrolls !== 'vertical';
 
   if (x && y) return 'both';
   if (y) return 'vertical';

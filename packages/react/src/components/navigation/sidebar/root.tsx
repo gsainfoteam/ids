@@ -5,13 +5,13 @@ import { use, type ReactElement, type ReactNode } from 'react';
 import { noop } from 'es-toolkit';
 
 import { SidebarContext, SidebarProviderContext, type SidebarContextValue } from './context';
-import { DEFAULT_SHORTCUT, useInternalSidebar } from './hooks/use-sidebar';
+import { SIDEBAR_WITHOUT_COLLAPSE, useInternalSidebar } from './hooks/use-sidebar';
 import { isType } from './lib/is-type';
 import { panelStateOf } from './lib/panel-state';
 import { SidebarFooter } from './parts/footer';
-import { SidebarList } from './parts/group';
 import { SidebarHeader } from './parts/header';
 import { SidebarItem } from './parts/item';
+import { SidebarList } from './parts/list';
 import { SidebarTrigger } from './parts/trigger';
 import { sidebarStyle } from './style';
 import { useInternalRequiredName } from '../../../internal/lib/accessible-name';
@@ -55,12 +55,7 @@ function splitChildren(children: ReactNode) {
 export function SidebarRoot({
   value,
   variant = 'sidebar',
-  collapsible: collapsibleProp,
-  collapsed,
-  defaultCollapsed,
-  onCollapsedChange,
-  shortcut = DEFAULT_SHORTCUT,
-  persist,
+  sidebar = SIDEBAR_WITHOUT_COLLAPSE,
   className,
   children,
   'aria-label': ariaLabel,
@@ -71,14 +66,15 @@ export function SidebarRoot({
   useInternalRequiredName('Sidebar', name);
 
   const provider = use(SidebarProviderContext);
-  const collapsible = collapsibleProp ?? false;
+  const { collapse, shortcut } = sidebar;
+  const collapsible = collapse?.mode ?? false;
   const controls = useInternalSidebar({
-    collapsed,
-    defaultCollapsed,
-    onCollapsedChange,
+    collapsed: collapse?.collapsed,
+    defaultCollapsed: collapse?.defaultCollapsed,
+    onCollapsedChange: collapse?.onCollapsedChange,
     collapsible,
     shortcut,
-    persist,
+    persist: collapse?.persist,
     variant,
     provider,
   });

@@ -29,7 +29,6 @@ const meta = {
     max: { control: 'number' },
     size: { control: 'radio', options: sizes },
     colorScheme: { control: 'select', options: schemes },
-    indeterminate: { control: 'boolean' },
   },
   args: { value: 65, max: 100, size: 'standard', colorScheme: 'primary' },
 } satisfies Meta<typeof Progress>;
@@ -100,7 +99,7 @@ export const Gallery: Story = {
             </Progress>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="indeterminate">
+        <Showcase.Row label="value={null}">
           <div className="w-64">
             <Progress aria-label="처리 중" />
           </div>
@@ -166,7 +165,7 @@ export const WaitWithoutAKnownValue: Story = {
     docs: {
       description: {
         story:
-          'value가 없거나 indeterminate면 진행률 없이 움직이고 aria-valuenow를 빼 둡니다. 모션 줄이기 설정에서는 흐린 막대로 멈춰 있습니다.',
+          'value가 없거나 null이면 진행률 없이 움직이고 aria-valuenow를 빼 둡니다. 모션 줄이기 설정에서는 흐린 막대로 멈춰 있습니다.',
       },
     },
   },

@@ -13,7 +13,6 @@ import type { CircularProgress } from '.';
 export function CircularProgressRoot({
   value,
   max,
-  indeterminate,
   size = 'standard',
   colorScheme = 'primary',
   getValueLabel,
@@ -31,7 +30,6 @@ export function CircularProgressRoot({
     {
       value,
       max,
-      indeterminate,
       getValueLabel,
       id,
       'aria-label': ariaLabel,

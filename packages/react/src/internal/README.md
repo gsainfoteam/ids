@@ -10,7 +10,7 @@
 
 | 모듈                                             | 내용                                                                                  | 쓰는 곳                                                                                                                                                                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`lib/accessible-name.ts`](#libaccessible-namets)       | 이름이 꼭 필요한 컴포넌트의 `AccessibleName` 타입과 이름 없음 경고                    | Breadcrumb, Calendar, Chart, MessageScroller, OTPField, Pagination, PromptInput, QRCode, Rating, Scheduler, Sidebar, Stepper, `temporal-field/` |
+| [`lib/accessible-name.ts`](#libaccessible-namets)       | 이름이 꼭 필요한 컴포넌트의 `AccessibleName` 타입과 이름 없음 경고                    | Breadcrumb, Calendar, Chart, MessageScroller, OTPField, Pagination, PromptInput, QRCode, Rating, Scheduler, Sidebar, Stepper, Timeline, `temporal-field/` |
 | [`parts/arc.tsx`](#partsarctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, CircularProgress                                                                                                                                                                                             |
 | [`surfaces/lib/control-surface.ts`](#surfaceslibcontrol-surfacets)       | 버튼류 컨트롤의 클래스 조각, scheme 클래스, compound variant                          | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
 | [`lib/corner-shape.ts`](#libcorner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer, Badge                                                                                                                                                                                     |
@@ -67,7 +67,7 @@
 
 ### 쓰는 곳
 
-- Breadcrumb, Calendar, MessageScroller, Pagination, PromptInput, QRCode, Scheduler, Sidebar, Stepper: props 타입에 `AccessibleName` 을 더하고 루트에서 `useInternalRequiredName` 을 부릅니다.
+- Breadcrumb, Calendar, MessageScroller, Pagination, PromptInput, QRCode, Scheduler, Sidebar, Stepper, Timeline: props 타입에 `AccessibleName` 을 더하고 루트에서 `useInternalRequiredName` 을 부릅니다.
 - Chart, OTPField, Rating: 타입은 그대로 두고 `useInternalUnnamedWarning` 만 부릅니다. Field 안에서는 Field.Label 이 `aria-labelledby` 로 이름을 주고, Chart 는 Chart.Title 이 이름이 되기 때문입니다.
 - `temporal-field/`: DateField, DateTimeField 의 팝업 Calendar 에 필드의 이름을 넘기는 `picker.name` 의 타입입니다.
 

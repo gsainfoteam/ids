@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps } from 'react';
+import { type ComponentProps, type ReactNode } from 'react';
 
 import { CheckIcon, XMarkIcon } from '@heroicons/react/16/solid';
 
@@ -9,36 +9,38 @@ import { Slot } from '../../../utility/slot';
 import { useInternalItemContext, useInternalRootContext } from '../context';
 import { statusAttributes } from '../lib/step-state';
 
-import type { StepperItemState } from './item';
+import type { StepItemState, StepperItemState } from './item';
 
 export type StepperIndicatorState = StepperItemState;
 
-export type StepperIndicatorProps = Omit<
+export type StepIndicatorProps<S = StepItemState> = Omit<
   ComponentProps<'span'>,
   'children' | 'className' | 'style'
 > &
-  StateRenderProps<StepperIndicatorState> & {
+  StateRenderProps<S> & {
     asChild?: boolean;
   };
 
+export type StepperIndicatorProps = StepIndicatorProps<StepperIndicatorState>;
+
 const EMPTY_SO_THE_STYLE_DRAWS_A_DOT = null;
 
-function defaultGlyph(state: StepperIndicatorState) {
+function defaultGlyph(state: StepItemState) {
   if (state.status === 'completed') return <CheckIcon />;
   if (state.status === 'error') return <XMarkIcon />;
   if (state.status === 'neutral') return EMPTY_SO_THE_STYLE_DRAWS_A_DOT;
   return state.index + 1;
 }
 
-export function StepperIndicator({
+export function StepIndicator({
   asChild,
   className,
   style,
   children,
   ...rest
-}: StepperIndicatorProps) {
-  const root = useInternalRootContext('Stepper.Indicator');
-  const { state } = useInternalItemContext('Stepper.Indicator');
+}: StepIndicatorProps) {
+  const root = useInternalRootContext('Indicator');
+  const { state } = useInternalItemContext('Indicator');
   const props = {
     'aria-hidden': true,
     ...rest,
@@ -53,4 +55,6 @@ export function StepperIndicator({
   return <span {...props}>{content === undefined ? defaultGlyph(state) : content}</span>;
 }
 
-StepperIndicator.displayName = 'Stepper.Indicator';
+StepIndicator.displayName = 'Stepper.Indicator';
+
+export const StepperIndicator = StepIndicator as (props: StepperIndicatorProps) => ReactNode;

@@ -159,7 +159,8 @@ export const PC: Story = {
             <span className="text-body-b2-semibold">GIST 인포팀</span>
           </Sidebar.Header>
           {GROUPS.map((group) => (
-            <Sidebar.Group key={group.label} label={group.label}>
+            <Sidebar.Group key={group.label}>
+              <Sidebar.Group.Label>{group.label}</Sidebar.Group.Label>
               {group.items.map((item) => (
                 <Sidebar.Item
                   key={item.id}
@@ -220,7 +221,7 @@ export const PC: Story = {
 
           <div className="flex flex-col gap-6 px-4 py-8 md:px-8">
             <h1 className="text-headline-h3-bold">게시판</h1>
-            <Skeleton loading>
+            <Skeleton>
               <p className="text-body-b3-regular">
                 수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
                 확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
@@ -228,14 +229,14 @@ export const PC: Story = {
             </Skeleton>
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="grid h-40">
-                <Skeleton loading asChild>
+                <Skeleton asChild>
                   <Card>
                     <Card.Title>수강 신청</Card.Title>
                   </Card>
                 </Skeleton>
               </div>
               <div className="grid h-40">
-                <Skeleton loading asChild>
+                <Skeleton asChild>
                   <Card>
                     <Card.Title>장학금 안내</Card.Title>
                   </Card>
@@ -243,7 +244,7 @@ export const PC: Story = {
               </div>
             </div>
             <div className="grid h-64">
-              <Skeleton loading asChild>
+              <Skeleton asChild>
                 <Card>
                   <Card.Title>본문</Card.Title>
                 </Card>

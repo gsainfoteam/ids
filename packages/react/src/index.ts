@@ -185,9 +185,20 @@ export type {
   TabsActivationMode,
 } from './components/navigation/tabs';
 export { Stepper } from './components/navigation/stepper';
-export type { StepperOrientation, StepperStatus } from './components/navigation/stepper';
-export { Sidebar } from './components/navigation/sidebar';
-export type { SidebarCollapsibleMode, SidebarVariant } from './components/navigation/sidebar';
+export type {
+  StepperItemStatus,
+  StepperOrientation,
+  StepperStatus,
+} from './components/navigation/stepper';
+export { Timeline, type TimelineStatus } from './components/data/timeline';
+export { Sidebar, useSidebar } from './components/navigation/sidebar';
+export type {
+  SidebarCollapse,
+  SidebarCollapsibleMode,
+  SidebarInstance,
+  SidebarOptions,
+  SidebarVariant,
+} from './components/navigation/sidebar';
 
 export type { IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
