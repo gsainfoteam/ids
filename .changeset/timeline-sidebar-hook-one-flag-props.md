@@ -11,4 +11,4 @@ Split `Timeline` out of `Stepper`, move the Sidebar options into `useSidebar` an
 - `Progress` and `CircularProgress` drop `indeterminate`: leave `value` out or pass `null`.
 - `Skeleton` drops `loading`: `aria-busy={false}` shows the content.
 - `Marker` drops `pending`: `aria-busy` draws the spinner and the shimmer.
-- `ScrollArea`'s `fade` is `'y' | 'x' | 'both'`; a bare `fade` is `fade="both"`.
+- `ScrollArea`'s `fade` is `'y' | 'x' | 'both'`; write a bare `fade` as `fade="both"`.
