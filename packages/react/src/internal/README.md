@@ -369,7 +369,7 @@ const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE
 ### 쓰는 곳
 
 - Sidebar: `sortable.tsx` 가 메뉴 항목을 끌 때 씁니다. `style.ts` 의 `dropLine`, `dragPreview` 슬롯이 이 조각을 가져갑니다.
-- Editor: `drag-handle/handle.tsx` 가 블록을 끌 때 씁니다. 같은 선을 ProseMirror dropcursor(`dropCursor` 슬롯)에도 입혀서, 파일을 끌어 놓을 때도 선이 같습니다.
+- BlockEditor: `editor/drag-handle/handle.tsx` 가 블록을 끌 때 씁니다. 같은 선을 ProseMirror dropcursor(`dropCursor` 슬롯)에도 입혀서, 파일을 끌어 놓을 때도 선이 같습니다.
 - Scheduler: `drag.tsx`, `movable.tsx` 가 일정을 끌 때 씁니다. 일정은 복사본 대신 자기 자신이 15분 칸에 맞춰 움직이므로, `style.ts` 의 `movable` 슬롯이 끄는 동안 `lifted` 를 씁니다.
 
 ### 쓰는 법
@@ -401,7 +401,7 @@ dnd-kit 끌기를 시작하는 규칙을 한곳에 둔 hook 입니다. 끌어 �
 
 - Sidebar: `sortable.tsx` 가 메뉴 항목을 끌 때 씁니다.
 - Scheduler: `drag.tsx` 가 일정을 옮기거나 빈 칸을 고를 때 씁니다.
-- Editor: `drag-handle/handle.tsx` 가 블록을 끌 때 `touch: false` 로 씁니다.
+- BlockEditor: `editor/drag-handle/handle.tsx` 가 블록을 끌 때 `touch: false` 로 씁니다.
 
 ### 쓰는 법
 
@@ -416,7 +416,7 @@ const sensors = useInternalDragSensors({ touch: false }); // 마우스만
 
 - 마우스는 4px 를 움직여야 끌기가 시작됩니다. 그 전에 떼면 그냥 누른 것이라 `onClick` 이 그대로 불립니다.
 - 터치는 250ms 를 누르고 있어야 시작되고, 그동안 5px 까지는 움직여도 됩니다. 그 전에 움직이면 스크롤입니다.
-- Editor 의 블록 손잡이는 마우스를 블록 위에 올렸을 때만 보입니다. 터치에는 올려 두는 동작이 없어 손잡이를 잡을 수 없으므로 터치 sensor 를 넣지 않습니다.
+- BlockEditor 의 블록 손잡이는 마우스를 블록 위에 올렸을 때만 보입니다. 터치에는 올려 두는 동작이 없어 손잡이를 잡을 수 없으므로 터치 sensor 를 넣지 않습니다.
 - 스타일 조각을 담은 `lib/drag-surface.ts` 와 파일을 나눴습니다. 그 조각은 `style.ts` 가 가져가는데, hook 이 같은 파일에 있으면 `'use client'` 가 붙어 서버에서 `X.Style()` 을 부를 수 없습니다.
 
 ### 알아둘 것

@@ -3,7 +3,7 @@ import { fieldSurface } from '../../../internal/surfaces/lib/field-surface';
 import { cn, tv } from '../../../utils';
 import { documentText } from '../../typography/rich-text/style';
 
-import type { EditorVariant } from './root';
+import type { EditorVariant } from './hooks/use-editor-root';
 import type { IdsSize } from '../../../tokens/types';
 import type { DocumentColor } from '../../typography/rich-text/lib/document-colors';
 import type { CalloutKind } from '../../typography/rich-text/schema/callout';

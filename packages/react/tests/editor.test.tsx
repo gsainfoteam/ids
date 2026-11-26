@@ -9,12 +9,28 @@ import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 import { Button, Dialog, Field, IdsProvider } from '../src';
 import { toast } from '../src/components/feedback/toast';
-import { Editor } from '../src/editor';
+import { BlockEditor, Editor, useEditor } from '../src/editor';
 import { RichText } from '../src/rich-text';
 
 const MOD_AS_PROSEMIRROR_READS_IT = /Mac|iP(hone|[oa]d)/.test(navigator.platform)
   ? 'Meta'
   : 'Control';
+
+function UploadingEditor({
+  onUpload,
+  ...props
+}: Editor.Props & { onUpload: Editor.ImageUploadOptions['onUpload'] }) {
+  const editor = useEditor({ imageUpload: { onUpload } });
+  return <Editor {...props} editor={editor} />;
+}
+
+function MentioningEditor({
+  find,
+  ...props
+}: Editor.Props & { find: Editor.MentionOptions['find'] }) {
+  const editor = useEditor({ mentions: { find } });
+  return <Editor {...props} editor={editor} />;
+}
 
 const press = (key: string) =>
   userEvent.keyboard(`{${MOD_AS_PROSEMIRROR_READS_IT}>}${key}{/${MOD_AS_PROSEMIRROR_READS_IT}}`);
@@ -476,15 +492,15 @@ test('Image uploads the picked file, holds a placeholder while it waits and inse
   const { upload, calls } = heldUpload();
   const onValueChange = vi.fn();
   render(
-    <Editor
+    <UploadingEditor
       aria-label="본문"
       defaultValue="<p>지도</p>"
-      onImageUpload={upload}
+      onUpload={upload}
       onValueChange={onValueChange}
     >
       <Editor.Image />
       <Editor.Content />
-    </Editor>,
+    </UploadingEditor>,
   );
   const content = await editable('본문');
   const tool = page.getByRole('button', { name: '그림' });
@@ -513,10 +529,10 @@ test('a failed upload removes its placeholder and says so in a toast', async () 
   const onValueChange = vi.fn();
   render(
     <IdsProvider theme={testTheme}>
-      <Editor aria-label="본문" onImageUpload={upload} onValueChange={onValueChange}>
+      <UploadingEditor aria-label="본문" onUpload={upload} onValueChange={onValueChange}>
         <Editor.Image />
         <Editor.Content />
-      </Editor>
+      </UploadingEditor>
     </IdsProvider>,
   );
   const content = await editable('본문');
@@ -538,9 +554,9 @@ test('a pasted or dropped image file goes through the upload, and other files do
   const upload = vi.fn(async (file: File) => `https://cdn.gistory.me/${file.name}`);
   const onValueChange = vi.fn();
   render(
-    <Editor aria-label="본문" onImageUpload={upload} onValueChange={onValueChange}>
+    <UploadingEditor aria-label="본문" onUpload={upload} onValueChange={onValueChange}>
       <Editor.Content />
-    </Editor>,
+    </UploadingEditor>,
   );
   const content = await editable('본문');
   await userEvent.click(content);
@@ -575,7 +591,7 @@ test('a pasted or dropped image file goes through the upload, and other files do
   expect(upload).toHaveBeenCalledTimes(2);
 });
 
-test('without onImageUpload there is no Image tool, files are not pasted and pasted images are dropped, but saved images stay', async () => {
+test('without imageUpload there is no Image tool, files are not pasted and pasted images are dropped, but saved images stay', async () => {
   const onValueChange = vi.fn();
   render(
     <Editor
@@ -697,15 +713,15 @@ test('javascript: and data: addresses never become images, in HTML, markdown or 
 test('Image sets the alt text of the selected image from a popover', async () => {
   const onValueChange = vi.fn();
   render(
-    <Editor
+    <UploadingEditor
       aria-label="본문"
       defaultValue="<p>지도</p>"
-      onImageUpload={async () => PICTURE}
+      onUpload={async () => PICTURE}
       onValueChange={onValueChange}
     >
       <Editor.Image />
       <Editor.Content />
-    </Editor>,
+    </UploadingEditor>,
   );
   const content = await editable('본문');
   const tool = page.getByRole('button', { name: '그림' });
@@ -735,25 +751,25 @@ test('markdown and JSON keep an uploaded image and its alt text', async () => {
   const json = vi.fn();
   render(
     <>
-      <Editor
+      <UploadingEditor
         format="markdown"
         aria-label="마크다운"
         defaultValue="![지도](https://cdn.gistory.me/map.png)"
-        onImageUpload={async () => 'blob:https://gistory.me/0f3c'}
+        onUpload={async () => 'blob:https://gistory.me/0f3c'}
         onValueChange={markdown}
       >
         <Editor.Image />
         <Editor.Content />
-      </Editor>
-      <Editor
+      </UploadingEditor>
+      <UploadingEditor
         format="json"
         aria-label="JSON"
-        onImageUpload={async () => 'data:image/png;base64,AAAA'}
+        onUpload={async () => 'data:image/png;base64,AAAA'}
         onValueChange={json}
       >
         <Editor.Image />
         <Editor.Content />
-      </Editor>
+      </UploadingEditor>
     </>,
   );
   const md = await editable('마크다운');
@@ -979,10 +995,10 @@ test('a picked file that is not an image is turned away with an error toast of i
   const upload = vi.fn(async (file: File) => `https://cdn.gistory.me/${file.name}`);
   render(
     <IdsProvider theme={testTheme}>
-      <Editor aria-label="본문" onImageUpload={upload}>
+      <UploadingEditor aria-label="본문" onUpload={upload}>
         <Editor.Image />
         <Editor.Content />
-      </Editor>
+      </UploadingEditor>
     </IdsProvider>,
   );
   await editable('본문');
@@ -1256,16 +1272,14 @@ test('typing / opens the block menu, the query filters it and Enter turns the li
 test('a block Editor shows no toolbar, offers every block in the / menu and formats with the bubble menu', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   render(
-    <Editor type="block" aria-label="본문" defaultValue="<p>글</p>">
-      <Editor.Bold />
-      <Editor.Content />
-    </Editor>,
+    <BlockEditor aria-label="본문" defaultValue="<p>글</p>">
+      <BlockEditor.Bold />
+      <BlockEditor.Content />
+    </BlockEditor>,
   );
   const content = await editable('본문');
   expect(page.getByRole('toolbar').query()).toBeNull();
-  expect(warn).toHaveBeenCalledWith(
-    expect.stringContaining('`<Editor type="block">` shows no toolbar'),
-  );
+  expect(warn).toHaveBeenCalledWith(expect.stringContaining('`<BlockEditor>` shows no toolbar'));
   warn.mockRestore();
 
   await userEvent.click(content);
@@ -1277,6 +1291,54 @@ test('a block Editor shows no toolbar, offers every block in the / menu and form
 
   await userEvent.tripleClick(page.getByText('글'));
   await expect.element(page.getByRole('toolbar', { name: '선택한 글 서식' })).toBeVisible();
+});
+
+test('BlockEditor.BubbleMenu without children shows the block editor tools, and with children only those', async () => {
+  render(
+    <div className="flex flex-col gap-4">
+      <BlockEditor aria-label="기본" defaultValue="<p>기본 글</p>">
+        <BlockEditor.Content />
+        <BlockEditor.BubbleMenu />
+      </BlockEditor>
+      <BlockEditor aria-label="고른 도구" defaultValue="<p>고른 글</p>">
+        <BlockEditor.Content />
+        <BlockEditor.BubbleMenu>
+          <BlockEditor.Bold />
+        </BlockEditor.BubbleMenu>
+      </BlockEditor>
+    </div>,
+  );
+  await editable('기본');
+  await userEvent.tripleClick(page.getByText('기본 글'));
+  const bubble = page.getByRole('toolbar', { name: '선택한 글 서식' });
+  for (const tool of ['굵게', '밑줄', '색', '링크'])
+    await expect.element(bubble.getByRole('button', { name: tool })).toBeVisible();
+
+  await editable('고른 도구');
+  await userEvent.tripleClick(page.getByText('고른 글'));
+  await expect.element(bubble.getByRole('button', { name: '굵게' })).toBeVisible();
+  expect(bubble.getByRole('button', { name: '밑줄' }).query()).toBeNull();
+});
+
+test('aria-invalid marks the body and the state, and Field hands its invalid state down', async () => {
+  const className = vi.fn((state: Editor.State) => (state.invalid ? 'invalid' : undefined));
+  render(
+    <div className="flex flex-col gap-4">
+      <Editor aria-label="오류" aria-invalid className={className}>
+        <Editor.Content />
+      </Editor>
+      <Field invalid>
+        <Field.Label>필드 오류</Field.Label>
+        <BlockEditor />
+      </Field>
+    </div>,
+  );
+  const marked = await editable('오류');
+  await expect.element(marked).toHaveAttribute('aria-invalid', 'true');
+  expect(className).toHaveBeenLastCalledWith(expect.objectContaining({ invalid: true }));
+
+  const inField = await editable('필드 오류');
+  await expect.element(inField).toHaveAttribute('aria-invalid', 'true');
 });
 
 test('the block menu offers only the blocks the Editor loaded and says when nothing matches', async () => {
@@ -1338,10 +1400,10 @@ test('typing @ asks mentions for people, and the chosen one is written as a ment
     people.filter((person) => person.label.includes(query)),
   );
   render(
-    <Editor
+    <MentioningEditor
       format="markdown"
       aria-label="본문"
-      mentions={mentions}
+      find={mentions}
       onValueChange={onValueChange}
     />,
   );
@@ -1378,15 +1440,14 @@ test('without mentions, @ is plain text', async () => {
 test('hovering a block shows its handle, whose menu turns, duplicates and deletes the block', async () => {
   const onValueChange = vi.fn();
   render(
-    <Editor
-      type="block"
+    <BlockEditor
       format="markdown"
       aria-label="본문"
       defaultValue={'첫 줄\n\n둘째 줄'}
       onValueChange={onValueChange}
     >
-      <Editor.Content />
-    </Editor>,
+      <BlockEditor.Content />
+    </BlockEditor>,
   );
   const content = await editable('본문');
   const handle = page.getByRole('button', { name: '블록 메뉴' });
@@ -1414,15 +1475,14 @@ test('hovering a block shows its handle, whose menu turns, duplicates and delete
 test('Add a block below opens the block menu on a new line under the block', async () => {
   const onValueChange = vi.fn();
   render(
-    <Editor
-      type="block"
+    <BlockEditor
       format="markdown"
       aria-label="본문"
       defaultValue={'위\n\n아래'}
       onValueChange={onValueChange}
     >
-      <Editor.Content />
-    </Editor>,
+      <BlockEditor.Content />
+    </BlockEditor>,
   );
   const content = await editable('본문');
   await userEvent.hover(content.getByText('위'));
@@ -1438,15 +1498,14 @@ test('dragging a block by its handle moves it', async (context) => {
   skipWithoutCdp(context);
   const onValueChange = vi.fn();
   render(
-    <Editor
-      type="block"
+    <BlockEditor
       format="markdown"
       aria-label="본문"
       defaultValue={'하나\n\n둘\n\n- 셋'}
       onValueChange={onValueChange}
     >
-      <Editor.Content />
-    </Editor>,
+      <BlockEditor.Content />
+    </BlockEditor>,
   );
   const content = await editable('본문');
   await userEvent.hover(content.getByText('셋'));
@@ -1476,9 +1535,9 @@ test('the block handle sits in a gutter inside the box, opens its menu below its
   render(
     <div className="flex flex-col gap-4">
       <Editor aria-label="손잡이 없음" defaultValue="<p>글</p>" />
-      <Editor type="block" aria-label="손잡이 있음" defaultValue="<p>글</p>">
-        <Editor.Content />
-      </Editor>
+      <BlockEditor aria-label="손잡이 있음" defaultValue="<p>글</p>">
+        <BlockEditor.Content />
+      </BlockEditor>
     </div>,
   );
   const without = await editable('손잡이 없음');
@@ -1509,9 +1568,9 @@ test('the block handle sits in a gutter inside the box, opens its menu below its
 
 test('a read-only Editor has no block handle', async () => {
   render(
-    <Editor type="block" readOnly aria-label="본문" defaultValue="<p>읽기만</p>">
-      <Editor.Content />
-    </Editor>,
+    <BlockEditor readOnly aria-label="본문" defaultValue="<p>읽기만</p>">
+      <BlockEditor.Content />
+    </BlockEditor>,
   );
   const content = page.getByRole('textbox', { name: '본문' });
   await expect.element(content).toHaveAttribute('contenteditable', 'false');
@@ -1522,15 +1581,15 @@ test('a read-only Editor has no block handle', async () => {
 test('Image inserts a picture from an address, adding https:// when it has no scheme, and turns away a script address', async () => {
   const onValueChange = vi.fn();
   render(
-    <Editor
+    <UploadingEditor
       aria-label="본문"
       defaultValue="<p>지도</p>"
-      onImageUpload={async () => PICTURE}
+      onUpload={async () => PICTURE}
       onValueChange={onValueChange}
     >
       <Editor.Image />
       <Editor.Content />
-    </Editor>,
+    </UploadingEditor>,
   );
   const content = await editable('본문');
   await userEvent.click(content);
@@ -1574,16 +1633,16 @@ test.each([
   async ({ tool, field }) => {
     const onValueChange = vi.fn();
     render(
-      <Editor
+      <UploadingEditor
         aria-label="본문"
         defaultValue="<p>지도</p>"
-        onImageUpload={async () => PICTURE}
+        onUpload={async () => PICTURE}
         onValueChange={onValueChange}
       >
         <Editor.Link />
         <Editor.Image />
         <Editor.Content />
-      </Editor>,
+      </UploadingEditor>,
     );
     const content = await editable('본문');
     await userEvent.click(content);
@@ -1606,10 +1665,10 @@ test.each([
 
 test('Image hands Choose files to the file picker', async () => {
   render(
-    <Editor aria-label="본문" onImageUpload={async () => PICTURE}>
+    <UploadingEditor aria-label="본문" onUpload={async () => PICTURE}>
       <Editor.Image />
       <Editor.Content />
-    </Editor>,
+    </UploadingEditor>,
   );
   const content = await editable('본문');
   await userEvent.click(content);
@@ -1626,10 +1685,10 @@ test('an image is resized by its Resizable handle, and HTML keeps the width', as
   skipWithoutCdp(context);
   const onValueChange = vi.fn();
   render(
-    <Editor aria-label="본문" onImageUpload={async () => PICTURE} onValueChange={onValueChange}>
+    <UploadingEditor aria-label="본문" onUpload={async () => PICTURE} onValueChange={onValueChange}>
       <Editor.Image />
       <Editor.Content />
-    </Editor>,
+    </UploadingEditor>,
   );
   const content = await editable('본문');
   await userEvent.click(content);
@@ -1659,10 +1718,10 @@ test('an image is resized by its Resizable handle, and HTML keeps the width', as
 test('an image width also changes from the keyboard on its Width separator', async () => {
   const onValueChange = vi.fn();
   render(
-    <Editor
+    <UploadingEditor
       aria-label="본문"
       defaultValue='<img src="/map.png" width="200">'
-      onImageUpload={async () => PICTURE}
+      onUpload={async () => PICTURE}
       onValueChange={onValueChange}
     />,
   );
@@ -1679,11 +1738,11 @@ test('an image width also changes from the keyboard on its Width separator', asy
 
 test('a markdown Editor draws no resize handles, since markdown keeps no width', async () => {
   render(
-    <Editor
+    <UploadingEditor
       format="markdown"
       aria-label="본문"
       defaultValue="![지도](/map.png)"
-      onImageUpload={async () => PICTURE}
+      onUpload={async () => PICTURE}
     />,
   );
   const content = await editable('본문');
