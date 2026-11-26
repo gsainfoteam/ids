@@ -558,11 +558,7 @@ export const Cover: Story = {
                   <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                     <Card size="tiny">
                       <div className="flex flex-col items-center gap-3">
-                        <Calendar
-                          aria-label="달력"
-                          defaultMonth={new CalendarDate(2026, 12, 1)}
-                          defaultValue={new CalendarDate(2026, 12, 24)}
-                        />
+                        <Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 12, 24)} />
                       </div>
                     </Card>
                   </IdsProvider.Scope>
@@ -1244,7 +1240,6 @@ export const Cover: Story = {
                             <Calendar
                               aria-label="달력"
                               selectionMode="range"
-                              defaultMonth={new CalendarDate(2026, 10, 1)}
                               defaultValue={{
                                 start: new CalendarDate(2026, 10, 13),
                                 end: new CalendarDate(2026, 10, 17),
@@ -1874,11 +1869,7 @@ export const Cover: Story = {
                   <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                     <Card size="tiny">
                       <div className="flex flex-col items-center gap-3">
-                        <Calendar
-                          aria-label="달력"
-                          defaultMonth={new CalendarDate(2026, 11, 1)}
-                          defaultValue={new CalendarDate(2026, 11, 20)}
-                        />
+                        <Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 11, 20)} />
                       </div>
                     </Card>
                   </IdsProvider.Scope>

@@ -4,7 +4,7 @@ import { createContext, use, type ComponentProps, type Ref } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { CalendarState } from './hooks/use-calendar';
+import type { CalendarState } from './hooks/use-calendar-grid';
 import type { CalendarDayProps } from './parts/day';
 import type { calendarStyle } from './style';
 import type { IdsSize } from '../../../tokens/types';

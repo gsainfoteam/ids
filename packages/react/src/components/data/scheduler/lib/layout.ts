@@ -16,14 +16,7 @@ import type { WeekDay } from '../../../../internal/date-locale';
 export type SchedulerView = 'month' | 'week' | 'days' | 'day';
 
 export type SchedulerColorScheme =
-  | 'neutral'
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info';
+  'neutral' | 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'info';
 
 export type SchedulerEventData = {
   id: string;

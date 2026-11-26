@@ -8,7 +8,15 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { cdp, page, server, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Menu, Scheduler } from '../src';
+import {
+  IdsProvider,
+  Menu,
+  Scheduler,
+  useScheduler,
+  type SchedulerEditingOptions,
+  type SchedulerNavigationOptions,
+  type SchedulerViewsOptions,
+} from '../src';
 import { skipWithoutCdp } from './engines';
 import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
@@ -49,6 +57,60 @@ const EVENTS: Scheduler.EventData[] = [
   { id: 'fest', title: 'Festival', start: on(19), end: on(21), allDay: true },
 ];
 
+type TestSchedulerProps = Scheduler.Props & {
+  view?: SchedulerViewsOptions['value'];
+  defaultView?: SchedulerViewsOptions['defaultValue'];
+  onViewChange?: SchedulerViewsOptions['onValueChange'];
+  dayCount?: number;
+  defaultDayCount?: number;
+  onDayCountChange?: (count: number) => void;
+  date?: CalendarDate;
+  defaultDate?: CalendarDate;
+  onDateChange?: (date: CalendarDate) => void;
+  weekStartsOn?: SchedulerNavigationOptions['weekStartsOn'];
+  now?: CalendarDateTime;
+  onEventChange?: SchedulerEditingOptions['onEventChange'];
+  onSlotSelect?: SchedulerEditingOptions['onSlotSelect'];
+};
+
+function TestScheduler({
+  view,
+  defaultView,
+  onViewChange,
+  dayCount,
+  defaultDayCount,
+  onDayCountChange,
+  date,
+  defaultDate,
+  onDateChange,
+  weekStartsOn,
+  now,
+  onEventChange,
+  onSlotSelect,
+  ...props
+}: TestSchedulerProps) {
+  const scheduler = useScheduler({
+    views: {
+      value: view,
+      defaultValue: defaultView,
+      onValueChange: onViewChange,
+      dayCount,
+      defaultDayCount,
+      onDayCountChange,
+    },
+    navigation: {
+      value: date,
+      defaultValue: defaultDate,
+      onValueChange: onDateChange,
+      weekStartsOn,
+      now,
+    },
+    editing: { onEventChange, onSlotSelect },
+  });
+
+  return <Scheduler {...props} scheduler={scheduler} />;
+}
+
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
 type Menus = {
@@ -62,24 +124,24 @@ const inProvider = ({
   children,
   locale,
   ...props
-}: Partial<Omit<Scheduler.Props, 'children'>> & {
+}: Partial<Omit<TestSchedulerProps, 'children'>> & {
   children?: (event: Scheduler.EventData) => ReactNode;
   locale?: string;
 } & Menus = {}) => (
   <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
-    <Scheduler
+    <TestScheduler
       {...({
         'aria-label': '일정표',
         events: EVENTS,
         defaultDate: on(17),
         now: NOW,
         ...props,
-      } as Scheduler.Props)}
+      } as TestSchedulerProps)}
     >
       {children}
       {eventMenu && <Scheduler.EventMenu>{eventMenu}</Scheduler.EventMenu>}
       {slotMenu && <Scheduler.SlotMenu>{slotMenu}</Scheduler.SlotMenu>}
-    </Scheduler>
+    </TestScheduler>
   </IdsProvider>
 );
 
@@ -654,7 +716,7 @@ test('pointer: a dropped event takes focus, the same as a keyboard drop', async 
     const [events, setEvents] = useState(EVENTS);
     return (
       <IdsProvider theme={testTheme}>
-        <Scheduler
+        <TestScheduler
           aria-label="일정표"
           events={events}
           defaultDate={on(17)}
@@ -1005,7 +1067,7 @@ test('no event box covers another, so every end handle can be grabbed', async ()
 test('the date popup opens under a locale whose only -u- keyword is the week start', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme} locale={koreanTextIn('ko-KR-u-fw-mon')}>
-      <Scheduler aria-label="일정표" events={EVENTS} defaultDate={on(17)} now={NOW} />
+      <TestScheduler aria-label="일정표" events={EVENTS} defaultDate={on(17)} now={NOW} />
     </IdsProvider>,
   );
   await userEvent.click(screen.container.querySelector<HTMLElement>('[data-scheduler-range]')!);

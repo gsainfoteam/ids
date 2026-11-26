@@ -9,7 +9,7 @@ import { en } from '../../../locales/en';
 import { Button } from '../../action/button';
 import { IdsProvider } from '../../utility/ids-provider';
 
-import { Calendar, type DateRange } from '.';
+import { Calendar, useCalendar, type DateRange } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -24,16 +24,16 @@ const meta = {
   argTypes: {
     selectionMode: { control: 'radio', options: modes },
     size: { control: 'radio', options: sizes },
-    monthsToShow: { control: { type: 'number', min: 1, max: 3 } },
     readOnly: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+    calendar: { control: false },
   },
   args: {
     'aria-label': '달력',
-    today,
     size: 'standard',
-    monthsToShow: 1,
+    readOnly: false,
+    disabled: false,
     onValueChange: fn(),
-    onMonthChange: fn(),
   },
 } satisfies Meta<typeof Calendar>;
 
@@ -45,16 +45,16 @@ const day = (canvasElement: HTMLElement, key: string) =>
 const focusedDay = () => (document.activeElement as HTMLElement).dataset.calendarDay;
 const grid = (canvasElement: HTMLElement) => canvasElement.querySelector('[role=grid]');
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  render: function Render(args) {
+    const calendar = useCalendar({ display: { today: new CalendarDate(2026, 9, 15) } });
+
+    return <Calendar {...args} calendar={calendar} />;
+  },
+};
 
 export const Usage: Story = {
-  render: () => (
-    <Calendar
-      aria-label="달력"
-      defaultValue={new CalendarDate(2026, 9, 18)}
-      today={new CalendarDate(2026, 9, 15)}
-    />
-  ),
+  render: () => <Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 9, 18)} />,
 };
 
 const valueFor = {
@@ -72,110 +72,123 @@ const valueFor = {
 } as const;
 
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="Selection mode × Size"
-        description="고른 날은 primary 로 채우고, 기간 안의 날은 primary soft, 오늘은 primary 글자와 테두리입니다."
-      >
-        <Showcase.Matrix
-          rows={sizes}
-          columns={modes}
-          render={(size, mode) => (
+  render: function Render() {
+    const september = useCalendar({ display: { today } });
+    const twoMonths = useCalendar({ display: { monthsToShow: 2, today } });
+    const limited = useCalendar({
+      availability: {
+        min: new CalendarDate(2026, 9, 7),
+        max: new CalendarDate(2026, 9, 25),
+        unavailable: { dayOfWeek: [0, 6] },
+      },
+      display: { today },
+    });
+
+    return (
+      <Showcase>
+        <Showcase.Section
+          title="Selection mode × Size"
+          description="고른 날은 primary 로 채우고, 기간 안의 날은 primary soft, 오늘은 primary 글자와 테두리입니다."
+        >
+          <Showcase.Matrix
+            rows={sizes}
+            columns={modes}
+            render={(size, mode) => (
+              <Calendar
+                {...({
+                  selectionMode: mode,
+                  ...valueFor[mode],
+                  'aria-label': `${mode} ${size}`,
+                } as Calendar.Props)}
+                size={size}
+                calendar={september}
+              />
+            )}
+          />
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Parts"
+          description='Calendar.Caption layout="dropdown" 은 연도와 월을 바로 고르는 native select 입니다. Calendar.WeekNumber 는 주차 열을, Calendar.Footer 는 달력 아래 알림 영역을 붙입니다.'
+        >
+          <Showcase.Row label="Caption dropdown">
+            <Calendar calendar={september} aria-label="드롭다운">
+              <Calendar.Caption layout="dropdown" />
+            </Calendar>
+          </Showcase.Row>
+          <Showcase.Row label="WeekNumber · Footer">
             <Calendar
-              {...({
-                selectionMode: mode,
-                ...valueFor[mode],
-                'aria-label': `${mode} ${size}`,
-              } as Calendar.Props)}
-              size={size}
-              today={today}
+              calendar={september}
+              defaultValue={new CalendarDate(2026, 9, 18)}
+              aria-label="주차"
+            >
+              <Calendar.WeekNumber />
+              <Calendar.Footer>9월 18일을 골랐습니다.</Calendar.Footer>
+            </Calendar>
+          </Showcase.Row>
+          <Showcase.Row label="two months">
+            <Calendar
+              selectionMode="range"
+              defaultValue={{
+                start: new CalendarDate(2026, 9, 24),
+                end: new CalendarDate(2026, 10, 6),
+              }}
+              calendar={twoMonths}
+              aria-label="두 달"
             />
-          )}
-        />
-      </Showcase.Section>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section
-        title="Parts"
-        description='Calendar.Caption layout="dropdown" 은 연도와 월을 바로 고르는 native select 입니다. Calendar.WeekNumber 는 주차 열을, Calendar.Footer 는 달력 아래 알림 영역을 붙입니다.'
-      >
-        <Showcase.Row label="Caption dropdown">
-          <Calendar today={today} aria-label="드롭다운">
-            <Calendar.Caption layout="dropdown" />
-          </Calendar>
-        </Showcase.Row>
-        <Showcase.Row label="WeekNumber · Footer">
-          <Calendar today={today} defaultValue={new CalendarDate(2026, 9, 18)} aria-label="주차">
-            <Calendar.WeekNumber />
-            <Calendar.Footer>9월 18일을 골랐습니다.</Calendar.Footer>
-          </Calendar>
-        </Showcase.Row>
-        <Showcase.Row label="two months">
-          <Calendar
-            selectionMode="range"
-            defaultValue={{
-              start: new CalendarDate(2026, 9, 24),
-              end: new CalendarDate(2026, 10, 6),
-            }}
-            monthsToShow={2}
-            today={today}
-            aria-label="두 달"
-          />
-        </Showcase.Row>
-      </Showcase.Section>
+        <Showcase.Section title="States">
+          <Showcase.Row label="limits">
+            <Calendar calendar={limited} aria-label="제한" />
+          </Showcase.Row>
+          <Showcase.Row label="readOnly">
+            <Calendar
+              readOnly
+              defaultValue={new CalendarDate(2026, 9, 18)}
+              calendar={september}
+              aria-label="읽기 전용"
+            />
+          </Showcase.Row>
+          <Showcase.Row label="disabled">
+            <Calendar
+              disabled
+              defaultValue={new CalendarDate(2026, 9, 18)}
+              calendar={september}
+              aria-label="비활성"
+            />
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section title="States">
-        <Showcase.Row label="limits">
-          <Calendar
-            today={today}
-            min={new CalendarDate(2026, 9, 7)}
-            max={new CalendarDate(2026, 9, 25)}
-            disabled={{ dayOfWeek: [0, 6] }}
-            aria-label="제한"
-          />
-        </Showcase.Row>
-        <Showcase.Row label="readOnly">
-          <Calendar
-            readOnly
-            defaultValue={new CalendarDate(2026, 9, 18)}
-            today={today}
-            aria-label="읽기 전용"
-          />
-        </Showcase.Row>
-        <Showcase.Row label="disabled">
-          <Calendar
-            disabled
-            defaultValue={new CalendarDate(2026, 9, 18)}
-            today={today}
-            aria-label="비활성"
-          />
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section title="Locale">
-        <Showcase.Row label="en-US">
-          <IdsProvider.Scope locale={en}>
-            <Calendar today={today} aria-label="English" />
-          </IdsProvider.Scope>
-        </Showcase.Row>
-        <Showcase.Row label="de-DE">
-          <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
-            <Calendar today={today} aria-label="Deutsch" />
-          </IdsProvider.Scope>
-        </Showcase.Row>
-        <Showcase.Row label="ar-EG-u-nu-arab · rtl">
-          <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }} dir="rtl">
-            <Calendar today={today} aria-label="العربية" />
-          </IdsProvider.Scope>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+        <Showcase.Section title="Locale">
+          <Showcase.Row label="en-US">
+            <IdsProvider.Scope locale={en}>
+              <Calendar calendar={september} aria-label="English" />
+            </IdsProvider.Scope>
+          </Showcase.Row>
+          <Showcase.Row label="de-DE">
+            <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
+              <Calendar calendar={september} aria-label="Deutsch" />
+            </IdsProvider.Scope>
+          </Showcase.Row>
+          <Showcase.Row label="ar-EG-u-nu-arab · rtl">
+            <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }} dir="rtl">
+              <Calendar calendar={september} aria-label="العربية" />
+            </IdsProvider.Scope>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const PickARange: Story = {
   render: function Render() {
     const [range, setRange] = useState<DateRange | null>(null);
+    const calendar = useCalendar({
+      display: { monthsToShow: 2, today: new CalendarDate(2026, 9, 15) },
+    });
 
     return (
       <div className="flex flex-col gap-3">
@@ -184,8 +197,7 @@ export const PickARange: Story = {
           selectionMode="range"
           value={range}
           onValueChange={setRange}
-          monthsToShow={2}
-          today={today}
+          calendar={calendar}
         />
         <output aria-label="기간" className="text-body-b3-regular">
           {range?.start?.day ?? '–'} ~ {range?.end?.day ?? '–'}
@@ -197,7 +209,7 @@ export const PickARange: Story = {
     docs: {
       description: {
         story:
-          'selectionMode="range" 는 첫 클릭이 시작, 두 번째 클릭이 끝입니다. 끝을 고르기 전에는 포인터나 키보드 포커스가 있는 날까지 기간을 미리 보여 줍니다. 더 이른 날을 고르면 시작과 끝이 바뀌고, 세 번째 클릭은 새 기간을 시작합니다. 값은 { start, end } 이고, monthsToShow 로 두 달을 나란히 보입니다.',
+          'selectionMode="range" 는 첫 클릭이 시작, 두 번째 클릭이 끝입니다. 끝을 고르기 전에는 포인터나 키보드 포커스가 있는 날까지 기간을 미리 보여 줍니다. 더 이른 날을 고르면 시작과 끝이 바뀌고, 세 번째 클릭은 새 기간을 시작합니다. 값은 { start, end } 이고, useCalendar 의 display.monthsToShow 로 두 달을 나란히 보입니다.',
       },
     },
   },
@@ -223,7 +235,19 @@ export const PickARange: Story = {
 };
 
 export const PickSeveralDays: Story = {
-  args: { selectionMode: 'multiple', defaultValue: [new CalendarDate(2026, 9, 3)] },
+  render: function Render(args) {
+    const calendar = useCalendar({ display: { today: new CalendarDate(2026, 9, 15) } });
+
+    return (
+      <Calendar
+        aria-label="달력"
+        selectionMode="multiple"
+        defaultValue={[new CalendarDate(2026, 9, 3)]}
+        onValueChange={args.onValueChange as (value: CalendarDate[]) => void}
+        calendar={calendar}
+      />
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -241,23 +265,30 @@ export const PickSeveralDays: Story = {
 };
 
 export const JumpToAFarYearWithDropdowns: Story = {
-  args: {
-    min: new CalendarDate(1990, 1, 1),
-    max: new CalendarDate(2026, 12, 31),
-    defaultMonth: new CalendarDate(2026, 9, 1),
-    children: <Calendar.Caption layout="dropdown" />,
+  render: function Render() {
+    const calendar = useCalendar({
+      availability: { min: new CalendarDate(1990, 1, 1), max: new CalendarDate(2026, 12, 31) },
+      display: { today: new CalendarDate(2026, 9, 15) },
+      month: { defaultValue: new CalendarDate(2026, 9, 1) },
+    });
+
+    return (
+      <Calendar aria-label="달력" calendar={calendar}>
+        <Calendar.Caption layout="dropdown" />
+      </Calendar>
+    );
   },
   parameters: {
     docs: {
       description: {
         story:
-          '생년월일처럼 먼 날짜는 <Calendar.Caption layout="dropdown" /> 을 넣어 연도와 월 목록으로 바로 옮깁니다. 목록은 min/max 안의 연도만 보이고, 범위를 벗어난 달은 고를 수 없습니다. 한국어는 연도를 먼저 놓습니다.',
+          '생년월일처럼 먼 날짜는 <Calendar.Caption layout="dropdown" /> 을 넣어 연도와 월 목록으로 바로 옮깁니다. 목록은 useCalendar 의 availability.min/max 안의 연도만 보이고, 범위를 벗어난 달은 고를 수 없습니다. 한국어는 연도를 먼저 놓습니다.',
       },
     },
   },
-  play: async ({ canvas, canvasElement, args, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.selectOptions(canvas.getByRole('combobox', { name: '년' }), '1995');
-    await expect(args.onMonthChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 9, 1));
+    await expect(grid(canvasElement)).toHaveAccessibleName('1995년 9월');
     await userEvent.selectOptions(canvas.getByRole('combobox', { name: '월' }), '0');
     await expect(grid(canvasElement)).toHaveAccessibleName('1995년 1월');
     await userEvent.click(canvas.getByRole('button', { name: '지난달' }));
@@ -266,16 +297,29 @@ export const JumpToAFarYearWithDropdowns: Story = {
 };
 
 export const BlockDaysOutsideLimits: Story = {
-  args: {
-    min: new CalendarDate(2026, 9, 10),
-    max: new CalendarDate(2026, 10, 20),
-    disabled: { dayOfWeek: [0] },
+  render: function Render(args) {
+    const calendar = useCalendar({
+      availability: {
+        min: new CalendarDate(2026, 9, 10),
+        max: new CalendarDate(2026, 10, 20),
+        unavailable: { dayOfWeek: [0] },
+      },
+      display: { today: new CalendarDate(2026, 9, 15) },
+    });
+
+    return (
+      <Calendar
+        aria-label="달력"
+        onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
+        calendar={calendar}
+      />
+    );
   },
   parameters: {
     docs: {
       description: {
         story:
-          'min/max 밖의 날짜와 disabled 가 막은 날짜는 고를 수 없고 키보드도 건너뜁니다. disabled 는 react-day-picker 의 matcher 라서 함수, 날짜, 기간, 요일을 받습니다. 범위 끝에서 달 버튼은 눌리지 않습니다.',
+          'useCalendar 의 availability 가 막은 날짜(min/max 밖, unavailable 이 고른 날)는 고를 수 없고 키보드도 건너뜁니다. unavailable 은 DateMatcher 라서 함수, 날짜, 기간, 요일을 받습니다. 범위 끝에서 달 버튼은 눌리지 않습니다.',
       },
     },
   },
@@ -310,14 +354,10 @@ export const MarkDaysWithEvents: Story = {
       new CalendarDate(2026, 10, 2),
     ];
     const busy = !!date && events.some((event) => event.compare(date) === 0);
+    const calendar = useCalendar({ display: { today: new CalendarDate(2026, 9, 15) } });
 
     return (
-      <Calendar
-        aria-label="달력"
-        value={date}
-        onValueChange={setDate}
-        today={new CalendarDate(2026, 9, 15)}
-      >
+      <Calendar aria-label="달력" value={date} onValueChange={setDate} calendar={calendar}>
         <Calendar.Day modifiers={{ event: events }}>
           {(day, state) => (
             <>
@@ -357,7 +397,7 @@ export const MarkDaysWithEvents: Story = {
 
 export const LabelTheFirstDayOfAMonth: Story = {
   render: () => (
-    <Calendar aria-label="달력" today={new CalendarDate(2026, 9, 15)}>
+    <Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 9, 15)}>
       <Calendar.Day>{(date) => (date.day === 1 ? `${date.month}/1` : date.day)}</Calendar.Day>
     </Calendar>
   ),
@@ -384,6 +424,10 @@ export const GoBackToToday: Story = {
   render: function Render() {
     const [date, setDate] = useState<CalendarDate | null>(null);
     const [month, setMonth] = useState(new CalendarDate(2026, 9, 1));
+    const calendar = useCalendar({
+      display: { today: new CalendarDate(2026, 9, 15) },
+      month: { value: month, onValueChange: setMonth },
+    });
 
     return (
       <div className="flex flex-col items-start gap-3">
@@ -397,14 +441,7 @@ export const GoBackToToday: Story = {
         >
           오늘
         </Button>
-        <Calendar
-          aria-label="달력"
-          value={date}
-          onValueChange={setDate}
-          month={month}
-          onMonthChange={setMonth}
-          today={new CalendarDate(2026, 9, 15)}
-        />
+        <Calendar aria-label="달력" value={date} onValueChange={setDate} calendar={calendar} />
       </div>
     );
   },
@@ -412,7 +449,7 @@ export const GoBackToToday: Story = {
     docs: {
       description: {
         story:
-          'month 와 onMonthChange 로 보이는 달을 앱이 쥐면, 달력 밖의 버튼이 오늘이 있는 달로 돌아가고 오늘을 고를 수 있습니다.',
+          'useCalendar 의 month 에 value 와 onValueChange 를 주어 보이는 달을 앱이 쥐면, 달력 밖의 버튼이 오늘이 있는 달로 돌아가고 오늘을 고를 수 있습니다.',
       },
     },
   },
@@ -427,7 +464,7 @@ export const GoBackToToday: Story = {
 
 export const ShowWeekNumbers: Story = {
   render: () => (
-    <Calendar aria-label="달력" today={new CalendarDate(2026, 9, 15)}>
+    <Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 9, 15)}>
       <Calendar.WeekNumber />
     </Calendar>
   ),
@@ -449,19 +486,19 @@ export const FollowTheLocale: Story = {
   render: () => (
     <div className="flex flex-wrap gap-8">
       <IdsProvider.Scope locale={en}>
-        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="English" />
+        <Calendar defaultValue={new CalendarDate(2026, 9, 15)} aria-label="English" />
       </IdsProvider.Scope>
       <IdsProvider.Scope locale={{ ...en, tag: 'en-US-u-fw-mon' }}>
-        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Monday first" />
+        <Calendar defaultValue={new CalendarDate(2026, 9, 15)} aria-label="Monday first" />
       </IdsProvider.Scope>
       <IdsProvider.Scope locale={{ ...en, language: 'ja', tag: 'ja-JP' }}>
-        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="日本語" />
+        <Calendar defaultValue={new CalendarDate(2026, 9, 15)} aria-label="日本語" />
       </IdsProvider.Scope>
       <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
-        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="Deutsch" />
+        <Calendar defaultValue={new CalendarDate(2026, 9, 15)} aria-label="Deutsch" />
       </IdsProvider.Scope>
       <IdsProvider.Scope locale={{ ...en, language: 'ar', tag: 'ar-EG-u-nu-arab' }} dir="rtl">
-        <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="العربية" />
+        <Calendar defaultValue={new CalendarDate(2026, 9, 15)} aria-label="العربية" />
       </IdsProvider.Scope>
     </div>
   ),
@@ -491,10 +528,18 @@ export const FollowTheLocale: Story = {
 
 export const Keyboard: Story = {
   tags: ['verification'],
-  args: {
-    autoFocus: true,
-    defaultValue: new CalendarDate(2026, 1, 31),
-    today: new CalendarDate(2026, 1, 31),
+  render: function Render(args) {
+    const calendar = useCalendar({ display: { today: new CalendarDate(2026, 1, 31) } });
+
+    return (
+      <Calendar
+        aria-label="달력"
+        autoFocus
+        defaultValue={new CalendarDate(2026, 1, 31)}
+        onValueChange={args.onValueChange as (value: CalendarDate | null) => void}
+        calendar={calendar}
+      />
+    );
   },
   parameters: {
     docs: {
@@ -528,7 +573,7 @@ export const RightToLeft: Story = {
   tags: ['verification'],
   render: () => (
     <div dir="rtl">
-      <Calendar today={new CalendarDate(2026, 9, 15)} aria-label="오른쪽에서 왼쪽" />
+      <Calendar defaultValue={new CalendarDate(2026, 9, 15)} aria-label="오른쪽에서 왼쪽" />
     </div>
   ),
   parameters: {

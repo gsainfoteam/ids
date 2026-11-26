@@ -1,4 +1,4 @@
-import { CalendarDate, getDayOfWeek, isSameDay } from '@internationalized/date';
+import { CalendarDate, getDayOfWeek, isSameDay, startOfMonth } from '@internationalized/date';
 import { isFunction } from 'es-toolkit';
 
 import { invariant } from '../../../../utils';
@@ -71,6 +71,8 @@ export function validateDate(value: unknown, owner = 'Calendar') {
 }
 
 export const ownDate = (date: CalendarDate) => new CalendarDate(date.year, date.month, date.day);
+
+export const firstOfMonth = (date: CalendarDate) => startOfMonth(ownDate(date));
 
 export const compareDays = (a: CalendarDate, b: CalendarDate) => ownDate(a).compare(ownDate(b));
 
