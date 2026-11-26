@@ -15,7 +15,7 @@ import { Card } from '../../components/data/card';
 import { toast } from '../../components/feedback/toast';
 import { ChipField } from '../../components/form/chip-field';
 import { Field } from '../../components/form/field';
-import { FileField } from '../../components/form/file-field';
+import { FileField, useFileField } from '../../components/form/file-field';
 import { TextArea } from '../../components/form/text-area';
 import { TextField } from '../../components/form/text-field';
 import { Menu } from '../../components/overlay/menu';
@@ -44,6 +44,7 @@ const CONTACTS = [
 export const PC: Story = {
   render: function Render() {
     const [to, setTo] = useState<string[]>(['team@gistory.me']);
+    const attachments = useFileField({ limits: { maxSize: 25 * 1024 * 1024 } });
 
     const send = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -110,7 +111,7 @@ export const PC: Story = {
                 </Field>
                 <Field>
                   <Field.Label>첨부 파일</Field.Label>
-                  <FileField name="attachments" multiple maxSize={25 * 1024 * 1024} />
+                  <FileField name="attachments" multiple fileField={attachments} />
                   <Field.Hint>한 파일에 25MB 까지 붙일 수 있어요.</Field.Hint>
                 </Field>
               </div>

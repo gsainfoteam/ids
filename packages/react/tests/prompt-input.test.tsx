@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IconButton, PromptInput } from '../src';
+import { Field, IconButton, PromptInput, usePromptInput } from '../src';
 import { FIREFOX_DROPS_SYNTHETIC_CLIPBOARD_DATA, skipInFirefox, skipWithoutCdp } from './engines';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -164,18 +164,19 @@ test('attachments: picked and dropped files list in the top bar and go with the 
   const onSend = vi.fn();
   const onFilesChange = vi.fn();
   const onReject = vi.fn();
-  const screen = await render(
-    <PromptInput
-      aria-label="메시지"
-      onSend={onSend}
-      onFilesChange={onFilesChange}
-      onReject={onReject}
-      accept=".pdf"
-    >
-      <PromptInput.Input />
-      <PromptInput.Attach />
-    </PromptInput>,
-  );
+  function Chat() {
+    const promptInput = usePromptInput({
+      attachments: { onValueChange: onFilesChange, onReject, accept: '.pdf' },
+    });
+
+    return (
+      <PromptInput aria-label="메시지" onSend={onSend} promptInput={promptInput}>
+        <PromptInput.Input />
+        <PromptInput.Attach />
+      </PromptInput>
+    );
+  }
+  const screen = await render(<Chat />);
 
   const opened = vi.fn();
   picker(screen.container).addEventListener('click', opened);
@@ -320,7 +321,11 @@ test('tools toggle, go with every message and stay on after sending', async () =
   const onSend = vi.fn();
   const onToolsChange = vi.fn();
   await render(
-    <PromptInput aria-label="메시지" onSend={onSend} onToolsChange={onToolsChange}>
+    <PromptInput
+      aria-label="메시지"
+      onSend={onSend}
+      promptInput={{ attachments: {}, tools: { onValueChange: onToolsChange } }}
+    >
       <PromptInput.Input />
       <PromptInput.Tool value="search">웹 검색</PromptInput.Tool>
       <PromptInput.Tool value="sources">출처 보기</PromptInput.Tool>
@@ -364,7 +369,10 @@ test('the action menu opens the file picker from its default item', async () => 
 
 test('the bars join the input with no line between them', async () => {
   const screen = await render(
-    <PromptInput aria-label="메시지" defaultFiles={[pdf()]}>
+    <PromptInput
+      aria-label="메시지"
+      promptInput={{ attachments: { defaultValue: [pdf()] }, tools: {} }}
+    >
       <PromptInput.Input />
       <PromptInput.Attach />
     </PromptInput>,
@@ -382,8 +390,10 @@ test('form reset restores the default text, files and tools without reporting th
     <PromptInput
       aria-label="메시지"
       defaultValue="start"
-      defaultFiles={[pdf()]}
-      defaultTools={['search']}
+      promptInput={{
+        attachments: { defaultValue: [pdf()] },
+        tools: { defaultValue: ['search'] },
+      }}
       onValueChange={onValueChange}
     >
       <PromptInput.Input />
@@ -422,10 +432,39 @@ test('disabled turns off the textarea, the attach button and sending', async () 
   expect(onSend).not.toHaveBeenCalled();
 });
 
+test('an invalid Field around it does not mark the attach button invalid', () => {
+  const doc = parse(
+    renderToString(
+      <Field invalid>
+        <PromptInput aria-label="메시지">
+          <PromptInput.Input />
+          <PromptInput.Attach />
+        </PromptInput>
+      </Field>,
+    ),
+  );
+
+  expect(doc.querySelector('[data-prompt-input-attach]')!.hasAttribute('aria-invalid')).toBe(false);
+});
+
+test('usePromptInput checks the attachment limits like useFileField', () => {
+  function Chat() {
+    const promptInput = usePromptInput({ attachments: { maxCount: -1 } });
+
+    return <PromptInput aria-label="메시지" promptInput={promptInput} />;
+  }
+
+  expect(() => renderToString(<Chat />)).toThrow(/^\[IDS\] usePromptInput: maxCount/);
+});
+
 test('server markup holds the form, the textarea and the send button', () => {
   const doc = parse(
     renderToString(
-      <PromptInput aria-label="메시지" defaultValue="hello" accept="image/*">
+      <PromptInput
+        aria-label="메시지"
+        defaultValue="hello"
+        promptInput={{ attachments: { accept: 'image/*' }, tools: {} }}
+      >
         <PromptInput.Input placeholder="Ask" />
         <PromptInput.Attach />
       </PromptInput>,

@@ -51,26 +51,52 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ```tsx
 <PromptInput aria-label="메시지" defaultValue="안녕" />                     // 비제어
 <PromptInput aria-label="메시지" value={draft} onValueChange={setDraft} />  // 제어. 보내면 onValueChange('') 로 비운다
-
-<PromptInput aria-label="메시지" defaultFiles={[draft]} />                  // 첨부도 비제어
-<PromptInput aria-label="메시지" files={files} onFilesChange={setFiles} />  // 제어. 보내면 onFilesChange([])
 ```
 
-- `<button type="reset">` 이나 `form.reset()` 은 `defaultValue` 와 `defaultFiles` 로 되돌리고 콜백을 부르지 않습니다.
+- 글의 값은 form 이 보내는 값이라 루트에 둡니다. 첨부와 도구의 값은 `usePromptInput` 에 둡니다(아래).
+- `<button type="reset">` 이나 `form.reset()` 은 글, 첨부, 도구를 각자의 `defaultValue` 로 되돌리고 콜백을 부르지 않습니다.
+
+## usePromptInput
+
+```tsx
+import { PromptInput, usePromptInput } from '@gsainfoteam/ids-react';
+
+const promptInput = usePromptInput({
+  attachments: {
+    value: files, // 또는 defaultValue
+    onValueChange: setFiles, // 보내면 onValueChange([])
+    accept: 'image/*,.pdf',
+    maxSize: 10 * 1024 * 1024,
+    maxCount: 5,
+    onReject: (rejections) => {},
+  },
+  tools: { defaultValue: ['search'] }, // 또는 value / onValueChange
+});
+
+<PromptInput aria-label="메시지" promptInput={promptInput} onSend={send} />;
+```
+
+- 첨부와 도구는 기능마다 객체 하나입니다. 값은 객체 안의 `value` / `defaultValue` / `onValueChange` 입니다.
+- 객체를 생략한 기능은 비제어로, 제한 없이 동작합니다. `promptInput` 을 생략해도 같습니다.
+- 보내기(`onSend`, `onStop`, `status`)는 루트에 둡니다. 모든 입력창이 쓰는 이 컨트롤의 동작이고, `onSend` 는 form 이 보내는 메시지를 받습니다.
 
 ## 첨부
 
 ```tsx
-<PromptInput aria-label="메시지" accept="image/*,.pdf" maxSize={10 * 1024 * 1024} maxCount={5} onReject={(rejections) => {}}>
+const promptInput = usePromptInput({
+  attachments: { accept: 'image/*,.pdf', maxSize: 10 * 1024 * 1024, maxCount: 5 },
+});
+
+<PromptInput aria-label="메시지" promptInput={promptInput}>
   <PromptInput.Input />
   <PromptInput.Attach />
-</PromptInput>
+</PromptInput>;
 ```
 
 - `PromptInput.Attach` 는 파일을 고르는 outline `IconButton` 입니다. 넣지 않아도 입력창에 파일을 끌어다 놓거나 붙여넣으면 첨부됩니다.
 - 파일을 끌어 올리는 동안 테두리가 primary 색이 됩니다. 글을 붙여넣는 것은 그대로 입력됩니다.
 - 첨부한 파일은 위 바에 `FileField.List` 로 보입니다. 파일마다 미리보기, 이름, 크기, 삭제 버튼이 있습니다.
-- `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받고, 입력창 아래 `role="alert"` 로 이유를 알립니다. 규칙은 FileField 와 같습니다.
+- `attachments` 의 `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받고, 입력창 아래 `role="alert"` 로 이유를 알립니다. 규칙은 FileField 와 같습니다.
 - 첨부 파일은 `onSend` 의 `files` 로 옵니다. native 제출의 FormData 에는 들어가지 않습니다.
 
 ## 도구
@@ -85,19 +111,19 @@ import { PromptInput } from '@gsainfoteam/ids-react';
   <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>웹 검색</PromptInput.Tool>
 </PromptInput>
 
-<PromptInput aria-label="메시지" defaultTools={['search']} />               // 처음부터 켠 도구
-<PromptInput aria-label="메시지" tools={tools} onToolsChange={setTools} />  // 제어
+usePromptInput({ tools: { defaultValue: ['search'] } });               // 처음부터 켠 도구
+usePromptInput({ tools: { value: tools, onValueChange: setTools } });  // 제어
 ```
 
 - `PromptInput.Tool` 은 outline `Toggle` 입니다. 켜면 테두리 대신 브랜드 옅은 채움(`secondary`)이 깔리고 `aria-pressed="true"` 가 됩니다. `icon` 이 없으면 켰을 때 체크 아이콘을 붙입니다.
-- 켠 도구의 `value` 는 `onSend` 의 `tools` 로 옵니다. 보낸 뒤에도 켜진 채로 남고, form reset 은 `defaultTools` 로 되돌립니다.
+- 켠 도구의 `value` 는 `onSend` 의 `tools` 로 옵니다. 보낸 뒤에도 켜진 채로 남고, form reset 은 `tools.defaultValue` 로 되돌립니다.
 - `PromptInput.ActionMenu` 는 outline `IconButton` 과 `Menu` 입니다. 메뉴는 위로 열리고(`side="top"`), 자리가 없으면 아래로 뒤집힙니다.
 - `PromptInput.AddAttachments` 는 `Menu.Item` 이라 `onSelect` 에서 `preventDefault()` 하면 파일 고르기를 열지 않습니다.
 
 ## 구성
 
 ```tsx
-<PromptInput aria-label="메시지" accept="image/*" onSend={send}>
+<PromptInput aria-label="메시지" onSend={send}>
   <PromptInput.Attachments />          {/* Input 앞 = 위 바. 생략하면 위 바 맨 앞 */}
   <PromptInput.Input placeholder="무엇이든 물어보세요" maxRows={8} />
   <PromptInput.Attach />               {/* Input 뒤 = 아래 바. 앞에서부터 */}
@@ -132,14 +158,17 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 | Property                                   | Type                                     | Default     |
 | ------------------------------------------ | ---------------------------------------- | ----------- |
 | `value` / `defaultValue` / `onValueChange` | `string`                                 | `''`        |
-| `files` / `defaultFiles` / `onFilesChange` | `File[]`                                 | `[]`        |
-| `tools` / `defaultTools` / `onToolsChange` | `string[]`                               | `[]`        |
 | `onSend`                                   | `({ text, files, tools }) => void`       | -           |
 | `onStop`                                   | `() => void`                             | -           |
 | `status`                                   | `'idle' \| 'submitting' \| 'streaming'`  | `'idle'`    |
-| `accept` / `maxSize` / `maxCount` / `onReject` | FileField 와 같음                    | -           |
+| `promptInput`                              | `usePromptInput()` 의 결과               | 비제어, 제한 없음 |
 | `disabled`                                 | `boolean`                                | `false`     |
 | `variant`                                  | `'outline' \| 'soft'`                    | `'outline'` |
 | `size`                                     | `'standard' \| 'tiny'`                   | Field 크기, 없으면 `'standard'` |
 
 - 나머지 props 는 `<form>` 에 갑니다.
+
+| `usePromptInput` | Type | Default |
+| --- | --- | --- |
+| `attachments` | `{ value, defaultValue, onValueChange }` (`File[]`) 과 `accept`, `maxSize`, `maxCount`, `onReject` (FileField 와 같음) | 비제어 `[]`, 제한 없음 |
+| `tools` | `{ value, defaultValue, onValueChange }` (`string[]`) | 비제어 `[]` |

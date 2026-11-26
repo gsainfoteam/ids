@@ -17,6 +17,13 @@ import {
 } from './root';
 import { promptInputStyle } from './style';
 
+import type {
+  PromptInputAttachmentsOptions,
+  PromptInputInstance,
+  PromptInputOptions,
+  PromptInputToolsOptions,
+} from './hooks/use-prompt-input';
+
 export function PromptInput(props: PromptInput.Props) {
   return <PromptInputRoot {...props} />;
 }
@@ -26,6 +33,10 @@ export namespace PromptInput {
   export type Status = PromptInputStatus;
   export type Variant = PromptInputVariant;
   export type Message = PromptInputMessage;
+  export type Options = PromptInputOptions;
+  export type Instance = PromptInputInstance;
+  export type AttachmentsOptions = PromptInputAttachmentsOptions;
+  export type ToolsOptions = PromptInputToolsOptions;
 
   export type InputProps = PromptInputInputProps;
   export type AttachmentsProps = PromptInputAttachmentsProps;
@@ -46,6 +57,14 @@ export namespace PromptInput {
   export const Style = promptInputStyle;
 }
 
+export { usePromptInput } from './hooks/use-prompt-input';
+
+export type {
+  PromptInputAttachmentsOptions,
+  PromptInputInstance,
+  PromptInputOptions,
+  PromptInputToolsOptions,
+} from './hooks/use-prompt-input';
 export type {
   PromptInputMessage,
   PromptInputProps,
