@@ -30,8 +30,7 @@ export function QRCodeRoot({
   value,
   size = 'standard',
   errorCorrection,
-  shape = 'square',
-  finderShape,
+  shape: shapeProp = 'square',
   quietZone = STANDARD_QUIET_ZONE,
   variant = 'theme',
   className,
@@ -45,7 +44,8 @@ export function QRCodeRoot({
 
   const hasLogo = containsElementOfType(children, LOGO_PARTS);
   const level = errorCorrection ?? (hasLogo ? 'H' : 'M');
-  const finder = finderShape ?? FINDER_FOR_SHAPE[shape];
+  const shape = typeof shapeProp === 'string' ? shapeProp : shapeProp.modules;
+  const finder = typeof shapeProp === 'string' ? FINDER_FOR_SHAPE[shapeProp] : shapeProp.finders;
 
   const geometry = useInternalQRCodeGeometry({ value, level, shape, finder, quietZone, hasLogo });
   const overflow = geometry === undefined;

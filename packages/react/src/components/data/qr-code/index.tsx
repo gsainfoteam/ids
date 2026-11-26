@@ -36,8 +36,7 @@ export namespace QRCode {
       variant?: QRCodeVariant;
       size?: IdsSize | number;
       errorCorrection?: QRCodeErrorCorrection;
-      shape?: QRCodeModuleShape;
-      finderShape?: QRCodeFinderShape;
+      shape?: QRCodeModuleShape | { modules: QRCodeModuleShape; finders: QRCodeFinderShape };
       quietZone?: number;
       className?: StateValue<string | undefined, State>;
       style?: StateValue<CSSProperties | undefined, State>;

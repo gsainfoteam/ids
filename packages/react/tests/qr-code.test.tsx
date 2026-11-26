@@ -139,8 +139,7 @@ describe('round trip through a scanner', () => {
       <QRCode
         aria-label="QR 코드"
         value={PROFILE}
-        shape={shape}
-        finderShape={finderShape}
+        shape={{ modules: shape, finders: finderShape }}
         size={240}
       />,
     );
