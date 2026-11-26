@@ -7,7 +7,7 @@ import { Showcase, holdTheNextCall } from '~story-kit';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
-import { Editor } from '.';
+import { Editor, useEditor } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -66,7 +66,7 @@ const meta = {
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: {
     variant: 'outline',
@@ -114,6 +114,10 @@ const PICTURE = `data:image/svg+xml;base64,${btoa(
 const TOOLS_NOTICE =
   '<h2>박람회 준비</h2><p style="text-align: center">부스마다 <mark>안내판</mark>을 세웁니다.</p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>부스 신청</p></li><li data-type="taskItem" data-checked="false"><p>장소 배정</p></li></ul><hr><p>문의는 학생회로 해 주세요.</p>';
 
+type UploadArgs = Extract<Editor.Props, { format?: 'html' | 'markdown' }> & {
+  onUpload: Editor.ImageUploadOptions['onUpload'];
+};
+
 const pictureFile = () => new File(['<svg/>'], '지도.png', { type: 'image/png' });
 
 const modifierKey = () => (/Mac|iP(hone|[oa]d)/.test(navigator.platform) ? 'Meta' : 'Control');
@@ -138,135 +142,135 @@ export const Usage: Story = {
 };
 
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section title="Variant × Size">
-        <Showcase.Matrix
-          rows={sizes}
-          columns={variants}
-          render={(size, variant) => (
-            <div className="w-96">
-              <Editor
-                size={size}
-                variant={variant}
-                aria-label={`${variant} ${size}`}
-                defaultValue="<p>가을 축제 <strong>부스</strong>를 모집합니다.</p>"
-              >
+  render: function Render() {
+    const uploads = useEditor({ imageUpload: { onUpload: async () => PICTURE } });
+
+    return (
+      <Showcase>
+        <Showcase.Section title="Variant × Size">
+          <Showcase.Matrix
+            rows={sizes}
+            columns={variants}
+            render={(size, variant) => (
+              <div className="w-96">
+                <Editor
+                  size={size}
+                  variant={variant}
+                  aria-label={`${variant} ${size}`}
+                  defaultValue="<p>가을 축제 <strong>부스</strong>를 모집합니다.</p>"
+                >
+                  <Editor.Bold />
+                  <Editor.Italic />
+                  <Editor.Strike />
+                  <Editor.Separator />
+                  <Editor.Link />
+                  <Editor.Content />
+                </Editor>
+              </div>
+            )}
+          />
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Toolbar"
+          description="자식이 없으면 기본 툴바가 붙습니다. Content 앞의 파트는 위 툴바, 뒤의 파트는 아래 바가 됩니다."
+        >
+          <Showcase.Row label="default">
+            <div className="w-[36rem]">
+              <Editor aria-label="기본 툴바" defaultValue={NOTICE} />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="custom">
+            <div className="w-[36rem]">
+              <Editor aria-label="고른 툴바" maxLength={200}>
+                <Editor.BlockType levels={[2, 3, 4]} />
+                <Editor.Separator />
                 <Editor.Bold />
                 <Editor.Italic />
-                <Editor.Strike />
+                <Editor.Underline />
+                <Editor.Code />
+                <Editor.Content placeholder="200자까지 쓸 수 있습니다" />
+                <Editor.Count />
+              </Editor>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="content only">
+            <div className="w-[36rem]">
+              <Editor aria-label="본문만">
+                <Editor.Content placeholder="툴바 없이 단축키로 서식을 넣습니다" />
+                <Editor.BubbleMenu />
+              </Editor>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Tools"
+          description="형광펜, 할 일 목록, 구분선, 정렬은 부품을 넣으면 그 확장이 함께 실립니다. 그림은 useEditor 에 imageUpload 가 있을 때만 툴바에 나옵니다."
+        >
+          <Showcase.Row label="every tool">
+            <div className="w-[40rem]">
+              <Editor aria-label="모든 도구" defaultValue={TOOLS_NOTICE} editor={uploads}>
+                <Editor.BlockType />
                 <Editor.Separator />
+                <Editor.Bold />
+                <Editor.Italic />
+                <Editor.Highlight />
                 <Editor.Link />
+                <Editor.Separator />
+                <Editor.BulletList />
+                <Editor.OrderedList />
+                <Editor.TaskList />
+                <Editor.Separator />
+                <Editor.TextAlign />
+                <Editor.Separator />
+                <Editor.Image />
+                <Editor.HorizontalRule />
+                <Editor.Table />
                 <Editor.Content />
               </Editor>
             </div>
-          )}
-        />
-      </Showcase.Section>
+          </Showcase.Row>
+          <Showcase.Row label="default with upload">
+            <div className="w-[40rem]">
+              <Editor aria-label="업로드가 있는 기본 툴바" editor={uploads} />
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section
-        title="Toolbar"
-        description="자식이 없으면 기본 툴바가 붙습니다. Content 앞의 파트는 위 툴바, 뒤의 파트는 아래 바가 됩니다."
-      >
-        <Showcase.Row label="default">
-          <div className="w-[36rem]">
-            <Editor aria-label="기본 툴바" defaultValue={NOTICE} />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="custom">
-          <div className="w-[36rem]">
-            <Editor aria-label="고른 툴바" maxLength={200}>
-              <Editor.BlockType levels={[2, 3, 4]} />
-              <Editor.Separator />
-              <Editor.Bold />
-              <Editor.Italic />
-              <Editor.Underline />
-              <Editor.Code />
-              <Editor.Content placeholder="200자까지 쓸 수 있습니다" />
-              <Editor.Count />
-            </Editor>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="content only">
-          <div className="w-[36rem]">
-            <Editor aria-label="본문만">
-              <Editor.Content placeholder="툴바 없이 단축키로 서식을 넣습니다" />
-              <Editor.BubbleMenu />
-            </Editor>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Tools"
-        description="형광펜, 할 일 목록, 구분선, 정렬은 부품을 넣으면 그 확장이 함께 실립니다. 그림은 onImageUpload 가 있을 때만 툴바에 나옵니다."
-      >
-        <Showcase.Row label="every tool">
-          <div className="w-[40rem]">
-            <Editor
-              aria-label="모든 도구"
-              defaultValue={TOOLS_NOTICE}
-              onImageUpload={async () => PICTURE}
-            >
-              <Editor.BlockType />
-              <Editor.Separator />
-              <Editor.Bold />
-              <Editor.Italic />
-              <Editor.Highlight />
-              <Editor.Link />
-              <Editor.Separator />
-              <Editor.BulletList />
-              <Editor.OrderedList />
-              <Editor.TaskList />
-              <Editor.Separator />
-              <Editor.TextAlign />
-              <Editor.Separator />
-              <Editor.Image />
-              <Editor.HorizontalRule />
-              <Editor.Table />
-              <Editor.Content />
-            </Editor>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="default with upload">
-          <div className="w-[40rem]">
-            <Editor aria-label="업로드가 있는 기본 툴바" onImageUpload={async () => PICTURE} />
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section title="States">
-        <Showcase.Row label="placeholder">
-          <div className="w-96">
-            <Editor aria-label="비어 있음">
-              <Editor.Bold />
-              <Editor.Italic />
-              <Editor.Content placeholder="내용을 입력하세요" />
-            </Editor>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="disabled">
-          <div className="w-96">
-            <Editor aria-label="비활성" disabled defaultValue={NOTICE} />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="readOnly">
-          <div className="w-96">
-            <Editor aria-label="읽기 전용" readOnly defaultValue={NOTICE} />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="invalid">
-          <div className="w-96">
-            <Editor aria-label="오류" invalid>
-              <Editor.Bold />
-              <Editor.Italic />
-              <Editor.Content placeholder="본문을 입력하세요" />
-            </Editor>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+        <Showcase.Section title="States">
+          <Showcase.Row label="placeholder">
+            <div className="w-96">
+              <Editor aria-label="비어 있음">
+                <Editor.Bold />
+                <Editor.Italic />
+                <Editor.Content placeholder="내용을 입력하세요" />
+              </Editor>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="disabled">
+            <div className="w-96">
+              <Editor aria-label="비활성" disabled defaultValue={NOTICE} />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="readOnly">
+            <div className="w-96">
+              <Editor aria-label="읽기 전용" readOnly defaultValue={NOTICE} />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="aria-invalid">
+            <div className="w-96">
+              <Editor aria-label="오류" aria-invalid>
+                <Editor.Bold />
+                <Editor.Italic />
+                <Editor.Content placeholder="본문을 입력하세요" />
+              </Editor>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const ReportWhatIsTyped: Story = {
@@ -556,38 +560,42 @@ export const SubmitAndResetAForm: Story = {
   },
 };
 
-export const UploadImages: Story = {
+export const UploadImages: StoryObj<UploadArgs> = {
   args: {
     defaultValue: '<p>학생회관 가는 길</p>',
     'aria-label': '그림 본문',
-    onImageUpload: fn(async () => PICTURE),
+    onUpload: fn(async () => PICTURE),
   },
-  render: (args) => (
-    <div className="w-[36rem] max-w-full">
-      <Editor {...args}>
-        <Editor.Bold />
-        <Editor.Image />
-        <Editor.Content />
-      </Editor>
-    </div>
-  ),
+  render: function Render({ onUpload, ...args }) {
+    const editor = useEditor({ imageUpload: { onUpload } });
+
+    return (
+      <div className="w-[36rem] max-w-full">
+        <Editor {...args} editor={editor}>
+          <Editor.Bold />
+          <Editor.Image />
+          <Editor.Content />
+        </Editor>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          'onImageUpload 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor.Image 를 누르면 그림 주소를 넣거나 파일을 고르는 Popover 가 열리고, 붙여넣거나 끌어 놓은 그림도 같은 함수로 올립니다. 주소는 http 나 https 만 받습니다. 올리는 동안 본문의 그 자리에 자리표시가 서고 도구가 aria-busy 가 됩니다. 그림을 고른 채 Editor.Image 를 누르면 대체 텍스트를 넣는 Popover 가 열립니다. html 과 json 에서는 그림 좌우의 손잡이를 끌어 너비를 바꾸고, 마크다운은 너비를 담지 못해 손잡이가 없습니다.',
+          'useEditor 의 imageUpload.onUpload 는 파일을 받아 올린 그림의 주소를 돌려줍니다. 그 결과를 editor 로 넘기면 그림 도구가 켜집니다. Editor.Image 를 누르면 그림 주소를 넣거나 파일을 고르는 Popover 가 열리고, 붙여넣거나 끌어 놓은 그림도 같은 함수로 올립니다. 주소는 http 나 https 만 받습니다. 올리는 동안 본문의 그 자리에 자리표시가 서고 도구가 aria-busy 가 됩니다. 그림을 고른 채 Editor.Image 를 누르면 대체 텍스트를 넣는 Popover 가 열립니다. html 과 json 에서는 그림 좌우의 손잡이를 끌어 너비를 바꾸고, 마크다운은 너비를 담지 못해 손잡이가 없습니다.',
       },
     },
   },
   play: async ({ args, canvas, canvasElement, userEvent }) => {
-    const finishUpload = holdTheNextCall(args.onImageUpload, PICTURE);
+    const finishUpload = holdTheNextCall(args.onUpload, PICTURE);
     const content = await editableContent(canvas, '그림 본문');
     await userEvent.click(content);
     selectText(content, '가는 길', { caretAfter: true });
     const input = canvasElement.querySelector<HTMLInputElement>('[data-editor-image-input]')!;
     await userEvent.upload(input, pictureFile());
 
-    await waitFor(() => expect(args.onImageUpload).toHaveBeenCalledOnce());
+    await waitFor(() => expect(args.onUpload).toHaveBeenCalledOnce());
     await expect(canvas.getByRole('button', { name: '그림' })).toHaveAttribute('aria-busy', 'true');
     await expect(content.querySelector('[data-editor-upload]')).not.toBeNull();
 
@@ -815,24 +823,27 @@ export const InsertBlocksAndMentions: Story = {
     defaultValue: '',
     'aria-label': '회의록 본문',
   },
-  render: (args) => (
-    <div className="w-[36rem] max-w-full">
-      <Editor
-        {...args}
-        mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
-      >
-        <Editor.Callout />
-        <Editor.Details />
-        <Editor.Table />
-        <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
-      </Editor>
-    </div>
-  ),
+  render: function Render(args) {
+    const editor = useEditor({
+      mentions: { find: (query) => MEMBERS.filter((member) => member.label.includes(query)) },
+    });
+
+    return (
+      <div className="w-[36rem] max-w-full">
+        <Editor {...args} editor={editor}>
+          <Editor.Callout />
+          <Editor.Details />
+          <Editor.Table />
+          <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+        </Editor>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          '줄에서 / 를 치면 블록 메뉴가 열립니다. 메뉴에는 Editor 가 불러온 블록만 나오고, 글자를 더 치면 이름과 영어 키워드(h2, todo, quote)로 좁혀집니다. 위아래 화살표로 고르고 Enter 로 넣으며, Escape 는 메뉴만 닫습니다. mentions 를 주면 @ 뒤의 글자로 그 함수를 불러 사람을 찾고, 고른 사람은 마크다운에 [@ id="" label=""] 로 남습니다. 함수는 Promise 를 돌려줘도 되고, 두 번째 인자인 AbortSignal 로 지난 요청을 끊을 수 있습니다.',
+          '줄에서 / 를 치면 블록 메뉴가 열립니다. 메뉴에는 Editor 가 불러온 블록만 나오고, 글자를 더 치면 이름과 영어 키워드(h2, todo, quote)로 좁혀집니다. 위아래 화살표로 고르고 Enter 로 넣으며, Escape 는 메뉴만 닫습니다. useEditor 에 mentions.find 를 주면 @ 뒤의 글자로 그 함수를 불러 사람을 찾고, 고른 사람은 마크다운에 [@ id="" label=""] 로 남습니다. 함수는 Promise 를 돌려줘도 되고, 두 번째 인자인 AbortSignal 로 지난 요청을 끊을 수 있습니다.',
       },
     },
   },
@@ -844,40 +855,6 @@ export const InsertBlocksAndMentions: Story = {
     await expect(menu).toBeVisible();
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.queryByRole('listbox')).toBeNull());
-  },
-};
-
-export const EditBlockByBlock: Story = {
-  args: {
-    type: 'block',
-    format: 'markdown',
-    defaultValue: '## 준비물\n\n이름표와 노트북을 챙기세요.\n\n- 9시 집합\n- 10시 발표',
-    'aria-label': '블록 본문',
-  },
-  render: (args) => (
-    <div className="w-[40rem]">
-      <Editor {...args}>
-        <Editor.Content placeholder="/ 로 블록을 넣으세요" />
-      </Editor>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'type="block" 인 Editor 는 툴바 없이 본문만 보여 줍니다. 블록은 / 메뉴로 넣고, 글자를 고르면 뜨는 BubbleMenu 로 꾸밉니다. / 메뉴에는 표, 콜아웃, 접는 블록, 할 일 목록까지 모든 블록이 나옵니다. 편집할 수 있으면 포인터를 올린 블록의 첫 줄 옆, 상자 바깥 왼쪽에 손잡이가 나옵니다. 상자 안쪽 여백은 늘지 않습니다. 손잡이를 끌면 Sidebar 처럼 블록의 복사본이 따라오고 놓을 자리에 primary 선이 그어지며, 놓은 블록은 옅은 틴트로 골라집니다. 누르면 메뉴가 열려 아래에 블록을 넣거나, 다른 종류로 바꾸거나, 복제하거나, 지울 수 있습니다. 손잡이는 Tab 순서에 들지 않습니다. 같은 일은 키보드로도 할 수 있어서(/ 메뉴, 잘라 내기와 붙여 넣기, 실행 취소), 손잡이는 포인터를 위한 지름길입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const content = await editableContent(canvas, '블록 본문');
-    await expect(canvas.queryByRole('toolbar')).toBeNull();
-    await userEvent.hover(within(content).getByText('이름표와 노트북을 챙기세요.'));
-    const handle = await canvas.findByRole('button', { name: '블록 메뉴' });
-    await userEvent.click(handle);
-    await expect(await canvas.findByRole('menuitem', { name: '복제' })).toBeVisible();
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
   },
 };
 
@@ -932,45 +909,48 @@ export const UseEveryTool: Story = {
       '<p></p>',
     ].join(''),
   },
-  render: (args) => (
-    <div className="w-[48rem]">
-      <Editor
-        {...args}
-        onImageUpload={async () => PICTURE}
-        mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
-      >
-        <Editor.BlockType />
-        <Editor.Separator />
-        <Editor.Bold />
-        <Editor.Italic />
-        <Editor.Underline />
-        <Editor.Strike />
-        <Editor.Code />
-        <Editor.Highlight />
-        <Editor.Color />
-        <Editor.Subscript />
-        <Editor.Superscript />
-        <Editor.Link />
-        <Editor.Separator />
-        <Editor.BulletList />
-        <Editor.OrderedList />
-        <Editor.TaskList />
-        <Editor.Blockquote />
-        <Editor.CodeBlock />
-        <Editor.Separator />
-        <Editor.TextAlign />
-        <Editor.Separator />
-        <Editor.Image />
-        <Editor.Table />
-        <Editor.Callout />
-        <Editor.Details />
-        <Editor.HorizontalRule />
-        <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
-        <Editor.BubbleMenu />
-        <Editor.Count />
-      </Editor>
-    </div>
-  ),
+  render: function Render(args) {
+    const editor = useEditor({
+      imageUpload: { onUpload: async () => PICTURE },
+      mentions: { find: (query) => MEMBERS.filter((member) => member.label.includes(query)) },
+    });
+
+    return (
+      <div className="w-[48rem]">
+        <Editor {...args} editor={editor}>
+          <Editor.BlockType />
+          <Editor.Separator />
+          <Editor.Bold />
+          <Editor.Italic />
+          <Editor.Underline />
+          <Editor.Strike />
+          <Editor.Code />
+          <Editor.Highlight />
+          <Editor.Color />
+          <Editor.Subscript />
+          <Editor.Superscript />
+          <Editor.Link />
+          <Editor.Separator />
+          <Editor.BulletList />
+          <Editor.OrderedList />
+          <Editor.TaskList />
+          <Editor.Blockquote />
+          <Editor.CodeBlock />
+          <Editor.Separator />
+          <Editor.TextAlign />
+          <Editor.Separator />
+          <Editor.Image />
+          <Editor.Table />
+          <Editor.Callout />
+          <Editor.Details />
+          <Editor.HorizontalRule />
+          <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+          <Editor.BubbleMenu />
+          <Editor.Count />
+        </Editor>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

@@ -1,12 +1,8 @@
-import { isValidElement, type ReactElement, type ReactNode } from 'react';
+import { type ReactElement, type ReactNode } from 'react';
 
 import { EDITOR_FEATURES, type EditorFeature } from './load-engine';
-import {
-  containsElementOfType,
-  elementTypeOf,
-  flattenFragments,
-  invariant,
-} from '../../../../utils';
+import { containsEditorPart, editorPartOf, isEditorPart } from './part-alias';
+import { flattenFragments, invariant } from '../../../../utils';
 import { warnOnce } from '../../../../utils/dev';
 import { EditorCallout } from '../callout/tool';
 import { EditorDetails } from '../details/tool';
@@ -63,18 +59,15 @@ const TOOLS = new Set<unknown>([
   EditorDetails,
 ]);
 
-const isOfType = (type: unknown) => (node: ReactNode) =>
-  isValidElement(node) && elementTypeOf(node) === type;
+const isFloating = isEditorPart(EditorBubbleMenu);
 
-const isFloating = isOfType(EditorBubbleMenu);
-
-export const isTool = (node: ReactNode) => isValidElement(node) && TOOLS.has(elementTypeOf(node));
+export const isTool = (node: ReactNode) => TOOLS.has(editorPartOf(node));
 
 function dropTheToolbar(items: ReactNode[]) {
   const kept = items.filter((item) => !isTool(item));
   if (kept.length < items.length) {
     warnOnce(
-      '`<Editor type="block">` shows no toolbar, so the tools placed beside `<Editor.Content>` are left out. Put them in `<Editor.BubbleMenu>`, or use `type="toolbar"`.',
+      '`<BlockEditor>` shows no toolbar, so the tools placed beside `<BlockEditor.Content>` are left out. Put them in `<BlockEditor.BubbleMenu>`, or use `<Editor>`.',
     );
   }
   return kept;
@@ -82,12 +75,15 @@ function dropTheToolbar(items: ReactNode[]) {
 
 function splitByContent(children: ReactNode, defaultContent: ReactElement<EditorContentProps>) {
   const items = flattenFragments(children);
-  const bubbles = items.filter(isOfType(EditorBubbleMenu));
+  const bubbles = items.filter(isFloating);
   const laidOut = items.filter((item) => !isFloating(item));
   const indexes = laidOut.flatMap((item, index) =>
-    isOfType(EditorContentPart)(item) ? [index] : [],
+    isEditorPart(EditorContentPart)(item) ? [index] : [],
   );
-  invariant(indexes.length <= 1, '`<Editor>` accepts at most one `<Editor.Content />`.');
+  invariant(
+    indexes.length <= 1,
+    'An editor accepts at most one `<Editor.Content />` or `<BlockEditor.Content />`.',
+  );
   const index = indexes[0];
   if (index === undefined)
     return { items, bubbles, top: laidOut, content: defaultContent, bottom: [] };
@@ -109,7 +105,7 @@ export function layOutTheEditor(
   }: {
     blockEditor: boolean;
     defaultContent: ReactElement<EditorContentProps>;
-    defaultBubbleMenu: ReactNode;
+    defaultBubbleMenu: ReactNode | null;
   },
 ) {
   const laidOut = splitByContent(shown, defaultContent);
@@ -117,8 +113,11 @@ export function layOutTheEditor(
     content: laidOut.content,
     top: blockEditor ? dropTheToolbar(laidOut.top) : laidOut.top,
     bottom: blockEditor ? dropTheToolbar(laidOut.bottom) : laidOut.bottom,
-    bubbles: blockEditor && laidOut.bubbles.length === 0 ? [defaultBubbleMenu] : laidOut.bubbles,
-    hasCount: laidOut.items.some(isOfType(EditorCount)),
+    bubbles:
+      defaultBubbleMenu !== null && laidOut.bubbles.length === 0
+        ? [defaultBubbleMenu]
+        : laidOut.bubbles,
+    hasCount: laidOut.items.some(isEditorPart(EditorCount)),
   };
 }
 
@@ -143,6 +142,6 @@ export function featuresIn(
   return EDITOR_FEATURES.filter((feature) =>
     feature === 'imageUpload' || feature === 'mention'
       ? props[feature]
-      : props.everyBlock || containsElementOfType(source, new Set(FEATURE_TOOLS[feature])),
+      : props.everyBlock || containsEditorPart(source, new Set(FEATURE_TOOLS[feature])),
   );
 }
