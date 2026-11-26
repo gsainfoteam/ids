@@ -63,17 +63,29 @@ function splitChildren<E extends SchedulerEventData>(children: SchedulerProps<E>
   };
 }
 
-export function SchedulerRoot<E extends SchedulerEventData>({
+export function SchedulerRoot<E extends SchedulerEventData>(props: SchedulerProps<E>) {
+  if (props.scheduler) {
+    return <SchedulerBoard {...props} scheduler={props.scheduler} />;
+  }
+
+  return <SchedulerWithItsOwnHook {...props} />;
+}
+
+function SchedulerWithItsOwnHook<E extends SchedulerEventData>(props: SchedulerProps<E>) {
+  const scheduler = useScheduler<E>();
+
+  return <SchedulerBoard {...props} scheduler={scheduler} />;
+}
+
+function SchedulerBoard<E extends SchedulerEventData>({
   events,
-  scheduler: given,
+  scheduler,
   children,
   className,
   'aria-label': ariaLabel,
   'aria-describedby': ariaDescribedBy,
   ...props
-}: SchedulerProps<E>) {
-  const own = useScheduler<E>();
-  const scheduler = given ?? own;
+}: SchedulerProps<E> & { scheduler: SchedulerInstance<E> }) {
   const { view, setView, dayCount, setDayCount, date, setDate, now, onEventChange, onSlotSelect } =
     scheduler;
 

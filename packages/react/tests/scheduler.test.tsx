@@ -222,6 +222,25 @@ test('the client clock draws the time line after hydration', async () => {
   expect(line.style.getPropertyValue('--scheduler-now')).toBe('14.25');
 });
 
+test('a scheduler handed over with a fixed `now` starts no clock of its own', async () => {
+  const setInterval = vi.spyOn(window, 'setInterval');
+  const clocksStarted = () => setInterval.mock.calls.filter(([, delay]) => delay === 15_000).length;
+
+  function FixedClock() {
+    const scheduler = useScheduler({ navigation: { defaultValue: on(17), now: NOW } });
+    return <Scheduler aria-label="Schedule" events={EVENTS} scheduler={scheduler} />;
+  }
+
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <FixedClock />
+    </IdsProvider>,
+  );
+  await expect.element(screen.getByRole('group', { name: 'Schedule' })).toBeInTheDocument();
+  expect(clocksStarted()).toBe(0);
+  setInterval.mockRestore();
+});
+
 test('a server on another date marks no day as today, and hydration marks the client day', async () => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date(2026, 10, 17, 23, 30));
