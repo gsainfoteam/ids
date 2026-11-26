@@ -1389,7 +1389,7 @@ test('adopted: a TimePicker column fades its top and bottom and keeps the centre
 test('adopted: a Table fades only its left and right, so its sticky header never fades', async () => {
   const columns = Array.from({ length: 8 }, (_, index) => `열 ${index + 1}`);
   const screen = await render(
-    <Table stickyHeader className="max-h-40 w-72">
+    <Table className="max-h-40 w-72">
       <Table.Header>
         <Table.Row>
           {columns.map((column) => (

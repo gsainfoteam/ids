@@ -6,26 +6,19 @@ import { ScrollArea } from '../../layout/scroll-area';
 
 import type { Table } from '.';
 
-function flag(on: boolean) {
-  return on ? '' : undefined;
-}
-
 export function TableRoot({
   variant = 'outline',
   size = 'standard',
   layout = 'auto',
-  striped = false,
-  stickyHeader = false,
-  highlightOnHover = false,
   className,
   style,
   children,
   ...props
 }: Table.Props) {
-  const styles = tableStyle({ variant, size, layout, striped, stickyHeader });
+  const styles = tableStyle({ variant, size, layout });
 
   return (
-    <TableContext value={{ styles, highlightOnHover }}>
+    <TableContext value={{ styles }}>
       <ScrollArea
         orientation="both"
         fade="x"
@@ -34,8 +27,6 @@ export function TableRoot({
         data-variant={variant}
         data-size={size}
         data-layout={layout}
-        data-striped={flag(striped)}
-        data-sticky-header={flag(stickyHeader)}
         className={styles.root({ className })}
         style={style}
       >

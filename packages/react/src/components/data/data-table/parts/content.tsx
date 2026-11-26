@@ -52,7 +52,11 @@ export function DataTableContent({ className }: DataTableContentProps) {
         <TableBody>
           {rows.length > 0 ? (
             rows.map((row) => (
-              <TableRow key={row.id} selected={Boolean(selection[row.id])} className={styles.row()}>
+              <TableRow
+                key={row.id}
+                aria-selected={Boolean(selection[row.id])}
+                className={styles.row()}
+              >
                 {row.getAllCells().map((cell) => (
                   <TableCell
                     key={cell.id}

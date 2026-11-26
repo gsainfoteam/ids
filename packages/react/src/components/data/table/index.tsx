@@ -27,9 +27,6 @@ export namespace Table {
     variant?: TableVariant;
     size?: IdsSize;
     layout?: TableLayout;
-    striped?: boolean;
-    stickyHeader?: boolean;
-    highlightOnHover?: boolean;
     className?: string;
     style?: CSSProperties;
   };

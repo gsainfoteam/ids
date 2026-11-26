@@ -6,14 +6,13 @@ import { invariant } from '../../../utils';
 
 import type { tableStyle } from './style';
 
-export type TableVariant = 'outline' | 'ghost';
+export type TableVariant = 'outline' | 'striped' | 'ghost';
 export type TableSection = 'header' | 'body' | 'footer';
 export type TableAlign = 'start' | 'center' | 'end';
 export type TableLayout = 'auto' | 'fixed';
 
 type Context = {
   styles: ReturnType<typeof tableStyle>;
-  highlightOnHover: boolean;
 };
 
 export const TableContext = createContext<Context | null>(null);

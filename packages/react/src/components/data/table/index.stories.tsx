@@ -10,7 +10,7 @@ import { Table } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['outline', 'ghost'] as const;
+const variants = ['outline', 'striped', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const MEMBERS = [
@@ -30,9 +30,6 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     layout: { control: 'radio', options: ['auto', 'fixed'] },
-    striped: { control: 'boolean' },
-    stickyHeader: { control: 'boolean' },
-    highlightOnHover: { control: 'boolean' },
   },
   args: { variant: 'outline', size: 'standard', 'aria-label': '멤버' },
   render: (args) => (
@@ -122,29 +119,9 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section title="Rows">
-        <Showcase.Row label="striped">
+        <Showcase.Row label="aria-selected">
           <div className="w-80">
-            <Table striped aria-label="줄무늬">
-              <Table.Header>
-                <Table.Row>
-                  <Table.Head>이름</Table.Head>
-                  <Table.Head>역할</Table.Head>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {MEMBERS.map((member) => (
-                  <Table.Row key={member.id}>
-                    <Table.Cell>{member.name}</Table.Cell>
-                    <Table.Cell>{member.role}</Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="selected">
-          <div className="w-80">
-            <Table highlightOnHover aria-label="선택된 행">
+            <Table aria-label="선택된 행">
               <Table.Header>
                 <Table.Row>
                   <Table.Head>이름</Table.Head>
@@ -153,7 +130,7 @@ export const Gallery: Story = {
               </Table.Header>
               <Table.Body>
                 {MEMBERS.map((member, index) => (
-                  <Table.Row key={member.id} selected={index === 1}>
+                  <Table.Row key={member.id} aria-selected={index === 1}>
                     <Table.Cell>{member.name}</Table.Cell>
                     <Table.Cell>{member.role}</Table.Cell>
                   </Table.Row>
@@ -162,12 +139,12 @@ export const Gallery: Story = {
             </Table>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="striped · selected">
+        <Showcase.Row label="striped · aria-current">
           <div className="w-80">
-            <Table striped aria-label="줄무늬와 선택">
+            <Table variant="striped" aria-label="줄무늬와 현재 행">
               <Table.Body>
                 {MEMBERS.map((member, index) => (
-                  <Table.Row key={member.id} selected={index === 1}>
+                  <Table.Row key={member.id} aria-current={index === 1 ? 'true' : undefined}>
                     <Table.Head>{member.name}</Table.Head>
                     <Table.Cell>{member.role}</Table.Cell>
                   </Table.Row>
@@ -253,7 +230,7 @@ export const SelectARowOnPress: Story = {
             {MEMBERS.map((member) => (
               <Table.Row
                 key={member.id}
-                selected={selected === member.id}
+                aria-selected={selected === member.id}
                 onClick={() => setSelected(member.id)}
               >
                 <Table.Head>
@@ -277,28 +254,31 @@ export const SelectARowOnPress: Story = {
     docs: {
       description: {
         story:
-          '`onClick` 이 있는 행은 포인터를 올리면 밝아지고 어디를 눌러도 됩니다. 키보드와 스크린 리더는 행 안의 버튼으로 같은 동작에 닿습니다. 행에 `role="button"` 을 주면 표의 행과 열 구조가 사라지므로 주지 않습니다.',
+          '`onClick` 이 있는 행은 포인터를 올리면 밝아지고 어디를 눌러도 됩니다. `aria-selected` 가 참인 행은 primary soft 로 칠해집니다. 키보드와 스크린 리더는 행 안의 버튼으로 같은 동작에 닿습니다. 행에 `role="button"` 을 주면 표의 행과 열 구조가 사라지므로 주지 않습니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('cell', { name: 'lee@example.com' }));
     const row = canvas.getByRole('row', { name: /이영희/ });
-    await expect(row).toHaveAttribute('data-selected');
+    await expect(row).toHaveAttribute('aria-selected', 'true');
     await expect(canvas.getByRole('button', { name: '이영희' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
     canvas.getByRole('button', { name: '김철수' }).focus();
     await userEvent.keyboard('{Enter}');
-    await expect(canvas.getByRole('row', { name: /김철수/ })).toHaveAttribute('data-selected');
+    await expect(canvas.getByRole('row', { name: /김철수/ })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
   },
 };
 
 export const PinTheHeaderWhileScrolling: Story = {
   render: () => (
     <div className="flex max-h-64 max-w-md flex-col">
-      <Table stickyHeader striped aria-label="긴 목록">
+      <Table variant="striped" aria-label="긴 목록">
         <Table.Header>
           <Table.Row>
             <Table.Head>번호</Table.Head>
@@ -322,7 +302,7 @@ export const PinTheHeaderWhileScrolling: Story = {
     docs: {
       description: {
         story:
-          '감싼 요소가 높이를 제한하면 표가 안에서 스크롤하고, `stickyHeader` 는 머리글 행을 위에 붙여 둡니다. 스크롤바는 ScrollArea 가 그립니다.',
+          '감싼 요소가 높이를 제한하면 표가 안에서 스크롤하고, 머리글 행은 늘 위에 붙어 있습니다. 스크롤바는 ScrollArea 가 그립니다.',
       },
     },
   },
