@@ -339,11 +339,11 @@ test(
 
     for (const reference of [
       'BlockEditorRoot',
-      'BlockEditorContent',
-      'BlockEditorBubbleMenu',
-      'BlockEditorBold',
-      'BlockEditorLink',
-      'BlockEditorCount',
+      'BlockEditorContentPart',
+      'BlockEditorBubbleMenuPart',
+      'BlockEditorBoldPart',
+      'BlockEditorLinkPart',
+      'BlockEditorCountPart',
     ])
       expect(rendered.stdout).toContain(`"${reference}"`);
   },

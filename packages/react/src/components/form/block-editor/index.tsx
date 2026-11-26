@@ -1,20 +1,23 @@
+import { BlockEditorBoldPart, type BlockEditorBoldPartProps } from './parts/bold';
 import {
-  BlockEditorBold,
-  BlockEditorBubbleMenu,
-  BlockEditorCode,
-  BlockEditorColor,
-  BlockEditorContent,
-  BlockEditorCount,
-  BlockEditorHighlight,
-  BlockEditorItalic,
-  BlockEditorLink,
-  BlockEditorSeparator,
-  BlockEditorStrike,
-  BlockEditorSubscript,
-  BlockEditorSuperscript,
-  BlockEditorTextAlign,
-  BlockEditorUnderline,
-} from './parts/parts';
+  BlockEditorBubbleMenuPart,
+  type BlockEditorBubbleMenuPartProps,
+} from './parts/bubble-menu';
+import { BlockEditorCodePart } from './parts/code';
+import { BlockEditorColorPart, type BlockEditorColorPartProps } from './parts/color';
+import { BlockEditorContentPart, type BlockEditorContentPartProps } from './parts/content';
+import { BlockEditorCountPart, type BlockEditorCountPartProps } from './parts/count';
+import { BlockEditorHighlightPart } from './parts/highlight';
+import { BlockEditorItalicPart } from './parts/italic';
+import { BlockEditorLinkPart, type BlockEditorLinkPartProps } from './parts/link';
+import { BlockEditorSeparatorPart, type BlockEditorSeparatorPartProps } from './parts/separator';
+import { BlockEditorStrikePart } from './parts/strike';
+import { BlockEditorSubscriptPart } from './parts/subscript';
+import {
+  BlockEditorSuperscriptPart,
+} from './parts/superscript';
+import { BlockEditorTextAlignPart, type BlockEditorTextAlignPartProps } from './parts/text-align';
+import { BlockEditorUnderlinePart } from './parts/underline';
 import {
   BlockEditorRoot,
   type BlockEditorProps,
@@ -31,14 +34,8 @@ import type {
 } from '../editor/hooks/use-editor';
 import type { EditorFormat } from '../editor/lib/value';
 import type { FindMentions as EditorFindMentions, EditorMention } from '../editor/mention/node';
-import type { EditorBubbleMenuProps } from '../editor/parts/bubble-menu';
-import type { EditorColorProps } from '../editor/parts/color';
-import type { EditorContentProps } from '../editor/parts/content';
-import type { EditorCountProps, EditorCountState } from '../editor/parts/count';
-import type { EditorLinkProps } from '../editor/parts/link';
-import type { EditorMarkProps } from '../editor/parts/marks';
-import type { EditorSeparatorProps } from '../editor/parts/separator';
-import type { EditorTextAlignment, EditorTextAlignProps } from '../editor/parts/text-align';
+import type { EditorCountState } from '../editor/parts/count';
+import type { EditorTextAlignment } from '../editor/parts/text-align';
 import type { JSONContent } from '@tiptap/core';
 
 export function BlockEditor(props: BlockEditor.Props) {
@@ -60,30 +57,30 @@ export namespace BlockEditor {
   export type ImageUploadOptions = EditorImageUploadOptions;
   export type MentionOptions = EditorMentionOptions;
 
-  export type ContentProps = EditorContentProps;
-  export type CountProps = EditorCountProps;
-  export type BubbleMenuProps = EditorBubbleMenuProps;
-  export type SeparatorProps = EditorSeparatorProps;
-  export type ToolProps = EditorMarkProps;
-  export type ColorProps = EditorColorProps;
-  export type LinkProps = EditorLinkProps;
-  export type TextAlignProps = EditorTextAlignProps;
+  export type ContentProps = BlockEditorContentPartProps;
+  export type CountProps = BlockEditorCountPartProps;
+  export type BubbleMenuProps = BlockEditorBubbleMenuPartProps;
+  export type SeparatorProps = BlockEditorSeparatorPartProps;
+  export type ToolProps = BlockEditorBoldPartProps;
+  export type ColorProps = BlockEditorColorPartProps;
+  export type LinkProps = BlockEditorLinkPartProps;
+  export type TextAlignProps = BlockEditorTextAlignPartProps;
 
-  export const Content = BlockEditorContent;
-  export const Count = BlockEditorCount;
-  export const BubbleMenu = BlockEditorBubbleMenu;
-  export const Separator = BlockEditorSeparator;
-  export const Bold = BlockEditorBold;
-  export const Italic = BlockEditorItalic;
-  export const Underline = BlockEditorUnderline;
-  export const Strike = BlockEditorStrike;
-  export const Code = BlockEditorCode;
-  export const Highlight = BlockEditorHighlight;
-  export const Subscript = BlockEditorSubscript;
-  export const Superscript = BlockEditorSuperscript;
-  export const Color = BlockEditorColor;
-  export const Link = BlockEditorLink;
-  export const TextAlign = BlockEditorTextAlign;
+  export const Content = BlockEditorContentPart;
+  export const Count = BlockEditorCountPart;
+  export const BubbleMenu = BlockEditorBubbleMenuPart;
+  export const Separator = BlockEditorSeparatorPart;
+  export const Bold = BlockEditorBoldPart;
+  export const Italic = BlockEditorItalicPart;
+  export const Underline = BlockEditorUnderlinePart;
+  export const Strike = BlockEditorStrikePart;
+  export const Code = BlockEditorCodePart;
+  export const Highlight = BlockEditorHighlightPart;
+  export const Subscript = BlockEditorSubscriptPart;
+  export const Superscript = BlockEditorSuperscriptPart;
+  export const Color = BlockEditorColorPart;
+  export const Link = BlockEditorLinkPart;
+  export const TextAlign = BlockEditorTextAlignPart;
 
   export const Style = editorStyle;
 }

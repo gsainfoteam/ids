@@ -1,6 +1,6 @@
 'use client';
 
-import { BlockEditorBubbleMenu } from './parts/parts';
+import { BlockEditorBubbleMenuPart } from './parts/bubble-menu';
 import { useInternalEditorRoot, type EditorRootProps } from '../editor/hooks/use-editor-root';
 import { EditorContentPart } from '../editor/parts/content';
 import { EditorShell } from '../editor/parts/shell';
@@ -11,7 +11,7 @@ export type { EditorVariant as BlockEditorVariant } from '../editor/hooks/use-ed
 export type BlockEditorProps = EditorRootProps;
 
 const DEFAULT_CONTENT = <EditorContentPart />;
-const DEFAULT_BUBBLE_MENU = <BlockEditorBubbleMenu key="block-editor-bubble-menu" />;
+const DEFAULT_BUBBLE_MENU = <BlockEditorBubbleMenuPart key="block-editor-bubble-menu" />;
 
 export function BlockEditorRoot(props: BlockEditorProps) {
   const root = useInternalEditorRoot(props, {
