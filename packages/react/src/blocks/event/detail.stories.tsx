@@ -186,10 +186,11 @@ export const PC: Story = {
                 </div>
               </Card.Content>
               <Card.Footer>
-                <AvatarGroup max={4} size="tiny" aria-label="참석하는 사람">
+                <AvatarGroup size="tiny" aria-label="참석하는 사람">
                   {ATTENDEES.map((name) => (
                     <Avatar key={name} name={name} />
                   ))}
+                  <AvatarGroup.Overflow max={4} />
                 </AvatarGroup>
                 {count}명이 가요
               </Card.Footer>

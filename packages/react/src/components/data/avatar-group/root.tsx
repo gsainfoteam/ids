@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, isValidElement, use } from 'react';
+import { createContext, isValidElement, use, type ReactElement } from 'react';
 
 import { arrangeAvatarGroup } from './lib/arrange';
 import { avatarGroupStyle } from './style';
@@ -25,28 +25,22 @@ const OverflowContext = createContext<OverflowContextValue | null>(null);
 const avatarAsWrittenOrServerRendered: unknown[] = [Avatar, AvatarRoot];
 
 export function AvatarGroupRoot({
-  max,
-  total,
   layout = 'stack',
   stacking = 'first-on-top',
   size = 'standard',
-  overflowLabel: overflowLabelProp,
   className,
   style,
   children,
   ...rest
 }: AvatarGroup.Props) {
   const t = useInternalTranslate();
-  const overflowLabel =
-    overflowLabelProp ?? ((count: number) => t('avatarGroup.overflow', { count }));
 
   const { items, visibleCount, hidden, hiddenNames } = arrangeAvatarGroup({
     children,
-    max,
-    total,
     layout,
     stacking,
-    isOverflow: (node) => isValidElement(node) && elementTypeOf(node) === AvatarGroupOverflow,
+    isOverflow: (node): node is ReactElement<AvatarGroup.Overflow.Props> =>
+      isValidElement(node) && elementTypeOf(node) === AvatarGroupOverflow,
     nameOf: (node) => {
       if (
         !isValidElement<Avatar.Props>(node) ||
@@ -62,7 +56,12 @@ export function AvatarGroupRoot({
   return (
     <AvatarGroupContext value={{ size }}>
       <OverflowContext
-        value={{ count: hidden, label: overflowLabel(hidden), names: hiddenNames, styles }}
+        value={{
+          count: hidden,
+          label: t('avatarGroup.overflow', { count: hidden }),
+          names: hiddenNames,
+          styles,
+        }}
       >
         <ul
           {...rest}
@@ -90,6 +89,8 @@ export function AvatarGroupRoot({
 }
 
 export function AvatarGroupOverflow({
+  max: _max,
+  total: _total,
   className,
   style,
   children,

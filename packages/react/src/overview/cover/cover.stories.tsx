@@ -404,12 +404,13 @@ export const Cover: Story = {
                         <Card.Title>인포팀 신입 모집</Card.Title>
                         <Card.Description>10월 12일까지</Card.Description>
                       </Card.Header>
-                      <AvatarGroup aria-label="지원자" max={4}>
+                      <AvatarGroup aria-label="지원자">
                         <Avatar name="박서연" />
                         <Avatar name="이도윤" />
                         <Avatar name="최하준" />
                         <Avatar name="정예린" />
                         <Avatar name="한지우" />
+                        <AvatarGroup.Overflow max={4} />
                       </AvatarGroup>
                       <div className="grid grid-cols-[1fr_auto] gap-2">
                         <Button size="tiny">지원하기</Button>
@@ -576,9 +577,10 @@ export const Cover: Story = {
                         <Card.Title>택시 합승</Card.Title>
                         <Card.Description>기숙사에서 광주송정역, 17:40</Card.Description>
                       </Card.Header>
-                      <AvatarGroup aria-label="합승 인원" max={3}>
+                      <AvatarGroup aria-label="합승 인원">
                         <Avatar name="한지우" />
                         <Avatar name="오세린" />
+                        <AvatarGroup.Overflow max={3} />
                       </AvatarGroup>
                       <div className="grid grid-cols-[1fr_auto] gap-2">
                         <Button size="tiny">함께 타기</Button>
@@ -1073,11 +1075,12 @@ export const Cover: Story = {
                       <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                         <Card size="tiny">
                           <div className="flex items-center justify-between">
-                            <AvatarGroup aria-label="참여자" max={3}>
+                            <AvatarGroup aria-label="참여자">
                               <Avatar name="김지수" />
                               <Avatar name="박서연" />
                               <Avatar name="이도윤" />
                               <Avatar name="최하준" />
+                              <AvatarGroup.Overflow max={3} />
                             </AvatarGroup>
                             <Button size="tiny" variant="soft">
                               초대
@@ -1439,11 +1442,12 @@ export const Cover: Story = {
                               <p className={cn(hint, 'truncate')}>전기전자컴퓨터공학부</p>
                             </div>
                           </div>
-                          <AvatarGroup aria-label="함께 아는 사람" max={3}>
+                          <AvatarGroup aria-label="함께 아는 사람">
                             <Avatar name="박서연" />
                             <Avatar name="이도윤" />
                             <Avatar name="최하준" />
                             <Avatar name="정예린" />
+                            <AvatarGroup.Overflow max={3} />
                           </AvatarGroup>
                           <div className="grid grid-cols-2 gap-2">
                             <Button size="tiny">팔로우</Button>

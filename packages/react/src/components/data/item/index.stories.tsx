@@ -184,10 +184,11 @@ export const Gallery: Story = {
           <div className="w-80">
             <Item variant="outline">
               <Item.Media>
-                <AvatarGroup size="tiny" max={3} aria-label="채팅 멤버">
+                <AvatarGroup size="tiny" aria-label="채팅 멤버">
                   {['Alice Kim', 'Bob Lee', 'Carol Park', '류현승'].map((name) => (
                     <Avatar key={name} name={name} />
                   ))}
+                  <AvatarGroup.Overflow max={3} />
                 </AvatarGroup>
               </Item.Media>
               <Item.Content>

@@ -109,10 +109,11 @@ export const PC: Story = {
               <Item.Description>Ziggle 과 IDS 이야기</Item.Description>
             </Item.Content>
             <Item.Actions>
-              <AvatarGroup max={3} size="tiny" aria-label={`멤버 ${MEMBERS.length}명`}>
+              <AvatarGroup size="tiny" aria-label={`멤버 ${MEMBERS.length}명`}>
                 {MEMBERS.map((member) => (
                   <Avatar key={member} name={member} />
                 ))}
+                <AvatarGroup.Overflow max={3} />
               </AvatarGroup>
               <IconButton variant="outline" aria-label="멤버 초대" icon={<UserPlusIcon />} />
             </Item.Actions>

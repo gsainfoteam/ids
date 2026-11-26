@@ -1,4 +1,4 @@
-import { isValidElement, type ReactNode } from 'react';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { flattenFragments } from '../../../../utils';
 import { isDevelopment } from '../../../../utils/dev';
@@ -10,29 +10,29 @@ export type AvatarGroupStacking = 'first-on-top' | 'last-on-top';
 
 export type AvatarGroupItem = { node: ReactNode; cutout: AvatarCutout | undefined };
 
+type OverflowLimits = { max?: number; total?: number };
+
 export function arrangeAvatarGroup({
   children,
-  max,
-  total,
   layout,
   stacking,
   isOverflow,
   nameOf,
 }: {
   children: ReactNode;
-  max: number | undefined;
-  total: number | undefined;
   layout: AvatarGroupLayout;
   stacking: AvatarGroupStacking;
-  isOverflow: (node: ReactNode) => boolean;
+  isOverflow: (node: ReactNode) => node is ReactElement<OverflowLimits>;
   nameOf: (node: ReactNode) => string | undefined;
 }) {
-  if (isDevelopment && max !== undefined && !(max >= 1))
-    console.warn('[IDS] AvatarGroup: max must be at least 1.');
-  const limit = max === undefined ? Infinity : Math.max(1, Math.floor(max));
-
   const nodes = flattenFragments(children).filter((node) => isValidElement(node));
   const overflowIndex = nodes.findIndex(isOverflow);
+  const overflowNode = nodes[overflowIndex];
+  const { max, total } = overflowNode && isOverflow(overflowNode) ? overflowNode.props : {};
+  if (isDevelopment && max !== undefined && !(max >= 1))
+    console.warn('[IDS] AvatarGroup.Overflow: max must be at least 1.');
+  const limit = max === undefined ? Infinity : Math.max(1, Math.floor(max));
+
   const avatars = nodes.filter((_, index) => index !== overflowIndex);
   const visible = avatars.slice(0, limit);
   const hidden = Math.max(total ?? 0, avatars.length) - visible.length;
@@ -43,7 +43,7 @@ export function arrangeAvatarGroup({
   const overflowFirst = overflowIndex === 0;
   const ordered: { node: ReactNode | null }[] = visible.map((node) => ({ node }));
   if (hidden > 0) {
-    const overflow = { node: overflowIndex === -1 ? null : nodes[overflowIndex] };
+    const overflow = { node: overflowNode ?? null };
     if (overflowFirst) ordered.unshift(overflow);
     else ordered.push(overflow);
   }

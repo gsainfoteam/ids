@@ -24,6 +24,11 @@ const MEMBERS = [
   { name: 'Eve Choi' },
 ];
 
+type AvatarGroupPlaygroundArgs = AvatarGroup.Props & {
+  overflowMax?: number;
+  overflowTotal?: number;
+};
+
 const meta = {
   title: 'Data/AvatarGroup',
   component: AvatarGroup,
@@ -32,37 +37,47 @@ const meta = {
     layout: { control: 'radio', options: layouts },
     stacking: { control: 'radio', options: ['first-on-top', 'last-on-top'] },
     size: { control: 'radio', options: sizes },
-    max: { control: { type: 'number', min: 1 } },
-    total: { control: { type: 'number', min: 0 } },
+    overflowMax: {
+      name: 'max',
+      control: { type: 'number', min: 1 },
+      table: { category: 'AvatarGroup.Overflow' },
+    },
+    overflowTotal: {
+      name: 'total',
+      control: { type: 'number', min: 0 },
+      table: { category: 'AvatarGroup.Overflow' },
+    },
   },
   args: {
     'aria-label': '회의 참석자',
-    max: 3,
+    overflowMax: 3,
     layout: 'stack',
     stacking: 'first-on-top',
     size: 'standard',
   },
-  render: (args) => (
+  render: ({ overflowMax, overflowTotal, ...args }) => (
     <AvatarGroup {...args}>
       {MEMBERS.map((member) => (
         <Avatar key={member.name} src={member.src} name={member.name} />
       ))}
+      <AvatarGroup.Overflow max={overflowMax} total={overflowTotal} />
     </AvatarGroup>
   ),
-} satisfies Meta<typeof AvatarGroup>;
+} satisfies Meta<AvatarGroupPlaygroundArgs>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<AvatarGroupPlaygroundArgs>;
 
 export const Playground: Story = {};
 
 export const Usage: Story = {
   render: () => (
-    <AvatarGroup max={3} aria-label="회의 참석자">
+    <AvatarGroup aria-label="회의 참석자">
       <Avatar src={photo(210)} name="Alice Kim" />
       <Avatar src={photo(30)} name="Bob Lee" />
       <Avatar name="Carol Park" />
       <Avatar name="Eve Choi" />
+      <AvatarGroup.Overflow max={3} />
     </AvatarGroup>
   ),
 };
@@ -75,10 +90,11 @@ export const Gallery: Story = {
           rows={sizes}
           columns={layouts}
           render={(size, layout) => (
-            <AvatarGroup layout={layout} size={size} max={3} aria-label={`${layout} ${size}`}>
+            <AvatarGroup layout={layout} size={size} aria-label={`${layout} ${size}`}>
               {MEMBERS.map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />
               ))}
+              <AvatarGroup.Overflow max={3} />
             </AvatarGroup>
           )}
         />
@@ -101,10 +117,11 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl" className="flex gap-6">
-            <AvatarGroup max={3} aria-label="rtl">
+            <AvatarGroup aria-label="rtl">
               {MEMBERS.map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />
               ))}
+              <AvatarGroup.Overflow max={3} />
             </AvatarGroup>
             <AvatarGroup stacking="last-on-top" aria-label="rtl last-on-top">
               {MEMBERS.slice(0, 3).map((member) => (
@@ -121,28 +138,31 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="muted">
           <div className="rounded-standard bg-neutral-soft p-3">
-            <AvatarGroup max={4} aria-label="muted">
+            <AvatarGroup aria-label="muted">
               {MEMBERS.map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />
               ))}
+              <AvatarGroup.Overflow max={4} />
             </AvatarGroup>
           </div>
         </Showcase.Row>
         <Showcase.Row label="primary">
           <div className="rounded-standard bg-primary-solid p-3">
-            <AvatarGroup max={4} aria-label="primary">
+            <AvatarGroup aria-label="primary">
               {MEMBERS.map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />
               ))}
+              <AvatarGroup.Overflow max={4} />
             </AvatarGroup>
           </div>
         </Showcase.Row>
         <Showcase.Row label="gradient">
           <div className="rounded-standard bg-linear-to-r from-fuchsia-500 via-amber-300 to-emerald-400 p-3">
-            <AvatarGroup max={4} aria-label="gradient">
+            <AvatarGroup aria-label="gradient">
               {MEMBERS.map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />
               ))}
+              <AvatarGroup.Overflow max={4} />
             </AvatarGroup>
           </div>
         </Showcase.Row>
@@ -150,22 +170,24 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Overflow">
         <Showcase.Row label="max 2">
-          <AvatarGroup max={2} aria-label="max 2">
+          <AvatarGroup aria-label="max 2">
             {MEMBERS.map((member) => (
               <Avatar key={member.name} src={member.src} name={member.name} />
             ))}
+            <AvatarGroup.Overflow max={2} />
           </AvatarGroup>
         </Showcase.Row>
         <Showcase.Row label="total 128">
-          <AvatarGroup total={128} aria-label="total 128">
+          <AvatarGroup aria-label="total 128">
             {MEMBERS.slice(0, 3).map((member) => (
               <Avatar key={member.name} src={member.src} name={member.name} />
             ))}
+            <AvatarGroup.Overflow total={128} />
           </AvatarGroup>
         </Showcase.Row>
         <Showcase.Row label="custom">
-          <AvatarGroup max={2} aria-label="custom overflow">
-            <AvatarGroup.Overflow>{({ count }) => `${count}+`}</AvatarGroup.Overflow>
+          <AvatarGroup aria-label="custom overflow">
+            <AvatarGroup.Overflow max={2}>{({ count }) => `${count}+`}</AvatarGroup.Overflow>
             {MEMBERS.map((member) => (
               <Avatar key={member.name} src={member.src} name={member.name} />
             ))}
@@ -185,7 +207,7 @@ export const GatherTheRestIntoACount: Story = {
     docs: {
       description: {
         story:
-          '`max` 를 넘는 사람은 `+N` 하나로 모읍니다. `+N` 은 "외 N명" 이라는 이름을 가진 이미지라서 스크린 리더가 숫자만 읽지 않습니다.',
+          '`AvatarGroup.Overflow` 의 `max` 를 넘는 사람은 `+N` 하나로 모읍니다. `+N` 은 "외 N명" 이라는 이름을 가진 이미지라서 스크린 리더가 숫자만 읽지 않습니다.',
       },
     },
   },
@@ -198,19 +220,19 @@ export const GatherTheRestIntoACount: Story = {
 };
 
 export const ShowATotalFromTheServer: Story = {
-  args: { max: undefined, total: 128 },
-  render: (args) => (
-    <AvatarGroup {...args}>
+  render: () => (
+    <AvatarGroup aria-label="회의 참석자">
       {MEMBERS.slice(0, 3).map((member) => (
         <Avatar key={member.name} src={member.src} name={member.name} />
       ))}
+      <AvatarGroup.Overflow total={128} />
     </AvatarGroup>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '서버가 앞의 몇 명과 전체 수만 줄 때는 `total` 을 넘깁니다. 그린 아바타를 뺀 나머지가 `+N` 이 됩니다.',
+          '서버가 앞의 몇 명과 전체 수만 줄 때는 `AvatarGroup.Overflow` 에 `total` 을 넘깁니다. 그린 아바타를 뺀 나머지가 `+N` 이 됩니다.',
       },
     },
   },
@@ -220,7 +242,6 @@ export const ShowATotalFromTheServer: Story = {
 };
 
 export const ChooseWhichAvatarSitsOnTop: Story = {
-  args: { max: 3 },
   parameters: {
     docs: {
       description: {
@@ -263,8 +284,10 @@ export const SetTheSizeForTheWholeGroup: Story = {
 
 export const PutTheCountFirst: Story = {
   render: () => (
-    <AvatarGroup max={2} overflowLabel={(count) => `and ${count} more`} aria-label="Reviewers">
-      <AvatarGroup.Overflow>{({ count }) => `${count}+`}</AvatarGroup.Overflow>
+    <AvatarGroup aria-label="Reviewers">
+      <AvatarGroup.Overflow max={2} aria-label="and 3 more">
+        {({ count }) => `${count}+`}
+      </AvatarGroup.Overflow>
       {MEMBERS.map((member) => (
         <Avatar key={member.name} src={member.src} name={member.name} />
       ))}
@@ -274,7 +297,7 @@ export const PutTheCountFirst: Story = {
     docs: {
       description: {
         story:
-          '`AvatarGroup.Overflow` 를 앞에 두면 `+N` 이 앞에 옵니다. children은 남은 수를 받는 함수가 될 수 있고, 이름은 `overflowLabel` 로 바꿉니다.',
+          '`AvatarGroup.Overflow` 를 앞에 두면 `+N` 이 앞에 옵니다. children은 남은 수를 받는 함수가 될 수 있고, 이름은 `aria-label` 로 바꿉니다.',
       },
     },
   },
@@ -287,7 +310,7 @@ export const PutTheCountFirst: Story = {
 
 export const LastOnTop: Story = {
   tags: ['verification'],
-  args: { max: 3, stacking: 'last-on-top' },
+  args: { stacking: 'last-on-top' },
   play: async ({ canvasElement }) => {
     const cutouts = avatars(canvasElement).map((avatar) => avatar.dataset.cutout ?? 'none');
     await expect(cutouts).toEqual(['end', 'end', 'end', 'none']);
