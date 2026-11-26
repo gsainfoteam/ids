@@ -122,7 +122,7 @@ import { Button, Card, IconButton } from '@gsainfoteam/ids-react';
 ```
 
 - 누를 수 있는 카드는 따로 켜지 않습니다. `onClick` 이 있거나, `asChild` 의 자식이 `href` 가 있는 요소(`<a href>`, Next.js `Link`)나 `<button>` 이면 누를 수 있는 모양과 동작이 됩니다.
-- 자식은 JSX 에 적힌 대로 봅니다. `to` 만 받는 라우터 링크(React Router, TanStack Router)는 알아보지 못하므로, 링크 컴포넌트가 그리는 `<a>` 를 `asChild` 로 감쌀 수 없으면 `onClick` 으로 이동합니다.
+- `to` 만 받는 라우터 링크(React Router, TanStack Router)나 `Accordion.Trigger` 처럼 JSX 만으로는 무엇을 그릴지 알 수 없는 자식은, 마운트된 뒤 그려진 요소(`a[href]`, `button`, `role="link"`, `role="button"`)를 보고 알아봅니다. 서버 HTML 에서는 아직 누를 수 있는 모양이 아니고, hydration 뒤에 hover와 포커스 표시가 켜집니다.
 
 | 키      | 동작                                       |
 | ------- | ------------------------------------------ |
