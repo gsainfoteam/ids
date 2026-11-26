@@ -78,7 +78,6 @@ export function SidebarAccordionSubmenu({
             >
               <Item
                 asChild
-                interactive
                 size="tiny"
                 disabled={disabled}
                 className={sidebar.styles.item({
@@ -167,7 +166,6 @@ export function SidebarMenuSubmenu({ parts, disabled, colorScheme, className }: 
       <Menu.Trigger asChild>
         <Item
           asChild
-          interactive
           size="tiny"
           disabled={disabled}
           selected={containsValue(parts.subItems, sidebar.value)}

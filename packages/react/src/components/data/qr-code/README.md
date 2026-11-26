@@ -20,10 +20,10 @@ import { QRCode } from '@gsainfoteam/ids-react';
 <QRCode aria-label="QR 코드" value={url} />                                    // square 모듈, square 파인더
 <QRCode aria-label="QR 코드" value={url} shape="rounded" />                    // 붙은 모듈은 이어지고 바깥 모서리만 둥글다
 <QRCode aria-label="QR 코드" value={url} shape="dots" />                       // 동그란 모듈, circle 파인더
-<QRCode aria-label="QR 코드" value={url} shape="dots" finderShape="square" />  // 파인더만 따로
+<QRCode aria-label="QR 코드" value={url} shape={{ modules: 'dots', finders: 'square' }} />  // 파인더만 따로
 ```
 
-- `finderShape` 를 주지 않으면 `shape` 를 따릅니다: `square` → `square`, `rounded` → `rounded`, `dots` → `circle`.
+- `shape` 가 이름 하나면 파인더는 그 모양을 따릅니다: `square` → `square`, `rounded` → `rounded`, `dots` → `circle`.
 - `dots` 의 점은 이웃한 점과 맞닿는 크기입니다. 점 사이를 더 벌리면 일부 스캐너(jsQR)가 읽지 못합니다.
 
 ## 크기와 여백
@@ -122,8 +122,7 @@ import { QRCode } from '@gsainfoteam/ids-react';
 | `variant`         | `theme`(기본, 테마를 따름) / `light` / `dark`(모드와 상관없이) |
 | `size`            | `standard`(128px, 기본) / `tiny`(96px) / 숫자(px)             |
 | `errorCorrection` | `L` / `M`(기본) / `Q` / `H`. 로고가 있으면 기본 `H`           |
-| `shape`           | `square`(기본) / `rounded` / `dots`                           |
-| `finderShape`     | `square` / `rounded` / `circle`. 기본은 `shape` 를 따름       |
+| `shape`           | `square`(기본) / `rounded` / `dots`. 파인더를 따로 고르면 `{ modules, finders }`(`square` / `rounded` / `circle`) |
 | `quietZone`       | 둘레 빈 칸 수. 기본 `4`                                       |
 | `Logo.asChild`    | 기본 `div` 대신 자식 요소에 속성을 합친다                     |
 | 그 외             | 루트 `div` 의 native 속성                                     |

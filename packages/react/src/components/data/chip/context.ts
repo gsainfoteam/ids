@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, use, type KeyboardEvent } from 'react';
+import { createContext, use, type KeyboardEvent, type RefObject } from 'react';
 
 import { invariant } from '../../../utils';
 
@@ -22,6 +22,10 @@ type Context = {
 };
 
 export const ChipContext = createContext<Context | null>(null);
+export const ChipGroupContext = createContext<{
+  size: IdsSize | undefined;
+  root: RefObject<HTMLElement | null>;
+} | null>(null);
 
 export function useInternalChipContext(part: string) {
   const context = use(ChipContext);

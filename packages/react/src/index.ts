@@ -52,6 +52,7 @@ export { IdsError, invariant } from './utils/invariant';
 export { Slot } from './components/utility/slot';
 export { Card } from './components/data/card';
 export { Chip } from './components/data/chip';
+export { ChipGroup } from './components/data/chip-group';
 export { Badge } from './components/data/badge';
 export { Bubble } from './components/data/bubble';
 export { Message } from './components/data/message';

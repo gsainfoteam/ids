@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Chip } from '../src';
+import { Chip, ChipGroup } from '../src';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -129,17 +129,19 @@ test('a chip that is a button draws its X for the pointer and removes on Backspa
   expect(events).toEqual(['removed', 'removed']);
 });
 
-test('removing a focused chip hands focus to the next chip, or the previous at the end', async () => {
+test('removing a focused chip in a ChipGroup hands focus to the next chip, or the previous at the end', async () => {
   function Tags() {
     const [tags, setTags] = useState(['a', 'b', 'c']);
     return (
-      <ul>
-        {tags.map((tag) => (
-          <li key={tag}>
-            <Chip onRemove={() => setTags((prev) => prev.filter((t) => t !== tag))}>{tag}</Chip>
-          </li>
-        ))}
-      </ul>
+      <ChipGroup asChild aria-label="Tags">
+        <ul>
+          {tags.map((tag) => (
+            <li key={tag}>
+              <Chip onRemove={() => setTags((prev) => prev.filter((t) => t !== tag))}>{tag}</Chip>
+            </li>
+          ))}
+        </ul>
+      </ChipGroup>
     );
   }
   const screen = await render(<Tags />);
@@ -149,6 +151,37 @@ test('removing a focused chip hands focus to the next chip, or the previous at t
   await expect.element(closeOf('c')).toHaveFocus();
   await userEvent.keyboard('{Delete}');
   await expect.element(closeOf('a'), { message: 'the last one hands focus back' }).toHaveFocus();
+});
+
+test('a chip outside a ChipGroup does not look for siblings, and the group hands its size down', async () => {
+  function Tags() {
+    const [tags, setTags] = useState(['a', 'b']);
+    return (
+      <div>
+        {tags.map((tag) => (
+          <Chip key={tag} onRemove={() => setTags((prev) => prev.filter((t) => t !== tag))}>
+            {tag}
+          </Chip>
+        ))}
+        <ChipGroup size="tiny" aria-label="Small">
+          <Chip>x</Chip>
+          <Chip size="standard">y</Chip>
+        </ChipGroup>
+      </div>
+    );
+  }
+  const screen = await render(<Tags />);
+  screen.getByRole('button', { name: 'a 삭제' }).element().focus();
+  await userEvent.keyboard('{Backspace}');
+  await nextFrame();
+  await nextFrame();
+  await expect.element(screen.getByRole('button', { name: 'b 삭제' })).not.toHaveFocus();
+  const group = screen.getByRole('group', { name: 'Small' }).element();
+  const sizes = Array.from(
+    group.querySelectorAll<HTMLElement>('[data-chip]'),
+    (chip) => chip.dataset.size,
+  );
+  expect(sizes).toEqual(['tiny', 'standard']);
 });
 
 test('onRemove gets the click or key that asked, and preventDefault leaves focus to it', async () => {

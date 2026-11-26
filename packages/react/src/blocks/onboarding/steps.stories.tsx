@@ -6,6 +6,7 @@ import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -99,7 +100,7 @@ export const PC: Story = {
                             고른 게시판의 글을 첫 화면에 먼저 보여 드려요.
                           </p>
                         </div>
-                        <div role="group" aria-label="관심 게시판" className="flex flex-wrap gap-2">
+                        <ChipGroup aria-label="관심 게시판">
                           {BOARDS.map((board) => (
                             <Chip
                               key={board}
@@ -109,7 +110,7 @@ export const PC: Story = {
                               {board}
                             </Chip>
                           ))}
-                        </div>
+                        </ChipGroup>
                       </>
                     )}
 

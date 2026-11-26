@@ -121,18 +121,20 @@ export const PC: Story = {
                 .
               </p>
 
-              <ItemGroup ordered aria-label="신청하는 순서">
-                {STEPS.map((step, index) => (
-                  <Item key={step.text}>
-                    <Item.Media variant="soft" aria-hidden>
-                      {index + 1}
-                    </Item.Media>
-                    <Item.Content>
-                      <Item.Title>{step.text}</Item.Title>
-                      <Item.Description>출처 {step.source}</Item.Description>
-                    </Item.Content>
-                  </Item>
-                ))}
+              <ItemGroup asChild aria-label="신청하는 순서">
+                <ol>
+                  {STEPS.map((step, index) => (
+                    <Item key={step.text}>
+                      <Item.Media variant="soft" aria-hidden>
+                        {index + 1}
+                      </Item.Media>
+                      <Item.Content>
+                        <Item.Title>{step.text}</Item.Title>
+                        <Item.Description>출처 {step.source}</Item.Description>
+                      </Item.Content>
+                    </Item>
+                  ))}
+                </ol>
               </ItemGroup>
 
               <Alert colorScheme="info">

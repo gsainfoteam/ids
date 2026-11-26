@@ -10,6 +10,7 @@ import { Avatar } from '../../components/data/avatar';
 import { AvatarGroup } from '../../components/data/avatar-group';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Timeline } from '../../components/data/timeline';
@@ -89,14 +90,14 @@ export const PC: Story = {
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <article className="flex flex-col gap-8">
             <header className="flex flex-col gap-3">
-              <div className="flex flex-wrap gap-1.5">
+              <ChipGroup>
                 <Chip variant="soft" colorScheme="primary">
                   축제
                 </Chip>
                 <Chip variant="soft" colorScheme="warning">
                   D-15
                 </Chip>
-              </div>
+              </ChipGroup>
               <h1 className="text-headline-h2-bold">2026 GIST 가을 축제</h1>
               <p className="text-body-b1-regular">
                 부스 30곳, 동아리 공연, 푸드 트럭, 그리고 마지막 밤의 불꽃놀이까지. 이틀 동안
@@ -185,10 +186,11 @@ export const PC: Story = {
                 </div>
               </Card.Content>
               <Card.Footer>
-                <AvatarGroup max={4} size="tiny" aria-label="참석하는 사람">
+                <AvatarGroup size="tiny" aria-label="참석하는 사람">
                   {ATTENDEES.map((name) => (
                     <Avatar key={name} name={name} />
                   ))}
+                  <AvatarGroup.Overflow max={4} />
                 </AvatarGroup>
                 {count}명이 가요
               </Card.Footer>

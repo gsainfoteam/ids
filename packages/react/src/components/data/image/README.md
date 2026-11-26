@@ -1,26 +1,29 @@
 # Image
 
-native `<img>` 에 불러오는 동안의 자리, 깨졌을 때 대신할 그림, 비율 상자를 더한 컴포넌트입니다. [ImageGroup](../image-group/README.md) 으로 여러 장을 가로, 세로, 격자로 늘어놓으면 누른 장부터 크게 봅니다.
+native `<img>` 에 불러오는 동안의 자리, 깨졌을 때 대신할 그림, 크게 보기를 더한 컴포넌트입니다. [ImageGroup](../image-group/README.md) 으로 여러 장을 가로, 세로, 격자로 늘어놓으면 누른 장부터 크게 봅니다.
 
 - **서버에서도 그냥 `<img>`.** 서버 HTML 에 `src` 와 `alt` 가 든 `<img>` 가 그대로 있어서, JavaScript 가 오기 전에 그림을 불러옵니다.
 - **불러오는 동안.** 그림 뒤에 [Skeleton](../../feedback/skeleton/README.md)(`Image.Placeholder`)이 사진 상자를 채워 깜빡이고, 다 불러오면 사라집니다. 그림을 가리지 않으므로 서버 HTML 의 그림은 hydration 을 기다리지 않고 보입니다.
 - **깨지면.** 깨진 `<img>` 는 DOM 에서 빠지고 그림 아이콘(`Image.Fallback`)이 자리를 채웁니다. 스크린 리더는 `alt` 를 그림의 이름으로 계속 읽습니다.
-- **비율.** `ratio` 를 주면 [AspectRatio](../../layout/aspect-ratio/README.md) 가 폭에 맞춘 높이를 정하고, 그림은 칸을 채우고 넘치는 부분은 잘립니다.
+- **비율은 감싸는 요소가.** [AspectRatio](../../layout/aspect-ratio/README.md) 로 감싸면 그 비율이 폭에 맞춘 높이를 정하고, 그림은 칸을 채우고 넘치는 부분은 잘립니다.
 - **크게 보기.** `preview` 를 준 그림과 `ImageGroup` 안의 그림은 버튼이 되어, 누르면 그 장부터 화면을 덮는 뷰어(`Image.Viewer`)를 엽니다. 넘기기, 확대, 쓸어 닫기가 됩니다.
 - **뷰어는 따로 불러옵니다.** 뷰어 코드(Embla, 확대 엔진)는 처음 열 때 받습니다. 사진에 마우스를 올리거나 포커스하면 미리 받기 시작합니다.
 
 ```tsx
-import { Image } from '@gsainfoteam/ids-react';
+import { AspectRatio, Image } from '@gsainfoteam/ids-react';
 
-<Image src="/photos/lake.jpg" alt="호수 위로 뜬 해" ratio={4 / 3} />;
+<AspectRatio ratio={4 / 3}>
+  <Image src="/photos/lake.jpg" alt="호수 위로 뜬 해" />
+</AspectRatio>;
 ```
 
 ## 크기와 비율
 
 ```tsx
 <Image src={src} alt="..." />                        // 부모 폭을 채우고, 높이는 그림의 비율
-<Image src={src} alt="..." ratio={1} />              // 정사각형. 그림은 칸을 채우고 잘린다
-<Image src={src} alt="..." ratio={16 / 9} />
+<AspectRatio ratio={1}>                              {/* 정사각형. 그림은 칸을 채우고 잘린다 */}
+  <Image src={src} alt="..." />
+</AspectRatio>
 <Image src={src} alt="..." width={640} height={480} />  // 불러오기 전에도 자리를 잡는다
 
 <div className="w-40">                               {/* 폭은 감싸는 요소가 */}
@@ -28,8 +31,8 @@ import { Image } from '@gsainfoteam/ids-react';
 </div>
 ```
 
-- **크기 계약: fill.** 폭은 부모를 가득 채웁니다(`w-full`). 크기는 부모의 폭과 `ratio` 가 정합니다.
-- `ratio` 가 없으면 높이는 불러온 그림의 비율입니다. 불러오기 전에는 높이를 모르므로 자리가 0 입니다. 목록처럼 자리가 흔들리면 안 되는 곳에는 `ratio` 나 `width`, `height` 를 줍니다.
+- **크기 계약: fill.** 폭은 부모를 가득 채웁니다(`w-full`). AspectRatio 안이면 그 상자를 가득 채웁니다.
+- 감싸는 비율 상자가 없으면 높이는 불러온 그림의 비율입니다. 불러오기 전에는 높이를 모르므로 자리가 0 입니다. 목록처럼 자리가 흔들리면 안 되는 곳에는 AspectRatio 로 감싸거나 `width`, `height` 를 줍니다.
 - 모서리는 `rounded-standard`(10px), 그림 안의 위치는 `object-cover` 입니다. 둘을 바꾸는 것은 IDS 밖의 새 디자인이고, 그때만 `className` 을 줍니다.
 
 ```tsx custom-design
@@ -61,7 +64,7 @@ import { Image } from '@gsainfoteam/ids-react';
 | `error`       | 깨졌거나 `src` 가 없다. `Image.Fallback` 이 보인다 |
 
 - 하이드레이션 전에 이미 불러온 그림, 캐시에서 바로 온 그림도 마운트 때 알아챕니다. 새 `src` 는 새 `<img>` 라서 앞 그림이 남지 않습니다.
-- `ratio` 없이 깨진 그림은 `width`, `height` 의 비율(없으면 4:3)로 자리를 지킵니다.
+- 깨진 그림은 `width`, `height` 의 비율(없으면 4:3)로 자리를 지킵니다. AspectRatio 안이면 그 상자를 채웁니다.
 - 이미지는 `loading="lazy"`, `decoding="async"` 가 기본입니다. 첫 화면의 큰 그림은 `loading="eager"` 와 `fetchPriority="high"` 를 줍니다.
 - 상태는 Avatar 와 같은 로직(`internal/hooks/use-image-status`)입니다.
 
@@ -73,6 +76,11 @@ import { Image } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Image src={src} alt="..." preview />            // 한 장도 누르면 크게 본다
+<Image src={thumb} alt="..." preview={{ src: full }} />  // 뷰어에서는 큰 그림
+
+<Image src={src} alt="...">
+  <Image.Caption>아침의 호수</Image.Caption>      {/* 뷰어에서 보일 설명 */}
+</Image>
 
 const [index, setIndex] = useState(0);
 <ImageGroup
@@ -82,13 +90,13 @@ const [index, setIndex] = useState(0);
   onOpenChange={setOpen}
   loop                                            // 끝에서 처음으로
   zoom={zoom}                                     // 확대 배율(1 이 맞춘 크기)
-  onZoomChange={setZoom}
+  onZoomChange={setZoom}                          // 비제어로 열 때 배율은 defaultZoom
 >
   ...
 </ImageGroup>
 ```
 
-- 사진을 누르거나, Tab 으로 가서 `Enter` `Space` 를 누르면 그 장이 `value` 가 되고 `open` 이 `true` 가 됩니다. 열 때 배율은 1 로 돌아갑니다.
+- 사진을 누르거나, Tab 으로 가서 `Enter` `Space` 를 누르면 그 장이 `value` 가 되고 `open` 이 `true` 가 됩니다. 열 때 배율은 `defaultZoom`(기본 1)으로 돌아갑니다.
 - 누를 수 있는 사진은 이름이 "{alt} 크게 보기" 인 버튼(`aria-haspopup="dialog"`)입니다. 지금 열린 장의 버튼은 `aria-expanded="true"` 입니다.
 - 마우스를 올리면 사진이 조금 어두워지고 커서가 돋보기가 됩니다. 키보드 포커스는 사진 상자에 링으로 보입니다.
 - `value` 는 문서 순서의 번호입니다. 사진의 순서가 바뀌면 번호도 따라갑니다.
@@ -140,7 +148,7 @@ const [index, setIndex] = useState(0);
 - 이전과 다음은 끝에서 `aria-disabled` 가 되고, `loop` 이면 넘어갑니다. 확대와 축소도 끝에서 `aria-disabled` 입니다.
 - 넘기면 배율이 1 로 돌아갑니다.
 - `Image.Viewer.Share` 는 브라우저에 `navigator.share` 가 있을 때만 보이고, 지금 장의 주소와 `alt` 를 공유합니다.
-- `Image.Viewer.Download` 는 지금 장의 `src`(`previewSrc`) 로 가는 `<a download>` 입니다.
+- `Image.Viewer.Download` 는 지금 장의 큰 그림(`preview` 의 `src`, 없으면 `src`)으로 가는 `<a download>` 입니다.
 
 ### 키보드
 
@@ -182,7 +190,7 @@ const [open, setOpen] = useState(false);
 overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 없이 항목에 묶인다
 ```
 
-- 썸네일 목록 없이 뷰어만 쓸 때는 `items` 를 줍니다. `open`, `value`, `loop`, `zoom` 과 그 콜백은 `ImageGroup` 과 같습니다.
+- 썸네일 목록 없이 뷰어만 쓸 때는 `items` 를 줍니다. `open`, `value`, `loop`, `zoom`(`defaultZoom`) 과 그 콜백은 `ImageGroup` 과 같습니다.
 - `ImageGroup` 안의 `Image.Viewer` 에 이 상태들을 주면 개발 모드에서 경고합니다. 묶음이 가진 상태이므로 `ImageGroup` 에 줍니다.
 - `overlay.open` 안에서는 `open` 없이 그 항목에 묶이고, 닫히는 애니메이션이 끝나면 항목이 사라집니다.
 
@@ -235,13 +243,16 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | 속성                  | 기본 / 동작                                                     |
 | --------------------- | --------------------------------------------------------------- |
 | `alt`                 | 필수. 장식용은 `""`                                             |
-| `ratio`               | 없음(그림의 비율). 숫자면 AspectRatio                           |
-| `preview`             | 혼자면 `false`, `ImageGroup` 안이면 `true`                     |
-| `previewSrc`          | 뷰어에서 보여 줄 그림. 기본 `src`                               |
-| `caption`             | 뷰어에서 보여 줄 설명                                           |
+| `preview`             | 혼자면 `false`, `ImageGroup` 안이면 `true`. `{ src }` 면 뷰어에서 그 그림 |
 | `onStatusChange`      | 불러오는 상태가 바뀔 때                                         |
 | `className` / `style` | 사진 상자로 간다. 상태를 받는 함수도 된다. 새 디자인에서만 쓴다 |
 | `ref` / 그 외 속성    | `<img>` 로 간다(`srcSet`, `sizes`, `loading`, `crossOrigin` 등) |
+
+| 파트                | 기본 / 동작                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| `Image.Placeholder` | 불러오는 동안의 자리. 기본 Skeleton                         |
+| `Image.Fallback`    | 깨졌을 때의 그림. 기본 `PhotoIcon`                          |
+| `Image.Caption`     | 뷰어에서 이 장 위에 보일 설명. 사진 상자에는 그리지 않는다 |
 
 ### Image.Viewer
 
@@ -250,7 +261,7 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | `items`                                    | 뷰어만 쓸 때의 사진. 아래 표                              |
 | `value` / `defaultValue` / `onValueChange` | 뷰어만 쓸 때. 지금 보는 장. 기본 `0`                      |
 | `open` / `defaultOpen` / `onOpenChange`    | 뷰어만 쓸 때. 기본 `false`. `overlay.open` 안이면 그 항목 |
-| `loop`, `zoom` / `onZoomChange`            | 뷰어만 쓸 때. `ImageGroup` 과 같다                       |
+| `loop`, `zoom` / `defaultZoom` / `onZoomChange` | 뷰어만 쓸 때. `ImageGroup` 과 같다                  |
 | `aria-label`                               | 대화상자의 이름. 기본 "사진 보기"                         |
 | `className` / `style`                      | 대화상자로 간다                                           |
 | `children`                                 | 그릴 부품. 없으면 기본 부품 모두                          |
@@ -282,8 +293,7 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 ## 알아둘 것
 
 - 기본 아이콘은 `@heroicons/react` 의 `PhotoIcon` 입니다. `Image.Fallback` 의 children 으로 바꿉니다.
-- `Image.Placeholder`, `Image.Fallback` 이 아닌 자식은 사진 상자 안, 그림 다음에 그립니다. 그림 위에 겹치려면(배지 등) `absolute` 로 자리를 정합니다. 크게 보기 버튼 밖이므로 그 안에 버튼을 두어도 됩니다.
-- `columns` 가 1 이상의 정수가 아니면 오류를 던집니다.
+- `Image.Placeholder`, `Image.Fallback`, `Image.Caption` 이 아닌 자식은 사진 상자 안, 그림 다음에 그립니다. 그림 위에 겹치려면(배지 등) `absolute` 로 자리를 정합니다. 크게 보기 버튼 밖이므로 그 안에 버튼을 두어도 됩니다.
 - 뷰어 부품을 `Image.Viewer` 밖에 두면 오류를 던집니다.
 - `<a download>` 는 같은 출처의 주소에서만 내려받습니다. 다른 출처의 사진은 브라우저가 열기만 합니다.
 - 뷰어는 제자리에 그려지고 top layer 로 올라갑니다. 포털을 쓰지 않으므로 그 자리의 테마(브랜드 색, radius)와 모드를 따릅니다.

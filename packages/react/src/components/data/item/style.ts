@@ -58,7 +58,7 @@ export const itemStyle = tv({
         description: 'text-caption-c1-regular',
       },
     } satisfies Record<IdsSize, object>,
-    truncate: { true: { title: 'block max-w-full truncate' }, false: {} },
+    overflow: { wrap: {}, truncate: { title: 'block max-w-full truncate' } },
     interactive: {
       true: {
         root: [
@@ -89,7 +89,7 @@ export const itemStyle = tv({
     variant: 'ghost',
     media: 'ghost',
     size: 'standard',
-    truncate: false,
+    overflow: 'wrap',
     interactive: false,
   },
 });

@@ -38,7 +38,6 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: ['standard', 'tiny', 192] },
     shape: { control: 'radio', options: shapes },
-    finderShape: { control: 'radio', options: [undefined, ...finderShapes] },
     errorCorrection: { control: 'radio', options: [undefined, ...levels] },
     quietZone: { control: { type: 'number', min: 0, max: 8 } },
   },
@@ -72,7 +71,11 @@ export const Gallery: Story = {
           rows={shapes}
           columns={finderShapes}
           render={(shape, finderShape) => (
-            <QRCode aria-label="QR 코드" value={PROFILE} shape={shape} finderShape={finderShape} />
+            <QRCode
+              aria-label="QR 코드"
+              value={PROFILE}
+              shape={{ modules: shape, finders: finderShape }}
+            />
           )}
         />
       </Showcase.Section>

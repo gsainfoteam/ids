@@ -25,7 +25,7 @@ export function SidebarRow({
       )}
       <Item.Content asChild className={styles.label()}>
         <span>
-          <Item.Title asChild truncate className={styles.title()}>
+          <Item.Title asChild overflow="truncate" className={styles.title()}>
             <span>{parts.label}</span>
           </Item.Title>
         </span>

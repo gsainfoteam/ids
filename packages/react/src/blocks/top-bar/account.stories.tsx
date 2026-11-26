@@ -66,7 +66,7 @@ export const PC: Story = {
                 {MENU.map((item) => (
                   <li key={item.href}>
                     <Drawer.Close asChild>
-                      <Item asChild interactive size="tiny" selected={item.href === CURRENT}>
+                      <Item asChild size="tiny" selected={item.href === CURRENT}>
                         <a
                           href={item.href}
                           aria-current={item.href === CURRENT ? 'page' : undefined}
@@ -120,8 +120,9 @@ export const PC: Story = {
             aria-label="찾기"
             icon={<MagnifyingGlassIcon />}
           />
-          <Badge content={UNREAD} aria-label={`읽지 않은 알림 ${UNREAD}개`}>
+          <Badge>
             <IconButton variant="outline" size="tiny" aria-label="알림" icon={<BellIcon />} />
+            <Badge.Indicator count={UNREAD} aria-label={`읽지 않은 알림 ${UNREAD}개`} />
           </Badge>
           <Menu>
             <Menu.Trigger asChild>

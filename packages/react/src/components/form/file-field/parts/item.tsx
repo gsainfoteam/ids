@@ -27,7 +27,7 @@ export function FileItem({ file, asChild, children, className, ...props }: FileI
           <>
             <FilePreview file={file} />
             <Item.Content>
-              <Item.Title truncate title={file.name}>
+              <Item.Title overflow="truncate" title={file.name}>
                 {file.name}
               </Item.Title>
               <Item.Description className={c.styles.itemSize()}>

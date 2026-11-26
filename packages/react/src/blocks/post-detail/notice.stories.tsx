@@ -4,6 +4,7 @@ import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
@@ -54,12 +55,12 @@ export const PC: Story = {
       <Card asChild>
         <article>
           <Card.Header className="border-b">
-            <div className="flex flex-wrap gap-1.5">
+            <ChipGroup>
               <Chip variant="soft">학사</Chip>
               <Chip variant="soft" colorScheme="danger">
                 중요
               </Chip>
-            </div>
+            </ChipGroup>
             <Card.Title asChild>
               <h1>
                 <span className="text-headline-h4-bold block">2026학년도 2학기 수강 정정 안내</span>

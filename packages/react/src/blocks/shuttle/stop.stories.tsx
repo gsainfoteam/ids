@@ -6,6 +6,7 @@ import { Button } from '../../components/action/button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
@@ -65,13 +66,13 @@ export const PC: Story = {
           />
         </div>
 
-        <div role="group" aria-label="정류장" className="flex flex-wrap gap-2">
+        <ChipGroup aria-label="정류장">
           {STOPS.map((option) => (
             <Chip key={option} selected={option === stop} onSelectedChange={() => setStop(option)}>
               {option}
             </Chip>
           ))}
-        </div>
+        </ChipGroup>
 
         <Card size="tiny">
           <ItemGroup aria-label={`${stop}에 곧 오는 셔틀`}>

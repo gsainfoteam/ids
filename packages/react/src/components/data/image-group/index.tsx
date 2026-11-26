@@ -28,7 +28,6 @@ export namespace ImageGroup {
   export type Props = Omit<ComponentProps<'ul'>, 'defaultValue' | 'onChange'> &
     UseImageGroupOptions & {
       layout?: ImageGroupLayout;
-      columns?: number;
     };
 
   export const Style = imageGroupStyle;

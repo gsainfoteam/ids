@@ -9,21 +9,21 @@ import { useInternalImagePicture } from './hooks/use-image-picture';
 import { useInternalImagePreview } from './hooks/use-image-preview';
 import { aspectOf } from './lib/image-size';
 import { ImageFallback } from './parts/fallback';
+import { ImageCaption, type ImageCaptionProps } from './parts/image-caption';
 import { ImagePlaceholder } from './parts/placeholder';
 import { ImageViewer, preloadImageViewer } from './parts/viewer';
 import { imageStyle } from './style';
 import { resolveState } from '../../../internal/lib/state-props';
 import { useInternalTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
-import { AspectRatio } from '../../layout/aspect-ratio';
 
 import type { Image } from '.';
 
 const ASPECT_WHILE_BROKEN = 4 / 3;
 
 const isPart =
-  (part: unknown) =>
-  (node: ReactNode): node is ReactElement =>
+  <P = unknown,>(part: unknown) =>
+  (node: ReactNode): node is ReactElement<P> =>
     isValidElement(node) && elementTypeOf(node) === part;
 
 const warmTheViewer = () => void preloadImageViewer();
@@ -38,27 +38,31 @@ function OneImageGroup({ children }: { children: ReactNode }) {
   );
 }
 
-export function ImageRoot(props: Image.Props) {
+type ImageFrameProps = Omit<Image.Props, 'preview'> & {
+  preview: boolean;
+  previewSrc: string | undefined;
+};
+
+export function ImageRoot({ preview: previewProp, ...props }: Image.Props) {
   const group = use(ImageGroupContext);
-  const preview = props.preview ?? group !== null;
+  const preview = previewProp === undefined ? group !== null : previewProp !== false;
+  const previewSrc = typeof previewProp === 'object' ? previewProp.src || undefined : undefined;
 
   if (preview && group === null)
     return (
       <OneImageGroup>
-        <ImageFrame {...props} preview />
+        <ImageFrame {...props} preview previewSrc={previewSrc} />
       </OneImageGroup>
     );
 
-  return <ImageFrame {...props} preview={preview} />;
+  return <ImageFrame {...props} preview={preview} previewSrc={previewSrc} />;
 }
 
 function ImageFrame({
   src,
   alt,
-  ratio,
   preview,
   previewSrc,
-  caption,
   onStatusChange,
   srcSet,
   sizes,
@@ -75,9 +79,17 @@ function ImageFrame({
   style,
   children,
   ...rest
-}: Image.Props & { preview: boolean }) {
+}: ImageFrameProps) {
   const t = useInternalTranslate();
   const name = alt ?? '';
+
+  const nodes = flattenFragments(children);
+  const placeholder = nodes.find(isPart(ImagePlaceholder)) ?? <ImagePlaceholder />;
+  const fallback = nodes.find(isPart(ImageFallback)) ?? <ImageFallback />;
+  const caption = nodes.find(isPart<ImageCaptionProps>(ImageCaption));
+  const overlays = nodes.filter(
+    (node) => node !== placeholder && node !== fallback && node !== caption,
+  );
 
   const current = src || undefined;
   const { status, report, imageRef, mergedRef } = useInternalImagePicture(
@@ -91,7 +103,7 @@ function ImageFrame({
     previewSrc,
     srcSet,
     alt: name,
-    caption,
+    caption: caption?.props.children,
     crossOrigin,
     referrerPolicy,
     imageRef,
@@ -100,11 +112,6 @@ function ImageFrame({
 
   const state: Image.State = { status, preview: previewable };
   const styles = imageStyle();
-
-  const nodes = flattenFragments(children);
-  const placeholder = nodes.find(isPart(ImagePlaceholder)) ?? <ImagePlaceholder />;
-  const fallback = nodes.find(isPart(ImageFallback)) ?? <ImageFallback />;
-  const overlays = nodes.filter((node) => node !== placeholder && node !== fallback);
 
   const picture = (
     <>
@@ -162,31 +169,23 @@ function ImageFrame({
   );
 
   const reserveTheBrokenBox =
-    ratio === undefined && status === 'error'
+    status === 'error'
       ? { aspectRatio: aspectOf(width, height) ?? ASPECT_WHILE_BROKEN }
       : undefined;
-  const frameProps = {
-    ref: setFrame,
-    'data-image': '',
-    'data-status': status,
-    'data-preview': previewable ? '' : undefined,
-    className: styles.root({ className: resolveState(className, state) }),
-    style: { ...reserveTheBrokenBox, ...resolveState(style, state) },
-  };
 
   return (
     <ImageContext value={{ state, alt: name, styles }}>
-      {ratio === undefined ? (
-        <div {...frameProps}>
-          {body}
-          {overlays}
-        </div>
-      ) : (
-        <AspectRatio {...frameProps} ratio={ratio}>
-          {body}
-          {overlays}
-        </AspectRatio>
-      )}
+      <div
+        ref={setFrame}
+        data-image=""
+        data-status={status}
+        data-preview={previewable ? '' : undefined}
+        className={styles.root({ className: resolveState(className, state) })}
+        style={{ ...reserveTheBrokenBox, ...resolveState(style, state) }}
+      >
+        {body}
+        {overlays}
+      </div>
     </ImageContext>
   );
 }

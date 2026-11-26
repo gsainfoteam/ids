@@ -16,6 +16,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { CodeBlock } from '../../components/data/code-block';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
@@ -257,17 +258,13 @@ export const PC: Story = {
               <Card.Content>
                 <div className="flex flex-col gap-3">
                   <p>안녕하세요. 행사 공지, 일정, 장소 예약을 도와드릴게요.</p>
-                  <div
-                    role="group"
-                    aria-label="대화 시작 문장"
-                    className="flex flex-col items-start gap-2"
-                  >
+                  <ChipGroup aria-label="대화 시작 문장">
                     {starters.map((starter) => (
                       <Chip key={starter} onClick={() => toast(`‘${starter}’로 대화를 시작해요`)}>
                         {starter}
                       </Chip>
                     ))}
-                  </div>
+                  </ChipGroup>
                 </div>
               </Card.Content>
               <Card.Footer>

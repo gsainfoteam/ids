@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { use, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 
 import { useControllableState } from '../../../../hooks/use-controllable-state';
 import { keyHandler, withModifiers } from '../../../../internal/lib/keys';
 import { isDevelopment } from '../../../../utils/dev';
+import { ChipGroupContext } from '../context';
 import { chipToFocusAfter } from '../lib/chip-focus';
 
 export type ChipRemoveEvent = MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>;
@@ -36,13 +37,18 @@ export function useInternalChip({
       console.warn('[IDS] Chip: selected needs onSelectedChange, or use defaultSelected.');
   }, [selected, onSelectedChange]);
 
+  const group = use(ChipGroupContext);
   const rootRef = useRef<HTMLElement>(null);
   const [labelId, setLabelId] = useState<string>();
 
   const remove = (event: ChipRemoveEvent) => {
     const chip = rootRef.current;
+    const groupRoot = group?.root.current;
     if (disabled || !onRemove) return;
-    const next = chip?.contains(document.activeElement) ? chipToFocusAfter(chip) : null;
+    const next =
+      chip && groupRoot && chip.contains(document.activeElement)
+        ? chipToFocusAfter(groupRoot, chip)
+        : null;
     onRemove(event);
     const parentMovesFocus = event.defaultPrevented;
     if (next && !parentMovesFocus)
@@ -58,6 +64,7 @@ export function useInternalChip({
   };
 
   return {
+    groupSize: group?.size,
     rootRef,
     selectable,
     selected: isSelected,

@@ -181,7 +181,7 @@ export const PC: Story = {
                       </Card.Footer>
                     </Card>
 
-                    <Table aria-label={`${route.name} 오늘 시간표`} highlightOnHover>
+                    <Table aria-label={`${route.name} 오늘 시간표`}>
                       <Table.Header>
                         <Table.Row>
                           <Table.Head>출발</Table.Head>
@@ -194,7 +194,10 @@ export const PC: Story = {
                           const gone = minutesOf(departure) < minutesOf(NOW);
 
                           return (
-                            <Table.Row key={departure} selected={departure === next}>
+                            <Table.Row
+                              key={departure}
+                              aria-current={departure === next ? 'true' : undefined}
+                            >
                               <Table.Cell>{departure}</Table.Cell>
                               <Table.Cell>
                                 {clockOf(minutesOf(departure) + route.minutes)}

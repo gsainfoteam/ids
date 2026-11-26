@@ -55,6 +55,11 @@ export function containsElementOfType(children: unknown, types: ReadonlySet<unkn
   return findElementOfType(children, types) !== undefined;
 }
 
+export function isPressableElement(node: unknown) {
+  if (!isValidElement<{ href?: unknown }>(node)) return false;
+  return elementTypeOf(node) === 'button' || node.props.href != null;
+}
+
 export function buttonTypeFor(asChild: boolean | undefined, children: ReactNode) {
   if (!asChild) return 'button';
   const childIsAnUntypedButton =

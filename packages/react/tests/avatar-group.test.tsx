@@ -10,8 +10,17 @@ const NAMES = ['Alice Kim', 'Bob Lee', 'Carol Park', 'Dan Oh', 'Eve Choi'];
 const people = (count = NAMES.length) =>
   NAMES.slice(0, count).map((name) => <Avatar key={name} name={name} />);
 
-function renderGroup(props: AvatarGroup.Props, children: ReactNode = people()) {
-  const html = renderToString(<AvatarGroup {...props}>{children}</AvatarGroup>);
+function renderGroup(
+  { max, total, ...props }: AvatarGroup.Props & Pick<AvatarGroup.OverflowProps, 'max' | 'total'>,
+  children: ReactNode = people(),
+) {
+  const limited = max !== undefined || total !== undefined;
+  const html = renderToString(
+    <AvatarGroup {...props}>
+      {children}
+      {limited && <AvatarGroup.Overflow max={max} total={total} />}
+    </AvatarGroup>,
+  );
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const group = doc.querySelector<HTMLElement>('[data-avatar-group]')!;
   const items = Array.from(group.children, (li) => li.firstElementChild) as HTMLElement[];
@@ -74,14 +83,24 @@ test('total counts people that were not rendered', () => {
 });
 
 test('without overflow there is no +N, even when AvatarGroup.Overflow is declared', () => {
-  const { items } = renderGroup({ max: 5 }, [<AvatarGroup.Overflow key="o" />, ...people(3)]);
+  const { items } = renderGroup({}, [<AvatarGroup.Overflow key="o" max={5} />, ...people(3)]);
   expect(items).toHaveLength(3);
   expect(items.some((item) => item.hasAttribute('data-avatar-group-overflow'))).toBe(false);
 });
 
+test('without Overflow every avatar is drawn', () => {
+  const { items } = renderGroup({});
+  expect(items).toHaveLength(NAMES.length);
+});
+
 test('a declared Overflow keeps its place and renders from the count', () => {
-  const { items } = renderGroup({ max: 2, overflowLabel: (count) => `and ${count} more` }, [
-    <AvatarGroup.Overflow key="o" className={(state) => `count-${state.count}`}>
+  const { items } = renderGroup({}, [
+    <AvatarGroup.Overflow
+      key="o"
+      max={2}
+      aria-label="and 3 more"
+      className={(state) => `count-${state.count}`}
+    >
       {(state) => `${state.count}+`}
     </AvatarGroup.Overflow>,
     ...people(),
@@ -121,7 +140,7 @@ test('a wrapped avatar still counts as one item and gets its cut-out', () => {
 test('an invalid max is clamped instead of throwing', () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   const { items } = renderGroup({ max: 0 });
-  expect(warn).toHaveBeenCalledWith('[IDS] AvatarGroup: max must be at least 1.');
+  expect(warn).toHaveBeenCalledWith('[IDS] AvatarGroup.Overflow: max must be at least 1.');
   warn.mockRestore();
   expect(items).toHaveLength(2);
   expect(items[1]!.textContent).toBe('+4');

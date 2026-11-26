@@ -22,7 +22,6 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    ordered: { control: 'boolean' },
   },
   args: { variant: 'bordered', size: 'standard', 'aria-label': '멤버' },
   render: (args) => (
@@ -188,17 +187,19 @@ export const ChooseHowRowsAreSeparated: Story = {
 export const ReadTheItemsInOrder: Story = {
   render: () => (
     <div className="w-80">
-      <ItemGroup ordered variant="separated" aria-label="가입 절차">
-        {['이메일 인증', '이름 정하기', '약관 동의'].map((step, index) => (
-          <Item key={step}>
-            <Item.Media variant="soft" aria-hidden>
-              {index + 1}
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>{step}</Item.Title>
-            </Item.Content>
-          </Item>
-        ))}
+      <ItemGroup asChild variant="separated" aria-label="가입 절차">
+        <ol>
+          {['이메일 인증', '이름 정하기', '약관 동의'].map((step, index) => (
+            <Item key={step}>
+              <Item.Media variant="soft" aria-hidden>
+                {index + 1}
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>{step}</Item.Title>
+              </Item.Content>
+            </Item>
+          ))}
+        </ol>
       </ItemGroup>
     </div>
   ),
@@ -206,7 +207,7 @@ export const ReadTheItemsInOrder: Story = {
     docs: {
       description: {
         story:
-          '`ordered` 는 `<ol>` 로 그려 스크린 리더가 순서를 읽는다. 번호는 그리지 않으니 보여야 하면 `Item.Media` 에 둔다.',
+          '`asChild` 로 `<ol>` 을 넘기면 그 목록에 그룹을 그리고 안의 행을 `<li>` 로 감싸, 스크린 리더가 순서를 읽는다. 번호는 그리지 않으니 보여야 하면 `Item.Media` 에 둔다.',
       },
     },
   },

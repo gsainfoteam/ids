@@ -5,48 +5,48 @@
 - **크기는 감싼 요소를 따른다(hug).** Badge 는 감싼 요소 하나만큼 자리를 차지하고, 배지는 그 위에 떠 있어 자리를 늘리지 않습니다. 폭과 높이는 감싼 요소나 Badge 를 둘러싼 앱 요소가 정합니다.
 - **위치는 Badge가 잡는다.** 부모에 `relative` 를 줄 필요 없이 감싼 요소의 모서리를 찾아갑니다. 위치 이름은 논리 방향이라 오른쪽에서 왼쪽으로 쓰는 문서에서는 알아서 뒤집힙니다.
 - **둥근 대상.** 감싼 요소의 모서리를 재서 그 곡선 위에 붙습니다. 동그란 `Avatar`, 둥근 버튼, 카드 모두 모서리 허공이 아니라 가장자리에 붙습니다.
-- **요소 하나를 감싼다.** children 은 요소 하나입니다. 글자, 여러 요소, 빈 값을 주면 `Children.only` 가 오류를 던집니다. `{open && <X />}` 처럼 조건으로 비울 수 있는 자리는 Badge 바깥에서 고릅니다.
-- **카운트.** `99+` 로 줄이고, 0은 숨깁니다. 숨은 배지도 자리를 지켜서 다시 나타날 때 커지며 나타납니다.
-- **읽히는 숫자.** `aria-label` 을 주면 값이 바뀔 때 그 문장을 읽어 주는 live region이 됩니다. 주지 않으면 붙은 버튼의 설명이 되어 "알림, 버튼, 3" 처럼 읽힙니다.
-- **강도와 의미.** `variant` 로 강도(`solid` / `soft` / `outline`), `colorScheme` 으로 의미를 고릅니다.
+- **요소 하나와 Indicator.** children 은 배지가 붙을 요소 하나와 `Badge.Indicator` 하나입니다. 요소가 없거나 둘 이상이면 오류를 던집니다. `{open && <X />}` 처럼 조건으로 비울 수 있는 자리는 Badge 바깥에서 고릅니다.
+- **있으면 그린다.** 배지는 `Badge.Indicator` 를 넣을 때만 그립니다. 0일 때 감추려면 Indicator 를 넣지 않습니다. 숨기는 prop 은 없습니다.
+- **카운트.** `count` 는 `99+` 로 줄이고, 0도 그대로 `0` 으로 그립니다.
+- **읽히는 숫자.** Indicator 에 `aria-label` 을 주면 값이 바뀔 때 그 문장을 읽어 주는 live region이 됩니다. 주지 않으면 붙은 버튼의 설명이 되어 "알림, 버튼, 3" 처럼 읽힙니다.
+- **강도와 의미.** 루트의 `variant` 로 강도(`solid` / `soft` / `outline`), `colorScheme` 으로 의미를 고릅니다.
 
 ```tsx
 import { Badge } from '@gsainfoteam/ids-react';
 
-<Badge content={unread} aria-label={`읽지 않은 알림 ${unread}개`}>
+<Badge>
   <IconButton aria-label="알림" icon={<BellIcon />} />
+  {unread > 0 && <Badge.Indicator count={unread} aria-label={`읽지 않은 알림 ${unread}개`} />}
 </Badge>;
 ```
 
 ## 카운트
 
 ```tsx
-<Badge content={3}>...</Badge>                // 3
-<Badge content={120}>...</Badge>              // 99+ (max 기본 99)
-<Badge content={1200} max={999}>...</Badge>   // 999+
-<Badge content={0}>...</Badge>                // 숨는다
-<Badge content={0} showZero>...</Badge>       // 0
-<Badge content="New">...</Badge>              // 숫자가 아니어도 된다
-<Badge content={<><CheckIcon />완료</>}>...</Badge>  // 아이콘은 글자 크기에 맞춰 그린다
+<Badge.Indicator count={3} />                // 3
+<Badge.Indicator count={120} />              // 99+ (max 기본 99)
+<Badge.Indicator count={1200} max={999} />   // 999+
+<Badge.Indicator count={0} />                // 0
+{count > 0 && <Badge.Indicator count={count} />}   // 0이면 그리지 않는다
+<Badge.Indicator>New</Badge.Indicator>       // 숫자가 아니어도 된다
+<Badge.Indicator><CheckIcon />완료</Badge.Indicator>  // 아이콘은 글자 크기에 맞춰 그린다
 ```
 
 - 음수와 소수는 0 이상의 정수로 셉니다.
 - 숫자가 `max` 를 넘으면 상태의 `overflowed` 가 `true` 입니다.
+- Indicator 가 새로 들어오면 작게 시작해 커지며 나타납니다(`@starting-style`).
 
 ## 점
 
 ```tsx
-<Badge colorScheme="success" placement="bottom-end" aria-label="온라인">
+<Badge colorScheme={online ? 'success' : 'neutral'} placement="bottom-end">
   <Avatar name="Alice Kim" />
-</Badge>
-
-<Badge invisible={!online} aria-label={online ? '온라인' : '오프라인'}>
-  <Avatar name="Alice Kim" />
+  <Badge.Indicator aria-label={online ? '온라인' : '오프라인'} />
 </Badge>
 ```
 
-- `content` 를 주지 않으면 점입니다. `content` 가 `null`, `''`, `0` 이면 점이 아니라 숨은 카운트입니다.
-- `invisible` 은 배지를 지우지 않고 줄여서 감춥니다. live region은 남아 있어 바뀐 상태를 읽습니다.
+- `count` 와 children 이 없는 Indicator 는 점입니다.
+- 상태가 바뀌어도 읽어 줘야 하면 Indicator 를 남기고 색을 바꿉니다. Indicator 를 빼면 live region 도 함께 빠집니다.
 
 ## 위치
 
@@ -60,21 +60,26 @@ import { Badge } from '@gsainfoteam/ids-react';
 ## 붙는 대상의 모서리를 따라간다
 
 ```tsx
-<Badge content={3}>                       {/* 원: 모서리에서 14.6% 안쪽 */}
+<Badge>                                  {/* 원: 모서리에서 14.6% 안쪽 */}
   <Avatar name="Alice Kim" />
+  <Badge.Indicator count={3} />
 </Badge>
-<Badge content={3}>                       {/* 10px 모서리의 곡선 위 */}
+<Badge>                                  {/* 10px 모서리의 곡선 위 */}
   <IconButton aria-label="알림" icon={<BellIcon />} />
+  <Badge.Indicator count={3} />
 </Badge>
-<Badge content="New">                     {/* 카드의 16px 모서리 */}
+<Badge>                                  {/* 카드의 16px 모서리 */}
   <Card>...</Card>
+  <Badge.Indicator>New</Badge.Indicator>
 </Badge>
-<Badge content={2}>                       {/* rounded-full 이면 어떤 요소든 원처럼 */}
+<Badge>                                  {/* rounded-full 이면 어떤 요소든 원처럼 */}
   <div className="size-10 rounded-full" />
+  <Badge.Indicator count={2} />
 </Badge>
 <IdsProvider theme={defineIdsTheme({ primary, cornerShape: 'squircle' })}>
-  <Badge content={3}>                     {/* squircle 곡선 위 */}
+  <Badge>                                {/* squircle 곡선 위 */}
     <IconButton aria-label="알림" icon={<BellIcon />} />
+    <Badge.Indicator count={3} />
   </Badge>
 </IdsProvider>
 ```
@@ -89,11 +94,12 @@ import { Badge } from '@gsainfoteam/ids-react';
 ## 접근성
 
 ```tsx
-<Badge content={3} aria-label="읽지 않은 알림 3개">...</Badge>  // live region이 문장을 읽는다
-<Badge content={3}>                                           // 버튼의 설명: "알림, 버튼, 3"
+<Badge.Indicator count={3} aria-label="읽지 않은 알림 3개" />  // live region이 문장을 읽는다
+<Badge>                                                       // 버튼의 설명: "알림, 버튼, 3"
   <IconButton aria-label="알림" icon={<BellIcon />} />
+  <Badge.Indicator count={3} />
 </Badge>
-<Badge>...</Badge>                                            // 점. 장식이라 읽지 않는다
+<Badge.Indicator />                                           // 점. 장식이라 읽지 않는다
 ```
 
 - `aria-label` 이 있으면 `role="status"` 안에 그 문장을 숨겨 두고, 보이는 숫자는 읽지 않습니다. 숫자만 바뀌어도 문장 전체를 읽습니다.
@@ -116,31 +122,31 @@ import { Badge } from '@gsainfoteam/ids-react';
 
 앱이 실행 중에 배지 상태를 읽는 길은 앱이 넘긴 prop 과 상태 함수입니다.
 
-- 위치, 숨김, 값은 앱이 넘긴 `placement`, `invisible`, `content`, `max`, `showZero` 그대로입니다.
-- `className`, `style` 은 `{ count, dot, invisible, overflowed }` 를 받는 함수가 될 수 있습니다.
+- 위치와 값은 앱이 넘긴 `placement`, Indicator 의 `count`, `max`, children 그대로입니다. 배지가 보이는지는 Indicator 를 넣었는지입니다.
+- 루트의 `className`, `style` 은 `{ count, dot, overflowed }` 를 받는 함수가 될 수 있습니다.
 
-| 상태         | 뜻                                |
-| ------------ | --------------------------------- |
-| `count`      | 숫자 `content` 를 센 값           |
-| `dot`        | `content` 가 없어 점이다          |
-| `invisible`  | 0이거나 `invisible` 이라 감춰졌다 |
-| `overflowed` | 숫자가 `max` 를 넘었다            |
+| 상태         | 뜻                                          |
+| ------------ | ------------------------------------------- |
+| `count`      | Indicator 의 `count` 를 센 값               |
+| `dot`        | Indicator 에 `count` 도 children 도 없다    |
+| `overflowed` | 숫자가 `max` 를 넘었다                      |
 
 ## 속성
 
 | 속성          | 기본 / 동작                                                             |
 | ------------- | ----------------------------------------------------------------------- |
-| `children`    | 배지가 붙을 요소 하나. 필수                                             |
-| `content`     | 숫자면 카운트, 그 밖에는 그대로 그린다. 주지 않으면 점                  |
-| `max`         | 기본 `99`                                                               |
-| `showZero`    | 0도 보인다                                                              |
-| `invisible`   | 지우지 않고 감춘다                                                      |
+| `children`    | 배지가 붙을 요소 하나와 `Badge.Indicator`                               |
 | `placement`   | `top-end`(기본) / `top-start` / `bottom-end` / `bottom-start`           |
 | `variant`     | `solid`(기본) / `soft` / `outline`                                      |
 | `colorScheme` | `danger`(기본) / `neutral` / `primary` / `secondary` / `tertiary` / `success` / `warning` / `info` |
 | `size`        | `standard`(기본) / `tiny`                                               |
-| `aria-label`  | 바뀔 때 읽을 문장                                                       |
 | 그 외         | 루트 `span` 의 native 속성                                              |
+
+| 파트              | 속성                                                                          |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `Badge.Indicator` | `count`(숫자), `max`(기본 `99`), children(숫자가 아닌 글), `aria-label`(바뀔 때 읽을 문장). `count` 와 children 이 없으면 점 |
+
+- `Badge.Indicator` 는 `<Badge>` 안에서만 씁니다. 밖에 두면 오류입니다.
 
 ## 알아둘 것
 

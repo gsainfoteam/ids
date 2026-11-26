@@ -57,10 +57,10 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Item.Title>{name}</Item.Title>                           {/* 기본. 줄바꿈된다 */}
-<Item.Title truncate title={name}>{name}</Item.Title>     {/* 한 줄에서 말줄임표로 줄인다 */}
+<Item.Title overflow="truncate" title={name}>{name}</Item.Title>     {/* 한 줄에서 말줄임표로 줄인다 */}
 ```
 
-- `truncate` 는 제목을 행 폭 안의 한 줄로 자릅니다. 파일 이름처럼 끝까지 읽을 필요가 적은 제목에 씁니다.
+- `overflow="truncate"` 는 제목을 행 폭 안의 한 줄로 자릅니다. 기본 `wrap` 은 줄을 바꿉니다. 파일 이름처럼 끝까지 읽을 필요가 적은 제목에 씁니다.
 - 잘린 부분은 보이지 않으니 `title` 로 전체 이름을 함께 둡니다.
 - 행과 `ItemGroup` 은 grid 나 flex 부모를 따라 줄어듭니다. 잘린 제목의 전체 길이만큼 넓어지지 않습니다.
 
@@ -155,12 +155,11 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 | `variant`        | `ghost`(기본) / `outline` / `soft`. `ItemGroup variant="separated"` 안에서는 `outline` |
 | `size`           | `standard`(기본) / `tiny`. `ItemGroup` 안에서는 그룹을 따른다     |
 | `onClick`        | 주면 행 어디를 눌러도 불린다. 제목이 버튼이 된다                   |
-| `interactive`    | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동    |
 | `selected`       | 선택 표시                                                          |
 | `disabled`       | 누를 수 없고 흐려진다                                              |
-| `asChild`        | 루트 `div` 대신 자식 요소에 속성을 합친다                          |
+| `asChild`        | 루트 `div` 대신 자식 요소에 속성을 합친다. 자식이 `<button>` 이거나 `href` 를 받으면 hover와 포커스를 그린다 |
 | `Media.variant`  | `ghost`(기본) / `soft` / `outline`                                 |
-| `Title.truncate` | `false`. 한 줄에서 말줄임표로 줄인다                               |
+| `Title.overflow` | `wrap`(기본) / `truncate`(한 줄에서 말줄임표로 줄인다)           |
 | 각 부분          | `asChild` 와 `div` 의 native 속성                                  |
 
 ## 알아둘 것

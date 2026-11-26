@@ -83,11 +83,14 @@ test('rows name themselves by their cells, and a row header is a rowheader', asy
   expect(screen.getByRole('row').elements()).toHaveLength(PEOPLE.length + 2);
 });
 
-test('a row with onClick presses anywhere and hovers; selection stays a data attribute', async () => {
+test('a row with onClick presses anywhere and hovers, and aria-selected marks the selected row', async () => {
   const pressed = vi.fn();
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      {people({}, (index) => ({ onClick: () => pressed(PEOPLE[index]), selected: index === 1 }))}
+      {people({}, (index) => ({
+        onClick: () => pressed(PEOPLE[index]),
+        'aria-selected': index === 1,
+      }))}
     </IdsProvider>,
   );
 
@@ -96,7 +99,7 @@ test('a row with onClick presses anywhere and hovers; selection stays a data att
 
   const grace = screen.getByRole('row', { name: /Grace/ }).element();
   expect(grace.hasAttribute('data-selected')).toBe(true);
-  expect(grace.hasAttribute('aria-selected')).toBe(false);
+  expect(grace.getAttribute('aria-selected')).toBe('true');
   expect(grace.hasAttribute('role')).toBe(false);
   expect(grace.className).toContain('cursor-pointer');
 
@@ -108,7 +111,10 @@ test('the stripe is a block row, a selected row is primary soft over it, and hov
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <p>Outside</p>
-      {people({ striped: true, highlightOnHover: true }, (index) => ({ selected: index === 3 }))}
+      {people({ variant: 'striped' }, (index) => ({
+        onClick: () => {},
+        'aria-selected': index === 3,
+      }))}
     </IdsProvider>,
   );
   await userEvent.hover(screen.getByText('Outside'));
@@ -140,10 +146,10 @@ test('the stripe is a block row, a selected row is primary soft over it, and hov
   expect(layerColor('Ken')).not.toBe(layerColor('Ada'));
 });
 
-test('stickyHeader keeps the header row in view while the body scrolls', async () => {
+test('the header row stays in view while the body scrolls', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Table stickyHeader aria-label="Long" className="max-h-40">
+      <Table aria-label="Long" className="max-h-40">
         <Table.Header>
           <Table.Row>
             <Table.Head>Row</Table.Head>

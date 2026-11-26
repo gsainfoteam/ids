@@ -36,6 +36,7 @@ import { Badge } from '../../components/data/badge';
 import { Calendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { ColorPicker } from '../../components/data/color-picker';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
@@ -184,12 +185,12 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip defaultSelected>전공</Chip>
                         <Chip>교양</Chip>
                         <Chip defaultSelected>영어 강의</Chip>
                         <Chip>온라인</Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
 
@@ -313,7 +314,7 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip variant="solid" colorScheme="primary">
                           새 기능
                         </Chip>
@@ -329,7 +330,7 @@ export const Cover: Story = {
                         <Chip variant="soft" colorScheme="danger">
                           중단
                         </Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
                 </div>
@@ -399,12 +400,13 @@ export const Cover: Story = {
                         <Card.Title>인포팀 신입 모집</Card.Title>
                         <Card.Description>10월 12일까지</Card.Description>
                       </Card.Header>
-                      <AvatarGroup aria-label="지원자" max={4}>
+                      <AvatarGroup aria-label="지원자">
                         <Avatar name="박서연" />
                         <Avatar name="이도윤" />
                         <Avatar name="최하준" />
                         <Avatar name="정예린" />
                         <Avatar name="한지우" />
+                        <AvatarGroup.Overflow max={4} />
                       </AvatarGroup>
                       <div className="grid grid-cols-[1fr_auto] gap-2">
                         <Button size="tiny">지원하기</Button>
@@ -567,9 +569,10 @@ export const Cover: Story = {
                         <Card.Title>택시 합승</Card.Title>
                         <Card.Description>기숙사에서 광주송정역, 17:40</Card.Description>
                       </Card.Header>
-                      <AvatarGroup aria-label="합승 인원" max={3}>
+                      <AvatarGroup aria-label="합승 인원">
                         <Avatar name="한지우" />
                         <Avatar name="오세린" />
+                        <AvatarGroup.Overflow max={3} />
                       </AvatarGroup>
                       <div className="grid grid-cols-[1fr_auto] gap-2">
                         <Button size="tiny">함께 타기</Button>
@@ -875,8 +878,9 @@ export const Cover: Story = {
                             <Card.Title>오늘의 학식</Card.Title>
                             <Card.Description>9월 30일 점심</Card.Description>
                             <Card.Action>
-                              <Badge content={2} aria-label="새 메뉴 2개">
+                              <Badge>
                                 <IconButton variant="ghost" aria-label="알림" icon={<BellIcon />} />
+                                <Badge.Indicator count={2} aria-label="새 메뉴 2개" />
                               </Badge>
                             </Card.Action>
                           </Card.Header>
@@ -909,11 +913,11 @@ export const Cover: Story = {
                     <div className={cn(column, 'w-[260px]')}>
                       <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                         <Card size="tiny">
-                          <div className="flex flex-wrap gap-2">
+                          <ChipGroup>
                             <Chip defaultSelected>중간고사</Chip>
                             <Chip>퀴즈</Chip>
                             <Chip defaultSelected>기말고사</Chip>
-                          </div>
+                          </ChipGroup>
                         </Card>
                       </IdsProvider.Scope>
 
@@ -992,7 +996,7 @@ export const Cover: Story = {
 
                       <IdsProvider.Scope theme={{ primary: palettes.pink }} asChild>
                         <Card size="tiny">
-                          <div className="flex flex-wrap gap-2">
+                          <ChipGroup>
                             <Chip defaultSelected>전체</Chip>
                             <Chip defaultSelected>학사</Chip>
                             <Chip>장학</Chip>
@@ -1000,7 +1004,7 @@ export const Cover: Story = {
                             <Chip variant="solid" colorScheme="primary" onRemove={noop}>
                               기숙사
                             </Chip>
-                          </div>
+                          </ChipGroup>
                         </Card>
                       </IdsProvider.Scope>
 
@@ -1058,11 +1062,12 @@ export const Cover: Story = {
                       <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                         <Card size="tiny">
                           <div className="flex items-center justify-between">
-                            <AvatarGroup aria-label="참여자" max={3}>
+                            <AvatarGroup aria-label="참여자">
                               <Avatar name="김지수" />
                               <Avatar name="박서연" />
                               <Avatar name="이도윤" />
                               <Avatar name="최하준" />
+                              <AvatarGroup.Overflow max={3} />
                             </AvatarGroup>
                             <Button size="tiny" variant="soft">
                               초대
@@ -1423,11 +1428,12 @@ export const Cover: Story = {
                               <p className={cn(hint, 'truncate')}>전기전자컴퓨터공학부</p>
                             </div>
                           </div>
-                          <AvatarGroup aria-label="함께 아는 사람" max={3}>
+                          <AvatarGroup aria-label="함께 아는 사람">
                             <Avatar name="박서연" />
                             <Avatar name="이도윤" />
                             <Avatar name="최하준" />
                             <Avatar name="정예린" />
+                            <AvatarGroup.Overflow max={3} />
                           </AvatarGroup>
                           <div className="grid grid-cols-2 gap-2">
                             <Button size="tiny">팔로우</Button>
@@ -1758,13 +1764,13 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.cyan }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip defaultSelected>월</Chip>
                         <Chip>화</Chip>
                         <Chip defaultSelected>수</Chip>
                         <Chip>목</Chip>
                         <Chip defaultSelected>금</Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
                 </div>
@@ -2127,12 +2133,12 @@ export const Cover: Story = {
 
                   <IdsProvider.Scope theme={{ primary: palettes.yellow }} asChild>
                     <Card size="tiny">
-                      <div className="flex flex-wrap gap-2">
+                      <ChipGroup>
                         <Chip defaultSelected>맑음</Chip>
                         <Chip>흐림</Chip>
                         <Chip>비</Chip>
                         <Chip defaultSelected>주말</Chip>
-                      </div>
+                      </ChipGroup>
                     </Card>
                   </IdsProvider.Scope>
 

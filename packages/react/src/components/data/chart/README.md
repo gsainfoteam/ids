@@ -144,7 +144,7 @@ const config = {
 - `Chart.Table` 이 없으면 같은 표를 `sr-only` 로 그립니다. 스크린 리더는 그래프의 이름을 듣고 표로 값을 읽습니다.
 - 행은 차트(원이면 `Pie`)의 `data` 이고, 열은 계열의 `dataKey` 입니다. 첫 열은 축(`XAxis`, `YAxis`, `PolarAngleAxis`)의 `dataKey`, 원이면 `nameKey` 입니다.
 - 첫 열 머리글은 그 축의 `name` 이고, 없으면 키 이름입니다. 계열 머리글과 첫 열의 값은 config 의 label 이 있으면 label 입니다.
-- `Chart.Table` 은 Table 의 속성(`variant`, `size`, `striped` …)을 받고, 제목(`Chart.Title`)을 이름으로 씁니다.
+- `Chart.Table` 은 Table 의 속성(`variant`, `size`, `layout` …)을 받고, 제목(`Chart.Title`)을 이름으로 씁니다.
 
 ## 크기
 

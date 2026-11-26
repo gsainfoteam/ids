@@ -6,6 +6,7 @@ import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Empty } from '../../components/data/empty';
 import { Select } from '../../components/form/select';
 import { TextField } from '../../components/form/text-field';
@@ -180,13 +181,15 @@ export const PC: Story = {
                   <Card.Content>
                     <div className="flex flex-col gap-3">
                       <p>{member.bio}</p>
-                      <ul aria-label={`${member.name}의 기술`} className="flex flex-wrap gap-1.5">
-                        {member.skills.map((skill) => (
-                          <li key={skill}>
-                            <Chip size="tiny">{skill}</Chip>
-                          </li>
-                        ))}
-                      </ul>
+                      <ChipGroup asChild size="tiny" aria-label={`${member.name}의 기술`}>
+                        <ul>
+                          {member.skills.map((skill) => (
+                            <li key={skill}>
+                              <Chip>{skill}</Chip>
+                            </li>
+                          ))}
+                        </ul>
+                      </ChipGroup>
                     </div>
                   </Card.Content>
                   <Card.Footer>

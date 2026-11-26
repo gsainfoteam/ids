@@ -7,7 +7,7 @@
 - **방향.** `align` 이 붙는 쪽을 고르고, 안의 Bubble 에도 같은 쪽을 줍니다. 기본은 `start` 입니다.
 - **연속 메시지.** [MessageGroup](../message-group/README.md) 이 같은 사람의 메시지를 묶습니다. 첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보이고, 이어지는 말풍선은 맞닿는 모서리를 줄입니다.
 - **읽음.** `unread` 에 안 읽은 사람 수(단체방)나 `true`(1대1)를 주면 말풍선 옆에 숫자나 점을 그립니다.
-- **보내는 중과 실패.** `pending` 은 말풍선을 옅게 하고 빛을 지나가게 합니다. `error` 는 말풍선 테두리를 빨갛게 하고, 시간 자리에 다시 보내기 버튼을, 아래에 실패 줄을 둡니다.
+- **보내는 중과 실패.** `<Message.Status value="pending" />` 은 말풍선을 옅게 하고 빛을 지나가게 합니다. `value="error"` 는 말풍선 테두리를 빨갛게 하고, 시간 자리에 `Message.Retry` 를, 아래에 실패 줄을 둡니다. 파트가 없으면 보낸 메시지입니다.
 - **시멘틱 구성.** 루트는 이름을 가리키는 `<article aria-labelledby>`, 이름과 시간은 `<header>` 와 `<time dateTime>`, 아래 줄은 `<footer>` 입니다.
 
 ```tsx
@@ -24,8 +24,10 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
   <Message.Actions />
 </Message>
 
-<Message align="end" status="error" onRetry={resend}>
+<Message align="end">
   <Bubble>보내기 실패한 글</Bubble>
+  <Message.Status value="error" />
+  <Message.Retry onClick={resend} />
 </Message>
 
 <Message align="end" time={sentAt} unread={2}>
@@ -49,9 +51,7 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 | `align`   | `'start' \| 'end'`                           | `'start'`                        |
 | `name`    | `string`                                     | -                                |
 | `time`    | `Date`                                       | -                                |
-| `status`  | `'sent' \| 'pending' \| 'error'`             | `'sent'`                         |
 | `unread`  | `number \| boolean`                          | -                                |
-| `onRetry` | `() => void`                                 | -                                |
 
 ## 파트
 
@@ -62,6 +62,8 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
   <Message.Content>…</Message.Content>  {/* 파트가 아닌 자식이 저절로 들어간다 */}
   <Message.Actions />         {/* 자식이 없으면 복사 버튼 */}
   <Message.Footer />          {/* 자식이 없으면 말풍선 없는 메시지의 시간 */}
+  <Message.Status value="error" />  {/* 둘 때만. 보내는 중이나 실패 */}
+  <Message.Retry onClick={resend} /> {/* 실패일 때만 그린다 */}
 </Message>
 ```
 
@@ -133,20 +135,29 @@ import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 ## 상태
 
 ```tsx
-<Message status="pending">…</Message>                     {/* 옅은 말풍선, 빛이 지나간다 */}
-<Message status="error" onRetry={resend}>…</Message>      {/* 빨간 테두리, 옆에 다시 보내기, 아래 실패 줄 */}
+<Message>
+  …
+  <Message.Status value="pending" />    {/* 옅은 말풍선, 빛이 지나간다 */}
+</Message>
+
+<Message>
+  …
+  <Message.Status value="error" />      {/* 빨간 테두리, 아래 실패 줄 */}
+  <Message.Retry onClick={resend} />    {/* 옆이나 실패 줄에 다시 보내기 */}
+</Message>
 ```
 
 | 상태      | 말풍선                                                   | 옆 줄                        | 아래                              |
 | --------- | -------------------------------------------------------- | ---------------------------- | --------------------------------- |
-| `sent`    | -                                                        | 안 읽은 수, 시간             | -                                 |
+| 파트 없음 | -                                                        | 안 읽은 수, 시간             | -                                 |
 | `pending` | 면을 옅게(`solid` 는 `soft` 색), 글자 `text-neutral`, 빛 | 시간, `t('message.pending')`(스크린 리더) | -                     |
 | `error`   | `inset-ring-danger` 테두리                               | 다시 보내기 IconButton       | 실패 줄 `t('message.error')`      |
 
 - 빛은 CSS 패키지의 `animate-skeleton-wave` 를 말풍선 면 뒤(`::after`)로 지나가게 한 것입니다. 움직임 줄이기 설정이면 옅은 면만 남습니다.
-- 보내지 못한 메시지에는 보낸 시간이 없으므로 `time` 을 줘도 시간을 그리지 않습니다. 말풍선이 있으면 그 자리에 다시 보내기 버튼(`t('message.retry')`)이 서고, `onRetry` 가 없으면 비워 둡니다.
+- 보내지 못한 메시지에는 보낸 시간이 없으므로 `time` 을 줘도 시간을 그리지 않습니다. 말풍선이 있으면 그 자리에 `Message.Retry`(`t('message.retry')`)가 서고, `Message.Retry` 가 없으면 비워 둡니다.
 - 말풍선이 없는 메시지는 머리와 아래 줄에도 시간을 그리지 않고, 다시 보내기 버튼을 실패 줄 옆에 둡니다.
-- 실패 줄은 `Marker` 이고 `role="status"` 입니다.
+- 실패 줄은 `Message.Status` 자리에 그리는 `Marker` 이고 `role="status"` 입니다.
+- `Message.Retry` 는 실패일 때만 그립니다. 말풍선 옆에서는 IconButton, 실패 줄에서는 Button 입니다.
 - 요소에는 `data-message`, `data-align`, `data-status` 가 붙고, 묶음 안이면 `data-first`, `data-last` 가 붙습니다.
 
 ## 동작

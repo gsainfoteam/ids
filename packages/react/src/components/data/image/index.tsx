@@ -5,6 +5,7 @@ import { ImageViewerClose, type ImageViewerCloseProps } from './parts/close';
 import { ImageViewerCounter, type ImageViewerCounterProps } from './parts/counter';
 import { ImageViewerDownload, type ImageViewerDownloadProps } from './parts/download';
 import { ImageFallback, type ImageFallbackProps } from './parts/fallback';
+import { ImageCaption, type ImageCaptionProps } from './parts/image-caption';
 import { ImageViewerNext, type ImageViewerNextProps } from './parts/next';
 import { ImagePlaceholder, type ImagePlaceholderProps } from './parts/placeholder';
 import { ImageViewerPrev, type ImageViewerPrevProps } from './parts/prev';
@@ -37,10 +38,7 @@ export namespace Image {
   > & {
     alt: string;
     src?: string;
-    ratio?: number;
-    preview?: boolean;
-    previewSrc?: string;
-    caption?: ReactNode;
+    preview?: boolean | { src: string };
     onStatusChange?: (status: ImageStatus) => void;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;
@@ -51,6 +49,7 @@ export namespace Image {
 
   export type PlaceholderProps = ImagePlaceholderProps;
   export type FallbackProps = ImageFallbackProps;
+  export type CaptionProps = ImageCaptionProps;
   export type ViewerProps = ImageViewerProps;
 
   export const Placeholder = ImagePlaceholder;
@@ -61,6 +60,11 @@ export namespace Image {
   export const Fallback = ImageFallback;
   export namespace Fallback {
     export type Props = ImageFallbackProps;
+  }
+
+  export const Caption = ImageCaption;
+  export namespace Caption {
+    export type Props = ImageCaptionProps;
   }
 
   export function Viewer(props: Viewer.Props) {

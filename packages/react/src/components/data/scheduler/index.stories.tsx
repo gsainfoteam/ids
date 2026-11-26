@@ -971,7 +971,7 @@ export const DrawYourOwnEventContent: Story = {
         {(event) => (
           <Scheduler.Event colorScheme="tertiary">
             <Item.Content>
-              <Item.Title truncate>{event.title}</Item.Title>
+              <Item.Title overflow="truncate">{event.title}</Item.Title>
               <Item.Description>{event.room}</Item.Description>
             </Item.Content>
           </Scheduler.Event>

@@ -322,7 +322,7 @@ export const ListEachFileYourWay: Story = {
                   <>
                     <FileField.Preview file={file} />
                     <Item.Content>
-                      <Item.Title truncate>
+                      <Item.Title overflow="truncate">
                         {index + 1}. {file.name}
                       </Item.Title>
                     </Item.Content>

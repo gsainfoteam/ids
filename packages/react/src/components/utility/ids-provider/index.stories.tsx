@@ -8,6 +8,7 @@ import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Card } from '../../data/card';
 import { Chip } from '../../data/chip';
+import { ChipGroup } from '../../data/chip-group';
 import { Checkbox } from '../../form/checkbox';
 import { TextField } from '../../form/text-field';
 
@@ -255,7 +256,7 @@ export const Gallery: Story = {
           render={(hue, status) => (
             <IdsProvider.Scope theme={{ primary: palettes[hue], status }} asChild>
               <div className={region}>
-                <div className="flex flex-wrap items-center gap-2">
+                <ChipGroup>
                   {statusFamilies.map((family) => (
                     <Chip variant="solid" key={family} colorScheme={family}>
                       {family}
@@ -266,7 +267,7 @@ export const Gallery: Story = {
                       {family}
                     </Chip>
                   ))}
-                </div>
+                </ChipGroup>
               </div>
             </IdsProvider.Scope>
           )}

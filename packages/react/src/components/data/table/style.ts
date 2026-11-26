@@ -9,7 +9,7 @@ export const tableStyle = tv({
     viewport: 'isolate',
     table: 'w-full border-separate border-spacing-0 text-neutral-strong',
     caption: 'caption-bottom text-start text-neutral',
-    header: '',
+    header: 'sticky top-0 z-10',
     body: '',
     footer: 'bg-block',
     row: 'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
@@ -18,11 +18,8 @@ export const tableStyle = tv({
   },
   variants: {
     variant: {
-      outline: {
-        root: '[--table-radius:var(--radius-container)] rounded-(--table-radius) border border-neutral',
-        viewport: 'rounded-[calc(var(--table-radius)-1px)]',
-        header: 'bg-block',
-      },
+      outline: {},
+      striped: {},
       ghost: { header: 'bg-(--ids-bg-current)' },
     } satisfies Record<TableVariant, object>,
     size: {
@@ -41,11 +38,6 @@ export const tableStyle = tv({
       auto: {},
       fixed: { table: 'table-fixed' },
     } satisfies Record<TableLayout, object>,
-    striped: { true: {}, false: {} },
-    stickyHeader: {
-      true: { header: 'sticky top-0 z-10' },
-      false: {},
-    },
     section: {
       header: { head: 'text-neutral' },
       body: {
@@ -58,12 +50,8 @@ export const tableStyle = tv({
       },
       footer: { head: 'border-t border-b-0', cell: 'border-t border-b-0' },
     } satisfies Record<TableSection, object>,
-    hoverable: {
-      true: { row: 'hover:state-hover' },
-      false: {},
-    },
     clickable: {
-      true: { row: 'cursor-pointer' },
+      true: { row: 'cursor-pointer hover:state-hover' },
       false: {},
     },
     align: {
@@ -73,16 +61,21 @@ export const tableStyle = tv({
     } satisfies Record<TableAlign, object>,
   },
   compoundVariants: [
-    { striped: true, section: 'body', class: { row: 'even:not-data-selected:bg-block' } },
+    {
+      variant: ['outline', 'striped'],
+      class: {
+        root: '[--table-radius:var(--radius-container)] rounded-(--table-radius) border border-neutral',
+        viewport: 'rounded-[calc(var(--table-radius)-1px)]',
+        header: 'bg-block',
+      },
+    },
+    { variant: 'striped', section: 'body', class: { row: 'even:not-data-selected:bg-block' } },
   ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',
     layout: 'auto',
-    striped: false,
-    stickyHeader: false,
     section: 'body',
-    hoverable: false,
     clickable: false,
     align: 'start',
   },

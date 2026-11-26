@@ -48,7 +48,7 @@ const fileField = useFileField({ limits: { maxSize: 5 * 1024 * 1024 } });
         <FileDropzone.Item key={file.name} file={file}>
           <FileDropzone.Preview file={file} />
           <Item.Content>
-            <Item.Title truncate>{file.name}</Item.Title>
+            <Item.Title overflow="truncate">{file.name}</Item.Title>
           </Item.Content>
           <Item.Actions>
             <FileDropzone.Remove file={file} />

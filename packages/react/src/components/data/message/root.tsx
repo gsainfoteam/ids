@@ -1,22 +1,19 @@
 'use client';
 
-import { isValidElement, use, useId, type ReactNode } from 'react';
+import { isValidElement, use, useId, type ReactElement, type ReactNode } from 'react';
 
-import { ArrowPathIcon, ExclamationCircleIcon } from '@heroicons/react/16/solid';
-
-import { MessageContext, MessageGroupContext } from './context';
+import { MessageContext, MessageGroupContext, MessageRetryPlacementContext } from './context';
 import { useInternalMessageContentReader } from './hooks/use-message-content-reader';
 import { MessageActions } from './parts/actions';
 import { MessageAvatar } from './parts/avatar';
 import { MessageContent } from './parts/content';
 import { MessageFooter } from './parts/footer';
 import { MessageHeader } from './parts/header';
+import { MessageRetry } from './parts/retry';
 import { MessageSide } from './parts/side';
+import { MessageStatus as MessageStatusPart, type MessageStatusProps } from './parts/status';
 import { messageStyle } from './style';
-import { useInternalTranslate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
-import { Button } from '../../action/button';
-import { Marker } from '../../feedback/marker';
 import { Bubble } from '../bubble';
 import { BubbleAlignContext } from '../bubble/context';
 import { BubbleRoot } from '../bubble/root';
@@ -32,6 +29,8 @@ const PARTS = new Set<unknown>([
   MessageContent,
   MessageActions,
   MessageFooter,
+  MessageStatusPart,
+  MessageRetry,
 ]);
 
 function splitParts(children: ReactNode) {
@@ -51,38 +50,11 @@ function childrenOf(part: ReactNode) {
   return isValidElement<{ children?: ReactNode }>(part) ? part.props.children : undefined;
 }
 
-function Failure({
-  styles,
-  onRetry,
-}: {
-  styles: ReturnType<typeof messageStyle>;
-  onRetry: (() => void) | undefined;
-}) {
-  const t = useInternalTranslate();
-
-  return (
-    <div data-message-failure="" className={styles.failure()}>
-      <Marker size="tiny" role="status" className={styles.failureText()}>
-        <ExclamationCircleIcon aria-hidden="true" />
-        {t('message.error')}
-      </Marker>
-      {onRetry && (
-        <Button size="tiny" variant="outline" onClick={() => onRetry()}>
-          <ArrowPathIcon aria-hidden="true" />
-          {t('message.retry')}
-        </Button>
-      )}
-    </div>
-  );
-}
-
 export function MessageRoot({
   align: alignProp,
   name,
   time,
-  status = 'sent',
   unread,
-  onRetry,
   className,
   children,
   ...rest
@@ -98,6 +70,9 @@ export function MessageRoot({
   const header = part(MessageHeader);
   const content = part(MessageContent);
   const footer = part(MessageFooter);
+  const statusPart = part(MessageStatusPart) as ReactElement<MessageStatusProps> | undefined;
+  const status: MessageStatus = statusPart?.props.value ?? 'sent';
+  const retry = part(MessageRetry);
   const bubbled = containsElementOfType(content ? childrenOf(content) : body, BUBBLE);
   const timeIn = bubbled ? 'side' : footer !== undefined || group !== null ? 'footer' : 'header';
   const labelled = name !== undefined || childrenOf(header) != null;
@@ -124,6 +99,10 @@ export function MessageRoot({
         labelId,
         contentRef,
         readContent,
+        retryBesideTheFailure:
+          !bubbled && retry ? (
+            <MessageRetryPlacementContext value="failure">{retry}</MessageRetryPlacementContext>
+          ) : null,
       }}
     >
       <MessageGroupContext value={null}>
@@ -143,12 +122,10 @@ export function MessageRoot({
               {drawnHeader}
               <div className={styles.body()}>
                 {drawnContent}
-                <MessageSide onRetry={bubbled ? onRetry : undefined} />
+                <MessageSide retry={bubbled ? retry : null} />
               </div>
               {content !== undefined && body}
-              {status === 'error' && (
-                <Failure styles={styles} onRetry={bubbled ? undefined : onRetry} />
-              )}
+              {statusPart}
               {part(MessageActions)}
               {drawnFooter}
             </div>

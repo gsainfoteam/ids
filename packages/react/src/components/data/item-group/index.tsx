@@ -17,8 +17,8 @@ export namespace ItemGroup {
   export type Props = Omit<ComponentProps<'ul'>, 'ref'> & {
     ref?: Ref<HTMLElement>;
     variant?: ItemGroupVariant;
-    ordered?: boolean;
     size?: IdsSize;
+    asChild?: boolean;
   };
 
   export const Style = itemGroupStyle;

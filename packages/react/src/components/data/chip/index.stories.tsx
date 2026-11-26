@@ -5,6 +5,8 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { ChipGroup } from '../chip-group';
+
 import { Chip } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -150,15 +152,13 @@ export const RemoveATag: Story = {
 
     return (
       <div className="flex flex-col items-start gap-3">
-        <ul className="flex flex-wrap gap-2" aria-label="태그">
+        <ChipGroup aria-label="태그">
           {tags.map((tag) => (
-            <li key={tag}>
-              <Chip onRemove={() => setTags((prev) => prev.filter((item) => item !== tag))}>
-                {tag}
-              </Chip>
-            </li>
+            <Chip key={tag} onRemove={() => setTags((prev) => prev.filter((item) => item !== tag))}>
+              {tag}
+            </Chip>
           ))}
-        </ul>
+        </ChipGroup>
         <output aria-label="남은 태그">{tags.join(',')}</output>
       </div>
     );
@@ -167,7 +167,7 @@ export const RemoveATag: Story = {
     docs: {
       description: {
         story:
-          '`onRemove` 만 주면 끝에 삭제 버튼이 붙습니다. 버튼 이름은 "frontend 삭제" 처럼 칩의 글과 이어지고, 포커스된 삭제 버튼에서 Backspace나 Delete를 눌러도 지워집니다. 지우면 포커스가 옆 칩으로 옮겨 갑니다.',
+          '`onRemove` 만 주면 끝에 삭제 버튼이 붙습니다. 버튼 이름은 "frontend 삭제" 처럼 칩의 글과 이어지고, 포커스된 삭제 버튼에서 Backspace나 Delete를 눌러도 지워집니다. `ChipGroup` 안에서 지우면 포커스가 옆 칩으로 옮겨 갑니다.',
       },
     },
   },
@@ -194,7 +194,7 @@ export const ToggleAndRemoveAFilter: Story = {
     ]);
 
     return (
-      <div className="flex gap-2">
+      <ChipGroup aria-label="필터">
         {filters.map((filter) => (
           <Chip
             key={filter.id}
@@ -210,7 +210,7 @@ export const ToggleAndRemoveAFilter: Story = {
             {filter.label}
           </Chip>
         ))}
-      </div>
+      </ChipGroup>
     );
   },
   parameters: {

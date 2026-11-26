@@ -1,10 +1,10 @@
 'use client';
 
-import { isValidElement, type CSSProperties, type ReactNode } from 'react';
+import { isValidElement, type ReactNode } from 'react';
 
 import { useInternalImageGroupDocumentOrder } from './hooks/use-image-group-document-order';
 import { imageGroupStyle } from './style';
-import { flattenFragments, invariant } from '../../../utils';
+import { flattenFragments } from '../../../utils';
 import { ImageGroupContext } from '../image/context';
 import { useInternalImageGroup } from '../image/hooks/use-image-group';
 import { ImageViewer } from '../image/parts/viewer';
@@ -17,7 +17,6 @@ type ImageGroupRootProps = ImageGroup.Props & { viewer?: ReactNode };
 
 export function ImageGroupRoot({
   layout = 'row',
-  columns = 3,
   value,
   defaultValue,
   onValueChange,
@@ -25,6 +24,7 @@ export function ImageGroupRoot({
   defaultOpen,
   onOpenChange,
   zoom,
+  defaultZoom,
   onZoomChange,
   loop,
   className,
@@ -34,11 +34,6 @@ export function ImageGroupRoot({
   viewer,
   ...rest
 }: ImageGroupRootProps) {
-  invariant(
-    Number.isInteger(columns) && columns > 0,
-    'ImageGroup: columns must be a positive whole number.',
-  );
-
   const group = useInternalImageGroup({
     value,
     defaultValue,
@@ -47,13 +42,13 @@ export function ImageGroupRoot({
     defaultOpen,
     onOpenChange,
     zoom,
+    defaultZoom,
     onZoomChange,
     loop,
   });
   const attachList = useInternalImageGroupDocumentOrder(group.followTheDocumentOrder, ref);
 
   const styles = imageGroupStyle({ layout });
-  const columnCount = layout === 'grid' ? ({ '--image-columns': columns } as CSSProperties) : null;
 
   const images = flattenFragments(children);
 
@@ -66,7 +61,7 @@ export function ImageGroupRoot({
         data-image-group=""
         data-layout={layout}
         className={styles.root({ className })}
-        style={{ ...columnCount, ...style }}
+        style={style}
       >
         {images.map((child, index) => {
           if (isValidElement(child) && child.type === 'li') return child;

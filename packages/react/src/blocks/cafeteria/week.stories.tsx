@@ -86,7 +86,7 @@ export const PC: Story = {
                       : row;
 
                   return (
-                    <Table.Row key={row.day} selected={row.day === TODAY}>
+                    <Table.Row key={row.day} aria-current={row.day === TODAY ? 'date' : undefined}>
                       <Table.Cell>
                         {row.day} ({row.weekday}){' '}
                         {row.day === TODAY && (

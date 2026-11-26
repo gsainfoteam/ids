@@ -6,7 +6,7 @@ import { ItemDescription, type ItemDescriptionProps } from './parts/description'
 import { ItemMedia, type ItemMediaProps } from './parts/media';
 import { type ItemPartProps } from './parts/part';
 import { ItemSeparator, type ItemSeparatorProps } from './parts/separator';
-import { ItemTitle, type ItemTitleProps } from './parts/title';
+import { ItemTitle, type ItemTitleOverflow, type ItemTitleProps } from './parts/title';
 import { ItemRoot, type ItemVariant } from './root';
 import { itemStyle } from './style';
 import { type StateValue } from '../../../internal/lib/state-props';
@@ -26,7 +26,6 @@ export namespace Item {
   export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
     variant?: ItemVariant;
     size?: IdsSize;
-    interactive?: boolean;
     selected?: boolean;
     disabled?: boolean;
     asChild?: boolean;
@@ -52,6 +51,7 @@ export namespace Item {
   export const Title = ItemTitle;
   export namespace Title {
     export type Props = ItemTitleProps;
+    export type Overflow = ItemTitleOverflow;
   }
 
   export const Description = ItemDescription;

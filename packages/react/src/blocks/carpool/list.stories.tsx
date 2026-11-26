@@ -10,6 +10,7 @@ import { Avatar } from '../../components/data/avatar';
 import { AvatarGroup } from '../../components/data/avatar-group';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Empty } from '../../components/data/empty';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
@@ -164,13 +165,13 @@ export const PC: Story = {
             <Toggle value="out">학교에서 출발</Toggle>
             <Toggle value="in">학교로 돌아오기</Toggle>
           </ToggleGroup>
-          <div role="group" aria-label="날짜" className="flex gap-2">
+          <ChipGroup aria-label="날짜">
             {(['오늘', '내일'] as const).map((option) => (
               <Chip key={option} selected={option === day} onSelectedChange={() => setDay(option)}>
                 {option}
               </Chip>
             ))}
-          </div>
+          </ChipGroup>
         </div>
 
         {shown.length === 0 ? (

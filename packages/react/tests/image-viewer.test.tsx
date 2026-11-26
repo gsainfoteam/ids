@@ -5,7 +5,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Image, ImageGroup, overlay } from '../src';
+import { AspectRatio, IdsProvider, Image, ImageGroup, overlay } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 
@@ -30,15 +30,13 @@ function Gallery({
   return (
     <IdsProvider theme={testTheme} mode={mode}>
       <div style={{ width: 300 }}>
-        <ImageGroup aria-label="Photos" layout="grid" columns={3} {...props}>
+        <ImageGroup aria-label="Photos" layout="grid" {...props}>
           {PHOTOS.map((photo) => (
-            <Image
-              key={photo.alt}
-              src={photo.src}
-              alt={photo.alt}
-              caption={photo.caption}
-              ratio={1}
-            />
+            <AspectRatio key={photo.alt} ratio={1}>
+              <Image src={photo.src} alt={photo.alt}>
+                <Image.Caption>{photo.caption}</Image.Caption>
+              </Image>
+            </AspectRatio>
           ))}
           {viewer}
         </ImageGroup>
@@ -473,11 +471,40 @@ test('a composed viewer draws only the parts it lists', async () => {
   await expect.element(page.getByRole('button', { name: '확대' })).not.toBeInTheDocument();
 });
 
+test('preview with a src shows that picture in the viewer and downloads it', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ width: 200 }}>
+        <Image src={PHOTOS[0]!.src} alt="Lake at dawn" preview={{ src: PHOTOS[1]!.src }} />
+      </div>
+    </IdsProvider>,
+  );
+  await openAt('Lake at dawn');
+
+  await expect
+    .element(page.getByRole('link', { name: '내려받기' }))
+    .toHaveAttribute('href', PHOTOS[1]!.src);
+});
+
+test('defaultZoom is the scale an uncontrolled viewer opens at', async () => {
+  await onADesktop();
+  await render(<Gallery defaultZoom={2} />);
+  await openAt('Second');
+
+  await expect
+    .element(page.getByRole('button', { name: '200%, 화면에 맞추기' }))
+    .toHaveTextContent('200%');
+});
+
 test('one image with preview opens a viewer of that image alone', async () => {
   await render(
     <IdsProvider theme={testTheme}>
       <div style={{ width: 200 }}>
-        <Image src={PHOTOS[0]!.src} alt="Lake at dawn" caption="Only one" preview ratio={1} />
+        <AspectRatio ratio={1}>
+          <Image src={PHOTOS[0]!.src} alt="Lake at dawn" preview>
+            <Image.Caption>Only one</Image.Caption>
+          </Image>
+        </AspectRatio>
       </div>
     </IdsProvider>,
   );

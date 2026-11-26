@@ -4,6 +4,7 @@ import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { ChipGroup } from '../../components/data/chip-group';
 import { Spacer } from '../../components/layout/spacer';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -194,7 +195,7 @@ export const PC: Story = {
           <p className="text-body-b2-regular">놓치면 아쉬운 공지와 모집을 모았어요.</p>
         </div>
 
-        <div role="group" aria-label="분류" className="flex flex-wrap gap-2">
+        <ChipGroup aria-label="분류">
           <Chip
             selected={category === null}
             onSelectedChange={() => {
@@ -216,7 +217,7 @@ export const PC: Story = {
               {CATEGORY_LABEL[value]}
             </Chip>
           ))}
-        </div>
+        </ChipGroup>
 
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((post) => (

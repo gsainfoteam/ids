@@ -149,13 +149,14 @@ const mergedRef = useCallback(
 
 ## children.ts
 
-자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments`, 요소의 실제 컴포넌트를 돌려주는 `elementTypeOf`, JSX 안 어디에든 적힌 파트를 찾는 `findElementOfType` 과 있는지만 보는 `containsElementOfType`, 오버레이 트리거가 `asChild` 자식에 줄 `type` 을 정하는 `buttonTypeFor` 입니다.
+자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments`, 요소의 실제 컴포넌트를 돌려주는 `elementTypeOf`, JSX 안 어디에든 적힌 파트를 찾는 `findElementOfType` 과 있는지만 보는 `containsElementOfType`, 오버레이 트리거가 `asChild` 자식에 줄 `type` 을 정하는 `buttonTypeFor`, `asChild` 자식이 누를 수 있는 요소인지 보는 `isPressableElement` 입니다.
 
 ### 쓰는 곳
 
 - [text-control](../internal/text-control/README.md) 의 `splitAroundInput`, Accordion, Alert, Avatar, AvatarGroup(`arrange.ts`), Chip, ChipField, Progress, TextArea
 - `containsElementOfType`: Card, Item 이 Title 이 있는지 보고 Title 을 버튼으로 만들지 정할 때([use-surface.ts](../internal/README.md#hooksuse-surfacets))
 - `findElementOfType`: `Sidebar.Provider` 가 자식의 `Sidebar` 를 찾아 `variant` 를 읽고, `inset` 이면 `Sidebar.Inset` 을 서버 HTML 부터 Card 로 그릴 때
+- `isPressableElement`: Card, Item 이 `asChild` 자식을 누를 수 있는 면으로 그릴지 정할 때([use-pressable-child.ts](../internal/README.md#hooksuse-pressable-childts)). `<button>` 이거나 `href` 를 받은 요소(`<a>`, `next/link`, `motion.a`)면 참입니다. `to` 만 받는 라우터 링크처럼 JSX 로 알 수 없는 자식은 hook 이 마운트 뒤 DOM 으로 봅니다.
 - `buttonTypeFor`: Dialog, Drawer, Popover, Menu, Tooltip 의 Trigger 와 `Menu.Command`. `asChild` 자식이 `type` 없는 `<button>` 이면 `"button"` 을 줘서 감싼 폼이 제출되지 않게 합니다. 자식이 `type` 을 적었거나 `<button>` 이 아닌 요소면 건드리지 않습니다. 컴포넌트 자식(`motion.button`)은 무엇을 그릴지 알 수 없어 앱이 `type` 을 적어야 합니다.
 
 ### 쓰는 법

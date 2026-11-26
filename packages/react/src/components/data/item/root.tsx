@@ -1,13 +1,14 @@
 'use client';
 
-import { isValidElement, use } from 'react';
+import { use } from 'react';
 
 import { ItemContext, ItemGroupContext } from './context';
 import { useInternalItem } from './hooks/use-item';
 import { ItemTitle } from './parts/title';
 import { itemStyle } from './style';
+import { useInternalPressableChild } from '../../../internal/hooks/use-pressable-child';
 import { resolveState } from '../../../internal/lib/state-props';
-import { containsElementOfType } from '../../../utils';
+import { containsElementOfType, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Item } from '.';
@@ -27,7 +28,6 @@ function isCurrent(value: unknown) {
 export function ItemRoot({
   variant: variantProp,
   size,
-  interactive: interactiveProp,
   selected,
   disabled = false,
   asChild = false,
@@ -45,14 +45,14 @@ export function ItemRoot({
   onPointerUp,
   onPointerCancel,
   onInteractionChange,
+  ref,
   ...rest
 }: Item.Props) {
   const group = use(ItemGroupContext);
   const variant = variantProp ?? group?.variant ?? 'ghost';
   const resolvedSize = size ?? group?.size ?? 'standard';
-  const nativeControl =
-    asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
-  const interactive = interactiveProp ?? (onClick != null || nativeControl);
+  const child = useInternalPressableChild<HTMLDivElement>(asChild, children);
+  const interactive = onClick != null || child.pressable;
   const titleIsTheButton = interactive && !asChild && containsElementOfType(children, ITEM_TITLE);
   const { interaction, props, dataProps, labelling, trigger, register } =
     useInternalItem<HTMLDivElement>({
@@ -84,6 +84,7 @@ export function ItemRoot({
     <ItemContext value={{ styles, trigger, ...register }}>
       <Root
         {...rest}
+        ref={mergeRefs(ref, child.ref)}
         {...props}
         {...labelling}
         {...(asChild && disabled
