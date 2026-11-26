@@ -58,12 +58,14 @@ export function EditorBlockType({
       disabled={!editable}
       className={styles.blockType({ className })}
     >
-      <Select.Item value={PARAGRAPH}>{t('editor.paragraph')}</Select.Item>
-      {levels.map((level) => (
-        <Select.Item key={level} value={headingValue(level)}>
-          {t('editor.heading', { level })}
-        </Select.Item>
-      ))}
+      <Select.Content narrow="popover">
+        <Select.Item value={PARAGRAPH}>{t('editor.paragraph')}</Select.Item>
+        {levels.map((level) => (
+          <Select.Item key={level} value={headingValue(level)}>
+            {t('editor.heading', { level })}
+          </Select.Item>
+        ))}
+      </Select.Content>
     </Select>
   );
 }
