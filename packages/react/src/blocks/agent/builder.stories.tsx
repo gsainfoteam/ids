@@ -191,12 +191,9 @@ export const PC: Story = {
                 <Field>
                   <Field.Label>지식</Field.Label>
                   <Field.Description>에이전트가 답할 때 먼저 찾아볼 문서예요.</Field.Description>
-                  <FileDropzone
-                    name="knowledge"
-                    multiple
-                    accept=".pdf,.docx,.txt,.md"
-                    placeholder="문서를 끌어다 놓거나 눌러서 고르세요"
-                  />
+                  <FileDropzone name="knowledge" multiple accept=".pdf,.docx,.txt,.md">
+                    <FileDropzone.Title>문서를 끌어다 놓거나 눌러서 고르세요</FileDropzone.Title>
+                  </FileDropzone>
                 </Field>
                 <ItemGroup variant="separated" size="tiny" aria-label="올린 문서">
                   {KNOWLEDGE.map((file) => (

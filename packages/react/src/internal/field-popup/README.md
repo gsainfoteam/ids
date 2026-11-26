@@ -1,6 +1,6 @@
 # field-popup
 
-필드가 여는 팝업을 그리는 공용 코드입니다. 보통은 trigger 에 붙는 popover 이고, `mobileVariant="drawer"` 인 필드는 640px 보다 좁은 화면에서 아래에서 올라오는 modal drawer 가 됩니다.
+필드가 여는 팝업을 그리는 공용 코드입니다. 보통은 trigger 에 붙는 popover 이고, `narrow="drawer"` 인 필드는 640px 보다 좁은 화면에서 아래에서 올라오는 modal drawer 가 됩니다.
 
 - 팝업 안 목록의 클래스는 [`list-styles.ts`](../README.md#liblist-stylests), 팝업을 여는 trigger 상자는 [`surfaces/lib/field-surface.ts`](../README.md#surfaceslibfield-surfacets) 의 `fieldTrigger` 입니다.
 - 파트 헬퍼 `part` 는 [`utils/part.ts`](../../utils/README.md#partts) 입니다.
@@ -48,7 +48,7 @@
   <FieldPopup
     anchor={rootRef}
     onClose={field.actions.close}               // (restoreFocus: boolean) => void
-    mobileVariant={mobileVariant}
+    narrow={narrow}
     matchWidth
     label={merged['aria-label'] ?? messages.chipField.listbox}
     aria-labelledby={drawer ? labelledBy : undefined}
@@ -66,7 +66,7 @@ revealed.current = true;
 | ------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `anchor`                        | 위치의 기준. 이 요소 안의 누르기와 포커스는 바깥으로 치지 않는다                                       |
 | `onClose(restoreFocus)`         | 포커스를 trigger 로 돌려야 하면 `true`. popover 바깥을 누른 경우는 포커스가 누른 곳으로 가므로 `false` |
-| `mobileVariant`                 | `'drawer'` 면 좁은 화면에서 drawer. 기본 `'popover'`                                                   |
+| `narrow`                        | `'drawer'` 면 좁은 화면에서 drawer. 기본 `'popover'`, Select 와 ChipField 는 `'drawer'` 를 넘긴다     |
 | `preferredWidth` / `matchWidth` | 최소 폭(기본 240px). anchor 보다 좁아지지 않는다. `matchWidth` 면 anchor 와 같은 폭                    |
 | `initialFocusSelector`          | 열 때 포커스를 줄 요소                                                                                 |
 | `label`                         | `role` 이 있는 팝업(drawer 는 `dialog`)에 `aria-label`, `aria-labelledby` 가 없을 때의 이름            |

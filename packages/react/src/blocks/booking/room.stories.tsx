@@ -10,7 +10,7 @@ import { CalendarDate } from '@internationalized/date';
 import { Button } from '../../components/action/button';
 import { Toggle } from '../../components/action/toggle';
 import { ToggleGroup } from '../../components/action/toggle-group';
-import { Calendar } from '../../components/data/calendar';
+import { Calendar, useCalendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { Alert } from '../../components/feedback/alert';
@@ -74,6 +74,13 @@ export const PC: Story = {
     const [date, setDate] = useState<CalendarDate | null>(TODAY.add({ days: 1 }));
     const [room, setRoom] = useState('b');
     const [slot, setSlot] = useState<string | null>('13:00');
+    const calendar = useCalendar({
+      availability: {
+        min: TODAY,
+        max: TODAY.add({ days: 14 }),
+        unavailable: { dayOfWeek: [0, 6] },
+      },
+    });
 
     const chosenRoom = ROOMS.find(({ id }) => id === room)!;
 
@@ -100,9 +107,7 @@ export const PC: Story = {
                   aria-label="예약 날짜"
                   value={date}
                   onValueChange={setDate}
-                  min={TODAY}
-                  max={TODAY.add({ days: 14 })}
-                  disabled={{ dayOfWeek: [0, 6] }}
+                  calendar={calendar}
                 />
               </Card.Content>
             </Card>

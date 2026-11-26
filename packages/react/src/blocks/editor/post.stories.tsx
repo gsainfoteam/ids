@@ -10,6 +10,7 @@ import { DateTimeField } from '../../components/form/date-time-field';
 import { Editor } from '../../components/form/editor';
 import { Field } from '../../components/form/field';
 import { FileDropzone } from '../../components/form/file-dropzone';
+import { useFileField } from '../../components/form/file-field';
 import { RadioGroup } from '../../components/form/radio-group';
 import { Select } from '../../components/form/select';
 import { Switch } from '../../components/form/switch';
@@ -41,6 +42,7 @@ export const PC: Story = {
     const [title, setTitle] = useState('가을 축제 부스 운영 동아리 모집');
     const [body, setBody] = useState(DRAFT);
     const [scheduled, setScheduled] = useState(false);
+    const cover = useFileField({ limits: { maxSize: 10 * 1024 * 1024 } });
 
     return (
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 break-keep sm:px-6 lg:py-14">
@@ -152,12 +154,9 @@ export const PC: Story = {
                 <Card.Description>목록과 공유 미리 보기에 보여요.</Card.Description>
               </Card.Header>
               <Card.Content>
-                <FileDropzone
-                  aria-label="표지 그림"
-                  accept="image/*"
-                  maxSize={10 * 1024 * 1024}
-                  placeholder="그림을 끌어다 놓거나 눌러서 고르세요"
-                />
+                <FileDropzone aria-label="표지 그림" accept="image/*" fileField={cover}>
+                  <FileDropzone.Title>그림을 끌어다 놓거나 눌러서 고르세요</FileDropzone.Title>
+                </FileDropzone>
               </Card.Content>
             </Card>
 

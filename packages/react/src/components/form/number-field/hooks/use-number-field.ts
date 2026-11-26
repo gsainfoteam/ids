@@ -73,7 +73,6 @@ export type UseNumberFieldOptions = {
   locale: string;
   formatOptions?: NumberFieldFormatOptions;
   disabled?: boolean;
-  invalid?: boolean;
   clearable: boolean;
 };
 
@@ -133,7 +132,6 @@ export function useInternalNumberField({
   locale,
   formatOptions,
   disabled: disabledProp,
-  invalid,
   clearable,
 }: UseNumberFieldOptions) {
   const t = useInternalTranslate();
@@ -345,7 +343,7 @@ export function useInternalNumberField({
   const control = useInternalTextControl({ inputRef, disabled, readOnly, clearable });
   const ref = useInternalMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
   const outOfRange = rangeMessage !== '';
-  const ariaInvalid = native['aria-invalid'] ?? invalid ?? (outOfRange || undefined);
+  const ariaInvalid = native['aria-invalid'] ?? (outOfRange || undefined);
 
   const inputProps = {
     ...native,

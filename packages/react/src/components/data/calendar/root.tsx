@@ -5,12 +5,9 @@ import { isValidElement, type CSSProperties, type ReactElement, type ReactNode }
 import { DayPicker, type DayPickerProps } from 'react-day-picker';
 
 import { CalendarContext, type NativeProps } from './context';
-import { useInternalCalendar, type CalendarState } from './hooks/use-calendar';
-import {
-  type CalendarValue,
-  type DateMatcher as CalendarDateMatcher,
-  type DateSelection,
-} from './lib/date';
+import { useCalendar, type CalendarInstance } from './hooks/use-calendar';
+import { useInternalCalendarGrid, type CalendarState } from './hooks/use-calendar-grid';
+import { type CalendarValue, type DateSelection } from './lib/date';
 import { dayPickerFormatters, dayPickerLabels } from './lib/day-picker-locale';
 import { CalendarCaption, type CalendarCaptionProps } from './parts/caption';
 import { Chevron } from './parts/chevron';
@@ -30,7 +27,6 @@ import { useFieldSize } from '../../form/field/context';
 
 import type { AccessibleName } from '../../../internal/lib/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
-import type { CalendarDate } from '@internationalized/date';
 
 export type CalendarDayState = {
   selected: boolean;
@@ -43,26 +39,16 @@ export type CalendarDayState = {
   modifiers: Record<string, boolean>;
 };
 
-export type CalendarOptions = {
-  min?: CalendarDate;
-  max?: CalendarDate;
-  disabled?: CalendarDateMatcher | CalendarDateMatcher[];
-  readOnly?: boolean;
-  monthsToShow?: number;
-  size?: IdsSize;
-  month?: CalendarDate;
-  defaultMonth?: CalendarDate;
-  onMonthChange?: (month: CalendarDate) => void;
-  today?: CalendarDate;
-  autoFocus?: boolean;
-  dir?: 'ltr' | 'rtl';
-  children?: ReactNode;
-};
-
 export type CalendarProps = NativeProps &
   AccessibleName &
-  CalendarOptions &
   DateSelection & {
+    calendar?: CalendarInstance;
+    disabled?: boolean;
+    readOnly?: boolean;
+    size?: IdsSize;
+    autoFocus?: boolean;
+    dir?: 'ltr' | 'rtl';
+    children?: ReactNode;
     className?: string | ((state: CalendarState) => string | undefined);
     style?: CSSProperties | ((state: CalendarState) => CSSProperties | undefined);
   };
@@ -112,16 +98,10 @@ export function CalendarRoot(props: CalendarProps) {
     value,
     defaultValue,
     onValueChange,
-    min,
-    max,
-    disabled,
+    calendar: given,
+    disabled = false,
     readOnly = false,
-    monthsToShow = 1,
     size,
-    month,
-    defaultMonth,
-    onMonthChange,
-    today,
     autoFocus = false,
     dir,
     children,
@@ -131,22 +111,20 @@ export function CalendarRoot(props: CalendarProps) {
     ...native
   } = props;
 
+  const own = useCalendar();
+  const calendar = given ?? own;
+  const { monthsToShow } = calendar;
+
   const { day, caption, weekNumber, footer } = calendarParts(children);
   const captionLayout = caption?.layout ?? 'label';
-  const api = useInternalCalendar({
+  const api = useInternalCalendarGrid({
+    calendar,
     selectionMode,
     value,
     defaultValue,
     onValueChange: onValueChange as ((value: CalendarValue) => void) | undefined,
-    min,
-    max,
     disabled,
     readOnly,
-    monthsToShow,
-    month,
-    defaultMonth,
-    onMonthChange,
-    today,
     dropdown: captionLayout === 'dropdown',
     dir,
   });

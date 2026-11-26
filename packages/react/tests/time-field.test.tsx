@@ -133,7 +133,7 @@ test('custom parts, readOnly, and a native onClick that prevents opening', async
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   await screen.rerender(
     <TimeField aria-label="알람">
-      <TimeField.Content mobileVariant="drawer">Custom time controls</TimeField.Content>
+      <TimeField.Content narrow="drawer">Custom time controls</TimeField.Content>
     </TimeField>,
   );
   await userEvent.click(screen.getByRole('combobox'));
@@ -197,7 +197,7 @@ test('react-hook-form value mode submits a Time and FormData keeps the precision
 test('TimeField.TimePicker takes the picker variant, and Content opens a drawer on a narrow screen', async () => {
   const screen = await render(
     <TimeField defaultValue={d()}>
-      <TimeField.Content mobileVariant="drawer" />
+      <TimeField.Content narrow="drawer" />
       <TimeField.TimePicker variant="wheel" />
     </TimeField>,
   );

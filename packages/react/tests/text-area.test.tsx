@@ -138,12 +138,12 @@ test('native form data, composition events, readOnly/disabled and the resize gri
   expect(grip()).toBeNull();
   await screen.rerender(
     <Field invalid={false} aria-label="Message">
-      <TextArea invalid />
+      <TextArea aria-invalid />
     </Field>,
   );
   await expect.element(textarea).toHaveAttribute('aria-invalid', 'false');
   await expect.element(shell()).not.toHaveAttribute('data-invalid');
-  await screen.rerender(<TextArea invalid />);
+  await screen.rerender(<TextArea aria-invalid />);
   await expect.element(textarea).toHaveAttribute('aria-invalid', 'true');
   await expect.element(shell()).toHaveAttribute('data-invalid', '');
 });
@@ -310,7 +310,7 @@ test('state on the shell, the textarea marked for focus-ring, onValueChange next
     ['change', 'hello'],
     ['value', 'hello'],
   ]);
-  await screen.rerender(<TextArea key="ro" aria-label="Bio" readOnly invalid />);
+  await screen.rerender(<TextArea key="ro" aria-label="Bio" readOnly aria-invalid />);
   await expect.element(shell()).toHaveAttribute('data-readonly');
   await expect.element(shell()).toHaveAttribute('data-invalid');
 });

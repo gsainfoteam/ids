@@ -50,6 +50,14 @@ export namespace Scheduler {
 }
 
 export type { SchedulerProps } from './root';
+export { useScheduler } from './hooks/use-scheduler';
+export type {
+  SchedulerEditingOptions,
+  SchedulerInstance,
+  SchedulerNavigationOptions,
+  SchedulerViewsOptions,
+  UseSchedulerOptions,
+} from './hooks/use-scheduler';
 export type {
   SchedulerColorScheme,
   SchedulerEventChange,

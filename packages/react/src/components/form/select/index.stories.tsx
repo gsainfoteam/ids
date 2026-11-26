@@ -39,7 +39,7 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     required: { control: 'boolean' },
@@ -88,12 +88,14 @@ const itemSets = {
     </Select.Item>
   )),
   groups: [
-    <Select.Group key="korean" heading="한식">
+    <Select.Group key="korean">
+      <Select.GroupLabel>한식</Select.GroupLabel>
       <Select.Item value="bibimbap">비빔밥</Select.Item>
       <Select.Item value="kimchi">김치찌개</Select.Item>
     </Select.Group>,
     <Select.Separator key="separator" />,
-    <Select.Group key="western" heading="양식">
+    <Select.Group key="western">
+      <Select.GroupLabel>양식</Select.GroupLabel>
       <Select.Item value="pasta">파스타</Select.Item>
       <Select.Item value="risotto" disabled>
         리소토 (품절)
@@ -136,7 +138,7 @@ type SelectPlaygroundArgs = Omit<
   defaultValues?: string[];
   searchField?: boolean;
   clearButton?: boolean;
-  contentMobileVariant?: Select.ContentProps['mobileVariant'];
+  contentNarrow?: Select.ContentProps['narrow'];
   wrapInField?: boolean;
   fieldLabel?: string;
   fieldDescription?: string;
@@ -156,7 +158,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
     disabled: false,
     readOnly: false,
     required: false,
-    invalid: false,
+    'aria-invalid': false,
   },
   argTypes: {
     items: {
@@ -198,17 +200,18 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
     placeholder: { control: 'text', table: { category: 'Value' } },
     variant: { table: { category: 'Look' } },
     size: { table: { category: 'Look' } },
-    contentMobileVariant: {
-      name: 'mobileVariant',
+    contentNarrow: {
+      name: 'narrow',
       control: 'inline-radio',
-      options: ['popover', 'drawer'],
-      description: '640px 보다 좁은 화면에서 drawer 는 모달 하단 시트로 엽니다.',
+      options: ['drawer', 'popover'],
+      description:
+        '640px 보다 좁은 화면에서 무엇으로 열지. 기본 drawer 는 모달 하단 시트, popover 는 트리거 옆 팝오버입니다.',
       table: { category: 'Select.Content' },
     },
     disabled: { table: { category: 'State' } },
     readOnly: { table: { category: 'State' } },
     required: { table: { category: 'State' } },
-    invalid: { table: { category: 'State' } },
+    'aria-invalid': { table: { category: 'State' } },
     wrapInField: {
       control: 'boolean',
       description: '<Field> 로 감싸 Field.Label 이 이름을 붙입니다. 끄면 aria-label 을 씁니다.',
@@ -240,7 +243,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
         'placeholder',
         'variant',
         'size',
-        'contentMobileVariant',
+        'contentNarrow',
         'disabled',
         'readOnly',
         'required',
@@ -260,7 +263,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
     defaultValues,
     searchField,
     clearButton,
-    contentMobileVariant,
+    contentNarrow,
     wrapInField,
     fieldLabel,
     fieldDescription,
@@ -282,7 +285,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
           onValueChange={onValueChange}
         >
           {clear}
-          <Select.Content mobileVariant={contentMobileVariant}>
+          <Select.Content narrow={contentNarrow}>
             {search}
             {items}
             {empty}
@@ -297,7 +300,7 @@ export const Playground: StoryObj<SelectPlaygroundArgs> = {
           onValueChange={onValueChange}
         >
           {clear}
-          <Select.Content mobileVariant={contentMobileVariant}>
+          <Select.Content narrow={contentNarrow}>
             {search}
             {items}
             {empty}
@@ -348,12 +351,14 @@ export const Gallery: Story = {
               defaultValue={['bibimbap', 'kimchi', 'pasta']}
               defaultOpen
             >
-              <Select.Group heading="한식">
+              <Select.Group>
+                <Select.GroupLabel>한식</Select.GroupLabel>
                 <Select.Item value="bibimbap">비빔밥</Select.Item>
                 <Select.Item value="kimchi">김치찌개</Select.Item>
               </Select.Group>
               <Select.Separator />
-              <Select.Group heading="양식">
+              <Select.Group>
+                <Select.GroupLabel>양식</Select.GroupLabel>
                 <Select.Item value="pasta">파스타</Select.Item>
                 <Select.Item value="risotto" disabled>
                   리소토 (품절)
@@ -428,7 +433,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-56">
-            <Select invalid aria-label="잘못됨">
+            <Select aria-invalid aria-label="잘못됨">
               {fruits.map(([value, label]) => (
                 <Select.Item key={value} value={value}>
                   {label}
@@ -474,7 +479,8 @@ export const PickSeveralWithSearch: Story = {
           <Field.Label>관심 분야</Field.Label>
           <Select selectionMode="multiple" value={value} onValueChange={setValue}>
             <Select.SearchField placeholder="분야 검색" />
-            <Select.Group heading="개발">
+            <Select.Group>
+              <Select.GroupLabel>개발</Select.GroupLabel>
               <Select.Item value="react">React</Select.Item>
               <Select.Item value="flutter" searchValue="Flutter Dart">
                 Flutter
@@ -713,7 +719,6 @@ export const OpenFromOutside: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '바깥에서 열기' }));
     await waitFor(() => expect(canvas.getByRole('listbox')).toBeVisible());
     await expect(canvas.getByLabelText('열림 상태')).toHaveTextContent('열림');
-    canvas.getByRole('combobox', { name: '과일' }).focus();
     await userEvent.keyboard('{Escape}');
     await expect(canvas.getByLabelText('열림 상태')).toHaveTextContent('닫힘');
   },
@@ -761,10 +766,10 @@ export const DrawCustomOptions: Story = {
   },
 };
 
-export const OpenAsABottomSheetOnPhones: Story = {
+export const KeepAPopoverOnPhones: Story = {
   args: {
     children: (
-      <Select.Content mobileVariant="drawer">
+      <Select.Content narrow="popover">
         <Select.Item value="apple">사과</Select.Item>
         <Select.Item value="banana" disabled>
           바나나
@@ -779,7 +784,7 @@ export const OpenAsABottomSheetOnPhones: Story = {
     docs: {
       description: {
         story:
-          '640px 보다 좁은 화면에서 Select.Content 에 mobileVariant="drawer" 를 주면 모달 하단 시트로 엽니다. 옵션은 모두 Select.Content 안에 둡니다. 배경이 어두워지고 클릭을 받지 않으며, 포커스는 시트 안에 머물고, 페이지 스크롤이 잠깁니다. 넓은 화면에서는 팝오버와 같습니다.',
+          'Select 는 640px 보다 좁은 화면에서 모달 하단 시트로 엽니다. 짧은 목록을 트리거 옆에 그대로 두려면 옵션을 모두 Select.Content 안에 두고 narrow="popover" 를 줍니다. 넓은 화면에서는 둘 다 팝오버입니다.',
       },
     },
   },
@@ -789,7 +794,7 @@ export const Keyboard: Story = {
   tags: ['verification'],
   args: {
     children: (
-      <>
+      <Select.Content narrow="popover">
         <Select.Item value="apple">사과</Select.Item>
         <Select.Item value="banana" disabled>
           바나나
@@ -797,14 +802,14 @@ export const Keyboard: Story = {
         <Select.Item value="cherry">체리</Select.Item>
         <Select.Item value="grape">포도</Select.Item>
         <Select.Item value="mango">망고</Select.Item>
-      </>
+      </Select.Content>
     ),
   },
   parameters: {
     docs: {
       description: {
         story:
-          '포커스는 트리거에 남고 aria-activedescendant 가 옵션을 가리킵니다. ↑↓ Home End PageUp PageDown 으로 움직이고, 글자를 치면 그 글자로 시작하는 옵션으로 갑니다. 같은 글자를 반복하면 그 글자의 옵션을 차례로 돕니다. 비활성 옵션은 건너뜁니다.',
+          '팝오버(narrow="popover")에서는 포커스가 트리거에 남고 aria-activedescendant 가 옵션을 가리킵니다. ↑↓ Home End PageUp PageDown 으로 움직이고, 글자를 치면 그 글자로 시작하는 옵션으로 갑니다. 같은 글자를 반복하면 그 글자의 옵션을 차례로 돕니다. 비활성 옵션은 건너뜁니다.',
       },
     },
   },

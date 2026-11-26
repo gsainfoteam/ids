@@ -441,8 +441,8 @@ story file adds nothing for it.
   last two give only PascalCase names, so a story constant named `today` is not taken for the
   function of that name. A name found in none of them (module-level data, a demo component,
   `useForm`) rules that candidate out. A Docs page with no candidate left has no editor: today
-  Calendar, DateField and DateTimeField (a module-level `today`), Field's zod page, Scheduler,
-  Splitter and IdsProvider.
+  DateField and DateTimeField (a module-level `today`), Field's zod page, Splitter and
+  IdsProvider.
 
 - **Usage is the starter.** Write `Usage` with literal values and imported names only, so the
   editor starts from the smallest real use. `tests/live-code.ssr.test.tsx` turns every `Usage`
@@ -1068,6 +1068,23 @@ the server HTML already has the right roles.
 **Forms.** `FormValue` never submits an empty string. Form reset restores `defaultValue` without
 calling the value callback (`useControllableState`'s `{ silent: true }`), the same as a native
 input, which fires no change event on reset.
+
+**Invalid is `aria-invalid` on a control, `invalid` on a container.** A single control (every
+`*Field`, Input, Select, Checkbox, Radio, Switch, Rating, SegmentedControl, Label) has no
+`invalid` prop: it reads `aria-invalid`, a native attribute, and the invalid state a parent Field or
+group hands down through context. Field, FieldGroup, CheckboxGroup and RadioGroup keep `invalid`,
+because their `div` is not an element ARIA 1.2 gives `aria-invalid` to; they pass it to the controls
+inside. The form bridges follow the same split: `invalid` on the `Field`, `aria-invalid` on the
+control it binds. Label reads `aria-invalid` for its color only and leaves it off the `<label>`.
+ChipField, OTPField, FileField and Editor still take `invalid`; that is debt their own changes
+remove.
+
+**A field popup's narrow form is `narrow` on its `X.Content`.** `narrow?: 'drawer' | 'popover'`
+says what the popup opens as below 640px. A list popup (Select, ChipField) defaults to `'drawer'`,
+where a long list has room; a calendar, time or color popup (DateField, TimeField, DateTimeField,
+ColorField) defaults to `'popover'`, which stays beside the field it edits. A short list inside IDS
+(the Editor toolbar's block type) asks for `'popover'` itself. ChipField.Content still names the
+prop `mobileVariant` until its own change moves it.
 
 **Nested fields.** A field drawn inside another field's shell (TelField's country Select) turns
 its own ring off, so only the outer shell rings.

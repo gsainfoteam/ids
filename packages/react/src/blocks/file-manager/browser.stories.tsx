@@ -30,6 +30,7 @@ import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { FileDropzone } from '../../components/form/file-dropzone';
+import { useFileField } from '../../components/form/file-field';
 import { TextField } from '../../components/form/text-field';
 import { Breadcrumb } from '../../components/navigation/breadcrumb';
 import { Dialog } from '../../components/overlay/dialog';
@@ -86,6 +87,7 @@ export const PC: Story = {
   render: function Render() {
     const [view, setView] = useState<View>('grid');
     const [query, setQuery] = useState('');
+    const fileField = useFileField({ limits: { maxSize: 100 * 1024 * 1024 } });
 
     const shown = FILES.filter((file) => file.name.includes(query));
 
@@ -153,7 +155,7 @@ export const PC: Story = {
                     <Dialog.Title>2026 가을에 올리기</Dialog.Title>
                     <Dialog.Description>파일을 끌어다 놓거나 골라요.</Dialog.Description>
                   </Dialog.Header>
-                  <FileDropzone aria-label="올릴 파일" multiple maxSize={100 * 1024 * 1024} />
+                  <FileDropzone aria-label="올릴 파일" multiple fileField={fileField} />
                   <Dialog.Footer>
                     <Dialog.Close asChild>
                       <Button variant="outline">취소</Button>

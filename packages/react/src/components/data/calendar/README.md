@@ -8,6 +8,7 @@
 - **WAI-ARIA 격자 키보드.** react-day-picker 의 키보드 그대로입니다. 막힌 날은 건너뛰고, 오른쪽에서 왼쪽으로 쓰는 문서에서는 좌우가 뒤집힙니다.
 - **Intl locale.** 월, 요일 이름, 날짜 숫자, 주 시작 요일을 브라우저의 `Intl` 로 그립니다. locale 은 `IdsProvider` 의 `locale`(BCP 47 태그)을 따르고, 어떤 언어든 import 없이 됩니다. 기본은 한국어입니다.
 - **날짜 칸 꾸미기.** `Calendar.Day` part 가 날짜에 이름을 붙이고(`modifiers`) 칸의 내용을 바꿉니다. 모양, 포커스, 상태 속성은 IDS 가 그립니다.
+- **옵션은 훅에.** 고를 수 있는 날, 달 수, 오늘, 보이는 달은 `useCalendar()` 가 받고, 그 결과를 `calendar` 로 넘깁니다. 고른 값(`value` 셋)과 `selectionMode` 는 폼이 제출하는 값이라 루트에 남습니다.
 
 ```tsx
 import { CalendarDate } from '@internationalized/date';
@@ -17,6 +18,31 @@ const [date, setDate] = useState<CalendarDate | null>(null);
 
 <Calendar aria-label="달력" value={date} onValueChange={setDate} />;
 ```
+
+## useCalendar
+
+```tsx
+import { Calendar, useCalendar } from '@gsainfoteam/ids-react';
+
+const calendar = useCalendar({
+  availability: { min, max, unavailable: { dayOfWeek: [0, 6] } },  // 고를 수 있는 날
+  display: { monthsToShow: 2, today },                             // 보여 주는 방식
+  month: { defaultValue: new CalendarDate(2026, 9, 1) },           // 보이는 첫 달. value / defaultValue / onValueChange
+});
+
+<Calendar aria-label="달력" calendar={calendar} value={date} onValueChange={setDate} />;
+```
+
+- 기능마다 객체 하나이고, 주지 않은 기능은 기본값입니다. 훅 없이 `<Calendar />` 만 써도 됩니다.
+- 결과 하나는 달력 하나에 넘깁니다. 두 달력에 같은 결과를 넘기면 보이는 달을 함께 옮깁니다.
+
+| 기능           | 키                                         | 기본                                  |
+| -------------- | ------------------------------------------ | ------------------------------------- |
+| `availability` | `min` / `max`                              | 없음. `CalendarDate`, 양 끝 포함      |
+|                | `unavailable`                              | 없음. `DateMatcher` 하나나 배열       |
+| `display`      | `monthsToShow`                             | `1`. 1~12                             |
+|                | `today`                                    | `today(getLocalTimeZone())`           |
+| `month`        | `value` / `defaultValue` / `onValueChange` | 첫 선택 날이나 오늘이 든 달           |
 
 ## 선택
 
@@ -39,11 +65,12 @@ const [date, setDate] = useState<CalendarDate | null>(null);
 ## 기간
 
 ```tsx
-import { Calendar, type DateRange } from '@gsainfoteam/ids-react';
+import { Calendar, useCalendar, type DateRange } from '@gsainfoteam/ids-react';
 
 const [range, setRange] = useState<DateRange | null>(null);
+const calendar = useCalendar({ display: { monthsToShow: 2 } });
 
-<Calendar aria-label="달력" selectionMode="range" value={range} onValueChange={setRange} monthsToShow={2} />;
+<Calendar aria-label="달력" selectionMode="range" value={range} onValueChange={setRange} calendar={calendar} />;
 // 첫 클릭   { start: 24일, end: null }    이후 포인터가 있는 날까지 미리 보기
 // 두 번째   { start: 24일, end: 10월 2일 } 더 이른 날을 누르면 시작과 끝이 바뀐다
 // 세 번째   { start: 새 날, end: null }    새 기간을 시작
@@ -59,15 +86,20 @@ const [range, setRange] = useState<DateRange | null>(null);
 <Calendar aria-label="달력">
   <Calendar.Caption layout="dropdown" />                                    // 제목 대신 연도, 월 목록
 </Calendar>
-<Calendar aria-label="달력" min={new CalendarDate(1920, 1, 1)} max={today(getLocalTimeZone())}>
+
+const birthday = useCalendar({
+  availability: { min: new CalendarDate(1920, 1, 1), max: today(getLocalTimeZone()) },
+});
+<Calendar aria-label="달력" calendar={birthday}>
   <Calendar.Caption layout="dropdown" />
 </Calendar>
-<Calendar aria-label="달력" monthsToShow={2} />                             // 1~12. 이전은 첫 달, 다음은 마지막 달에만
-<Calendar aria-label="달력" defaultMonth={new CalendarDate(2026, 9, 1)} />  // 처음 보일 달
-<Calendar aria-label="달력" month={month} onMonthChange={setMonth} />       // 보이는 달을 제어. 그 달 1일의 CalendarDate
+
+useCalendar({ display: { monthsToShow: 2 } });                             // 1~12. 이전은 첫 달, 다음은 마지막 달에만
+useCalendar({ month: { defaultValue: new CalendarDate(2026, 9, 1) } });    // 처음 보일 달
+useCalendar({ month: { value: month, onValueChange: setMonth } });        // 보이는 달을 제어. 그 달 1일의 CalendarDate
 ```
 
-- 처음 보이는 달은 `defaultMonth`, 첫 선택 날, 오늘 순서이고 min/max 안으로 들어옵니다.
+- 처음 보이는 달은 `month.defaultValue`, 첫 선택 날, 오늘 순서이고 min/max 안으로 들어옵니다.
 - 연도 목록은 `min` 부터 `max` 까지입니다. 없으면 오늘 기준 앞뒤 100년입니다. 한국어는 연도 목록이 먼저 옵니다.
 - 범위 밖의 달은 월 목록에서 고를 수 없습니다.
 - 이전/다음은 ghost [IconButton](../../action/icon-button/README.md) 입니다. 범위 끝에서는 `disabled` 대신 `aria-disabled` 가 되어 눌리지 않고, 마지막 달로 넘긴 버튼에서 포커스가 빠지지 않습니다.
@@ -78,14 +110,18 @@ const [range, setRange] = useState<DateRange | null>(null);
 ## 제한
 
 ```tsx
-<Calendar
-  aria-label="달력"
-  min={new CalendarDate(2026, 1, 1)}           // 양 끝 포함. min === max 도 된다
-  max={new CalendarDate(2026, 12, 31)}
-  disabled={{ dayOfWeek: [0, 6] }}             // DateMatcher
-/>
-<Calendar aria-label="달력" disabled={(date) => isHoliday(date)} />
-<Calendar aria-label="달력" disabled={[new CalendarDate(2026, 9, 17), { start, end }]} />
+const calendar = useCalendar({
+  availability: {
+    min: new CalendarDate(2026, 1, 1),         // 양 끝 포함. min === max 도 된다
+    max: new CalendarDate(2026, 12, 31),
+    unavailable: { dayOfWeek: [0, 6] },        // DateMatcher
+  },
+});
+<Calendar aria-label="달력" calendar={calendar} />
+
+useCalendar({ availability: { unavailable: (date) => isHoliday(date) } });
+useCalendar({ availability: { unavailable: [new CalendarDate(2026, 9, 17), { start, end }] } });
+
 <Calendar aria-label="달력" disabled />               // 전체를 막는다. 이동, 선택, Tab 진입 모두
 <Calendar aria-label="달력" readOnly value={date} />  // 이동은 되고 선택은 안 된다
 ```
@@ -100,7 +136,8 @@ const [range, setRange] = useState<DateRange | null>(null);
 | `(date: CalendarDate) => boolean`           | `true` 를 돌려준 날                         |
 | `true` / `false`                            | 모두 / 없음                                 |
 
-- `disabled` 는 `DateMatcher` 하나나 배열입니다. 배열이면 하나라도 맞는 날을 막습니다.
+- `unavailable` 은 `DateMatcher` 하나나 배열입니다. 배열이면 하나라도 맞는 날을 막습니다.
+- 루트의 `disabled` 는 native 속성처럼 `boolean` 만 받고 달력 전체를 막습니다. 날짜별로 막는 것은 `unavailable` 입니다.
 - 막힌 날은 native `disabled` 버튼이라 클릭도 키보드도 닿지 않습니다.
 
 ## 키보드
@@ -192,7 +229,7 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 
 앱은 상태를 값으로 읽습니다.
 
-- 고른 날: `value` / `onValueChange`. 보이는 달: `month` / `onMonthChange`.
+- 고른 날: `value` / `onValueChange`. 보이는 달: `useCalendar` 의 `month.value` / `month.onValueChange`.
 - 날짜 하나의 상태: `Calendar.Day` 의 children 함수가 받는 `Calendar.DayState`([날짜 칸 꾸미기](#날짜-칸-꾸미기)).
 - 루트의 `className` 과 `style` 은 `Calendar.State`(`value`, `month`, `disabled`, `readOnly`, `selectionMode`)를 받는 함수도 됩니다. `className` 처럼 IDS 위에 새 디자인을 지을 때만 씁니다.
 
@@ -213,12 +250,9 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 | ------------------------------------------ | --------------------------------------------------------- |
 | `selectionMode`                            | `single`(기본) / `range` / `multiple`                     |
 | `value` / `defaultValue` / `onValueChange` | 모드별 타입. 기본 `null`, `multiple` 은 `[]`              |
-| `min` / `max`                              | `CalendarDate`. 양 끝 포함                                |
-| `disabled`                                 | `true` 면 전체, `DateMatcher` 면 날짜별                   |
+| `calendar`                                 | `useCalendar()` 의 결과. 없으면 기본값                    |
+| `disabled`                                 | `true` 면 전체를 막는다                                   |
 | `readOnly`                                 | 이동만                                                    |
-| `monthsToShow`                             | `1`. 1~12. 한 달이면 앞뒤 달의 날도 보이고, 여러 달이면 숨긴다 |
-| `month` / `defaultMonth` / `onMonthChange` | 보이는 첫 달. 그 달 1일의 `CalendarDate`                  |
-| `today`                                    | `today(getLocalTimeZone())`. 오늘 표시와 첫 달의 기준     |
 | `dir`                                      | 부모 방향                                                 |
 | `size`                                     | `standard`(칸 36px) / `tiny`(32px). 생략하면 `Field` 크기 |
 | `autoFocus`                                | 선택한 날, 없으면 오늘에 포커스                           |
@@ -239,8 +273,9 @@ locale 은 가장 가까운 `IdsProvider` 의 `locale` 입니다. 달력 하나�
 ## 알아둘 것
 
 - 값은 시간대가 없는 달력 날짜입니다. react-day-picker 에는 `lib/day-picker-bridge.ts` 에서만 로컬 자정 `Date` 로 바꿔 넘기고, 받는 즉시 되돌립니다. 로컬 시간대를 바꿔도 고른 날은 그대로입니다.
-- 바깥에서 준 `value` 는 min/max 로 자르지 않고, 바뀌어도 보이는 달을 옮기지 않습니다. 필요하면 `month` 도 함께 제어합니다.
-- 서버 렌더링 결과를 클라이언트와 맞추려면 `today` 를 고정합니다.
+- 바깥에서 준 `value` 는 min/max 로 자르지 않고, 바뀌어도 보이는 달을 옮기지 않습니다. 필요하면 `useCalendar` 의 `month` 도 함께 제어합니다.
+- 서버 렌더링 결과를 클라이언트와 맞추려면 `useCalendar` 의 `display.today` 를 고정합니다.
+- 한 달이면 앞뒤 달의 날도 보이고, `display.monthsToShow` 가 2 이상이면 숨깁니다.
 - 앞뒤 달의 날을 누르면 그 날을 고르지만 보이는 달은 그대로입니다.
 - `prefers-reduced-motion` 이면 색 전환도 하지 않습니다.
 - 이름과 숫자는 런타임의 `Intl` 데이터입니다. 서버(Node)와 브라우저의 ICU 가 다르면 글자가 조금 다를 수 있습니다.

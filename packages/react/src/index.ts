@@ -186,9 +186,20 @@ export type {
   TabsActivationMode,
 } from './components/navigation/tabs';
 export { Stepper } from './components/navigation/stepper';
-export type { StepperOrientation, StepperStatus } from './components/navigation/stepper';
-export { Sidebar } from './components/navigation/sidebar';
-export type { SidebarCollapsibleMode, SidebarVariant } from './components/navigation/sidebar';
+export type {
+  StepperItemStatus,
+  StepperOrientation,
+  StepperStatus,
+} from './components/navigation/stepper';
+export { Timeline, type TimelineStatus } from './components/data/timeline';
+export { Sidebar, useSidebar } from './components/navigation/sidebar';
+export type {
+  SidebarCollapse,
+  SidebarCollapsibleMode,
+  SidebarInstance,
+  SidebarOptions,
+  SidebarVariant,
+} from './components/navigation/sidebar';
 
 export type { IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
@@ -226,7 +237,7 @@ export type {
 export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
 
-export { PromptInput } from './components/form/prompt-input';
+export { PromptInput, usePromptInput } from './components/form/prompt-input';
 
 export { Questionnaire } from './components/form/questionnaire';
 export type {
@@ -239,8 +250,12 @@ export type {
   QuestionnaireSelectionMode,
 } from './components/form/questionnaire';
 export type {
+  PromptInputAttachmentsOptions,
+  PromptInputInstance,
   PromptInputMessage,
+  PromptInputOptions,
   PromptInputProps,
+  PromptInputToolsOptions,
   PromptInputStatus,
   PromptInputVariant,
 } from './components/form/prompt-input';
@@ -266,15 +281,25 @@ export type {
   UseChipFieldOptions,
 } from './components/form/chip-field';
 
-export { FileField } from './components/form/file-field';
-export type { FileFieldProps, FileFieldRejection } from './components/form/file-field';
+export { FileField, useFileField } from './components/form/file-field';
+export type {
+  FileFieldInstance,
+  FileFieldLimitsOptions,
+  FileFieldOptions,
+  FileFieldProps,
+  FileFieldRejection,
+} from './components/form/file-field';
 export { FileDropzone } from './components/form/file-dropzone';
 export type { FileDropzoneProps } from './components/form/file-dropzone';
 
-export { Calendar } from './components/data/calendar';
+export { Calendar, useCalendar } from './components/data/calendar';
 export type {
   CalendarProps,
-  CalendarOptions,
+  CalendarInstance,
+  CalendarAvailabilityOptions,
+  CalendarDisplayOptions,
+  CalendarMonthOptions,
+  UseCalendarOptions,
   CalendarState,
   CalendarDayState,
   DateMatcher,
@@ -292,9 +317,14 @@ export type {
   HourCycle,
 } from './components/data/time-picker';
 
-export { Scheduler } from './components/data/scheduler';
+export { Scheduler, useScheduler } from './components/data/scheduler';
 export type {
   SchedulerProps,
+  SchedulerInstance,
+  SchedulerViewsOptions,
+  SchedulerNavigationOptions,
+  SchedulerEditingOptions,
+  UseSchedulerOptions,
   SchedulerView,
   SchedulerEventData,
   SchedulerColorScheme,

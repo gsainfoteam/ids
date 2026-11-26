@@ -152,28 +152,28 @@ export const PC: Story = {
 
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
         <h1 className="text-headline-h3-bold">공지</h1>
-        <Skeleton loading>
+        <Skeleton>
           <p className="text-body-b3-regular">
             수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
             시간표가 겹치지 않는지 미리 살펴 두세요.
           </p>
         </Skeleton>
         <div className="grid h-24">
-          <Skeleton loading asChild>
+          <Skeleton asChild>
             <Card>
               <Card.Title>수강 신청</Card.Title>
             </Card>
           </Skeleton>
         </div>
         <div className="grid h-24">
-          <Skeleton loading asChild>
+          <Skeleton asChild>
             <Card>
               <Card.Title>장학금 안내</Card.Title>
             </Card>
           </Skeleton>
         </div>
         <div className="grid h-24">
-          <Skeleton loading asChild>
+          <Skeleton asChild>
             <Card>
               <Card.Title>동아리 모집</Card.Title>
             </Card>

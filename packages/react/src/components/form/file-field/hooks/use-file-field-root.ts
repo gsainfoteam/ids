@@ -2,14 +2,15 @@
 
 import { useCallback, useId, type DragEvent, type MouseEvent } from 'react';
 
+import { NO_LIMITS } from '../lib/file-limits';
 import { isFile, isValidAccept } from '../lib/file-rules';
 import { isType } from '../lib/is-type';
 import { FileLimits, type FileFieldLimits } from '../parts/limits';
 import { FileRejection } from '../parts/rejection';
 import { filePartsStyle } from '../style';
-import { useInternalFileField, type FileFieldValue } from './use-file-field';
+import { useInternalFileFieldState, type FileFieldValue } from './use-file-field-state';
 import { flattenFragments, invariant, mergeRefs } from '../../../../utils';
-import { useFieldSize } from '../../field/context';
+import { useFieldSize, useFieldState } from '../../field/context';
 
 import type { FileMessagesProps } from '../parts/messages';
 import type { FilePickerProps } from '../parts/picker';
@@ -31,10 +32,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     onValueChange,
     variant: _variant,
     size,
-    invalid,
-    maxSize,
-    maxCount,
-    onReject,
+    fileField,
     placeholder,
     children,
     className: _className,
@@ -62,16 +60,11 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     ...native
   } = props;
   const owner = componentNameOf(look);
-  invariant(
-    maxSize === undefined || (Number.isFinite(maxSize) && maxSize >= 0),
-    `${owner}: maxSize must be non-negative bytes.`,
-  );
-  invariant(
-    maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
-    `${owner}: maxCount must be a non-negative integer.`,
-  );
+  const { maxSize, maxCount, onReject } = fileField?.limits ?? NO_LIMITS;
+  const fieldState = useFieldState();
+  const fieldInvalid = look !== 'embedded' && (fieldState?.invalid ?? false);
 
-  const { rootRef, pickerRef, triggerRef, ...field } = useInternalFileField({
+  const { rootRef, pickerRef, triggerRef, ...field } = useInternalFileFieldState({
     multiple,
     value,
     defaultValue,
@@ -116,8 +109,9 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
     maxCount: multiple ? maxCount : undefined,
   };
   const listsRejections = !!rejectionPart && s.rejections.length > 0;
-  const showsInvalid =
-    s.rejections.length > 0 ? true : (ariaInvalid ?? invalid) === true || ariaInvalid === 'true';
+  const markedInvalid =
+    ariaInvalid === undefined ? fieldInvalid : ariaInvalid === true || ariaInvalid === 'true';
+  const showsInvalid = s.rejections.length > 0 || markedInvalid;
   const state: FileFieldState = {
     dragging: s.dragging,
     disabled,
@@ -145,7 +139,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
       limitsParts.length > 0 && limitsId,
       listsRejections && errorId,
     ),
-    'aria-invalid': s.rejections.length ? true : (ariaInvalid ?? (invalid || undefined)),
+    'aria-invalid': s.rejections.length ? true : (ariaInvalid ?? (markedInvalid || undefined)),
     'aria-disabled': readOnly || undefined,
     'data-field-input': look === 'field' ? '' : undefined,
     'data-dragging': s.dragging ? '' : undefined,

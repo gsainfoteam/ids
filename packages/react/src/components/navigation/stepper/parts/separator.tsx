@@ -1,23 +1,27 @@
 'use client';
 
+import { type ReactNode } from 'react';
+
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
 import { Divider } from '../../../layout/divider';
 import { useInternalItemContext, useInternalRootContext } from '../context';
 import { statusAttributes } from '../lib/step-state';
 
-import type { StepperItemState } from './item';
+import type { StepItemState, StepperItemState } from './item';
 
 export type StepperSeparatorState = StepperItemState;
 
-export type StepperSeparatorProps = Omit<
+export type StepSeparatorProps<S = StepItemState> = Omit<
   Divider.Props,
   'children' | 'className' | 'style' | 'orientation' | 'align' | 'aria-hidden' | 'asChild'
 > &
-  Omit<StateRenderProps<StepperSeparatorState>, 'children'>;
+  Omit<StateRenderProps<S>, 'children'>;
 
-export function StepperSeparator({ className, style, ...rest }: StepperSeparatorProps) {
-  const root = useInternalRootContext('Stepper.Separator');
-  const { state } = useInternalItemContext('Stepper.Separator');
+export type StepperSeparatorProps = StepSeparatorProps<StepperSeparatorState>;
+
+export function StepSeparator({ className, style, ...rest }: StepSeparatorProps) {
+  const root = useInternalRootContext('Separator');
+  const { state } = useInternalItemContext('Separator');
 
   return (
     <Divider
@@ -32,4 +36,6 @@ export function StepperSeparator({ className, style, ...rest }: StepperSeparator
   );
 }
 
-StepperSeparator.displayName = 'Stepper.Separator';
+StepSeparator.displayName = 'Stepper.Separator';
+
+export const StepperSeparator = StepSeparator as (props: StepperSeparatorProps) => ReactNode;

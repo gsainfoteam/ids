@@ -20,7 +20,6 @@ export namespace Label {
     size?: IdsSize;
     required?: boolean;
     disabled?: boolean;
-    invalid?: boolean;
     asChild?: boolean;
     className?: string | ((state: State) => string | undefined);
     style?: CSSProperties | ((state: State) => CSSProperties | undefined);

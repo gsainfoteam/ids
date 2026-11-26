@@ -30,7 +30,7 @@ import { Field, Input } from '@gsainfoteam/ids-react';
 ```
 
 - 모든 type에서 `onChange` 는 native 이벤트이고, 값은 `onValueChange` 가 필드마다의 타입으로 넘깁니다.
-- `variant`, `size`, `invalid` 와 그 외 속성도 고른 필드의 것을 씁니다.
+- `variant`, `size`, `aria-invalid` 와 그 외 속성도 고른 필드의 것을 씁니다.
 
 ## 조립
 

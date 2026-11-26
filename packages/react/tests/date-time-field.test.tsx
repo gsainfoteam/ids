@@ -349,7 +349,7 @@ test('every wall-clock time can be picked, and the local time zone shifts nothin
 test('the Calendar and TimePicker parts take their own options, and Content opens a drawer on a narrow screen', async () => {
   const screen = await render(
     <DateTimeField defaultValue={d()}>
-      <DateTimeField.Content mobileVariant="drawer" />
+      <DateTimeField.Content narrow="drawer" />
       <DateTimeField.Calendar today={t()} monthsToShow={2} />
       <DateTimeField.TimePicker variant="wheel" />
     </DateTimeField>,

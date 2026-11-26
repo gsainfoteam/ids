@@ -32,7 +32,7 @@ const meta = {
     step: { control: 'number' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: {
     'aria-label': '수량',

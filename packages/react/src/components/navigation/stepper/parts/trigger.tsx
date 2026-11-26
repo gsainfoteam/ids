@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps } from 'react';
+import { type ComponentProps, type ReactNode } from 'react';
 
 import { StepperBody } from './body';
 import { StepperIndicator } from './indicator';
@@ -14,17 +14,19 @@ import { isType } from '../lib/is-type';
 import { statusText } from '../lib/status-text';
 import { flag, statusAttributes } from '../lib/step-state';
 
-import type { StepperItemState } from './item';
+import type { StepItemState, StepperItemState } from './item';
 
 export type StepperTriggerState = InteractiveState & StepperItemState;
 
-export type StepperTriggerProps = Omit<
+export type StepTriggerProps<S = StepItemState> = Omit<
   ComponentProps<'button'>,
   'children' | 'className' | 'style' | 'type' | 'disabled' | 'id'
 > &
-  StateRenderProps<StepperTriggerState>;
+  StateRenderProps<InteractiveState & S>;
 
-export function StepperTrigger({
+export type StepperTriggerProps = StepTriggerProps<StepperItemState>;
+
+export function StepTrigger({
   className,
   style,
   children,
@@ -39,7 +41,7 @@ export function StepperTrigger({
   onPointerUp,
   onPointerCancel,
   ...rest
-}: StepperTriggerProps) {
+}: StepTriggerProps) {
   const t = useInternalTranslate();
   const { root, item, step, interaction, handlers } = useInternalStepperTrigger({
     onKeyDown,
@@ -52,7 +54,7 @@ export function StepperTrigger({
     onPointerUp,
     onPointerCancel,
   });
-  const state: StepperTriggerState = { ...interaction, ...item.state };
+  const state = { ...interaction, ...item.state };
   const content = resolveState(children, state);
   const nodes = flattenFragments(content);
   const hasIndicator = nodes.some(isType(StepperIndicator));
@@ -119,4 +121,6 @@ export function StepperTrigger({
   );
 }
 
-StepperTrigger.displayName = 'Stepper.Trigger';
+StepTrigger.displayName = 'Stepper.Trigger';
+
+export const StepperTrigger = StepTrigger as (props: StepperTriggerProps) => ReactNode;

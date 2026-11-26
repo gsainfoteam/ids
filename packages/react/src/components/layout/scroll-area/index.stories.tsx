@@ -19,9 +19,9 @@ const meta = {
     variant: { control: 'radio', options: ['hover', 'auto', 'always', 'none'] },
     size: { control: 'radio', options: ['standard', 'tiny'] },
     orientation: { control: 'radio', options: ['vertical', 'horizontal', 'both'] },
-    fade: { control: 'radio', options: [false, true, 'y', 'x'] },
+    fade: { control: 'radio', options: [undefined, 'y', 'x', 'both'] },
   },
-  args: { variant: 'hover', size: 'standard', orientation: 'vertical', fade: false },
+  args: { variant: 'hover', size: 'standard', orientation: 'vertical' },
 } satisfies Meta<typeof ScrollArea>;
 
 export default meta;
@@ -233,7 +233,7 @@ export const Gallery: Story = {
         description="내용이 더 남은 가장자리만 흐립니다. 흐린 폭은 가려진 거리만큼 자라 standard 24px, tiny 16px 에서 멈춥니다. 여기서는 모두 양쪽 끝에서 떨어진 자리에서 시작합니다."
       >
         <Showcase.Row label="vertical">
-          <ScrollArea fade variant="always" asChild>
+          <ScrollArea fade="both" variant="always" asChild>
             <div className={frame}>
               <ScrollArea.Viewport ref={startClearOfBothEdges}>
                 <Text />
@@ -242,7 +242,7 @@ export const Gallery: Story = {
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="horizontal">
-          <ScrollArea fade variant="always" orientation="horizontal" asChild>
+          <ScrollArea fade="both" variant="always" orientation="horizontal" asChild>
             <div className="w-72">
               <ScrollArea.Viewport ref={startClearOfBothEdges}>
                 <Wide />
@@ -251,7 +251,7 @@ export const Gallery: Story = {
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="both">
-          <ScrollArea fade variant="always" orientation="both" asChild>
+          <ScrollArea fade="both" variant="always" orientation="both" asChild>
             <div className={frame}>
               <ScrollArea.Viewport ref={startClearOfBothEdges}>
                 <Grid />
@@ -261,7 +261,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl">
-            <ScrollArea fade variant="always" orientation="both" asChild>
+            <ScrollArea fade="both" variant="always" orientation="both" asChild>
               <div className={frame}>
                 <ScrollArea.Viewport ref={startClearOfBothEdges}>
                   <Grid />
@@ -271,7 +271,7 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="tiny">
-          <ScrollArea fade size="tiny" variant="always" asChild>
+          <ScrollArea fade="both" size="tiny" variant="always" asChild>
             <div className={frame}>
               <ScrollArea.Viewport ref={startClearOfBothEdges}>
                 <Text />
@@ -441,7 +441,7 @@ export const ScrollAListboxItself: Story = {
 
 export const FadeTheEdgesThatHideContent: Story = {
   render: () => (
-    <ScrollArea fade asChild>
+    <ScrollArea fade="both" asChild>
       <div className={frame}>
         <Text />
       </div>

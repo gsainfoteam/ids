@@ -178,7 +178,7 @@ test('StrictMode opens on the active day; custom content keeps the close button 
   await screen.rerender(
     <StrictMode>
       <DateField aria-label="마감일">
-        <DateField.Content mobileVariant="drawer">Custom content</DateField.Content>
+        <DateField.Content narrow="drawer">Custom content</DateField.Content>
       </DateField>
     </StrictMode>,
   );
@@ -245,10 +245,10 @@ test('DateField.Calendar takes the calendar options: months shown, the first mon
   await expect.element(screen.getByRole('combobox', { name: '년' })).toHaveValue('2000');
 });
 
-test('DateField.Content mobileVariant="drawer" opens a drawer on a narrow screen and a popover on a wide one', async () => {
+test('DateField.Content narrow="drawer" opens a drawer on a narrow screen and a popover on a wide one', async () => {
   const screen = await render(
     <DateField>
-      <DateField.Content mobileVariant="drawer" />
+      <DateField.Content narrow="drawer" />
       <DateField.Calendar today={d(15)} />
     </DateField>,
   );
@@ -427,7 +427,7 @@ test('state reaches className/style functions and data attributes', async () => 
   const screen = await render(
     <DateField
       defaultValue={d(15)}
-      invalid
+      aria-invalid
       required
       size="tiny"
       variant="soft"

@@ -48,6 +48,10 @@ export const SidebarProviderContext = createContext<SidebarProviderContextValue 
 
 export const SidebarListContext = createContext(false);
 
+export type SidebarGroupContextValue = { labelId: string; inTrigger: boolean };
+
+export const SidebarGroupContext = createContext<SidebarGroupContextValue | null>(null);
+
 export const SidebarFoldedContext = createContext(false);
 
 export type SidebarFrame = { element: HTMLElement; preview: ReactNode; folded: boolean };

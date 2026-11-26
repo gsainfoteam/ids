@@ -37,7 +37,6 @@ export type UsePasswordFieldOptions = {
   rootProps: PasswordFieldInputProps;
   input: PasswordFieldInputProps & { asChild?: boolean; children?: ReactNode };
   disabled?: boolean;
-  invalid?: boolean;
   onValueChange?: (value: string) => void;
   visible?: boolean;
   defaultVisible: boolean;
@@ -68,7 +67,6 @@ export function useInternalPasswordField({
   rootProps,
   input: { asChild, children, ...own },
   disabled: disabledProp,
-  invalid,
   onValueChange,
   visible: visibleProp,
   defaultVisible,
@@ -84,7 +82,7 @@ export function useInternalPasswordField({
   const native: ComponentProps<'input'> = mergeProps(mergeProps({ ...childProps }, rootProps), own);
   const disabled = Boolean(own.disabled ?? disabledProp ?? childProps?.disabled);
   const readOnly = Boolean(native.readOnly);
-  const ariaInvalid = native['aria-invalid'] ?? invalid;
+  const ariaInvalid = native['aria-invalid'];
   const id = native.id ?? `ids-password-${generatedId}`;
 
   const [visible, setVisible] = useControllableState({

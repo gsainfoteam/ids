@@ -30,7 +30,7 @@ const meta = {
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: {
     name: 'password',
@@ -105,7 +105,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-56">
-            <PasswordField name="password" defaultValue="1234" invalid aria-label="잘못됨" />
+            <PasswordField name="password" defaultValue="1234" aria-invalid aria-label="잘못됨" />
           </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">

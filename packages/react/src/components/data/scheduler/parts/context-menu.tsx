@@ -14,7 +14,12 @@ import { clamp } from 'es-toolkit';
 import { part } from '../../../../utils';
 import { Menu } from '../../../overlay/menu';
 import { useInternalMenuContext } from '../../../overlay/menu/context';
-import { daysBetween, HOURS_IN_DAY, type SchedulerEventData, type SchedulerSlot } from '../lib/layout';
+import {
+  daysBetween,
+  HOURS_IN_DAY,
+  type SchedulerEventData,
+  type SchedulerSlot,
+} from '../lib/layout';
 
 import type { SchedulerFormat } from '../lib/format';
 
@@ -22,8 +27,7 @@ const MINUTES_IN_DAY = HOURS_IN_DAY * 60;
 const SLOT_MINUTES = 30;
 
 type Target<E extends SchedulerEventData> =
-  | { event: E; label: string }
-  | { slot: SchedulerSlot; label: string };
+  { event: E; label: string } | { slot: SchedulerSlot; label: string };
 
 export function slotAt(column: HTMLElement, clientY: number): SchedulerSlot {
   const day = parseDate(column.getAttribute('data-scheduler-column')!);

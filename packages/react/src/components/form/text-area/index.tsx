@@ -23,7 +23,6 @@ export namespace TextArea {
     variant?: TextAreaVariant;
     size?: IdsSize;
     disabled?: boolean;
-    invalid?: boolean;
     onValueChange?: (value: string) => void;
     resize?: TextAreaResize;
     minRows?: number;

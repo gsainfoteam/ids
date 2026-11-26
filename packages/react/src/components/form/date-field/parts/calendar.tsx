@@ -1,9 +1,10 @@
 'use client';
 
 import { useInternalTemporalPicker } from '../../../../internal/temporal-field';
-import { Calendar, CalendarPickContext } from '../../../data/calendar';
+import { Calendar, CalendarPickContext, useCalendar } from '../../../data/calendar';
 import { useInternalDateFieldContext } from '../context';
 
+import type { FieldCalendarOptions } from '../../../data/calendar/hooks/use-calendar';
 import type { CalendarValue, DateSelection } from '../../../data/calendar/lib/date';
 
 export type DateFieldCalendarProps = Omit<
@@ -12,19 +13,35 @@ export type DateFieldCalendarProps = Omit<
   | 'value'
   | 'defaultValue'
   | 'onValueChange'
-  | 'min'
-  | 'max'
+  | 'calendar'
   | 'disabled'
   | 'readOnly'
   | 'size'
   | 'autoFocus'
   | 'aria-label'
   | 'aria-labelledby'
->;
+> &
+  FieldCalendarOptions;
 
-export function DateFieldCalendar(props: DateFieldCalendarProps) {
+export function DateFieldCalendar({
+  monthsToShow,
+  today,
+  month,
+  defaultMonth,
+  onMonthChange,
+  ...props
+}: DateFieldCalendarProps) {
   const field = useInternalDateFieldContext('DateField.Calendar');
   const picker = useInternalTemporalPicker<CalendarValue>('DateField.Calendar');
+  const calendar = useCalendar({
+    availability: {
+      min: field.min,
+      max: field.max,
+      unavailable: field.disabled === true ? undefined : field.disabled,
+    },
+    display: { monthsToShow, today },
+    month: { value: month, defaultValue: defaultMonth, onValueChange: onMonthChange },
+  });
   const closeOnPick = field.selectionMode === 'single' ? () => picker.close(true) : null;
 
   return (
@@ -37,9 +54,7 @@ export function DateFieldCalendar(props: DateFieldCalendarProps) {
           onValueChange: picker.change,
         } as DateSelection)}
         {...picker.name}
-        min={field.min}
-        max={field.max}
-        disabled={field.disabled === true ? undefined : field.disabled}
+        calendar={calendar}
         size={picker.size}
       />
     </CalendarPickContext>

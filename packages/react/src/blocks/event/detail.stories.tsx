@@ -12,9 +12,9 @@ import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
+import { Timeline } from '../../components/data/timeline';
 import { toast } from '../../components/feedback/toast';
 import { Breadcrumb } from '../../components/navigation/breadcrumb';
-import { Stepper } from '../../components/navigation/stepper';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -122,16 +122,16 @@ export const PC: Story = {
               <h2 id="schedule" className="text-headline-h5-bold">
                 첫날 순서
               </h2>
-              <Stepper progress={false} orientation="vertical" aria-label="첫날 순서">
+              <Timeline aria-label="첫날 순서">
                 {SCHEDULE.map((step) => (
-                  <Stepper.Item key={step.time}>
-                    <Stepper.Title>
+                  <Timeline.Item key={step.time}>
+                    <Timeline.Title>
                       {step.time} {step.title}
-                    </Stepper.Title>
-                    <Stepper.Description>{step.description}</Stepper.Description>
-                  </Stepper.Item>
+                    </Timeline.Title>
+                    <Timeline.Description>{step.description}</Timeline.Description>
+                  </Timeline.Item>
                 ))}
-              </Stepper>
+              </Timeline>
             </section>
 
             <section aria-labelledby="faq" className="flex flex-col gap-4">

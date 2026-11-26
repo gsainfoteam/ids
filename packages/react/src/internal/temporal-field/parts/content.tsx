@@ -8,10 +8,10 @@ import { useInternalTemporalContext } from '../context';
 
 export type ContentProps = ComponentProps<'div'> & {
   asChild?: boolean;
-  mobileVariant?: 'popover' | 'drawer';
+  narrow?: 'popover' | 'drawer';
 };
 
-export function TemporalContent({ asChild, children, mobileVariant, ...props }: ContentProps) {
+export function TemporalContent({ asChild, children, narrow, ...props }: ContentProps) {
   const c = useInternalTemporalContext('Content');
   if (!c.state.open) return null;
 
@@ -19,7 +19,7 @@ export function TemporalContent({ asChild, children, mobileVariant, ...props }: 
     <FieldPopup
       anchor={c.popup.anchor}
       onClose={c.picker.close}
-      mobileVariant={mobileVariant}
+      narrow={narrow}
       preferredWidth={c.popup.preferredWidth}
       initialFocusSelector={c.popup.initialFocusSelector}
       role="dialog"

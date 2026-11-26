@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react';
 
-import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Avatar, Stepper } from '../src';
+import { Stepper } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -105,7 +104,7 @@ test('linear: only the steps behind and the next one can be pressed', async () =
 
 test('linear: a step marked completed can be reached even when it lies ahead', async () => {
   await render(
-    <Stepper aria-label="진행 단계">{steps(undefined, [{}, {}, { completed: true }])}</Stepper>,
+    <Stepper aria-label="진행 단계">{steps(undefined, [{}, {}, { status: 'completed' }])}</Stepper>,
   );
 
   await expect.element(step('Review')).toBeEnabled();
@@ -192,7 +191,7 @@ test('right-to-left swaps the left and right arrows', async () => {
 test('an error step keeps aria-current and reads its state after the title', async () => {
   await render(
     <Stepper aria-label="진행 단계" defaultValue={1}>
-      {steps(undefined, [{}, { error: true }])}
+      {steps(undefined, [{}, { status: 'error' }])}
     </Stepper>,
   );
 
@@ -294,114 +293,10 @@ test('a vertical title keeps its first line level with the indicator, also when 
   }
 });
 
-test('SSR: progress={false} lists events with no current step; unmarked events are neutral and read no status', () => {
-  const doc = parse(
-    renderToString(
-      <Stepper
-        progress={false}
-        aria-label="Activity"
-        className={(state) => `value-${state.value} progress-${state.progress}`}
-      >
-        {steps(['Commented', 'Deployed', 'Failed'], [{}, { completed: true }, { error: true }])}
-      </Stepper>,
-    ),
-  );
-  const list = doc.querySelector('ol')!;
-  const items = Array.from(list.children);
-
-  expect(doc.querySelector('[data-stepper]')!.className).toContain('value--1 progress-false');
-  expect(list.getAttribute('aria-label')).toBe('Activity');
-  expect(items.map((item) => item.getAttribute('data-state'))).toEqual([
-    'neutral',
-    'completed',
-    'error',
-  ]);
-  expect(doc.querySelectorAll('button')).toHaveLength(0);
-  expect(doc.querySelector('[aria-current]')).toBeNull();
-  expect(items.map((item) => item.textContent)).toEqual([
-    'CommentedCommented details',
-    'DeployedDeployed details완료',
-    'FailedFailed details오류',
-  ]);
-
-  const neutralParts = items[0]!.querySelectorAll(
-    '[data-stepper-trigger], [data-stepper-indicator], [data-stepper-title], [data-stepper-description], [data-stepper-separator]',
-  );
-  expect(neutralParts).toHaveLength(5);
-  for (const part of [items[0]!, ...neutralParts]) {
-    expect(part.getAttribute('data-state')).toBe('neutral');
-    expect(part.hasAttribute('data-neutral')).toBe(true);
-    expect(part.hasAttribute('data-upcoming')).toBe(false);
-  }
-  expect(items[0]!.querySelector('[data-stepper-indicator]')!.childNodes).toHaveLength(0);
-  expect(items[1]!.querySelector('[data-stepper-indicator] svg'), 'a check').not.toBeNull();
-});
-
-test('progress={false} draws a plain event as a dot on the first line of its title, and keeps the lines neutral', async () => {
-  await render(
-    <div className="w-48">
-      <Stepper progress={false} orientation="vertical" aria-label="Activity">
-        <Stepper.Item completed>
-          <Stepper.Title>Deployed</Stepper.Title>
-        </Stepper.Item>
-        <Stepper.Item>
-          <Stepper.Title>A title long enough to wrap onto another line</Stepper.Title>
-        </Stepper.Item>
-        <Stepper.Item>
-          <Stepper.Title>Created</Stepper.Title>
-        </Stepper.Item>
-      </Stepper>
-    </div>,
-  );
-
-  const [deployed, wrapped] = document.querySelectorAll('[data-stepper-item]');
-  const dot = wrapped!.querySelector('[data-stepper-indicator]')!;
-  const lines = linesOf(wrapped!.querySelector('[data-stepper-title]')!);
-  const drawn = getComputedStyle(dot, '::before');
-
-  expect(lines.length).toBeGreaterThan(1);
-  expect([drawn.width, drawn.height]).toEqual(['10px', '10px']);
-  expect(getComputedStyle(dot).backgroundColor).toBe('rgba(0, 0, 0, 0)');
-  expect(Math.abs(middleOf(rectOf(dot)) - middleOf(lines[0]!))).toBeLessThanOrEqual(1);
-
-  const lineAfter = (item: Element) =>
-    getComputedStyle(item.querySelector('[data-stepper-separator]')!).backgroundColor;
-  expect(lineAfter(deployed!)).toBe(lineAfter(wrapped!));
-});
-
-test('progress={false} ignores value, onValueChange and linear, with a development warning', async () => {
-  const warn = silenceWarnings();
-  const onValueChange = vi.fn();
-  await render(
-    <Stepper
-      progress={false}
-      aria-label="Activity"
-      value={5}
-      onValueChange={onValueChange}
-      linear={false}
-    >
-      {steps()}
-    </Stepper>,
-  );
-
-  expect(document.querySelectorAll('button')).toHaveLength(0);
-  expect(document.querySelector('[aria-current]')).toBeNull();
-  expect(Array.from(document.querySelectorAll('li'), (item) => item.dataset.state)).toEqual([
-    'neutral',
-    'neutral',
-    'neutral',
-  ]);
-  expect(warn).toHaveBeenCalledWith(
-    expect.stringContaining('ignores value, onValueChange, linear'),
-  );
-  expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('is outside the'));
-  expect(onValueChange).not.toHaveBeenCalled();
-});
-
 test('a Stepper has no default list name and warns in development until it gets one', async () => {
   const warn = silenceWarnings();
   const Unnamed = Stepper as (props: Omit<Stepper.Props, 'aria-label'>) => ReactNode;
-  const unnamed = await render(<Unnamed progress={false}>{steps()}</Unnamed>);
+  const unnamed = await render(<Unnamed>{steps()}</Unnamed>);
 
   expect(document.querySelector('ol')!.hasAttribute('aria-label')).toBe(false);
   expect(warn).toHaveBeenCalledWith(expect.stringContaining('Stepper: it has no accessible name'));
@@ -411,7 +306,7 @@ test('a Stepper has no default list name and warns in development until it gets 
   await render(
     <>
       <h2 id="activity-heading">Activity</h2>
-      <Stepper progress={false} aria-labelledby="activity-heading">
+      <Stepper aria-labelledby="activity-heading">
         {steps()}
       </Stepper>
     </>,
@@ -419,39 +314,6 @@ test('a Stepper has no default list name and warns in development until it gets 
 
   await expect.element(page.getByRole('list', { name: 'Activity' })).toBeInTheDocument();
   expect(warn).not.toHaveBeenCalled();
-});
-
-test('Indicator asChild draws an Avatar at the indicator size, hidden from screen readers', async () => {
-  for (const [size, side] of [
-    ['standard', 32],
-    ['tiny', 24],
-  ] as const) {
-    const screen = await render(
-      <Stepper progress={false} orientation="vertical" size={size} aria-label="Activity">
-        <Stepper.Item>
-          <Stepper.Indicator asChild>
-            <Avatar name="Alice Kim" />
-          </Stepper.Indicator>
-          <Stepper.Title>Alice commented</Stepper.Title>
-        </Stepper.Item>
-        <Stepper.Item>
-          <Stepper.Title>Bob joined</Stepper.Title>
-        </Stepper.Item>
-      </Stepper>,
-    );
-
-    const avatar = document.querySelector<HTMLElement>('[data-avatar]')!;
-    const [avatarColumn, dotColumn] = document.querySelectorAll('[data-stepper-indicator]');
-    expect(avatar).toBe(avatarColumn);
-    expect(avatar.getAttribute('aria-hidden')).toBe('true');
-    expect(avatar.hasAttribute('role')).toBe(false);
-    expect([rectOf(avatar).width, rectOf(avatar).height]).toEqual([side, side]);
-    expect(rectOf(dotColumn!).width).toBe(side);
-    expect(getComputedStyle(avatar).borderRadius).not.toBe('0px');
-    await expect.element(page.getByText('AK')).toBeVisible();
-
-    await screen.unmount();
-  }
 });
 
 test('Body renders outside the step button: its button is its own Tab stop and pressing it keeps the step', async () => {
@@ -513,65 +375,35 @@ test('Body renders outside the step button: its button is its own Tab stop and p
   await expect.element(step('Account')).toHaveAttribute('aria-current', 'step');
 });
 
-test('Body asChild hands its attributes and indent to the child, which takes the step state', async () => {
-  await render(
-    <Stepper progress={false} orientation="vertical" aria-label="Activity">
-      <Stepper.Item error>
-        <Stepper.Title>Tests failed</Stepper.Title>
-        <Stepper.Body asChild className={(state) => `body-${state.status}`}>
-          <section aria-label="Failure report">3 tests failed</section>
-        </Stepper.Body>
-      </Stepper.Item>
-    </Stepper>,
-  );
-
-  const report = page.getByRole('region', { name: 'Failure report' }).element();
-  expect(report.hasAttribute('data-stepper-body')).toBe(true);
-  expect(report.getAttribute('data-state')).toBe('error');
-  expect(report.className).toContain('body-error');
-  expect(rectOf(report).left).toBeCloseTo(
-    rectOf(document.querySelector('[data-stepper-title]')).left,
-    0,
-  );
-});
-
 test('the vertical connector line runs beside the Body, at the title column, to the next step', async () => {
-  for (const progress of [true, false]) {
-    const screen = await render(
-      <div className="w-80">
-        <Stepper orientation="vertical" progress={progress} aria-label="Activity">
-          <Stepper.Item>
-            <Stepper.Title>First</Stepper.Title>
-            <Stepper.Body>
-              <div className="h-40">A tall body</div>
-            </Stepper.Body>
-          </Stepper.Item>
-          <Stepper.Item>
-            <Stepper.Title>Second</Stepper.Title>
-          </Stepper.Item>
-        </Stepper>
-      </div>,
-    );
+  await render(
+    <div className="w-80">
+      <Stepper orientation="vertical" aria-label="Steps">
+        <Stepper.Item>
+          <Stepper.Title>First</Stepper.Title>
+          <Stepper.Body>
+            <div className="h-40">A tall body</div>
+          </Stepper.Body>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>Second</Stepper.Title>
+        </Stepper.Item>
+      </Stepper>
+    </div>,
+  );
 
-    const [first, second] = document.querySelectorAll('[data-stepper-item]');
-    const line = rectOf(first!.querySelector('[data-stepper-separator]'));
-    const body = rectOf(first!.querySelector('[data-stepper-body]'));
-    const indicator = rectOf(first!.querySelector('[data-stepper-indicator]'));
-    const next = rectOf(second!.querySelector('[data-stepper-indicator]'));
+  const [first, second] = document.querySelectorAll('[data-stepper-item]');
+  const line = rectOf(first!.querySelector('[data-stepper-separator]'));
+  const body = rectOf(first!.querySelector('[data-stepper-body]'));
+  const indicator = rectOf(first!.querySelector('[data-stepper-indicator]'));
+  const next = rectOf(second!.querySelector('[data-stepper-indicator]'));
 
-    expect(line.top).toBeGreaterThanOrEqual(indicator.bottom);
-    expect(line.top).toBeLessThanOrEqual(body.top);
-    expect(line.bottom).toBeGreaterThan(body.bottom);
-    expect(line.bottom).toBeLessThanOrEqual(next.top);
-    expect(line.right).toBeLessThan(body.left);
-    expect(body.left).toBeCloseTo(rectOf(first!.querySelector('[data-stepper-title]')).left, 0);
-    if (!progress) {
-      expect(line.top).toBeCloseTo(indicator.bottom, 0);
-      expect(line.bottom).toBeCloseTo(next.top, 0);
-    }
-
-    await screen.unmount();
-  }
+  expect(line.top).toBeGreaterThanOrEqual(indicator.bottom);
+  expect(line.top).toBeLessThanOrEqual(body.top);
+  expect(line.bottom).toBeGreaterThan(body.bottom);
+  expect(line.bottom).toBeLessThanOrEqual(next.top);
+  expect(line.right).toBeLessThan(body.left);
+  expect(body.left).toBeCloseTo(rectOf(first!.querySelector('[data-stepper-title]')).left, 0);
 });
 
 test('Body is hidden in a horizontal Stepper and placed inside Trigger, each with a development warning', async () => {
@@ -598,44 +430,4 @@ test('Body is hidden in a horizontal Stepper and placed inside Trigger, each wit
   expect(warn).toHaveBeenCalledWith(
     expect.stringContaining('Stepper.Body belongs in Stepper.Item next to Stepper.Trigger'),
   );
-});
-
-test('a record with avatars and a Body hydrates the server HTML without a mismatch', async () => {
-  const tree = (
-    <Stepper progress={false} orientation="vertical" aria-label="Activity">
-      <Stepper.Item>
-        <Stepper.Indicator asChild>
-          <Avatar name="Alice Kim" />
-        </Stepper.Indicator>
-        <Stepper.Title>Alice commented</Stepper.Title>
-        <Stepper.Description>
-          <time dateTime="2026-09-30T09:12">5 minutes ago</time>
-        </Stepper.Description>
-        <Stepper.Body>
-          <a href="#comment">Open the comment</a>
-        </Stepper.Body>
-      </Stepper.Item>
-      <Stepper.Item error>
-        <Stepper.Title>Tests failed</Stepper.Title>
-      </Stepper.Item>
-    </Stepper>
-  );
-  const container = document.body.appendChild(document.createElement('div'));
-  container.innerHTML = renderToString(tree);
-  const errors = vi.spyOn(console, 'error');
-  const recoverable: unknown[] = [];
-  const root = hydrateRoot(container, tree, {
-    onRecoverableError: (error) => recoverable.push(error),
-  });
-  onTestFinished(() => {
-    root.unmount();
-    container.remove();
-    errors.mockRestore();
-  });
-
-  const link = page.getByRole('link', { name: 'Open the comment' });
-  await expect.element(link).toBeVisible();
-  expect(link.element().closest('[data-stepper-trigger]')).toBeNull();
-  expect(recoverable).toEqual([]);
-  expect(errors).not.toHaveBeenCalled();
 });

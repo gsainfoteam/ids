@@ -199,7 +199,7 @@ test('disabled/invalid overrides and hidden auto toggle while explicit compositi
   const screen = await render(
     <Field disabled invalid={false}>
       <Field.Label>Password</Field.Label>
-      <PasswordField name="password" invalid defaultValue="secret" />
+      <PasswordField name="password" aria-invalid defaultValue="secret" />
     </Field>,
   );
   const input = screen.getByLabelText('Password');
@@ -586,7 +586,7 @@ test('onValueChange, the shell state and a Clear part with Escape', async () => 
     <PasswordField
       aria-label="Password"
       name="password"
-      invalid
+      aria-invalid
       onValueChange={(value) => values.push(value)}
     >
       <PasswordField.Input />

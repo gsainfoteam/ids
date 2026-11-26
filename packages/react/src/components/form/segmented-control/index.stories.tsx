@@ -34,7 +34,7 @@ const meta = {
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     required: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: {
     'aria-label': '기간',
@@ -169,7 +169,7 @@ export const Gallery: Story = {
           </SegmentedControl>
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <SegmentedControl<Period> invalid aria-label="오류">
+          <SegmentedControl<Period> aria-invalid aria-label="오류">
             {({ Item }) =>
               periods.map((period) => (
                 <Item key={period.value} value={period.value}>

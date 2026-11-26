@@ -32,7 +32,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
   canMove,
   children,
 }: SidebarSortableProps<T>) {
-  const { styles } = useInternalSidebarContext('Sidebar.Group');
+  const { styles } = useInternalSidebarContext('Sidebar.Group.Tree');
   const t = useInternalTranslate();
   const {
     value,

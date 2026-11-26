@@ -54,12 +54,11 @@ import { ScrollArea } from '../../layout/scroll-area';
 import { Dialog } from '../../overlay/dialog';
 import { Kbd } from '../../typography/kbd';
 
-import { Sidebar } from '.';
+import { Sidebar, useSidebar } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['sidebar', 'floating', 'inset'] as const;
-const collapsibles = { none: undefined, icon: 'icon', offcanvas: 'offcanvas' } as const;
 
 const meta = {
   title: 'Navigation/Sidebar',
@@ -68,78 +67,82 @@ const meta = {
   parameters: { canvasPadding: false },
   argTypes: {
     variant: { control: 'radio', options: variants },
-    collapsible: { control: 'radio', options: Object.keys(collapsibles), mapping: collapsibles },
     value: { control: 'text' },
   },
   args: {
     'aria-label': '사이드바',
     variant: 'sidebar',
-    collapsible: 'icon',
     value: '/board',
   },
-  render: (args) => (
-    <Sidebar.Provider>
-      <Sidebar {...args}>
-        <Sidebar.Header>
-          <CubeTransparentIcon className="size-6 shrink-0" />
-          <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
-        </Sidebar.Header>
-        <Sidebar.Group label="둘러보기">
-          <Sidebar.Item value="/" href="#home">
-            <HomeIcon />홈
-          </Sidebar.Item>
-          <Sidebar.Item value="/board" href="#board">
-            <MegaphoneIcon />
-            게시판
-            <Chip variant="soft">{12}</Chip>
-          </Sidebar.Item>
-          <Sidebar.Item value="/shuttle" href="#shuttle">
-            <TruckIcon />
-            셔틀
-          </Sidebar.Item>
-        </Sidebar.Group>
-        <Sidebar.Group label="설정">
-          <Sidebar.Item>
-            <Cog6ToothIcon />
-            설정
-            <Sidebar.Item value="/settings/account" href="#account">
-              계정
+  render: function Render(args) {
+    const sidebar = useSidebar({ collapse: { mode: 'icon' } });
+
+    return (
+      <Sidebar.Provider>
+        <Sidebar {...args} sidebar={sidebar}>
+          <Sidebar.Header>
+            <CubeTransparentIcon className="size-6 shrink-0" />
+            <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
+          </Sidebar.Header>
+          <Sidebar.Group>
+            <Sidebar.Group.Label>둘러보기</Sidebar.Group.Label>
+            <Sidebar.Item value="/" href="#home">
+              <HomeIcon />홈
             </Sidebar.Item>
-            <Sidebar.Item value="/settings/alerts" href="#alerts">
-              알림
+            <Sidebar.Item value="/board" href="#board">
+              <MegaphoneIcon />
+              게시판
+              <Chip variant="soft">{12}</Chip>
             </Sidebar.Item>
-          </Sidebar.Item>
-        </Sidebar.Group>
-        <Sidebar.Footer>
-          <Sidebar.Item href="#profile">
-            <Avatar name="김지수" size="tiny" />
-            김지수
-          </Sidebar.Item>
-        </Sidebar.Footer>
-      </Sidebar>
-      <Sidebar.Inset>
-        <div className="flex min-h-0 flex-1 flex-col gap-6 p-6">
-          <div className="flex items-center gap-3">
-            <Sidebar.Trigger />
-            <h1 className="text-headline-h3-bold">게시판</h1>
-          </div>
-          <Skeleton loading>
-            <p className="text-body-b3-regular">
-              수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
-              시간표가 겹치지 않는지 미리 살펴 두세요.
-            </p>
-          </Skeleton>
-          <div className="grid h-64">
-            <Skeleton loading asChild>
-              <Card>
-                <Card.Title>본문</Card.Title>
-              </Card>
+            <Sidebar.Item value="/shuttle" href="#shuttle">
+              <TruckIcon />
+              셔틀
+            </Sidebar.Item>
+          </Sidebar.Group>
+          <Sidebar.Group>
+            <Sidebar.Group.Label>설정</Sidebar.Group.Label>
+            <Sidebar.Item>
+              <Cog6ToothIcon />
+              설정
+              <Sidebar.Item value="/settings/account" href="#account">
+                계정
+              </Sidebar.Item>
+              <Sidebar.Item value="/settings/alerts" href="#alerts">
+                알림
+              </Sidebar.Item>
+            </Sidebar.Item>
+          </Sidebar.Group>
+          <Sidebar.Footer>
+            <Sidebar.Item href="#profile">
+              <Avatar name="김지수" size="tiny" />
+              김지수
+            </Sidebar.Item>
+          </Sidebar.Footer>
+        </Sidebar>
+        <Sidebar.Inset>
+          <div className="flex min-h-0 flex-1 flex-col gap-6 p-6">
+            <div className="flex items-center gap-3">
+              <Sidebar.Trigger />
+              <h1 className="text-headline-h3-bold">게시판</h1>
+            </div>
+            <Skeleton>
+              <p className="text-body-b3-regular">
+                수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
+                확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
+              </p>
             </Skeleton>
+            <div className="grid h-64">
+              <Skeleton asChild>
+                <Card>
+                  <Card.Title>본문</Card.Title>
+                </Card>
+              </Skeleton>
+            </div>
           </div>
-        </div>
-      </Sidebar.Inset>
-    </Sidebar.Provider>
-  ),
+        </Sidebar.Inset>
+      </Sidebar.Provider>
+    );
+  },
 } satisfies Meta<typeof Sidebar>;
 
 export default meta;
@@ -151,7 +154,8 @@ export const Usage: Story = {
   render: () => (
     <Sidebar.Provider>
       <Sidebar aria-label="사이드바" value="/inbox">
-        <Sidebar.Group label="워크스페이스">
+        <Sidebar.Group>
+          <Sidebar.Group.Label>워크스페이스</Sidebar.Group.Label>
           <Sidebar.Item value="/inbox" href="#inbox">
             <InboxIcon />
             받은 소식
@@ -175,123 +179,24 @@ export const Usage: Story = {
 };
 
 export const Gallery: Story = {
-  render: () => (
-    <Showcase className="p-6">
-      <Showcase.Section
-        title="Variant"
-        description="sidebar 는 가장자리에 붙고 선 하나로 나뉩니다. floating 은 사이드바가 카드로 뜨고, inset 은 본문이 카드로 뜹니다."
-      >
-        <Showcase.Row label="sidebar">
-          <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
-            <Sidebar.Provider>
-              <Sidebar value="/" shortcut={false} aria-label="sidebar 메뉴">
-                <Sidebar.Item value="/" href="#home">
-                  <HomeIcon />홈
-                </Sidebar.Item>
-                <Sidebar.Item href="#inbox">
-                  <InboxIcon />
-                  받은 소식
-                  <Chip variant="soft">{3}</Chip>
-                </Sidebar.Item>
-                <Sidebar.Item href="#bookmarks">
-                  <BookmarkIcon />
-                  북마크
-                </Sidebar.Item>
-              </Sidebar>
-              <Sidebar.Inset>
-                <div className="flex min-h-0 flex-1 flex-col p-4">
-                  <div className="grid flex-1">
-                    <Skeleton loading asChild>
-                      <Card>
-                        <Card.Title>본문</Card.Title>
-                      </Card>
-                    </Skeleton>
-                  </div>
-                </div>
-              </Sidebar.Inset>
-            </Sidebar.Provider>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="floating">
-          <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
-            <Sidebar.Provider>
-              <Sidebar value="/" variant="floating" shortcut={false} aria-label="floating 메뉴">
-                <Sidebar.Item value="/" href="#home">
-                  <HomeIcon />홈
-                </Sidebar.Item>
-                <Sidebar.Item href="#inbox">
-                  <InboxIcon />
-                  받은 소식
-                  <Chip variant="soft">{3}</Chip>
-                </Sidebar.Item>
-                <Sidebar.Item href="#bookmarks">
-                  <BookmarkIcon />
-                  북마크
-                </Sidebar.Item>
-              </Sidebar>
-              <Sidebar.Inset>
-                <div className="flex min-h-0 flex-1 flex-col p-4">
-                  <div className="grid flex-1">
-                    <Skeleton loading asChild>
-                      <Card>
-                        <Card.Title>본문</Card.Title>
-                      </Card>
-                    </Skeleton>
-                  </div>
-                </div>
-              </Sidebar.Inset>
-            </Sidebar.Provider>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="inset">
-          <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
-            <Sidebar.Provider>
-              <Sidebar value="/" variant="inset" shortcut={false} aria-label="inset 메뉴">
-                <Sidebar.Item value="/" href="#home">
-                  <HomeIcon />홈
-                </Sidebar.Item>
-                <Sidebar.Item href="#inbox">
-                  <InboxIcon />
-                  받은 소식
-                  <Chip variant="soft">{3}</Chip>
-                </Sidebar.Item>
-                <Sidebar.Item href="#bookmarks">
-                  <BookmarkIcon />
-                  북마크
-                </Sidebar.Item>
-              </Sidebar>
-              <Sidebar.Inset>
-                <div className="flex min-h-0 flex-1 flex-col p-4">
-                  <div className="grid flex-1">
-                    <Skeleton loading asChild>
-                      <Card>
-                        <Card.Title>본문</Card.Title>
-                      </Card>
-                    </Skeleton>
-                  </div>
-                </div>
-              </Sidebar.Inset>
-            </Sidebar.Provider>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
+  render: function Render() {
+    const withoutShortcut = useSidebar({ shortcut: false });
+    const rail = useSidebar({
+      collapse: { mode: 'icon', defaultCollapsed: true },
+      shortcut: false,
+    });
+    const collapsing = useSidebar({ collapse: { mode: 'icon' }, shortcut: false });
 
-      <Showcase.Section
-        title="Collapsed"
-        description="icon 은 아이콘 띠만 남고 라벨은 Tooltip 으로 뜹니다. 하위 메뉴는 Menu 로 열립니다."
-      >
-        {variants.map((variant) => (
-          <Showcase.Row key={variant} label={variant}>
+    return (
+      <Showcase className="p-6">
+        <Showcase.Section
+          title="Variant"
+          description="sidebar 는 가장자리에 붙고 선 하나로 나뉩니다. floating 은 사이드바가 카드로 뜨고, inset 은 본문이 카드로 뜹니다."
+        >
+          <Showcase.Row label="sidebar">
             <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
               <Sidebar.Provider>
-                <Sidebar
-                  value="/"
-                  variant={variant}
-                  collapsible="icon"
-                  defaultCollapsed
-                  shortcut={false}
-                  aria-label={`접힌 ${variant} 메뉴`}
-                >
+                <Sidebar value="/" sidebar={withoutShortcut} aria-label="sidebar 메뉴">
                   <Sidebar.Item value="/" href="#home">
                     <HomeIcon />홈
                   </Sidebar.Item>
@@ -300,17 +205,15 @@ export const Gallery: Story = {
                     받은 소식
                     <Chip variant="soft">{3}</Chip>
                   </Sidebar.Item>
-                  <Sidebar.Item>
-                    <Cog6ToothIcon />
-                    설정
-                    <Sidebar.Item href="#account">계정</Sidebar.Item>
-                    <Sidebar.Item href="#alerts">알림</Sidebar.Item>
+                  <Sidebar.Item href="#bookmarks">
+                    <BookmarkIcon />
+                    북마크
                   </Sidebar.Item>
                 </Sidebar>
                 <Sidebar.Inset>
                   <div className="flex min-h-0 flex-1 flex-col p-4">
                     <div className="grid flex-1">
-                      <Skeleton loading asChild>
+                      <Skeleton asChild>
                         <Card>
                           <Card.Title>본문</Card.Title>
                         </Card>
@@ -321,77 +224,193 @@ export const Gallery: Story = {
               </Sidebar.Provider>
             </div>
           </Showcase.Row>
-        ))}
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Parts"
-        description="Header 끝에 접기 버튼이 붙고, Group 은 라벨과 목록을 묶습니다. Item 안의 Item 은 하위 메뉴, Footer 는 아래 끝에 붙습니다."
-      >
-        <Showcase.Row label="states">
-          <div className="h-[30rem] w-full overflow-hidden [--sidebar-height:30rem]">
-            <Sidebar.Provider>
-              <Sidebar
-                value="/settings/alerts"
-                collapsible="icon"
-                shortcut={false}
-                aria-label="파트 메뉴"
-              >
-                <Sidebar.Header>
-                  <CubeTransparentIcon className="size-6 shrink-0" />
-                  <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
-                </Sidebar.Header>
-                <Sidebar.Group label="둘러보기">
-                  <Sidebar.Item href="#home">
+          <Showcase.Row label="floating">
+            <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
+              <Sidebar.Provider>
+                <Sidebar
+                  value="/"
+                  variant="floating"
+                  sidebar={withoutShortcut}
+                  aria-label="floating 메뉴"
+                >
+                  <Sidebar.Item value="/" href="#home">
                     <HomeIcon />홈
                   </Sidebar.Item>
-                  <Sidebar.Item href="#notice" disabled>
-                    <BellIcon />
-                    알림(disabled)
+                  <Sidebar.Item href="#inbox">
+                    <InboxIcon />
+                    받은 소식
+                    <Chip variant="soft">{3}</Chip>
                   </Sidebar.Item>
-                </Sidebar.Group>
-                <Sidebar.Group label="접히는 그룹" collapsible>
                   <Sidebar.Item href="#bookmarks">
                     <BookmarkIcon />
                     북마크
                   </Sidebar.Item>
-                </Sidebar.Group>
-                <Sidebar.Group label="설정">
-                  <Sidebar.Item>
-                    <Cog6ToothIcon />
-                    설정
-                    <Sidebar.Item value="/settings/account" href="#account">
-                      계정
-                    </Sidebar.Item>
-                    <Sidebar.Item value="/settings/alerts" href="#alerts">
-                      알림
-                    </Sidebar.Item>
-                  </Sidebar.Item>
-                </Sidebar.Group>
-                <Sidebar.Footer>
-                  <Sidebar.Item href="#profile">
-                    <Avatar name="김지수" size="tiny" />
-                    김지수
-                  </Sidebar.Item>
-                </Sidebar.Footer>
-              </Sidebar>
-              <Sidebar.Inset>
-                <div className="flex min-h-0 flex-1 flex-col p-4">
-                  <div className="grid flex-1">
-                    <Skeleton loading asChild>
-                      <Card>
-                        <Card.Title>본문</Card.Title>
-                      </Card>
-                    </Skeleton>
+                </Sidebar>
+                <Sidebar.Inset>
+                  <div className="flex min-h-0 flex-1 flex-col p-4">
+                    <div className="grid flex-1">
+                      <Skeleton asChild>
+                        <Card>
+                          <Card.Title>본문</Card.Title>
+                        </Card>
+                      </Skeleton>
+                    </div>
                   </div>
-                </div>
-              </Sidebar.Inset>
-            </Sidebar.Provider>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+                </Sidebar.Inset>
+              </Sidebar.Provider>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="inset">
+            <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
+              <Sidebar.Provider>
+                <Sidebar
+                  value="/"
+                  variant="inset"
+                  sidebar={withoutShortcut}
+                  aria-label="inset 메뉴"
+                >
+                  <Sidebar.Item value="/" href="#home">
+                    <HomeIcon />홈
+                  </Sidebar.Item>
+                  <Sidebar.Item href="#inbox">
+                    <InboxIcon />
+                    받은 소식
+                    <Chip variant="soft">{3}</Chip>
+                  </Sidebar.Item>
+                  <Sidebar.Item href="#bookmarks">
+                    <BookmarkIcon />
+                    북마크
+                  </Sidebar.Item>
+                </Sidebar>
+                <Sidebar.Inset>
+                  <div className="flex min-h-0 flex-1 flex-col p-4">
+                    <div className="grid flex-1">
+                      <Skeleton asChild>
+                        <Card>
+                          <Card.Title>본문</Card.Title>
+                        </Card>
+                      </Skeleton>
+                    </div>
+                  </div>
+                </Sidebar.Inset>
+              </Sidebar.Provider>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Collapsed"
+          description="icon 은 아이콘 띠만 남고 라벨은 Tooltip 으로 뜹니다. 하위 메뉴는 Menu 로 열립니다."
+        >
+          {variants.map((variant) => (
+            <Showcase.Row key={variant} label={variant}>
+              <div className="h-80 w-full overflow-hidden [--sidebar-height:--spacing(80)]">
+                <Sidebar.Provider>
+                  <Sidebar
+                    value="/"
+                    variant={variant}
+                    sidebar={rail}
+                    aria-label={`접힌 ${variant} 메뉴`}
+                  >
+                    <Sidebar.Item value="/" href="#home">
+                      <HomeIcon />홈
+                    </Sidebar.Item>
+                    <Sidebar.Item href="#inbox">
+                      <InboxIcon />
+                      받은 소식
+                      <Chip variant="soft">{3}</Chip>
+                    </Sidebar.Item>
+                    <Sidebar.Item>
+                      <Cog6ToothIcon />
+                      설정
+                      <Sidebar.Item href="#account">계정</Sidebar.Item>
+                      <Sidebar.Item href="#alerts">알림</Sidebar.Item>
+                    </Sidebar.Item>
+                  </Sidebar>
+                  <Sidebar.Inset>
+                    <div className="flex min-h-0 flex-1 flex-col p-4">
+                      <div className="grid flex-1">
+                        <Skeleton asChild>
+                          <Card>
+                            <Card.Title>본문</Card.Title>
+                          </Card>
+                        </Skeleton>
+                      </div>
+                    </div>
+                  </Sidebar.Inset>
+                </Sidebar.Provider>
+              </div>
+            </Showcase.Row>
+          ))}
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Parts"
+          description="Header 끝에 접기 버튼이 붙고, Group 은 라벨과 목록을 묶습니다. Item 안의 Item 은 하위 메뉴, Footer 는 아래 끝에 붙습니다."
+        >
+          <Showcase.Row label="states">
+            <div className="h-[30rem] w-full overflow-hidden [--sidebar-height:30rem]">
+              <Sidebar.Provider>
+                <Sidebar value="/settings/alerts" sidebar={collapsing} aria-label="파트 메뉴">
+                  <Sidebar.Header>
+                    <CubeTransparentIcon className="size-6 shrink-0" />
+                    <span className="text-body-b2-semibold truncate">GIST 인포팀</span>
+                  </Sidebar.Header>
+                  <Sidebar.Group>
+                    <Sidebar.Group.Label>둘러보기</Sidebar.Group.Label>
+                    <Sidebar.Item href="#home">
+                      <HomeIcon />홈
+                    </Sidebar.Item>
+                    <Sidebar.Item href="#notice" disabled>
+                      <BellIcon />
+                      알림(disabled)
+                    </Sidebar.Item>
+                  </Sidebar.Group>
+                  <Sidebar.Group collapse={{}}>
+                    <Sidebar.Group.Label>접히는 그룹</Sidebar.Group.Label>
+                    <Sidebar.Item href="#bookmarks">
+                      <BookmarkIcon />
+                      북마크
+                    </Sidebar.Item>
+                  </Sidebar.Group>
+                  <Sidebar.Group>
+                    <Sidebar.Group.Label>설정</Sidebar.Group.Label>
+                    <Sidebar.Item>
+                      <Cog6ToothIcon />
+                      설정
+                      <Sidebar.Item value="/settings/account" href="#account">
+                        계정
+                      </Sidebar.Item>
+                      <Sidebar.Item value="/settings/alerts" href="#alerts">
+                        알림
+                      </Sidebar.Item>
+                    </Sidebar.Item>
+                  </Sidebar.Group>
+                  <Sidebar.Footer>
+                    <Sidebar.Item href="#profile">
+                      <Avatar name="김지수" size="tiny" />
+                      김지수
+                    </Sidebar.Item>
+                  </Sidebar.Footer>
+                </Sidebar>
+                <Sidebar.Inset>
+                  <div className="flex min-h-0 flex-1 flex-col p-4">
+                    <div className="grid flex-1">
+                      <Skeleton asChild>
+                        <Card>
+                          <Card.Title>본문</Card.Title>
+                        </Card>
+                      </Skeleton>
+                    </div>
+                  </div>
+                </Sidebar.Inset>
+              </Sidebar.Provider>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const UseRouterLinks: Story = {
@@ -401,7 +420,8 @@ export const UseRouterLinks: Story = {
     return (
       <Sidebar.Provider>
         <Sidebar aria-label="사이드바" value={pathname}>
-          <Sidebar.Group label="워크스페이스">
+          <Sidebar.Group>
+            <Sidebar.Group.Label>워크스페이스</Sidebar.Group.Label>
             <Sidebar.Item value="/inbox" asChild>
               <a
                 href="/inbox"
@@ -436,7 +456,7 @@ export const UseRouterLinks: Story = {
               <h1 className="text-headline-h3-bold">{pathname}</h1>
             </div>
             <div className="grid h-64">
-              <Skeleton loading asChild>
+              <Skeleton asChild>
                 <Card>
                   <Card.Title>본문</Card.Title>
                 </Card>
@@ -488,7 +508,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
     <Chip variant="soft" colorScheme="danger">{2}</Chip>
   </Sidebar.Item>
 
-  <Sidebar.Group label="즐겨찾기" collapsible>
+  <Sidebar.Group collapse={{}}><Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
     <Sidebar.Item value="ziggle-v3" href="#ziggle-v3" colorScheme="primary">
       <RocketLaunchSolid />
       Ziggle v3 출시
@@ -505,7 +525,7 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
     </Sidebar.Item>
   </Sidebar.Group>
 
-  <Sidebar.Group label="팀" collapsible>
+  <Sidebar.Group collapse={{}}><Sidebar.Group.Label>팀</Sidebar.Group.Label>
     <Sidebar.Item value="info" colorScheme="primary">
       <BuildingLibrarySolid />
       인포팀
@@ -588,162 +608,168 @@ const TREE_CODE = `<Sidebar aria-label="워크스페이스">
 
 export const BuildAWorkspaceTree: Story = {
   args: { 'aria-label': '워크스페이스', value: 'frontend-active' },
-  render: (args) => (
-    <Sidebar.Provider>
-      <Sidebar {...args}>
-        <Sidebar.Header>
-          <Avatar name="GIST 인포팀" size="tiny" aria-hidden>
-            <Avatar.Fallback>
-              <CubeTransparentIcon />
-            </Avatar.Fallback>
-          </Avatar>
-          <span className="text-body-b2-semibold">GIST 인포팀</span>
-        </Sidebar.Header>
+  render: function Render(args) {
+    const sidebar = useSidebar({ collapse: { mode: 'icon' } });
 
-        <Sidebar.Item href="#search">
-          <MagnifyingGlassIcon />
-          찾기
-          <Kbd keys="Mod+K" size="tiny" />
-        </Sidebar.Item>
-        <Sidebar.Item value="inbox" href="#inbox">
-          <InboxIcon />
-          받은 소식
-          <Chip variant="soft" colorScheme="primary">
-            {12}
-          </Chip>
-        </Sidebar.Item>
-        <Sidebar.Item value="my-issues" href="#my-issues">
-          <UserCircleIcon />내 이슈
-          <Chip variant="soft" colorScheme="warning">
-            {4}
-          </Chip>
-        </Sidebar.Item>
-        <Sidebar.Item value="reviews" href="#reviews">
-          <CheckCircleIcon />
-          리뷰 요청
-          <Chip variant="soft" colorScheme="danger">
-            {2}
-          </Chip>
-        </Sidebar.Item>
+    return (
+      <Sidebar.Provider>
+        <Sidebar {...args} sidebar={sidebar}>
+          <Sidebar.Header>
+            <Avatar name="GIST 인포팀" size="tiny" aria-hidden>
+              <Avatar.Fallback>
+                <CubeTransparentIcon />
+              </Avatar.Fallback>
+            </Avatar>
+            <span className="text-body-b2-semibold">GIST 인포팀</span>
+          </Sidebar.Header>
 
-        <Sidebar.Group label="즐겨찾기" collapsible>
-          <Sidebar.Item value="ziggle-v3" href="#ziggle-v3" colorScheme="primary">
-            <RocketLaunchSolid />
-            Ziggle v3 출시
-            <Chip variant="solid" colorScheme="success" />
+          <Sidebar.Item href="#search">
+            <MagnifyingGlassIcon />
+            찾기
+            <Kbd keys="Mod+K" size="tiny" />
           </Sidebar.Item>
-          <Sidebar.Item value="ids-tokens" href="#ids-tokens" colorScheme="danger">
-            <SwatchSolid />
-            IDS 색 토큰 정리
-          </Sidebar.Item>
-          <Sidebar.Item value="shuttle-api" href="#shuttle-api" colorScheme="warning">
-            <TruckSolid />
-            셔틀 API 개편
-            <Chip variant="solid" colorScheme="warning" />
-          </Sidebar.Item>
-        </Sidebar.Group>
-
-        <Sidebar.Group label="팀" collapsible>
-          <Sidebar.Item value="info" colorScheme="primary">
-            <BuildingLibrarySolid />
-            인포팀
-            <Sidebar.Item value="info-issues" href="#info-issues">
-              <InboxIcon />
-              이슈
-              <Chip variant="soft">{38}</Chip>
-            </Sidebar.Item>
-            <Sidebar.Item value="info-projects" href="#info-projects">
-              <RectangleStackIcon />
-              프로젝트
-            </Sidebar.Item>
-            <Sidebar.Item value="frontend" colorScheme="info">
-              <CodeBracketSolid />
-              프론트엔드
-              <Sidebar.Item value="frontend-active" href="#frontend-active">
-                <PlayCircleIcon />
-                진행 중
-                <Chip variant="soft" colorScheme="info">
-                  {7}
-                </Chip>
-              </Sidebar.Item>
-              <Sidebar.Item value="frontend-backlog" href="#frontend-backlog">
-                <ArchiveBoxIcon />
-                백로그
-              </Sidebar.Item>
-              <Sidebar.Item value="frontend-cycles" href="#frontend-cycles">
-                <ArrowPathIcon />
-                사이클
-                <Chip variant="outline" colorScheme="success">
-                  12주차
-                </Chip>
-              </Sidebar.Item>
-            </Sidebar.Item>
-            <Sidebar.Item value="backend" colorScheme="success">
-              <ServerStackSolid />
-              백엔드
-              <Sidebar.Item value="backend-active" href="#backend-active">
-                <PlayCircleIcon />
-                진행 중
-                <Chip variant="soft" colorScheme="info">
-                  {3}
-                </Chip>
-              </Sidebar.Item>
-              <Sidebar.Item value="backend-backlog" href="#backend-backlog">
-                <ArchiveBoxIcon />
-                백로그
-              </Sidebar.Item>
-            </Sidebar.Item>
-          </Sidebar.Item>
-          <Sidebar.Item value="design" colorScheme="danger">
-            <PaintBrushSolid />
-            디자인팀
-            <Sidebar.Item value="design-issues" href="#design-issues">
-              <InboxIcon />
-              이슈
-              <Chip variant="soft">{9}</Chip>
-            </Sidebar.Item>
-            <Sidebar.Item value="design-projects" href="#design-projects">
-              <RectangleStackIcon />
-              프로젝트
-            </Sidebar.Item>
-          </Sidebar.Item>
-          <Sidebar.Item value="photo" colorScheme="warning">
-            <CameraSolid />
-            사진부
-            <Sidebar.Item value="photo-issues" href="#photo-issues">
-              <InboxIcon />
-              이슈
-            </Sidebar.Item>
-          </Sidebar.Item>
-        </Sidebar.Group>
-
-        <Sidebar.Footer>
-          <Sidebar.Item href="#help">
-            <QuestionMarkCircleIcon />
-            도움말
-          </Sidebar.Item>
-          <Sidebar.Item href="#profile">
-            <Avatar name="김지수" size="tiny" />
-            김지수
+          <Sidebar.Item value="inbox" href="#inbox">
+            <InboxIcon />
+            받은 소식
             <Chip variant="soft" colorScheme="primary">
-              관리자
+              {12}
             </Chip>
           </Sidebar.Item>
-        </Sidebar.Footer>
-      </Sidebar>
-      <Sidebar.Inset>
-        <div className="flex min-h-0 flex-1 flex-col p-6">
-          <Card>
-            <ScrollArea orientation="horizontal">
-              <pre className="text-body-b3-regular font-mono">
-                <code>{TREE_CODE}</code>
-              </pre>
-            </ScrollArea>
-          </Card>
-        </div>
-      </Sidebar.Inset>
-    </Sidebar.Provider>
-  ),
+          <Sidebar.Item value="my-issues" href="#my-issues">
+            <UserCircleIcon />내 이슈
+            <Chip variant="soft" colorScheme="warning">
+              {4}
+            </Chip>
+          </Sidebar.Item>
+          <Sidebar.Item value="reviews" href="#reviews">
+            <CheckCircleIcon />
+            리뷰 요청
+            <Chip variant="soft" colorScheme="danger">
+              {2}
+            </Chip>
+          </Sidebar.Item>
+
+          <Sidebar.Group collapse={{}}>
+            <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
+            <Sidebar.Item value="ziggle-v3" href="#ziggle-v3" colorScheme="primary">
+              <RocketLaunchSolid />
+              Ziggle v3 출시
+              <Chip variant="solid" colorScheme="success" />
+            </Sidebar.Item>
+            <Sidebar.Item value="ids-tokens" href="#ids-tokens" colorScheme="danger">
+              <SwatchSolid />
+              IDS 색 토큰 정리
+            </Sidebar.Item>
+            <Sidebar.Item value="shuttle-api" href="#shuttle-api" colorScheme="warning">
+              <TruckSolid />
+              셔틀 API 개편
+              <Chip variant="solid" colorScheme="warning" />
+            </Sidebar.Item>
+          </Sidebar.Group>
+
+          <Sidebar.Group collapse={{}}>
+            <Sidebar.Group.Label>팀</Sidebar.Group.Label>
+            <Sidebar.Item value="info" colorScheme="primary">
+              <BuildingLibrarySolid />
+              인포팀
+              <Sidebar.Item value="info-issues" href="#info-issues">
+                <InboxIcon />
+                이슈
+                <Chip variant="soft">{38}</Chip>
+              </Sidebar.Item>
+              <Sidebar.Item value="info-projects" href="#info-projects">
+                <RectangleStackIcon />
+                프로젝트
+              </Sidebar.Item>
+              <Sidebar.Item value="frontend" colorScheme="info">
+                <CodeBracketSolid />
+                프론트엔드
+                <Sidebar.Item value="frontend-active" href="#frontend-active">
+                  <PlayCircleIcon />
+                  진행 중
+                  <Chip variant="soft" colorScheme="info">
+                    {7}
+                  </Chip>
+                </Sidebar.Item>
+                <Sidebar.Item value="frontend-backlog" href="#frontend-backlog">
+                  <ArchiveBoxIcon />
+                  백로그
+                </Sidebar.Item>
+                <Sidebar.Item value="frontend-cycles" href="#frontend-cycles">
+                  <ArrowPathIcon />
+                  사이클
+                  <Chip variant="outline" colorScheme="success">
+                    12주차
+                  </Chip>
+                </Sidebar.Item>
+              </Sidebar.Item>
+              <Sidebar.Item value="backend" colorScheme="success">
+                <ServerStackSolid />
+                백엔드
+                <Sidebar.Item value="backend-active" href="#backend-active">
+                  <PlayCircleIcon />
+                  진행 중
+                  <Chip variant="soft" colorScheme="info">
+                    {3}
+                  </Chip>
+                </Sidebar.Item>
+                <Sidebar.Item value="backend-backlog" href="#backend-backlog">
+                  <ArchiveBoxIcon />
+                  백로그
+                </Sidebar.Item>
+              </Sidebar.Item>
+            </Sidebar.Item>
+            <Sidebar.Item value="design" colorScheme="danger">
+              <PaintBrushSolid />
+              디자인팀
+              <Sidebar.Item value="design-issues" href="#design-issues">
+                <InboxIcon />
+                이슈
+                <Chip variant="soft">{9}</Chip>
+              </Sidebar.Item>
+              <Sidebar.Item value="design-projects" href="#design-projects">
+                <RectangleStackIcon />
+                프로젝트
+              </Sidebar.Item>
+            </Sidebar.Item>
+            <Sidebar.Item value="photo" colorScheme="warning">
+              <CameraSolid />
+              사진부
+              <Sidebar.Item value="photo-issues" href="#photo-issues">
+                <InboxIcon />
+                이슈
+              </Sidebar.Item>
+            </Sidebar.Item>
+          </Sidebar.Group>
+
+          <Sidebar.Footer>
+            <Sidebar.Item href="#help">
+              <QuestionMarkCircleIcon />
+              도움말
+            </Sidebar.Item>
+            <Sidebar.Item href="#profile">
+              <Avatar name="김지수" size="tiny" />
+              김지수
+              <Chip variant="soft" colorScheme="primary">
+                관리자
+              </Chip>
+            </Sidebar.Item>
+          </Sidebar.Footer>
+        </Sidebar>
+        <Sidebar.Inset>
+          <div className="flex min-h-0 flex-1 flex-col p-6">
+            <Card>
+              <ScrollArea orientation="horizontal">
+                <pre className="text-body-b3-regular font-mono">
+                  <code>{TREE_CODE}</code>
+                </pre>
+              </ScrollArea>
+            </Card>
+          </div>
+        </Sidebar.Inset>
+      </Sidebar.Provider>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -775,45 +801,43 @@ const FAVORITES_CODE = `<Sidebar aria-label="워크스페이스">
     <InboxIcon />
     받은 소식
   </Sidebar.Item>
-  <Sidebar.Group
-    label="즐겨찾기"
-    items={favorites}
-    onItemsChange={setFavorites}
-    canMove={({ to }) => to.parent === null}
-  >
+  <Sidebar.Group><Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label><Sidebar.Group.Tree items={favorites} sortable={{ onItemsChange: setFavorites, canMove: ({ to }) => to.parent === null }}>
     {(page) => (
       <Sidebar.Item value={page.id} href={\`#\${page.id}\`} colorScheme={page.colorScheme}>
         {page.icon}
         {page.label}
       </Sidebar.Item>
     )}
-  </Sidebar.Group>
+  </Sidebar.Group.Tree></Sidebar.Group>
 </Sidebar>`;
 
 export const ReorderFavorites: Story = {
   args: { 'aria-label': '워크스페이스', value: 'tokens' },
   render: function Render(args) {
+    const sidebar = useSidebar({ collapse: { mode: 'icon' } });
+
     const [favorites, setFavorites] = useState(FAVORITES);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args}>
+        <Sidebar {...args} sidebar={sidebar}>
           <Sidebar.Item value="inbox" href="#inbox">
             <InboxIcon />
             받은 소식
           </Sidebar.Item>
-          <Sidebar.Group
-            label="즐겨찾기"
-            items={favorites}
-            onItemsChange={setFavorites}
-            canMove={({ to }) => to.parent === null}
-          >
-            {(page) => (
-              <Sidebar.Item value={page.id} href={`#${page.id}`} colorScheme={page.colorScheme}>
-                {page.icon}
-                {page.label}
-              </Sidebar.Item>
-            )}
+          <Sidebar.Group>
+            <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
+            <Sidebar.Group.Tree
+              items={favorites}
+              sortable={{ onItemsChange: setFavorites, canMove: ({ to }) => to.parent === null }}
+            >
+              {(page) => (
+                <Sidebar.Item value={page.id} href={`#${page.id}`} colorScheme={page.colorScheme}>
+                  {page.icon}
+                  {page.label}
+                </Sidebar.Item>
+              )}
+            </Sidebar.Group.Tree>
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset>
@@ -872,14 +896,8 @@ const CHANNELS: Channel[] = [
 ];
 
 const CHANNELS_CODE = `<Sidebar aria-label="워크스페이스">
-  <Sidebar.Group
-    label="채널"
-    items={channels}
-    onItemsChange={setChannels}
-    canMove={({ item, to }) =>
-      item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category'
-    }
-  >
+  <Sidebar.Group><Sidebar.Group.Label>채널</Sidebar.Group.Label><Sidebar.Group.Tree items={channels} sortable={{ onItemsChange: setChannels, canMove: ({ item, to }) =>
+      item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category' }}>
     {(channel) =>
       channel.kind === 'category' ? (
         <Sidebar.Item>
@@ -896,43 +914,48 @@ const CHANNELS_CODE = `<Sidebar aria-label="워크스페이스">
         </Sidebar.Item>
       )
     }
-  </Sidebar.Group>
+  </Sidebar.Group.Tree></Sidebar.Group>
 </Sidebar>`;
 
 export const MoveChannelsBetweenCategories: Story = {
   args: { 'aria-label': '워크스페이스', value: 'frontend' },
   render: function Render(args) {
+    const sidebar = useSidebar({ collapse: { mode: 'icon' } });
+
     const [channels, setChannels] = useState(CHANNELS);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args}>
-          <Sidebar.Group
-            label="채널"
-            items={channels}
-            onItemsChange={setChannels}
-            canMove={({ item, to }) =>
-              item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category'
-            }
-          >
-            {(channel) =>
-              channel.kind === 'category' ? (
-                <Sidebar.Item>
-                  <FolderIcon />
-                  {channel.label}
-                </Sidebar.Item>
-              ) : (
-                <Sidebar.Item value={channel.id} href={`#${channel.id}`}>
-                  <HashtagIcon />
-                  {channel.label}
-                  {channel.unread && (
-                    <Chip variant="soft" colorScheme="primary">
-                      {channel.unread}
-                    </Chip>
-                  )}
-                </Sidebar.Item>
-              )
-            }
+        <Sidebar {...args} sidebar={sidebar}>
+          <Sidebar.Group>
+            <Sidebar.Group.Label>채널</Sidebar.Group.Label>
+            <Sidebar.Group.Tree
+              items={channels}
+              sortable={{
+                onItemsChange: setChannels,
+                canMove: ({ item, to }) =>
+                  item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category',
+              }}
+            >
+              {(channel) =>
+                channel.kind === 'category' ? (
+                  <Sidebar.Item>
+                    <FolderIcon />
+                    {channel.label}
+                  </Sidebar.Item>
+                ) : (
+                  <Sidebar.Item value={channel.id} href={`#${channel.id}`}>
+                    <HashtagIcon />
+                    {channel.label}
+                    {channel.unread && (
+                      <Chip variant="soft" colorScheme="primary">
+                        {channel.unread}
+                      </Chip>
+                    )}
+                  </Sidebar.Item>
+                )
+              }
+            </Sidebar.Group.Tree>
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset>
@@ -1016,10 +1039,7 @@ const PAGES: Page[] = [
 ];
 
 const PAGES_CODE = `<Sidebar aria-label="워크스페이스">
-  <Sidebar.Group
-    label="페이지"
-    items={pages}
-    onItemsChange={async (next, { item, to }) => {
+  <Sidebar.Group><Sidebar.Group.Label>페이지</Sidebar.Group.Label><Sidebar.Group.Tree items={pages} sortable={{ onItemsChange: async (next, { item, to }) => {
       const place = to.parent ? \`"\${to.parent.label}" 안\` : '맨 위';
       const confirmed = await overlay.open<boolean>(({ close }) => (
         <Dialog>
@@ -1038,8 +1058,7 @@ const PAGES_CODE = `<Sidebar aria-label="워크스페이스">
         </Dialog>
       ));
       if (confirmed) setPages(next);
-    }}
-  >
+    } }}>
     {(page) => (
       <Sidebar.Item value={page.id} href={\`#\${page.id}\`} colorScheme={page.colorScheme}>
         {page.icon}
@@ -1047,51 +1066,57 @@ const PAGES_CODE = `<Sidebar aria-label="워크스페이스">
         {page.badge}
       </Sidebar.Item>
     )}
-  </Sidebar.Group>
+  </Sidebar.Group.Tree></Sidebar.Group>
 </Sidebar>`;
 
 export const ConfirmBeforeMovingAPage: Story = {
   args: { 'aria-label': '워크스페이스', value: 'color' },
   render: function Render(args) {
+    const sidebar = useSidebar({ collapse: { mode: 'icon' } });
+
     const [pages, setPages] = useState(PAGES);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args}>
-          <Sidebar.Group
-            label="페이지"
-            items={pages}
-            onItemsChange={async (next, { item, to }) => {
-              const place = to.parent ? `"${to.parent.label}" 안` : '맨 위';
-              const confirmed = await overlay.open<boolean>(({ close }) => (
-                <div className="break-keep">
-                  <Dialog>
-                    <Dialog.Content>
-                      <Dialog.Header>
-                        <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
-                        <Dialog.Description>
-                          &quot;{item.label}&quot; 페이지가 {place}의 {to.index + 1}번째 자리로
-                          옮겨집니다.
-                        </Dialog.Description>
-                      </Dialog.Header>
-                      <Dialog.Footer>
-                        <Dialog.Close>취소</Dialog.Close>
-                        <Button onClick={() => close(true)}>옮기기</Button>
-                      </Dialog.Footer>
-                    </Dialog.Content>
-                  </Dialog>
-                </div>
-              ));
-              if (confirmed) setPages(next);
-            }}
-          >
-            {(page) => (
-              <Sidebar.Item value={page.id} href={`#${page.id}`} colorScheme={page.colorScheme}>
-                {page.icon}
-                {page.label}
-                {page.badge}
-              </Sidebar.Item>
-            )}
+        <Sidebar {...args} sidebar={sidebar}>
+          <Sidebar.Group>
+            <Sidebar.Group.Label>페이지</Sidebar.Group.Label>
+            <Sidebar.Group.Tree
+              items={pages}
+              sortable={{
+                onItemsChange: async (next, { item, to }) => {
+                  const place = to.parent ? `"${to.parent.label}" 안` : '맨 위';
+                  const confirmed = await overlay.open<boolean>(({ close }) => (
+                    <div className="break-keep">
+                      <Dialog>
+                        <Dialog.Content>
+                          <Dialog.Header>
+                            <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
+                            <Dialog.Description>
+                              &quot;{item.label}&quot; 페이지가 {place}의 {to.index + 1}번째 자리로
+                              옮겨집니다.
+                            </Dialog.Description>
+                          </Dialog.Header>
+                          <Dialog.Footer>
+                            <Dialog.Close>취소</Dialog.Close>
+                            <Button onClick={() => close(true)}>옮기기</Button>
+                          </Dialog.Footer>
+                        </Dialog.Content>
+                      </Dialog>
+                    </div>
+                  ));
+                  if (confirmed) setPages(next);
+                },
+              }}
+            >
+              {(page) => (
+                <Sidebar.Item value={page.id} href={`#${page.id}`} colorScheme={page.colorScheme}>
+                  {page.icon}
+                  {page.label}
+                  {page.badge}
+                </Sidebar.Item>
+              )}
+            </Sidebar.Group.Tree>
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset>
@@ -1144,12 +1169,7 @@ const FILES: FileNode[] = [
 ];
 
 const FILES_CODE = `<Sidebar aria-label="파일">
-  <Sidebar.Group
-    label="ids-react"
-    items={files}
-    onItemsChange={setFiles}
-    canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}
-  >
+  <Sidebar.Group><Sidebar.Group.Label>ids-react</Sidebar.Group.Label><Sidebar.Group.Tree items={files} sortable={{ onItemsChange: setFiles, canMove: ({ to }) => to.parent === null || to.parent.kind === 'folder' }}>
     {(file) =>
       file.kind === 'folder' ? (
         <Sidebar.Item>
@@ -1163,36 +1183,42 @@ const FILES_CODE = `<Sidebar aria-label="파일">
         </Sidebar.Item>
       )
     }
-  </Sidebar.Group>
+  </Sidebar.Group.Tree></Sidebar.Group>
 </Sidebar>`;
 
 export const BuildAFileTree: Story = {
   args: { 'aria-label': '파일', value: 'button.tsx' },
   render: function Render(args) {
+    const sidebar = useSidebar({ collapse: { mode: 'icon' } });
+
     const [files, setFiles] = useState(FILES);
 
     return (
       <Sidebar.Provider>
-        <Sidebar {...args}>
-          <Sidebar.Group
-            label="ids-react"
-            items={files}
-            onItemsChange={setFiles}
-            canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}
-          >
-            {(file) =>
-              file.kind === 'folder' ? (
-                <Sidebar.Item>
-                  <FolderIcon />
-                  {file.name}
-                </Sidebar.Item>
-              ) : (
-                <Sidebar.Item value={file.id} href={`#${file.id}`}>
-                  <DocumentTextIcon />
-                  {file.name}
-                </Sidebar.Item>
-              )
-            }
+        <Sidebar {...args} sidebar={sidebar}>
+          <Sidebar.Group>
+            <Sidebar.Group.Label>ids-react</Sidebar.Group.Label>
+            <Sidebar.Group.Tree
+              items={files}
+              sortable={{
+                onItemsChange: setFiles,
+                canMove: ({ to }) => to.parent === null || to.parent.kind === 'folder',
+              }}
+            >
+              {(file) =>
+                file.kind === 'folder' ? (
+                  <Sidebar.Item>
+                    <FolderIcon />
+                    {file.name}
+                  </Sidebar.Item>
+                ) : (
+                  <Sidebar.Item value={file.id} href={`#${file.id}`}>
+                    <DocumentTextIcon />
+                    {file.name}
+                  </Sidebar.Item>
+                )
+              }
+            </Sidebar.Group.Tree>
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset>
@@ -1239,7 +1265,7 @@ export const OpenAsADrawerOnPhones: Story = {
             <h1 className="text-headline-h3-bold">홈</h1>
           </div>
           <div className="grid h-64">
-            <Skeleton loading asChild>
+            <Skeleton asChild>
               <Card>
                 <Card.Title>본문</Card.Title>
               </Card>

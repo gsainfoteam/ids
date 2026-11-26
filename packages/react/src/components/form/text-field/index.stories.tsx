@@ -38,7 +38,7 @@ const meta = {
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     placeholder: { control: 'text' },
   },
   args: {
@@ -110,10 +110,15 @@ export const Gallery: Story = {
           </Showcase.Row>
           <Showcase.Row label="invalid">
             <div className="w-56">
-              <TextField defaultValue="인포팀!" invalid aria-label="잘못됨" />
+              <TextField defaultValue="인포팀!" aria-invalid aria-label="잘못됨" />
             </div>
             <div className="w-56">
-              <TextField defaultValue="인포팀!" invalid variant="soft" aria-label="잘못됨 soft" />
+              <TextField
+                defaultValue="인포팀!"
+                aria-invalid
+                variant="soft"
+                aria-label="잘못됨 soft"
+              />
             </div>
           </Showcase.Row>
           <Showcase.Row label="disabled">

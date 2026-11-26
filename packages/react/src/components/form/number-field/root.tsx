@@ -43,7 +43,6 @@ export function NumberFieldRoot({
   smallStep,
   largeStep,
   formatOptions,
-  invalid,
   disabled,
   size,
   variant = 'outline',
@@ -82,7 +81,6 @@ export function NumberFieldRoot({
     locale,
     formatOptions,
     disabled,
-    invalid,
     clearable: countOf(items, TextControlClear) > 0,
   });
   const state: NumberFieldState = { size: resolvedSize, variant, ...field.state };

@@ -29,7 +29,7 @@ const meta = {
     hourCycle: { control: 'radio', options: [undefined, '12h', '24h'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
     format: { control: 'object' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     required: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -133,7 +133,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-44">
-            <TimeField invalid defaultValue={at(9)} aria-label="잘못됨" />
+            <TimeField aria-invalid defaultValue={at(9)} aria-label="잘못됨" />
           </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
@@ -253,7 +253,7 @@ export const OpenAsADrawerOnPhones: Story = {
       <Field>
         <Field.Label>알람</Field.Label>
         <TimeField defaultValue={new Time(7, 30)}>
-          <TimeField.Content mobileVariant="drawer" />
+          <TimeField.Content narrow="drawer" />
         </TimeField>
       </Field>
     </div>
@@ -262,7 +262,7 @@ export const OpenAsADrawerOnPhones: Story = {
     docs: {
       description: {
         story:
-          '좁은 화면에서 팝업을 아래에서 올라오는 드로어로 띄우려면 TimeField.Content에 mobileVariant="drawer"를 줍니다. 넓은 화면에서는 그대로 팝오버입니다.',
+          '좁은 화면에서 팝업을 아래에서 올라오는 드로어로 띄우려면 TimeField.Content에 narrow="drawer"를 줍니다. 넓은 화면에서는 그대로 팝오버입니다.',
       },
     },
   },

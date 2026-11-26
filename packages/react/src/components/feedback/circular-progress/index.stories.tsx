@@ -30,7 +30,6 @@ const meta = {
     max: { control: 'number' },
     size: { control: 'radio', options: sizes },
     colorScheme: { control: 'select', options: schemes },
-    indeterminate: { control: 'boolean' },
   },
   args: { value: 65, max: 100, size: 'standard', colorScheme: 'primary' },
 } satisfies Meta<typeof CircularProgress>;
@@ -93,7 +92,7 @@ export const Gallery: Story = {
             <CircularProgress.Value />
           </CircularProgress>
         </Showcase.Row>
-        <Showcase.Row label="indeterminate">
+        <Showcase.Row label="value={null}">
           <CircularProgress aria-label="처리 중" />
           <CircularProgress size="tiny" aria-label="처리 중" />
         </Showcase.Row>
@@ -160,7 +159,7 @@ export const WaitWithoutAKnownValue: Story = {
     docs: {
       description: {
         story:
-          'value가 없거나 indeterminate면 원의 4분의 1이 돌고 aria-valuenow를 빼 둡니다. 모션 줄이기 설정에서는 돌지 않습니다.',
+          'value가 없거나 null이면 원의 4분의 1이 돌고 aria-valuenow를 빼 둡니다. 모션 줄이기 설정에서는 돌지 않습니다.',
       },
     },
   },

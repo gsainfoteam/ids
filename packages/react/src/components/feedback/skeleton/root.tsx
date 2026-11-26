@@ -8,13 +8,14 @@ import type { Skeleton } from '.';
 
 export function SkeletonRoot({
   animation = 'pulse',
-  loading = true,
+  'aria-busy': ariaBusy = true,
   asChild = false,
   className,
   children,
   ref,
   ...rest
 }: Skeleton.Props) {
+  const loading = ariaBusy === true || ariaBusy === 'true';
   const styles = skeletonStyle({ animation, wrapping: asChild ? 'child' : 'div', loading });
   const wrapperProps = {
     ...rest,

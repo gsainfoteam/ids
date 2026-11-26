@@ -10,11 +10,10 @@ const DEFAULT_MAX = 100;
 export function resolveProgress(
   value: number | null | undefined,
   max: number,
-  indeterminate: boolean,
 ): ResolvedProgress {
   const validMax = Number.isFinite(max) && max > 0;
   const safeMax = validMax ? max : DEFAULT_MAX;
-  if (indeterminate || value == null || !validMax || !Number.isFinite(value))
+  if (value == null || !validMax || !Number.isFinite(value))
     return { value: null, max: safeMax, percent: null };
   const clamped = clamp(value, 0, safeMax);
   return { value: clamped, max: safeMax, percent: (clamped / safeMax) * 100 };

@@ -51,7 +51,6 @@ export type RatingProps = Omit<
   size?: IdsSize;
   disabled?: boolean;
   readOnly?: boolean;
-  invalid?: boolean;
   required?: boolean;
   name?: string;
   form?: string;
@@ -71,7 +70,6 @@ export function RatingRoot({
   size,
   disabled = false,
   readOnly = false,
-  invalid,
   required = false,
   name,
   form,
@@ -87,7 +85,7 @@ export function RatingRoot({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledby,
   'aria-describedby': ariaDescribedby,
-  'aria-invalid': ariaInvalidProp,
+  'aria-invalid': ariaInvalid,
   'aria-required': ariaRequired,
   ...rest
 }: RatingProps) {
@@ -123,7 +121,6 @@ export function RatingRoot({
     choose,
     forwardRootFocusToChecked,
   } = rating;
-  const ariaInvalid = ariaInvalidProp ?? invalid;
   const state: RatingState = {
     value: current,
     previewValue: hover,

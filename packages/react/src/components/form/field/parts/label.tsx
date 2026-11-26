@@ -19,7 +19,7 @@ export function FieldLabel({ required, className, style, children, ...rest }: Fi
         size={state.size}
         required={required ?? state.required}
         disabled={state.disabled}
-        invalid={state.invalid}
+        aria-invalid={state.invalid || undefined}
         data-field-part="label"
         {...stateAttributes(state)}
         className={resolve(className, state)}

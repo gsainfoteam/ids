@@ -1,43 +1,41 @@
 'use client';
 
-import { cloneElement, isValidElement, useId, type ReactNode } from 'react';
+import { useId } from 'react';
 
 import { SelectContent } from './content';
-import { useInternalSelectContext } from '../context';
+import { GroupContext, useInternalSelectContext } from '../context';
+import { SelectGroupLabel } from './group-label';
 import { SelectItem } from './item';
-import { mergeProps, part } from '../../../../utils';
+import { flattenFragments, mergeProps, part } from '../../../../utils';
+import { isType } from '../lib/is-type';
 import { collectOptions, slotChildren } from '../lib/select-options';
 
 import type { BoxProps } from '../lib/box-props';
 
-export type SelectGroupProps = BoxProps & { heading: ReactNode };
+export type SelectGroupProps = BoxProps;
 
-export function SelectGroup({ heading, asChild, children, className, ...props }: SelectGroupProps) {
+export function SelectGroup({ asChild, children, className, ...props }: SelectGroupProps) {
   const c = useInternalSelectContext('Select.Group');
-  const headingId = useId();
+  const labelId = useId();
 
   const inner = slotChildren(children, asChild);
+  const labelled = flattenFragments(inner).some(isType(SelectGroupLabel));
   const visible = new Set(c.select.state.visible.map((option) => option.value));
   if (!collectOptions(inner, OPTION_KINDS).some((option) => visible.has(option.value))) return null;
 
-  const content = (
-    <>
-      <div id={headingId} className={c.styles.groupHeading()}>
-        {heading}
-      </div>
-      {inner}
-    </>
-  );
-
-  return part(
-    'div',
-    asChild,
-    asChild && isValidElement(children) ? cloneElement(children, {}, content) : content,
-    mergeProps(props, {
-      role: 'group',
-      'aria-labelledby': headingId,
-      className: c.styles.group({ className }),
-    }),
+  return (
+    <GroupContext value={{ labelId }}>
+      {part(
+        'div',
+        asChild,
+        children,
+        mergeProps(props, {
+          role: 'group',
+          'aria-labelledby': props['aria-labelledby'] ?? (labelled ? labelId : undefined),
+          className: c.styles.group({ className }),
+        }),
+      )}
+    </GroupContext>
   );
 }
 

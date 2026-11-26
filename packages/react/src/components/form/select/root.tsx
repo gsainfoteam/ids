@@ -60,7 +60,6 @@ type BaseProps = NativeTriggerProps & {
   placeholder?: string;
   variant?: SelectVariant;
   size?: IdsSize;
-  invalid?: boolean;
   readOnly?: boolean;
   required?: boolean;
   open?: boolean;
@@ -101,7 +100,6 @@ export function SelectRoot(props: SelectProps) {
     placeholder,
     variant = 'outline',
     size,
-    invalid,
     readOnly = false,
     required = false,
     disabled = false,
@@ -116,14 +114,14 @@ export function SelectRoot(props: SelectProps) {
   } = props;
   const multiple = selectionMode === 'multiple';
 
-  const { triggers, clears, contents, rest, mobileVariant } = splitSelectChildren(children);
+  const { triggers, clears, contents, rest, narrow } = splitSelectChildren(children);
   const options = selectOptionsIn(children);
 
   const popupNodes = contents.length ? contents : rest;
   useInternalSelectItemsWarning(!options.length && popupNodes.some(isForeignComponent));
   const searchable = holdsASearchField(popupNodes);
 
-  const drawer = useInternalDrawerPresentation(mobileVariant);
+  const drawer = useInternalDrawerPresentation(narrow);
   const select = useInternalSelect({
     multiple,
     value,
@@ -147,7 +145,7 @@ export function SelectRoot(props: SelectProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = selectStyle({ variant, size: resolvedSize });
-  const ariaInvalid = native['aria-invalid'] ?? invalid;
+  const ariaInvalid = native['aria-invalid'];
   const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
   const state: SelectState = {
     open: s.open,
@@ -239,7 +237,7 @@ export function SelectRoot(props: SelectProps) {
         <FieldPopup
           anchor={rootRef}
           onClose={select.actions.close}
-          mobileVariant={mobileVariant}
+          narrow={narrow}
           label={native['aria-label'] ?? t('common.options')}
           aria-labelledby={drawer ? native['aria-labelledby'] : undefined}
           data-select-popup={ids.base}

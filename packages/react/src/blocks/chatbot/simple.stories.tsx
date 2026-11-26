@@ -97,7 +97,7 @@ export const PC: Story = {
         <Divider />
 
         <div className="flex min-h-0 flex-1 flex-col">
-          <ScrollArea fade>
+          <ScrollArea fade="y">
             <ol
               aria-label="대화"
               className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-6"

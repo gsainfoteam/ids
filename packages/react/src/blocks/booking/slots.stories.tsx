@@ -5,7 +5,7 @@ import { CalendarDate } from '@internationalized/date';
 
 import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
-import { Calendar } from '../../components/data/calendar';
+import { Calendar, useCalendar } from '../../components/data/calendar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Empty } from '../../components/data/empty';
@@ -40,6 +40,13 @@ export const PC: Story = {
     const [date, setDate] = useState<CalendarDate | null>(TODAY.add({ days: 1 }));
     const [time, setTime] = useState<string | null>(null);
     const [step, setStep] = useState<'pick' | 'details' | 'done'>('pick');
+    const calendar = useCalendar({
+      availability: {
+        min: TODAY,
+        max: TODAY.add({ days: 30 }),
+        unavailable: { dayOfWeek: [0, 6] },
+      },
+    });
 
     const book = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -79,9 +86,7 @@ export const PC: Story = {
                       setDate(next);
                       setTime(null);
                     }}
-                    min={TODAY}
-                    max={TODAY.add({ days: 30 })}
-                    disabled={{ dayOfWeek: [0, 6] }}
+                    calendar={calendar}
                   />
                   {date && (
                     <section

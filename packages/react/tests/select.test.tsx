@@ -467,8 +467,9 @@ test('asChild Content and Group still collect items; an empty string is a value'
       </Select.Trigger>
       <Select.Content asChild>
         <section>
-          <Select.Group heading="Values" asChild>
+          <Select.Group asChild>
             <section>
+              <Select.GroupLabel>Values</Select.GroupLabel>
               <Select.Item value="">Empty</Select.Item>
             </section>
           </Select.Group>
@@ -555,6 +556,28 @@ test('the popup flips above a trigger near the bottom, stays on screen and leave
   await expect.poll(() => popup.getBoundingClientRect().bottom).toBeLessThanOrEqual(0);
 });
 
+test('a small screen opens a drawer by default and a popover with narrow="popover"', async () => {
+  await page.viewport(400, 700);
+  const screen = await render(
+    <div>
+      <Select aria-label="Default">{items}</Select>
+      <Select aria-label="Popover">
+        <Select.Content narrow="popover">{items}</Select.Content>
+      </Select>
+    </div>,
+  );
+  await userEvent.click(screen.getByRole('combobox', { name: 'Default' }));
+  await expect
+    .element(screen.getByRole('dialog', { name: 'Default' }))
+    .toHaveAttribute('data-presentation', 'drawer');
+  await userEvent.keyboard('{Escape}');
+  await userEvent.click(screen.getByRole('combobox', { name: 'Popover' }));
+  await expect.element(screen.getByRole('listbox')).toBeVisible();
+  await expect
+    .element(page.elementLocator(document.querySelector('[data-field-popup]')!))
+    .toHaveAttribute('data-presentation', 'popover');
+});
+
 test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab held, scroll locked', async () => {
   await page.viewport(400, 700);
   const onValueChange = vi.fn();
@@ -563,7 +586,7 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     <div>
       <button onClick={pressedUnderneath}>Before</button>
       <Select aria-label="Fruit" defaultValue="cherry" onValueChange={onValueChange}>
-        <Select.Content mobileVariant="drawer">{items}</Select.Content>
+        <Select.Content narrow="drawer">{items}</Select.Content>
       </Select>
     </div>,
   );

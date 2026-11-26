@@ -7,6 +7,7 @@ import { SelectClear } from '../parts/clear';
 import { SelectContent, type SelectContentProps } from '../parts/content';
 import { SelectEmpty } from '../parts/empty';
 import { OPTION_KINDS, SelectGroup } from '../parts/group';
+import { SelectGroupLabel } from '../parts/group-label';
 import { SelectIcon } from '../parts/icon';
 import { SelectItem } from '../parts/item';
 import { SelectItemIndicator } from '../parts/item-indicator';
@@ -25,6 +26,7 @@ const PARTS = new Set<unknown>([
   SelectItem,
   SelectItemIndicator,
   SelectGroup,
+  SelectGroupLabel,
   SelectSeparator,
   SelectEmpty,
 ]);
@@ -59,8 +61,7 @@ export function splitSelectChildren(children: ReactNode) {
     clears,
     contents,
     rest,
-    mobileVariant: (contents[0] as ReactElement<SelectContentProps> | undefined)?.props
-      .mobileVariant,
+    narrow: (contents[0] as ReactElement<SelectContentProps> | undefined)?.props.narrow ?? 'drawer',
   };
 }
 

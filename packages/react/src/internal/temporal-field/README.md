@@ -108,7 +108,7 @@ export namespace DateField {
 - Input 은 필드 상자 안의 맨 `input` 입니다. TextField 를 쓰면 상자가 하나 더 그려집니다. `autoComplete` 는 Input 만 읽고 기본값은 `'off'` 입니다.
 - Clear 는 TextField 의 Clear 와 달리 Tab 순서에 남습니다. Input 이 없는 날짜 필드에는 지울 글자가 없고, 달력에도 값을 비우는 키가 없습니다.
 - Clear 와 Input 옆 버튼은 [`fieldAction.unpadded`](../README.md#field-surfacets) 입니다. Trigger 가 상자 끝까지 차서 상자에 padding 이 없습니다.
-- 팝업은 `TemporalContent` 가 그립니다(`X.Content`). 그래서 좁은 화면의 모양 `mobileVariant` 는 루트가 아니라 Content 의 prop 이고, Content 의 나머지 속성은 팝업 안 내용 상자에 붙습니다. Content 를 주지 않으면 루트가 빈 Content 를 그립니다.
+- 팝업은 `TemporalContent` 가 그립니다(`X.Content`). 그래서 좁은 화면의 모양 `narrow` 는 루트가 아니라 Content 의 prop 이고, Content 의 나머지 속성은 팝업 안 내용 상자에 붙습니다. Content 를 주지 않으면 루트가 빈 Content 를 그립니다.
 - 팝업은 `role="dialog"` 이고 `data-temporal-owner` 는 `popupId` 입니다. 이름은 필드의 이름(`picker.name` 과 같은 `aria-labelledby` 나 `aria-label`)입니다. IDS 가 쓴 제목은 없습니다.
 - 팝업의 `aria-labelledby` 로 컨트롤을 가리키지 않습니다. combobox 를 가리키면 이름 대신 그 값이 읽힙니다(accname 의 embedded control).
 - 머리(`FieldPopupHeader`)는 닫기 버튼 하나이고, 늘 렌더하고 drawer 에서만 보입니다.
@@ -161,7 +161,7 @@ export namespace DateField {
 
 - 필드의 id, 라벨, 설명, `role="combobox"`, ARIA 는 `control` 하나에 모읍니다. Input 이 있으면 Input props(`textBox`)에, 없으면 Trigger props 에 펼칩니다.
 - Input 이 있으면 Trigger props 는 버튼의 것만 가집니다(`tabIndex: -1`, `aria-label` 은 `messages.open`).
-- `aria-invalid` prop 이 `invalid` 보다 우선합니다. 둘 다 없으면 읽을 수 없는 글자(`unreadable`)가 invalid 를 정합니다.
+- 오류 상태는 `aria-invalid` 가 정합니다. Field 안이면 Field 가 넘긴 값입니다. `aria-invalid` 가 없으면 읽을 수 없는 글자(`unreadable`)가 정합니다.
 
 ### 알아둘 것
 

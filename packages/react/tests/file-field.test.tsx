@@ -4,7 +4,7 @@ import { expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Field, FileField } from '../src';
+import { Field, FileField, useFileField } from '../src';
 import { FIREFOX_DROPS_SYNTHETIC_CLIPBOARD_DATA, skipInFirefox } from './engines';
 import { Field as RHFField } from '../src/react-hook-form';
 
@@ -102,6 +102,47 @@ test('SSR: labels, native picker attributes, button semantics, validator and dia
   expect(() => renderToString(<FileField accept="pdf" />)).toThrow(/accept/);
 });
 
+test('useFileField checks its limits', () => {
+  function NegativeSize() {
+    return <FileField aria-label="Files" fileField={useFileField({ limits: { maxSize: -1 } })} />;
+  }
+  function FractionalCount() {
+    return (
+      <FileField
+        aria-label="Files"
+        multiple
+        fileField={useFileField({ limits: { maxCount: 1.5 } })}
+      />
+    );
+  }
+
+  expect(() => renderToString(<NegativeSize />)).toThrow(/^\[IDS\] useFileField: maxSize/);
+  expect(() => renderToString(<FractionalCount />)).toThrow(/^\[IDS\] useFileField: maxCount/);
+});
+
+test('invalid comes from aria-invalid or the Field around it, not a prop', () => {
+  const marked = parse(renderToString(<FileField aria-label="Files" aria-invalid />));
+  expect(marked.querySelector('[data-file-field]')!.hasAttribute('data-invalid')).toBe(true);
+  expect(marked.querySelector('button')!.getAttribute('aria-invalid')).toBe('true');
+
+  const inField = parse(
+    renderToString(
+      <Field invalid>
+        <Field.Label>Files</Field.Label>
+        <FileField />
+      </Field>,
+    ),
+  );
+  expect(inField.querySelector('[data-file-field]')!.hasAttribute('data-invalid')).toBe(true);
+  expect(inField.querySelector('[data-file-field] button')!.getAttribute('aria-invalid')).toBe(
+    'true',
+  );
+
+  const plain = parse(renderToString(<FileField aria-label="Files" />));
+  expect(plain.querySelector('[data-file-field]')!.hasAttribute('data-invalid')).toBe(false);
+  expect(plain.querySelector('button')!.hasAttribute('aria-invalid')).toBe(false);
+});
+
 test('single: replacement, rejections keep the model, a repeat pick, and clear', async () => {
   const onValueChange = vi.fn();
   const onReject = vi.fn();
@@ -109,9 +150,8 @@ test('single: replacement, rejections keep the model, a repeat pick, and clear',
     <FileField
       aria-label="Files"
       accept=".pdf"
-      maxSize={10}
+      fileField={{ limits: { maxSize: 10, onReject } }}
       onValueChange={onValueChange}
-      onReject={onReject}
     >
       {rejection}
     </FileField>,
@@ -158,9 +198,8 @@ test('multiple: appends, dedupes, limits, and removal keeps focus in the list', 
         aria-label="Files"
         multiple
         accept=".pdf"
-        maxCount={3}
+        fileField={{ limits: { maxCount: 3, onReject } }}
         onValueChange={onValueChange}
-        onReject={onReject}
       >
         {rejection}
       </FileField>

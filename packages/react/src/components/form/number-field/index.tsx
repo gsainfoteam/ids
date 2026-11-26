@@ -35,7 +35,6 @@ export namespace NumberField {
     smallStep?: number;
     largeStep?: number;
     formatOptions?: NumberFieldFormatOptions;
-    invalid?: boolean;
     disabled?: boolean;
     size?: IdsSize;
     variant?: NumberFieldVariant;

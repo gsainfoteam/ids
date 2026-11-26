@@ -43,12 +43,13 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 
 <Label disabled>이름</Label>           // 직접 흐리게
 
-<Label invalid>이름</Label>            // danger 색
+<Label aria-invalid>이름</Label>       // danger 색
 ```
 
 - `*` 는 `aria-hidden` 입니다. 필수라는 사실은 컨트롤의 `required` 가 스크린 리더에 전합니다. 컨트롤에도 `required` 를 주세요.
 - 컨트롤의 `disabled`, `aria-disabled="true"`, `data-disabled` 를 비활성으로, `required`, `aria-required="true"` 를 필수로 읽습니다.
-- `invalid` 는 직접 줄 때만 켜집니다. 오류인 그룹 안 선택지의 라벨까지 붉어지지 않도록 컨트롤의 `aria-invalid` 는 따르지 않습니다.
+- 오류 색은 라벨에 직접 준 `aria-invalid` 로만 켜집니다. 오류인 그룹 안 선택지의 라벨까지 붉어지지 않도록 컨트롤의 `aria-invalid` 는 따르지 않습니다.
+- 라벨의 `aria-invalid` 는 색만 바꾸고 `<label>` 요소에는 쓰지 않습니다. ARIA 1.2 에서 `aria-invalid` 는 라벨이 아니라 컨트롤의 속성이고, 오류는 컨트롤의 `aria-invalid` 가 스크린 리더에 전합니다.
 - 비활성일 때 라벨을 눌러도 커스텀 위젯으로 포커스를 옮기지 않습니다.
 
 ## 크기
@@ -80,7 +81,7 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 | ---------- | ----------------------------- |
 | `disabled` | 비활성이다 (직접 또는 컨트롤) |
 | `required` | 필수다 (직접 또는 컨트롤)     |
-| `invalid`  | 오류다 (직접)                 |
+| `invalid`  | 오류다 (직접 준 `aria-invalid`) |
 
 ## 속성
 
@@ -89,7 +90,7 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 | `htmlFor`             | 연결할 컨트롤의 `id`                               |
 | `required`            | 생략하면 컨트롤을 따른다. `true` / `false` 로 고정 |
 | `disabled`            | 생략하면 컨트롤을 따른다. `true` / `false` 로 고정 |
-| `invalid`             | `true` 면 danger 색. 기본 `false`                  |
+| `aria-invalid`        | `true` 면 danger 색. 요소에는 쓰지 않는다          |
 | `size`                | `standard`(기본) / `tiny`                          |
 | `asChild`             | 자식 요소 하나를 라벨로 그린다                     |
 | `id`                  | 생략하면 만들어 붙인다                             |

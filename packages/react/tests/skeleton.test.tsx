@@ -32,7 +32,7 @@ function Wrapped({ loading }: { loading: boolean }) {
   return (
     <IdsProvider theme={testTheme}>
       <button type="button">Before</button>
-      <Skeleton loading={loading} data-testid="wrapper">
+      <Skeleton aria-busy={loading} data-testid="wrapper">
         <input aria-label="Name" data-1p-ignore data-lpignore="true" />
       </Skeleton>
       <button type="button">After</button>
@@ -63,7 +63,7 @@ test('SSR: wrapping paints the div, marks it busy and puts the children in an in
 
   const loaded = skeletonIn(
     html(
-      <Skeleton loading={false} className="w-40">
+      <Skeleton aria-busy={false} className="w-40">
         <button type="button">Save</button>
       </Skeleton>,
     ),
@@ -81,7 +81,7 @@ test('SSR: wrapping paints the div, marks it busy and puts the children in an in
 test('SSR: asChild paints the child itself, keeps its radius and makes it inert', () => {
   const tree = (loading: boolean) =>
     html(
-      <Skeleton loading={loading} asChild animation="wave">
+      <Skeleton aria-busy={loading} asChild animation="wave">
         <section aria-label="Profile" className="rounded-container shadow-xs">
           <h2>Kim</h2>
         </section>
@@ -116,10 +116,10 @@ test('the server markup hydrates without a mismatch in both modes', async () => 
       <Skeleton>
         <p>Loading text</p>
       </Skeleton>
-      <Skeleton loading={false}>
+      <Skeleton aria-busy={false}>
         <p>Loaded text</p>
       </Skeleton>
-      <Skeleton loading asChild>
+      <Skeleton asChild>
         <Avatar name="Kim" />
       </Skeleton>
     </IdsProvider>
@@ -180,7 +180,7 @@ test('asChild merges into an IDS component: its radius, its ref and its own prop
       <Card data-testid="plain">
         <Card.Title>Plain</Card.Title>
       </Card>
-      <Skeleton loading asChild ref={ref}>
+      <Skeleton asChild ref={ref}>
         <Card data-testid="painted" className="w-60">
           <Card.Title>Painted</Card.Title>
         </Card>
@@ -208,7 +208,7 @@ test('asChild on an Avatar keeps its circle and size and hides its initials and 
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <Avatar name="Lee" data-testid="plain" />
-      <Skeleton loading asChild>
+      <Skeleton asChild>
         <Avatar name="Kim" data-testid="painted" />
       </Skeleton>
     </IdsProvider>,
@@ -232,7 +232,7 @@ test('the painted box is as large as the children it wraps', async () => {
         <Skeleton data-testid="loading">
           <p className="text-body-b3-regular">Registration opens on the first of September.</p>
         </Skeleton>
-        <Skeleton loading={false} data-testid="loaded">
+        <Skeleton aria-busy={false} data-testid="loaded">
           <p className="text-body-b3-regular">Registration opens on the first of September.</p>
         </Skeleton>
       </div>
