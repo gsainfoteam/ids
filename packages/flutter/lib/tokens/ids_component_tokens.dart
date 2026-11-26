@@ -9,8 +9,28 @@ import 'ids_enums.dart';
 abstract final class IdsShadows {
   static const steps = <String, List<BoxShadow>>{
     '0': <BoxShadow>[],
-    '1': <BoxShadow>[BoxShadow(color: Color(0x0D000000), offset: Offset(0, 1), blurRadius: 2, spreadRadius: 0)],
-    '2': <BoxShadow>[BoxShadow(color: Color(0x1A000000), offset: Offset(0, 10), blurRadius: 15, spreadRadius: -3), BoxShadow(color: Color(0x1A000000), offset: Offset(0, 4), blurRadius: 6, spreadRadius: -4)],
+    '1': <BoxShadow>[
+      BoxShadow(
+        color: Color(0x0D000000),
+        offset: Offset(0, 1),
+        blurRadius: 2,
+        spreadRadius: 0,
+      ),
+    ],
+    '2': <BoxShadow>[
+      BoxShadow(
+        color: Color(0x1A000000),
+        offset: Offset(0, 10),
+        blurRadius: 15,
+        spreadRadius: -3,
+      ),
+      BoxShadow(
+        color: Color(0x1A000000),
+        offset: Offset(0, 4),
+        blurRadius: 6,
+        spreadRadius: -4,
+      ),
+    ],
   };
 }
 
@@ -49,16 +69,14 @@ abstract final class IdsComponentTokens {
   };
 
   static const shadowSteps = <IdsMode, Map<String, String>>{
-    IdsMode.light: {
-      'shadow-surface': '1',
-    },
-    IdsMode.dark: {
-      'shadow-surface': '0',
-    },
+    IdsMode.light: {'shadow-surface': '1'},
+    IdsMode.dark: {'shadow-surface': '0'},
   };
 
-  static Map<String, T> inMode<T>(Map<IdsMode, Map<String, T>> table, IdsMode mode) =>
-      table[mode] ?? (throw ArgumentError.value(mode, 'mode', 'is not light or dark'));
+  static Map<String, T> inMode<T>(
+    Map<IdsMode, Map<String, T>> table,
+    IdsMode mode,
+  ) => table[mode] ?? (throw ArgumentError.value(mode, 'mode', 'has no table'));
 }
 
 @immutable
@@ -80,37 +98,51 @@ class IdsComponentColors {
   });
 
   factory IdsComponentColors.of(IdsColors colors, IdsMode mode) {
-    final roles = IdsComponentTokens.inMode(IdsComponentTokens.colorRoles, mode);
-    Color token(String name) => colors[roles[name]!];
+    final roles = IdsComponentTokens.inMode(
+      IdsComponentTokens.colorRoles,
+      mode,
+    );
     return IdsComponentColors(
-      bgControlOutline: token('bg-control-outline'),
-      borderControlOutline: token('border-control-outline'),
-      bgFieldOutline: token('bg-field-outline'),
-      borderFieldOutline: token('border-field-outline'),
-      borderFieldBar: token('border-field-bar'),
-      bgFieldCodeOutline: token('bg-field-code-outline'),
-      bgFieldBlockOutline: token('bg-field-block-outline'),
-      bgSwitchThumb: token('bg-switch-thumb'),
-      bgSegment: token('bg-segment'),
-      bgQrCode: token('bg-qr-code'),
-      textQrCode: token('text-qr-code'),
-      bgQrCodeInverse: token('bg-qr-code-inverse'),
-      textQrCodeInverse: token('text-qr-code-inverse'),
+      bgControlOutline: colors[roles['bg-control-outline']!],
+      borderControlOutline: colors[roles['border-control-outline']!],
+      bgFieldOutline: colors[roles['bg-field-outline']!],
+      borderFieldOutline: colors[roles['border-field-outline']!],
+      borderFieldBar: colors[roles['border-field-bar']!],
+      bgFieldCodeOutline: colors[roles['bg-field-code-outline']!],
+      bgFieldBlockOutline: colors[roles['bg-field-block-outline']!],
+      bgSwitchThumb: colors[roles['bg-switch-thumb']!],
+      bgSegment: colors[roles['bg-segment']!],
+      bgQrCode: colors[roles['bg-qr-code']!],
+      textQrCode: colors[roles['text-qr-code']!],
+      bgQrCodeInverse: colors[roles['bg-qr-code-inverse']!],
+      textQrCodeInverse: colors[roles['text-qr-code-inverse']!],
     );
   }
 
   final Color bgControlOutline;
+
   final Color borderControlOutline;
+
   final Color bgFieldOutline;
+
   final Color borderFieldOutline;
+
   final Color borderFieldBar;
+
   final Color bgFieldCodeOutline;
+
   final Color bgFieldBlockOutline;
+
   final Color bgSwitchThumb;
+
   final Color bgSegment;
+
   final Color bgQrCode;
+
   final Color textQrCode;
+
   final Color bgQrCodeInverse;
+
   final Color textQrCodeInverse;
 
   Map<String, Color> get tokens => {
@@ -152,15 +184,15 @@ class IdsComponentColors {
 
 @immutable
 class IdsComponentShadows {
-  const IdsComponentShadows({
-    required this.shadowSurface,
-  });
+  const IdsComponentShadows({required this.shadowSurface});
 
   factory IdsComponentShadows.of(IdsMode mode) {
-    final steps = IdsComponentTokens.inMode(IdsComponentTokens.shadowSteps, mode);
-    List<BoxShadow> token(String name) => IdsShadows.steps[steps[name]!]!;
+    final steps = IdsComponentTokens.inMode(
+      IdsComponentTokens.shadowSteps,
+      mode,
+    );
     return IdsComponentShadows(
-      shadowSurface: token('shadow-surface'),
+      shadowSurface: IdsShadows.steps[steps['shadow-surface']!]!,
     );
   }
 

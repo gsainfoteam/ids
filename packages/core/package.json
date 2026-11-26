@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsx src/codegen.ts && node messages.build.mjs",
+    "codegen": "tsx src/codegen.ts && node messages.build.mjs",
     "typecheck": "tsc6 -p .",
     "test": "vitest run && node --test dart-messages.test.mjs",
     "lint": "eslint ."

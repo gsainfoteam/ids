@@ -25,7 +25,7 @@
     "./no-fonts.css": "./dist/ids.css"
   },
   "scripts": {
-    "build": "pnpm --filter @gsainfoteam/ids-core build && node scripts/copy-fonts.mjs"
+    "build": "node scripts/copy-fonts.mjs"
   },
   "peerDependencies": {
     "tailwindcss": "^4.0.0"

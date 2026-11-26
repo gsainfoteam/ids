@@ -51,8 +51,50 @@
         "type": { "case": "pascal", "prefixed": true },
         "key": { "case": "kebab", "prefixed": false }
       },
-      "symbols": {},
-      "outputs": {}
+      "symbols": {
+        "mode": ["mode"],
+        "colorRoles": ["color", "roles"],
+        "families": ["families"],
+        "familySlots": ["family", "slots"],
+        "neutralOnlySlots": ["neutral", "only", "slots"],
+        "allSlots": ["all"],
+        "neutralScales": ["neutral", "scales"],
+        "neutralSteps": ["neutral", "steps"],
+        "slotsOf": ["slots", "of"],
+        "stateOpacity": ["state", "opacity"],
+        "stateLayer": ["state", "layer"],
+        "colors": ["colors"],
+        "fromRoles": ["from", "roles"],
+        "roles": ["roles"],
+        "shadows": ["shadows"],
+        "shadowSteps": ["steps"],
+        "componentTokens": ["component", "tokens"],
+        "componentColorRoles": ["color", "roles"],
+        "componentShadowSteps": ["shadow", "steps"],
+        "inMode": ["in", "mode"],
+        "componentColors": ["component", "colors"],
+        "componentShadows": ["component", "shadows"],
+        "of": ["of"],
+        "tokens": ["tokens"],
+        "motion": ["motion"],
+        "typography": ["typography"],
+        "sans": ["sans"],
+        "mono": ["mono"],
+        "sansFontFamily": ["sans", "font", "family"],
+        "sansFontPackage": ["sans", "font", "package"],
+        "monoFontFamily": ["mono", "font", "family"],
+        "monoFontFamilyFallback": ["mono", "font", "family", "fallback"],
+        "paletteModel": ["palette", "model"],
+        "statusPalettes": ["status", "palettes"]
+      },
+      "outputs": {
+        "enums": "lib/tokens/ids_enums.dart",
+        "colorRoles": "lib/tokens/ids_color_roles.dart",
+        "motion": "lib/tokens/ids_motion.dart",
+        "componentTokens": "lib/tokens/ids_component_tokens.dart",
+        "typography": "lib/tokens/ids_typography.dart",
+        "paletteModel": "lib/tokens/ids_palette_model.dart"
+      }
     }
   }
 }
