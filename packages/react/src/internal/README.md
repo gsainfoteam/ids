@@ -49,6 +49,7 @@
 | [`lib/state-props.ts`](#libstate-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Image, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                 |
 | [`lib/status-palette.ts`](#libstatus-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                                    | Alert                                                                                                                                                                                                                 |
 | [`hooks/use-surface.ts`](#hooksuse-surfacets)           | 통째로 누르는 카드와 목록 행의 누르기와 인터랙션 상태                                 | Card, Item                                                                                                                                                                                                      |
+| [`hooks/use-pressable-child.ts`](#hooksuse-pressable-childts) | `asChild` 자식이 누를 수 있는 요소인지, JSX 와 그려진 DOM 으로 판단                 | Card, Item |
 | [`hooks/use-labelling.ts`](#hooksuse-labellingts)       | 누르는 표면을 Title, Description 과 잇는 id 상태                                      | Card, Item                                                                                                                                                                                                      |
 | [`hooks/use-registered-id.ts`](#hooksuse-registered-idts) | 파트가 마운트된 동안 자기 id 를 루트에 등록하는 hook                                | Card, Item, Chip, `field-popup/`                                                                                                                                                                                                      |
 | [`parts/surface-trigger.tsx`](#partssurface-triggertsx)     | 누르는 표면의 Title 안에 그리는 버튼                                                  | Card.Title, Item.Title                                                                                                                                                                                                |
@@ -1416,6 +1417,33 @@ const Glyph = statusIcons[state.colorScheme];
 - 색은 여기 없습니다. Alert 의 `--alert-*` 변수가 scheme 마다 색을 정하고, 테스트가 그 변수 이름을 봅니다.
 - scheme 을 더하면 `statusIcons` 가 `satisfies Record<StatusColorScheme, unknown>` 로 빠진 아이콘을 알려 줍니다. 쓰는 컴포넌트의 `colorScheme` variant 도 함께 더합니다.
 
+## hooks/use-pressable-child.ts
+
+`asChild` 로 받은 자식이 누를 수 있는 요소인지 알려 주는 hook(`useInternalPressableChild`)입니다. Card 와 Item 이 `interactive` 같은 prop 없이 hover와 포커스 표시를 켤지 정할 때 씁니다.
+
+### 쓰는 곳
+
+- Card(`root.tsx`), Item(`root.tsx`)
+
+### 쓰는 법
+
+```tsx
+const child = useInternalPressableChild<HTMLDivElement>(asChild, children);
+const interactive = onClick != null || child.pressable;
+
+<Root {...rest} ref={mergeRefs(ref, child.ref)} />;
+```
+
+### 왜 이렇게
+
+- 먼저 JSX 를 봅니다([`isPressableElement`](../utils/README.md#childrents)). `<button>` 이거나 `href` 를 받은 요소면 서버 HTML 부터 누를 수 있는 면입니다.
+- `to` 만 받는 라우터 링크, `Accordion.Trigger`, `motion.button` 처럼 무엇을 그릴지 JSX 로 알 수 없는 컴포넌트는, 마운트된 뒤 ref 로 그려진 요소가 `a[href]`, `button`, `role="button"`, `role="link"` 인지 봅니다. 그래서 이런 자식은 hydration 뒤에 hover와 포커스 표시가 켜집니다.
+- 예전의 `interactive` prop 이 하던 일입니다. 앱이 알려 주지 않아도 자식이 스스로 말합니다.
+
+### 알아둘 것
+
+- 판단은 ref 가 붙을 때 한 번 합니다. 같은 자식이 나중에 다른 태그로 바뀌면, 새 요소에 ref 가 다시 붙을 때 다시 봅니다.
+
 ## hooks/use-surface.ts
 
 카드나 목록 행처럼 통째로 누르는 표면의 누르기와 인터랙션 상태를 다루는 hook(`useInternalSurface`)입니다. 이름과 설명은 [hooks/use-labelling.ts](#hooksuse-labellingts), 파트의 id 는 [hooks/use-registered-id.ts](#hooksuse-registered-idts) 가 잇습니다.
@@ -1506,7 +1534,7 @@ const { interaction, props, dataProps, labelling, descriptionId, register } = us
 
 ### 쓰는 곳
 
-- Card.Title, Item.Title. Item 은 `truncate` 면 버튼에 `block truncate` 를 줍니다.
+- Card.Title, Item.Title. Item 은 `overflow="truncate"` 면 버튼에 `block truncate` 를 줍니다.
 
 ### 왜 이렇게
 

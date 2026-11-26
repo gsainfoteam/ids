@@ -229,7 +229,7 @@ export const DrawYourOwnFileList: Story = {
                   <>
                     <FileDropzone.Preview file={file} />
                     <Item.Content>
-                      <Item.Title truncate>
+                      <Item.Title overflow="truncate">
                         {index + 1}. {file.name}
                       </Item.Title>
                     </Item.Content>

@@ -94,17 +94,19 @@ export const PC: Story = {
                     </QRCode>
 
                     <div className="w-full">
-                      <ItemGroup ordered aria-label="QR 코드로 로그인하는 법" size="tiny">
-                        {STEPS.map((step, index) => (
-                          <Item key={step}>
-                            <Item.Media variant="soft" aria-hidden>
-                              {index + 1}
-                            </Item.Media>
-                            <Item.Content>
-                              <Item.Title>{step}</Item.Title>
-                            </Item.Content>
-                          </Item>
-                        ))}
+                      <ItemGroup asChild aria-label="QR 코드로 로그인하는 법" size="tiny">
+                        <ol>
+                          {STEPS.map((step, index) => (
+                            <Item key={step}>
+                              <Item.Media variant="soft" aria-hidden>
+                                {index + 1}
+                              </Item.Media>
+                              <Item.Content>
+                                <Item.Title>{step}</Item.Title>
+                              </Item.Content>
+                            </Item>
+                          ))}
+                        </ol>
                       </ItemGroup>
                     </div>
 

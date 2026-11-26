@@ -238,13 +238,15 @@ test('Group variant: bordered draws seams between square rows, separated spaces 
   );
 });
 
-test('Group ordered: an ol a screen reader counts, still a list in Safari', async () => {
+test('Group asChild: an ol a screen reader counts, still a list in Safari', async () => {
   const ref = vi.fn();
   const screen = await render(
-    <ItemGroup ordered ref={ref} aria-label="Steps">
-      <Item>Verify email</Item>
-      <Item.Separator />
-      <Item>Choose a name</Item>
+    <ItemGroup asChild ref={ref} aria-label="Steps">
+      <ol>
+        <Item>Verify email</Item>
+        <Item.Separator />
+        <Item>Choose a name</Item>
+      </ol>
     </ItemGroup>,
   );
   const list = screen.getByRole('list', { name: 'Steps' });
@@ -253,6 +255,8 @@ test('Group ordered: an ol a screen reader counts, still a list in Safari', asyn
   expect(list.element().tagName).toBe('OL');
   expect(ref).toHaveBeenCalledWith(list.element());
   expect(screen.getByRole('listitem').all()).toHaveLength(2);
+  expect(list.element().getAttribute('role')).toBe('list');
+  expect(list.element().hasAttribute('data-item-group')).toBe(true);
   expect(html(<ItemGroup aria-label="x" />).querySelector('ul')).not.toBeNull();
 });
 
@@ -268,19 +272,19 @@ test('a truncated title stays on one line within its row', () => {
   const wrapping = title({});
   expect(wrapping.className).toMatch(/(^| )flex( |$)/);
   expect(wrapping.className, 'titles wrap by default').not.toMatch(/truncate/);
-  const cut = title({ truncate: true });
+  const cut = title({ overflow: 'truncate' });
   expect(cut.className).toMatch(/(^| )truncate( |$)/);
   expect(cut.className).toMatch(/(^| )max-w-full( |$)/);
   expect(cut.className).toMatch(/(^| )block( |$)/);
   expect(cut.className, 'a flex box would clip without an ellipsis').not.toMatch(/(^| )flex( |$)/);
-  expect(cut.hasAttribute('truncate')).toBe(false);
+  expect(cut.hasAttribute('overflow')).toBe(false);
 });
 
 test('a group and its rows shrink with their parent, so a truncated title cannot widen them', () => {
   const doc = html(
     <ItemGroup>
       <Item>
-        <Item.Title truncate>x</Item.Title>
+        <Item.Title overflow="truncate">x</Item.Title>
       </Item>
     </ItemGroup>,
   );

@@ -66,7 +66,7 @@ export const PC: Story = {
                 {MENU.map((item) => (
                   <li key={item.href}>
                     <Drawer.Close asChild>
-                      <Item asChild interactive size="tiny" selected={item.href === CURRENT}>
+                      <Item asChild size="tiny" selected={item.href === CURRENT}>
                         <a
                           href={item.href}
                           aria-current={item.href === CURRENT ? 'page' : undefined}

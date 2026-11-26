@@ -6,10 +6,12 @@ import { useInternalRegisteredId } from '../../../../internal/hooks/use-register
 import { titleContent } from '../../../../internal/parts/surface-trigger';
 import { cn } from '../../../../utils';
 
-export type ItemTitleProps = ItemPartProps & { truncate?: boolean };
+export type ItemTitleOverflow = 'wrap' | 'truncate';
+
+export type ItemTitleProps = ItemPartProps & { overflow?: ItemTitleOverflow };
 
 export function ItemTitle({
-  truncate = false,
+  overflow = 'wrap',
   className,
   id,
   asChild,
@@ -24,13 +26,13 @@ export function ItemTitle({
       asChild={asChild}
       id={titleId}
       kind="title"
-      className={styles.title({ truncate, className })}
+      className={styles.title({ overflow, className })}
     >
       {titleContent({
         trigger,
         asChild,
         children,
-        triggerClassName: truncate ? cn('block truncate') : undefined,
+        triggerClassName: overflow === 'truncate' ? cn('block truncate') : undefined,
       })}
     </Part>
   );

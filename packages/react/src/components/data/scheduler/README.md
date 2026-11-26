@@ -82,7 +82,7 @@ type EventData = {
   {(room) => (
     <Scheduler.Event colorScheme="tertiary">
       <Item.Content>
-        <Item.Title truncate>{room.title}</Item.Title>
+        <Item.Title overflow="truncate">{room.title}</Item.Title>
         <Item.Description>{room.place}</Item.Description>
       </Item.Content>
     </Scheduler.Event>

@@ -1,13 +1,12 @@
 'use client';
 
-import { isValidElement } from 'react';
-
 import { CardContext } from './context';
 import { useInternalCard } from './hooks/use-card';
 import { CardTitle } from './parts/title';
 import { cardStyle } from './style';
+import { useInternalPressableChild } from '../../../internal/hooks/use-pressable-child';
 import { resolveState } from '../../../internal/lib/state-props';
-import { containsElementOfType, elementTypeOf } from '../../../utils';
+import { containsElementOfType, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Card } from '.';
@@ -18,11 +17,6 @@ const CARD_TITLE = new Set<unknown>([CardTitle]);
 
 function flag(on: boolean) {
   return on ? '' : undefined;
-}
-
-function isPressableElement(node: unknown) {
-  if (!isValidElement<{ href?: unknown }>(node)) return false;
-  return elementTypeOf(node) === 'button' || node.props.href != null;
 }
 
 export function CardRoot({
@@ -44,9 +38,11 @@ export function CardRoot({
   onPointerUp,
   onPointerCancel,
   onInteractionChange,
+  ref,
   ...rest
 }: Card.Props) {
-  const interactive = onClick != null || (asChild && isPressableElement(children));
+  const child = useInternalPressableChild<HTMLDivElement>(asChild, children);
+  const interactive = onClick != null || child.pressable;
   const titleIsTheButton = interactive && !asChild && containsElementOfType(children, CARD_TITLE);
   const { interaction, props, dataProps, labelling, descriptionId, register } =
     useInternalCard<HTMLDivElement>({
@@ -82,6 +78,7 @@ export function CardRoot({
     >
       <Root
         {...rest}
+        ref={mergeRefs(ref, child.ref)}
         {...props}
         {...labelling}
         {...(asChild && disabled

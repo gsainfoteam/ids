@@ -126,7 +126,7 @@ export const PC: Story = {
                 >
                   <a href={`#${chat.id}`}>
                     <Item.Content>
-                      <Item.Title truncate title={chat.title}>
+                      <Item.Title overflow="truncate" title={chat.title}>
                         {chat.title}
                       </Item.Title>
                     </Item.Content>

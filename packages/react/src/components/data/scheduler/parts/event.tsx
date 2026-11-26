@@ -68,7 +68,7 @@ export function SchedulerEvent({
             </span>
           )}
           <Item.Title
-            truncate={oneLine}
+            overflow={oneLine ? 'truncate' : 'wrap'}
             className={styles.eventTitle({ allDay: oneLine, startsAt })}
           >
             {event.title}

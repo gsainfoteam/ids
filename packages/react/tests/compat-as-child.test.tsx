@@ -388,9 +388,6 @@ type SurfaceCase = {
   item: Pressable;
 };
 
-const F8 = 'F8: a router link given only `to` is not recognised';
-const BY_TAG = 'Item recognises only a literal <a> or <button> child, not one a component renders';
-const MOTION_BUTTON = 'motion.button is a component, so its tag is not read as a button';
 
 const SURFACE_CASES: SurfaceCase[] = [
   {
@@ -398,28 +395,28 @@ const SURFACE_CASES: SurfaceCase[] = [
     kind: 'next/link',
     build: (props) => <NextLink href={HREF['next/link']} {...props} />,
     card: 'pressable',
-    item: `not pressable: ${BY_TAG}`,
+    item: 'pressable',
   },
   {
     child: 'tanstack router',
     kind: 'tanstack router',
     build: (props) => <TanStackLink to={HREF['tanstack router']} {...props} />,
-    card: `not pressable: ${F8}`,
-    item: `not pressable: ${F8}`,
+    card: 'pressable',
+    item: 'pressable',
   },
   {
     child: 'motion.a',
     kind: 'motion.a',
     build: (props) => <motion.a href={HREF['motion.a']} {...props} />,
     card: 'pressable',
-    item: `not pressable: ${BY_TAG}`,
+    item: 'pressable',
   },
   {
     child: 'motion.button',
     kind: 'none',
     build: (props) => <motion.button type="button" {...props} />,
-    card: `not pressable: ${MOTION_BUTTON}`,
-    item: `not pressable: ${MOTION_BUTTON}`,
+    card: 'pressable',
+    item: 'pressable',
   },
 ];
 
@@ -459,21 +456,6 @@ describe.each(SURFACES)('$name asChild without onClick is a pressable surface', 
       await expectPressableSurface(subject);
     });
   }
-
-  test('interactive turns any child into a pressable surface', async () => {
-    if (surface.name !== 'Item') return;
-    const { screen } = await mount(
-      'tanstack router',
-      <Item asChild interactive>
-        <TanStackLink to="/target" data-testid="subject">
-          Open the post
-        </TanStackLink>
-      </Item>,
-    );
-    const subject = screen.getByTestId('subject');
-
-    await expectPressableSurface(subject);
-  });
 });
 
 describe.each(['next/link', 'tanstack router', 'motion.a'] as const)(

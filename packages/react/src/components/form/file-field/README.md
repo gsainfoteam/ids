@@ -92,7 +92,7 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
             <>
               <FileField.Preview file={file} /> {/* 이미지면 썸네일, 아니면 문서 아이콘 */}
               <Item.Content>
-                <Item.Title truncate>
+                <Item.Title overflow="truncate">
                   {index + 1}. {file.name}
                 </Item.Title>
               </Item.Content>

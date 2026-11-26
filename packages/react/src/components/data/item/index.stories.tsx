@@ -40,7 +40,6 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    interactive: { control: 'boolean' },
     selected: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
@@ -227,7 +226,7 @@ export const Gallery: Story = {
                 <DocumentIcon />
               </Item.Media>
               <Item.Content>
-                <Item.Title truncate>
+                <Item.Title overflow="truncate">
                   2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf
                 </Item.Title>
                 <Item.Description>2.4 MB</Item.Description>
@@ -238,7 +237,7 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section title="States">
-        <Showcase.Row label="interactive">
+        <Showcase.Row label="onClick">
           <div className="w-56">
             <Item onClick={() => {}}>
               <Item.Media>
@@ -506,7 +505,7 @@ export const ListAttachedFiles: Story = {
               {file.thumbnail ? <img src={file.thumbnail} alt="" /> : <DocumentIcon />}
             </Item.Media>
             <Item.Content>
-              <Item.Title truncate title={file.name}>
+              <Item.Title overflow="truncate" title={file.name}>
                 {file.name}
               </Item.Title>
               <Item.Description>{file.size}</Item.Description>
@@ -528,7 +527,7 @@ export const ListAttachedFiles: Story = {
     docs: {
       description: {
         story:
-          '타일과 그 둘레 여백은 행 높이에 비례해 함께 커지고, 왼쪽·위·아래 여백이 같습니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, grid 안에서도 목록을 넓히지 않습니다. 타일 안의 이미지는 타일을 채웁니다.',
+          '타일과 그 둘레 여백은 행 높이에 비례해 함께 커지고, 왼쪽·위·아래 여백이 같습니다. `Item.Title overflow="truncate"` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, grid 안에서도 목록을 넓히지 않습니다. 타일 안의 이미지는 타일을 채웁니다.',
       },
     },
   },

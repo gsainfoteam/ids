@@ -2,7 +2,7 @@
 
 여러 [Item](../item/README.md) 을 목록으로 묶습니다. Item 의 일부가 아니라 여러 Item 을 담는 그릇이라, `Item.Group` 이 아닌 별도 컴포넌트입니다.
 
-- **시멘틱 구성.** `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다. Safari가 목록 의미를 잃지 않습니다. `ordered` 면 `<ol>` 입니다.
+- **시멘틱 구성.** `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다. Safari가 목록 의미를 잃지 않습니다. 순서가 있는 목록은 `asChild` 로 `<ol>` 을 넘깁니다.
 - **설정을 잇습니다.** `size` 는 안의 Item 으로, `separated` 는 Item 의 `outline` 으로 이어집니다. Item 에 직접 준 값이 이깁니다.
 - **구분선과 간격.** `bordered`(기본)는 행 사이에 선을 긋고, `separated` 는 행마다 테두리 카드로 띄우고, `ghost` 는 아무것도 긋지 않습니다.
 
@@ -22,9 +22,9 @@ import { Item, ItemGroup } from '@gsainfoteam/ids-react';
 | --------- | -------------------------------------- | ---------- |
 | `variant` | `'bordered' \| 'separated' \| 'ghost'` | `bordered` |
 | `size`    | `'standard' \| 'tiny'`                 | -          |
-| `ordered` | `boolean`                              | `false`    |
+| `asChild` | `boolean`                              | `false`    |
 
-`<ul>`(`ordered` 면 `<ol>`) 의 나머지 속성은 루트로 갑니다.
+`<ul>`(`asChild` 면 넘긴 요소)의 나머지 속성은 루트로 갑니다.
 
 ## 행 감싸기
 
@@ -46,17 +46,19 @@ import { Item, ItemGroup } from '@gsainfoteam/ids-react';
 ## 순서 있는 목록
 
 ```tsx
-<ItemGroup ordered aria-label="가입 절차">
-  <Item>
-    <Item.Media variant="soft" aria-hidden>
-      1
-    </Item.Media>
-    <Item.Content>이메일 인증</Item.Content>
-  </Item>
+<ItemGroup asChild aria-label="가입 절차">
+  <ol>
+    <Item>
+      <Item.Media variant="soft" aria-hidden>
+        1
+      </Item.Media>
+      <Item.Content>이메일 인증</Item.Content>
+    </Item>
+  </ol>
 </ItemGroup>
 ```
 
-- `<ol>` 로 그려 스크린 리더가 순서를 읽습니다. 번호는 그리지 않으니 보여야 하면 `Item.Media` 에 둡니다.
+- `asChild` 로 넘긴 `<ol>` 에 그룹의 속성을 합치고, 그 안의 자식을 `<li>` 로 감쌉니다. 스크린 리더가 순서를 읽습니다. 번호는 그리지 않으니 보여야 하면 `Item.Media` 에 둡니다.
 
 ## 알아둘 것
 

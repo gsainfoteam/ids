@@ -49,7 +49,7 @@ import { Field, FileDropzone } from '@gsainfoteam/ids-react';
         <FileDropzone.Item key={file.name} file={file}>
           <FileDropzone.Preview file={file} />
           <Item.Content>
-            <Item.Title truncate>{file.name}</Item.Title>
+            <Item.Title overflow="truncate">{file.name}</Item.Title>
           </Item.Content>
           <Item.Actions>
             <FileDropzone.Remove file={file} />

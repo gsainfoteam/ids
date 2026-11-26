@@ -71,7 +71,6 @@ export function SidebarItem({
           <Tooltip.Trigger asChild>
             <Item
               asChild
-              interactive
               size="tiny"
               disabled={disabled}
               selected={value !== undefined && value === sidebar.value}
