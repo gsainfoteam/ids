@@ -6,7 +6,9 @@ import { MessageContent, type MessageContentProps } from './parts/content';
 import { MessageCopy, type MessageCopyProps } from './parts/copy';
 import { MessageFooter, type MessageFooterProps } from './parts/footer';
 import { MessageHeader, type MessageHeaderProps } from './parts/header';
-import { MessageRoot, type MessageAlign, type MessageStatus } from './root';
+import { MessageRetry, type MessageRetryProps } from './parts/retry';
+import { MessageStatus as MessageStatusPart, type MessageStatusProps } from './parts/status';
+import { MessageRoot, type MessageAlign } from './root';
 import { messageStyle } from './style';
 
 export function Message(props: Message.Props) {
@@ -15,15 +17,12 @@ export function Message(props: Message.Props) {
 
 export namespace Message {
   export type Align = MessageAlign;
-  export type Status = MessageStatus;
 
   export type Props = Omit<ComponentProps<'article'>, 'children'> & {
     align?: MessageAlign;
     name?: string;
     time?: Date;
-    status?: MessageStatus;
     unread?: number | boolean;
-    onRetry?: () => void;
     children?: ReactNode;
   };
 
@@ -33,6 +32,8 @@ export namespace Message {
   export type ActionsProps = MessageActionsProps;
   export type CopyProps = MessageCopyProps;
   export type FooterProps = MessageFooterProps;
+  export type StatusProps = MessageStatusProps;
+  export type RetryProps = MessageRetryProps;
 
   export const Avatar = MessageAvatar;
   export namespace Avatar {
@@ -62,6 +63,16 @@ export namespace Message {
   export const Footer = MessageFooter;
   export namespace Footer {
     export type Props = MessageFooterProps;
+  }
+
+  export const Status = MessageStatusPart;
+  export namespace Status {
+    export type Props = MessageStatusProps;
+  }
+
+  export const Retry = MessageRetry;
+  export namespace Retry {
+    export type Props = MessageRetryProps;
   }
 
   export const Style = messageStyle;

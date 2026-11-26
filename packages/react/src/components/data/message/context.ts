@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, use, type RefObject } from 'react';
+import { createContext, use, type ReactNode, type RefObject } from 'react';
 
 import { invariant } from '../../../utils';
 
@@ -19,6 +19,7 @@ type Context = {
   labelId: string;
   contentRef: RefObject<HTMLDivElement | null>;
   readContent: () => string;
+  retryBesideTheFailure: ReactNode;
 };
 
 export const MessageContext = createContext<Context | null>(null);
@@ -36,3 +37,5 @@ export type MessageGroupPosition = {
 };
 
 export const MessageGroupContext = createContext<MessageGroupPosition | null>(null);
+
+export const MessageRetryPlacementContext = createContext<'side' | 'failure' | null>(null);

@@ -17,7 +17,7 @@ import { Message } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const aligns = ['start', 'end'] as const;
-const statuses = ['sent', 'pending', 'error'] as const;
+const statuses = ['pending', 'error'] as const;
 
 function photo(hue: number) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" fill="hsl(${hue} 70% 78%)"/><circle cx="80" cy="66" r="30" fill="hsl(${hue} 40% 36%)"/><path d="M22 160c6-36 31-54 58-54s52 18 58 54z" fill="hsl(${hue} 40% 36%)"/></svg>`;
@@ -28,32 +28,47 @@ const JISU = photo(210);
 const SENT_AT = new Date('2026-11-17T12:20:00+09:00');
 const ANSWERED_AT = new Date('2026-11-17T12:21:00+09:00');
 
+type MessagePlaygroundArgs = Message.Props & {
+  statusValue?: Message.Status.Props['value'];
+  retryOnClick?: () => void;
+};
+
 const meta = {
   title: 'Data/Message',
   component: Message,
   tags: ['autodocs'],
   argTypes: {
     align: { control: 'radio', options: aligns },
-    status: { control: 'radio', options: statuses },
     time: { control: false },
+    statusValue: {
+      name: 'value',
+      control: 'radio',
+      options: [undefined, ...statuses],
+      table: { category: 'Message.Status' },
+    },
+    retryOnClick: { name: 'onClick', table: { category: 'Message.Retry' } },
   },
   args: {
     align: 'end',
     name: '김지수',
     time: SENT_AT,
-    status: 'sent',
     unread: 1,
     children: <Bubble>오늘 셔틀 몇 시에 와?</Bubble>,
+    retryOnClick: fn(),
   },
-  render: (args) => (
+  render: ({ statusValue, retryOnClick, children, ...args }) => (
     <div className="w-96 break-keep">
-      <Message {...args} />
+      <Message {...args}>
+        {children}
+        {statusValue && <Message.Status value={statusValue} />}
+        {statusValue === 'error' && <Message.Retry onClick={retryOnClick} />}
+      </Message>
     </div>
   ),
-} satisfies Meta<typeof Message>;
+} satisfies Meta<MessagePlaygroundArgs>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<MessagePlaygroundArgs>;
 
 export const Playground: Story = {};
 
@@ -110,13 +125,15 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Status"
-        description="pending 은 말풍선을 옅게 하고 빛을 지나가게 합니다. error 는 테두리를 빨갛게 하고, 시간 자리에 다시 보내기 버튼을, 아래에 실패 줄을 둡니다."
+        description="Message.Status 가 pending 이면 말풍선을 옅게 하고 빛을 지나가게 합니다. error 면 테두리를 빨갛게 하고, 시간 자리에 Message.Retry 를, 아래에 실패 줄을 둡니다."
       >
         {statuses.map((status) => (
           <Showcase.Row key={status} label={status}>
             <div className="w-96">
-              <Message align="end" time={SENT_AT} status={status} onRetry={() => {}}>
+              <Message align="end" time={SENT_AT}>
                 <Bubble>학식 메뉴 알려 줘</Bubble>
+                <Message.Status value={status} />
+                <Message.Retry onClick={() => {}} />
               </Message>
             </div>
           </Showcase.Row>
@@ -267,22 +284,20 @@ export const CopyAnAnswer: Story = {
 };
 
 export const ResendAFailedMessage: Story = {
-  args: { onRetry: fn() },
   render: function Render(args) {
-    const [status, setStatus] = useState<Message.Status>('error');
+    const [status, setStatus] = useState<Message.Status.Props['value']>('error');
 
     return (
       <div className="w-96 break-keep">
-        <Message
-          align="end"
-          time={SENT_AT}
-          status={status}
-          onRetry={() => {
-            args.onRetry?.();
-            setStatus('pending');
-          }}
-        >
+        <Message align="end" time={SENT_AT}>
           <Bubble>보내기 실패한 글</Bubble>
+          <Message.Status value={status} />
+          <Message.Retry
+            onClick={() => {
+              args.retryOnClick?.();
+              setStatus('pending');
+            }}
+          />
         </Message>
       </div>
     );
@@ -291,7 +306,7 @@ export const ResendAFailedMessage: Story = {
     docs: {
       description: {
         story:
-          '`status="error"` 면 말풍선 테두리가 빨개지고, 아래에 실패 줄을 그립니다. 보내지 못한 메시지에는 보낸 시간이 없으므로 시간 자리에 다시 보내기 버튼(`onRetry`)이 섭니다. 실패 줄은 `role="status"` 라 상태가 바뀌면 스크린 리더가 읽습니다. 다시 보내면 `pending` 이 되어 말풍선이 옅어지고 빛이 지나갑니다.',
+          '`<Message.Status value="error" />` 를 두면 말풍선 테두리가 빨개지고, 아래에 실패 줄을 그립니다. 보내지 못한 메시지에는 보낸 시간이 없으므로 시간 자리에 다시 보내기 버튼(`Message.Retry`)이 섭니다. 실패 줄은 `role="status"` 라 상태가 바뀌면 스크린 리더가 읽습니다. 다시 보내면 `value` 가 `pending` 이 되어 말풍선이 옅어지고 빛이 지나갑니다.',
       },
     },
   },
@@ -299,7 +314,7 @@ export const ResendAFailedMessage: Story = {
     await expect(canvas.getByRole('status')).toHaveTextContent('보내지 못했어요');
     await expect(canvas.getByRole('article').querySelector('time')).toBeNull();
     await userEvent.click(canvas.getByRole('button', { name: '다시 보내기' }));
-    await expect(args.onRetry).toHaveBeenCalledOnce();
+    await expect(args.retryOnClick).toHaveBeenCalledOnce();
     await expect(canvas.getByRole('article')).toHaveAttribute('data-status', 'pending');
     await expect(canvas.queryByRole('button', { name: '다시 보내기' })).not.toBeInTheDocument();
     await expect(canvas.getByRole('article')).toHaveTextContent('보내는 중');

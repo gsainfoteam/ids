@@ -255,11 +255,13 @@ test('unread draws a count or a dot beside the bubble, read by screen readers, o
       <Message align="end" unread={0}>
         <Bubble>다 읽음</Bubble>
       </Message>
-      <Message align="end" unread={2} status="pending">
+      <Message align="end" unread={2}>
         <Bubble>보내는 중</Bubble>
+        <Message.Status value="pending" />
       </Message>
-      <Message align="end" unread={2} status="error">
+      <Message align="end" unread={2}>
         <Bubble>실패</Bubble>
+        <Message.Status value="error" />
       </Message>
     </>,
   );
@@ -322,11 +324,13 @@ test('error rings the bubble in danger and pending fades its fill', async () => 
         <Message align="end">
           <Bubble>보낸 글</Bubble>
         </Message>
-        <Message align="end" status="error">
+        <Message align="end">
           <Bubble>실패한 글</Bubble>
+          <Message.Status value="error" />
         </Message>
-        <Message align="end" status="pending">
+        <Message align="end">
           <Bubble>보내는 글</Bubble>
+          <Message.Status value="pending" />
         </Message>
       </>,
     ),
@@ -344,11 +348,14 @@ test('status="error" draws the failure line under the bubble and the retry butto
   const screen = await render(
     withProvider(
       <>
-        <Message align="end" status="error" onRetry={onRetry}>
+        <Message align="end">
           <Bubble>다시 보낼 글</Bubble>
+          <Message.Status value="error" />
+          <Message.Retry onClick={onRetry} />
         </Message>
-        <Message align="end" status="error">
+        <Message align="end">
           <Bubble>그냥 실패한 글</Bubble>
+          <Message.Status value="error" />
         </Message>
       </>,
     ),
@@ -370,15 +377,18 @@ test('status="error" draws the failure line under the bubble and the retry butto
 test('a message that failed to send draws no time, wherever its time would stand', () => {
   const doc = parse(
     <>
-      <Message align="end" time={SENT_AT} status="error">
+      <Message align="end" time={SENT_AT}>
         <Bubble>말풍선</Bubble>
+        <Message.Status value="error" />
       </Message>
-      <Message name="GIST 도우미" time={SENT_AT} status="error">
+      <Message name="GIST 도우미" time={SENT_AT}>
         머리
+        <Message.Status value="error" />
       </Message>
-      <Message time={SENT_AT} status="error">
+      <Message time={SENT_AT}>
         아래 줄
         <Message.Footer />
+        <Message.Status value="error" />
       </Message>
     </>,
   );
@@ -457,8 +467,10 @@ test('Tab reaches the actions and the retry button in order, never the article',
             <IconButton aria-label="다시 답하기" icon={<svg />} />
           </Message.Actions>
         </Message>
-        <Message align="end" status="error" onRetry={() => {}}>
+        <Message align="end">
           <Bubble>실패</Bubble>
+          <Message.Status value="error" />
+          <Message.Retry onClick={() => {}} />
         </Message>
       </>,
     ),
@@ -495,8 +507,10 @@ test('axe finds nothing in a chat of groups, answers and failures', async () => 
             <Bubble>오늘 거</Bubble>
           </Message>
         </MessageGroup>
-        <Message align="end" status="error" onRetry={() => {}}>
+        <Message align="end">
           <Bubble>실패한 글</Bubble>
+          <Message.Status value="error" />
+          <Message.Retry onClick={() => {}} />
         </Message>
       </div>,
     ),
