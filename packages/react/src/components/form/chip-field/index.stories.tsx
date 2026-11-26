@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { TagIcon } from '@heroicons/react/16/solid';
-import { noop } from 'es-toolkit';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, fn, waitFor } from 'storybook/test';
 
@@ -11,7 +10,7 @@ import { Field as FormField } from '../../../react-hook-form';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
-import { ChipField } from '.';
+import { ChipField, useChipField } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -26,8 +25,7 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     defaultOpen: { control: 'boolean' },
-    maxCount: { control: { type: 'number', min: 0 } },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -39,12 +37,14 @@ const meta = {
     onOpenChange: fn(),
     children: (
       <>
-        <ChipField.Group heading="프론트엔드">
+        <ChipField.Group>
+          <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
           <ChipField.Item value="react">React</ChipField.Item>
           <ChipField.Item value="vue">Vue</ChipField.Item>
           <ChipField.Item value="svelte">Svelte</ChipField.Item>
         </ChipField.Group>
-        <ChipField.Group heading="모바일">
+        <ChipField.Group>
+          <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
           <ChipField.Item value="flutter">Flutter</ChipField.Item>
           <ChipField.Item value="swift">Swift</ChipField.Item>
           <ChipField.Item value="kotlin" disabled>
@@ -88,50 +88,31 @@ export const Usage: Story = {
 };
 
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="Open"
-        description="고른 옵션에는 primary 체크가 붙습니다. 찾는 옵션이 없으면 새 값을 만드는 행이 나옵니다."
-      >
-        <Showcase.Row label="onCreate" className="h-72 items-start">
-          <div className="w-80">
-            <ChipField aria-label="열림" defaultValue={['react']} onCreate={noop} defaultOpen>
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
+  render: function Render() {
+    const creatable = useChipField({ create: {} });
 
-      <Showcase.Section title="Variant × Size">
-        <Showcase.Matrix
-          rows={sizes}
-          columns={variants}
-          render={(size, variant) => (
-            <div className="w-72">
+    return (
+      <Showcase>
+        <Showcase.Section
+          title="Open"
+          description="고른 옵션에는 primary 체크가 붙습니다. 찾는 옵션이 없으면 새 값을 만드는 행이 나옵니다."
+        >
+          <Showcase.Row label="create" className="h-72 items-start">
+            <div className="w-80">
               <ChipField
-                size={size}
-                variant={variant}
-                defaultValue={['react', 'flutter']}
-                aria-label={`${variant} ${size}`}
+                aria-label="열림"
+                defaultValue={['react']}
+                chipField={creatable}
+                defaultOpen
               >
-                <ChipField.Group heading="프론트엔드">
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
                   <ChipField.Item value="react">React</ChipField.Item>
                   <ChipField.Item value="vue">Vue</ChipField.Item>
                   <ChipField.Item value="svelte">Svelte</ChipField.Item>
                 </ChipField.Group>
-                <ChipField.Group heading="모바일">
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
                   <ChipField.Item value="flutter">Flutter</ChipField.Item>
                   <ChipField.Item value="swift">Swift</ChipField.Item>
                   <ChipField.Item value="kotlin" disabled>
@@ -140,154 +121,205 @@ export const Gallery: Story = {
                 </ChipField.Group>
               </ChipField>
             </div>
-          )}
-        />
-      </Showcase.Section>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section title="States">
-        <Showcase.Row label="empty">
-          <div className="w-80">
-            <ChipField aria-label="비어 있음">
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="wrapping standard">
-          <div className="w-64">
-            <ChipField
-              aria-label="여러 줄 standard"
-              defaultValue={['react', 'vue', 'svelte', 'flutter', 'swift']}
-            >
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="wrapping tiny">
-          <div className="w-48">
-            <ChipField
-              aria-label="여러 줄 tiny"
-              size="tiny"
-              defaultValue={['react', 'vue', 'svelte', 'flutter', 'swift']}
-            >
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="adornments">
-          <div className="w-80">
-            <ChipField aria-label="꾸밈" defaultValue={['react']}>
-              <TagIcon aria-hidden="true" />
-              <ChipField.Input placeholder="태그 검색" />
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="invalid">
-          <div className="w-80">
-            <ChipField aria-label="잘못됨" invalid>
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="disabled">
-          <div className="w-80">
-            <ChipField aria-label="비활성" disabled defaultValue={['react', 'vue']}>
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="readOnly">
-          <div className="w-80">
-            <ChipField aria-label="읽기 전용" readOnly defaultValue={['react', 'vue']}>
-              <ChipField.Group heading="프론트엔드">
-                <ChipField.Item value="react">React</ChipField.Item>
-                <ChipField.Item value="vue">Vue</ChipField.Item>
-                <ChipField.Item value="svelte">Svelte</ChipField.Item>
-              </ChipField.Group>
-              <ChipField.Group heading="모바일">
-                <ChipField.Item value="flutter">Flutter</ChipField.Item>
-                <ChipField.Item value="swift">Swift</ChipField.Item>
-                <ChipField.Item value="kotlin" disabled>
-                  Kotlin (준비 중)
-                </ChipField.Item>
-              </ChipField.Group>
-            </ChipField>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+        <Showcase.Section title="Variant × Size">
+          <Showcase.Matrix
+            rows={sizes}
+            columns={variants}
+            render={(size, variant) => (
+              <div className="w-72">
+                <ChipField
+                  size={size}
+                  variant={variant}
+                  defaultValue={['react', 'flutter']}
+                  aria-label={`${variant} ${size}`}
+                >
+                  <ChipField.Group>
+                    <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                    <ChipField.Item value="react">React</ChipField.Item>
+                    <ChipField.Item value="vue">Vue</ChipField.Item>
+                    <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                  </ChipField.Group>
+                  <ChipField.Group>
+                    <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                    <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                    <ChipField.Item value="swift">Swift</ChipField.Item>
+                    <ChipField.Item value="kotlin" disabled>
+                      Kotlin (준비 중)
+                    </ChipField.Item>
+                  </ChipField.Group>
+                </ChipField>
+              </div>
+            )}
+          />
+        </Showcase.Section>
+
+        <Showcase.Section title="States">
+          <Showcase.Row label="empty">
+            <div className="w-80">
+              <ChipField aria-label="비어 있음">
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                  <ChipField.Item value="react">React</ChipField.Item>
+                  <ChipField.Item value="vue">Vue</ChipField.Item>
+                  <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                </ChipField.Group>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                  <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                  <ChipField.Item value="swift">Swift</ChipField.Item>
+                  <ChipField.Item value="kotlin" disabled>
+                    Kotlin (준비 중)
+                  </ChipField.Item>
+                </ChipField.Group>
+              </ChipField>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="wrapping standard">
+            <div className="w-64">
+              <ChipField
+                aria-label="여러 줄 standard"
+                defaultValue={['react', 'vue', 'svelte', 'flutter', 'swift']}
+              >
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                  <ChipField.Item value="react">React</ChipField.Item>
+                  <ChipField.Item value="vue">Vue</ChipField.Item>
+                  <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                </ChipField.Group>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                  <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                  <ChipField.Item value="swift">Swift</ChipField.Item>
+                  <ChipField.Item value="kotlin" disabled>
+                    Kotlin (준비 중)
+                  </ChipField.Item>
+                </ChipField.Group>
+              </ChipField>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="wrapping tiny">
+            <div className="w-48">
+              <ChipField
+                aria-label="여러 줄 tiny"
+                size="tiny"
+                defaultValue={['react', 'vue', 'svelte', 'flutter', 'swift']}
+              >
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                  <ChipField.Item value="react">React</ChipField.Item>
+                  <ChipField.Item value="vue">Vue</ChipField.Item>
+                  <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                </ChipField.Group>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                  <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                  <ChipField.Item value="swift">Swift</ChipField.Item>
+                  <ChipField.Item value="kotlin" disabled>
+                    Kotlin (준비 중)
+                  </ChipField.Item>
+                </ChipField.Group>
+              </ChipField>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="adornments">
+            <div className="w-80">
+              <ChipField aria-label="꾸밈" defaultValue={['react']}>
+                <TagIcon aria-hidden="true" />
+                <ChipField.Input placeholder="태그 검색" />
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                  <ChipField.Item value="react">React</ChipField.Item>
+                  <ChipField.Item value="vue">Vue</ChipField.Item>
+                  <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                </ChipField.Group>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                  <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                  <ChipField.Item value="swift">Swift</ChipField.Item>
+                  <ChipField.Item value="kotlin" disabled>
+                    Kotlin (준비 중)
+                  </ChipField.Item>
+                </ChipField.Group>
+              </ChipField>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="invalid">
+            <div className="w-80">
+              <ChipField aria-label="잘못됨" aria-invalid>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                  <ChipField.Item value="react">React</ChipField.Item>
+                  <ChipField.Item value="vue">Vue</ChipField.Item>
+                  <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                </ChipField.Group>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                  <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                  <ChipField.Item value="swift">Swift</ChipField.Item>
+                  <ChipField.Item value="kotlin" disabled>
+                    Kotlin (준비 중)
+                  </ChipField.Item>
+                </ChipField.Group>
+              </ChipField>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="disabled">
+            <div className="w-80">
+              <ChipField aria-label="비활성" disabled defaultValue={['react', 'vue']}>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                  <ChipField.Item value="react">React</ChipField.Item>
+                  <ChipField.Item value="vue">Vue</ChipField.Item>
+                  <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                </ChipField.Group>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                  <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                  <ChipField.Item value="swift">Swift</ChipField.Item>
+                  <ChipField.Item value="kotlin" disabled>
+                    Kotlin (준비 중)
+                  </ChipField.Item>
+                </ChipField.Group>
+              </ChipField>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="readOnly">
+            <div className="w-80">
+              <ChipField aria-label="읽기 전용" readOnly defaultValue={['react', 'vue']}>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+                  <ChipField.Item value="react">React</ChipField.Item>
+                  <ChipField.Item value="vue">Vue</ChipField.Item>
+                  <ChipField.Item value="svelte">Svelte</ChipField.Item>
+                </ChipField.Group>
+                <ChipField.Group>
+                  <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+                  <ChipField.Item value="flutter">Flutter</ChipField.Item>
+                  <ChipField.Item value="swift">Swift</ChipField.Item>
+                  <ChipField.Item value="kotlin" disabled>
+                    Kotlin (준비 중)
+                  </ChipField.Item>
+                </ChipField.Group>
+              </ChipField>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const CreateValuesNotInTheList: Story = {
   render: function Render() {
     const [emails, setEmails] = useState<string[]>([]);
+    const recipients = useChipField({
+      create: {
+        validate: (text) => /^[^\s@]+@[^\s@]+$/.test(text) || '이메일 주소가 아닙니다.',
+      },
+    });
 
     return (
       <div className="grid w-96 gap-3">
@@ -296,8 +328,7 @@ export const CreateValuesNotInTheList: Story = {
           <ChipField
             value={emails}
             onValueChange={setEmails}
-            onCreate={noop}
-            validate={(text) => /^[^\s@]+@[^\s@]+$/.test(text) || '이메일 주소가 아닙니다.'}
+            chipField={recipients}
             placeholder="이메일 입력"
           />
           <Field.Hint>쉼표나 Enter 로 주소를 나눕니다.</Field.Hint>
@@ -310,7 +341,7 @@ export const CreateValuesNotInTheList: Story = {
     docs: {
       description: {
         story:
-          'onCreate 를 주면 목록에 없는 값도 칩이 됩니다. 새 값을 따로 저장할 곳이 없으면 noop 을 줍니다. validate 가 거부한 값은 만들기 행에 이유가 뜨고 추가되지 않습니다. 쉼표를 치면 지금까지 쓴 값을 칩으로 만듭니다.',
+          'useChipField 에 create 를 주면 목록에 없는 값도 칩이 됩니다. 새 값을 따로 저장하려면 create.onCreate 를 줍니다. create.validate 가 거부한 값은 만들기 행에 이유가 뜨고 추가되지 않습니다. 쉼표를 치면 지금까지 쓴 값을 칩으로 만듭니다.',
       },
     },
   },
@@ -336,30 +367,36 @@ export const CreateValuesNotInTheList: Story = {
 };
 
 export const LimitHowManyCanBePicked: Story = {
-  render: () => (
-    <div className="w-80">
-      <ChipField aria-label="기술" maxCount={2} defaultValue={['react']}>
-        <ChipField.Group heading="프론트엔드">
-          <ChipField.Item value="react">React</ChipField.Item>
-          <ChipField.Item value="vue">Vue</ChipField.Item>
-          <ChipField.Item value="svelte">Svelte</ChipField.Item>
-        </ChipField.Group>
-        <ChipField.Group heading="모바일">
-          <ChipField.Item value="flutter">Flutter</ChipField.Item>
-          <ChipField.Item value="swift">Swift</ChipField.Item>
-          <ChipField.Item value="kotlin" disabled>
-            Kotlin (준비 중)
-          </ChipField.Item>
-        </ChipField.Group>
-        <ChipField.Limit>최대 2개까지 고를 수 있습니다.</ChipField.Limit>
-      </ChipField>
-    </div>
-  ),
+  render: function Render() {
+    const skills = useChipField({ maxCount: 2 });
+
+    return (
+      <div className="w-80">
+        <ChipField aria-label="기술" chipField={skills} defaultValue={['react']}>
+          <ChipField.Group>
+            <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
+            <ChipField.Item value="react">React</ChipField.Item>
+            <ChipField.Item value="vue">Vue</ChipField.Item>
+            <ChipField.Item value="svelte">Svelte</ChipField.Item>
+          </ChipField.Group>
+          <ChipField.Group>
+            <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
+            <ChipField.Item value="flutter">Flutter</ChipField.Item>
+            <ChipField.Item value="swift">Swift</ChipField.Item>
+            <ChipField.Item value="kotlin" disabled>
+              Kotlin (준비 중)
+            </ChipField.Item>
+          </ChipField.Group>
+          <ChipField.Limit>최대 2개까지 고를 수 있습니다.</ChipField.Limit>
+        </ChipField>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          'maxCount 에 닿으면 고르지 않은 옵션이 비활성이 되고 ChipField.Limit 에 쓴 안내가 목록 위에 나옵니다. 고른 칩을 지우면 다시 고를 수 있습니다.',
+          'useChipField 의 maxCount 에 닿으면 고르지 않은 옵션이 비활성이 되고 ChipField.Limit 에 쓴 안내가 목록 위에 나옵니다. 고른 칩을 지우면 다시 고를 수 있습니다.',
       },
     },
   },
@@ -378,12 +415,14 @@ export const PasteSeveralValuesAtOnce: Story = {
   render: () => (
     <div className="w-80">
       <ChipField aria-label="기술">
-        <ChipField.Group heading="프론트엔드">
+        <ChipField.Group>
+          <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
           <ChipField.Item value="react">React</ChipField.Item>
           <ChipField.Item value="vue">Vue</ChipField.Item>
           <ChipField.Item value="svelte">Svelte</ChipField.Item>
         </ChipField.Group>
-        <ChipField.Group heading="모바일">
+        <ChipField.Group>
+          <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
           <ChipField.Item value="flutter">Flutter</ChipField.Item>
           <ChipField.Item value="swift">Swift</ChipField.Item>
           <ChipField.Item value="kotlin" disabled>
@@ -425,12 +464,14 @@ export const SubmitWithANativeForm: Story = {
         <Field>
           <Field.Label>기술</Field.Label>
           <ChipField name="skills" required>
-            <ChipField.Group heading="프론트엔드">
+            <ChipField.Group>
+              <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
               <ChipField.Item value="react">React</ChipField.Item>
               <ChipField.Item value="vue">Vue</ChipField.Item>
               <ChipField.Item value="svelte">Svelte</ChipField.Item>
             </ChipField.Group>
-            <ChipField.Group heading="모바일">
+            <ChipField.Group>
+              <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
               <ChipField.Item value="flutter">Flutter</ChipField.Item>
               <ChipField.Item value="swift">Swift</ChipField.Item>
               <ChipField.Item value="kotlin" disabled>
@@ -491,12 +532,14 @@ export const ConnectReactHookForm: Story = {
           >
             <FormField.Label>태그</FormField.Label>
             <ChipField>
-              <ChipField.Group heading="프론트엔드">
+              <ChipField.Group>
+                <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
                 <ChipField.Item value="react">React</ChipField.Item>
                 <ChipField.Item value="vue">Vue</ChipField.Item>
                 <ChipField.Item value="svelte">Svelte</ChipField.Item>
               </ChipField.Group>
-              <ChipField.Group heading="모바일">
+              <ChipField.Group>
+                <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
                 <ChipField.Item value="flutter">Flutter</ChipField.Item>
                 <ChipField.Item value="swift">Swift</ChipField.Item>
                 <ChipField.Item value="kotlin" disabled>
@@ -534,12 +577,14 @@ export const SearchInABottomSheetOnMobile: Story = {
   render: () => (
     <div className="w-80">
       <ChipField aria-label="기술" defaultValue={['react']}>
-        <ChipField.Group heading="프론트엔드">
+        <ChipField.Group>
+          <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
           <ChipField.Item value="react">React</ChipField.Item>
           <ChipField.Item value="vue">Vue</ChipField.Item>
           <ChipField.Item value="svelte">Svelte</ChipField.Item>
         </ChipField.Group>
-        <ChipField.Group heading="모바일">
+        <ChipField.Group>
+          <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
           <ChipField.Item value="flutter">Flutter</ChipField.Item>
           <ChipField.Item value="swift">Swift</ChipField.Item>
           <ChipField.Item value="kotlin" disabled>
@@ -563,13 +608,15 @@ export const KeepAPopoverOnMobile: Story = {
   render: () => (
     <div className="w-80">
       <ChipField aria-label="기술" defaultValue={['react']}>
-        <ChipField.Content mobileVariant="popover">
-          <ChipField.Group heading="프론트엔드">
+        <ChipField.Content narrow="popover">
+          <ChipField.Group>
+            <ChipField.GroupLabel>프론트엔드</ChipField.GroupLabel>
             <ChipField.Item value="react">React</ChipField.Item>
             <ChipField.Item value="vue">Vue</ChipField.Item>
             <ChipField.Item value="svelte">Svelte</ChipField.Item>
           </ChipField.Group>
-          <ChipField.Group heading="모바일">
+          <ChipField.Group>
+            <ChipField.GroupLabel>모바일</ChipField.GroupLabel>
             <ChipField.Item value="flutter">Flutter</ChipField.Item>
             <ChipField.Item value="swift">Swift</ChipField.Item>
             <ChipField.Item value="kotlin" disabled>
@@ -584,7 +631,7 @@ export const KeepAPopoverOnMobile: Story = {
     docs: {
       description: {
         story:
-          'ChipField.Content 에 mobileVariant="popover" 를 주면 좁은 화면에서도 하단 시트 대신 필드 아래 팝오버로 엽니다. Content 를 쓰면 옵션은 모두 그 안에 둡니다.',
+          'ChipField.Content 에 narrow="popover" 를 주면 좁은 화면에서도 하단 시트 대신 필드 아래 팝오버로 엽니다. Content 를 쓰면 옵션은 모두 그 안에 둡니다.',
       },
     },
   },

@@ -10,11 +10,13 @@ import { OTPFieldSlot } from './parts/slot';
 import { otpFieldStyle } from './style';
 import { useInternalUnnamedWarning } from '../../../internal/lib/accessible-name';
 import { invariant, mergeProps } from '../../../utils';
-import { useFieldSize } from '../field/context';
+import { useFieldSize, useFieldState } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
 export type OTPFieldVariant = 'outline' | 'soft';
+
+export type OTPFieldMask = 'none' | 'dot';
 
 type NativeInputProps = Omit<
   ComponentProps<'input'>,
@@ -38,9 +40,8 @@ export type OTPFieldProps = NativeInputProps & {
   onValueChange?: (value: string) => void;
   onComplete?: (value: string) => void;
   pattern?: OTPFieldPattern;
-  mask?: boolean | string;
+  mask?: OTPFieldMask;
   placeholder?: string;
-  invalid?: boolean;
   size?: IdsSize;
   variant?: OTPFieldVariant;
   className?: string;
@@ -62,9 +63,8 @@ export function OTPFieldRoot({
   onValueChange,
   onComplete,
   pattern = 'numeric',
-  mask,
+  mask = 'none',
   placeholder,
-  invalid,
   size,
   variant = 'outline',
   className,
@@ -79,6 +79,7 @@ export function OTPFieldRoot({
     'OTPField: length must be an integer from 1 to 12.',
   );
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const fieldState = useFieldState();
   const styles = otpFieldStyle({ size: resolvedSize, variant });
   const { state, handlers, rootRef, inputRef } = useInternalOTPField({
     length,
@@ -92,7 +93,7 @@ export function OTPFieldRoot({
     ref,
   });
 
-  const ariaInvalid = inputProps['aria-invalid'] ?? invalid;
+  const ariaInvalid = inputProps['aria-invalid'] ?? fieldState?.invalid;
   const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
   const labelled =
     inputProps['aria-label'] !== undefined ||

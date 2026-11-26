@@ -27,8 +27,8 @@ const meta = {
     size: { control: 'radio', options: sizes },
     pattern: { control: 'radio', options: ['numeric', 'alphanumeric'] },
     length: { control: { type: 'number', min: 1, max: 12 } },
-    mask: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    mask: { control: 'radio', options: ['none', 'dot'] },
+    'aria-invalid': { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -90,7 +90,7 @@ export const Gallery: Story = {
           <OTPField length={6} defaultValue="123456" aria-label="완성" />
         </Showcase.Row>
         <Showcase.Row label="invalid">
-          <OTPField length={6} defaultValue="123456" invalid aria-label="잘못됨" />
+          <OTPField length={6} defaultValue="123456" aria-invalid aria-label="잘못됨" />
         </Showcase.Row>
         <Showcase.Row label="disabled">
           <OTPField length={6} defaultValue="12" disabled aria-label="비활성" />
@@ -138,8 +138,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Content">
         <Showcase.Row label="mask">
-          <OTPField length={4} mask defaultValue="1234" aria-label="PIN" />
-          <OTPField length={4} mask="✱" defaultValue="12" aria-label="PIN 별표" />
+          <OTPField length={4} mask="dot" defaultValue="1234" aria-label="PIN" />
         </Showcase.Row>
         <Showcase.Row label="placeholder">
           <OTPField length={6} placeholder="○○○○○○" aria-label="자리 표시" />
@@ -245,6 +244,42 @@ export const ValidateWithReactHookForm: Story = {
     await userEvent.paste('654321');
     await userEvent.click(canvas.getByRole('button', { name: '검증' }));
     await expect(canvas.getByLabelText('검증 결과')).toHaveTextContent('검증 완료: 654321');
+  },
+};
+
+export const HideAPin: Story = {
+  render: () => (
+    <div className="grid gap-4">
+      <OTPField length={4} mask="dot" defaultValue="12" aria-label="PIN" />
+      <OTPField length={4} defaultValue="12" aria-label="PIN 별표">
+        <OTPField.Group>
+          {[0, 1, 2, 3].map((index) => (
+            <OTPField.Slot key={index} index={index}>
+              {(slot) => (
+                <>
+                  {slot.isFilled && '✱'}
+                  {slot.hasFakeCaret && <OTPField.Caret />}
+                </>
+              )}
+            </OTPField.Slot>
+          ))}
+        </OTPField.Group>
+      </OTPField>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'mask="dot" 이면 채운 칸에 숫자 대신 점을 그립니다. 다른 글자로 가리려면 OTPField.Slot 의 children 함수에서 그 글자와 OTPField.Caret 을 그립니다. 입력과 FormData 에는 실제 코드가 들어갑니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const slots = [...canvasElement.querySelectorAll('[data-otp-slot]')];
+    await expect(slots[4]).toHaveTextContent('✱');
+    await expect(slots[0]).not.toHaveTextContent('1');
+    await expect(canvasElement.querySelectorAll('input')[0]).toHaveValue('12');
   },
 };
 

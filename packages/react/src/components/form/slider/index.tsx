@@ -1,4 +1,5 @@
-import { type SliderValue } from './hooks/use-slider';
+import { type SliderInstance, type UseSliderOptions } from './hooks/use-slider';
+import { type SliderValue } from './hooks/use-slider-state';
 import { SliderMark, type SliderMarkProps } from './parts/mark';
 import { SliderMarks, type SliderMarksProps } from './parts/marks';
 import { SliderRange, type SliderRangeProps } from './parts/range';
@@ -24,6 +25,8 @@ export namespace Slider {
   export type ThumbState = SliderThumbState;
   export type Value = SliderValue;
   export type Orientation = SliderOrientation;
+  export type Instance = SliderInstance;
+  export type Options = UseSliderOptions;
 
   export type TrackProps = SliderTrackProps;
   export type RangeProps = SliderRangeProps;
@@ -66,4 +69,6 @@ export namespace Slider {
 }
 
 export type { SliderOrientation, SliderState, SliderThumbState, SliderProps } from './root';
-export type { SliderValue } from './hooks/use-slider';
+export type { SliderValue } from './hooks/use-slider-state';
+export { useSlider } from './hooks/use-slider';
+export type { SliderInstance, UseSliderOptions } from './hooks/use-slider';

@@ -5,11 +5,12 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { OTPSlotState } from './hooks/use-otp-field';
+import type { OTPFieldMask } from './root';
 import type { otpFieldStyle } from './style';
 
 type Context = {
   slots: OTPSlotState[];
-  mask: boolean | string | undefined;
+  mask: OTPFieldMask;
   placeholder: string | undefined;
   invalid: boolean;
   styles: ReturnType<typeof otpFieldStyle>;

@@ -34,7 +34,7 @@ export const chipFieldStyle = tv({
     item: listStyles.option,
     indicator: listStyles.indicator,
     group: 'flex flex-col',
-    groupHeading: listStyles.heading,
+    groupLabel: listStyles.heading,
     create: [listStyles.option, 'data-invalid:text-danger'],
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
     limit: ['px-2.5 pt-1.5 pb-1 text-caption-c1-regular text-neutral', 'not-data-full:sr-only'],

@@ -8,6 +8,7 @@ import { render } from 'vitest-browser-react';
 
 import { Field, Slider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { SliderWith } from './hook-controls';
 import { Field as RHFField } from '../src/react-hook-form';
 
 type Point = { x: number; y: number };
@@ -84,7 +85,7 @@ test('SSR: a single thumb carries the name and value, the root carries the Field
         <Field size="tiny" invalid>
           <Field.Label>Volume</Field.Label>
           <Field.Description>Loudness</Field.Description>
-          <Slider name="volume" defaultValue={30} formatLabel={(value) => `${value}%`} />
+          <SliderWith name="volume" defaultValue={30} formatLabel={(value) => `${value}%`} />
         </Field>
       </form>,
     ),
@@ -105,7 +106,7 @@ test('SSR: a single thumb carries the name and value, the root carries the Field
 test('SSR: a range is a labelled group whose thumbs bound each other', () => {
   const doc = parse(
     renderToString(
-      <Slider
+      <SliderWith
         aria-label="Price"
         name="price"
         defaultValue={[20, 70]}
@@ -196,7 +197,7 @@ test('right-to-left flips the horizontal arrows only; vertical sliders go up', a
 test('range thumbs never cross and keep minStepsBetweenThumbs apart', async () => {
   const changes: Array<[number, number]> = [];
   const screen = await render(
-    <Slider
+    <SliderWith
       aria-label="Price"
       defaultValue={[40, 50]}
       step={5}
@@ -437,6 +438,20 @@ test('the first value fixes the shape; a later change of shape warns and keeps i
   warn.mockRestore();
 });
 
+test('useSlider largeStep sets how far PageUp, PageDown and Shift with an arrow move', async () => {
+  const screen = await render(
+    <SliderWith aria-label="Hue" max={360} defaultValue={100} largeStep={45} />,
+  );
+  const thumb = screen.getByRole('slider', { name: 'Hue' });
+  thumb.element().focus();
+  await userEvent.keyboard('{PageUp}');
+  await expect.element(thumb).toHaveAttribute('aria-valuenow', '145');
+  await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
+  await expect.element(thumb).toHaveAttribute('aria-valuenow', '100');
+  await userEvent.keyboard('{PageDown}{PageDown}{PageDown}');
+  await expect.element(thumb).toHaveAttribute('aria-valuenow', '0');
+});
+
 test('react-hook-form controlMode="value": numbers in, error focus on the thumb', async () => {
   let methods!: UseFormReturn<{ volume: number }>;
   function App() {
@@ -490,7 +505,7 @@ test('a decimal step lands on exact values and draws one mark per step', async (
 
 test('Slider.Mark draws a labelled tick, and Slider.Thumb takes its own aria-label', async () => {
   const screen = await render(
-    <Slider aria-label="Price" defaultValue={[20, 80]} formatLabel={(value) => `${value}%`}>
+    <SliderWith aria-label="Price" defaultValue={[20, 80]} formatLabel={(value) => `${value}%`}>
       <Slider.Track>
         <Slider.Range />
         <Slider.Thumb index={0} aria-label="최저가" />
@@ -502,7 +517,7 @@ test('Slider.Mark draws a labelled tick, and Slider.Thumb takes its own aria-lab
         <Slider.Mark value={0} />
         <Slider.Mark value={50}>절반</Slider.Mark>
       </Slider.Marks>
-    </Slider>,
+    </SliderWith>,
   );
   await expect.element(screen.getByRole('slider', { name: '최저가' })).toBeInTheDocument();
   const upper = screen.getByRole('slider', { name: '최고가' });

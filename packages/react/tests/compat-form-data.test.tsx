@@ -578,7 +578,7 @@ const specs: Spec[] = [
     ownsForm: true,
     draw: ({ filled }) => (
       <Questionnaire id={FORM_ID} defaultValue={filled ? { [NAME]: 'casual' } : undefined}>
-        <Questionnaire.Question name={NAME}>
+        <Questionnaire.Question name={NAME} required>
           {LABEL}
           <Questionnaire.Option value="formal">Formal</Questionnaire.Option>
           <Questionnaire.Option value="casual">Casual</Questionnaire.Option>

@@ -31,12 +31,12 @@ export function readQuestions(children: ReactNode): QuestionnaireQuestionShape[]
     if (!isValidElement<QuestionnaireQuestionProps>(node) || !QUESTION.has(elementTypeOf(node)))
       return [];
 
-    const { name, selectionMode = 'single', optional = false, children: parts } = node.props;
+    const { name, selectionMode = 'single', required = false, children: parts } = node.props;
     return [
       {
         name,
         selectionMode,
-        optional,
+        required,
         hasOther: containsElementOfType(parts, OTHER),
         optionValues: optionValuesIn(parts),
       },

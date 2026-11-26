@@ -21,7 +21,7 @@ export type QuestionnaireQuestionProps = Omit<
 > & {
   name: string;
   selectionMode?: QuestionnaireSelectionMode;
-  optional?: boolean;
+  required?: boolean;
   orientation?: QuestionnaireOrientation;
   variant?: QuestionnaireVariant;
   className?: string;
@@ -32,7 +32,7 @@ export type QuestionnaireQuestionProps = Omit<
 export function QuestionnaireQuestion({
   name,
   selectionMode = 'single',
-  optional: _readByTheRoot,
+  required: _readByTheRoot,
   orientation = 'vertical',
   variant = 'card',
   hidden,

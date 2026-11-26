@@ -5,7 +5,7 @@ import { createContext, use, type ComponentProps, type RefObject } from 'react';
 import { invariant } from '../../../utils';
 
 import type { ChipFieldInputProps, ChipFieldItemState, ChipFieldState } from '.';
-import type { useInternalChipField } from './hooks/use-chip-field';
+import type { useInternalChipField } from './hooks/use-chip-field-state';
 import type { chipFieldStyle } from './style';
 import type { IdsSize } from '../../../tokens/types';
 import type { SelectOption } from '../select/lib/select-options';
@@ -31,6 +31,7 @@ type ChipFieldContextValue = {
 
 export const ChipContext = createContext<ChipFieldContextValue | null>(null);
 export const ItemContext = createContext<ChipFieldItemState | null>(null);
+export const GroupLabelContext = createContext<string | null>(null);
 
 export function useInternalChip(name: string) {
   const context = use(ChipContext);

@@ -134,7 +134,8 @@ export { Radio } from './components/form/radio';
 export { RadioGroup } from './components/form/radio-group';
 export { SegmentedControl } from './components/form/segmented-control';
 export { CheckboxGroup } from './components/form/checkbox-group';
-export { Slider } from './components/form/slider';
+export { Slider, useSlider } from './components/form/slider';
+export type { SliderInstance, UseSliderOptions } from './components/form/slider';
 export { TextField } from './components/form/text-field';
 export { NumberField } from './components/form/number-field';
 export type { NumberFieldProps, NumberFieldVariant } from './components/form/number-field';
@@ -215,7 +216,12 @@ export { PasswordField } from './components/form/password-field';
 export type { PasswordFieldProps, PasswordFieldVariant } from './components/form/password-field';
 
 export { OTPField } from './components/form/otp-field';
-export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './components/form/otp-field';
+export type {
+  OTPFieldProps,
+  OTPFieldVariant,
+  OTPFieldPattern,
+  OTPFieldMask,
+} from './components/form/otp-field';
 
 export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
@@ -224,6 +230,7 @@ export { PromptInput } from './components/form/prompt-input';
 
 export { Questionnaire } from './components/form/questionnaire';
 export type {
+  QuestionnaireAdvance,
   QuestionnaireAnswer,
   QuestionnaireAnswers,
   QuestionnaireVariant,
@@ -251,8 +258,13 @@ export type {
 export { ColorField } from './components/form/color-field';
 export type { ColorFieldProps, ColorFormat } from './components/form/color-field';
 
-export { ChipField } from './components/form/chip-field';
-export type { ChipFieldProps } from './components/form/chip-field';
+export { ChipField, useChipField } from './components/form/chip-field';
+export type {
+  ChipFieldProps,
+  ChipFieldCreateOptions,
+  ChipFieldInstance,
+  UseChipFieldOptions,
+} from './components/form/chip-field';
 
 export { FileField } from './components/form/file-field';
 export type { FileFieldProps, FileFieldRejection } from './components/form/file-field';

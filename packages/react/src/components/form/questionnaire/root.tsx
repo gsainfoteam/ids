@@ -19,18 +19,24 @@ import { Progress } from '../../feedback/progress';
 
 import type { IdsSize } from '../../../tokens/types';
 
+export type QuestionnaireAdvance = 'submit' | 'select';
+
 export type QuestionnaireProps = Omit<ComponentProps<'form'>, 'defaultValue' | 'children'> & {
+  value?: QuestionnaireAnswers;
   defaultValue?: QuestionnaireAnswers;
+  onValueChange?: (answers: QuestionnaireAnswers) => void;
   onComplete?: (answers: QuestionnaireAnswers) => void;
-  advanceOnSelect?: boolean;
+  advance?: QuestionnaireAdvance;
   size?: IdsSize;
   children: ReactNode;
 };
 
 export function QuestionnaireRoot({
+  value,
   defaultValue,
+  onValueChange,
   onComplete,
-  advanceOnSelect = false,
+  advance: advanceOn = 'submit',
   size,
   className,
   children,
@@ -56,17 +62,20 @@ export function QuestionnaireRoot({
     handleSubmit,
   } = useInternalQuestionnaire({
     questions,
+    value,
     defaultValue,
+    onValueChange,
     onComplete,
     onSubmit,
     action: rest.action,
   });
   const styles = questionnaireStyle({ size });
 
+  const advanceOnSelect = advanceOn === 'select';
   const opensTheNextStepOnSelect =
     advanceOnSelect && current?.selectionMode === 'single' && !current.hasOther;
   const showsPrevious = index > 0;
-  const showsSkip = current?.optional === true;
+  const showsSkip = current?.required === false;
   const showsForward = current !== undefined && !opensTheNextStepOnSelect;
   const parts = flattenFragments(children);
   const submit = parts.find(isSubmit) ?? <QuestionnaireSubmit />;
