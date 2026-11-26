@@ -889,8 +889,9 @@ export const Cover: Story = {
                             <Card.Title>오늘의 학식</Card.Title>
                             <Card.Description>9월 30일 점심</Card.Description>
                             <Card.Action>
-                              <Badge content={2} aria-label="새 메뉴 2개">
+                              <Badge>
                                 <IconButton variant="ghost" aria-label="알림" icon={<BellIcon />} />
+                                <Badge.Indicator count={2} aria-label="새 메뉴 2개" />
                               </Badge>
                             </Card.Action>
                           </Card.Header>

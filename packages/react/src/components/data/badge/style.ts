@@ -10,7 +10,7 @@ export const badgeStyle = tv({
       'inline-flex shrink-0 items-center justify-center rounded-full tabular-nums',
       'whitespace-nowrap select-none',
       'transition-[scale,opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'data-invisible:scale-0 data-invisible:opacity-0',
+      'starting:scale-0 starting:opacity-0',
       'pointer-events-none absolute z-10 ring-2 ring-(--ids-bg-current)',
     ],
   },

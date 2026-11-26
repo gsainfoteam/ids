@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 
+import { BadgeContext } from './context';
 import { useInternalBadge } from './hooks/use-badge';
 import { useInternalBadgeInset } from './hooks/use-badge-inset';
 import { badgeStyle } from './style';
@@ -15,15 +16,7 @@ export type BadgeVariant = 'solid' | 'soft' | 'outline';
 export type BadgeColorScheme =
   'neutral' | 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'info';
 
-function flag(on: boolean) {
-  return on ? '' : undefined;
-}
-
 export function BadgeRoot({
-  content,
-  max = 99,
-  showZero = false,
-  invisible = false,
   placement = 'top-end',
   variant = 'solid',
   colorScheme = 'danger',
@@ -32,59 +25,32 @@ export function BadgeRoot({
   style,
   children,
   ref,
-  'aria-label': label,
   ...rest
 }: Badge.Props) {
   const rootRef = useRef<HTMLSpanElement>(null);
-  const { indicatorId, dot, display, hidden, anchor } = useInternalBadge({
-    content,
-    max,
-    showZero,
-    invisible,
-    label,
-    children,
-  });
+  const { indicatorId, indicator, display, anchor } = useInternalBadge(children);
   useInternalBadgeInset(rootRef, placement);
 
-  const styles = badgeStyle({ variant, colorScheme, size, dot, placement });
+  const styles = badgeStyle({ placement });
   const state: Badge.State = {
-    count: display.count,
-    dot,
-    invisible: hidden,
-    overflowed: display.overflowed,
-  };
-  const text = dot ? null : display.text;
-
-  const indicator = {
-    id: indicatorId,
-    'data-badge-indicator': '',
-    'data-dot': flag(dot),
-    'data-invisible': flag(hidden),
-    'data-overflow': flag(display.overflowed),
-    ...(label === undefined
-      ? { 'aria-hidden': true, children: text }
-      : {
-          role: 'status',
-          children: (
-            <>
-              <span aria-hidden="true">{text}</span>
-              <span className="sr-only">{label}</span>
-            </>
-          ),
-        }),
+    count: display?.count,
+    dot: display?.dot ?? false,
+    overflowed: display?.overflowed ?? false,
   };
 
   return (
-    <span
-      {...rest}
-      ref={mergeRefs(ref, rootRef)}
-      data-badge=""
-      data-placement={placement}
-      className={styles.root({ className: resolveState(className, state) })}
-      style={resolveState(style, state)}
-    >
-      {anchor}
-      <span {...indicator} className={styles.indicator()} />
-    </span>
+    <BadgeContext value={{ indicatorId, variant, colorScheme, size, placement }}>
+      <span
+        {...rest}
+        ref={mergeRefs(ref, rootRef)}
+        data-badge=""
+        data-placement={placement}
+        className={styles.root({ className: resolveState(className, state) })}
+        style={resolveState(style, state)}
+      >
+        {anchor}
+        {indicator}
+      </span>
+    </BadgeContext>
   );
 }

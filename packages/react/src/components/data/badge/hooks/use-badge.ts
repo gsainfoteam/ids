@@ -1,34 +1,43 @@
 'use client';
 
-import { Children, cloneElement, Fragment, useId, type ReactElement, type ReactNode } from 'react';
+import {
+  cloneElement,
+  Fragment,
+  isValidElement,
+  useId,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
+import { elementTypeOf, flattenFragments, invariant } from '../../../../utils';
 import { badgeDisplay } from '../lib/badge-count';
+import { BADGE_MAX, BadgeIndicator, type BadgeIndicatorProps } from '../parts/indicator';
 
 type Describable = ReactElement<{ 'aria-describedby'?: string }>;
 
-export function useInternalBadge({
-  content,
-  max,
-  showZero,
-  invisible,
-  label,
-  children,
-}: {
-  content: ReactNode;
-  max: number;
-  showZero: boolean;
-  invisible: boolean;
-  label: string | undefined;
-  children: ReactElement;
-}) {
+const isIndicator = (node: ReactNode): node is ReactElement<BadgeIndicatorProps> =>
+  isValidElement(node) && elementTypeOf(node) === BadgeIndicator;
+
+export function useInternalBadge(children: ReactNode) {
   const indicatorId = `${useId()}-badge`;
-  const child = Children.only(children);
+  const nodes = flattenFragments(children);
+  const indicator = nodes.find(isIndicator);
+  const others = nodes.filter((node) => !isIndicator(node));
+  const child = others[0];
+  invariant(
+    others.length === 1 && isValidElement(child),
+    '`<Badge>` wraps exactly one element, with an optional `<Badge.Indicator>` beside it.',
+  );
 
-  const dot = content === undefined;
-  const display = badgeDisplay(content, max, showZero);
-  const hidden = invisible || (!dot && display.empty);
-
-  const describes = label === undefined && !dot && !hidden;
+  const display = indicator
+    ? badgeDisplay(
+        indicator.props.count,
+        indicator.props.children,
+        indicator.props.max ?? BADGE_MAX,
+      )
+    : undefined;
+  const describes =
+    display !== undefined && !display.dot && indicator?.props['aria-label'] === undefined;
   const anchor =
     describes && child.type !== Fragment
       ? cloneElement(child as Describable, {
@@ -38,5 +47,5 @@ export function useInternalBadge({
         })
       : child;
 
-  return { indicatorId, dot, display, hidden, anchor };
+  return { indicatorId, indicator, display, anchor };
 }

@@ -1,5 +1,6 @@
-import type { ComponentProps, CSSProperties, ReactElement, ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
+import { BadgeIndicator, type BadgeIndicatorProps } from './parts/indicator';
 import { BadgeRoot, type BadgePlacement, type BadgeVariant, type BadgeColorScheme } from './root';
 import { badgeStyle } from './style';
 import { type StateValue } from '../../../internal/lib/state-props';
@@ -18,23 +19,25 @@ export namespace Badge {
   export type State = {
     count: number | undefined;
     dot: boolean;
-    invisible: boolean;
     overflowed: boolean;
   };
 
-  export type Props = Omit<ComponentProps<'span'>, 'className' | 'style' | 'content'> & {
-    content?: ReactNode;
-    max?: number;
-    showZero?: boolean;
-    invisible?: boolean;
+  export type Props = Omit<ComponentProps<'span'>, 'className' | 'style' | 'children'> & {
     placement?: BadgePlacement;
     variant?: BadgeVariant;
     colorScheme?: BadgeColorScheme;
     size?: IdsSize;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;
-    children: ReactElement;
+    children: ReactNode;
   };
+
+  export type IndicatorProps = BadgeIndicatorProps;
+
+  export const Indicator = BadgeIndicator;
+  export namespace Indicator {
+    export type Props = BadgeIndicatorProps;
+  }
 
   export const Style = badgeStyle;
 }

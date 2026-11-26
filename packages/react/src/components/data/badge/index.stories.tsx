@@ -41,13 +41,8 @@ const meta = {
     colorScheme: { control: 'select', options: colorSchemes },
     placement: { control: 'radio', options: placements },
     size: { control: 'radio', options: ['standard', 'tiny'] },
-    content: { control: 'number' },
-    max: { control: 'number' },
-    showZero: { control: 'boolean' },
-    invisible: { control: 'boolean' },
   },
   args: {
-    content: 3,
     variant: 'solid',
     colorScheme: 'danger',
     size: 'standard',
@@ -59,12 +54,44 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+type BadgePlaygroundArgs = Omit<Badge.Props, 'children'> & {
+  indicatorCount?: number;
+  indicatorMax?: number;
+  indicatorLabel?: string;
+};
+
+export const Playground: StoryObj<BadgePlaygroundArgs> = {
+  args: { indicatorCount: 3, indicatorMax: 99, indicatorLabel: '' },
+  argTypes: {
+    indicatorCount: {
+      name: 'count',
+      control: 'number',
+      table: { category: 'Badge.Indicator' },
+    },
+    indicatorMax: { name: 'max', control: 'number', table: { category: 'Badge.Indicator' } },
+    indicatorLabel: {
+      name: 'aria-label',
+      control: 'text',
+      table: { category: 'Badge.Indicator' },
+    },
+  },
+  render: ({ indicatorCount, indicatorMax, indicatorLabel, ...args }) => (
+    <Badge {...args}>
+      <BellIcon className="size-7" />
+      <Badge.Indicator
+        count={indicatorCount}
+        max={indicatorMax}
+        aria-label={indicatorLabel || undefined}
+      />
+    </Badge>
+  ),
+};
 
 export const Usage: Story = {
   render: () => (
-    <Badge content={3} aria-label="읽지 않은 알림 3개">
+    <Badge>
       <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+      <Badge.Indicator count={3} aria-label="읽지 않은 알림 3개" />
     </Badge>
   ),
 };
@@ -78,17 +105,21 @@ export const Gallery: Story = {
           columns={variants}
           render={(colorScheme, variant) => (
             <div className="flex items-center gap-6">
-              <Badge content={5} variant={variant} colorScheme={colorScheme}>
+              <Badge variant={variant} colorScheme={colorScheme}>
                 <Box />
-              </Badge>
-              <Badge content={128} variant={variant} colorScheme={colorScheme}>
-                <Box />
-              </Badge>
-              <Badge content={7} variant={variant} colorScheme={colorScheme}>
-                <Box />
+                <Badge.Indicator count={5} />
               </Badge>
               <Badge variant={variant} colorScheme={colorScheme}>
                 <Box />
+                <Badge.Indicator count={128} />
+              </Badge>
+              <Badge variant={variant} colorScheme={colorScheme}>
+                <Box />
+                <Badge.Indicator count={7} />
+              </Badge>
+              <Badge variant={variant} colorScheme={colorScheme}>
+                <Box />
+                <Badge.Indicator />
               </Badge>
             </div>
           )}
@@ -101,16 +132,18 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="ltr" className="gap-10 py-3">
           {placements.map((placement) => (
-            <Badge key={placement} content={9} placement={placement}>
+            <Badge key={placement} placement={placement}>
               <Box />
+              <Badge.Indicator count={9} />
             </Badge>
           ))}
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl" className="flex gap-10 py-3">
             {placements.map((placement) => (
-              <Badge key={placement} content={9} placement={placement}>
+              <Badge key={placement} placement={placement}>
                 <Box />
+                <Badge.Indicator count={9} />
               </Badge>
             ))}
           </div>
@@ -122,52 +155,62 @@ export const Gallery: Story = {
         description="Badge가 감싼 요소의 모서리를 재서 그 곡선 위에 붙습니다."
       >
         <Showcase.Row label="avatar">
-          <Badge content={3}>
+          <Badge>
             <Avatar name="Alice Kim" />
+            <Badge.Indicator count={3} />
           </Badge>
-          <Badge colorScheme="success" placement="bottom-end" aria-label="온라인">
+          <Badge colorScheme="success" placement="bottom-end">
             <Avatar name="Bob Lee" />
+            <Badge.Indicator aria-label="온라인" />
           </Badge>
         </Showcase.Row>
         <Showcase.Row label="icon button">
-          <Badge content={3}>
+          <Badge>
             <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+            <Badge.Indicator count={3} />
           </Badge>
           <Badge>
             <IconButton aria-label="받은 편지함" variant="soft" icon={<InboxIcon />} />
+            <Badge.Indicator />
           </Badge>
         </Showcase.Row>
         <Showcase.Row label="card">
-          <Badge content="New" colorScheme="primary">
+          <Badge colorScheme="primary">
             <Card variant="outline">
               <Card.Header>
                 <Card.Title>새 공지</Card.Title>
                 <Card.Description>오늘 올라온 글</Card.Description>
               </Card.Header>
             </Card>
+            <Badge.Indicator>New</Badge.Indicator>
           </Badge>
         </Showcase.Row>
         <Showcase.Row label="rounded-full">
-          <Badge content={2}>
+          <Badge>
             <div className="bg-neutral-soft size-10 rounded-full" />
+            <Badge.Indicator count={2} />
           </Badge>
-          <Badge content={12}>
+          <Badge>
             <div className="bg-neutral-soft h-8 w-20 rounded-full" />
+            <Badge.Indicator count={12} />
           </Badge>
         </Showcase.Row>
         <Showcase.Row label="square">
-          <Badge content={5}>
+          <Badge>
             <div className="bg-neutral-soft size-10" />
+            <Badge.Indicator count={5} />
           </Badge>
         </Showcase.Row>
         <Showcase.Row label="squircle theme">
           <IdsProvider.Scope theme={{ cornerShape: 'squircle', radius: 14 }}>
             <div className="flex gap-6">
-              <Badge content={3}>
+              <Badge>
                 <IconButton aria-label="알림" variant="outline" icon={<BellIcon />} />
+                <Badge.Indicator count={3} />
               </Badge>
-              <Badge content={7}>
+              <Badge>
                 <Box />
+                <Badge.Indicator count={7} />
               </Badge>
             </div>
           </IdsProvider.Scope>
@@ -176,19 +219,23 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Size">
         <Showcase.Row label="standard">
-          <Badge content={3}>
+          <Badge>
             <BellIcon className="size-7" />
+            <Badge.Indicator count={3} />
           </Badge>
           <Badge>
             <BellIcon className="size-7" />
+            <Badge.Indicator />
           </Badge>
         </Showcase.Row>
         <Showcase.Row label="tiny">
-          <Badge content={3} size="tiny">
+          <Badge size="tiny">
             <BellIcon className="size-5" />
+            <Badge.Indicator count={3} />
           </Badge>
           <Badge size="tiny">
             <BellIcon className="size-5" />
+            <Badge.Indicator />
           </Badge>
         </Showcase.Row>
       </Showcase.Section>
@@ -199,19 +246,23 @@ export const Gallery: Story = {
 export const ShowAnUnreadCount: Story = {
   render: () => (
     <div className="flex items-center gap-8">
-      <Badge content={99}>
+      <Badge>
         <BellIcon className="size-7" />
+        <Badge.Indicator count={99} />
       </Badge>
-      <Badge content={100}>
+      <Badge>
         <BellIcon className="size-7" />
+        <Badge.Indicator count={100} />
       </Badge>
-      <Badge content={1200} max={999}>
+      <Badge>
         <BellIcon className="size-7" />
+        <Badge.Indicator count={1200} max={999} />
       </Badge>
-      <Badge content={0}>
+      <Badge>
         <BellIcon className="size-7" />
+        <Badge.Indicator count={0} />
       </Badge>
-      <Badge content={0} showZero>
+      <Badge>
         <BellIcon className="size-7" />
       </Badge>
     </div>
@@ -220,7 +271,7 @@ export const ShowAnUnreadCount: Story = {
     docs: {
       description: {
         story:
-          '숫자는 `max`(기본 99)를 넘으면 `99+` 가 됩니다. 0은 숨고, `showZero` 면 보입니다. 숨은 배지도 자리를 지켜서 다시 나타날 때 튀어나오듯 커집니다.',
+          '`Badge.Indicator` 의 `count` 는 `max`(기본 99)를 넘으면 `99+` 가 됩니다. 0도 그대로 그리니, 0일 때 감추려면 Indicator 를 넣지 않습니다. 다시 넣으면 커지며 나타납니다.',
       },
     },
   },
@@ -231,11 +282,8 @@ export const ShowAnUnreadCount: Story = {
       '99+',
       '999+',
       '0',
-      '0',
     ]);
     await expect(indicators[1]).toHaveAttribute('data-overflow');
-    await expect(indicators[3]).toHaveAttribute('data-invisible');
-    await expect(indicators[4]).not.toHaveAttribute('data-invisible');
   },
 };
 
@@ -245,14 +293,16 @@ export const AnnounceTheCount: Story = {
 
     return (
       <div className="flex items-center gap-6">
-        <Badge content={unread} aria-label={`읽지 않은 메일 ${unread}통`}>
+        <Badge>
           <Button variant="outline">
             <EnvelopeIcon />
             받은 편지함
           </Button>
+          <Badge.Indicator count={unread} aria-label={`읽지 않은 메일 ${unread}통`} />
         </Badge>
-        <Badge content={unread} size="tiny">
+        <Badge size="tiny">
           <IconButton aria-label="알림" variant="ghost" icon={<BellIcon />} />
+          {unread > 0 && <Badge.Indicator count={unread} />}
         </Badge>
         <Button size="tiny" onClick={() => setUnread((count) => count + 1)}>
           새 메일
@@ -267,7 +317,7 @@ export const AnnounceTheCount: Story = {
     docs: {
       description: {
         story:
-          '`aria-label` 을 주면 배지가 live region이 되어 바뀔 때마다 그 문장을 읽습니다. 주지 않으면 숫자가 붙어 있는 버튼의 설명(`aria-describedby`)이 되어 "알림, 버튼, 3" 처럼 읽힙니다.',
+          '`Badge.Indicator` 에 `aria-label` 을 주면 live region이 되어 바뀔 때마다 그 문장을 읽습니다. 0이 되어도 남겨 두면 "읽지 않은 메일 0통" 까지 읽습니다. 주지 않으면 숫자가 붙어 있는 버튼의 설명(`aria-describedby`)이 되어 "알림, 버튼, 3" 처럼 읽히고, 0이면 Indicator 를 빼서 설명도 사라집니다.',
       },
     },
   },
@@ -278,7 +328,7 @@ export const AnnounceTheCount: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '새 메일' }));
     await expect(status).toHaveTextContent('읽지 않은 메일 4통');
     await userEvent.click(canvas.getByRole('button', { name: '모두 읽음' }));
-    await expect(status).toHaveAttribute('data-invisible');
+    await expect(status).toHaveTextContent('읽지 않은 메일 0통');
     await expect(canvas.getByRole('button', { name: '알림' })).not.toHaveAttribute(
       'aria-describedby',
     );
@@ -288,14 +338,17 @@ export const AnnounceTheCount: Story = {
 export const AttachToAnyRoundedTarget: Story = {
   render: () => (
     <div className="flex items-center gap-6">
-      <Badge content={3}>
+      <Badge>
         <Avatar name="Alice Kim" />
+        <Badge.Indicator count={3} />
       </Badge>
-      <Badge content={3}>
+      <Badge>
         <div className="bg-neutral-soft size-10 rounded-full" />
+        <Badge.Indicator count={3} />
       </Badge>
-      <Badge content={3}>
+      <Badge>
         <div className="bg-neutral-soft size-10" />
+        <Badge.Indicator count={3} />
       </Badge>
     </div>
   ),
@@ -323,13 +376,9 @@ export const ShowOnlineStatus: Story = {
 
     return (
       <div className="flex items-center gap-4">
-        <Badge
-          invisible={!online}
-          colorScheme="success"
-          placement="bottom-end"
-          aria-label={online ? '온라인' : '오프라인'}
-        >
+        <Badge colorScheme={online ? 'success' : 'neutral'} placement="bottom-end">
           <Avatar name="Alice Kim" />
+          <Badge.Indicator aria-label={online ? '온라인' : '오프라인'} />
         </Badge>
         <Button size="tiny" variant="outline" onClick={() => setOnline((value) => !value)}>
           {online ? '오프라인으로' : '온라인으로'}
@@ -341,17 +390,18 @@ export const ShowOnlineStatus: Story = {
     docs: {
       description: {
         story:
-          '`invisible` 은 배지를 지우지 않고 줄여서 감춥니다. 다시 보일 때 커지며 나타나고, live region은 그대로 남아 상태 변화를 읽습니다.',
+          'children 없는 `Badge.Indicator` 는 점입니다. 상태를 색(`colorScheme`)으로 바꾸고 Indicator 는 그대로 두면, live region이 남아 바뀐 상태를 읽습니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     const status = canvas.getByRole('status');
     await userEvent.click(canvas.getByRole('button', { name: '오프라인으로' }));
-    await expect(status).toHaveAttribute('data-invisible');
     await expect(status).toHaveTextContent('오프라인');
+    await expect(status.className).toContain('scheme-neutral');
     await userEvent.click(canvas.getByRole('button', { name: '온라인으로' }));
-    await waitFor(() => expect(status).not.toHaveAttribute('data-invisible'));
+    await expect(status).toHaveTextContent('온라인');
+    await expect(status.className).toContain('scheme-success');
   },
 };
 
@@ -438,12 +488,7 @@ export const EveryCorner: Story = {
           columns={placements}
           render={(target, placement) => {
             const badges = [3, undefined].map((content) => (
-              <Badge
-                key={content ?? 'dot'}
-                content={content}
-                placement={placement}
-                data-target={target}
-              >
+              <Badge key={content ?? 'dot'} placement={placement} data-target={target}>
                 {
                   {
                     avatar: <Avatar name="Alice Kim" />,
@@ -486,6 +531,7 @@ export const EveryCorner: Story = {
                     rtl: <div className="bg-neutral-soft size-12 rounded-tl-[24px]" />,
                   }[target]
                 }
+                <Badge.Indicator count={content} />
               </Badge>
             ));
 

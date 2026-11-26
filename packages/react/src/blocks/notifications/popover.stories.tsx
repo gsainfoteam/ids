@@ -53,10 +53,16 @@ export const PC: Story = {
           </div>
           <div className="flex items-center gap-3">
             <Popover defaultOpen>
-              <Badge content={unread.length} aria-label={`읽지 않은 알림 ${unread.length}개`}>
+              <Badge>
                 <Popover.Trigger asChild>
                   <IconButton variant="outline" aria-label="알림" icon={<BellIcon />} />
                 </Popover.Trigger>
+                {unread.length > 0 && (
+                  <Badge.Indicator
+                    count={unread.length}
+                    aria-label={`읽지 않은 알림 ${unread.length}개`}
+                  />
+                )}
               </Badge>
               <Popover.Content>
                 <div className="flex w-80 flex-col gap-3 sm:w-96">

@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test } from 'vitest';
@@ -10,96 +10,124 @@ import { testTheme } from './theme';
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
 function renderBadge(
-  props: Omit<Badge.Props, 'children'>,
+  indicator: Badge.IndicatorProps | null,
+  root: Omit<Badge.Props, 'children'> = {},
   children: ReactElement = <button type="button">Inbox</button>,
 ) {
-  const doc = parse(renderToString(<Badge {...props}>{children}</Badge>));
+  const doc = parse(
+    renderToString(
+      <Badge {...root}>
+        {children}
+        {indicator && <Badge.Indicator {...indicator} />}
+      </Badge>,
+    ),
+  );
   return {
     root: doc.querySelector<HTMLElement>('[data-badge]')!,
-    indicator: doc.querySelector<HTMLElement>('[data-badge-indicator]')!,
+    indicator: doc.querySelector<HTMLElement>('[data-badge-indicator]'),
     anchor: doc.querySelector('button')!,
   };
 }
 
-test('a count is capped at max, and zero stays mounted but invisible', () => {
-  expect(renderBadge({ content: 99 }).indicator.textContent).toBe('99');
-  const over = renderBadge({ content: 100 }).indicator;
+test('a count is capped at max, and zero is drawn like any count', () => {
+  expect(renderBadge({ count: 99 }).indicator!.textContent).toBe('99');
+  const over = renderBadge({ count: 100 }).indicator!;
   expect(over.textContent).toBe('99+');
   expect(over.hasAttribute('data-overflow')).toBe(true);
-  expect(renderBadge({ content: 1200, max: 999 }).indicator.textContent).toBe('999+');
-  const zero = renderBadge({ content: 0 }).indicator;
-  expect(zero.hasAttribute('data-invisible'), 'hidden, not removed, so it can animate back').toBe(
-    true,
-  );
-  expect(renderBadge({ content: 0, showZero: true }).indicator.hasAttribute('data-invisible')).toBe(
-    false,
-  );
-  expect(renderBadge({ content: -4, showZero: true }).indicator.textContent).toBe('0');
-  expect(renderBadge({ content: 'New' }).indicator.textContent).toBe('New');
+  expect(renderBadge({ count: 1200, max: 999 }).indicator!.textContent).toBe('999+');
+  expect(renderBadge({ count: 0 }).indicator!.textContent).toBe('0');
+  expect(renderBadge({ count: -4 }).indicator!.textContent).toBe('0');
+  expect(renderBadge({ children: 'New' }).indicator!.textContent).toBe('New');
+});
+
+test('no Indicator draws no badge and describes nothing', () => {
+  const { indicator, anchor } = renderBadge(null);
+  expect(indicator).toBeNull();
+  expect(anchor.hasAttribute('aria-describedby')).toBe(false);
 });
 
 test('an unlabelled count describes the element it is attached to', () => {
-  const { indicator, anchor } = renderBadge({ content: 3 });
-  expect(indicator.getAttribute('aria-hidden')).toBe('true');
-  expect(anchor.getAttribute('aria-describedby')).toBe(indicator.id);
+  const { indicator, anchor } = renderBadge({ count: 3 });
+  expect(indicator!.getAttribute('aria-hidden')).toBe('true');
+  expect(anchor.getAttribute('aria-describedby')).toBe(indicator!.id);
   const merged = renderBadge(
-    { content: 3 },
+    { count: 3 },
+    {},
     <button type="button" aria-describedby="hint">
       Inbox
     </button>,
   );
-  expect(merged.anchor.getAttribute('aria-describedby')).toBe(`hint ${merged.indicator.id}`);
-  expect(renderBadge({ content: 0 }).anchor.hasAttribute('aria-describedby')).toBe(false);
+  expect(merged.anchor.getAttribute('aria-describedby')).toBe(`hint ${merged.indicator!.id}`);
   expect(renderBadge({}).anchor.hasAttribute('aria-describedby')).toBe(false);
 });
 
-test('a labelled badge is a live region that reads its sentence, even while invisible', () => {
-  const { indicator, anchor } = renderBadge({ content: 3, 'aria-label': '읽지 않은 메일 3통' });
-  expect(indicator.getAttribute('role')).toBe('status');
-  expect(indicator.hasAttribute('aria-hidden')).toBe(false);
-  expect(indicator.querySelector('.sr-only')?.textContent).toBe('읽지 않은 메일 3통');
-  expect(indicator.querySelector('[aria-hidden=true]')?.textContent).toBe('3');
+test('a labelled Indicator is a live region that reads its sentence', () => {
+  const { indicator, anchor } = renderBadge({ count: 3, 'aria-label': '읽지 않은 메일 3통' });
+  expect(indicator!.getAttribute('role')).toBe('status');
+  expect(indicator!.hasAttribute('aria-hidden')).toBe(false);
+  expect(indicator!.querySelector('.sr-only')?.textContent).toBe('읽지 않은 메일 3통');
+  expect(indicator!.querySelector('[aria-hidden=true]')?.textContent).toBe('3');
   expect(anchor.hasAttribute('aria-describedby')).toBe(false);
-  const hidden = renderBadge({ content: 0, 'aria-label': '읽지 않은 메일 0통' }).indicator;
-  expect(hidden.getAttribute('role')).toBe('status');
-  expect(hidden.hasAttribute('data-invisible')).toBe(true);
 });
 
-test('no content draws a dot; invisible hides without unmounting', () => {
-  const dot = renderBadge({ colorScheme: 'success' }).indicator;
+test('an Indicator with no count and no children draws a dot', () => {
+  const dot = renderBadge({}, { colorScheme: 'success' }).indicator!;
   expect(dot.hasAttribute('data-dot')).toBe(true);
   expect(dot.textContent).toBe('');
   expect(dot.getAttribute('aria-hidden')).toBe('true');
-  const off = renderBadge({ invisible: true, 'aria-label': 'Offline' }).indicator;
-  expect(off.hasAttribute('data-invisible')).toBe(true);
-  expect(off.textContent).toBe('Offline');
+  expect(dot.className).toContain('scheme-success');
+  const labelled = renderBadge({ 'aria-label': 'Online' }).indicator!;
+  expect(labelled.getAttribute('role')).toBe('status');
+  expect(labelled.textContent).toBe('Online');
 });
 
 test('placement is logical and starts at the corner until the client measures it', () => {
-  const { root, indicator } = renderBadge({ content: 1, placement: 'bottom-start' });
+  const { root, indicator } = renderBadge({ count: 1 }, { placement: 'bottom-start' });
   expect(root.dataset.placement).toBe('bottom-start');
-  expect(indicator.classList.contains('pointer-events-none'), 'clicks reach the anchor').toBe(true);
-  expect(indicator.className).toContain('start-(--badge-inset-x)');
-  expect(indicator.className).toContain('rtl:translate-x-1/2');
-  const onAvatar = renderBadge({ content: 1 }, <Avatar name="Alice Kim" />).root;
+  expect(indicator!.classList.contains('pointer-events-none'), 'clicks reach the anchor').toBe(
+    true,
+  );
+  expect(indicator!.className).toContain('start-(--badge-inset-x)');
+  expect(indicator!.className).toContain('rtl:translate-x-1/2');
+  const onAvatar = renderBadge({ count: 1 }, {}, <Avatar name="Alice Kim" />).root;
   expect(onAvatar.className).toContain('[--badge-inset-x:0px]');
   expect(onAvatar.getAttribute('style'), 'the server writes no measured inset').toBeNull();
 });
 
+test('the anchor is drawn first wherever the Indicator is written', () => {
+  const doc = parse(
+    renderToString(
+      <Badge>
+        <Badge.Indicator count={2} />
+        <button type="button">Inbox</button>
+      </Badge>,
+    ),
+  );
+  const root = doc.querySelector('[data-badge]')!;
+  expect(root.firstElementChild!.tagName).toBe('BUTTON');
+  expect(root.lastElementChild!.hasAttribute('data-badge-indicator')).toBe(true);
+});
+
 test('a Badge that does not wrap exactly one element throws', () => {
-  const wraps = (children: unknown) => () =>
-    renderToString(<Badge content={3}>{children as ReactElement}</Badge>);
+  const wraps = (children: ReactNode) => () =>
+    renderToString(
+      <Badge>
+        {children}
+        <Badge.Indicator count={3} />
+      </Badge>,
+    );
   expect(wraps('Inbox')).toThrow();
   expect(wraps([<span key="a" />, <span key="b" />])).toThrow();
   expect(wraps(false)).toThrow();
   expect(wraps(<span />)).not.toThrow();
+  expect(() => renderToString(<Badge.Indicator count={1} />)).toThrow();
 });
 
 test('className takes the badge state', () => {
-  const { root } = renderBadge({
-    content: 120,
-    className: (state) => `count-${state.count} over-${state.overflowed}`,
-  });
+  const { root } = renderBadge(
+    { count: 120 },
+    { className: (state) => `count-${state.count} over-${state.overflowed}` },
+  );
   expect(root.classList.contains('count-120')).toBe(true);
   expect(root.classList.contains('over-true')).toBe(true);
 });
@@ -113,11 +141,13 @@ test('an icon in the content takes the text size, labelled or not', async () => 
   );
   const screen = await render(
     <>
-      <Badge content={content}>
+      <Badge>
         <span />
+        <Badge.Indicator>{content}</Badge.Indicator>
       </Badge>
-      <Badge content={content} aria-label="Done" size="tiny">
+      <Badge size="tiny">
         <span />
+        <Badge.Indicator aria-label="Done">{content}</Badge.Indicator>
       </Badge>
     </>,
   );
@@ -139,8 +169,9 @@ function centerOf(element: Element) {
 async function renderOnTarget(target: ReactElement, placement: Badge.Placement = 'top-end') {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <Badge content={3} placement={placement}>
+      <Badge placement={placement}>
         {target}
+        <Badge.Indicator count={3} />
       </Badge>
     </IdsProvider>,
   );
@@ -208,8 +239,9 @@ test('right to left, top-end reads the top-left corner, scaled down the way CSS 
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <div dir="rtl">
-        <Badge content={3}>
+        <Badge>
           <div className="size-10 rounded-tl-full" />
+          <Badge.Indicator count={3} />
         </Badge>
       </div>
     </IdsProvider>,
@@ -248,8 +280,9 @@ test('under a squircle theme the badge sits on the superellipse', async (context
 
   const screen = await render(
     <IdsProvider theme={{ ...testTheme, cornerShape: 'squircle' }}>
-      <Badge content={3}>
+      <Badge>
         <Button>Inbox</Button>
+        <Badge.Indicator count={3} />
       </Badge>
     </IdsProvider>,
   );

@@ -4,25 +4,21 @@ export type BadgeDisplay = {
   count: number | undefined;
   text: ReactNode;
   overflowed: boolean;
-  empty: boolean;
+  dot: boolean;
 };
 
-export function badgeDisplay(content: ReactNode, max: number, showZero: boolean): BadgeDisplay {
-  if (typeof content !== 'number')
-    return {
-      count: undefined,
-      text: content,
-      overflowed: false,
-      empty: content == null || content === false || content === '',
-    };
+export function badgeDisplay(
+  count: number | undefined,
+  children: ReactNode,
+  max: number,
+): BadgeDisplay {
+  if (count === undefined) {
+    const dot = children == null || children === false || children === '';
+    return { count: undefined, text: dot ? null : children, overflowed: false, dot };
+  }
 
-  const count = Number.isFinite(content) ? Math.max(0, Math.floor(content)) : 0;
+  const whole = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
   const cap = Math.max(0, Math.floor(max));
-  const overflowed = count > cap;
-  return {
-    count,
-    text: overflowed ? `${cap}+` : String(count),
-    overflowed,
-    empty: count === 0 && !showZero,
-  };
+  const overflowed = whole > cap;
+  return { count: whole, text: overflowed ? `${cap}+` : String(whole), overflowed, dot: false };
 }
