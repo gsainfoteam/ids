@@ -54,7 +54,7 @@ describe('the IR', () => {
       const outputs = {
         ...(await cssOutputs(root, ir)),
         ...(await tsOutputs(root, ir)),
-        ...dartOutputs(root, writtenIr(ir)),
+        ...(await dartOutputs(root, writtenIr(ir))),
       };
 
       for (const [file, source] of Object.entries(outputs)) expect(source, file).toBe(read(file));

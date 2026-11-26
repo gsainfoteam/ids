@@ -80,7 +80,7 @@ describe('a message', () => {
           }),
         )
       )();
-      const dart = dartOutputs(root, writtenIr(ir));
+      const dart = await dartOutputs(root, writtenIr(ir));
       const messages = outputEnding(dart, 'ids_messages.dart');
       const readers = outputEnding(dart, 'ids_message_readers.dart');
       const ts = await tsOutputs(root, ir);
@@ -169,6 +169,6 @@ describe('a messages source error names the file and the key', () => {
   test('for a member every Dart messages class has', DART_COMPILES_BOTH_STEPS_FIRST, async () => {
     const ir = (await buildWith(korean({ ...EDITOR, language: '언어' })))();
 
-    expect(() => dartOutputs(root, writtenIr(ir))).toThrow();
+    await expect(dartOutputs(root, writtenIr(ir))).rejects.toThrow();
   });
 });
