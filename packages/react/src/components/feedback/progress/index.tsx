@@ -41,7 +41,6 @@ export namespace Progress {
   > & {
     value?: number | null;
     max?: number;
-    indeterminate?: boolean;
     size?: IdsSize;
     colorScheme?: ColorScheme;
     getValueLabel?: (value: number, max: number) => string;

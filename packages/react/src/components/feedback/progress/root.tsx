@@ -13,7 +13,6 @@ import type { Progress } from '.';
 export function ProgressRoot({
   value,
   max,
-  indeterminate,
   size = 'standard',
   colorScheme = 'primary',
   getValueLabel,
@@ -31,7 +30,6 @@ export function ProgressRoot({
     {
       value,
       max,
-      indeterminate,
       getValueLabel,
       id,
       'aria-label': ariaLabel,

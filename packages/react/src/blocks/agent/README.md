@@ -12,7 +12,7 @@ Storybook `Blocks/Agent/*`. AI 에이전트 화면 네 가지입니다.
 - **쓰인 컴포넌트.** Breadcrumb, Button, IconButton, Item, Accordion, Table, Alert, Marker, Spinner, Card, CodeBlock, Stepper, Progress, TextArea, TextField, Select, Switch, FileDropzone, ChipField, Chip, Avatar, Tabs, Menu, Questionnaire, Field, Divider, Spacer, toast
 - **대신 쓴 것.** shadcn/ui 와 AI Elements 의 에이전트 파트가 IDS 에는 아직 없습니다.
   - 계획(Plan), 할 일(Task): `Stepper` 의 진행 표시. 지금 단계가 현재 하는 일이다.
-  - 실행 기록의 끝난 줄: 시간과 요약이 둘째 줄에 붙어 아이콘을 둔 `Item size="tiny"`. 진행 중인 줄은 `Marker pending`.
+  - 실행 기록의 끝난 줄: 시간과 요약이 둘째 줄에 붙어 아이콘을 둔 `Item size="tiny"`. 진행 중인 줄은 `Marker aria-busy`.
   - 도구 호출(Tool): `Accordion variant="soft"`. 넘긴 값은 `Table`.
   - 승인 요청(Confirmation): `Alert colorScheme="warning"` 과 `Alert.Actions`. 고른 뒤에는 success 나 neutral Alert 로 바뀐다.
   - 결과물(Artifact): 내려받기 버튼을 단 `Card`.

@@ -30,12 +30,12 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     animation: { control: 'radio', options: animations },
-    loading: { control: 'boolean' },
+    'aria-busy': { control: 'boolean' },
     asChild: { control: false },
     children: { control: false },
   },
   args: {
-    loading: true,
+    'aria-busy': true,
     animation: 'pulse',
     className: cn('max-w-sm'),
     children: (
@@ -59,7 +59,7 @@ export const Playground: Story = {};
 export const Usage: Story = {
   render: () => (
     <div className="max-w-sm">
-      <Skeleton loading>
+      <Skeleton>
         <Card>
           <Card.Header>
             <Card.Title>2026 가을 학기 공지</Card.Title>
@@ -83,7 +83,7 @@ export const Gallery: Story = {
           columns={animations}
           render={(wrapping, animation) => (
             <div className="w-48">
-              <Skeleton loading animation={animation} asChild={wrapping === 'asChild'}>
+              <Skeleton animation={animation} asChild={wrapping === 'asChild'}>
                 <Card>
                   <Card.Title>학기 공지</Card.Title>
                   <Card.Description>9월 1일 오전 10시</Card.Description>
@@ -94,7 +94,7 @@ export const Gallery: Story = {
         />
         <Showcase.Row label="wave, rtl">
           <div dir="rtl" className="w-48">
-            <Skeleton loading animation="wave">
+            <Skeleton animation="wave">
               <p className="text-body-b3-regular">수강 신청은 9월 1일에 열립니다.</p>
             </Skeleton>
           </div>
@@ -105,16 +105,16 @@ export const Gallery: Story = {
         title="Loading"
         description="끝나면 속성과 클래스만 빠지고 같은 구조에서 자식이 보입니다."
       >
-        <Showcase.Row label="loading" className="items-start">
+        <Showcase.Row label="aria-busy" className="items-start">
           <div className="w-48">
-            <Skeleton loading>
+            <Skeleton>
               <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
             </Skeleton>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="loading={false}" className="items-start">
+        <Showcase.Row label="aria-busy={false}" className="items-start">
           <div className="w-48">
-            <Skeleton loading={false}>
+            <Skeleton aria-busy={false}>
               <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
             </Skeleton>
           </div>
@@ -126,31 +126,31 @@ export const Gallery: Story = {
         description="인라인 컴포넌트는 asChild 로 칠해서 그 크기와 모서리를 그대로 씁니다."
       >
         <Showcase.Row label="Avatar">
-          <Skeleton loading asChild>
+          <Skeleton asChild>
             <Avatar name="김지스트" />
           </Skeleton>
-          <Skeleton loading asChild>
+          <Skeleton asChild>
             <Avatar name="김지스트" size="tiny" />
           </Skeleton>
         </Showcase.Row>
         <Showcase.Row label="Chip">
-          <Skeleton loading asChild>
+          <Skeleton asChild>
             <Chip>새 글</Chip>
           </Skeleton>
         </Showcase.Row>
         <Showcase.Row label="Button">
-          <Skeleton loading asChild>
+          <Skeleton asChild>
             <Button>자세히 보기</Button>
           </Skeleton>
         </Showcase.Row>
         <Showcase.Row label="Text" className="items-start">
           <div className="w-fit">
-            <Skeleton loading>
+            <Skeleton>
               <p className="text-body-b2-semibold">학기 공지</p>
             </Skeleton>
           </div>
           <div className="w-fit">
-            <Skeleton loading>
+            <Skeleton>
               <p className="text-caption-c1-regular">인포팀 · 3분 전</p>
             </Skeleton>
           </div>
@@ -169,7 +169,7 @@ export const ShowACardWhileItLoads: Story = {
         <Button variant="outline" onClick={() => setLoading((value) => !value)}>
           {loading ? '불러오기 끝내기' : '다시 불러오기'}
         </Button>
-        <Skeleton loading={loading}>
+        <Skeleton aria-busy={loading}>
           <Card>
             <Card.Header>
               <Card.Title>2026 가을 학기 공지</Card.Title>
@@ -187,7 +187,7 @@ export const ShowACardWhileItLoads: Story = {
     docs: {
       description: {
         story:
-          '`loading` 이면 감싼 div 에 aria-busy 가 붙고, 자식은 보이지 않고 inert 라 Tab 과 스크린 리더가 들어가지 않습니다. 끝나면 속성과 클래스만 빠지고 구조는 그대로라 화면이 밀리지 않고 자식이 다시 마운트되지 않습니다.',
+          '`aria-busy` 를 빼거나 `true` 로 두면 감싼 div 에 aria-busy 가 붙고, 자식은 보이지 않고 inert 라 Tab 과 스크린 리더가 들어가지 않습니다. 끝나면 속성과 클래스만 빠지고 구조는 그대로라 화면이 밀리지 않고 자식이 다시 마운트되지 않습니다.',
       },
     },
   },
@@ -222,11 +222,11 @@ export const KeepTheShapeOfAnAvatarOrCard: Story = {
           {loading ? '불러오기 끝내기' : '다시 불러오기'}
         </Button>
         <div className="flex items-center gap-3">
-          <Skeleton loading={loading} asChild>
+          <Skeleton aria-busy={loading} asChild>
             <Avatar name="김지스트" />
           </Skeleton>
           <div className="w-64">
-            <Skeleton loading={loading} asChild>
+            <Skeleton aria-busy={loading} asChild>
               <Card>
                 <Card.Title>김지스트</Card.Title>
                 <Card.Description>인포팀 프론트엔드</Card.Description>
@@ -268,12 +268,12 @@ export const HoldTheHeightOfText: Story = {
   render: () => (
     <div className="flex items-start gap-4">
       <div className="w-40">
-        <Skeleton loading data-testid="loading">
+        <Skeleton data-testid="loading">
           <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
         </Skeleton>
       </div>
       <div className="w-40">
-        <Skeleton loading={false} data-testid="loaded">
+        <Skeleton aria-busy={false} data-testid="loaded">
           <p className="text-body-b3-regular">수강 신청은 9월 1일 오전 10시에 열립니다.</p>
         </Skeleton>
       </div>
@@ -307,18 +307,18 @@ export const LoadAList: Story = {
           {members.map((member) => (
             <Item key={member.name}>
               <Item.Media>
-                <Skeleton loading={loading} asChild>
+                <Skeleton aria-busy={loading} asChild>
                   <Avatar name={member.name} />
                 </Skeleton>
               </Item.Media>
               <Item.Content>
                 <div className="w-fit">
-                  <Skeleton loading={loading} asChild>
+                  <Skeleton aria-busy={loading} asChild>
                     <Item.Title>{member.name}</Item.Title>
                   </Skeleton>
                 </div>
                 <div className="w-fit">
-                  <Skeleton loading={loading} asChild>
+                  <Skeleton aria-busy={loading} asChild>
                     <Item.Description>{member.team}</Item.Description>
                   </Skeleton>
                 </div>

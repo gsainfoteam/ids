@@ -4,11 +4,14 @@ import { createContext, use, type KeyboardEvent } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { StepperItemState } from './parts/item';
+import type { StepItemState } from './parts/item';
 import type { StepperOrientation } from './root';
-import type { stepperStyle } from './style';
+import type { stepPartsStyle } from './style';
 
-type RootContext = {
+export type StepsName = 'Stepper' | 'Timeline';
+
+export type StepsContextValue = {
+  name: StepsName;
   id: string;
   value: number;
   count: number;
@@ -17,7 +20,7 @@ type RootContext = {
   progress: boolean;
   disabled: boolean;
   interactive: boolean;
-  styles: ReturnType<typeof stepperStyle>;
+  styles: ReturnType<typeof stepPartsStyle>;
   select: (index: number) => void;
   tabStop: string | null | undefined;
   onTriggerFocus: (value: string) => void;
@@ -25,26 +28,32 @@ type RootContext = {
 };
 
 type ItemContext = {
-  state: StepperItemState;
+  state: StepItemState;
   reachable: boolean;
   hasTitle: boolean;
   hasDescription: boolean;
   ids: { trigger: string; title: string; description: string; status: string };
 };
 
-export const StepperContext = createContext<RootContext | null>(null);
+export const StepperContext = createContext<StepsContextValue | null>(null);
 export const StepperIndexContext = createContext<number | null>(null);
 export const StepperItemContext = createContext<ItemContext | null>(null);
 
 export function useInternalRootContext(part: string) {
   const context = use(StepperContext);
-  invariant(context, `\`<${part}>\` must be used inside \`<Stepper>\`.`);
+  invariant(
+    context,
+    `\`<Stepper.${part}>\` and \`<Timeline.${part}>\` must be used inside \`<Stepper>\` or \`<Timeline>\`.`,
+  );
   return context;
 }
 
 export function useInternalItemContext(part: string) {
   const context = use(StepperItemContext);
-  invariant(context, `\`<${part}>\` must be used inside \`<Stepper.Item>\`.`);
+  invariant(
+    context,
+    `\`<Stepper.${part}>\` and \`<Timeline.${part}>\` must be used inside \`<Stepper.Item>\` or \`<Timeline.Item>\`.`,
+  );
   return context;
 }
 

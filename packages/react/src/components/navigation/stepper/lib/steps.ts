@@ -1,11 +1,17 @@
-import { isValidElement, type ReactElement } from 'react';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { elementTypeOf } from '../../../../utils';
-import { StepperContent } from '../parts/content';
-import { StepperItem } from '../parts/item';
 
-export const isStep = (node: unknown): node is ReactElement =>
-  isValidElement(node) && elementTypeOf(node) === StepperItem;
+export function sortSteps(nodes: ReactNode[], item: unknown, allowed: readonly unknown[] = []) {
+  const isStep = (node: ReactNode): node is ReactElement =>
+    isValidElement(node) && elementTypeOf(node) === item;
+  const others = nodes.filter((node) => !isStep(node));
 
-export const isStray = (node: unknown) =>
-  isValidElement(node) && !isStep(node) && elementTypeOf(node) !== StepperContent;
+  return {
+    steps: nodes.filter(isStep),
+    others,
+    strayCount: others.filter(
+      (node) => isValidElement(node) && !allowed.includes(elementTypeOf(node)),
+    ).length,
+  };
+}

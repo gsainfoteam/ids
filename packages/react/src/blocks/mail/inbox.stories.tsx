@@ -188,7 +188,7 @@ export const PC: Story = {
 
     const list = (
       <div className="flex h-full flex-col">
-        <ScrollArea fade>
+        <ScrollArea fade="y">
           <div className="p-2">
             <ItemGroup aria-label="받은 메일">
               {MAILS.map((mail) => (
@@ -214,7 +214,7 @@ export const PC: Story = {
 
     const reading = opened && (
       <div className="flex h-full flex-col">
-        <ScrollArea fade>
+        <ScrollArea fade="y">
           <article className="flex flex-col gap-6 p-4 md:p-6">
             <div className="flex items-center gap-2">
               <div className="flex md:hidden">

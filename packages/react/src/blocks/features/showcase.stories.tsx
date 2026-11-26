@@ -6,8 +6,8 @@ import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { ItemGroup } from '../../components/data/item-group';
+import { Timeline } from '../../components/data/timeline';
 import { Progress } from '../../components/feedback/progress';
-import { Stepper } from '../../components/navigation/stepper';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -92,20 +92,20 @@ export const PC: Story = {
               <Card.Content>
                 <div className="flex flex-col gap-4">
                   <Progress value={80} aria-label="다음 셔틀까지" />
-                  <Stepper progress={false} orientation="vertical" size="tiny" aria-label="정류장">
-                    <Stepper.Item completed>
-                      <Stepper.Title>학생회관</Stepper.Title>
-                      <Stepper.Description>12:20 출발</Stepper.Description>
-                    </Stepper.Item>
-                    <Stepper.Item>
-                      <Stepper.Title>기숙사 A동</Stepper.Title>
-                      <Stepper.Description>12:26</Stepper.Description>
-                    </Stepper.Item>
-                    <Stepper.Item>
-                      <Stepper.Title>광주송정역</Stepper.Title>
-                      <Stepper.Description>12:45 도착</Stepper.Description>
-                    </Stepper.Item>
-                  </Stepper>
+                  <Timeline size="tiny" aria-label="정류장">
+                    <Timeline.Item status="completed">
+                      <Timeline.Title>학생회관</Timeline.Title>
+                      <Timeline.Description>12:20 출발</Timeline.Description>
+                    </Timeline.Item>
+                    <Timeline.Item>
+                      <Timeline.Title>기숙사 A동</Timeline.Title>
+                      <Timeline.Description>12:26</Timeline.Description>
+                    </Timeline.Item>
+                    <Timeline.Item>
+                      <Timeline.Title>광주송정역</Timeline.Title>
+                      <Timeline.Description>12:45 도착</Timeline.Description>
+                    </Timeline.Item>
+                  </Timeline>
                 </div>
               </Card.Content>
             </Card>

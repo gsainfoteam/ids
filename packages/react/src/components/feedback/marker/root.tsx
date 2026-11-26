@@ -16,7 +16,7 @@ type ChildProps = { children?: ReactNode };
 export function MarkerRoot({
   variant = 'default',
   size = 'standard',
-  pending = false,
+  'aria-busy': ariaBusy,
   asChild = false,
   role,
   className,
@@ -31,23 +31,24 @@ export function MarkerRoot({
     '`Marker asChild` requires one element to render as, such as an `a` or `button`.',
   );
 
-  const state: Marker.State = { variant, size, pending };
-  const { root, content, line } = markerStyle({ variant, size, pending });
+  const busy = ariaBusy === true || ariaBusy === 'true';
+  const state: Marker.State = { variant, size, busy };
+  const { root, content, line } = markerStyle({ variant, size, busy });
 
   const props = {
     ...rest,
-    role: role ?? (pending && !child ? 'status' : undefined),
+    role: role ?? (busy && !child ? 'status' : undefined),
+    'aria-busy': busy || undefined,
     'data-marker': '',
     'data-variant': variant,
     'data-size': size,
-    'data-pending': pending ? '' : undefined,
     className: root({ className: resolveState(className, state) }),
     style: resolveState(style, state),
   };
 
   const body = (
     <span className={content()}>
-      {pending && <Spinner size={size} aria-hidden />}
+      {busy && <Spinner size={size} aria-hidden />}
       {child ? child.props.children : children}
     </span>
   );

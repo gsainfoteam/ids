@@ -200,7 +200,7 @@ export const PC: Story = {
                 )}
               </li>
               <li className="px-2">
-                <Marker pending>시간표 3안을 만드는 중이에요 · 2:05</Marker>
+                <Marker aria-busy>시간표 3안을 만드는 중이에요 · 2:05</Marker>
               </li>
             </ol>
 

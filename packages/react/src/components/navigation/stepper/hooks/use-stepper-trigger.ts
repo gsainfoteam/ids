@@ -8,8 +8,8 @@ export function useInternalStepperTrigger({
   onFocus,
   ...options
 }: Omit<UseInteractiveOptions<HTMLButtonElement>, 'disabled'>) {
-  const root = useInternalRootContext('Stepper.Trigger');
-  const item = useInternalItemContext('Stepper.Trigger');
+  const root = useInternalRootContext('Trigger');
+  const item = useInternalItemContext('Trigger');
   const step = String(item.state.index);
   const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
     ...options,

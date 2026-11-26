@@ -5,18 +5,21 @@
 - **구조가 곧 접근성.** `<aside>` 안의 `<nav aria-label>`, 묶음은 `<section aria-labelledby>` 와 `<ul>`, 항목은 `<li>` 안의 링크입니다. 지금 페이지 링크에 `aria-current="page"` 가 붙습니다.
 - **자식 순서로 칸을 나눕니다.** `Sidebar.Item` 의 첫 아이콘은 아이콘 칸, 글자는 라벨, 그 뒤(Chip, Kbd)는 끝 칸입니다.
 - **아이콘 띠로 접힙니다.** 접으면 라벨은 Tooltip 으로, 하위 메뉴는 Menu 로 뜹니다. `Mod+B` 로 접고 펼칩니다.
-- **데이터로 그리고 끌어서 옮깁니다.** `Sidebar.Group` 에 `items` 와 한 줄을 그리는 함수를 주면 트리를 그리고, `onItemsChange` 를 주면 항목을 끌어 순서를 바꾸고 다른 항목 안으로 넣습니다. 키보드는 Space 로 집고 방향키로 고릅니다.
+- **데이터로 그리고 끌어서 옮깁니다.** `Sidebar.Group.Tree` 에 `items` 와 한 줄을 그리는 함수를 주면 트리를 그리고, `sortable` 을 주면 항목을 끌어 순서를 바꾸고 다른 항목 안으로 넣습니다. 키보드는 Space 로 집고 방향키로 고릅니다.
 - **좁은 화면에서는 Drawer.** 640px 아래에서는 사이드바 대신 왼쪽 Drawer 가 열리고, 항목을 누르면 닫힙니다.
 - **IDS 로 짓습니다.** 끌기는 `@dnd-kit/core`, 항목은 Item, 하위 메뉴는 Accordion 과 Menu, 라벨은 Tooltip, 접기 버튼은 IconButton, 스크롤은 ScrollArea, 선은 Divider, floating 사이드바와 inset 본문의 표면은 Card 입니다.
 
 ```tsx
-import { Chip, Sidebar } from '@gsainfoteam/ids-react';
+import { Chip, Sidebar, useSidebar } from '@gsainfoteam/ids-react';
 
-<Sidebar aria-label="사이드바" value={pathname} collapsible="icon">
+const sidebar = useSidebar({ collapse: { mode: 'icon' } });
+
+<Sidebar aria-label="사이드바" value={pathname} sidebar={sidebar}>
   <Sidebar.Header>
     <Logo />
   </Sidebar.Header>
-  <Sidebar.Group label="워크스페이스">
+  <Sidebar.Group>
+    <Sidebar.Group.Label>워크스페이스</Sidebar.Group.Label>
     <Sidebar.Item value="/inbox" asChild>
       <RouterLink to="/inbox">
         <InboxIcon />
@@ -25,7 +28,8 @@ import { Chip, Sidebar } from '@gsainfoteam/ids-react';
       </RouterLink>
     </Sidebar.Item>
   </Sidebar.Group>
-  <Sidebar.Group label="설정">
+  <Sidebar.Group>
+    <Sidebar.Group.Label>설정</Sidebar.Group.Label>
     <Sidebar.Item>
       <Cog6ToothIcon />
       설정
@@ -42,8 +46,8 @@ import { Chip, Sidebar } from '@gsainfoteam/ids-react';
 
 | 파트               | 역할                                                                                      |
 | ------------------ | ----------------------------------------------------------------------------------------- |
-| `Sidebar.Header`   | 위 끝 줄. `collapsible` 이면 접기 버튼, Drawer 에서는 닫기 버튼이 끝에 저절로 붙는다      |
-| `Sidebar.Group`    | 라벨과 항목 목록. `label` 이 `<section>` 의 이름이 된다                                   |
+| `Sidebar.Header`   | 위 끝 줄. 접을 수 있으면 접기 버튼, Drawer 에서는 닫기 버튼이 끝에 저절로 붙는다         |
+| `Sidebar.Group`    | 라벨과 항목 목록. `Sidebar.Group.Label` 이 `<section>` 의 이름이 된다                     |
 | `Sidebar.Item`     | 항목. `href` 면 `<a>`, `asChild` 면 자식 링크, 둘 다 없으면 `<button>`                    |
 | `Sidebar.Footer`   | 아래 끝 줄. 스크롤하지 않는다                                                             |
 | `Sidebar.Trigger`  | 접기 버튼. 640px 아래에서는 Drawer 를 여는 메뉴 버튼                                      |
@@ -51,7 +55,7 @@ import { Chip, Sidebar } from '@gsainfoteam/ids-react';
 | `Sidebar.Inset`    | 선택. 본문 `<main>`. `variant="inset"` 이면 카드 표면으로 뜬다                            |
 
 - Header, Footer 밖의 자식은 가운데 스크롤 영역(ScrollArea)의 `<nav>` 에 들어갑니다. 위아래에 더 내용이 있으면 그 끝이 흐려집니다(`fade`). Group 밖의 Item 은 이어진 것끼리 `<ul>` 하나로 묶입니다.
-- Header 를 생략해도 `collapsible` 이면 접기 버튼만 있는 줄이 생깁니다. `Sidebar.Trigger` 를 직접 두면 저절로 붙지 않습니다.
+- Header 를 생략해도 접을 수 있으면 접기 버튼만 있는 줄이 생깁니다. `Sidebar.Trigger` 를 직접 두면 저절로 붙지 않습니다.
 - 사이드바의 이름은 필수입니다. `aria-label`(또는 보이는 제목의 `id` 를 가리키는 `aria-labelledby`)로 주고, `<aside>`, `<nav>`, Drawer 가 같은 이름을 씁니다. 이름이 없으면 개발 모드에서 경고합니다.
 
 ## 항목
@@ -114,12 +118,17 @@ import { CodeBracketIcon } from '@heroicons/react/16/solid';
 ## 묶음
 
 ```tsx
-<Sidebar.Group label="즐겨찾기">…</Sidebar.Group>
-<Sidebar.Group label="보관함" collapsible>…</Sidebar.Group>                      {/* 라벨을 눌러 접는다 */}
-<Sidebar.Group label="보관함" collapsible defaultOpen={false}>…</Sidebar.Group>  {/* 접힌 채로 시작 */}
+<Sidebar.Group>
+  <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
+  …
+</Sidebar.Group>
+
+<Sidebar.Group collapse={{}}>…</Sidebar.Group>                                  {/* 라벨을 눌러 접는다 */}
+<Sidebar.Group collapse={{ defaultOpen: false }}>…</Sidebar.Group>              {/* 접힌 채로 시작 */}
+<Sidebar.Group collapse={{ open, onOpenChange: setOpen }}>…</Sidebar.Group>     {/* 제어 */}
 ```
 
-- `collapsible` 묶음은 Accordion 입니다. 라벨이 `aria-expanded` 버튼이 되고, 목록은 그 버튼을 이름으로 가진 영역입니다.
+- `collapse` 를 준 묶음은 Accordion 입니다. 라벨이 없으면 접지 않습니다. 라벨이 `aria-expanded` 버튼이 되고, 목록은 그 버튼을 이름으로 가진 영역입니다.
 - 사이드바가 아이콘 띠로 접히면 묶음 라벨은 화면에서 숨고(스크린 리더는 읽음) 목록은 늘 보입니다.
 
 ## 데이터로 그리기
@@ -127,39 +136,46 @@ import { CodeBracketIcon } from '@heroicons/react/16/solid';
 ```tsx
 const [docs, setDocs] = useState(DOCS); // { id, label, children? }[]
 
-<Sidebar.Group label="즐겨찾기" items={docs} onItemsChange={setDocs}>
-  {(doc) => (
-    <Sidebar.Item value={doc.id} href={`/docs/${doc.id}`}>
-      <DocumentTextIcon />
-      {doc.label}
-    </Sidebar.Item>
-  )}
+<Sidebar.Group>
+  <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
+  <Sidebar.Group.Tree items={docs} sortable={{ onItemsChange: setDocs }}>
+    {(doc) => (
+      <Sidebar.Item value={doc.id} href={`/docs/${doc.id}`}>
+        <DocumentTextIcon />
+        {doc.label}
+      </Sidebar.Item>
+    )}
+  </Sidebar.Group.Tree>
 </Sidebar.Group>
 ```
 
-- Group 은 항목을 JSX children 으로 받거나, `items` 와 한 줄을 그리는 함수로 받습니다. 한 Group 안에서 둘을 섞으면 타입 오류입니다.
+- Group 은 항목을 JSX children 으로 받거나, `Sidebar.Group.Tree` 로 받습니다. Tree 는 `items` 와 한 줄을 그리는 함수를 받습니다.
 - 함수는 항목 하나의 `Sidebar.Item` 을 돌려줍니다. `children` 이 있는 항목은 IDS 가 하위 항목을 같은 함수로 그려 그 Item 의 하위 메뉴로 붙입니다. 하위 메뉴, 아이콘 띠의 Menu 는 JSX 로 겹쳐 쓸 때와 같습니다.
 - 함수는 `Sidebar.Item` 을 직접 돌려줘야 합니다. 그것을 감싼 컴포넌트를 돌려주면 하위 항목을 붙이지 못하고 끌 수 없으며, 개발 모드에서 경고합니다.
 - 함수의 두 번째 인자는 `{ depth }` 입니다. 맨 위 단계가 `0` 입니다.
 - 데이터는 `{ id, children? }` 모양입니다. `id` 는 `string` 이나 `number` 이고 같은 부모 아래에서만 겹치지 않으면 됩니다(React 의 `key` 와 같은 규칙). 겹치면 개발 모드에서 경고하고 뒤의 것을 뺍니다.
 - `id` 는 항목을 가리키는 값이고, 지금 페이지를 고르는 `value` 와는 따로입니다. 이름을 바꿔도 `id` 는 그대로 둡니다.
-- 타입은 `items` 에서 추론합니다. 함수, `onItemsChange`, `canMove` 의 항목은 모두 그 타입이고, 폴더와 파일처럼 모양이 다른 노드의 유니온도 좁혀집니다.
-- 렌더 함수는 서버에서 클라이언트로 넘길 수 없으므로, `items` 를 쓰는 Group 은 클라이언트 컴포넌트 안에 둡니다.
+- 타입은 `items` 에서 추론합니다. 함수, `sortable.onItemsChange`, `sortable.canMove` 의 항목은 모두 그 타입이고, 폴더와 파일처럼 모양이 다른 노드의 유니온도 좁혀집니다.
+- 렌더 함수는 서버에서 클라이언트로 넘길 수 없으므로, `Sidebar.Group.Tree` 는 클라이언트 컴포넌트 안에 둡니다.
 
 ## 끌어서 옮기기
 
 ```tsx
-<Sidebar.Group
-  label="파일"
-  items={files}
-  onItemsChange={setFiles}
-  canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}
->
-  {(file) => <Sidebar.Item value={file.id}>{file.name}</Sidebar.Item>}
+<Sidebar.Group>
+  <Sidebar.Group.Label>파일</Sidebar.Group.Label>
+  <Sidebar.Group.Tree
+    items={files}
+    sortable={{
+      onItemsChange: setFiles,
+      canMove: ({ to }) => to.parent === null || to.parent.kind === 'folder',
+    }}
+  >
+    {(file) => <Sidebar.Item value={file.id}>{file.name}</Sidebar.Item>}
+  </Sidebar.Group.Tree>
 </Sidebar.Group>
 ```
 
-- `onItemsChange` 를 주면 항목을 끌 수 있습니다. 제어 방식만 있습니다. IDS 는 옮긴 뒤의 새 배열을 넘기기만 하고, 앱이 `items` 를 바꿔야 화면이 바뀝니다.
+- `sortable` 을 주면 항목을 끌 수 있습니다. 제어 방식만 있습니다. IDS 는 옮긴 뒤의 새 배열을 넘기기만 하고, 앱이 `items` 를 바꿔야 화면이 바뀝니다.
 - 마우스는 4px 넘게 움직여야 끌기가 시작됩니다. 그 전에 떼면 그냥 누른 것입니다. 손가락은 0.25초 누르고 있어야 시작합니다.
 - 놓을 자리는 포인터와 같은 높이의 줄로 정합니다. 포인터가 들여쓰기 여백에 있어도 그 높이의 줄을 고릅니다. 위 1/4 은 그 줄 앞, 아래 1/4 은 그 줄 뒤, 가운데는 그 줄 안의 맨 앞입니다. 하위 항목이 펼쳐진 줄은 아래 3/4 이 모두 안입니다.
 - 그 줄 안으로 넣는 것을 `canMove` 가 막으면 줄을 반으로 나눠 위는 앞, 아래는 뒤입니다. 펼쳐진 줄의 아래 절반은 뒤가 아니라 막힌 자리로 봅니다.
@@ -185,37 +201,38 @@ type Place<T> = {
 type Move<T> = { item: T; from: Place<T>; to: Place<T> };
 ```
 
-- `onItemsChange(items, move)` 는 옮긴 뒤의 새 배열과 이동 정보를 줍니다.
+- `sortable.onItemsChange(items, move)` 는 옮긴 뒤의 새 배열과 이동 정보를 줍니다.
 - `from` 의 항목은 옮기기 전 `items` 의 객체이고, `item` 과 `to` 의 항목은 새 배열의 객체입니다. 옮길 때 지나간 부모는 새로 복사되므로 둘은 같은 객체가 아닐 수 있습니다.
 - 앞뒤 항목 사이의 값으로 순서를 매기는 서버(`sortOrder`, LexoRank, "이 항목 뒤에")는 `to.previousSibling`, `to.nextSibling` 을 씁니다. 되돌리기는 `from` 을 씁니다.
 
 ```tsx
-onItemsChange={(next, { item, to }) => {
-  setDocs(next);
-  api.move(item.id, { parent: to.parent?.id ?? null, after: to.previousSibling?.id ?? null });
+sortable={{
+  onItemsChange: (next, { item, to }) => {
+    setDocs(next);
+    api.move(item.id, { parent: to.parent?.id ?? null, after: to.previousSibling?.id ?? null });
+  },
 }}
 ```
 
 ### 놓을 수 있는 자리 정하기
 
-- `canMove(move)` 가 `false` 를 돌려주면 그 자리에 놓지 못합니다. 끄는 동안 자리마다 불리므로 동기 함수여야 합니다.
+- `sortable.canMove(move)` 가 `false` 를 돌려주면 그 자리에 놓지 못합니다. 끄는 동안 자리마다 불리므로 동기 함수여야 합니다.
 - 안으로 넣는 것도 `to.parent` 가 그 항목인 이동이라 같은 함수로 막습니다. 따로 폴더를 표시하는 값은 없습니다.
 - 막힌 줄 위를 끌면 표시선이 그 줄이 아니라 가장 가까운 허용된 자리에 그려지고, 놓으면 그 자리로 옮겨집니다.
 
 ```tsx
-canMove={({ to }) => to.parent === null}                                       // 즐겨찾기: 순서만
-canMove={({ item, to }) =>
-  item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category'
-}                                                                              // 채널 묶음
-canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}        // 파일 트리
+canMove: ({ to }) => to.parent === null                                       // 즐겨찾기: 순서만
+canMove: ({ item, to }) =>
+  item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category' // 채널 묶음
+canMove: ({ to }) => to.parent === null || to.parent.kind === 'folder'        // 파일 트리
 ```
 
 ### 옮기기 전 확인
 
-- `onItemsChange` 에서 `overlay.open` 을 기다린 뒤 `items` 를 바꿉니다. 취소하면 아무것도 바뀌지 않습니다.
+- `sortable.onItemsChange` 에서 `overlay.open` 을 기다린 뒤 `items` 를 바꿉니다. 취소하면 아무것도 바뀌지 않습니다.
 
 ```tsx
-onItemsChange={async (next, { item, to }) => {
+onItemsChange: async (next, { item, to }) => {
   const confirmed = await overlay.open<boolean>(({ close }) => (
     <Dialog>
       <Dialog.Content>
@@ -230,20 +247,25 @@ onItemsChange={async (next, { item, to }) => {
     </Dialog>
   ));
   if (confirmed) setDocs(next);
-}}
+};
 ```
 
 ## 접기
 
 ```tsx
-<Sidebar aria-label="사이드바" collapsible="icon" />                                  // 아이콘 띠로 접힌다
-<Sidebar aria-label="사이드바" collapsible="offcanvas" />                             // 통째로 밀려 나간다. Provider 가 필요하다
-<Sidebar aria-label="사이드바" collapsible="icon" defaultCollapsed />                 // 비제어
-<Sidebar aria-label="사이드바" collapsible="icon" collapsed={collapsed} onCollapsedChange={setCollapsed} /> // 제어
-<Sidebar aria-label="사이드바" collapsible="icon" shortcut="Mod+\" />                 // 단축키를 바꾼다
-<Sidebar aria-label="사이드바" collapsible="icon" shortcut={false} />                 // 단축키를 끈다
+const sidebar = useSidebar({ collapse: { mode: 'icon' } });
+
+<Sidebar aria-label="사이드바" sidebar={sidebar} />
+
+useSidebar({ collapse: {} });                                             // mode 기본 'icon'. 아이콘 띠로 접힌다
+useSidebar({ collapse: { mode: 'offcanvas' } });                          // 통째로 밀려 나간다. Provider 가 필요하다
+useSidebar({ collapse: { defaultCollapsed: true } });                     // 비제어
+useSidebar({ collapse: { collapsed, onCollapsedChange: setCollapsed } }); // 제어
+useSidebar({ collapse: {}, shortcut: 'Mod+\\' });                          // 단축키를 바꾼다
+useSidebar({ shortcut: false });                                          // 단축키를 끈다
 ```
 
+- `useSidebar` 를 주지 않거나 `collapse` 가 없으면 접지 않습니다. 단축키(`Mod+B`)는 그래도 좁은 화면의 Drawer 를 열고 닫으므로 `collapse` 밖에 둡니다.
 - 아이콘 띠는 48px 입니다. 라벨과 묶음 라벨은 화면에서만 숨고, 끝 칸은 사라집니다. 항목에 마우스를 올리거나 키보드로 오면 라벨이 오른쪽 Tooltip 으로 뜹니다.
 - `offcanvas` 로 접힌 사이드바는 폭이 0 이 되고 `inert` 라 Tab 이 들어가지 않습니다. 다시 열 `Sidebar.Trigger` 가 밖에 있어야 하므로 `Sidebar.Provider` 없이 쓰면 개발 모드에서 경고합니다.
 - 단축키는 입력칸에 포커스가 있을 때는 동작하지 않습니다(편집기의 굵게 `Mod+B` 를 막지 않습니다). 640px 아래에서는 Drawer 를 열고 닫습니다.
@@ -262,14 +284,23 @@ export default async function Layout({ children }) {
 
   return (
     <Sidebar.Provider>
-      <Sidebar aria-label="사이드바" collapsible="icon" persist="sidebar" defaultCollapsed={collapsed}>…</Sidebar>
+      <AppSidebar defaultCollapsed={collapsed} />
       <Sidebar.Inset>{children}</Sidebar.Inset>
     </Sidebar.Provider>
   );
 }
+
+// app/app-sidebar.tsx
+'use client';
+
+export function AppSidebar({ defaultCollapsed }: { defaultCollapsed: boolean }) {
+  const sidebar = useSidebar({ collapse: { persist: 'sidebar', defaultCollapsed } });
+
+  return <Sidebar aria-label="사이드바" sidebar={sidebar}>…</Sidebar>;
+}
 ```
 
-- `persist` 에 이름을 주면 접고 펼칠 때마다 그 이름의 쿠키에 `true`, `false` 를 씁니다(`path=/`, 1년, `SameSite=Lax`).
+- `collapse.persist` 에 이름을 주면 접고 펼칠 때마다 그 이름의 쿠키에 `true`, `false` 를 씁니다(`path=/`, 1년, `SameSite=Lax`).
 - 쿠키를 읽는 것은 앱입니다. 서버가 읽어 `defaultCollapsed` 로 넘기면 첫 HTML 부터 접힌 모양이라 깜빡이지 않습니다. 서버 렌더링이 없는 앱은 `document.cookie` 를 읽어 넘깁니다.
 
 ## 모양
@@ -289,7 +320,7 @@ export default async function Layout({ children }) {
 
 ```tsx
 <Sidebar.Provider>
-  <Sidebar aria-label="사이드바" value={pathname} variant="inset" collapsible="offcanvas" persist="sidebar">
+  <Sidebar aria-label="사이드바" value={pathname} variant="inset" sidebar={sidebar}>
     …
   </Sidebar>
   <Sidebar.Inset>
@@ -302,7 +333,7 @@ export default async function Layout({ children }) {
 ```
 
 - Provider 는 선택입니다. 없으면 Sidebar 가 자기 상태를 갖고, 있으면 그 안 어디의 `Sidebar.Trigger` 든 같은 사이드바를 접고 엽니다.
-- 상태 prop(`collapsed`, `defaultCollapsed`, `persist`, `shortcut`)은 Provider 가 있어도 `Sidebar` 에 줍니다.
+- `useSidebar` 의 결과는 Provider 가 있어도 `Sidebar` 의 `sidebar` 에 줍니다. `useSidebar` 는 클라이언트 훅이므로, Server Component 의 레이아웃에서는 사이드바를 클라이언트 컴포넌트로 뺍니다(위의 `AppSidebar`).
 - Provider 는 `flex w-full` 이고 최소 높이가 `--sidebar-height`(기본 `100dvh`)인 `<div>` 입니다. 사이드바와 본문을 나란히 놓습니다.
 - 640px 아래에서 Provider 가 있으면 사이드바는 숨고, 본문의 `Sidebar.Trigger` 가 Drawer 를 엽니다. Provider 가 없으면 사이드바 자리에 Drawer 를 여는 메뉴 버튼만 남습니다.
 
@@ -320,20 +351,19 @@ export default async function Layout({ children }) {
 | -------------------------------------------- | ------------------------------------------------------------------- |
 | `value`                                      | 지금 페이지. 같은 `value` 의 항목에 `aria-current="page"`           |
 | `variant`                                    | `sidebar`(기본) / `floating` / `inset`                              |
-| `collapsible`                                | `'icon'` / `'offcanvas'`. 주지 않으면 접지 않는다                   |
-| `collapsed` / `defaultCollapsed`             | 접힘 상태. 기본 `false`                                             |
-| `onCollapsedChange`                          | 접거나 펼칠 때 새 상태로                                            |
-| `shortcut`                                   | `'Mod+B'`. `false` 면 끈다                                          |
-| `persist`                                    | 접힘 상태를 쓸 쿠키 이름                                            |
+| `sidebar`                                    | `useSidebar()` 의 결과. 없으면 접지 않고 단축키는 `Mod+B`           |
+| `useSidebar({ collapse })`                   | `mode`(`'icon'` 기본 / `'offcanvas'`), `collapsed` / `defaultCollapsed` / `onCollapsedChange`, `persist`(쿠키 이름) |
+| `useSidebar({ shortcut })`                   | `'Mod+B'`(기본). `false` 면 끈다                                    |
 | `aria-label` / `aria-labelledby`             | 필수. 사이드바의 이름                                               |
-| `Sidebar.Group`                              | `label`, `collapsible`, `defaultOpen`(`true`)                       |
-| `Sidebar.Group` 데이터 방식                  | `items`, `children(item, { depth })`, `onItemsChange`, `canMove`    |
+| `Sidebar.Group`                              | `collapse`: `open` / `defaultOpen`(`true`) / `onOpenChange`. 주면 라벨을 눌러 접는다 |
+| `Sidebar.Group.Label`                        | 묶음의 이름. `div` 의 속성                                          |
+| `Sidebar.Group.Tree`                         | `items`, `children(item, { depth })`, `sortable`: `onItemsChange`, `canMove` |
 | `Sidebar.Item`                               | `value`, `href`, `asChild`, `disabled`, `onClick`, `colorScheme`    |
 | `Sidebar.Trigger`                            | IconButton 의 속성. `icon` 으로 아이콘을 바꾼다                     |
 | `Sidebar.Provider`, `Sidebar.Inset`          | `asChild` 로 다른 요소에 붙인다                                     |
 
 ## 알아둘 것
 
-- 한 페이지에 Sidebar 를 여러 개 두면 단축키가 모두를 접습니다. 하나만 남기고 `shortcut={false}` 를 줍니다.
+- 한 페이지에 Sidebar 를 여러 개 두면 단축키가 모두를 접습니다. 하나만 남기고 `useSidebar({ shortcut: false })` 로 끕니다.
 - 사이드바는 왼쪽에만 붙습니다.
 - Item 의 칸 나누기는 자식을 직접 읽습니다. 아이콘과 라벨을 다른 컴포넌트로 감싸면 그 컴포넌트 하나가 아이콘 칸이 됩니다.

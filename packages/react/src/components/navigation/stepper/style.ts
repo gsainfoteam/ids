@@ -3,7 +3,7 @@ import { tv } from '../../../utils';
 import type { StepperOrientation } from './root';
 import type { IdsSize } from '../../../tokens/types';
 
-export const stepperStyle = tv({
+export const stepPartsStyle = tv({
   slots: {
     root: 'flex w-full flex-col gap-6',
     list: 'flex w-full',
@@ -76,16 +76,6 @@ export const stepperStyle = tv({
         body: 'text-caption-c1-regular',
       },
     } satisfies Record<IdsSize, object>,
-    interactive: {
-      true: {
-        trigger: 'cursor-pointer disabled:cursor-default data-disabled:cursor-not-allowed',
-      },
-      false: {},
-    },
-    progress: {
-      true: { separator: 'data-completed:bg-primary-solid' },
-      false: {},
-    },
   },
   compoundVariants: [
     {
@@ -106,28 +96,28 @@ export const stepperStyle = tv({
         body: 'ms-8',
       },
     },
-    {
-      orientation: 'vertical',
-      progress: false,
-      class: { separator: 'bottom-0' },
-    },
-    {
-      orientation: 'vertical',
-      size: 'standard',
-      progress: false,
-      class: { separator: 'top-8' },
-    },
-    {
-      orientation: 'vertical',
-      size: 'tiny',
-      progress: false,
-      class: { separator: 'top-6' },
-    },
   ],
   defaultVariants: {
     orientation: 'horizontal',
     size: 'standard',
+  },
+});
+
+export const stepperStyle = tv({
+  extend: stepPartsStyle,
+  slots: {
+    trigger: '',
+    separator: 'data-completed:bg-primary-solid',
+  },
+  variants: {
+    interactive: {
+      true: {
+        trigger: 'cursor-pointer disabled:cursor-default data-disabled:cursor-not-allowed',
+      },
+      false: {},
+    },
+  },
+  defaultVariants: {
     interactive: false,
-    progress: true,
   },
 });

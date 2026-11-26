@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps } from 'react';
+import { type ComponentProps, type ReactNode } from 'react';
 
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
 import { Slot } from '../../../utility/slot';
@@ -8,19 +8,24 @@ import { useInternalItemContext, useInternalRootContext } from '../context';
 import { useInternalStepperBodyWarning } from '../hooks/use-stepper-body-warning';
 import { statusAttributes } from '../lib/step-state';
 
-import type { StepperItemState } from './item';
+import type { StepItemState, StepperItemState } from './item';
 
 export type StepperBodyState = StepperItemState;
 
-export type StepperBodyProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> &
-  StateRenderProps<StepperBodyState> & {
+export type StepBodyProps<S = StepItemState> = Omit<
+  ComponentProps<'div'>,
+  'children' | 'className' | 'style'
+> &
+  StateRenderProps<S> & {
     asChild?: boolean;
   };
 
-export function StepperBody({ asChild, className, style, children, ...rest }: StepperBodyProps) {
-  const root = useInternalRootContext('Stepper.Body');
-  const { state } = useInternalItemContext('Stepper.Body');
-  useInternalStepperBodyWarning(root.orientation === 'horizontal');
+export type StepperBodyProps = StepBodyProps<StepperBodyState>;
+
+export function StepBody({ asChild, className, style, children, ...rest }: StepBodyProps) {
+  const root = useInternalRootContext('Body');
+  const { state } = useInternalItemContext('Body');
+  useInternalStepperBodyWarning(root.name, root.orientation === 'horizontal');
 
   const props = {
     ...rest,
@@ -35,4 +40,6 @@ export function StepperBody({ asChild, className, style, children, ...rest }: St
   return <div {...props}>{content}</div>;
 }
 
-StepperBody.displayName = 'Stepper.Body';
+StepBody.displayName = 'Stepper.Body';
+
+export const StepperBody = StepBody as (props: StepperBodyProps) => ReactNode;

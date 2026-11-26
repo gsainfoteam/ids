@@ -1,6 +1,6 @@
 'use client';
 
-import { use, type ComponentProps } from 'react';
+import { use, type ComponentProps, type ReactNode } from 'react';
 
 import { StepperBody } from './body';
 import {
@@ -14,57 +14,74 @@ import { StepperSeparator } from './separator';
 import { StepperTitle } from './title';
 import { StepperTrigger } from './trigger';
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
-import { containsElementOfType, flattenFragments, invariant } from '../../../../utils';
-import { isType } from '../lib/is-type';
+import { flattenFragments, invariant } from '../../../../utils';
+import { containsPart, isType } from '../lib/is-type';
 import {
+  eventStatus,
   flag,
   isReachable,
-  recordStatus,
   statusAttributes,
   stepStatus,
+  type StepperItemStatus,
   type StepperStatus,
+  type StepStatus,
+  type TimelineStatus,
 } from '../lib/step-state';
 
-export type StepperItemState = {
+export type StepItemState = {
   index: number;
-  status: StepperStatus;
+  status: StepStatus;
   current: boolean;
   disabled: boolean;
   last: boolean;
 };
 
-export type StepperItemProps = Omit<ComponentProps<'li'>, 'children' | 'className' | 'style'> &
-  StateRenderProps<StepperItemState> & {
-    completed?: boolean;
-    error?: boolean;
+export type StepperItemState = Omit<StepItemState, 'status'> & { status: StepperStatus };
+
+type StepItemProps = Omit<ComponentProps<'li'>, 'children' | 'className' | 'style'> &
+  StateRenderProps<StepItemState> & {
+    status?: StepStatus;
     disabled?: boolean;
   };
 
-const TITLE = new Set<unknown>([StepperTitle]);
-const DESCRIPTION = new Set<unknown>([StepperDescription]);
+export type StepperItemProps = Omit<ComponentProps<'li'>, 'children' | 'className' | 'style'> &
+  StateRenderProps<StepperItemState> & {
+    status?: StepperItemStatus;
+    disabled?: boolean;
+  };
 
-export function StepperItem({
-  completed,
-  error,
+function statusIn(
+  progress: boolean,
+  index: number,
+  current: number,
+  given: StepStatus | undefined,
+): StepStatus {
+  if (progress) return stepStatus(index, current, given as StepperItemStatus | undefined);
+  return eventStatus(given as TimelineStatus | undefined);
+}
+
+export function StepItem({
+  status: given,
   disabled,
   className,
   style,
   children,
   ...rest
-}: StepperItemProps) {
-  const root = useInternalRootContext('Stepper.Item');
+}: StepItemProps) {
+  const root = useInternalRootContext('Item');
   const index = use(StepperIndexContext);
-  invariant(index !== null, '`<Stepper.Item>` must be a direct child of `<Stepper>`.');
+  invariant(
+    index !== null,
+    '`<Stepper.Item>` and `<Timeline.Item>` must be direct children of `<Stepper>` or `<Timeline>`.',
+  );
 
-  const status = root.progress
-    ? stepStatus(index, root.value, { completed, error })
-    : recordStatus({ completed, error });
+  const status = statusIn(root.progress, index, root.value, given);
   const isDisabled = root.disabled || disabled === true;
   const reachable =
     root.interactive &&
     !isDisabled &&
     isReachable({ index, current: root.value, status, linear: root.linear });
-  const state: StepperItemState = {
+  const state: StepItemState = {
     index,
     status,
     current: index === root.value,
@@ -84,8 +101,8 @@ export function StepperItem({
       value={{
         state,
         reachable,
-        hasTitle: containsElementOfType(steps, TITLE),
-        hasDescription: containsElementOfType(steps, DESCRIPTION),
+        hasTitle: containsPart(steps, StepperTitle),
+        hasDescription: containsPart(steps, StepperDescription),
         ids: stepIds(root.id, index),
       }}
     >
@@ -106,4 +123,6 @@ export function StepperItem({
   );
 }
 
-StepperItem.displayName = 'Stepper.Item';
+StepItem.displayName = 'Stepper.Item';
+
+export const StepperItem = StepItem as (props: StepperItemProps) => ReactNode;

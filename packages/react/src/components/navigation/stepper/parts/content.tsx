@@ -23,7 +23,7 @@ export function StepperContent({
   children,
   ...rest
 }: StepperContentProps) {
-  const root = useInternalRootContext('Stepper.Content');
+  const root = useInternalRootContext('Content');
   const current = value === root.value;
   const state: StepperContentState = { value, current };
 

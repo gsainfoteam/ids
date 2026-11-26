@@ -74,7 +74,7 @@ function useInternalMissingProviderWarning(
     if (!isDevelopment || hasProvider) return;
     if (collapsible === 'offcanvas')
       console.warn(
-        '[IDS] `<Sidebar collapsible="offcanvas">` hides the whole sidebar, so the trigger that opens it again must sit outside it. Wrap the layout in `<Sidebar.Provider>` and place a `<Sidebar.Trigger>` in `<Sidebar.Inset>`.',
+        '[IDS] `useSidebar({ collapse: { mode: "offcanvas" } })` hides the whole sidebar, so the trigger that opens it again must sit outside it. Wrap the layout in `<Sidebar.Provider>` and place a `<Sidebar.Trigger>` in `<Sidebar.Inset>`.',
       );
     if (variant === 'inset')
       console.warn(
@@ -83,7 +83,40 @@ function useInternalMissingProviderWarning(
   }, [hasProvider, variant, collapsible]);
 }
 
-export type UseSidebarOptions = {
+export type SidebarCollapse = {
+  mode?: SidebarCollapsibleMode;
+  collapsed?: boolean;
+  defaultCollapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+  persist?: string;
+};
+
+export type SidebarOptions = {
+  collapse?: SidebarCollapse;
+  shortcut?: Hotkey | false;
+};
+
+export type SidebarInstance = {
+  collapse: (SidebarCollapse & { mode: SidebarCollapsibleMode }) | null;
+  shortcut: Hotkey | false;
+};
+
+export const SIDEBAR_WITHOUT_COLLAPSE: SidebarInstance = {
+  collapse: null,
+  shortcut: DEFAULT_SHORTCUT,
+};
+
+export function useSidebar({
+  collapse,
+  shortcut = DEFAULT_SHORTCUT,
+}: SidebarOptions = {}): SidebarInstance {
+  return {
+    collapse: collapse ? { ...collapse, mode: collapse.mode ?? 'icon' } : null,
+    shortcut,
+  };
+}
+
+type InternalSidebarOptions = {
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
@@ -103,7 +136,7 @@ export function useInternalSidebar({
   persist,
   variant,
   provider,
-}: UseSidebarOptions): SidebarControls {
+}: InternalSidebarOptions): SidebarControls {
   const [collapsedState, setCollapsed] = useControllableState({
     value: collapsedProp,
     defaultValue: defaultCollapsed,

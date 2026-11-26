@@ -67,22 +67,23 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 ## 가장자리 흐림
 
 ```tsx
-<ScrollArea fade />                                            // 스크롤하는 방향 모두
-<ScrollArea fade="y" />                                        // 위아래만
-<ScrollArea fade="x" />                                        // 좌우만
+<ScrollArea fade="y" />     // 위아래
+<ScrollArea fade="x" />     // 좌우
+<ScrollArea fade="both" />  // 스크롤하는 방향 모두
+<ScrollArea />              // 주지 않으면 흐리지 않는다
 ```
 
 - 흐린 폭은 `size` 가 정합니다. 폭을 바꾸는 것은 새 디자인이고 root 의 `className` 으로 줍니다.
 
 ```tsx custom-design
-<ScrollArea fade className="[--scroll-area-fade-size:40px]" />
+<ScrollArea fade="both" className="[--scroll-area-fade-size:40px]" />
 ```
 
 - 내용이 더 남은 가장자리만 흐립니다. 맨 위에서는 위 가장자리가 선명하고, 내리면 위가 흐려집니다. 끝에 닿은 가장자리는 다시 선명해집니다.
 - 흐린 폭은 그 가장자리 너머에 가려진 거리만큼 자라고 `--scroll-area-fade-size`(standard 24px, tiny 16px)에서 멈춥니다. 스크롤을 시작하면 0 에서 자라고, 끝에 다가가면 줄어듭니다. 갑자기 나타나지 않습니다.
 - viewport 의 `mask-image` 그라디언트라 배경색을 몰라도 어느 표면 위에서나 맞습니다. 막대와 Corner 는 viewport 밖에 있어 흐려지지 않습니다.
 - 두 방향이면 그라디언트 둘을 `mask-composite: intersect` 로 겹칩니다. 가로는 `dir="rtl"` 에서 오른쪽이 시작입니다.
-- 스크롤하지 않는 방향은 흐리지 않습니다. `orientation="vertical"` 에 `fade` 면 위아래만 흐리고, `fade="x"` 면 아무 데도 흐리지 않습니다.
+- 스크롤하지 않는 방향은 흐리지 않습니다. `orientation="vertical"` 에 `fade="both"` 면 위아래만 흐리고, `fade="x"` 면 아무 데도 흐리지 않습니다.
 - 흐리는 축의 `scroll-padding` 은 흐린 폭입니다. 포커스나 `scrollIntoView` 로 보이게 스크롤한 요소는 흐린 띠 밖에 멈춥니다. 목록에서 방향키로 옮긴 옵션이 흐려진 채 서지 않습니다.
 - 서버 HTML 과 첫 그림은 흐리지 않습니다. 넘친 거리를 잰 뒤부터 흐립니다.
 - 흐림은 스크롤 위치를 그대로 따라갈 뿐 전환이 없습니다. 그래서 `prefers-reduced-motion` 에서도 따로 바꾸지 않습니다.
@@ -253,7 +254,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 | `variant`             | `hover`(기본) / `auto` / `always` / `none` |
 | `size`                | `standard`(기본, 8px) / `tiny`(6px)      |
 | `orientation`         | 선언한 막대의 방향, 없으면 `vertical` |
-| `fade`                | `false`(기본) / `true` / `'y'` / `'x'`   |
+| `fade`                | 흐릴 축. `'y'` / `'x'` / `'both'`. 없으면 흐리지 않는다 |
 | `asChild`             | 자식 요소 하나를 root 로 쓴다            |
 | `className` / `style` | 새 디자인에서만. 상태를 받는 함수도 된다 |
 | 그 외 속성            | root 로 간다                             |

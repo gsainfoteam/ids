@@ -7,14 +7,11 @@ import { useInternalRovingFocus } from '../../../utility/group/hooks/use-roving-
 
 import type { StepperOrientation } from '../root';
 
-const NO_CURRENT_STEP = -1;
-
 type UseStepperOptions = {
   value: number | undefined;
   defaultValue: number | undefined;
   onValueChange: ((value: number) => void) | undefined;
   orientation: StepperOrientation;
-  progress: boolean;
   disabled: boolean;
 };
 
@@ -23,7 +20,6 @@ export function useInternalStepper({
   defaultValue,
   onValueChange,
   orientation,
-  progress,
   disabled,
 }: UseStepperOptions) {
   const id = useId();
@@ -33,8 +29,7 @@ export function useInternalStepper({
     defaultValue: defaultValue ?? 0,
     onValueChange,
   });
-  const interactive = progress && (value === undefined || onValueChange !== undefined);
-  const shownValue = progress ? current : NO_CURRENT_STEP;
+  const interactive = value === undefined || onValueChange !== undefined;
 
   const roving = useInternalRovingFocus({
     rootRef: listRef,
@@ -49,5 +44,5 @@ export function useInternalStepper({
     if (interactive && !disabled) setCurrent(index);
   };
 
-  return { id, listRef, current, interactive, shownValue, roving, select };
+  return { id, listRef, current, interactive, roving, select };
 }

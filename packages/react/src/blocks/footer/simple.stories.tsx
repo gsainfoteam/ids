@@ -22,11 +22,11 @@ export const PC: Story = {
     <div className="flex min-h-dvh flex-col break-keep">
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-10 sm:px-6">
         <div className="w-fit">
-          <Skeleton loading>
+          <Skeleton>
             <h1 className="text-headline-h3-bold">이번 학기 공지</h1>
           </Skeleton>
         </div>
-        <Skeleton loading>
+        <Skeleton>
           <p className="text-body-b3-regular">
             수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을 확인하고,
             시간표가 겹치지 않는지 미리 살펴 두세요.
