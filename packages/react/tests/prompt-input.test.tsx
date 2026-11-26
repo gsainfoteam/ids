@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IconButton, PromptInput, usePromptInput } from '../src';
+import { Field, IconButton, PromptInput, usePromptInput } from '../src';
 import { FIREFOX_DROPS_SYNTHETIC_CLIPBOARD_DATA, skipInFirefox, skipWithoutCdp } from './engines';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -430,6 +430,21 @@ test('disabled turns off the textarea, the attach button and sending', async () 
   await expect.element(sendButton()).toHaveAttribute('aria-disabled', 'true');
   await userEvent.click(sendButton(), { force: true });
   expect(onSend).not.toHaveBeenCalled();
+});
+
+test('an invalid Field around it does not mark the attach button invalid', () => {
+  const doc = parse(
+    renderToString(
+      <Field invalid>
+        <PromptInput aria-label="메시지">
+          <PromptInput.Input />
+          <PromptInput.Attach />
+        </PromptInput>
+      </Field>,
+    ),
+  );
+
+  expect(doc.querySelector('[data-prompt-input-attach]')!.hasAttribute('aria-invalid')).toBe(false);
 });
 
 test('usePromptInput checks the attachment limits like useFileField', () => {

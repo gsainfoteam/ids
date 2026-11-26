@@ -62,6 +62,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
   const owner = componentNameOf(look);
   const { maxSize, maxCount, onReject } = fileField?.limits ?? NO_LIMITS;
   const fieldState = useFieldState();
+  const fieldInvalid = look !== 'embedded' && (fieldState?.invalid ?? false);
 
   const { rootRef, pickerRef, triggerRef, ...field } = useInternalFileFieldState({
     multiple,
@@ -109,9 +110,7 @@ export function useInternalFileFieldRoot(props: FileFieldProps, look: FileFieldL
   };
   const listsRejections = !!rejectionPart && s.rejections.length > 0;
   const markedInvalid =
-    ariaInvalid === undefined
-      ? (fieldState?.invalid ?? false)
-      : ariaInvalid === true || ariaInvalid === 'true';
+    ariaInvalid === undefined ? fieldInvalid : ariaInvalid === true || ariaInvalid === 'true';
   const showsInvalid = s.rejections.length > 0 || markedInvalid;
   const state: FileFieldState = {
     dragging: s.dragging,
