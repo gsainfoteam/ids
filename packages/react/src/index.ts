@@ -220,7 +220,7 @@ export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './componen
 export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
 
-export { PromptInput } from './components/form/prompt-input';
+export { PromptInput, usePromptInput } from './components/form/prompt-input';
 
 export { Questionnaire } from './components/form/questionnaire';
 export type {
@@ -232,8 +232,12 @@ export type {
   QuestionnaireSelectionMode,
 } from './components/form/questionnaire';
 export type {
+  PromptInputAttachmentsOptions,
+  PromptInputInstance,
   PromptInputMessage,
+  PromptInputOptions,
   PromptInputProps,
+  PromptInputToolsOptions,
   PromptInputStatus,
   PromptInputVariant,
 } from './components/form/prompt-input';
@@ -254,8 +258,14 @@ export type { ColorFieldProps, ColorFormat } from './components/form/color-field
 export { ChipField } from './components/form/chip-field';
 export type { ChipFieldProps } from './components/form/chip-field';
 
-export { FileField } from './components/form/file-field';
-export type { FileFieldProps, FileFieldRejection } from './components/form/file-field';
+export { FileField, useFileField } from './components/form/file-field';
+export type {
+  FileFieldInstance,
+  FileFieldLimitsOptions,
+  FileFieldOptions,
+  FileFieldProps,
+  FileFieldRejection,
+} from './components/form/file-field';
 export { FileDropzone } from './components/form/file-dropzone';
 export type { FileDropzoneProps } from './components/form/file-dropzone';
 

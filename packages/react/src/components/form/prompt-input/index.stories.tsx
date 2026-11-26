@@ -9,7 +9,7 @@ import { Chip } from '../../data/chip';
 import { Menu } from '../../overlay/menu';
 import { Select } from '../select';
 
-import { PromptInput } from '.';
+import { PromptInput, usePromptInput } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -85,81 +85,86 @@ export const Usage: Story = {
 };
 
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section title="Variant × Size">
-        <Showcase.Matrix
-          rows={sizes}
-          columns={variants}
-          render={(size, variant) => (
+  render: function Render() {
+    const withFiles = usePromptInput({ attachments: { defaultValue: [REPORT, NOTES] } });
+    const withTools = usePromptInput({ tools: { defaultValue: ['search'] } });
+
+    return (
+      <Showcase>
+        <Showcase.Section title="Variant × Size">
+          <Showcase.Matrix
+            rows={sizes}
+            columns={variants}
+            render={(size, variant) => (
+              <div className="w-72">
+                <PromptInput aria-label={`${variant} ${size}`} size={size} variant={variant}>
+                  <PromptInput.Input />
+                  <PromptInput.Attach />
+                </PromptInput>
+              </div>
+            )}
+          />
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Status"
+          description="보내는 동안에는 보내기 버튼이 멈추기 버튼이 됩니다. onStop 이 없으면 스피너를 보이고 눌리지 않습니다."
+        >
+          <Showcase.Row label="idle">
             <div className="w-72">
-              <PromptInput aria-label={`${variant} ${size}`} size={size} variant={variant}>
+              <PromptInput aria-label="idle" defaultValue="오늘 학식 뭐야?">
+                <PromptInput.Input />
+              </PromptInput>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="submitting">
+            <div className="w-72">
+              <PromptInput aria-label="submitting" status="submitting">
+                <PromptInput.Input />
+              </PromptInput>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="streaming">
+            <div className="w-72">
+              <PromptInput aria-label="streaming" status="streaming" onStop={() => {}}>
+                <PromptInput.Input />
+              </PromptInput>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section title="States">
+          <Showcase.Row label="attachments">
+            <div className="w-72">
+              <PromptInput aria-label="첨부" promptInput={withFiles}>
                 <PromptInput.Input />
                 <PromptInput.Attach />
               </PromptInput>
             </div>
-          )}
-        />
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Status"
-        description="보내는 동안에는 보내기 버튼이 멈추기 버튼이 됩니다. onStop 이 없으면 스피너를 보이고 눌리지 않습니다."
-      >
-        <Showcase.Row label="idle">
-          <div className="w-72">
-            <PromptInput aria-label="idle" defaultValue="오늘 학식 뭐야?">
-              <PromptInput.Input />
-            </PromptInput>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="submitting">
-          <div className="w-72">
-            <PromptInput aria-label="submitting" status="submitting">
-              <PromptInput.Input />
-            </PromptInput>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="streaming">
-          <div className="w-72">
-            <PromptInput aria-label="streaming" status="streaming" onStop={() => {}}>
-              <PromptInput.Input />
-            </PromptInput>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section title="States">
-        <Showcase.Row label="attachments">
-          <div className="w-72">
-            <PromptInput aria-label="첨부" defaultFiles={[REPORT, NOTES]}>
-              <PromptInput.Input />
-              <PromptInput.Attach />
-            </PromptInput>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="tools">
-          <div className="w-72">
-            <PromptInput aria-label="도구" defaultTools={['search']}>
-              <PromptInput.Input />
-              <PromptInput.ActionMenu />
-              <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
-                웹 검색
-              </PromptInput.Tool>
-            </PromptInput>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="disabled">
-          <div className="w-72">
-            <PromptInput aria-label="비활성" disabled defaultValue="보낼 수 없음">
-              <PromptInput.Input />
-              <PromptInput.Attach />
-            </PromptInput>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+          </Showcase.Row>
+          <Showcase.Row label="tools">
+            <div className="w-72">
+              <PromptInput aria-label="도구" promptInput={withTools}>
+                <PromptInput.Input />
+                <PromptInput.ActionMenu />
+                <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+                  웹 검색
+                </PromptInput.Tool>
+              </PromptInput>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="disabled">
+            <div className="w-72">
+              <PromptInput aria-label="비활성" disabled defaultValue="보낼 수 없음">
+                <PromptInput.Input />
+                <PromptInput.Attach />
+              </PromptInput>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const SendAMessage: Story = {
@@ -194,19 +199,25 @@ export const SendAMessage: Story = {
 };
 
 export const AttachFiles: Story = {
-  render: (args) => (
-    <div className="w-96">
-      <PromptInput {...args} accept="image/*,.pdf,.txt" maxCount={3}>
-        <PromptInput.Input placeholder="파일에 대해 물어보세요" />
-        <PromptInput.Attach />
-      </PromptInput>
-    </div>
-  ),
+  render: function Render(args) {
+    const promptInput = usePromptInput({
+      attachments: { accept: 'image/*,.pdf,.txt', maxCount: 3 },
+    });
+
+    return (
+      <div className="w-96">
+        <PromptInput {...args} promptInput={promptInput}>
+          <PromptInput.Input placeholder="파일에 대해 물어보세요" />
+          <PromptInput.Attach />
+        </PromptInput>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          'PromptInput.Attach 는 파일을 고르는 버튼이고, accept 와 maxCount 로 받을 파일을 정합니다. 입력창에 파일을 끌어다 놓거나 붙여넣어도 첨부되고, 첨부한 파일은 위 바에 FileField 목록으로 보입니다. 글 없이 파일만 보내도 됩니다.',
+          'PromptInput.Attach 는 파일을 고르는 버튼입니다. 받을 파일은 usePromptInput 의 attachments(accept, maxSize, maxCount, onReject)로 정하고, 결과를 promptInput 으로 넘깁니다. 입력창에 파일을 끌어다 놓거나 붙여넣어도 첨부되고, 첨부한 파일은 위 바에 FileField 목록으로 보입니다. 글 없이 파일만 보내도 됩니다.',
       },
     },
   },

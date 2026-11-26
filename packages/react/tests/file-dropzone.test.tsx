@@ -15,7 +15,7 @@ test('limits are described up front, and a single file is listed with its previe
     <FileDropzone
       aria-label="Files"
       accept="image/*,.pdf,application/x-zip"
-      maxSize={5 * 1024 * 1024}
+      fileField={{ limits: { maxSize: 5 * 1024 * 1024 } }}
       defaultValue={file('cover.png', 'x', 'image/png')}
     >
       <FileDropzone.Limits>
@@ -42,7 +42,9 @@ test('limits are described up front, and a single file is listed with its previe
 
 test('the trigger is the drop area and does not take the field focus marker', async () => {
   const screen = await render(
-    <FileDropzone aria-label="Files" variant="soft" placeholder="파일을 끌어다 놓으세요" />,
+    <FileDropzone aria-label="Files" variant="soft">
+      <FileDropzone.Title>파일을 끌어다 놓으세요</FileDropzone.Title>
+    </FileDropzone>,
   );
   const trigger = screen.getByRole('button', { name: 'Files', exact: true }).element();
   expect(trigger.hasAttribute('data-field-input')).toBe(false);
