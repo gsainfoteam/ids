@@ -1,3 +1,5 @@
+import { type FileFieldInstance, type FileFieldOptions } from './hooks/use-file-field';
+import { type FileFieldLimitsOptions } from './lib/file-limits';
 import { type FileFieldRejection } from './lib/file-rules';
 import { FileClear, type FileClearProps } from './parts/clear';
 import { FileItem, type FileItemProps } from './parts/item';
@@ -28,6 +30,9 @@ export namespace FileField {
   export type Variant = FileFieldVariant;
   export type Rejection = FileFieldRejection;
   export type Limits = FileFieldLimits;
+  export type Options = FileFieldOptions;
+  export type Instance = FileFieldInstance;
+  export type LimitsOptions = FileFieldLimitsOptions;
 
   export type TriggerProps = FileTriggerProps;
   export type ValueProps = FileValueProps;
@@ -52,6 +57,10 @@ export namespace FileField {
   export const Style = fileFieldStyle;
 }
 
+export { useFileField } from './hooks/use-file-field';
+
 export type { FileFieldVariant, FileFieldState, FileFieldItemState, FileFieldProps } from './root';
+export type { FileFieldInstance, FileFieldOptions } from './hooks/use-file-field';
+export type { FileFieldLimitsOptions } from './lib/file-limits';
 export type { FileFieldRejection } from './lib/file-rules';
 export type { FileFieldLimits } from './parts/limits';

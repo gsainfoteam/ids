@@ -32,7 +32,7 @@ import { StepperRoot, type StepperOrientation } from './root';
 import { stepperStyle } from './style';
 import { type StateRenderProps } from '../../../internal/lib/state-props';
 
-import type { StepperStatus } from './lib/step-state';
+import type { StepperItemStatus, StepperStatus } from './lib/step-state';
 import type { AccessibleName } from '../../../internal/lib/accessible-name';
 import type { IdsSize } from '../../../tokens/types';
 
@@ -43,12 +43,12 @@ export function Stepper(props: Stepper.Props) {
 export namespace Stepper {
   export type Orientation = StepperOrientation;
   export type Status = StepperStatus;
+  export type ItemStatus = StepperItemStatus;
 
   export type State = {
     value: number;
     orientation: StepperOrientation;
     disabled: boolean;
-    progress: boolean;
   };
 
   export type Props = Omit<
@@ -62,7 +62,6 @@ export namespace Stepper {
       onValueChange?: (value: number) => void;
       orientation?: StepperOrientation;
       linear?: boolean;
-      progress?: boolean;
       size?: IdsSize;
       disabled?: boolean;
     };
@@ -128,4 +127,4 @@ export namespace Stepper {
 }
 
 export type { StepperOrientation } from './root';
-export type { StepperStatus } from './lib/step-state';
+export type { StepperItemStatus, StepperStatus } from './lib/step-state';

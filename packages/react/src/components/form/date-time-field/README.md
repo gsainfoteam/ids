@@ -79,14 +79,14 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
     <Calendar.Caption layout="dropdown" />
   </DateTimeField.Calendar>
   <DateTimeField.TimePicker variant="wheel" />
-  <DateTimeField.Content mobileVariant="drawer" />
+  <DateTimeField.Content narrow="drawer" />
 </DateTimeField>
 ```
 
 - `DateTimeField.Calendar` 는 [Calendar](../../data/calendar/README.md) 의 `monthsToShow`, `today`, `month` 셋과 `Calendar.*` part 를 받습니다. 값, 제한, 크기는 필드가 넘깁니다.
 - `DateTimeField.TimePicker` 는 [TimePicker](../../data/time-picker/README.md) 의 `variant`, `className`, 컬럼 part 를 받습니다. `precision`, `step`, `hourCycle` 과 그 날의 한도는 필드가 넘깁니다.
 - 둘 다 필드의 자식으로 적고 팝업 안에 그려집니다. 없으면 기본 달력과 시계를 그립니다.
-- `DateTimeField.Content` 는 팝업이고 `mobileVariant` 를 받습니다. [DateField](../date-field/README.md#열기와-닫기) 와 같습니다.
+- `DateTimeField.Content` 는 팝업이고 `narrow` 를 받습니다. 기본은 `popover` 입니다. [DateField](../date-field/README.md#열기와-닫기) 와 같습니다.
 
 ## 폼
 
@@ -149,7 +149,7 @@ const schema = z.object({
 | `placeholder`                                    | 기본 없음                              |
 | `name` / `form` / `required`                     | 숨은 값 입력과 브라우저 검증           |
 | `readOnly`                                       | 열기, 고르기, Clear 를 막는다          |
-| `invalid` / `variant` / `size`                   | DateField 와 같다                      |
+| `aria-invalid` / `variant` / `size`              | DateField 와 같다                      |
 | 그 외 native 속성, `ref`                         | Trigger `button` 으로 간다             |
 
 ## 알아둘 것

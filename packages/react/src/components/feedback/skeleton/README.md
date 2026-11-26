@@ -10,11 +10,11 @@
 ```tsx
 import { Skeleton } from '@gsainfoteam/ids-react';
 
-<Skeleton loading={isLoading}>
+<Skeleton aria-busy={isLoading}>
   <Card>...</Card>
 </Skeleton>
 
-<Skeleton loading={isLoading} asChild>
+<Skeleton aria-busy={isLoading} asChild>
   <Avatar src={user?.photo} name={user?.name ?? '사용자'} />
 </Skeleton>;
 ```
@@ -22,21 +22,21 @@ import { Skeleton } from '@gsainfoteam/ids-react';
 ## 감싸기
 
 ```tsx
-<Skeleton loading={isLoading}>          {/* div 로 감싸서 자식의 크기 그대로 칠한다 */}
+<Skeleton aria-busy={isLoading}>          {/* div 로 감싸서 자식의 크기 그대로 칠한다 */}
   <Card>...</Card>
 </Skeleton>
 
-<Skeleton loading={isLoading} asChild>  {/* 감싸지 않고 자식 요소를 직접 칠한다 */}
+<Skeleton aria-busy={isLoading} asChild>  {/* 감싸지 않고 자식 요소를 직접 칠한다 */}
   <Avatar name={user?.name ?? '사용자'} />
 </Skeleton>
 
-<Skeleton>                              {/* loading 을 빼면 true */}
+<Skeleton>                              {/* aria-busy 를 빼면 true */}
   <p className="text-body-b3-regular">수강 신청은 9월 1일에 열립니다.</p>
 </Skeleton>
 ```
 
 - 불러오는 동안 자식은 보이지 않고(`invisible`) `inert` 입니다. Tab, 스크린 리더, 포인터가 들어가지 않습니다.
-- 끝나면(`loading={false}`) 속성과 클래스만 빠집니다. 구조가 그대로라서 화면이 밀리지 않고 자식이 다시 마운트되지 않습니다.
+- 끝나면(`aria-busy={false}`) 속성과 클래스만 빠집니다. 구조가 그대로라서 화면이 밀리지 않고 자식이 다시 마운트되지 않습니다.
 - 기본 감싸기는 `div` 두 개입니다.
   - 칠하는 바깥 `div`: `aria-busy="true"`, 모서리 `standard`. 새 디자인에서 쓰는 `className` 과 `style` 이 여기로 갑니다.
   - 자식을 담는 안쪽 `div`: `display: contents` 라서 상자를 만들지 않고, `inert` 가 여기에 붙습니다.
@@ -54,18 +54,18 @@ const placeholderPost = { author: '김지스트', team: '인포팀', title: '202
 <section aria-busy={isLoading} aria-label="최근 글">
   <Card>
     <div className="flex items-center gap-3">
-      <Skeleton loading={isLoading} asChild>
+      <Skeleton aria-busy={isLoading} asChild>
         <Avatar name={(post ?? placeholderPost).author} />
       </Skeleton>
       <div className="flex-1">                       {/* 남은 폭은 감싸는 요소가 */}
-        <Skeleton loading={isLoading}>
+        <Skeleton aria-busy={isLoading}>
           <p className="text-body-b3-medium">{(post ?? placeholderPost).author}</p>
           <p className="text-body-b3-regular">{(post ?? placeholderPost).team}</p>
         </Skeleton>
       </div>
     </div>
     <div className="w-fit">                          {/* 글 너비만큼만 칠한다 */}
-      <Skeleton loading={isLoading}>
+      <Skeleton aria-busy={isLoading}>
         <Card.Title>{(post ?? placeholderPost).title}</Card.Title>
       </Skeleton>
     </div>
@@ -82,18 +82,18 @@ const placeholderMembers = Array.from({ length: 5 }, (_, index) => ({
   {(members ?? placeholderMembers).map((member) => (
     <Item key={member.id}>
       <Item.Media>
-        <Skeleton loading={isLoading} asChild>
+        <Skeleton aria-busy={isLoading} asChild>
           <Avatar name={member.name} />
         </Skeleton>
       </Item.Media>
       <Item.Content>
         <div className="w-fit">
-          <Skeleton loading={isLoading} asChild>
+          <Skeleton aria-busy={isLoading} asChild>
             <Item.Title>{member.name}</Item.Title>
           </Skeleton>
         </div>
         <div className="w-fit">
-          <Skeleton loading={isLoading} asChild>
+          <Skeleton aria-busy={isLoading} asChild>
             <Item.Description>{member.team}</Item.Description>
           </Skeleton>
         </div>
@@ -125,14 +125,14 @@ const placeholderMembers = Array.from({ length: 5 }, (_, index) => ({
 
 앱은 상태를 런타임 값으로 읽습니다. DOM 의 `data-*` 속성은 IDS 내부 스타일용이라 문서에 두지 않고 지키겠다고 약속하지도 않습니다.
 
-- 불러오는 중인지와 움직임은 앱이 넘긴 `loading`, `animation` 입니다. Skeleton 이 스스로 바꾸는 상태는 없습니다.
+- 불러오는 중인지와 움직임은 앱이 넘긴 `aria-busy`, `animation` 입니다. Skeleton 이 스스로 바꾸는 상태는 없습니다.
 
 ## 속성
 
 | 속성                 | 기본 / 동작                                                   |
 | -------------------- | ------------------------------------------------------------- |
 | `children`           | 필수. 불러오는 내용. `asChild` 면 요소 하나                   |
-| `loading`            | 불러오는 중인지. 기본 `true`                                  |
+| `aria-busy`          | 불러오는 중인지. 기본 `true`. `false` 면 감싼 내용을 그대로 보인다 |
 | `animation`          | `pulse`(기본) / `wave` / `none`                               |
 | `asChild`            | `div` 로 감싸지 않고 자식 요소를 칠한다                       |
 | `className`, `style` | 새 디자인에서만. 바깥 `div` 나 자식 요소로 간다               |
@@ -141,6 +141,6 @@ const placeholderMembers = Array.from({ length: 5 }, (_, index) => ({
 ## 알아둘 것
 
 - 기본 감싸기는 `div` 라서 `p`, 제목, 버튼 안에는 `asChild` 로 그 안의 요소를 칠합니다.
-- `loading` 은 Skeleton 이 그리는 상태입니다. `aria-busy` 와 `inert` 는 이 값에서 나오므로 직접 주지 않습니다.
+- 불러오는 중인지는 `aria-busy` 로 줍니다. 칠하기와 `inert` 는 이 값에서 나오고, `false` 면 DOM 에 `aria-busy` 를 쓰지 않습니다.
 - `asChild` 의 자식 컴포넌트는 받은 `className`, `inert`, `aria-busy`, `ref` 를 DOM 요소까지 전달해야 합니다(Slot 규칙).
 - 감싼 자식의 크기가 내용으로 정해지면(빈 글자, 주소가 없는 이미지) 불러오는 동안 크기가 없습니다. placeholder 데이터를 주거나 감싸는 grid 요소로 크기를 줍니다: `<div className="grid h-5 w-24"><Skeleton>…</Skeleton></div>`.

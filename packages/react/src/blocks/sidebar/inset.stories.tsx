@@ -19,7 +19,7 @@ import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
 import { Spacer } from '../../components/layout/spacer';
-import { Sidebar } from '../../components/navigation/sidebar';
+import { Sidebar, useSidebar } from '../../components/navigation/sidebar';
 import { Menu } from '../../components/overlay/menu';
 import { Kbd } from '../../components/typography/kbd';
 
@@ -57,6 +57,7 @@ const STARRED = [
 export const PC: Story = {
   render: function Render() {
     const [workspace, setWorkspace] = useState(WORKSPACES[0].id);
+    const sidebar = useSidebar({ collapse: { mode: 'offcanvas' } });
 
     const active = WORKSPACES.find(({ id }) => id === workspace)!;
 
@@ -66,7 +67,7 @@ export const PC: Story = {
           <Sidebar
             value="inbox"
             variant="inset"
-            collapsible="offcanvas"
+            sidebar={sidebar}
             aria-label="워크스페이스 메뉴"
           >
             <Sidebar.Header>
@@ -111,7 +112,8 @@ export const PC: Story = {
               </Chip>
             </Sidebar.Item>
 
-            <Sidebar.Group label="즐겨찾기" collapsible>
+            <Sidebar.Group collapse={{}}>
+              <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
               {STARRED.map((page) => (
                 <Sidebar.Item key={page.id} value={page.id} href={`#${page.id}`}>
                   <StarIcon />
@@ -120,7 +122,8 @@ export const PC: Story = {
               ))}
             </Sidebar.Group>
 
-            <Sidebar.Group label="채널" collapsible>
+            <Sidebar.Group collapse={{}}>
+              <Sidebar.Group.Label>채널</Sidebar.Group.Label>
               {CHANNELS.map((channel) => (
                 <Sidebar.Item key={channel.id} value={channel.id} href={`#${channel.id}`}>
                   <HashtagIcon />
@@ -172,28 +175,28 @@ export const PC: Story = {
             </Item>
             <Divider />
             <div className="flex flex-col gap-4 p-4">
-              <Skeleton loading>
+              <Skeleton>
                 <p className="text-body-b3-regular">
                   수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
                   확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
                 </p>
               </Skeleton>
               <div className="grid h-24">
-                <Skeleton loading asChild>
+                <Skeleton asChild>
                   <Card>
                     <Card.Title>수강 신청</Card.Title>
                   </Card>
                 </Skeleton>
               </div>
               <div className="grid h-24">
-                <Skeleton loading asChild>
+                <Skeleton asChild>
                   <Card>
                     <Card.Title>장학금 안내</Card.Title>
                   </Card>
                 </Skeleton>
               </div>
               <div className="grid h-24">
-                <Skeleton loading asChild>
+                <Skeleton asChild>
                   <Card>
                     <Card.Title>동아리 모집</Card.Title>
                   </Card>

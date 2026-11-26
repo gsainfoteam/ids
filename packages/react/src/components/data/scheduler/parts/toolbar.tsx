@@ -5,6 +5,7 @@ import { use, useState } from 'react';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
 import { getLocalTimeZone, today as todayIn } from '@internationalized/date';
 
+import { SchedulerDatePicker } from './date-picker';
 import { SchedulerDayCountField } from './day-count-field';
 import { withWeekStart } from '../../../../internal/date-locale';
 import { LanguageContext, useInternalTranslate } from '../../../../internal/translate';
@@ -14,7 +15,6 @@ import { IconButton } from '../../../action/icon-button';
 import { Toggle } from '../../../action/toggle';
 import { ToggleGroup } from '../../../action/toggle-group';
 import { Popover } from '../../../overlay/popover';
-import { Calendar } from '../../calendar';
 import { stepOf, type SchedulerView } from '../lib/layout';
 
 import type { WeekDay } from '../../../../internal/date-locale';
@@ -96,13 +96,12 @@ export function SchedulerToolbar({
           className={styles.datePopup()}
         >
           <LanguageContext value={{ ...language, tag: withWeekStart(locale, weekStartsOn) }}>
-            <Calendar
+            <SchedulerDatePicker
               aria-label={t('scheduler.goToDate')}
-              value={date}
-              defaultMonth={date}
+              date={date}
               today={today}
-              onValueChange={(picked) => {
-                if (picked) onDateChange(picked);
+              onPick={(picked) => {
+                onDateChange(picked);
                 setPicking(false);
               }}
             />

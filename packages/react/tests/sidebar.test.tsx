@@ -6,7 +6,7 @@ import { afterEach, expect, onTestFinished, test, vi, type Mock } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Chip, IdsProvider, Sidebar } from '../src';
+import { Chip, IdsProvider, Sidebar, useSidebar, type SidebarOptions } from '../src';
 import { skipWithoutCdp } from './engines';
 import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
 import { testTheme } from './theme';
@@ -22,7 +22,8 @@ afterEach(async () => {
 function Menu() {
   return (
     <>
-      <Sidebar.Group label="워크스페이스">
+      <Sidebar.Group>
+        <Sidebar.Group.Label>워크스페이스</Sidebar.Group.Label>
         <Sidebar.Item value="/" href="#home">
           <HomeIcon />홈
         </Sidebar.Item>
@@ -32,7 +33,8 @@ function Menu() {
           <Chip variant="solid">3</Chip>
         </Sidebar.Item>
       </Sidebar.Group>
-      <Sidebar.Group label="설정">
+      <Sidebar.Group>
+        <Sidebar.Group.Label>설정</Sidebar.Group.Label>
         <Sidebar.Item>
           <Cog6ToothIcon />
           설정
@@ -46,6 +48,12 @@ function Menu() {
       </Sidebar.Group>
     </>
   );
+}
+
+function CollapsingSidebar({ collapse, shortcut, ...props }: Sidebar.Props & SidebarOptions) {
+  const sidebar = useSidebar({ collapse, shortcut });
+
+  return <Sidebar {...props} sidebar={sidebar} />;
 }
 
 const ui = (children: ReactNode) => <IdsProvider theme={testTheme}>{children}</IdsProvider>;
@@ -80,15 +88,14 @@ test('collapsible adds a collapse button to the header that hides the labels and
   const onCollapsedChange = vi.fn();
   const screen = await render(
     ui(
-      <Sidebar
+      <CollapsingSidebar
         aria-label="사이드바"
         value="/"
-        collapsible="icon"
-        onCollapsedChange={onCollapsedChange}
+        collapse={{ mode: 'icon', onCollapsedChange }}
       >
         <Sidebar.Header>로고</Sidebar.Header>
         <Menu />
-      </Sidebar>,
+      </CollapsingSidebar>,
     ),
   );
 
@@ -111,9 +118,9 @@ test('Mod+B collapses and expands, and persist writes the state to a cookie', as
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar aria-label="사이드바" collapsible="icon" persist="sidebar">
+      <CollapsingSidebar aria-label="사이드바" collapse={{ mode: 'icon', persist: 'sidebar' }}>
         <Menu />
-      </Sidebar>,
+      </CollapsingSidebar>,
     ),
   );
 
@@ -133,9 +140,9 @@ test('Mod+B typed in a text field stays with the field', async () => {
   const screen = await render(
     ui(
       <div className="flex">
-        <Sidebar aria-label="사이드바" collapsible="icon" onCollapsedChange={onCollapsedChange}>
+        <CollapsingSidebar aria-label="사이드바" collapse={{ mode: 'icon', onCollapsedChange }}>
           <Menu />
-        </Sidebar>
+        </CollapsingSidebar>
         <main>
           <input aria-label="본문" data-1p-ignore data-lpignore="true" />
         </main>
@@ -153,9 +160,9 @@ test('Mod+B typed in a text field stays with the field', async () => {
 test('defaultCollapsed renders the icon rail in the server HTML', () => {
   const html = renderToString(
     ui(
-      <Sidebar aria-label="사이드바" collapsible="icon" defaultCollapsed>
+      <CollapsingSidebar aria-label="사이드바" collapse={{ mode: 'icon', defaultCollapsed: true }}>
         <Menu />
-      </Sidebar>,
+      </CollapsingSidebar>,
     ),
   );
 
@@ -189,9 +196,9 @@ test('a nested item opens as an accordion, and as a menu in the icon rail', asyn
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar aria-label="사이드바" value="/settings/alerts" collapsible="icon">
+      <CollapsingSidebar aria-label="사이드바" value="/settings/alerts" collapse={{ mode: 'icon' }}>
         <Menu />
-      </Sidebar>,
+      </CollapsingSidebar>,
     ),
   );
 
@@ -217,7 +224,8 @@ test('a collapsible group folds its list', async () => {
   const screen = await render(
     ui(
       <Sidebar aria-label="사이드바">
-        <Sidebar.Group label="즐겨찾기" collapsible>
+        <Sidebar.Group collapse={{}}>
+          <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
           <Sidebar.Item href="#a">문서</Sidebar.Item>
         </Sidebar.Group>
       </Sidebar>,
@@ -233,15 +241,43 @@ test('a collapsible group folds its list', async () => {
   expect(panel.querySelector('a[href="#a"]')).not.toBeNull();
 });
 
+test('a group collapse takes the open trio, and useSidebar collapses to the icon rail by default', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onOpenChange = vi.fn();
+  const screen = await render(
+    ui(
+      <CollapsingSidebar aria-label="사이드바" collapse={{}}>
+        <Sidebar.Group collapse={{ open: false, onOpenChange }}>
+          <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
+          <Sidebar.Item href="#a">문서</Sidebar.Item>
+        </Sidebar.Group>
+      </CollapsingSidebar>,
+    ),
+  );
+
+  const label = screen.getByRole('button', { name: '즐겨찾기' });
+  await expect.element(label).toHaveAttribute('aria-expanded', 'false');
+  await userEvent.click(label);
+  expect(onOpenChange).toHaveBeenLastCalledWith(true);
+  await expect.element(label).toHaveAttribute('aria-expanded', 'false');
+
+  await userEvent.click(screen.getByRole('button', { name: '접기' }));
+  await expect
+    .element(screen.getByRole('complementary'))
+    .toHaveAttribute('data-collapsible', 'icon');
+});
+
 test('a group hands its section props to its section, collapsible or not', async () => {
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
       <Sidebar aria-label="사이드바">
-        <Sidebar.Group label="즐겨찾기" collapsible id="favorites" data-testid="collapsible">
+        <Sidebar.Group id="favorites" data-testid="collapsible" collapse={{}}>
+          <Sidebar.Group.Label>즐겨찾기</Sidebar.Group.Label>
           <Sidebar.Item href="#a">문서</Sidebar.Item>
         </Sidebar.Group>
-        <Sidebar.Group label="채널" id="channels" data-testid="fixed">
+        <Sidebar.Group id="channels" data-testid="fixed">
+          <Sidebar.Group.Label>채널</Sidebar.Group.Label>
           <Sidebar.Item href="#b">공지</Sidebar.Item>
         </Sidebar.Group>
       </Sidebar>,
@@ -284,10 +320,10 @@ test('with a Provider, a Trigger outside the sidebar shares its state and offcan
   const screen = await render(
     ui(
       <Sidebar.Provider>
-        <Sidebar aria-label="사이드바" collapsible="offcanvas" variant="inset">
+        <CollapsingSidebar aria-label="사이드바" variant="inset" collapse={{ mode: 'offcanvas' }}>
           <Sidebar.Header>로고</Sidebar.Header>
           <Menu />
-        </Sidebar>
+        </CollapsingSidebar>
         <Sidebar.Inset>
           <Sidebar.Trigger data-testid="outside" />
           본문
@@ -315,13 +351,13 @@ test('offcanvas or inset without a Provider warns in development', async () => {
 
   await render(
     ui(
-      <Sidebar aria-label="사이드바" collapsible="offcanvas" variant="inset">
+      <CollapsingSidebar aria-label="사이드바" variant="inset" collapse={{ mode: 'offcanvas' }}>
         <Menu />
-      </Sidebar>,
+      </CollapsingSidebar>,
     ),
   );
 
-  expect(warn).toHaveBeenCalledWith(expect.stringContaining('collapsible="offcanvas"'));
+  expect(warn).toHaveBeenCalledWith(expect.stringContaining('mode: "offcanvas"'));
   expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="inset"'));
 });
 
@@ -329,7 +365,7 @@ test('items nest to any depth, as accordions in the panel and as nested menus in
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
     ui(
-      <Sidebar aria-label="사이드바" value="frontend-issues" collapsible="icon">
+      <CollapsingSidebar aria-label="사이드바" value="frontend-issues" collapse={{ mode: 'icon' }}>
         <Sidebar.Item value="info">
           <HomeIcon />
           인포팀
@@ -343,7 +379,7 @@ test('items nest to any depth, as accordions in the panel and as nested menus in
             </Sidebar.Item>
           </Sidebar.Item>
         </Sidebar.Item>
-      </Sidebar>,
+      </CollapsingSidebar>,
     ),
   );
 
@@ -382,27 +418,31 @@ function Docs({
   canMove,
 }: {
   onItemsChange: Mock;
-  canMove?: Sidebar.Group.ItemsProps<Doc>['canMove'];
+  canMove?: Sidebar.Group.Sortable<Doc>['canMove'];
 }) {
   const [docs, setDocs] = useState(DOCS);
 
   return (
     <Sidebar aria-label="사이드바">
-      <Sidebar.Group
-        label="문서"
-        items={docs}
-        canMove={canMove}
-        onItemsChange={(next, move) => {
-          onItemsChange(move);
-          setDocs(next);
-        }}
-      >
-        {(doc) => (
-          <Sidebar.Item value={doc.id} href={`#${doc.id}`}>
-            <DocumentTextIcon />
-            {doc.label}
-          </Sidebar.Item>
-        )}
+      <Sidebar.Group>
+        <Sidebar.Group.Label>문서</Sidebar.Group.Label>
+        <Sidebar.Group.Tree
+          items={docs}
+          sortable={{
+            onItemsChange: (next, move) => {
+              onItemsChange(move);
+              setDocs(next);
+            },
+            canMove,
+          }}
+        >
+          {(doc) => (
+            <Sidebar.Item value={doc.id} href={`#${doc.id}`}>
+              <DocumentTextIcon />
+              {doc.label}
+            </Sidebar.Item>
+          )}
+        </Sidebar.Group.Tree>
       </Sidebar.Group>
     </Sidebar>
   );

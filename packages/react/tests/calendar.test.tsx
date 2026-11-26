@@ -4,20 +4,51 @@ import { expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Calendar, IdsProvider } from '../src';
+import { Calendar, IdsProvider, useCalendar, type DateMatcher } from '../src';
 import { koreanTextIn } from './locale';
 import { testTheme } from './theme';
 
+type TestCalendarProps = Calendar.Props & {
+  min?: CalendarDate;
+  max?: CalendarDate;
+  unavailable?: DateMatcher | DateMatcher[];
+  monthsToShow?: number;
+  today?: CalendarDate;
+  month?: CalendarDate;
+  defaultMonth?: CalendarDate;
+  onMonthChange?: (month: CalendarDate) => void;
+};
+
+function TestCalendar({
+  min,
+  max,
+  unavailable,
+  monthsToShow,
+  today,
+  month,
+  defaultMonth,
+  onMonthChange,
+  ...props
+}: TestCalendarProps) {
+  const calendar = useCalendar({
+    availability: { min, max, unavailable },
+    display: { monthsToShow, today },
+    month: { value: month, defaultValue: defaultMonth, onValueChange: onMonthChange },
+  });
+
+  return <Calendar {...props} calendar={calendar} />;
+}
+
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
-const ssr = (props: Partial<Calendar.Props>, locale?: string) =>
+const ssr = (props: Partial<TestCalendarProps>, locale?: string) =>
   parse(
     renderToString(
       locale ? (
         <IdsProvider theme={testTheme} locale={koreanTextIn(locale)}>
-          <Calendar {...({ 'aria-label': '달력', ...props } as Calendar.Props)} />
+          <TestCalendar {...({ 'aria-label': '달력', ...props } as TestCalendarProps)} />
         </IdsProvider>
       ) : (
-        <Calendar {...({ 'aria-label': '달력', ...props } as Calendar.Props)} />
+        <TestCalendar {...({ 'aria-label': '달력', ...props } as TestCalendarProps)} />
       ),
     ),
   );
@@ -114,7 +145,12 @@ test('diagnostics for mismatched values, limits and parts outside the calendar',
 test('keyboard: month ends clamp, Home and End follow the week start, Shift jumps', async () => {
   await render(
     <IdsProvider theme={testTheme} locale={koreanTextIn('ko-KR-u-fw-mon')}>
-      <Calendar aria-label="달력" defaultValue={d(2024, 1, 31)} today={d(2024, 1, 1)} autoFocus />
+      <TestCalendar
+        aria-label="달력"
+        defaultValue={d(2024, 1, 31)}
+        today={d(2024, 1, 1)}
+        autoFocus
+      />
     </IdsProvider>,
   );
   await expect.element(day('2024-01-31')).toHaveFocus();
@@ -141,7 +177,12 @@ test('keyboard: month ends clamp, Home and End follow the week start, Shift jump
 test('an inherited right-to-left direction swaps the horizontal arrows', async () => {
   const screen = await render(
     <div dir="rtl">
-      <Calendar aria-label="달력" defaultValue={d(2026, 9, 15)} today={d(2026, 9, 15)} autoFocus />
+      <TestCalendar
+        aria-label="달력"
+        defaultValue={d(2026, 9, 15)}
+        today={d(2026, 9, 15)}
+        autoFocus
+      />
     </div>,
   );
   await expect.element(screen.getByRole('group', { name: '달력' })).toHaveAttribute('dir', 'rtl');
@@ -155,12 +196,12 @@ test('an inherited right-to-left direction swaps the horizontal arrows', async (
 test('single: blocked days refuse, the value is a CalendarDate, a re-click is no change', async () => {
   const changes: (CalendarDate | null)[] = [];
   await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       today={d(2026, 9, 15)}
       min={d(2026, 9, 10)}
       max={d(2026, 9, 20)}
-      disabled={(date) => date.day === 16}
+      unavailable={(date) => date.day === 16}
       onValueChange={(next) => changes.push(next)}
     />,
   );
@@ -186,17 +227,17 @@ test('single: blocked days refuse, the value is a CalendarDate, a re-click is no
 test('a DayPicker matcher blocks days, and equal min and max leave one day and no months', async () => {
   let value = null as CalendarDate | null;
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       today={d(2026, 9, 15)}
-      disabled={{ dayOfWeek: [0, 6] }}
+      unavailable={{ dayOfWeek: [0, 6] }}
       onValueChange={(next) => (value = next)}
     />,
   );
   await expect.element(day('2026-09-19')).toHaveAttribute('disabled');
   await expect.element(day('2026-09-18')).not.toHaveAttribute('disabled');
   await screen.rerender(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       key="one day"
       today={d(2026, 9, 15)}
@@ -218,7 +259,7 @@ test('a DayPicker matcher blocks days, and equal min and max leave one day and n
 test('range: a partial value, ordered ends, restart, and a preview under the pointer or focus', async () => {
   let value = null as Calendar.Range | null;
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       selectionMode="range"
       today={d(2026, 9, 15)}
@@ -258,7 +299,7 @@ test('range: a partial value, ordered ends, restart, and a preview under the poi
 test('multiple toggles by day and marks the grid multiselectable', async () => {
   let value: CalendarDate[] = [];
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       selectionMode="multiple"
       today={d(2026, 9, 15)}
@@ -276,7 +317,12 @@ test('multiple toggles by day and marks the grid multiselectable', async () => {
 test('readOnly browses without changes and keeps a value; disabled blocks navigation and selection', async () => {
   const onValueChange = vi.fn();
   const screen = await render(
-    <Calendar aria-label="달력" today={d(2026, 9, 15)} onValueChange={onValueChange} readOnly />,
+    <TestCalendar
+      aria-label="달력"
+      today={d(2026, 9, 15)}
+      onValueChange={onValueChange}
+      readOnly
+    />,
   );
   await userEvent.click(day('2026-09-15'));
   expect(onValueChange).not.toHaveBeenCalled();
@@ -284,7 +330,7 @@ test('readOnly browses without changes and keeps a value; disabled blocks naviga
   await userEvent.click(screen.getByRole('button', { name: '다음 달' }));
   await expect.element(day('2026-10-15')).toBeInTheDocument();
   await screen.rerender(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       key="readonly value"
       today={d(2026, 9, 15)}
@@ -296,7 +342,7 @@ test('readOnly browses without changes and keeps a value; disabled blocks naviga
   await userEvent.click(day('2026-09-20'));
   await expect.element(day('2026-09-20')).not.toHaveAttribute('data-selected');
   await screen.rerender(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       key="disabled"
       today={d(2026, 9, 15)}
@@ -318,7 +364,7 @@ test('readOnly browses without changes and keeps a value; disabled blocks naviga
 test('caption dropdowns jump by year and month within min and max', async () => {
   const months: CalendarDate[] = [];
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       today={d(2026, 9, 15)}
       min={d(2020, 3, 10)}
@@ -326,7 +372,7 @@ test('caption dropdowns jump by year and month within min and max', async () => 
       onMonthChange={(next) => months.push(next)}
     >
       <Calendar.Caption layout="dropdown" />
-    </Calendar>,
+    </TestCalendar>,
   );
   const [year, month] = screen.container.querySelectorAll('select');
   expect(year).toHaveAttribute('aria-label', '년');
@@ -353,9 +399,9 @@ test('caption dropdowns jump by year and month within min and max', async () => 
 
 test('without limits the year menu spans a century either side of today', async () => {
   const screen = await render(
-    <Calendar aria-label="달력" today={d(2026, 9, 15)}>
+    <TestCalendar aria-label="달력" today={d(2026, 9, 15)}>
       <Calendar.Caption layout="dropdown" />
-    </Calendar>,
+    </TestCalendar>,
   );
   const year = screen.getByRole('combobox', { name: '년' }).element() as HTMLSelectElement;
   expect(year.options[0].value).toBe('1926');
@@ -366,14 +412,14 @@ test('without limits the year menu spans a century either side of today', async 
 test('a month picked in the second caption lands in the second grid', async () => {
   const months: CalendarDate[] = [];
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       monthsToShow={2}
       today={d(2026, 9, 15)}
       onMonthChange={(next) => months.push(next)}
     >
       <Calendar.Caption layout="dropdown" />
-    </Calendar>,
+    </TestCalendar>,
   );
   const selects = screen.getByRole('combobox', { name: '월' });
   expect(selects.elements()).toHaveLength(2);
@@ -385,7 +431,7 @@ test('a month picked in the second caption lands in the second grid', async () =
 test('Previous and Next are ghost IconButtons that keep focus once the last month is reached', async () => {
   const months: CalendarDate[] = [];
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       today={d(2026, 9, 15)}
       max={d(2026, 10, 31)}
@@ -420,7 +466,7 @@ test('Previous and Next are ghost IconButtons that keep focus once the last mont
 
 test('several months: Previous before the first grid only, Next after the last only', async () => {
   const screen = await render(
-    <Calendar aria-label="달력" today={d(2026, 9, 15)} monthsToShow={3} />,
+    <TestCalendar aria-label="달력" today={d(2026, 9, 15)} monthsToShow={3} />,
   );
   const months = screen
     .getByRole('grid')
@@ -442,7 +488,7 @@ test('several months: Previous before the first grid only, Next after the last o
 test('a controlled month waits for the parent', async () => {
   let month = null as CalendarDate | null;
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       today={d(2026, 9, 15)}
       month={d(2026, 9, 1)}
@@ -457,12 +503,12 @@ test('a controlled month waits for the parent', async () => {
 test('Calendar.Day children replace only the content and get the day state; modifiers and a footer', async () => {
   const states: Record<string, Calendar.DayState> = {};
   const screen = await render(
-    <Calendar
+    <TestCalendar
       aria-label="달력"
       selectionMode="range"
       today={d(2026, 9, 15)}
       defaultValue={{ start: d(2026, 9, 21), end: d(2026, 9, 23) }}
-      disabled={d(2026, 9, 5)}
+      unavailable={d(2026, 9, 5)}
     >
       <Calendar.Day
         modifiers={{ event: [d(2026, 9, 4), d(2026, 9, 22)], weekend: { dayOfWeek: [0, 6] } }}
@@ -479,7 +525,7 @@ test('Calendar.Day children replace only the content and get the day state; modi
         }}
       </Calendar.Day>
       <Calendar.Footer>일정 2개</Calendar.Footer>
-    </Calendar>,
+    </TestCalendar>,
   );
   expect(day('2026-09-04').querySelector('[data-event-dot]')).toBeInTheDocument();
   expect(day('2026-09-06').querySelector('[data-event-dot]')).toBeNull();
@@ -547,8 +593,12 @@ test('parts: Day modifiers reach the day state; WeekNumber, a dropdown Caption a
 });
 
 test('every DateMatcher form blocks the days it names', () => {
-  const blocked = (disabled: Calendar.Props['disabled']) =>
-    [...ssr({ today: d(2026, 9, 15), disabled }).querySelectorAll('[data-calendar-day][disabled]')]
+  const blocked = (unavailable: TestCalendarProps['unavailable']) =>
+    [
+      ...ssr({ today: d(2026, 9, 15), unavailable }).querySelectorAll(
+        '[data-calendar-day][disabled]',
+      ),
+    ]
       .map((node) => node.getAttribute('data-calendar-day'))
       .filter((key) => key!.startsWith('2026-09'));
   expect(blocked(d(2026, 9, 9))).toEqual(['2026-09-09']);
@@ -621,7 +671,7 @@ test('values are checked by shape: a lookalike passes, a Date or another calenda
 test('root className and style accept a function of the calendar state; native props reach it', async () => {
   let pressed = '';
   const screen = await render(
-    <Calendar
+    <TestCalendar
       today={d(2026, 9, 15)}
       defaultValue={d(2026, 9, 18)}
       id="schedule"
@@ -652,7 +702,7 @@ function colorOf(variable: string) {
 test('a range band is primary subtle, a preview neutral, and today a primary label and ring', async () => {
   await render(
     <IdsProvider theme={testTheme}>
-      <Calendar
+      <TestCalendar
         aria-label="달력"
         selectionMode="range"
         defaultValue={{ start: d(2026, 9, 10), end: d(2026, 9, 17) }}

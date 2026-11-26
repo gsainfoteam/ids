@@ -19,7 +19,15 @@ import { describe, expect, onTestFinished, test, type TestContext } from 'vitest
 import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Calendar, DateField, DateTimeField, IdsProvider, Scheduler, TimeField } from '../src';
+import {
+  Calendar,
+  DateField,
+  DateTimeField,
+  IdsProvider,
+  Scheduler,
+  TimeField,
+  useScheduler,
+} from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 
@@ -221,17 +229,26 @@ describe.each(BROWSER_ZONES)('an app in %s that holds Date objects', (zone) => {
     const tz = getLocalTimeZone();
     const start = new Date(2026, 8, 5, 21, 0);
     const end = new Date(2026, 8, 5, 22, 0);
+    function DayOfTheCall() {
+      const scheduler = useScheduler({
+        views: { defaultValue: 'day' },
+        navigation: { defaultValue: toCalendarDate(fromDate(start, tz)) },
+      });
+
+      return (
+        <Scheduler
+          aria-label="일정표"
+          scheduler={scheduler}
+          events={[
+            { id: 'call', title: 'Call', start: fromDate(start, tz), end: fromDate(end, tz) },
+          ]}
+        />
+      );
+    }
     await render(
       inIds(
         <div className="flex h-[600px] flex-col">
-          <Scheduler
-            aria-label="일정표"
-            defaultView="day"
-            defaultDate={toCalendarDate(fromDate(start, tz))}
-            events={[
-              { id: 'call', title: 'Call', start: fromDate(start, tz), end: fromDate(end, tz) },
-            ]}
-          />
+          <DayOfTheCall />
         </div>,
       ),
     );

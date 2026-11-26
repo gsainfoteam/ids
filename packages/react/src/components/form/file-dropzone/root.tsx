@@ -2,6 +2,7 @@
 
 import { ArrowUpTrayIcon } from '@heroicons/react/16/solid';
 
+import { FileDropzoneTitle } from './parts/title';
 import { fileDropzoneStyle } from './style';
 import { resolveState } from '../../../internal/lib/state-props';
 import { invariant } from '../../../utils';
@@ -14,25 +15,28 @@ import { FileMessages } from '../file-field/parts/messages';
 import { FilePicker } from '../file-field/parts/picker';
 import { FileTrigger } from '../file-field/parts/trigger';
 
-import type { FileFieldProps, FileFieldState, FileFieldVariant } from '../file-field/root';
+import type {
+  FileFieldBaseProps,
+  FileFieldState,
+  FileFieldValueProps,
+  FileFieldVariant,
+} from '../file-field/root';
 
 export type FileDropzoneVariant = FileFieldVariant;
 export type FileDropzoneState = FileFieldState;
-export type FileDropzoneProps = FileFieldProps;
+export type FileDropzoneProps = FileFieldBaseProps & FileFieldValueProps;
 
 export function FileDropzoneRoot(props: FileDropzoneProps) {
   const { variant = 'outline', className, style } = props;
-  const {
-    context,
-    rootProps,
-    picker,
-    messages,
-    structure: nodes,
-    limitsParts,
-  } = useInternalFileFieldRoot(props, 'dropzone');
-  const { state, placeholder } = context;
+  const { context, rootProps, picker, messages, structure, limitsParts } = useInternalFileFieldRoot(
+    props,
+    'dropzone',
+  );
+  const { state } = context;
   const styles = fileDropzoneStyle({ variant, size: context.size });
 
+  const titleParts = structure.filter(isType(FileDropzoneTitle));
+  const nodes = structure.filter((node) => !titleParts.includes(node));
   invariant(
     !nodes.length || nodes.filter(isType(FileTrigger)).length === 1,
     'FileDropzone: explicit children require exactly one Trigger.',
@@ -46,7 +50,7 @@ export function FileDropzoneRoot(props: FileDropzoneProps) {
   const triggerContent = (
     <>
       <ArrowUpTrayIcon aria-hidden="true" className={styles.dropIcon()} />
-      {placeholder && <span className={styles.title()}>{placeholder}</span>}
+      {titleParts}
       {limitsParts}
     </>
   );

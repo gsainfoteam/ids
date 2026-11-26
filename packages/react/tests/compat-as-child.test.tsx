@@ -834,7 +834,7 @@ const STATIC_TARGETS: StaticTarget[] = [
     marker: 'data-skeleton',
     inertWhileLoading: true,
     render: (child) => (
-      <Skeleton asChild loading>
+      <Skeleton asChild>
         {child({})}
       </Skeleton>
     ),

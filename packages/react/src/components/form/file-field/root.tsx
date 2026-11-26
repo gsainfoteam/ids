@@ -11,7 +11,6 @@ import { PaperClipIcon } from '@heroicons/react/16/solid';
 
 import { FileContext } from './context';
 import { useInternalFileFieldRoot } from './hooks/use-file-field-root';
-import { type FileFieldRejection } from './lib/file-rules';
 import { isType } from './lib/is-type';
 import { FileClear } from './parts/clear';
 import { FileList } from './parts/list';
@@ -24,6 +23,7 @@ import { fileFieldStyle } from './style';
 import { resolveState } from '../../../internal/lib/state-props';
 import { invariant } from '../../../utils';
 
+import type { FileFieldInstance } from './hooks/use-file-field';
 import type { IdsSize } from '../../../tokens/types';
 
 export type FileFieldVariant = 'outline' | 'soft' | 'ghost';
@@ -42,7 +42,7 @@ export type FileFieldItemState = { file: File; index: number };
 
 type ButtonProps = 'onClick' | 'onBlur' | 'onFocus' | 'onKeyDown' | 'ref';
 
-type BaseProps = Omit<
+export type FileFieldBaseProps = Omit<
   ComponentProps<'input'>,
   | 'type'
   | 'size'
@@ -63,33 +63,29 @@ type BaseProps = Omit<
   Pick<ComponentProps<'button'>, ButtonProps> & {
     variant?: FileFieldVariant;
     size?: IdsSize;
-    invalid?: boolean;
-    maxSize?: number;
-    maxCount?: number;
-    onReject?: (rejections: FileFieldRejection[]) => void;
+    fileField?: FileFieldInstance;
     onDrop?: DragEventHandler<HTMLDivElement>;
     onDragOver?: DragEventHandler<HTMLDivElement>;
-    placeholder?: ReactNode;
     className?: string | ((state: FileFieldState) => string | undefined);
     style?: CSSProperties;
     children?: ReactNode;
   };
 
-export type FileFieldProps = BaseProps &
-  (
-    | {
-        multiple?: false;
-        value?: File | null;
-        defaultValue?: File | null;
-        onValueChange?: (value: File | null) => void;
-      }
-    | {
-        multiple: true;
-        value?: File[];
-        defaultValue?: File[];
-        onValueChange?: (value: File[]) => void;
-      }
-  );
+export type FileFieldValueProps =
+  | {
+      multiple?: false;
+      value?: File | null;
+      defaultValue?: File | null;
+      onValueChange?: (value: File | null) => void;
+    }
+  | {
+      multiple: true;
+      value?: File[];
+      defaultValue?: File[];
+      onValueChange?: (value: File[]) => void;
+    };
+
+export type FileFieldProps = FileFieldBaseProps & { placeholder?: string } & FileFieldValueProps;
 
 export function FileFieldRoot(props: FileFieldProps) {
   const { variant = 'outline', multiple = false, className, style } = props;

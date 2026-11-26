@@ -268,7 +268,7 @@ export const StackADrawerOnADrawer: Story = {
           </Drawer.Description>
         </Drawer.Header>
         <Select aria-label="언어" defaultValue="ko">
-          <Select.Content mobileVariant="drawer">
+          <Select.Content narrow="drawer">
             <Select.Item value="ko">한국어</Select.Item>
             <Select.Item value="en">English</Select.Item>
           </Select.Content>

@@ -4,10 +4,10 @@
 
 - **세 가지 입력.** 버튼으로 고르고, 필드에 끌어다 놓고, 포커스를 둔 채 붙여넣습니다. 스크린샷도 붙여넣기로 바로 들어갑니다.
 - **미리보기.** 이미지는 썸네일로 보입니다. 파일을 지우거나 필드가 사라지면 썸네일 주소를 바로 해제합니다.
-- **제한과 거부 사유.** `accept`, `maxSize`, `maxCount` 에 걸린 파일은 빼고 받습니다. 규칙과 거부 사유의 문구는 앱이 `FileField.Limits`, `FileField.Rejection` 으로 씁니다.
+- **제한과 거부 사유.** `accept` 와 `useFileField` 의 `limits`(`maxSize`, `maxCount`)에 걸린 파일은 빼고 받습니다. 규칙과 거부 사유의 문구는 앱이 `FileField.Limits`, `FileField.Rejection` 으로 씁니다.
 - **폼.** 지금 고른 `File` 이 그대로 FormData 에 들어갑니다. `required` 는 브라우저 검증이 막고, `<button type="reset">` 은 처음 값으로 되돌립니다.
 - **너비.** 부모 너비를 다 채웁니다(`w-full min-w-0`). 너비와 위치는 감싸는 요소가 정합니다: `<div className="w-80"><FileField /></div>`.
-- **끌어 놓는 영역이 필요하면 [FileDropzone](../file-dropzone/README.md).** 같은 값, 제한, part 를 받고, 필드 대신 넓은 영역을 그립니다.
+- **끌어 놓는 영역이 필요하면 [FileDropzone](../file-dropzone/README.md).** 같은 값, `useFileField`, part 를 받고, 필드 대신 넓은 영역을 그립니다.
 
 ```tsx
 import { Field, FileField } from '@gsainfoteam/ids-react';
@@ -43,12 +43,20 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 ## 제한과 거부
 
 ```tsx
+import { FileField, useFileField } from '@gsainfoteam/ids-react';
+
+const fileField = useFileField({
+  limits: {
+    maxSize: 5 * 1024 * 1024, // 파일당 bytes
+    maxCount: 5, // 여러 개일 때 전체 개수
+    onReject: (rejections) => {}, // [{ file, reason: 'type' | 'size' | 'count' }]
+  },
+});
+
 <FileField
   multiple
   accept="image/*,.pdf" // MIME 은 File.type, 확장자는 이름 끝을 대소문자 무시로 본다
-  maxSize={5 * 1024 * 1024} // 파일당 bytes
-  maxCount={5} // 여러 개일 때 전체 개수
-  onReject={(rejections) => {}} // [{ file, reason: 'type' | 'size' | 'count' }]
+  fileField={fileField}
 >
   <FileField.Limits>
     {({ accept, maxSize, maxCount }) => `이미지, PDF · 파일당 최대 5 MB · 최대 ${maxCount}개`}
@@ -67,6 +75,8 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 </FileField>
 ```
 
+- 크기와 개수 제한, 거부 콜백은 한 기능이라 `useFileField({ limits })` 에 모읍니다. 결과를 `fileField` 로 넘기고, FileDropzone 도 같은 결과를 받습니다. `fileField` 를 생략하면 `accept` 말고는 제한이 없습니다.
+- `accept` 와 `multiple` 은 native input 의 속성이라 루트에 그대로 둡니다.
 - 걸린 파일만 빼고 나머지는 받습니다. 모두 걸리면 이전 값을 그대로 둡니다.
 - 거부가 있으면 트리거가 `aria-invalid` 가 됩니다. 다음에 제대로 고르거나 지우거나 초기화하면 풀립니다.
 - `FileField.Limits` 의 자식 함수는 `{ accept, maxSize, maxCount }` 를 받습니다. `accept` 는 소문자로 다듬은 토큰 배열, `maxCount` 는 여러 개일 때만 옵니다. 컨트롤 아래에 그리고 트리거의 `aria-describedby` 로 잇습니다.
@@ -120,12 +130,14 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 ## 상태
 
 ```tsx
-<FileField value={resume} onValueChange={setResume} onReject={setRejections} />
+const fileField = useFileField({ limits: { onReject: setRejections } });
+
+<FileField value={resume} onValueChange={setResume} fileField={fileField} />
 ```
 
-- 앱은 값을 `value` / `onValueChange` 로, 거부된 파일을 `onReject` 로 읽습니다. 비어 있는지는 `null` 이나 빈 배열로 압니다.
+- 앱은 값을 `value` / `onValueChange` 로, 거부된 파일을 `limits.onReject` 로 읽습니다. 비어 있는지는 `null` 이나 빈 배열로 압니다.
 - `disabled`, `readOnly`, `required` 는 앱이 준 값 그대로입니다.
-- `invalid` 는 앱이 준 값이거나, `onReject` 로 받은 거부 파일이 남아 있는 동안 켜집니다.
+- 상태의 `invalid` 는 `aria-invalid` 나 감싼 `Field` 의 `invalid` 가 켜졌을 때, 또는 `onReject` 로 받은 거부 파일이 남아 있는 동안 켜집니다. `invalid` prop 은 없습니다.
 - 새 디자인을 그릴 때만, 루트와 `Trigger` 의 `className` 은 `FileField.State`(`dragging` 포함)를 받는 함수도 됩니다.
 
 ## 폼
@@ -161,7 +173,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 ```tsx
 <FileField variant="soft" />          // outline(기본) / soft / ghost
 <FileField size="tiny" />             // standard / tiny. 생략하면 Field 를 따른다
-<FileField invalid />                 // danger 색
+<FileField aria-invalid />            // danger 색. Field 안이면 Field 의 invalid 를 따른다
 ```
 
 ## 속성
@@ -172,12 +184,11 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `value` / `defaultValue` | 생략하면 비제어. 기본 `null` / `[]`                                                     |
 | `onValueChange`          | 값이 바뀔 때                                                                            |
 | `accept`                 | 쉼표로 구분한 MIME 또는 `.확장자`. 형식이 틀리면 오류                                   |
-| `maxSize` / `maxCount`   | 파일당 bytes / 여러 개일 때 개수                                                        |
-| `onReject`               | 거부 목록                                                                               |
+| `fileField`              | `useFileField({ limits: { maxSize, maxCount, onReject } })` 의 결과                     |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                                                      |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기                                              |
-| `placeholder`            | 기본값 없음. 비어 있을 때 트리거에 보인다                                               |
-| `invalid`                | danger 색. 명시한 `aria-invalid` 가 우선하고, 거부가 있으면 늘 오류                     |
+| `placeholder`            | 문자열. 기본값 없음. 비어 있을 때 트리거에 보인다                                       |
+| `aria-invalid`           | danger 색. 생략하면 `Field` 의 `invalid` 를 따르고, 거부가 있으면 늘 오류               |
 | `disabled` / `readOnly`  | 고르기, 놓기, 붙여넣기, 지우기를 막는다                                                 |
 | `name` / `form`          | 지금 파일을 같은 이름으로 제출                                                          |
 | `required`               | 브라우저 검증                                                                           |

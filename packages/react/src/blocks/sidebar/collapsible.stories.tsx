@@ -20,7 +20,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Skeleton } from '../../components/feedback/skeleton';
-import { Sidebar } from '../../components/navigation/sidebar';
+import { Sidebar, useSidebar } from '../../components/navigation/sidebar';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -107,13 +107,14 @@ const PINNED: {
 export const PC: Story = {
   render: function Render() {
     const [current, setCurrent] = useState('shuttle');
+    const sidebar = useSidebar({ collapse: { mode: 'icon' } });
 
     const label = [...ITEMS, ...PINNED].find((item) => item.id === current)!.label;
 
     return (
       <div className="break-keep">
         <Sidebar.Provider>
-          <Sidebar value={current} collapsible="icon" aria-label="주 메뉴">
+          <Sidebar value={current} sidebar={sidebar} aria-label="주 메뉴">
             <Sidebar.Header>
               <Avatar name="인포팀" size="tiny" aria-hidden>
                 <Avatar.Fallback>
@@ -137,7 +138,8 @@ export const PC: Story = {
                 {item.badge}
               </Sidebar.Item>
             ))}
-            <Sidebar.Group label="고정한 페이지">
+            <Sidebar.Group>
+              <Sidebar.Group.Label>고정한 페이지</Sidebar.Group.Label>
               {PINNED.map((item) => (
                 <Sidebar.Item
                   key={item.id}
@@ -176,7 +178,7 @@ export const PC: Story = {
                 <Sidebar.Trigger />
                 <h1 className="text-headline-h3-bold">{label}</h1>
               </div>
-              <Skeleton loading>
+              <Skeleton>
                 <p className="text-body-b3-regular">
                   수강 신청은 9월 1일 오전 10시에 열립니다. 신청 전에 졸업 요건과 선수 과목을
                   확인하고, 시간표가 겹치지 않는지 미리 살펴 두세요.
@@ -184,21 +186,21 @@ export const PC: Story = {
               </Skeleton>
               <div className="grid gap-4 lg:grid-cols-3">
                 <div className="grid h-32">
-                  <Skeleton loading asChild>
+                  <Skeleton asChild>
                     <Card>
                       <Card.Title>수강 신청</Card.Title>
                     </Card>
                   </Skeleton>
                 </div>
                 <div className="grid h-32">
-                  <Skeleton loading asChild>
+                  <Skeleton asChild>
                     <Card>
                       <Card.Title>장학금 안내</Card.Title>
                     </Card>
                   </Skeleton>
                 </div>
                 <div className="grid h-32">
-                  <Skeleton loading asChild>
+                  <Skeleton asChild>
                     <Card>
                       <Card.Title>동아리 모집</Card.Title>
                     </Card>
@@ -206,7 +208,7 @@ export const PC: Story = {
                 </div>
               </div>
               <div className="grid h-64">
-                <Skeleton loading asChild>
+                <Skeleton asChild>
                   <Card>
                     <Card.Title>본문</Card.Title>
                   </Card>

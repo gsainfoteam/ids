@@ -3,7 +3,7 @@
 대화 속에 끼는 짧은 줄입니다. "웹 검색 3건" 같은 상태 줄, "대화를 정리했어요" 같은 시스템 메모, 날짜 구분선을 맡습니다.
 
 - **흐린 한 줄.** 글자는 `--ids-color-text-neutral` 이고, 앞 아이콘은 크기에 맞는 아이콘 토큰으로 맞춰집니다.
-- **진행 중.** `pending` 이면 아이콘 자리에 Spinner 가 서고, 글자에 `shimmer` 가 지나가고, 줄이 `role="status"` 가 됩니다.
+- **진행 중.** `aria-busy` 면 아이콘 자리에 Spinner 가 서고, 글자에 `shimmer` 가 지나가고, 줄이 `role="status"` 가 됩니다.
 - **구분선 모양.** `variant="separator"` 는 글자 양쪽에 장식용 Divider 를 긋습니다. 스크린 리더는 글자만 읽습니다.
 - **링크와 버튼.** `asChild` 면 자식 요소가 줄이 됩니다.
 
@@ -13,7 +13,7 @@ import { Marker } from '@gsainfoteam/ids-react';
 <Marker>
   <GlobeAltIcon />웹 검색 3건
 </Marker>
-<Marker pending>생각하는 중</Marker>
+<Marker aria-busy>생각하는 중</Marker>
 <Marker variant="separator">
   <time dateTime="2026-10-27">10월 27일</time>
 </Marker>
@@ -35,8 +35,8 @@ import { Marker } from '@gsainfoteam/ids-react';
 ## 진행 중
 
 ```tsx
-<Marker pending>생각하는 중</Marker>
-<Marker pending variant="separator">대화를 정리하는 중</Marker>
+<Marker aria-busy>생각하는 중</Marker>
+<Marker aria-busy variant="separator">대화를 정리하는 중</Marker>
 ```
 
 - 줄이 `role="status"` 라서 글자가 바뀌면 스크린 리더가 읽습니다. Spinner 는 장식이라 따로 읽히지 않습니다.
@@ -57,7 +57,7 @@ import { Marker } from '@gsainfoteam/ids-react';
 ```
 
 - 링크는 밑줄이 붙고, 링크와 버튼은 올리면 글자가 진해지고 포커스 링을 받습니다.
-- `asChild` 면 역할은 자식이 정합니다. `pending` 이어도 링크는 링크로 남고, 알림이 필요하면 `role` 을 직접 줍니다.
+- `asChild` 면 역할은 자식이 정합니다. `aria-busy` 여도 링크는 링크로 남고, 알림이 필요하면 `role` 을 직접 줍니다.
 - 글 안의 링크도 밑줄이 붙습니다: `<Marker><span><a href="#">구현 메모</a>를 열었어요</span></Marker>`.
 
 ## 접히는 줄
@@ -88,7 +88,7 @@ Marker 는 접지 않습니다. 추론이나 도구 호출처럼 펼쳐 보는 �
 | --------- | -------------- |
 | `variant` | 넘긴 모양      |
 | `size`    | 넘긴 크기      |
-| `pending` | 진행 중이다    |
+| `busy`    | `aria-busy` 다 |
 
 - 상태는 `className`, `style` 에 넘긴 상태 함수로 읽습니다. IDS 위에 새 디자인을 얹을 때만 씁니다.
 
@@ -98,7 +98,7 @@ Marker 는 접지 않습니다. 추론이나 도구 호출처럼 펼쳐 보는 �
 | --------------------- | ---------------------------------------------------- |
 | `variant`             | `default`(기본) / `underline` / `separator`          |
 | `size`                | `standard`(기본) / `tiny`                            |
-| `pending`             | `false`. Spinner, 반짝임, `role="status"`            |
+| `aria-busy`           | `false`. Spinner, 반짝임, `role="status"`            |
 | `asChild`             | 자식 요소 하나를 줄로 그린다                         |
 | `className` / `style` | 상태를 받는 함수도 된다                              |
 | 그 외 속성            | 줄(`p`)로 간다                                       |

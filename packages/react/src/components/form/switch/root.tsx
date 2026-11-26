@@ -34,7 +34,6 @@ export type SwitchProps = NativeInputProps & {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  invalid?: boolean;
   size?: IdsSize;
   className?: StateProp<string | undefined>;
   style?: StateProp<CSSProperties | undefined>;
@@ -56,7 +55,6 @@ export function SwitchRoot({
   checked: checkedProp,
   defaultChecked,
   onCheckedChange,
-  invalid,
   size,
   className,
   style,
@@ -101,7 +99,7 @@ export function SwitchRoot({
     onPointerCancel,
   });
 
-  const ariaInvalid = inputProps['aria-invalid'] ?? invalid;
+  const ariaInvalid = inputProps['aria-invalid'];
   const state: SwitchState = {
     checked: checked === true,
     disabled: Boolean(inputProps.disabled),

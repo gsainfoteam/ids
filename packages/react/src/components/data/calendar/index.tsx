@@ -1,4 +1,4 @@
-import { type CalendarModifiers, type CalendarState } from './hooks/use-calendar';
+import { type CalendarModifiers, type CalendarState } from './hooks/use-calendar-grid';
 import {
   type CalendarSelectionMode,
   type DateMatcher as CalendarDateMatcher,
@@ -57,9 +57,17 @@ export namespace Calendar {
 }
 
 export { type CalendarCaptionLayout } from './parts/caption';
-export { type CalendarDayState, type CalendarOptions, type CalendarProps } from './root';
-export { CalendarPickContext } from './hooks/use-calendar';
+export { type CalendarDayState, type CalendarProps } from './root';
+export { CalendarPickContext } from './hooks/use-calendar-grid';
+export { useCalendar } from './hooks/use-calendar';
 
-export type { CalendarState } from './hooks/use-calendar';
+export type { CalendarState } from './hooks/use-calendar-grid';
+export type {
+  CalendarAvailabilityOptions,
+  CalendarDisplayOptions,
+  CalendarInstance,
+  CalendarMonthOptions,
+  UseCalendarOptions,
+} from './hooks/use-calendar';
 
 export type { DateRange, CalendarSelectionMode, CalendarValue, DateMatcher } from './lib/date';

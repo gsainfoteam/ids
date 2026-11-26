@@ -1,13 +1,11 @@
 import { useState } from 'react';
 
-import { CommandLineIcon, CreditCardIcon, TruckIcon, UserIcon } from '@heroicons/react/16/solid';
+import { CreditCardIcon, TruckIcon, UserIcon } from '@heroicons/react/16/solid';
 import { expect, fn, within } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
-import { Avatar } from '../../data/avatar';
-import { Card } from '../../data/card';
 import { Spinner } from '../../feedback/spinner';
 
 import { Stepper } from '.';
@@ -16,7 +14,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const orientations = ['horizontal', 'vertical'] as const;
 const sizes = ['standard', 'tiny'] as const;
-const modes = ['progress', 'record'] as const;
 
 const meta = {
   title: 'Navigation/Stepper',
@@ -26,7 +23,6 @@ const meta = {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
     linear: { control: 'boolean' },
-    progress: { control: 'boolean' },
     disabled: { control: 'boolean' },
     defaultValue: { control: { type: 'number', min: 0, max: 3 } },
   },
@@ -115,7 +111,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="States"
-        description="앞 단계는 completed, 값의 단계는 current, 뒤 단계는 upcoming 입니다. error 와 disabled 는 단계마다 줍니다."
+        description="앞 단계는 completed, 값의 단계는 current, 뒤 단계는 upcoming 입니다. status 의 error 와 disabled 는 단계마다 줍니다."
       >
         <Showcase.Row label="progress">
           <div className="w-[36rem]">
@@ -141,7 +137,7 @@ export const Gallery: Story = {
               <Stepper.Item>
                 <Stepper.Title>계정</Stepper.Title>
               </Stepper.Item>
-              <Stepper.Item error>
+              <Stepper.Item status="error">
                 <Stepper.Title>결제</Stepper.Title>
                 <Stepper.Description>카드가 거절되었습니다</Stepper.Description>
               </Stepper.Item>
@@ -215,109 +211,29 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section
-        title="Record × Size"
-        description="progress={false} 는 현재 단계 없이 일어난 일을 늘어놓는 기록입니다. 표시하지 않은 기록은 점(neutral)이고, completed 와 error 는 진행에서처럼 그립니다. 연결선은 늘 중립색입니다."
+        title="Body × Size"
+        description="Stepper.Body 는 제목과 설명 아래의 자유로운 내용입니다. 단계 버튼 밖에 그려져 링크와 버튼을 둘 수 있고, 제목 칸에 맞춰 들여 쓰며 연결선이 옆으로 이어집니다. 세로에서만 보입니다."
       >
-        <Showcase.Matrix
-          rows={sizes}
-          columns={orientations}
-          render={(size, orientation) => (
-            <div className={orientation === 'horizontal' ? 'w-[28rem]' : 'w-56'}>
-              <Stepper
-                progress={false}
-                orientation={orientation}
-                size={size}
-                aria-label="배포 기록"
-              >
-                <Stepper.Item completed>
-                  <Stepper.Title>배포</Stepper.Title>
-                  <Stepper.Description>v2.4.0</Stepper.Description>
-                </Stepper.Item>
-                <Stepper.Item error>
-                  <Stepper.Title>테스트</Stepper.Title>
-                </Stepper.Item>
-                <Stepper.Item>
-                  <Stepper.Title>빌드 시작</Stepper.Title>
-                </Stepper.Item>
-              </Stepper>
-            </div>
-          )}
-        />
-        <Showcase.Row label="avatars, icons">
+        <Showcase.Row label="vertical">
           {sizes.map((size) => (
             <div key={size} className="w-64">
-              <Stepper progress={false} orientation="vertical" size={size} aria-label="최근 활동">
+              <Stepper aria-label="진행 단계" orientation="vertical" size={size} defaultValue={1}>
                 <Stepper.Item>
-                  <Stepper.Indicator asChild>
-                    <Avatar name="김지우" />
-                  </Stepper.Indicator>
-                  <Stepper.Title>김지우 님이 참여했습니다</Stepper.Title>
+                  <Stepper.Title>계정</Stepper.Title>
+                  <Stepper.Description>이메일 인증</Stepper.Description>
+                  <Stepper.Body>
+                    <Button variant="outline" size="tiny">
+                      인증 메일 다시 보내기
+                    </Button>
+                  </Stepper.Body>
                 </Stepper.Item>
                 <Stepper.Item>
-                  <Stepper.Indicator>
-                    <CommandLineIcon />
-                  </Stepper.Indicator>
-                  <Stepper.Title>빌드를 시작했습니다</Stepper.Title>
-                </Stepper.Item>
-                <Stepper.Item>
-                  <Stepper.Title>제목이 길어 줄이 넘어가도 점은 첫 줄에 맞춥니다</Stepper.Title>
+                  <Stepper.Title>프로필</Stepper.Title>
                 </Stepper.Item>
               </Stepper>
             </div>
           ))}
         </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Body × Size"
-        description="Stepper.Body 는 제목과 설명 아래의 자유로운 내용입니다. 단계 버튼 밖에 그려져 링크와 버튼을 둘 수 있고, 제목 칸에 맞춰 들여 쓰며 연결선이 옆으로 이어집니다. 세로에서만 보입니다."
-      >
-        <Showcase.Matrix
-          rows={sizes}
-          columns={modes}
-          render={(size, mode) =>
-            mode === 'progress' ? (
-              <div className="w-64">
-                <Stepper aria-label="진행 단계" orientation="vertical" size={size} defaultValue={1}>
-                  <Stepper.Item>
-                    <Stepper.Title>계정</Stepper.Title>
-                    <Stepper.Description>이메일 인증</Stepper.Description>
-                    <Stepper.Body>
-                      <Button variant="outline" size="tiny">
-                        인증 메일 다시 보내기
-                      </Button>
-                    </Stepper.Body>
-                  </Stepper.Item>
-                  <Stepper.Item>
-                    <Stepper.Title>프로필</Stepper.Title>
-                  </Stepper.Item>
-                </Stepper>
-              </div>
-            ) : (
-              <div className="w-64">
-                <Stepper progress={false} orientation="vertical" size={size} aria-label="댓글">
-                  <Stepper.Item>
-                    <Stepper.Indicator asChild>
-                      <Avatar name="박서준" />
-                    </Stepper.Indicator>
-                    <Stepper.Title>박서준 님의 댓글</Stepper.Title>
-                    <Stepper.Description>
-                      <time dateTime="2026-09-30T09:12">5분 전</time>
-                    </Stepper.Description>
-                    <Stepper.Body>
-                      <Card variant="soft" size={size}>
-                        다음 회의에서 같이 봐요.
-                      </Card>
-                    </Stepper.Body>
-                  </Stepper.Item>
-                  <Stepper.Item>
-                    <Stepper.Title>이서연 님이 문서를 열었습니다</Stepper.Title>
-                  </Stepper.Item>
-                </Stepper>
-              </div>
-            )
-          }
-        />
       </Showcase.Section>
     </Showcase>
   ),
@@ -466,7 +382,7 @@ export const MarkAFailedStep: Story = {
         <Stepper.Item>
           <Stepper.Title>계정</Stepper.Title>
         </Stepper.Item>
-        <Stepper.Item error>
+        <Stepper.Item status="error">
           <Stepper.Title>결제</Stepper.Title>
           <Stepper.Description>카드가 거절되었습니다</Stepper.Description>
         </Stepper.Item>
@@ -480,7 +396,7 @@ export const MarkAFailedStep: Story = {
     docs: {
       description: {
         story:
-          '`error` 인 단계는 표시가 danger 색으로 바뀌고, 스크린 리더는 제목 뒤에 "오류" 를 읽습니다. 설명은 `aria-describedby` 로 이어집니다.',
+          '`status="error"` 인 단계는 표시가 danger 색으로 바뀌고, 스크린 리더는 제목 뒤에 "오류" 를 읽습니다. 설명은 `aria-describedby` 로 이어집니다.',
       },
     },
   },
@@ -493,72 +409,6 @@ export const MarkAFailedStep: Story = {
   },
 };
 
-export const ListRecentActivity: Story = {
-  render: () => (
-    <div className="w-full max-w-md">
-      <Stepper progress={false} orientation="vertical" aria-label="최근 활동">
-        <Stepper.Item>
-          <Stepper.Indicator asChild>
-            <Avatar name="김지우" />
-          </Stepper.Indicator>
-          <Stepper.Title>김지우 님이 댓글을 남겼습니다</Stepper.Title>
-          <Stepper.Description>
-            <time dateTime="2026-09-30T09:12">5분 전</time>
-          </Stepper.Description>
-          <Stepper.Body>
-            <Card variant="soft">좋은 의견이네요! 다음 회의에서 같이 봐요.</Card>
-          </Stepper.Body>
-        </Stepper.Item>
-        <Stepper.Item>
-          <Stepper.Indicator asChild>
-            <Avatar name="박서준" />
-          </Stepper.Indicator>
-          <Stepper.Title>박서준 님이 문서를 고쳤습니다</Stepper.Title>
-          <Stepper.Description>
-            <time dateTime="2026-09-30T08:40">40분 전</time>
-          </Stepper.Description>
-          <Stepper.Body>
-            <a href="#design-system-v2" className="text-primary underline underline-offset-4">
-              디자인 시스템 v2 개편안
-            </a>
-          </Stepper.Body>
-        </Stepper.Item>
-        <Stepper.Item>
-          <Stepper.Title>이서연 님이 프로젝트에 참여했습니다</Stepper.Title>
-          <Stepper.Description>
-            <time dateTime="2026-09-29">어제</time>
-          </Stepper.Description>
-        </Stepper.Item>
-      </Stepper>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '`progress={false}` 는 현재 단계가 없는 기록입니다. 표시하지 않은 기록은 점으로 그리고 상태 문구를 읽지 않습니다. 아바타는 `Stepper.Indicator asChild` 로 표시 자리에 두고, 시각은 `Stepper.Description` 안의 `<time>` 으로 적습니다. `Stepper.Body` 는 단계 버튼 밖이라 카드와 링크를 담습니다. 목록 이름은 `aria-label` 로 줍니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    const list = canvas.getByRole('list', { name: '최근 활동' });
-    const items = within(list).getAllByRole('listitem');
-    await expect(items).toHaveLength(3);
-    for (const item of items) {
-      await expect(item).toHaveAttribute('data-state', 'neutral');
-      await expect(item).not.toHaveAttribute('aria-current');
-    }
-    await expect(list).not.toHaveTextContent(/완료|오류/);
-    await expect(canvas.queryAllByRole('button')).toHaveLength(0);
-    await expect(canvas.queryAllByRole('img')).toHaveLength(0);
-
-    const link = canvas.getByRole('link', { name: '디자인 시스템 v2 개편안' });
-    await expect(link.closest('[data-stepper-body]')).not.toBeNull();
-    await expect(link.closest('[data-stepper-trigger]')).toBeNull();
-    await expect(canvas.getByText('40분 전')).toHaveAttribute('datetime', '2026-09-30T08:40');
-  },
-};
-
 export const TrackAPipeline: Story = {
   render: () => (
     <div className="w-full max-w-md">
@@ -567,7 +417,7 @@ export const TrackAPipeline: Story = {
           <Stepper.Title>빌드</Stepper.Title>
           <Stepper.Description>1분 12초</Stepper.Description>
         </Stepper.Item>
-        <Stepper.Item error>
+        <Stepper.Item status="error">
           <Stepper.Title>테스트</Stepper.Title>
           <Stepper.Description>3개 실패</Stepper.Description>
           <Stepper.Body>
@@ -592,7 +442,7 @@ export const TrackAPipeline: Story = {
     docs: {
       description: {
         story:
-          '`value` 만 준 표시 전용 Stepper 로 파이프라인을 그립니다. 실패한 단계는 `error`, 도는 단계는 `Stepper.Indicator` 에 `Spinner aria-hidden` 을 둡니다. 현재 단계의 `li` 가 `aria-current="step"` 이라 따로 알리지 않아도 됩니다. `Stepper.Body` 는 진행에서도 쓰고, 안의 링크는 단계와 따로 Tab 이 멈춥니다.',
+          '`value` 만 준 표시 전용 Stepper 로 파이프라인을 그립니다. 실패한 단계는 `status="error"`, 도는 단계는 `Stepper.Indicator` 에 `Spinner aria-hidden` 을 둡니다. 현재 단계의 `li` 가 `aria-current="step"` 이라 따로 알리지 않아도 됩니다. `Stepper.Body` 는 진행에서도 쓰고, 안의 링크는 단계와 따로 Tab 이 멈춥니다.',
       },
     },
   },

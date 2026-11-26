@@ -33,7 +33,7 @@ const meta = {
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     resize: { control: 'radio', options: resizes },
     placeholder: { control: 'text' },
   },
@@ -102,13 +102,13 @@ export const Gallery: Story = {
           </Showcase.Row>
           <Showcase.Row label="invalid">
             <div className="w-56">
-              <TextArea rows={2} defaultValue="짧음" invalid aria-label="잘못됨" />
+              <TextArea rows={2} defaultValue="짧음" aria-invalid aria-label="잘못됨" />
             </div>
             <div className="w-56">
               <TextArea
                 rows={2}
                 defaultValue="짧음"
-                invalid
+                aria-invalid
                 maxLength={100}
                 aria-label="잘못됨 카운터"
               >

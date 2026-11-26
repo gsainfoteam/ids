@@ -27,7 +27,6 @@ export namespace PasswordField {
     variant?: PasswordFieldVariant;
     size?: IdsSize;
     disabled?: boolean;
-    invalid?: boolean;
     onValueChange?: (value: string) => void;
     visible?: boolean;
     defaultVisible?: boolean;

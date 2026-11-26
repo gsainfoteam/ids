@@ -44,6 +44,7 @@ import { ItemGroup } from '../../components/data/item-group';
 import { QRCode } from '../../components/data/qr-code';
 import { Table } from '../../components/data/table';
 import { TimePicker } from '../../components/data/time-picker';
+import { Timeline } from '../../components/data/timeline';
 import { Alert } from '../../components/feedback/alert';
 import { Progress } from '../../components/feedback/progress';
 import { Skeleton } from '../../components/feedback/skeleton';
@@ -231,25 +232,20 @@ export const Cover: Story = {
                         <Card.Title>택배</Card.Title>
                         <Card.Description>생활관 A동</Card.Description>
                       </Card.Header>
-                      <Stepper
-                        progress={false}
-                        orientation="vertical"
-                        size="tiny"
-                        aria-label="택배"
-                      >
-                        <Stepper.Item completed>
-                          <Stepper.Title>집하</Stepper.Title>
-                          <Stepper.Description>9월 28일</Stepper.Description>
-                        </Stepper.Item>
-                        <Stepper.Item completed>
-                          <Stepper.Title>배송 중</Stepper.Title>
-                          <Stepper.Description>9월 29일</Stepper.Description>
-                        </Stepper.Item>
-                        <Stepper.Item>
-                          <Stepper.Title>도착</Stepper.Title>
-                          <Stepper.Description>오늘 예정</Stepper.Description>
-                        </Stepper.Item>
-                      </Stepper>
+                      <Timeline size="tiny" aria-label="택배">
+                        <Timeline.Item status="completed">
+                          <Timeline.Title>집하</Timeline.Title>
+                          <Timeline.Description>9월 28일</Timeline.Description>
+                        </Timeline.Item>
+                        <Timeline.Item status="completed">
+                          <Timeline.Title>배송 중</Timeline.Title>
+                          <Timeline.Description>9월 29일</Timeline.Description>
+                        </Timeline.Item>
+                        <Timeline.Item>
+                          <Timeline.Title>도착</Timeline.Title>
+                          <Timeline.Description>오늘 예정</Timeline.Description>
+                        </Timeline.Item>
+                      </Timeline>
                     </Card>
                   </IdsProvider.Scope>
 
@@ -560,11 +556,7 @@ export const Cover: Story = {
                   <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                     <Card size="tiny">
                       <div className="flex flex-col items-center gap-3">
-                        <Calendar
-                          aria-label="달력"
-                          defaultMonth={new CalendarDate(2026, 12, 1)}
-                          defaultValue={new CalendarDate(2026, 12, 24)}
-                        />
+                        <Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 12, 24)} />
                       </div>
                     </Card>
                   </IdsProvider.Scope>
@@ -670,36 +662,31 @@ export const Cover: Story = {
                           <div className="bg-neutral-solid mx-auto mb-4 h-6 w-24 rounded-full dark:bg-(--ids-color-border-neutral-strong)" />
                           <p className="text-caption-c1-medium text-neutral">gistory</p>
                           <p className="text-headline-h5-bold mb-4">최근 활동</p>
-                          <Stepper
-                            progress={false}
-                            orientation="vertical"
-                            size="tiny"
-                            aria-label="최근 활동"
-                          >
-                            <Stepper.Item completed>
-                              <Stepper.Title>Carousel 을 합쳤어요</Stepper.Title>
-                              <Stepper.Description>방금 전</Stepper.Description>
-                            </Stepper.Item>
-                            <Stepper.Item completed>
-                              <Stepper.Title>배포 성공</Stepper.Title>
-                              <Stepper.Description>12분 전</Stepper.Description>
-                            </Stepper.Item>
-                            <Stepper.Item>
-                              <Stepper.Title>리뷰를 남겼어요</Stepper.Title>
-                              <Stepper.Description>1시간 전</Stepper.Description>
-                              <Stepper.Body>
+                          <Timeline size="tiny" aria-label="최근 활동">
+                            <Timeline.Item status="completed">
+                              <Timeline.Title>Carousel 을 합쳤어요</Timeline.Title>
+                              <Timeline.Description>방금 전</Timeline.Description>
+                            </Timeline.Item>
+                            <Timeline.Item status="completed">
+                              <Timeline.Title>배포 성공</Timeline.Title>
+                              <Timeline.Description>12분 전</Timeline.Description>
+                            </Timeline.Item>
+                            <Timeline.Item>
+                              <Timeline.Title>리뷰를 남겼어요</Timeline.Title>
+                              <Timeline.Description>1시간 전</Timeline.Description>
+                              <Timeline.Body>
                                 <div className="pt-2">
                                   <Card variant="soft" size="tiny">
                                     모서리 손잡이가 예뻐요
                                   </Card>
                                 </div>
-                              </Stepper.Body>
-                            </Stepper.Item>
-                            <Stepper.Item error>
-                              <Stepper.Title>시각 테스트 실패</Stepper.Title>
-                              <Stepper.Description>어제</Stepper.Description>
-                            </Stepper.Item>
-                          </Stepper>
+                              </Timeline.Body>
+                            </Timeline.Item>
+                            <Timeline.Item status="error">
+                              <Timeline.Title>시각 테스트 실패</Timeline.Title>
+                              <Timeline.Description>어제</Timeline.Description>
+                            </Timeline.Item>
+                          </Timeline>
                         </div>
                       </Card>
                     </IdsProvider.Scope>
@@ -743,11 +730,11 @@ export const Cover: Story = {
 
                   <Card size="tiny">
                     <div className="flex items-center gap-3">
-                      <Skeleton loading asChild>
+                      <Skeleton asChild>
                         <Avatar name="김지스트" />
                       </Skeleton>
                       <div className="flex-1">
-                        <Skeleton loading>
+                        <Skeleton>
                           <p className="text-body-b3-medium">김지스트</p>
                           <p className="text-body-b3-regular">인포팀 프론트엔드</p>
                         </Skeleton>
@@ -1249,7 +1236,6 @@ export const Cover: Story = {
                             <Calendar
                               aria-label="달력"
                               selectionMode="range"
-                              defaultMonth={new CalendarDate(2026, 10, 1)}
                               defaultValue={{
                                 start: new CalendarDate(2026, 10, 13),
                                 end: new CalendarDate(2026, 10, 17),
@@ -1284,22 +1270,22 @@ export const Cover: Story = {
 
                       <Card size="tiny">
                         <div className="flex items-center gap-3">
-                          <Skeleton loading asChild>
+                          <Skeleton asChild>
                             <Avatar name="이인포" />
                           </Skeleton>
                           <div className="flex-1">
-                            <Skeleton loading>
+                            <Skeleton>
                               <p className="text-body-b3-medium">이인포</p>
                               <p className="text-body-b3-regular">인포팀 디자인</p>
                             </Skeleton>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <Skeleton loading asChild>
+                          <Skeleton asChild>
                             <Avatar name="박팀장" />
                           </Skeleton>
                           <div className="flex-1">
-                            <Skeleton loading>
+                            <Skeleton>
                               <p className="text-body-b3-medium">박팀장</p>
                               <p className="text-body-b3-regular">인포팀 팀장</p>
                             </Skeleton>
@@ -1695,7 +1681,7 @@ export const Cover: Story = {
                                     <Breadcrumb.Page>공지</Breadcrumb.Page>
                                   </Breadcrumb.Item>
                                 </Breadcrumb>
-                                <Skeleton loading>
+                                <Skeleton>
                                   <p className="text-body-b3-regular">
                                     2026 가을 학기 수강 신청은 9월 1일 오전 10시에 열립니다. 신청
                                     전에 졸업 요건을 확인하세요.
@@ -1880,11 +1866,7 @@ export const Cover: Story = {
                   <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                     <Card size="tiny">
                       <div className="flex flex-col items-center gap-3">
-                        <Calendar
-                          aria-label="달력"
-                          defaultMonth={new CalendarDate(2026, 11, 1)}
-                          defaultValue={new CalendarDate(2026, 11, 20)}
-                        />
+                        <Calendar aria-label="달력" defaultValue={new CalendarDate(2026, 11, 20)} />
                       </div>
                     </Card>
                   </IdsProvider.Scope>

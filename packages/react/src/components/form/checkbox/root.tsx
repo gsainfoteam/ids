@@ -38,7 +38,6 @@ export type CheckboxProps = NativeInputProps & {
   checked?: CheckedState;
   defaultChecked?: CheckedState;
   onCheckedChange?: (checked: boolean) => void;
-  invalid?: boolean;
   variant?: CheckboxVariant;
   size?: IdsSize;
   className?: StateProp<string | undefined>;
@@ -50,7 +49,6 @@ export function CheckboxRoot({
   checked: checkedProp,
   defaultChecked,
   onCheckedChange,
-  invalid,
   variant,
   size,
   className,
@@ -123,7 +121,7 @@ export function CheckboxRoot({
     onPointerCancel,
   });
 
-  const ariaInvalid = inputProps['aria-invalid'] ?? (invalid || group?.invalid || undefined);
+  const ariaInvalid = inputProps['aria-invalid'] ?? (group?.invalid || undefined);
   const state: CheckboxState = {
     checked: checked === true,
     indeterminate: checked === 'indeterminate',

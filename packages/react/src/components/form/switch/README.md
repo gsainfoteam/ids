@@ -121,7 +121,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `checked` / `defaultChecked` | `boolean`. 기본 `false`                                         |
 | `onCheckedChange`            | 사용자나 코드가 input을 바꿨을 때                               |
 | `readOnly`                   | 바뀌지 않는다. `aria-readonly`                                  |
-| `invalid`                    | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선      |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `size`                       | `standard` / `tiny`. 생략하면 `Field` 크기                      |
 | `className` / `style`        | 트랙으로 간다. 새 디자인(`custom-design`)에서만 쓴다                          |
 | `children`                   | `Switch.Thumb`. 생략하면 기본 thumb                             |

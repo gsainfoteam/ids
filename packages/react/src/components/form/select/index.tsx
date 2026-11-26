@@ -2,6 +2,7 @@ import { SelectClear, type SelectClearProps } from './parts/clear';
 import { SelectContent, type SelectContentProps } from './parts/content';
 import { SelectEmpty, type SelectEmptyProps } from './parts/empty';
 import { SelectGroup, type SelectGroupProps } from './parts/group';
+import { SelectGroupLabel, type SelectGroupLabelProps } from './parts/group-label';
 import { SelectIcon, type SelectIconProps } from './parts/icon';
 import { SelectItem, type SelectItemProps } from './parts/item';
 import { SelectItemIndicator, type SelectItemIndicatorProps } from './parts/item-indicator';
@@ -39,6 +40,7 @@ export namespace Select {
   export type ItemProps = SelectItemProps;
   export type ItemIndicatorProps = SelectItemIndicatorProps;
   export type GroupProps = SelectGroupProps;
+  export type GroupLabelProps = SelectGroupLabelProps;
   export type SeparatorProps = SelectSeparatorProps;
   export type EmptyProps = SelectEmptyProps;
 
@@ -51,6 +53,7 @@ export namespace Select {
   export const Item = SelectItem;
   export const ItemIndicator = SelectItemIndicator;
   export const Group = SelectGroup;
+  export const GroupLabel = SelectGroupLabel;
   export const Separator = SelectSeparator;
   export const Empty = SelectEmpty;
 

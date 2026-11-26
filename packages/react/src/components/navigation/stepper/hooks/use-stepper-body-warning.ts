@@ -4,11 +4,13 @@ import { useEffect } from 'react';
 
 import { isDevelopment } from '../../../../utils/dev';
 
-export function useInternalStepperBodyWarning(hasNoRoomBesideTheSteps: boolean) {
+import type { StepsName } from '../context';
+
+export function useInternalStepperBodyWarning(name: StepsName, hasNoRoomBesideTheSteps: boolean) {
   useEffect(() => {
     if (isDevelopment && hasNoRoomBesideTheSteps)
       console.warn(
-        '[IDS] Stepper: Stepper.Body is hidden in a horizontal Stepper, where the steps sit side by side. Use orientation="vertical", or show the content outside the Stepper.',
+        `[IDS] ${name}: ${name}.Body is hidden in a horizontal ${name}, where the steps sit side by side. Use orientation="vertical", or show the content outside the ${name}.`,
       );
-  }, [hasNoRoomBesideTheSteps]);
+  }, [name, hasNoRoomBesideTheSteps]);
 }

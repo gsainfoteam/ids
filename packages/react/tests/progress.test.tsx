@@ -61,12 +61,12 @@ test('out-of-range values are clamped instead of thrown, percent rounds down', (
   expect(almost.querySelector('[data-progress]')!.hasAttribute('data-complete')).toBe(false);
 });
 
-test('no value, NaN, a bad max or indeterminate draw without a value', () => {
+test('no value, null, NaN or a bad max draw without a value', () => {
   const cases: Progress.Props[] = [
     {},
     { value: NaN },
     { value: 3, max: 0 },
-    { value: 3, indeterminate: true },
+    { value: null },
   ];
   for (const props of cases) {
     const doc = html(

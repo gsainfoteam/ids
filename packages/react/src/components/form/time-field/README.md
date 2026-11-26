@@ -55,13 +55,13 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 <TimeField min={new Time(9)} max={new Time(18)} />           // 양 끝 포함
 <TimeField>
   <TimeField.TimePicker variant="wheel" />                   // 스크롤해서 멈춘 자리를 고르는 휠
-  <TimeField.Content mobileVariant="drawer" />               // 640px 보다 좁으면 아래에서 올라오는 판
+  <TimeField.Content narrow="drawer" />               // 640px 보다 좁으면 아래에서 올라오는 판
 </TimeField>
 ```
 
 - 단위, 간격, 키보드는 [TimePicker](../../data/time-picker/README.md) 와 같습니다.
 - `TimeField.TimePicker` 는 TimePicker 의 `variant`, `className`, 컬럼 part 를 받습니다. 값, `precision`, `step`, `hourCycle`, `min` / `max`, 크기는 필드가 넘깁니다. 필드의 자식으로 적고 팝업 안에 그려집니다.
-- `TimeField.Content` 는 팝업이고 `mobileVariant` 를 받습니다. [DateField](../date-field/README.md#열기와-닫기) 와 같습니다.
+- `TimeField.Content` 는 팝업이고 `narrow` 를 받습니다. 기본은 `popover` 입니다. [DateField](../date-field/README.md#열기와-닫기) 와 같습니다.
 
 ## 폼
 
@@ -145,7 +145,7 @@ const schema = z.object({
 | `placeholder`                              | 기본 없음                                               |
 | `name` / `form` / `required`               | 숨은 값 입력과 브라우저 검증                            |
 | `disabled` / `readOnly`                    | 열기, 고르기, Clear 를 막는다                           |
-| `invalid`                                  | danger 테두리와 링. Field 의 `aria-invalid` 가 우선     |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `variant` / `size`                         | `outline` / `standard`                                  |
 | `className` / `style`                      | 필드 표면. 상태를 받는 함수도 된다                      |
 | 그 외 native 속성, `ref`                   | Trigger `button` 으로 간다                              |

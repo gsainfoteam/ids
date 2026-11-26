@@ -12,11 +12,10 @@ export namespace Skeleton {
 
   export type Props = Omit<
     HTMLAttributes<HTMLElement>,
-    'children' | 'aria-busy' | 'aria-hidden' | 'inert'
+    'children' | 'aria-hidden' | 'inert'
   > & {
     ref?: Ref<HTMLElement>;
     animation?: Animation;
-    loading?: boolean;
     asChild?: boolean;
     children: ReactNode;
   };

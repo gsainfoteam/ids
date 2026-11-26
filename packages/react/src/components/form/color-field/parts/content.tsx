@@ -13,13 +13,13 @@ export type ColorFieldContentProps = Omit<
 > & {
   className?: string;
   children?: ReactNode;
-  mobileVariant?: PopupPresentation;
+  narrow?: PopupPresentation;
 };
 
 export function ColorFieldContent({
   children,
   className,
-  mobileVariant: _readByTheRoot,
+  narrow: _readByTheRoot,
   ...props
 }: ColorFieldContentProps) {
   const c = useInternalColorFieldContext('ColorField.Content');

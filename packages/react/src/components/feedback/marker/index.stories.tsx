@@ -25,10 +25,10 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    pending: { control: 'boolean' },
+    'aria-busy': { control: 'boolean' },
     children: { control: 'text' },
   },
-  args: { variant: 'default', size: 'standard', pending: false, children: '파일 4개를 읽었어요' },
+  args: { variant: 'default', size: 'standard', 'aria-busy': false, children: '파일 4개를 읽었어요' },
 } satisfies Meta<typeof Marker>;
 
 export default meta;
@@ -72,13 +72,13 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section
-        title="Pending"
+        title="aria-busy"
         description="아이콘 자리에 Spinner가 서고 글자가 반짝입니다. 움직임 줄이기 설정이면 멈춥니다."
       >
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
             <div className="w-72">
-              <Marker variant={variant} pending>
+              <Marker variant={variant} aria-busy>
                 {variant === 'separator' ? '대화를 정리하는 중' : '생각하는 중'}
               </Marker>
             </div>
@@ -146,14 +146,14 @@ export const Gallery: Story = {
 export const ShowWorkInProgress: Story = {
   render: () => (
     <div className="w-72">
-      <Marker pending>생각하는 중</Marker>
+      <Marker aria-busy>생각하는 중</Marker>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '진행 중인 줄은 `role="status"` 라서 글자가 바뀌면 스크린 리더가 읽습니다. Spinner는 장식이라 따로 읽히지 않습니다.',
+          '`aria-busy` 인 줄은 `role="status"` 라서 글자가 바뀌면 스크린 리더가 읽습니다. Spinner는 장식이라 따로 읽히지 않습니다.',
       },
     },
   },
@@ -161,7 +161,7 @@ export const ShowWorkInProgress: Story = {
     const status = canvas.getByRole('status');
     await expect(status.tagName).toBe('P');
     await expect(status).toHaveTextContent('생각하는 중');
-    await expect(status).toHaveAttribute('data-pending');
+    await expect(status).toHaveAttribute('aria-busy', 'true');
     await expect(status.querySelector('.shimmer')).toHaveTextContent('생각하는 중');
     await expect(canvasElement.querySelectorAll('[role="status"]')).toHaveLength(1);
     await expect(status.querySelector('[data-spinner]')).toHaveAttribute('aria-hidden', 'true');

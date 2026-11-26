@@ -10,7 +10,7 @@ import { Button } from '../../action/button';
 import { Item } from '../../data/item';
 import { Field } from '../field';
 
-import { FileField } from '.';
+import { FileField, useFileField } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -36,7 +36,7 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     multiple: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -46,7 +46,6 @@ const meta = {
     variant: 'outline',
     size: 'standard',
     onValueChange: fn(),
-    onReject: fn(),
   },
   render: (args) => (
     <div className="w-80">
@@ -130,7 +129,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-80">
-            <FileField aria-label="잘못됨" placeholder="파일 선택" invalid />
+            <FileField aria-label="잘못됨" placeholder="파일 선택" aria-invalid />
           </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
@@ -151,6 +150,7 @@ export const Gallery: Story = {
 export const AcceptSeveralFilesWithLimits: Story = {
   render: function Render() {
     const [files, setFiles] = useState<File[]>([]);
+    const fileField = useFileField({ limits: { maxSize: 20, maxCount: 2 } });
 
     return (
       <form className="grid w-96 gap-3">
@@ -161,8 +161,7 @@ export const AcceptSeveralFilesWithLimits: Story = {
             value={files}
             onValueChange={setFiles}
             accept=".txt"
-            maxSize={20}
-            maxCount={2}
+            fileField={fileField}
             name="attachments"
             placeholder="텍스트 파일 선택"
             data-testid="file-picker"
@@ -192,7 +191,7 @@ export const AcceptSeveralFilesWithLimits: Story = {
     docs: {
       description: {
         story:
-          '여러 파일은 목록에 쌓이고, 같은 파일은 다시 넣지 않습니다. accept, maxSize, maxCount 에 걸린 파일은 빼고 나머지만 받습니다. FileField.Limits 의 자식 함수는 { accept, maxSize, maxCount } 를 받아 규칙을 적고, FileField.Rejection 의 자식 함수는 거부된 파일마다 { file, reason } 을 받아 이유를 적습니다. 목록에서 지우면 포커스가 다음 파일로 갑니다.',
+          '여러 파일은 목록에 쌓이고, 같은 파일은 다시 넣지 않습니다. accept 와 useFileField 의 limits(maxSize, maxCount)에 걸린 파일은 빼고 나머지만 받습니다. 결과는 fileField 로 넘깁니다. FileField.Limits 의 자식 함수는 { accept, maxSize, maxCount } 를 받아 규칙을 적고, FileField.Rejection 의 자식 함수는 거부된 파일마다 { file, reason } 을 받아 이유를 적습니다. 목록에서 지우면 포커스가 다음 파일로 갑니다.',
       },
     },
   },

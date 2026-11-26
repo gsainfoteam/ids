@@ -16,14 +16,13 @@ export namespace Marker {
   export type State = {
     variant: Variant;
     size: IdsSize;
-    pending: boolean;
+    busy: boolean;
   };
 
   export type Props = Omit<HTMLAttributes<HTMLElement>, 'className' | 'style' | 'children'> & {
     ref?: Ref<HTMLElement>;
     variant?: Variant;
     size?: IdsSize;
-    pending?: boolean;
     asChild?: boolean;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;

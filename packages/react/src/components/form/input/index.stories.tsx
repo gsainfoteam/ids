@@ -28,7 +28,7 @@ const meta = {
     type: { control: 'radio', options: types },
     size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
   },
   args: { type: 'text', 'aria-label': '입력' },
 } satisfies Meta<typeof Input>;

@@ -122,7 +122,7 @@ export const PC: Story = {
         <Divider />
 
         <div className="flex min-h-0 flex-1 flex-col">
-          <ScrollArea fade>
+          <ScrollArea fade="y">
             <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 md:px-6">
               {DAYS.map(({ day, messages }) => (
                 <section key={day} aria-label={day} className="flex flex-col gap-6">

@@ -122,7 +122,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 | `onChange`               | native change 이벤트                                          |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                            |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
-| `invalid`                | `aria-invalid` 와 danger 테두리. 명시한 `aria-invalid` 가 우선 |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `disabled`               | 컨테이너와 input에 함께 적용. Input의 값이 우선                |
 | 그 외 native 속성, ref    | 실제 input으로 간다                                           |
 | `TextField.Clear`        | `aria-label`, `children`(아이콘), `asChild`                    |

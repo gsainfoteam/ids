@@ -16,7 +16,7 @@ import { Menu } from '../../overlay/menu';
 import { IdsProvider } from '../../utility/ids-provider';
 import { Item } from '../item';
 
-import { Scheduler } from '.';
+import { Scheduler, useScheduler, type SchedulerNavigationOptions } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -239,25 +239,63 @@ const ROOMS = [
   { id: 'c', title: '확률과 통계', room: 'B 301', start: at(18, 9), end: at(18, 10, 30) },
 ];
 
+type StoryArgs = Scheduler.Props & {
+  defaultView?: Scheduler.View;
+  defaultDayCount?: number;
+  weekStartsOn?: SchedulerNavigationOptions['weekStartsOn'];
+  onViewChange?: (view: Scheduler.View) => void;
+  onDateChange?: (date: CalendarDate) => void;
+  onDayCountChange?: (count: number) => void;
+};
+
+const BY_USE_SCHEDULER = { table: { category: 'useScheduler' } };
+
 const meta = {
   title: 'Data/Scheduler',
   component: Scheduler,
   tags: ['autodocs'],
   argTypes: {
-    defaultView: { control: 'radio', options: ['month', 'week', 'days', 'day'] },
-    defaultDayCount: { control: { type: 'number', min: 2, max: 14 } },
-    weekStartsOn: { control: { type: 'number', min: 0, max: 6 } },
+    defaultView: {
+      control: 'radio',
+      options: ['month', 'week', 'days', 'day'],
+      ...BY_USE_SCHEDULER,
+    },
+    defaultDayCount: { control: { type: 'number', min: 2, max: 14 }, ...BY_USE_SCHEDULER },
+    weekStartsOn: { control: { type: 'number', min: 0, max: 6 }, ...BY_USE_SCHEDULER },
+    onViewChange: BY_USE_SCHEDULER,
+    onDateChange: BY_USE_SCHEDULER,
+    onDayCountChange: BY_USE_SCHEDULER,
+    scheduler: { control: false },
   },
   args: {
     'aria-label': '일정표',
     events: EVENTS,
-    defaultDate: TODAY,
-    now: NOW,
     onViewChange: fn(),
     onDateChange: fn(),
     onDayCountChange: fn(),
   },
-} satisfies Meta<typeof Scheduler>;
+  render: function Render({
+    defaultView,
+    defaultDayCount,
+    weekStartsOn,
+    onViewChange,
+    onDateChange,
+    onDayCountChange,
+    ...args
+  }) {
+    const scheduler = useScheduler({
+      views: {
+        defaultValue: defaultView,
+        defaultDayCount,
+        onValueChange: onViewChange,
+        onDayCountChange,
+      },
+      navigation: { defaultValue: TODAY, weekStartsOn, now: NOW, onValueChange: onDateChange },
+    });
+
+    return <Scheduler {...args} scheduler={scheduler} />;
+  },
+} satisfies Meta<StoryArgs>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -274,112 +312,138 @@ const eventBox = (canvasElement: HTMLElement, id: string) =>
 export const Playground: Story = {};
 
 export const Usage: Story = {
-  render: () => (
-    <div className="[--scheduler-height:--spacing(120)]">
-      <Scheduler aria-label="일정표" events={EVENTS} defaultDate={TODAY} now={NOW} />
-    </div>
-  ),
+  render: function Render() {
+    const scheduler = useScheduler({
+      navigation: {
+        defaultValue: new CalendarDate(2026, 11, 17),
+        now: new CalendarDateTime(2026, 11, 17, 10, 30),
+      },
+    });
+
+    return (
+      <div className="[--scheduler-height:--spacing(120)]">
+        <Scheduler
+          aria-label="일정표"
+          scheduler={scheduler}
+          events={[
+            {
+              id: 'algo',
+              title: '알고리즘',
+              start: new CalendarDateTime(2026, 11, 17, 9),
+              end: new CalendarDateTime(2026, 11, 17, 10, 30),
+            },
+            {
+              id: 'fest',
+              title: '지스트 축제',
+              start: new CalendarDate(2026, 11, 19),
+              end: new CalendarDate(2026, 11, 21),
+              colorScheme: 'warning',
+            },
+          ]}
+        />
+      </div>
+    );
+  },
 };
 
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="View"
-        description="month는 그달이 든 주들, week는 locale의 첫 요일부터 7일, days는 고른 날부터 dayCount일, day는 하루입니다. 오늘은 날짜 숫자를 칠하고, 지금 시각에 선을 긋습니다."
-      >
-        <Showcase.Row label="month">
-          <div className="[--scheduler-height:--spacing(160)]">
-            <Scheduler
-              events={EVENTS}
-              defaultView="month"
-              defaultDate={TODAY}
-              now={NOW}
-              aria-label="월 보기"
-            />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="week">
-          <div className="[--scheduler-height:--spacing(120)]">
-            <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="주 보기" />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="days">
-          <div className="[--scheduler-height:--spacing(120)]">
-            <Scheduler
-              events={EVENTS}
-              defaultView="days"
-              defaultDayCount={3}
-              defaultDate={TODAY}
-              now={NOW}
-              aria-label="3일 보기"
-            />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="day">
-          <div className="[--scheduler-height:--spacing(120)]">
-            <Scheduler
-              events={EVENTS}
-              defaultView="day"
-              defaultDate={TODAY}
-              now={NOW}
-              aria-label="일 보기"
-            />
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
+  render: function Render() {
+    const month = useScheduler({
+      views: { defaultValue: 'month' },
+      navigation: { defaultValue: TODAY, now: NOW },
+    });
+    const week = useScheduler({ navigation: { defaultValue: TODAY, now: NOW } });
+    const days = useScheduler({
+      views: { defaultValue: 'days', defaultDayCount: 3 },
+      navigation: { defaultValue: TODAY, now: NOW },
+    });
+    const day = useScheduler({
+      views: { defaultValue: 'day' },
+      navigation: { defaultValue: TODAY, now: NOW },
+    });
+    const colors = useScheduler({
+      views: { defaultValue: 'day' },
+      navigation: { defaultValue: TODAY, now: NOW },
+    });
+    const english = useScheduler({ navigation: { defaultValue: TODAY, now: NOW } });
+    const german = useScheduler({ navigation: { defaultValue: TODAY, now: NOW } });
+    const empty = useScheduler({ navigation: { defaultValue: TODAY, now: NOW } });
+    const nextWeek = useScheduler({ navigation: { defaultValue: on(25), now: NOW } });
 
-      <Showcase.Section
-        title="Color scheme"
-        description="일정마다 colorScheme을 줍니다. 기본은 primary입니다."
-      >
-        <Showcase.Row label="colorScheme">
-          <div className="[--scheduler-height:--spacing(120)]">
-            <Scheduler
-              events={SCHEME_EVENTS}
-              defaultView="day"
-              defaultDate={TODAY}
-              now={NOW}
-              aria-label="색"
-            />
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
+    return (
+      <Showcase>
+        <Showcase.Section
+          title="View"
+          description="month는 그달이 든 주들, week는 locale의 첫 요일부터 7일, days는 고른 날부터 dayCount일, day는 하루입니다. 오늘은 날짜 숫자를 칠하고, 지금 시각에 선을 긋습니다."
+        >
+          <Showcase.Row label="month">
+            <div className="[--scheduler-height:--spacing(160)]">
+              <Scheduler events={EVENTS} scheduler={month} aria-label="월 보기" />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="week">
+            <div className="[--scheduler-height:--spacing(120)]">
+              <Scheduler events={EVENTS} scheduler={week} aria-label="주 보기" />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="days">
+            <div className="[--scheduler-height:--spacing(120)]">
+              <Scheduler events={EVENTS} scheduler={days} aria-label="3일 보기" />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="day">
+            <div className="[--scheduler-height:--spacing(120)]">
+              <Scheduler events={EVENTS} scheduler={day} aria-label="일 보기" />
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section
-        title="Locale"
-        description="요일, 날짜, 시각과 첫 요일을 locale에서 읽습니다."
-      >
-        <Showcase.Row label="en-US">
-          <div className="[--scheduler-height:--spacing(96)]">
-            <IdsProvider.Scope locale={en}>
-              <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="en-US" />
-            </IdsProvider.Scope>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="de-DE">
-          <div className="[--scheduler-height:--spacing(96)]">
-            <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
-              <Scheduler events={EVENTS} defaultDate={TODAY} now={NOW} aria-label="de-DE" />
-            </IdsProvider.Scope>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
+        <Showcase.Section
+          title="Color scheme"
+          description="일정마다 colorScheme을 줍니다. 기본은 primary입니다."
+        >
+          <Showcase.Row label="colorScheme">
+            <div className="[--scheduler-height:--spacing(120)]">
+              <Scheduler events={SCHEME_EVENTS} scheduler={colors} aria-label="색" />
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section title="States">
-        <Showcase.Row label="empty">
-          <div className="[--scheduler-height:--spacing(80)]">
-            <Scheduler events={[]} defaultDate={TODAY} now={NOW} aria-label="빈 주" />
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="another week">
-          <div className="[--scheduler-height:--spacing(80)]">
-            <Scheduler events={EVENTS} defaultDate={on(25)} now={NOW} aria-label="다른 주" />
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+        <Showcase.Section
+          title="Locale"
+          description="요일, 날짜, 시각과 첫 요일을 locale에서 읽습니다."
+        >
+          <Showcase.Row label="en-US">
+            <div className="[--scheduler-height:--spacing(96)]">
+              <IdsProvider.Scope locale={en}>
+                <Scheduler events={EVENTS} scheduler={english} aria-label="en-US" />
+              </IdsProvider.Scope>
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="de-DE">
+            <div className="[--scheduler-height:--spacing(96)]">
+              <IdsProvider.Scope locale={{ ...en, language: 'de', tag: 'de-DE' }}>
+                <Scheduler events={EVENTS} scheduler={german} aria-label="de-DE" />
+              </IdsProvider.Scope>
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+
+        <Showcase.Section title="States">
+          <Showcase.Row label="empty">
+            <div className="[--scheduler-height:--spacing(80)]">
+              <Scheduler events={[]} scheduler={empty} aria-label="빈 주" />
+            </div>
+          </Showcase.Row>
+          <Showcase.Row label="another week">
+            <div className="[--scheduler-height:--spacing(80)]">
+              <Scheduler events={EVENTS} scheduler={nextWeek} aria-label="다른 주" />
+            </div>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const MoveBetweenPeriods: Story = {
@@ -459,7 +523,7 @@ export const ShowAChosenNumberOfDays: Story = {
     docs: {
       description: {
         story:
-          '`view="days"` 는 고른 날부터 `dayCount` 일(기본 3일)을 주 보기와 같은 시간 격자로 보여 줍니다. 툴바의 날 수 칸에 2일부터 14일까지 직접 입력하거나 위아래 버튼과 방향키로 바꿉니다. 이전과 다음은 `dayCount` 일씩 옮깁니다.',
+          '`days` 보기는 고른 날부터 `dayCount` 일(기본 3일)을 주 보기와 같은 시간 격자로 보여 줍니다. 툴바의 날 수 칸에 2일부터 14일까지 직접 입력하거나 위아래 버튼과 방향키로 바꿉니다. 이전과 다음은 `dayCount` 일씩 옮깁니다.',
       },
     },
   },
@@ -527,10 +591,11 @@ export const OpenAnEventOnClick: Story = {
   },
   render: function Render() {
     const [opened, setOpened] = useState('');
+    const scheduler = useScheduler({ navigation: { defaultValue: TODAY, now: NOW } });
 
     return (
       <div className="flex w-full flex-col gap-3">
-        <Scheduler aria-label="일정표" events={EVENTS} defaultDate={TODAY} now={NOW}>
+        <Scheduler aria-label="일정표" events={EVENTS} scheduler={scheduler}>
           {(event) => <Scheduler.Event onClick={() => setOpened(event.title)} />}
         </Scheduler>
         <p className="text-body-b3-regular" data-testid="opened">
@@ -564,28 +629,28 @@ export const DragAnEventToANewTime: Story = {
     docs: {
       description: {
         story:
-          '`onEventChange` 를 주면 시각이 있는 일정을 끌어 옮기고 아래 끝을 끌어 길이를 바꿉니다. 둘 다 15분 단위로 맞고, 놓을 때 한 번 새 `start` 와 `end` 를 알립니다. 키보드로는 일정에서 Space 로 집고, 위아래 방향키로 15분(Shift 와 함께 1시간), 좌우 방향키로 하루씩 옮긴 뒤 Enter 로 놓습니다. 아래 끝은 Tab 으로 가는 separator "끝 시각"이라 위아래 방향키로 15분씩 바꿉니다. 앱이 `events` 를 바꿔야 자리가 바뀝니다.',
+          '`useScheduler` 의 `editing.onEventChange` 를 주면 시각이 있는 일정을 끌어 옮기고 아래 끝을 끌어 길이를 바꿉니다. 둘 다 15분 단위로 맞고, 놓을 때 한 번 새 `start` 와 `end` 를 알립니다. 키보드로는 일정에서 Space 로 집고, 위아래 방향키로 15분(Shift 와 함께 1시간), 좌우 방향키로 하루씩 옮긴 뒤 Enter 로 놓습니다. 아래 끝은 Tab 으로 가는 separator "끝 시각"이라 위아래 방향키로 15분씩 바꿉니다. 앱이 `events` 를 바꿔야 자리가 바뀝니다.',
       },
     },
   },
   render: function Render() {
     const [events, setEvents] = useState(EVENTS);
     const [changed, setChanged] = useState('');
+    const scheduler = useScheduler({
+      navigation: { defaultValue: TODAY, now: NOW },
+      editing: {
+        onEventChange: (event, { start, end }) => {
+          setEvents((previous) =>
+            previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
+          );
+          setChanged(`${event.title} ${start.toString()} – ${end.toString()}`);
+        },
+      },
+    });
 
     return (
       <div className="flex w-full flex-col gap-3">
-        <Scheduler
-          aria-label="일정표"
-          events={events}
-          defaultDate={TODAY}
-          now={NOW}
-          onEventChange={(event, { start, end }) => {
-            setEvents((previous) =>
-              previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
-            );
-            setChanged(`${event.title} ${start.toString()} – ${end.toString()}`);
-          }}
-        >
+        <Scheduler aria-label="일정표" events={events} scheduler={scheduler}>
           {(event) => <Scheduler.Event onClick={() => setChanged(event.title)} />}
         </Scheduler>
         <p className="text-body-b3-regular" data-testid="changed">
@@ -640,27 +705,26 @@ export const AddRightClickMenus: Story = {
     docs: {
       description: {
         story:
-          '`Scheduler.EventMenu` 는 일정을 우클릭했을 때, `Scheduler.SlotMenu` 는 빈 시간 칸을 우클릭했을 때 열 `Menu.Item` 들을 children 함수로 돌려줍니다. 빈 칸은 포인터 아래의 30분 `{ start, end }` 로 넘어옵니다. 메뉴를 주지 않은 곳은 브라우저 메뉴가 그대로 뜹니다. 이 스토리는 `onEventChange` 도 줘서, 메뉴와 함께 일정을 끌어 옮기고 길이를 바꿀 수 있습니다.',
+          '`Scheduler.EventMenu` 는 일정을 우클릭했을 때, `Scheduler.SlotMenu` 는 빈 시간 칸을 우클릭했을 때 열 `Menu.Item` 들을 children 함수로 돌려줍니다. 빈 칸은 포인터 아래의 30분 `{ start, end }` 로 넘어옵니다. 메뉴를 주지 않은 곳은 브라우저 메뉴가 그대로 뜹니다. 이 스토리는 `editing.onEventChange` 도 줘서, 메뉴와 함께 일정을 끌어 옮기고 길이를 바꿀 수 있습니다.',
       },
     },
   },
   render: function Render() {
     const [events, setEvents] = useState(EVENTS);
     const [done, setDone] = useState('');
+    const scheduler = useScheduler({
+      navigation: { defaultValue: TODAY, now: NOW },
+      editing: {
+        onEventChange: (event, { start, end }) =>
+          setEvents((previous) =>
+            previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
+          ),
+      },
+    });
 
     return (
       <div className="flex w-full flex-col gap-3">
-        <Scheduler
-          aria-label="일정표"
-          events={events}
-          defaultDate={TODAY}
-          now={NOW}
-          onEventChange={(event, { start, end }) =>
-            setEvents((previous) =>
-              previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
-            )
-          }
-        >
+        <Scheduler aria-label="일정표" events={events} scheduler={scheduler}>
           {(event) => <Scheduler.Event onClick={() => setDone(event.title)} />}
           <Scheduler.EventMenu>
             {(event) => (
@@ -749,29 +813,29 @@ export const CreateAnEventBySelectingTime: Story = {
     docs: {
       description: {
         story:
-          '`onSlotSelect` 를 주면 빈 시간 칸을 끌어 시간을 고릅니다. 15분 단위로 맞고, 끄는 동안 고른 시간이 칸 위에 보이며, 놓을 때 한 번 `{ start, end, allDay: false }` 를 넘깁니다. 그냥 누르면 고르지 않고, Escape 는 취소합니다. 터치는 250ms 를 누르고 있어야 시작합니다. 앱은 넘어온 시간으로 일정을 만들거나 만들기 창을 엽니다.',
+          '`useScheduler` 의 `editing.onSlotSelect` 를 주면 빈 시간 칸을 끌어 시간을 고릅니다. 15분 단위로 맞고, 끄는 동안 고른 시간이 칸 위에 보이며, 놓을 때 한 번 `{ start, end, allDay: false }` 를 넘깁니다. 그냥 누르면 고르지 않고, Escape 는 취소합니다. 터치는 250ms 를 누르고 있어야 시작합니다. 앱은 넘어온 시간으로 일정을 만들거나 만들기 창을 엽니다.',
       },
     },
   },
   render: function Render() {
     const [events, setEvents] = useState(EVENTS);
     const [selected, setSelected] = useState('');
+    const scheduler = useScheduler({
+      navigation: { defaultValue: TODAY, now: NOW },
+      editing: {
+        onSlotSelect: ({ start, end, allDay }) => {
+          setEvents((previous) => [
+            ...previous,
+            { id: `new-${start.toString()}`, title: '새 일정', start, end, allDay },
+          ]);
+          setSelected(`${start.toString()} – ${end.toString()}`);
+        },
+      },
+    });
 
     return (
       <div className="flex w-full flex-col gap-3">
-        <Scheduler
-          aria-label="일정표"
-          events={events}
-          defaultDate={TODAY}
-          now={NOW}
-          onSlotSelect={({ start, end, allDay }) => {
-            setEvents((previous) => [
-              ...previous,
-              { id: `new-${start.toString()}`, title: '새 일정', start, end, allDay },
-            ]);
-            setSelected(`${start.toString()} – ${end.toString()}`);
-          }}
-        />
+        <Scheduler aria-label="일정표" events={events} scheduler={scheduler} />
         <p className="text-body-b3-regular" data-testid="selected">
           {selected}
         </p>
@@ -819,36 +883,36 @@ export const MoveEventsInTheMonthView: Story = {
     docs: {
       description: {
         story:
-          '월 보기에서도 `onEventChange` 를 주면 일정을 끌어 다른 날로 옮깁니다. 시각은 그대로 두고 날짜만 하루 단위로 바뀌며, 여러 주에 걸친 막대도 잡은 날을 기준으로 움직입니다. 키보드로는 Space 로 집고 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter 로 놓습니다. `onSlotSelect` 를 주면 빈 날 칸을 끌어 여러 날을 고르고, 놓을 때 `{ start, end, allDay: true }` 를 넘깁니다.',
+          '월 보기에서도 `editing.onEventChange` 를 주면 일정을 끌어 다른 날로 옮깁니다. 시각은 그대로 두고 날짜만 하루 단위로 바뀌며, 여러 주에 걸친 막대도 잡은 날을 기준으로 움직입니다. 키보드로는 Space 로 집고 좌우 방향키로 하루, 위아래 방향키로 한 주씩 옮긴 뒤 Enter 로 놓습니다. `editing.onSlotSelect` 를 주면 빈 날 칸을 끌어 여러 날을 고르고, 놓을 때 `{ start, end, allDay: true }` 를 넘깁니다.',
       },
     },
   },
   render: function Render() {
     const [events, setEvents] = useState(EVENTS);
     const [done, setDone] = useState('');
+    const scheduler = useScheduler({
+      views: { defaultValue: 'month' },
+      navigation: { defaultValue: TODAY, now: NOW },
+      editing: {
+        onEventChange: (event, { start, end }) => {
+          setEvents((previous) =>
+            previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
+          );
+          setDone(`${event.title} ${start.toString()} – ${end.toString()}`);
+        },
+        onSlotSelect: ({ start, end, allDay }) => {
+          setEvents((previous) => [
+            ...previous,
+            { id: `new-${start.toString()}`, title: '새 일정', start, end, allDay },
+          ]);
+          setDone(`새 일정 ${start.toString()} – ${end.toString()}`);
+        },
+      },
+    });
 
     return (
       <div className="flex w-full flex-col gap-3">
-        <Scheduler
-          aria-label="일정표"
-          events={events}
-          defaultView="month"
-          defaultDate={TODAY}
-          now={NOW}
-          onEventChange={(event, { start, end }) => {
-            setEvents((previous) =>
-              previous.map((item) => (item.id === event.id ? { ...item, start, end } : item)),
-            );
-            setDone(`${event.title} ${start.toString()} – ${end.toString()}`);
-          }}
-          onSlotSelect={({ start, end, allDay }) => {
-            setEvents((previous) => [
-              ...previous,
-              { id: `new-${start.toString()}`, title: '새 일정', start, end, allDay },
-            ]);
-            setDone(`새 일정 ${start.toString()} – ${end.toString()}`);
-          }}
-        />
+        <Scheduler aria-label="일정표" events={events} scheduler={scheduler} />
         <p className="text-body-b3-regular" data-testid="done">
           {done}
         </p>
@@ -899,18 +963,22 @@ export const DrawYourOwnEventContent: Story = {
       },
     },
   },
-  render: () => (
-    <Scheduler aria-label="일정표" events={ROOMS} defaultDate={TODAY} now={NOW}>
-      {(event) => (
-        <Scheduler.Event colorScheme="tertiary">
-          <Item.Content>
-            <Item.Title overflow="truncate">{event.title}</Item.Title>
-            <Item.Description>{event.room}</Item.Description>
-          </Item.Content>
-        </Scheduler.Event>
-      )}
-    </Scheduler>
-  ),
+  render: function Render() {
+    const scheduler = useScheduler({ navigation: { defaultValue: TODAY, now: NOW } });
+
+    return (
+      <Scheduler aria-label="일정표" events={ROOMS} scheduler={scheduler}>
+        {(event) => (
+          <Scheduler.Event colorScheme="tertiary">
+            <Item.Content>
+              <Item.Title overflow="truncate">{event.title}</Item.Title>
+              <Item.Description>{event.room}</Item.Description>
+            </Item.Content>
+          </Scheduler.Event>
+        )}
+      </Scheduler>
+    );
+  },
   play: async ({ canvas }) => {
     await expect(canvas.getByText('C 205')).toBeInTheDocument();
   },
@@ -921,25 +989,21 @@ export const ControlTheDateAndView: Story = {
     docs: {
       description: {
         story:
-          '`view` 와 `onViewChange`, `date` 와 `onDateChange` 로 보기와 날짜를 앱의 state 에 둡니다. 툴바로 옮기거나 보기를 바꾸면 두 콜백이 새 값을 알립니다.',
+          '`useScheduler` 의 `views` 와 `navigation` 에 `value` 와 `onValueChange` 를 주어 보기와 날짜를 앱의 state 에 둡니다. 툴바로 옮기거나 보기를 바꾸면 두 콜백이 새 값을 알립니다.',
       },
     },
   },
   render: function Render() {
     const [view, setView] = useState<Scheduler.View>('day');
     const [date, setDate] = useState(on(18));
+    const scheduler = useScheduler({
+      views: { value: view, onValueChange: setView },
+      navigation: { value: date, onValueChange: setDate, now: NOW },
+    });
 
     return (
       <div className="flex w-full flex-col gap-3">
-        <Scheduler
-          aria-label="일정표"
-          events={EVENTS}
-          view={view}
-          onViewChange={setView}
-          date={date}
-          onDateChange={setDate}
-          now={NOW}
-        />
+        <Scheduler aria-label="일정표" events={EVENTS} scheduler={scheduler} />
         <p className="text-body-b3-regular" data-testid="state">
           {view} · {date.toString()}
         </p>
@@ -966,7 +1030,7 @@ export const ShowDatesInAnotherLocale: Story = {
     docs: {
       description: {
         story:
-          '요일, 날짜, 시각은 가장 가까운 IdsProvider 의 locale 을 따릅니다. 첫 요일은 locale 을 따르고 `weekStartsOn` 으로 바꿉니다.',
+          '요일, 날짜, 시각은 가장 가까운 IdsProvider 의 locale 을 따릅니다. 첫 요일은 locale 을 따르고 `navigation.weekStartsOn` 으로 바꿉니다.',
       },
     },
   },

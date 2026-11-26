@@ -10,7 +10,7 @@
 
 | 모듈                                             | 내용                                                                                  | 쓰는 곳                                                                                                                                                                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`lib/accessible-name.ts`](#libaccessible-namets)       | 이름이 꼭 필요한 컴포넌트의 `AccessibleName` 타입과 이름 없음 경고                    | Breadcrumb, Calendar, Chart, MessageScroller, OTPField, Pagination, PromptInput, QRCode, Rating, Scheduler, Sidebar, Stepper, `temporal-field/` |
+| [`lib/accessible-name.ts`](#libaccessible-namets)       | 이름이 꼭 필요한 컴포넌트의 `AccessibleName` 타입과 이름 없음 경고                    | Breadcrumb, Calendar, Chart, MessageScroller, OTPField, Pagination, PromptInput, QRCode, Rating, Scheduler, Sidebar, Stepper, Timeline, `temporal-field/` |
 | [`parts/arc.tsx`](#partsarctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, CircularProgress                                                                                                                                                                                             |
 | [`surfaces/lib/control-surface.ts`](#surfaceslibcontrol-surfacets)       | 버튼류 컨트롤의 클래스 조각, scheme 클래스, compound variant                          | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
 | [`lib/corner-shape.ts`](#libcorner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer, Badge                                                                                                                                                                                     |
@@ -68,7 +68,7 @@
 
 ### 쓰는 곳
 
-- Breadcrumb, Calendar, MessageScroller, Pagination, PromptInput, QRCode, Scheduler, Sidebar, Stepper: props 타입에 `AccessibleName` 을 더하고 루트에서 `useInternalRequiredName` 을 부릅니다.
+- Breadcrumb, Calendar, MessageScroller, Pagination, PromptInput, QRCode, Scheduler, Sidebar, Stepper, Timeline: props 타입에 `AccessibleName` 을 더하고 루트에서 `useInternalRequiredName` 을 부릅니다.
 - Chart, OTPField, Rating: 타입은 그대로 두고 `useInternalUnnamedWarning` 만 부릅니다. Field 안에서는 Field.Label 이 `aria-labelledby` 로 이름을 주고, Chart 는 Chart.Title 이 이름이 되기 때문입니다.
 - `temporal-field/`: DateField, DateTimeField 의 팝업 Calendar 에 필드의 이름을 넘기는 `picker.name` 의 타입입니다.
 
@@ -351,7 +351,7 @@ const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE
 - `resolveLocale` 은 `Intl.getCanonicalLocales` 로 태그를 검사하고 정규형(`ko-kr` → `ko-KR`)을 돌려줍니다. 어떤 태그든 import 없이 됩니다. locale 데이터는 런타임의 ICU 에 이미 있습니다.
 - 인자를 생략하면 `DEFAULT_LOCALE`(`'ko-KR'`)을 씁니다. 날짜와 시간 컴포넌트는 `locale` prop 이 없고 가장 가까운 `IdsProvider` 의 `locale`([translate.ts](#translatets) 의 `useInternalProviderLocale`)을 넘깁니다. 주 시작과 숫자 체계도 그 태그의 `-u-fw-`, `-u-nu-` 확장으로 정합니다.
 - `dateFormatter` 는 `@internationalized/date` 의 `DateFormatter` 입니다. 같은 locale 과 옵션의 `Intl.DateTimeFormat` 을 캐시하고, Chrome 의 `hour12` 버그를 피합니다.
-- `withWeekStart` 는 태그에 이미 있는 `-fw-` 를 지우고 `-u-` 확장 안에 다시 적습니다. Scheduler 는 자기 `weekStartsOn` 을 Calendar 에 넘길 prop 이 없어서, 이 태그를 `LanguageContext` 로 내려 줍니다.
+- `withWeekStart` 는 태그에 이미 있는 `-fw-` 를 지우고 `-u-` 확장 안에 다시 적습니다. Scheduler 는 `useScheduler` 의 `navigation.weekStartsOn` 을 Calendar 에 넘길 prop 이 없어서, 이 태그를 `LanguageContext` 로 내려 줍니다.
 - `periodFirst`, `dateOrder`, `monthNames`, `nativeDigits` 는 locale 마다 한 번 계산합니다(`memoize`).
 - `weekStartOf` 는 알려진 일요일(`A_SUNDAY`)이 그 locale 의 주에서 몇 번째 날인지(`getDayOfWeek`)로 주 시작을 거꾸로 구합니다. `getDayOfWeek` 은 `Intl.Locale` 의 주 정보와 `-u-fw-` 확장을 따릅니다.
 - `monthNames` 는 날짜 안의 꼴(`{ day, month }` 의 `month` 부분)과 홀로 쓰는 꼴(`{ month }`)을 모두 담습니다. 러시아어처럼 두 꼴이 다른 언어가 있습니다. 끝의 `.`(`oct.`, `Sept.`)은 떼고 비교합니다.

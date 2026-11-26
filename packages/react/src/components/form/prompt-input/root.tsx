@@ -3,8 +3,8 @@
 import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
 import { PromptInputContext } from './context';
-import { useInternalPromptInput } from './hooks/use-prompt-input';
-import { NO_FILES, NO_TOOLS } from './lib/empty-defaults';
+import { useInternalPromptInputRoot } from './hooks/use-prompt-input-root';
+import { UNCONTROLLED_AND_UNLIMITED } from './lib/empty-defaults';
 import { PromptInputAttachments } from './parts/attachments';
 import { PromptInputInput, type PromptInputInputProps } from './parts/input';
 import { PromptInputSubmit } from './parts/submit';
@@ -28,8 +28,8 @@ import { FilePicker } from '../file-field/parts/picker';
 import { TextArea } from '../text-area';
 import { TextAreaInput } from '../text-area/parts/input';
 
+import type { PromptInputInstance } from './hooks/use-prompt-input';
 import type { IdsSize } from '../../../tokens/types';
-import type { FileFieldRejection } from '../file-field/lib/file-rules';
 
 export type PromptInputStatus = 'idle' | 'submitting' | 'streaming';
 export type PromptInputVariant = 'outline' | 'soft';
@@ -43,19 +43,10 @@ export type PromptInputProps = Omit<
     value?: string;
     defaultValue?: string;
     onValueChange?: (value: string) => void;
-    files?: File[];
-    defaultFiles?: File[];
-    onFilesChange?: (files: File[]) => void;
-    tools?: string[];
-    defaultTools?: string[];
-    onToolsChange?: (tools: string[]) => void;
     onSend?: (message: PromptInputMessage) => void;
     onStop?: () => void;
     status?: PromptInputStatus;
-    accept?: string;
-    maxSize?: number;
-    maxCount?: number;
-    onReject?: (rejections: FileFieldRejection[]) => void;
+    promptInput?: PromptInputInstance;
     disabled?: boolean;
     variant?: PromptInputVariant;
     size?: IdsSize;
@@ -91,19 +82,10 @@ export function PromptInputRoot({
   value,
   defaultValue = '',
   onValueChange,
-  files: filesProp,
-  defaultFiles = NO_FILES,
-  onFilesChange,
-  tools: toolsProp,
-  defaultTools = NO_TOOLS,
-  onToolsChange,
   onSend,
   onStop,
   status = 'idle',
-  accept,
-  maxSize,
-  maxCount,
-  onReject,
+  promptInput = UNCONTROLLED_AND_UNLIMITED,
   disabled = false,
   variant = 'outline',
   size: sizeProp,
@@ -127,24 +109,15 @@ export function PromptInputRoot({
     canSend,
     send,
     sendOrStop,
-  } = useInternalPromptInput({
+  } = useInternalPromptInputRoot({
     value,
     defaultValue,
     onValueChange,
-    files: filesProp,
-    defaultFiles,
-    onFilesChange,
-    tools: toolsProp,
-    defaultTools,
-    onToolsChange,
     onSend,
     onStop,
     onSubmit,
+    promptInput,
     status,
-    accept,
-    maxSize,
-    maxCount,
-    onReject,
     disabled,
     size,
   });

@@ -15,7 +15,7 @@ export function LabelRoot({
   size = 'standard',
   required,
   disabled,
-  invalid = false,
+  'aria-invalid': ariaInvalid,
   asChild = false,
   id,
   htmlFor,
@@ -43,7 +43,10 @@ export function LabelRoot({
     required,
     ref,
   });
-  const state: Label.State = { ...mirrored, invalid };
+  const state: Label.State = {
+    ...mirrored,
+    invalid: ariaInvalid === true || ariaInvalid === 'true',
+  };
   const { root, marker } = labelStyle({ size });
 
   const props = {

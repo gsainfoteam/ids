@@ -1,186 +1,63 @@
 'use client';
 
-import {
-  Children,
-  cloneElement,
-  Fragment,
-  isValidElement,
-  useId,
-  type ComponentProps,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { useId, type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
-import { SidebarListContext, useInternalSidebarContext } from '../context';
-import { SidebarItem, type SidebarItemProps } from './item';
-import { SidebarSortable } from './sortable';
-import { elementTypeOf } from '../../../../utils';
+import { SidebarGroupContext, useInternalSidebarContext } from '../context';
+import { SidebarGroupLabel } from './group-label';
+import { SidebarGroupTree } from './group-tree';
+import { SidebarList } from './list';
+import { useControllableState } from '../../../../hooks/use-controllable-state';
+import { flattenFragments } from '../../../../utils';
 import { Accordion } from '../../../data/accordion';
-import { useInternalSidebarTree } from '../hooks/use-sidebar-tree';
-import { useInternalSidebarTreeWarnings } from '../hooks/use-sidebar-tree-warnings';
-import {
-  TREE_KEY_PROP,
-  type SidebarMove,
-  type SidebarTree,
-  type SidebarTreeId,
-  type SidebarTreeItem,
-} from '../lib/tree';
+import { isType } from '../lib/is-type';
 
-type SidebarGroupBaseProps = Omit<ComponentProps<'section'>, 'children'> & {
-  label?: ReactNode;
-  collapsible?: boolean;
+export type SidebarGroupCollapse = {
+  open?: boolean;
   defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-export type SidebarGroupProps = SidebarGroupBaseProps & {
-  items?: never;
-  onItemsChange?: never;
-  canMove?: never;
-  children?: ReactNode;
+export type SidebarGroupProps = ComponentProps<'section'> & {
+  collapse?: SidebarGroupCollapse;
 };
-
-export type SidebarGroupItemState = { depth: number };
-
-export type SidebarGroupItemsProps<T extends SidebarTreeItem<T>> = SidebarGroupBaseProps & {
-  items: readonly T[];
-  onItemsChange?: (items: NoInfer<T>[], move: SidebarMove<NoInfer<T>>) => void;
-  canMove?: (move: SidebarMove<NoInfer<T>>) => boolean;
-  children: (item: NoInfer<T>, state: SidebarGroupItemState) => ReactNode;
-};
-
-type AnyTreeItem = { id: SidebarTreeId; children?: readonly AnyTreeItem[] };
-
-type RenderItem<T> = (item: T, state: SidebarGroupItemState) => ReactNode;
 
 const GROUP = 'group';
+const NOT_COLLAPSIBLE: SidebarGroupCollapse = {};
 
-export function SidebarList({ children }: { children?: ReactNode }) {
-  const { styles } = useInternalSidebarContext('Sidebar.Group');
+function splitBody(nodes: ReactNode[]) {
+  const body: ReactNode[] = [];
+  let run: ReactNode[] = [];
 
-  return (
-    <SidebarListContext value>
-      <ul className={styles.list()}>
-        {Children.map(children, (child) =>
-          isValidElement(child) && elementTypeOf(child) === SidebarItem ? (
-            child
-          ) : child == null || typeof child === 'boolean' ? (
-            child
-          ) : (
-            <li className={styles.listItem()}>{child}</li>
-          ),
-        )}
-      </ul>
-    </SidebarListContext>
-  );
+  const closeRun = () => {
+    if (run.length > 0) body.push(<SidebarList key={`list-${body.length}`}>{run}</SidebarList>);
+    run = [];
+  };
+
+  for (const node of nodes) {
+    if (isType(SidebarGroupTree)(node)) {
+      closeRun();
+      body.push(node);
+    } else run.push(node);
+  }
+  closeRun();
+
+  return body;
 }
 
-function withNestedItems(
-  element: ReactElement<SidebarItemProps>,
-  key: string,
-  nested: ReactNode[],
-) {
-  const ownProps = { key, [TREE_KEY_PROP]: key } as Partial<SidebarItemProps>;
-  if (nested.length === 0) return cloneElement(element, ownProps);
-
-  const { asChild, children } = element.props;
-  if (asChild && isValidElement<{ children?: ReactNode }>(children))
-    return cloneElement(
-      element,
-      ownProps,
-      cloneElement(children, undefined, children.props.children, ...nested),
-    );
-  return cloneElement(element, ownProps, children, ...nested);
-}
-
-function renderRows<T>(tree: SidebarTree<T>, keys: readonly string[], render: RenderItem<T>) {
-  let everyRowIsAnItem = true;
-
-  const rowsOf = (rowKeys: readonly string[]): ReactNode[] =>
-    rowKeys.map((key) => {
-      const node = tree.nodes.get(key)!;
-      const row = render(node.item, { depth: node.depth });
-      const nested = rowsOf(node.children);
-
-      if (isValidElement<SidebarItemProps>(row) && elementTypeOf(row) === SidebarItem)
-        return withNestedItems(row, key, nested);
-      everyRowIsAnItem = false;
-      return <Fragment key={key}>{row}</Fragment>;
-    });
-
-  return { rows: rowsOf(keys), everyRowIsAnItem };
-}
-
-function SidebarTreeList<T extends SidebarTreeItem<T>>({
-  items,
-  onItemsChange,
-  canMove,
-  render,
-}: {
-  items: readonly T[];
-  onItemsChange?: (items: T[], move: SidebarMove<T>) => void;
-  canMove?: (move: SidebarMove<T>) => boolean;
-  render: RenderItem<T>;
-}) {
-  const { rail, presentation } = useInternalSidebarContext('Sidebar.Group');
-  const tree = useInternalSidebarTree(items);
-  const { rows, everyRowIsAnItem } = renderRows(tree, tree.roots, render);
-  useInternalSidebarTreeWarnings(everyRowIsAnItem, tree.duplicates.join(', '));
-
-  const list = <SidebarList>{rows}</SidebarList>;
-  if (!onItemsChange || rail || presentation === 'drawer') return list;
-
-  return (
-    <SidebarSortable items={items} tree={tree} onItemsChange={onItemsChange} canMove={canMove}>
-      {list}
-    </SidebarSortable>
-  );
-}
-
-function SidebarGroupBody({
-  items,
-  onItemsChange,
-  canMove,
-  children,
-}: Pick<SidebarGroupItemsProps<AnyTreeItem>, 'onItemsChange' | 'canMove'> & {
-  items: readonly AnyTreeItem[] | undefined;
-  children: ReactNode | RenderItem<AnyTreeItem>;
-}) {
-  if (items === undefined) return <SidebarList>{children as ReactNode}</SidebarList>;
-
-  return (
-    <SidebarTreeList
-      items={items}
-      onItemsChange={onItemsChange}
-      canMove={canMove}
-      render={children as RenderItem<AnyTreeItem>}
-    />
-  );
-}
-
-export function SidebarGroup<T extends SidebarTreeItem<T>>(
-  props: SidebarGroupItemsProps<T>,
-): ReactElement;
-export function SidebarGroup(props: SidebarGroupProps): ReactElement;
-export function SidebarGroup({
-  label,
-  collapsible = false,
-  defaultOpen = true,
-  items,
-  onItemsChange,
-  canMove,
-  className,
-  children,
-  ...props
-}: SidebarGroupProps | SidebarGroupItemsProps<AnyTreeItem>) {
+export function SidebarGroup({ collapse, className, children, ...props }: SidebarGroupProps) {
   const { styles, rail } = useInternalSidebarContext('Sidebar.Group');
   const labelId = useId();
-  const body = (
-    <SidebarGroupBody items={items} onItemsChange={onItemsChange} canMove={canMove}>
-      {children}
-    </SidebarGroupBody>
-  );
+  const nodes = flattenFragments(children);
+  const label = nodes.find(isType(SidebarGroupLabel)) as ReactElement | undefined;
+  const body = splitBody(nodes.filter((node) => node !== label));
 
-  const collapses = collapsible && label !== undefined && !rail;
+  const { open, defaultOpen = true, onOpenChange } = collapse ?? NOT_COLLAPSIBLE;
+  const [isOpen, setOpen] = useControllableState({
+    value: open,
+    defaultValue: defaultOpen,
+    onValueChange: onOpenChange,
+  });
+  const collapses = collapse !== undefined && label !== undefined && !rail;
 
   return (
     <section
@@ -193,31 +70,30 @@ export function SidebarGroup({
         <Accordion
           type="single"
           collapsible
-          defaultValue={defaultOpen ? GROUP : null}
+          value={isOpen ? GROUP : null}
+          onValueChange={(value) => setOpen(value === GROUP)}
           variant="ghost"
           size="tiny"
         >
           <Accordion.Item value={GROUP}>
             <Accordion.Header asChild>
               <div>
-                <Accordion.Trigger className={styles.groupTrigger()}>{label}</Accordion.Trigger>
+                <Accordion.Trigger className={styles.groupTrigger()}>
+                  <SidebarGroupContext value={{ labelId, inTrigger: true }}>
+                    {label}
+                  </SidebarGroupContext>
+                </Accordion.Trigger>
               </div>
             </Accordion.Header>
             <Accordion.Content className="p-0">{body}</Accordion.Content>
           </Accordion.Item>
         </Accordion>
       ) : (
-        <>
-          {label !== undefined && (
-            <div id={labelId} className={styles.groupLabel()}>
-              {label}
-            </div>
-          )}
+        <SidebarGroupContext value={{ labelId, inTrigger: false }}>
+          {label}
           {body}
-        </>
+        </SidebarGroupContext>
       )}
     </section>
   );
 }
-
-SidebarGroup.displayName = 'Sidebar.Group';

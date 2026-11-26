@@ -102,7 +102,7 @@ const { register } = useForm({ defaultValues: { plan: 'free' } });
 ```tsx
 <Radio variant="soft" />    // outline(기본) / soft: 테두리 대신 옅은 면
 <Radio size="tiny" />       // standard(16px) / tiny(14px). 생략하면 RadioGroup, 그다음 Field를 따른다
-<Radio invalid />           // 테두리와 점이 danger 색
+<Radio aria-invalid />      // 테두리와 점이 danger 색
 ```
 
 - **크기 계약: hug.** 원 크기만큼 차지하고 바깥 여백이 없습니다. 자리와 간격은 감싸는 요소와 그 `gap` 이 정합니다.
@@ -115,7 +115,7 @@ const { register } = useForm({ defaultValues: { plan: 'free' } });
 | `checked` / `defaultChecked` | 그룹 밖에서만. 기본 `false`                                    |
 | `onCheckedChange`            | 선택되거나 그룹의 다른 라디오에 밀려 풀렸을 때                 |
 | `readOnly`                   | 선택되지 않는다                                                |
-| `invalid`                    | `aria-invalid` 와 danger 색                                    |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `variant`                    | `outline`(기본) / `soft`                                       |
 | `size`                       | `standard` / `tiny`                                            |
 | `className` / `style`        | 원으로 간다. 새 디자인(`custom-design`)에서만 쓴다                           |

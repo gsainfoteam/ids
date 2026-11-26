@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import type { CalendarModifiers } from '../hooks/use-calendar';
+import type { CalendarModifiers } from '../hooks/use-calendar-grid';
 import type { CalendarDayState } from '../root';
 import type { CalendarDate } from '@internationalized/date';
 

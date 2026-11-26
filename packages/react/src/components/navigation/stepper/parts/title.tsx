@@ -1,24 +1,29 @@
 'use client';
 
-import { type ComponentProps } from 'react';
+import { type ComponentProps, type ReactNode } from 'react';
 
 import { resolveState, type StateRenderProps } from '../../../../internal/lib/state-props';
 import { Slot } from '../../../utility/slot';
 import { useInternalItemContext, useInternalRootContext } from '../context';
 import { statusAttributes } from '../lib/step-state';
 
-import type { StepperItemState } from './item';
+import type { StepItemState, StepperItemState } from './item';
 
 export type StepperTitleState = StepperItemState;
 
-export type StepperTitleProps = Omit<ComponentProps<'span'>, 'children' | 'className' | 'style'> &
-  StateRenderProps<StepperTitleState> & {
+export type StepTitleProps<S = StepItemState> = Omit<
+  ComponentProps<'span'>,
+  'children' | 'className' | 'style'
+> &
+  StateRenderProps<S> & {
     asChild?: boolean;
   };
 
-export function StepperTitle({ asChild, className, style, children, ...rest }: StepperTitleProps) {
-  const root = useInternalRootContext('Stepper.Title');
-  const item = useInternalItemContext('Stepper.Title');
+export type StepperTitleProps = StepTitleProps<StepperTitleState>;
+
+export function StepTitle({ asChild, className, style, children, ...rest }: StepTitleProps) {
+  const root = useInternalRootContext('Title');
+  const item = useInternalItemContext('Title');
   const { state } = item;
   const props = {
     id: item.ids.title,
@@ -34,4 +39,6 @@ export function StepperTitle({ asChild, className, style, children, ...rest }: S
   return <span {...props}>{content}</span>;
 }
 
-StepperTitle.displayName = 'Stepper.Title';
+StepTitle.displayName = 'Stepper.Title';
+
+export const StepperTitle = StepTitle as (props: StepperTitleProps) => ReactNode;

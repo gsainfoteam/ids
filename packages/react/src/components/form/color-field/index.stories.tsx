@@ -26,7 +26,7 @@ const meta = {
     size: { control: 'radio', options: sizes },
     format: { control: 'radio', options: ['hex', 'rgb', 'hsl', 'oklch'] },
     defaultOpen: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    'aria-invalid': { control: 'boolean' },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -420,7 +420,7 @@ export const OpenAsABottomSheetOnMobile: Story = {
   render: () => (
     <div className="w-64">
       <ColorField aria-label="브랜드 색상" defaultValue="#3B82F6">
-        <ColorField.Content mobileVariant="drawer" />
+        <ColorField.Content narrow="drawer" />
       </ColorField>
     </div>
   ),
@@ -428,7 +428,7 @@ export const OpenAsABottomSheetOnMobile: Story = {
     docs: {
       description: {
         story:
-          '640px 보다 좁은 화면에서 ColorField.Content 에 mobileVariant="drawer" 를 주면 제목과 닫기 버튼이 있는 모달 하단 시트로 엽니다. Content 에 자식이 없으면 기본 배치를 그립니다.',
+          '640px 보다 좁은 화면에서 ColorField.Content 에 narrow="drawer" 를 주면 제목과 닫기 버튼이 있는 모달 하단 시트로 엽니다. Content 에 자식이 없으면 기본 배치를 그립니다.',
       },
     },
   },

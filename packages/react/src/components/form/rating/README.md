@@ -140,7 +140,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `readOnly`               | 표시 전용 그림. Tab 에 멈추지 않는다. `name` 이 있으면 점수를 제출 |
 | `disabled`               | 조작, 탭 이동, 폼 제출에서 모두 빠진다                  |
 | `required`               | 0점이면 제출을 막는다                                   |
-| `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선                |
+| `aria-invalid` | 오류 표시(danger 색). Field 안이면 Field 가 넘긴다 |
 | `name` / `form`          | 라디오의 `name`, `form`. 고른 점수를 제출한다           |
 | `getValueLabel`          | `(value, max) => string`                                |
 | `size`                   | `standard` / `tiny`                                     |

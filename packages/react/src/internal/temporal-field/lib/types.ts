@@ -18,7 +18,6 @@ export type TemporalFieldProps<V> = Omit<
   onOpenChange?: (open: boolean) => void;
   variant?: FieldSurfaceVariant;
   size?: IdsSize;
-  invalid?: boolean;
   required?: boolean;
   readOnly?: boolean;
   disabled?: boolean;

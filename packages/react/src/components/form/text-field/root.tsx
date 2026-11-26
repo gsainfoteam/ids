@@ -39,7 +39,6 @@ export function TextFieldRoot({
   variant = 'outline',
   size: sizeProp,
   disabled,
-  invalid,
   onValueChange,
   className,
   style,
@@ -57,7 +56,6 @@ export function TextFieldRoot({
     rootProps,
     input: input.props,
     disabled,
-    invalid,
     onValueChange,
     clearable: countOf(items, TextControlClear) > 0,
   });

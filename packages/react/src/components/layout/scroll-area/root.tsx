@@ -79,7 +79,7 @@ export function ScrollAreaRoot({
   variant = 'hover',
   size = 'standard',
   orientation,
-  fade = false,
+  fade,
   asChild = false,
   className,
   style,

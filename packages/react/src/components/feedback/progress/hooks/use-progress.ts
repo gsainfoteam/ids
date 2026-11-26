@@ -11,7 +11,6 @@ export type ProgressOwner = 'Progress' | 'CircularProgress';
 export type ProgressRootOptions = {
   value?: number | null;
   max?: number;
-  indeterminate?: boolean;
   getValueLabel?: (value: number, max: number) => string;
   id?: string;
   'aria-label'?: string;
@@ -32,7 +31,6 @@ export function useInternalProgressRoot(
   {
     value,
     max = 100,
-    indeterminate = false,
     getValueLabel,
     id,
     'aria-label': ariaLabel,
@@ -51,7 +49,7 @@ export function useInternalProgressRoot(
     (isValidElement<{ id?: string }>(label) ? label.props.id : undefined) ?? `${generatedId}-label`;
   const labelled = ariaLabel !== undefined || ariaLabelledBy !== undefined || label !== undefined;
 
-  const resolved = resolveProgress(value, max, indeterminate);
+  const resolved = resolveProgress(value, max);
   const valueLabel =
     resolved.value === null || resolved.percent === null
       ? undefined

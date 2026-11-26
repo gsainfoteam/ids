@@ -23,9 +23,11 @@ function currentMinute() {
 
 const unknownOnTheServer = () => null;
 
+const stayStill = () => () => {};
+
 export function useInternalNow(fixed: CalendarDateTime | undefined) {
   const minute = useSyncExternalStore(
-    subscribeToTheClock,
+    fixed ? stayStill : subscribeToTheClock,
     fixed ? unknownOnTheServer : currentMinute,
     unknownOnTheServer,
   );
