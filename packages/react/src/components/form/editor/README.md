@@ -8,27 +8,27 @@
 - **필드와 같은 테두리.** TextField, TextArea 와 같은 `field-surface` 라 `outline`, `soft`, 포커스 링, 오류 테두리가 같습니다.
 - **폼에 들어감.** `name` 을 주면 숨은 input 으로 FormData 에 들어가고, `required` 면 빈 본문의 제출을 브라우저가 막습니다. Field 안에 두면 라벨, 설명, 오류가 본문에 연결됩니다.
 - **세 가지 값.** `format` 이 `html`(기본), `markdown`, `json` 중 무엇이냐에 따라 값의 모양이 바뀝니다.
-- **두 가지 편집 방식.** `type="toolbar"`(기본)는 툴바로 서식을 넣고, `type="block"` 은 툴바 없이 `/` 메뉴와 블록 손잡이로 블록을 넣고 옮깁니다.
+- **툴바 에디터.** 툴바로 서식을 넣습니다. 툴바 없이 `/` 메뉴와 블록 손잡이로 블록을 넣고 옮기는 편집기는 [BlockEditor](../block-editor/README.md) 입니다.
+- **확장은 hook 으로.** 그림 올리기와 멘션은 `useEditor()` 로 켜고, 그 결과를 `editor` 로 넘깁니다.
 
 ## 툴바 에디터와 블록 에디터
 
 ```tsx
-<Editor />                                  // 툴바 에디터. 툴바가 트레이 위에, 본문이 그 안의 카드에
-<Editor type="block">                       // 블록 에디터. 툴바 없이 본문만
-  <Editor.Content placeholder="/ 로 블록을 넣으세요" />
-</Editor>
+import { BlockEditor, Editor } from '@gsainfoteam/ids-react/editor';
+
+<Editor />       // 툴바가 트레이 위에, 본문이 그 안의 카드에
+<BlockEditor />  // 툴바 없이 본문만. / 메뉴, 블록 손잡이, 버블 메뉴
 ```
 
-| | `toolbar`(기본) | `block` |
-| --- | --- | --- |
-| 툴바 | `Editor.Content` 위아래의 부품 | 없음. 도구 부품을 넣으면 개발 중 경고를 띄우고 뺍니다 |
-| 불러오는 블록 | 넣은 부품의 블록만 | 표, 콜아웃, 토글, 할 일, 정렬, 형광펜까지 모두 |
-| `/` 블록 메뉴 | 불러온 블록만 | 모든 블록 |
-| BubbleMenu | 넣을 때만 | 늘 있음. 자식이 없으면 굵게, 기울임, 밑줄, 취소선, 코드, 색, 링크 |
-| 블록 손잡이 | 없음 | 편집할 수 있으면 본문 왼쪽 여백에 나옴 |
-
+- 두 컴포넌트는 같은 값, 같은 `format`, 같은 `useEditor()` 결과를 받습니다. 다른 것은 구조입니다.
+- `Editor` 는 넣은 부품의 블록만 불러오고, 손잡이가 없습니다. `BlockEditor` 는 모든 블록을 불러오고, 손잡이와 기본 버블 메뉴가 늘 있습니다.
 - 위아래 바가 있으면 Editor 는 회색 트레이가 되고 본문은 그 안의 카드가 됩니다. [DataTable](../../data/data-table/README.md) 과 같은 모양입니다. 바가 없으면 본문 상자 하나입니다.
-- 블록 에디터에도 `Editor.Count` 는 아래 바로 넣을 수 있습니다.
+
+## 크기
+
+- **fill.** 부모의 너비를 다 씁니다. 너비는 감싸는 요소가 정합니다.
+
+## 폼
 
 ```tsx
 import { Field } from '@gsainfoteam/ids-react';
@@ -70,7 +70,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 ```
 
 - `Editor.Content` 위의 자식은 위 툴바, 아래의 자식은 아래 바가 됩니다. TextArea 의 바와 같습니다.
-- 자식이 없으면 기본 툴바(문단 모양, 굵게, 기울임, 취소선, 코드, 링크, 목록 둘, 인용, 코드 블록)와 본문이 들어갑니다. `onImageUpload` 가 있으면 링크 뒤에 그림이 더 붙습니다.
+- 자식이 없으면 기본 툴바(문단 모양, 굵게, 기울임, 취소선, 코드, 링크, 목록 둘, 인용, 코드 블록)와 본문이 들어갑니다. `useEditor` 에 `imageUpload` 가 있으면 링크 뒤에 그림이 더 붙습니다.
 - `Editor.Content` 가 없으면 자식은 모두 위 툴바가 되고, 본문은 그 아래에 기본으로 들어갑니다.
 
 | 부품                                                   | 하는 일                                                         |
@@ -97,7 +97,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 - 도구는 `icon` 과 `aria-label` 로 아이콘과 이름을 바꿀 수 있습니다.
 - `Highlight`, `Color`, `Subscript`, `Superscript`, `TaskList`, `TextAlign`, `Table`, `Callout`, `Details` 는 Editor 의 자식(`BubbleMenu` 의 자식 포함)에 있을 때만 그 Tiptap 확장을 엔진과 함께 `import()` 로 불러옵니다. 쓰지 않는 앱은 그 코드를 받지 않고, 스키마와 플러그인도 돌리지 않습니다.
 - 그래서 그 부품이 없으면 값에 있던 형광펜, 할 일, 정렬, 표, 콜아웃, 접는 블록도 읽지 않고 버립니다. 저장한 글에 쓰인 서식의 부품은 계속 둡니다.
-- 그림 노드는 저장된 그림을 지키려고 늘 엔진에 있습니다. 올리기, 자리표시, 파일 붙여넣기와 끌어 놓기는 `onImageUpload` 가 있을 때만 따로 불러옵니다.
+- 그림 노드는 저장된 그림을 지키려고 늘 엔진에 있습니다. 올리기, 자리표시, 파일 붙여넣기와 끌어 놓기는 `imageUpload` 가 있을 때만 따로 불러옵니다.
 - 부품을 앱의 컴포넌트 안에 감싸 넣으면 Editor 가 찾지 못합니다. 개발 중에는 콘솔 경고가 뜨고 도구가 꺼집니다.
 - 위아래 바는 줄을 바꾸지 않습니다. 필드보다 넓으면 [ScrollArea](../../layout/scroll-area/README.md) 로 가로 스크롤합니다. 스크롤바는 그리지 않고(`variant="none"`), 더 남은 쪽 가장자리를 흐립니다. 키보드로 옮긴 도구는 보이는 자리까지 스크롤됩니다.
 - 마우스로 도구를 눌러도 포커스는 본문에 남습니다. 키보드로는 Tab 이 툴바의 한 도구에 닿고, 화살표로 도구 사이를 옮깁니다.
@@ -117,7 +117,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `Mod+Shift+L` `E` `R` `J` | 왼쪽, 가운데, 오른쪽, 양쪽 정렬(`TextAlign` 이 있을 때) |
 | `Mod+Z` `Mod+Shift+Z` | 실행 취소, 다시 실행        |
 | `/`                   | 블록 메뉴를 엶              |
-| `@`                   | 멘션 목록을 엶(`mentions` 가 있을 때) |
+| `@`                   | 멘션 목록을 엶(`useEditor` 에 `mentions` 가 있을 때) |
 | `↑` `↓` `Enter` `Tab` | 블록 메뉴와 멘션 목록에서 고르고 넣음 |
 | `> [!tip]` 뒤에 공백  | 그 줄을 콜아웃으로 바꿈(`Callout` 이 있을 때) |
 | `Escape`              | 블록 메뉴, 멘션 목록, 버블 메뉴, Popover, Dialog 를 닫음 |
@@ -145,35 +145,56 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 - 브라우저 맞춤법 검사는 기본으로 꺼져 있습니다. 한국어 글에서 영어 낱말과 고유 명사마다 빨간 줄이 그어지기 때문입니다. `spellCheck` 를 주면 켭니다.
 - 주소를 쳐 넣으면 저절로 링크가 됩니다(`autolink`).
 
-## 블록 메뉴와 손잡이
+## 블록 메뉴
+
+- 블록 메뉴는 고칠 수 있는 Editor 에 늘 켜져 있습니다.
+- 빈 자리나 공백 뒤에 `/` 를 치면 블록 메뉴가 열립니다. 뒤에 친 글자로 이름과 영어 키워드(`h2`, `todo`, `quote`)를 걸러 냅니다. 띄어쓰기는 무시하므로 "제목 2" 와 "제목2" 가 같습니다.
+- 메뉴에는 불러온 블록만 나옵니다. `Table` 부품이 없으면 표가 빠집니다. 코드 블록 안에서는 `/` 가 그냥 글자입니다.
+- 맞는 블록이 없는 채로 공백을 치면 메뉴가 닫힙니다.
+- 블록 손잡이는 [BlockEditor](../block-editor/README.md) 에만 있습니다. Editor 에는 손잡이도, 손잡이를 위한 여백도 없습니다.
+- 골라진 블록(누른 멘션 등)에는 옅은 primary 틴트가 블록의 모서리를 따라 덮입니다. 테두리를 긋지 않아 블록의 모양이 그대로 보입니다. 그림만 틴트 대신 안쪽 테두리를 그어, 그림의 색을 바꾸지 않고 너비 손잡이도 가리지 않습니다.
+
+## 확장(useEditor)
 
 ```tsx
-<Editor type="block" />
+'use client';
+
+import { Editor, useEditor } from '@gsainfoteam/ids-react/editor';
+
+function PostBody() {
+  const editor = useEditor({
+    imageUpload: { onUpload: uploadToStorage },
+    mentions: { find: findMembers },
+  });
+
+  return <Editor editor={editor} name="body" />;
+}
 ```
 
-- 블록 메뉴는 고칠 수 있는 Editor 에 늘 켜져 있습니다. 툴바 에디터에도 있습니다.
-- 빈 자리나 공백 뒤에 `/` 를 치면 블록 메뉴가 열립니다. 뒤에 친 글자로 이름과 영어 키워드(`h2`, `todo`, `quote`)를 걸러 냅니다. 띄어쓰기는 무시하므로 "제목 2" 와 "제목2" 가 같습니다.
-- 메뉴에는 불러온 블록만 나옵니다. 툴바 에디터에 `Table` 부품이 없으면 표가 빠집니다. 블록 에디터는 모든 블록을 불러옵니다. 코드 블록 안에서는 `/` 가 그냥 글자입니다.
-- 맞는 블록이 없는 채로 공백을 치면 메뉴가 닫힙니다.
-- 손잡이는 블록 에디터(`type="block"`)에만 나옵니다. 툴바 에디터에는 손잡이도, 손잡이를 위한 여백도 없습니다.
-- 블록 에디터는 본문 왼쪽에 손잡이가 들어갈 여백을 둡니다. 손잡이는 그 여백에서 마우스가 올라간 블록의 첫 줄 옆에 나타나고, 나타나고 사라질 때 서서히 흐려집니다. 손잡이를 누르면 메뉴가 손잡이 바로 아래에 열립니다.
-- 표의 손잡이 메뉴에는 툴바의 표 메뉴와 같은 행, 열, 머리글, 칸 동작이 더 나옵니다. 커서가 그 표 안에 있으면 그 칸을, 없으면 마지막 칸을 기준으로 합니다.
-- 손잡이를 끌면 [Sidebar](../../navigation/sidebar/README.md) 와 같은 모양으로 옮깁니다. 끄는 블록의 반투명한 복사본이 포인터를 따라오고, 원래 블록은 흐려지며, 놓을 자리에 primary 선이 그어집니다. 놓은 블록은 골라진 채로 남습니다.
-- 손잡이를 누르면 Menu 가 열립니다.
-- 손잡이 Menu 는 아래에 블록 넣기(넣은 자리에서 블록 메뉴가 열림), 바꾸기(글이 있는 블록을 다른 글 블록으로), 복제, 삭제입니다.
-- 손잡이는 마우스용입니다. 키보드로는 같은 일을 `/` 블록 메뉴와 단축키로 합니다.
-- 손잡이는 맨 바깥 블록에만 붙습니다. 목록 항목이나 인용 안의 문단은 바깥 블록째로 옮깁니다.
-- 골라진 블록(옮긴 블록, 누른 멘션)에는 옅은 primary 틴트가 블록의 모서리를 따라 덮입니다. 테두리를 긋지 않아 블록의 모양이 그대로 보입니다. 그림만 틴트 대신 안쪽 테두리를 그어, 그림의 색을 바꾸지 않고 너비 손잡이도 가리지 않습니다.
+- 기능 하나에 객체 하나입니다. 객체를 주면 켜지고, 빼면 꺼집니다.
+- `Editor` 와 `BlockEditor` 모두 같은 결과를 `editor` 로 받습니다.
+- 결과는 렌더마다 같은 객체입니다. 함수는 늘 마지막 렌더의 것을 부르므로 인라인 함수를 넘겨도 편집기를 다시 만들지 않습니다.
+- 기능을 켜고 끄면(객체를 주다가 빼면) 엔진을 다시 불러옵니다.
+- hook 이라 Client Component 에서 부릅니다. `format` 과 값은 폼이 받는 값의 모양을 정하므로 hook 이 아니라 루트에 둡니다.
+
+| 옵션 | 모양 | 켜는 것 |
+| --- | --- | --- |
+| `imageUpload` | `{ onUpload: (file) => Promise<string> }` | `Image` 도구, 붙여넣기와 끌어 놓기 올리기 |
+| `mentions` | `{ find: (query, signal) => Mention[] \| Promise<Mention[]> }` | `@` 멘션 목록 |
 
 ## 멘션
 
 ```tsx
-<Editor
-  mentions={async (query, signal) => {
-    const response = await fetch(`/api/users?q=${query}`, { signal });
-    return response.json(); // { id, label, description?, avatar? }[]
-  }}
-/>
+const editor = useEditor({
+  mentions: {
+    find: async (query, signal) => {
+      const response = await fetch(`/api/users?q=${query}`, { signal });
+      return response.json(); // { id, label, description?, avatar? }[]
+    },
+  },
+});
+
+<Editor editor={editor} />;
 ```
 
 - `mentions` 를 주면 `@` 로 사람을 찾는 목록이 열립니다. 주지 않으면 `@` 는 그냥 글자입니다.
@@ -201,15 +222,19 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 ## 그림
 
 ```tsx
-<Editor
-  onImageUpload={async (file) => {
-    const { url } = await uploadToStorage(file);
-    return url;
-  }}
-/>
+const editor = useEditor({
+  imageUpload: {
+    onUpload: async (file) => {
+      const { url } = await uploadToStorage(file);
+      return url;
+    },
+  },
+});
+
+<Editor editor={editor} />;
 ```
 
-- `onImageUpload` 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor 는 파일을 서버로 보내지 않습니다.
+- `onUpload` 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor 는 파일을 서버로 보내지 않습니다.
 - `Editor.Image` 를 누르면 그림 주소를 넣거나 파일을 고르는 Popover 가 열립니다. 주소에 스킴이 없으면 `https://` 를 붙입니다. `http:` 와 `https:` 주소만 받고, 다른 주소나 상대 주소에는 입력란 아래에 오류를 보입니다.
 - `Editor.Image` 로 고른 파일, 붙여 넣은 파일, 끌어 놓은 파일이 모두 이 함수로 갑니다. PNG, JPEG, GIF, WebP, AVIF 만 받습니다. 형식은 FileField 의 `accept` 규칙으로 가리고, 다른 파일은 그 파일 이름을 제목으로 한 오류 toast 로 알립니다. 사유 문구는 붙이지 않습니다.
 - 올리는 동안 본문의 그 자리에 Skeleton 모양의 자리표시가 서고, `Editor.Image` 는 Spinner 와 `aria-busy` 를 보입니다. 화면 읽기 프로그램에는 "그림을 올리는 중입니다" 를 알립니다.
@@ -220,11 +245,11 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
   - 손잡이는 `role="separator"` 라 포커스를 두고 방향키로도 너비를 바꿉니다.
   - 비율은 그대로 두고, 너비는 `width` 로 저장합니다. 본문 너비를 넘지 않습니다.
   - 마크다운은 너비를 담지 못해 손잡이가 없습니다.
-- `onImageUpload` 가 없으면 그림을 넣는 길이 모두 닫힙니다. `Editor.Image` 는 그리지 않고, 파일은 붙지 않고, 붙여 넣은 HTML 의 `<img>` 는 버립니다. 값에 이미 있던 그림은 그대로 보입니다.
-- 그림이 되는 주소는 `http:`, `https:`, 스킴 없는 상대 주소, 그리고 이 Editor 의 `onImageUpload` 가 돌려준 주소뿐입니다. `javascript:` 나 `data:` 는 값, 마크다운, JSON, 붙여넣기 어디서 와도 그림이 되지 않습니다.
+- `imageUpload` 가 없으면 그림을 넣는 길이 모두 닫힙니다. `Editor.Image` 는 그리지 않고, 파일은 붙지 않고, 붙여 넣은 HTML 의 `<img>` 는 버립니다. 값에 이미 있던 그림은 그대로 보입니다.
+- 그림이 되는 주소는 `http:`, `https:`, 스킴 없는 상대 주소, 그리고 이 Editor 의 `onUpload` 가 돌려준 주소뿐입니다. `javascript:` 나 `data:` 는 값, 마크다운, JSON, 붙여넣기 어디서 와도 그림이 되지 않습니다.
 - 그래서 `data:` 나 `blob:` 을 돌려주는 업로드는 그 화면에서만 그림이 남습니다. 저장했다가 다시 열면 사라지므로 서버 주소를 돌려줍니다.
 - 그림 파일과 HTML 을 함께 붙여 넣으면(브라우저의 "이미지 복사") 파일만 올립니다. 같은 그림이 두 번 들어가지 않게 하려는 것입니다.
-- `onImageUpload` 는 함수라 Server Component 에서 넘길 수 없습니다. Client Component 에서 Editor 를 감싸 넘깁니다.
+- `useEditor` 는 hook 이라 Server Component 에서 부를 수 없습니다. 그림이나 멘션을 쓰면 Client Component 에서 Editor 를 감쌉니다.
 
 ## 붙여넣기
 
@@ -248,9 +273,12 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 ```tsx
 <Editor disabled />   // 흐려지고 고칠 수 없음. 툴바도 꺼짐
 <Editor readOnly />   // 읽을 수만 있음. 글을 고르고 복사할 수 있음
-<Editor invalid />    // 오류 테두리. Field 의 오류도 같은 테두리를 그림
+<Editor aria-invalid /> // 오류 테두리. Field 안에서는 Field 의 오류 상태를 따름
 <Editor variant="soft" size="tiny" />
 ```
+
+- 오류는 `aria-invalid` 로 받습니다. Field 안에서는 Field 가 `aria-invalid` 를 넘기므로 따로 쓰지 않습니다.
+- 앱은 상태를 `onValueChange` 와 `className`, `style` 의 함수(`(state) => …`)로 읽습니다. `state` 는 `disabled`, `readOnly`, `invalid`, `focused`, `filled` 입니다.
 
 ## 서버 렌더링
 

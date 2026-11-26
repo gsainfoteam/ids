@@ -75,7 +75,7 @@ export async function uploadImage(
   }
   if (typeof src !== 'string' || src === '') {
     dispatchMeta(editor, { remove: id });
-    throw new TypeError('`onImageUpload` must resolve to the URL of the uploaded image.');
+    throw new TypeError('`imageUpload.onUpload` must resolve to the URL of the uploaded image.');
   }
 
   uploaded.add(src);

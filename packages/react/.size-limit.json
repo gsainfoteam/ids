@@ -228,6 +228,39 @@
     "gzip": true
   },
   {
+    "name": "import { BlockEditor } from editor",
+    "path": "dist/editor.js",
+    "import": "{ BlockEditor }",
+    "entry": ["index"],
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "135 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { BlockEditor } from editor, its engine loaded",
+    "path": "dist/editor.js",
+    "import": "{ BlockEditor }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "430 kB",
+    "gzip": true
+  },
+  {
     "name": "import { RichText } from rich-text",
     "path": "dist/rich-text.js",
     "import": "{ RichText }",
