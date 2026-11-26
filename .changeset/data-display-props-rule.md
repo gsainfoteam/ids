@@ -5,7 +5,7 @@
 Table, Item, Chip, Badge, AvatarGroup, Image, ImageGroup, Message and QRCode follow the props rule: looks go through `variant`, screen elements are parts, and a feature with props of its own lives on its part.
 
 - **Table.** `striped`, `stickyHeader` and `highlightOnHover` are gone. Stripes are `variant="striped"`, the header is always sticky, and a body row with `onClick` takes the hover layer. `Table.Row` drops `selected`: it paints a selected or current row from `aria-selected` and `aria-current`.
-- **Item, Card.** `interactive` is gone from Item. An `asChild` Item or Card whose child renders a link or a button (an `<a href>`, a router `Link`, `Accordion.Trigger`) is pressable on its own.
+- **Item, Card.** `interactive` is gone from Item. An `asChild` Item or Card whose child renders a link or a button (an `<a href>`, a router `Link`, `Accordion.Trigger`) is pressable on its own. A child known only from its rendered element (a `to`-only router link, `Accordion.Trigger`) turns pressable after hydration, not in the server HTML.
 - **ItemGroup.** `ordered` is gone. Write `<ItemGroup asChild><ol>…</ol></ItemGroup>`; the rows still go into `<li>`.
 - **ChipGroup.** New. It lays chips in a wrapping row, gives them its `size`, and is the only place where removing a chip moves focus to the next one. A chip outside a ChipGroup leaves focus alone.
 - **Badge.** `content`, `max`, `showZero` and `invisible` are gone. The count is `<Badge.Indicator count={n} max={99} />`, a dot is `<Badge.Indicator />`, and a badge that should not show is left out: `{unread > 0 && <Badge.Indicator count={unread} />}`.
